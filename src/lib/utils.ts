@@ -1,0 +1,71 @@
+import { type ClassValue, clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+
+export function formatNumber(n: number): string {
+  if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+  if (n >= 1000) return (n / 1000).toFixed(1) + 'k';
+  return n.toString();
+}
+
+export function formatDate(date: Date | string, lang: 'fr' | 'ar' = 'fr'): string {
+  const d = typeof date === 'string' ? new Date(date) : date;
+  if (lang === 'ar') {
+    return d.toLocaleDateString('ar-TN', { year: 'numeric', month: 'long', day: 'numeric' });
+  }
+  return d.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+
+export function timeAgo(date: Date | string): string {
+  const d = typeof date === 'string' ? new Date(date) : date;
+  const seconds = Math.floor((Date.now() - d.getTime()) / 1000);
+  const intervals: [number, string][] = [
+    [31536000, 'an'],
+    [2592000, 'mois'],
+    [86400, 'jour'],
+    [3600, 'heure'],
+    [60, 'minute'],
+  ];
+  for (const [secs, label] of intervals) {
+    const interval = Math.floor(seconds / secs);
+    if (interval >= 1) {
+      return `il y a ${interval} ${label}${interval > 1 ? 's' : ''}`;
+    }
+  }
+  return 'à l\'instant';
+}
+
+export function slugify(text: string): string {
+  return text.toLowerCase()
+    .replace(/[àáâãäå]/g, 'a').replace(/[èéêë]/g, 'e').replace(/[ìíîï]/g, 'i')
+    .replace(/[òóôõö]/g, 'o').replace(/[ùúûü]/g, 'u').replace(/[ç]/g, 'c')
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+export function fileSize(bytes: number): string {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / 1024 / 1024).toFixed(1) + ' MB';
+}
+
+export const RESOURCE_TYPE_LABELS: Record<string, { fr: string; ar: string; color: string }> = {
+  COURSE:        { fr: 'Cours',           ar: 'درس',           color: 'bg-blue-100 text-blue-700' },
+  HOMEWORK:      { fr: 'Devoir',          ar: 'فرض',           color: 'bg-amber-100 text-amber-700' },
+  EXERCISE:      { fr: 'Série d\'exercices', ar: 'سلسلة تمارين', color: 'bg-green-100 text-green-700' },
+  REVISION:      { fr: 'Révision',        ar: 'مراجعة',        color: 'bg-purple-100 text-purple-700' },
+  EXAM:          { fr: 'Contrôle/Examen', ar: 'اختبار',        color: 'bg-red-100 text-red-700' },
+  BAC_SUBJECT:   { fr: 'Sujet Bac',       ar: 'موضوع باك',     color: 'bg-pink-100 text-pink-700' },
+  CORRECTION:    { fr: 'Corrigé',         ar: 'تصحيح',         color: 'bg-emerald-100 text-emerald-700' },
+  SUMMARY:       { fr: 'Résumé',          ar: 'ملخص',          color: 'bg-indigo-100 text-indigo-700' },
+  OTHER:         { fr: 'Autre',           ar: 'آخر',           color: 'bg-slate-100 text-slate-700' },
+};
+
+export const GOVERNORATES = [
+  'Tunis', 'Ariana', 'Ben Arous', 'Manouba', 'Nabeul', 'Zaghouan', 'Bizerte',
+  'Béja', 'Jendouba', 'Kef', 'Siliana', 'Sousse', 'Monastir', 'Mahdia',
+  'Sfax', 'Kairouan', 'Kasserine', 'Sidi Bouzid', 'Gabès', 'Medenine',
+  'Tataouine', 'Gafsa', 'Tozeur', 'Kebili'
+];

@@ -1,0 +1,367 @@
+import Link from 'next/link';
+import { Search, BookOpen, Upload, Star, Download, Eye, MessageCircle, Shield, Smartphone, Printer, Share2, Check, ArrowRight, Sparkles, Users, FileText, TrendingUp, Award, Mail } from 'lucide-react';
+import Header from '@/components/layout/Header';
+import Footer from '@/components/layout/Footer';
+import ResourceCard from '@/components/resources/ResourceCard';
+import { prisma } from '@/lib/prisma';
+import { formatNumber } from '@/lib/utils';
+
+export const dynamic = 'force-dynamic';
+
+async function getHomeData() {
+  const [popular, recent, stats, subjects] = await Promise.all([
+    prisma.resource.findMany({
+      where: { status: 'PUBLISHED' },
+      take: 8,
+      orderBy: [{ viewsCount: 'desc' }, { publishedAt: 'desc' }],
+      include: { subject: true, class: true, teacher: { select: { firstName: true, lastName: true } } }
+    }),
+    prisma.resource.findMany({
+      where: { status: 'PUBLISHED' },
+      take: 8,
+      orderBy: { publishedAt: 'desc' },
+      include: { subject: true, class: true, teacher: { select: { firstName: true, lastName: true } } }
+    }),
+    Promise.all([
+      prisma.resource.count({ where: { status: 'PUBLISHED' } }),
+      prisma.user.count({ where: { role: 'TEACHER', status: 'ACTIVE' } }),
+      prisma.user.count({ where: { role: 'STUDENT', status: 'ACTIVE' } }),
+      prisma.resource.aggregate({ _sum: { downloadsCount: true } }),
+    ]),
+    prisma.subject.findMany({ orderBy: { order: 'asc' } }),
+  ]);
+  return { popular, recent, stats, subjects };
+}
+
+export default async function HomePage() {
+  const { popular, recent, stats, subjects } = await getHomeData();
+  const [resourceCount, teacherCount, studentCount, downloads] = stats;
+
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Header />
+
+      <main className="flex-1 pt-16 lg:pt-20">
+        {/* HERO */}
+        <section className="relative bg-gradient-to-br from-primary-50 via-white to-sky-50 overflow-hidden">
+          <div className="absolute top-20 -left-20 w-96 h-96 bg-primary-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float" />
+          <div className="absolute top-40 -right-20 w-96 h-96 bg-amber-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float" style={{ animationDelay: '2s' }} />
+          <div className="absolute -bottom-20 left-1/3 w-96 h-96 bg-sky-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float" style={{ animationDelay: '4s' }} />
+
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 relative">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              <div className="animate-fade-in-up">
+                <div className="inline-flex items-center gap-2 bg-white border border-primary-200 rounded-full px-4 py-2 mb-6 shadow-sm">
+                  <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                  <span className="text-xs font-semibold text-slate-700">+{formatNumber(resourceCount)} ressources disponibles</span>
+                </div>
+
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold leading-[1.05] mb-6">
+                  La plateforme pédagogique <span className="gradient-text">#1 en Tunisie</span>
+                </h1>
+
+                <p className="text-lg lg:text-xl text-slate-600 mb-8 max-w-xl">
+                  Cours, devoirs, séries, révisions, sujets bac et corrigés — <strong className="text-slate-900">100% gratuits</strong> pour les élèves du Primaire, Collège et Lycée.
+                </p>
+
+                <form action="/recherche" method="GET" className="bg-white rounded-2xl p-2 shadow-xl shadow-primary-500/10 flex flex-col sm:flex-row gap-2 mb-6 border border-slate-100">
+                  <div className="flex-1 flex items-center gap-2 px-4 py-2">
+                    <Search className="w-5 h-5 text-slate-400" />
+                    <input name="q" type="text" placeholder="Rechercher un cours, un devoir, une matière..." className="flex-1 bg-transparent outline-none text-slate-700 placeholder-slate-400 text-sm" />
+                  </div>
+                  <button type="submit" className="btn-primary">
+                    <Search className="w-4 h-4" /> Rechercher
+                  </button>
+                </form>
+
+                <div className="flex flex-wrap gap-2 mb-8">
+                  {['Maths', 'Physique', 'SVT', 'Français', 'Arabe', 'Anglais'].map(s => (
+                    <Link key={s} href={`/matieres/${s.toLowerCase()}`} className="px-4 py-2 bg-white border border-slate-200 rounded-full text-xs font-semibold text-slate-700 hover:border-primary-400 hover:text-primary-600 transition">
+                      {s}
+                    </Link>
+                  ))}
+                </div>
+
+                <div className="flex flex-wrap gap-3">
+                  <Link href="/ressources" className="btn-primary text-base px-7 py-3.5">
+                    <BookOpen className="w-5 h-5" /> Explorer les ressources
+                  </Link>
+                  <Link href="/inscription-enseignant" className="btn-accent text-base px-7 py-3.5">
+                    <Upload className="w-5 h-5" /> Devenir enseignant
+                  </Link>
+                </div>
+              </div>
+
+              <div className="relative hidden lg:block">
+                <div className="relative w-full max-w-md mx-auto aspect-square">
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary-500 to-primary-700 rounded-3xl shadow-2xl shadow-primary-500/40 rotate-3 hover:rotate-0 transition-transform duration-500 flex items-center justify-center">
+                    <div className="text-center text-white p-8">
+                      <div className="text-8xl mb-4">📚</div>
+                      <div className="text-2xl font-extrabold">Apprends</div>
+                      <div className="text-lg opacity-90">à ton rythme</div>
+                    </div>
+                  </div>
+                  <div className="absolute -top-4 -right-4 bg-white rounded-2xl shadow-2xl p-4 animate-float">
+                    <div className="flex items-center gap-2">
+                      <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                        <Download className="w-5 h-5 text-green-600" />
+                      </div>
+                      <div>
+                        <div className="text-xs text-slate-500">Téléchargements</div>
+                        <div className="text-lg font-bold">{formatNumber(downloads._sum.downloadsCount || 0)}</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="absolute -bottom-4 -left-4 bg-white rounded-2xl shadow-2xl p-4 animate-float" style={{ animationDelay: '1s' }}>
+                    <div className="flex items-center gap-2">
+                      <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center">
+                        <Star className="w-5 h-5 fill-amber-500 text-amber-500" />
+                      </div>
+                      <div>
+                        <div className="text-xs text-slate-500">Note moyenne</div>
+                        <div className="text-lg font-bold">4.8/5</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Live stats */}
+            <div className="mt-16 grid grid-cols-2 lg:grid-cols-4 gap-4">
+              {[
+                { icon: FileText, value: resourceCount, label: 'Ressources PDF', color: 'from-primary-500 to-primary-700', bg: 'bg-primary-100', text: 'text-primary-600' },
+                { icon: Users, value: teacherCount, label: 'Enseignants', color: 'from-amber-500 to-amber-600', bg: 'bg-amber-100', text: 'text-amber-600' },
+                { icon: Award, value: studentCount, label: 'Élèves inscrits', color: 'from-emerald-500 to-emerald-600', bg: 'bg-emerald-100', text: 'text-emerald-600' },
+                { icon: TrendingUp, value: downloads._sum.downloadsCount || 0, label: 'Téléchargements', color: 'from-purple-500 to-purple-600', bg: 'bg-purple-100', text: 'text-purple-600' },
+              ].map((s, i) => (
+                <div key={i} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 text-center card-hover">
+                  <div className={`w-12 h-12 mx-auto mb-3 rounded-xl ${s.bg} flex items-center justify-center`}>
+                    <s.icon className={`w-6 h-6 ${s.text}`} />
+                  </div>
+                  <div className="text-3xl lg:text-4xl font-extrabold text-slate-900 mb-1">{formatNumber(s.value)}+</div>
+                  <div className="text-sm text-slate-500">{s.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* NIVEAUX */}
+        <section className="py-20 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <div className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 rounded-full text-xs font-bold mb-3">NIVEAUX SCOLAIRES</div>
+              <h2 className="text-3xl lg:text-5xl font-extrabold mb-3">Choisissez votre <span className="gradient-text">niveau</span></h2>
+              <p className="text-lg text-slate-600">Des ressources adaptées à chaque étape de votre parcours</p>
+            </div>
+            <div className="grid md:grid-cols-3 gap-6">
+              {[
+                { slug: 'primaire', name: 'Primaire', desc: 'De la 1ère à la 6ème année', color: 'from-emerald-500 to-emerald-600', shadow: 'shadow-emerald-500/30', bg: 'from-emerald-50 to-green-50', border: 'border-emerald-200', icon: '🎒' },
+                { slug: 'college', name: 'Collège', desc: '7ème, 8ème et 9ème année de base', color: 'from-primary-500 to-primary-700', shadow: 'shadow-primary-500/30', bg: 'from-primary-50 to-sky-50', border: 'border-primary-200', icon: '📖' },
+                { slug: 'lycee', name: 'Lycée & Bac', desc: 'De la 1ère année au Baccalauréat', color: 'from-amber-500 to-amber-600', shadow: 'shadow-amber-500/30', bg: 'from-amber-50 to-orange-50', border: 'border-amber-200', icon: '🎓' },
+              ].map(n => (
+                <Link key={n.slug} href={`/niveaux/${n.slug}`} className={`group relative bg-gradient-to-br ${n.bg} rounded-3xl p-8 border-2 ${n.border} hover:border-primary-400 transition-all card-hover overflow-hidden`}>
+                  <div className="absolute -top-10 -right-10 w-40 h-40 bg-primary-200 rounded-full opacity-30 group-hover:scale-150 transition-transform duration-500" />
+                  <div className="relative z-10">
+                    <div className="text-6xl mb-4">{n.icon}</div>
+                    <h3 className="text-2xl font-extrabold text-slate-900 mb-2">{n.name}</h3>
+                    <p className="text-slate-600 mb-4">{n.desc}</p>
+                    <div className="flex items-center gap-2 text-sm text-primary-700 font-semibold">
+                      Explorer <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* MATIÈRES */}
+        <section className="py-20 bg-gradient-to-br from-slate-50 to-primary-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <div className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 rounded-full text-xs font-bold mb-3">MATIÈRES</div>
+              <h2 className="text-3xl lg:text-5xl font-extrabold mb-3">Toutes les <span className="gradient-text">matières</span></h2>
+              <p className="text-lg text-slate-600">Plus de 20 matières couvertes par nos enseignants</p>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-3">
+              {subjects.slice(0, 16).map(s => (
+                <Link key={s.slug} href={`/matieres/${s.slug}`} className="bg-white rounded-2xl p-4 text-center card-hover border border-slate-100 group">
+                  <div className="w-12 h-12 mx-auto mb-2 rounded-xl flex items-center justify-center" style={{ background: (s.color || '#0EA5E9') + '20' }}>
+                    <BookOpen className="w-6 h-6" style={{ color: s.color || '#0EA5E9' }} />
+                  </div>
+                  <div className="font-bold text-xs text-slate-900 line-clamp-2">{s.nameFr}</div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* POPULAIRES */}
+        <section className="py-20 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-10">
+              <div>
+                <div className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 rounded-full text-xs font-bold mb-3">POPULAIRES</div>
+                <h2 className="text-3xl lg:text-5xl font-extrabold mb-2">Ressources les plus <span className="gradient-text">consultées</span></h2>
+                <p className="text-lg text-slate-600">Les fichiers plébiscités par la communauté</p>
+              </div>
+              <Link href="/ressources" className="mt-4 md:mt-0 inline-flex items-center gap-2 text-primary-600 font-semibold hover:gap-3 transition-all">
+                Voir tout <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {popular.slice(0, 8).map(r => <ResourceCard key={r.id} resource={r as any} />)}
+            </div>
+          </div>
+        </section>
+
+        {/* NOUVEAUTÉS */}
+        <section className="py-20 bg-gradient-to-br from-primary-50 to-sky-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-10">
+              <div>
+                <div className="inline-block px-4 py-1.5 bg-emerald-100 text-emerald-700 rounded-full text-xs font-bold mb-3">🆕 NOUVEAUTÉS</div>
+                <h2 className="text-3xl lg:text-5xl font-extrabold mb-2">Récemment <span className="gradient-text">ajoutés</span></h2>
+                <p className="text-lg text-slate-600">Les dernières ressources publiées</p>
+              </div>
+              <Link href="/ressources?sort=recent" className="mt-4 md:mt-0 inline-flex items-center gap-2 text-primary-600 font-semibold hover:gap-3 transition-all">
+                Voir tout <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {recent.slice(0, 8).map(r => <ResourceCard key={r.id} resource={r as any} />)}
+            </div>
+          </div>
+        </section>
+
+        {/* COMMENT ÇA MARCHE */}
+        <section className="py-20 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <div className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 rounded-full text-xs font-bold mb-3">COMMENT ÇA MARCHE</div>
+              <h2 className="text-3xl lg:text-5xl font-extrabold mb-3">Simple comme <span className="gradient-text">1, 2, 3</span></h2>
+            </div>
+            <div className="grid lg:grid-cols-2 gap-8">
+              <div className="card p-8 border-slate-100">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-xs font-bold mb-4">POUR LES ÉLÈVES</div>
+                <h3 className="text-2xl font-extrabold mb-6">Trouvez vos ressources</h3>
+                {[
+                  { title: 'Recherchez', desc: 'Trouvez vos cours, devoirs et corrigés par matière, classe ou professeur.' },
+                  { title: 'Consultez', desc: 'Visualisez le PDF en ligne, téléchargez, imprimez ou partagez en un clic.' },
+                  { title: 'Interagissez', desc: 'Notez, commentez, ajoutez en favoris. Créez un compte gratuit pour aller plus loin.' },
+                ].map((s, i) => (
+                  <div key={i} className="flex gap-4 mb-4 last:mb-0">
+                    <div className="w-10 h-10 flex-shrink-0 rounded-full bg-primary-100 text-primary-700 font-extrabold flex items-center justify-center">{i + 1}</div>
+                    <div>
+                      <h4 className="font-bold text-slate-900">{s.title}</h4>
+                      <p className="text-sm text-slate-600">{s.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="card p-8 border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-bold mb-4">POUR LES ENSEIGNANTS</div>
+                <h3 className="text-2xl font-extrabold mb-6">Partagez vos ressources</h3>
+                {[
+                  { title: 'Créez votre compte', desc: 'Inscription gratuite avec vérification par email et approbation par notre équipe.' },
+                  { title: 'Uploadez vos PDF', desc: 'Cours, devoirs, séries — ajoutez vos ressources avec une description détaillée.' },
+                  { title: 'Suivez vos stats', desc: 'Vues, téléchargements, avis : suivez l\'impact de vos ressources en temps réel.' },
+                ].map((s, i) => (
+                  <div key={i} className="flex gap-4 mb-4 last:mb-0">
+                    <div className="w-10 h-10 flex-shrink-0 rounded-full bg-amber-200 text-amber-700 font-extrabold flex items-center justify-center">{i + 1}</div>
+                    <div>
+                      <h4 className="font-bold text-slate-900">{s.title}</h4>
+                      <p className="text-sm text-slate-600">{s.desc}</p>
+                    </div>
+                  </div>
+                ))}
+                <Link href="/inscription-enseignant" className="btn-accent mt-4">
+                  Devenir enseignant <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* POURQUOI NOUS */}
+        <section className="py-20 bg-gradient-to-br from-slate-50 to-primary-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <div className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 rounded-full text-xs font-bold mb-3">POURQUOI NOUS</div>
+              <h2 className="text-3xl lg:text-5xl font-extrabold mb-3">Une plateforme <span className="gradient-text">pensée pour vous</span></h2>
+            </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[
+                { icon: Download, title: '100% Gratuit', desc: 'Téléchargez toutes les ressources sans aucun frais, sans compte obligatoire.', color: 'bg-primary-100 text-primary-600' },
+                { icon: Shield, title: 'Contenu Vérifié', desc: 'Chaque ressource est validée par notre équipe avant publication.', color: 'bg-amber-100 text-amber-600' },
+                { icon: Eye, title: 'Aperçu Instantané', desc: 'Visualisez chaque PDF en ligne avant même de le télécharger.', color: 'bg-emerald-100 text-emerald-600' },
+                { icon: Printer, title: 'Impression Directe', desc: 'Imprimez vos cours et devoirs en un clic.', color: 'bg-purple-100 text-purple-600' },
+                { icon: Share2, title: 'Partage Facile', desc: 'Partagez sur WhatsApp, Facebook, par email ou copiez le lien.', color: 'bg-pink-100 text-pink-600' },
+                { icon: Smartphone, title: 'Mobile First', desc: 'Conçu pour les smartphones : rapide, fluide, parfait sur tous les écrans.', color: 'bg-cyan-100 text-cyan-600' },
+              ].map((f, i) => (
+                <div key={i} className="bg-white rounded-2xl p-6 border border-slate-100 card-hover">
+                  <div className={`w-14 h-14 rounded-2xl ${f.color} flex items-center justify-center mb-4`}>
+                    <f.icon className="w-7 h-7" />
+                  </div>
+                  <h3 className="text-lg font-bold mb-2">{f.title}</h3>
+                  <p className="text-slate-600 text-sm">{f.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* CTA ENSEIGNANT */}
+        <section className="py-20 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="relative bg-gradient-to-br from-primary-600 via-primary-700 to-primary-900 rounded-3xl p-10 lg:p-16 overflow-hidden">
+              <div className="absolute -top-20 -right-20 w-80 h-80 bg-primary-400 rounded-full opacity-20 blur-3xl" />
+              <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-amber-400 rounded-full opacity-20 blur-3xl" />
+              <div className="relative z-10 grid lg:grid-cols-2 gap-8 items-center">
+                <div>
+                  <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur border border-white/20 rounded-full px-4 py-2 mb-6">
+                    <Sparkles className="w-4 h-4 text-amber-300" />
+                    <span className="text-xs font-bold text-white">POUR LES ENSEIGNANTS</span>
+                  </div>
+                  <h2 className="text-3xl lg:text-5xl font-extrabold text-white mb-4 leading-tight">
+                    Partagez votre savoir avec <span className="text-amber-300">+{formatNumber(studentCount)} élèves</span>
+                  </h2>
+                  <p className="text-primary-100 text-lg mb-6">Inscrivez-vous gratuitement et contribuez à l'éducation en Tunisie. Suivez l'impact de vos ressources en temps réel.</p>
+                  <div className="flex flex-wrap gap-3">
+                    <Link href="/inscription-enseignant" className="bg-white text-primary-700 font-bold px-7 py-3.5 rounded-full shadow-xl hover:scale-105 transition-all inline-flex items-center gap-2">
+                      <Upload className="w-5 h-5" /> Devenir enseignant
+                    </Link>
+                    <Link href="/professeurs" className="bg-white/10 backdrop-blur border border-white/30 text-white font-bold px-7 py-3.5 rounded-full hover:bg-white/20 transition inline-flex items-center gap-2">
+                      Voir les enseignants →
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* NEWSLETTER */}
+        <section className="py-20 bg-gradient-to-br from-slate-50 to-primary-50">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-primary-100 flex items-center justify-center">
+              <Mail className="w-8 h-8 text-primary-600" />
+            </div>
+            <h2 className="text-3xl lg:text-5xl font-extrabold mb-4">Restez <span className="gradient-text">informé</span></h2>
+            <p className="text-lg text-slate-600 mb-8">Recevez chaque semaine les meilleures ressources, nouveaux sujets de bac et corrigés.</p>
+            <form action="/api/newsletter" method="POST" className="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto">
+              <input type="email" name="email" placeholder="votre.email@exemple.com" required className="input flex-1" />
+              <button type="submit" className="btn-primary px-7 py-3">S'abonner</button>
+            </form>
+            <p className="text-xs text-slate-500 mt-3">🔒 Pas de spam. Désabonnement en un clic.</p>
+          </div>
+        </section>
+      </main>
+
+      <Footer />
+    </div>
+  );
+}

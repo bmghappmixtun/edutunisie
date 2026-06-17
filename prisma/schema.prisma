@@ -1,0 +1,345 @@
+// Prisma Schema - EduTunisie
+// Plateforme pédagogique tunisienne
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============ ENUMS (as strings for SQLite compat) ============
+// UserRole: VISITOR | STUDENT | TEACHER | ADMIN
+// UserStatus: PENDING_OTP | PENDING_APPROVAL | ACTIVE | SUSPENDED | BANNED
+// ResourceStatus: DRAFT | PENDING_APPROVAL | PUBLISHED | REJECTED | ARCHIVED
+// ResourceType: COURSE | HOMEWORK | EXERCISE | REVISION | EXAM | BAC_SUBJECT | CORRECTION | SUMMARY | OTHER
+// ReportReason: INAPPROPRIATE | COPYRIGHT | SPAM | WRONG_CONTENT | OTHER
+
+// ============ USERS ============
+model User {
+  id              String      @id @default(cuid())
+  email           String      @unique
+  emailVerifiedAt DateTime?
+  passwordHash    String?
+  role            String    @default("STUDENT")
+  status          String  @default("PENDING_OTP")
+
+  // OAuth
+  oauthProvider   String?
+  oauthId         String?
+
+  // Profile
+  firstName       String?
+  lastName        String?
+  avatarUrl       String?
+  bio             String?
+  phone           String?
+  schoolLevel     String?
+  classLevel      String?
+  section         String?
+  schoolName      String?
+  governorate     String?
+
+  // Teacher specific
+  teachingSubjects String?  // JSON array as string
+  teachingLevels   String?  // JSON array as string
+  cvUrl           String?
+  diploma         String?
+  isVerifiedTeacher Boolean  @default(false)
+  approvedAt      DateTime?
+  approvedById    String?
+
+  // Preferences
+  preferredLang   String     @default("fr")
+  themePref       String     @default("light")
+  notifyEmail     Boolean    @default(true)
+
+  // Relations
+  uploadedFiles   Resource[]    @relation("UploadedBy")
+  approvedFiles   Resource[]    @relation("ApprovedBy")
+  approvedBy      User?         @relation("ApprovedUsers", fields: [approvedById], references: [id])
+  approvedUsers   User[]        @relation("ApprovedUsers")
+  comments        Comment[]
+  ratings         Rating[]
+  favorites       Favorite[]
+  views           View[]
+  downloads       Download[]
+  reports         Report[]
+  otpCodes        OtpCode[]
+  sessions        Session[]
+  notifications   Notification[]
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  lastLoginAt     DateTime?
+
+  @@index([role, status])
+  @@index([email])
+}
+
+model OtpCode {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  code        String
+  purpose     String
+  expiresAt   DateTime
+  consumedAt  DateTime?
+  attempts    Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  @@index([userId, purpose])
+}
+
+model Session {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token       String   @unique
+  userAgent   String?
+  ipAddress   String?
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+}
+
+// ============ TAXONOMY ============
+model Level {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  nameFr    String
+  nameAr    String
+  order     Int      @default(0)
+  classes   Class[]
+}
+
+model Class {
+  id        String   @id @default(cuid())
+  levelId   String
+  level     Level    @relation(fields: [levelId], references: [id])
+  slug      String   @unique
+  nameFr    String
+  nameAr    String
+  order     Int      @default(0)
+  sections  Section[]
+  resources Resource[]
+}
+
+model Section {
+  id        String   @id @default(cuid())
+  classId   String
+  class     Class    @relation(fields: [classId], references: [id])
+  slug      String
+  nameFr    String
+  nameAr    String
+  resources Resource[]
+
+  @@unique([classId, slug])
+}
+
+model Subject {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  nameFr    String
+  nameAr    String
+  icon      String?
+  color     String?
+  order     Int      @default(0)
+  resources Resource[]
+}
+
+// ============ RESOURCES ============
+model Resource {
+  id              String         @id @default(cuid())
+  slug            String         @unique
+
+  title           String
+  description     String?
+  type            String
+  status          String @default("DRAFT")
+
+  fileKey         String
+  fileUrl         String
+  fileSize        Int            @default(0)
+  pageCount       Int?
+  thumbnailKey    String?
+  thumbnailUrl    String?
+
+  classId         String?
+  class           Class?         @relation(fields: [classId], references: [id])
+  sectionId       String?
+  section         Section?       @relation(fields: [sectionId], references: [id])
+  subjectId       String
+  subject         Subject        @relation(fields: [subjectId], references: [id])
+  teacherId       String?
+  teacher         User?          @relation("UploadedBy", fields: [teacherId], references: [id])
+  trimester       String?
+  year            String?
+  tags            String?        // comma-separated
+  language        String         @default("fr")
+
+  viewsCount      Int            @default(0)
+  downloadsCount  Int            @default(0)
+  sharesCount     Int            @default(0)
+  favoritesCount  Int            @default(0)
+  commentsCount   Int            @default(0)
+  avgRating       Float          @default(0)
+  ratingCount     Int            @default(0)
+
+  approvedAt      DateTime?
+  approvedById    String?
+  approvedBy      User?          @relation("ApprovedBy", fields: [approvedById], references: [id])
+  rejectionReason String?
+  publishedAt     DateTime?
+
+  comments        Comment[]
+  ratings         Rating[]
+  favorites       Favorite[]
+  views           View[]
+  downloads       Download[]
+  shares          Share[]
+  reports         Report[]
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([status, publishedAt])
+  @@index([subjectId, classId])
+  @@index([teacherId])
+  @@index([type])
+}
+
+// ============ ENGAGEMENT ============
+model Comment {
+  id          String   @id @default(cuid())
+  resourceId  String
+  resource    Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  content     String
+  parentId    String?
+  parent      Comment? @relation("Replies", fields: [parentId], references: [id])
+  replies     Comment[] @relation("Replies")
+  isHidden    Boolean  @default(false)
+  likes       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([resourceId, createdAt])
+}
+
+model Rating {
+  id          String   @id @default(cuid())
+  resourceId  String
+  resource    Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  stars       Int
+  review      String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([resourceId, userId])
+}
+
+model Favorite {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  resourceId  String
+  resource    Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+
+  @@unique([userId, resourceId])
+}
+
+model View {
+  id          String   @id @default(cuid())
+  resourceId  String
+  resource    Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id])
+  ipAddress   String
+  userAgent   String?
+  duration    Int?
+
+  createdAt   DateTime @default(now())
+
+  @@index([resourceId, createdAt])
+}
+
+model Download {
+  id          String   @id @default(cuid())
+  resourceId  String
+  resource    Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id])
+  ipAddress   String
+
+  createdAt   DateTime @default(now())
+
+  @@index([resourceId, createdAt])
+}
+
+model Share {
+  id          String   @id @default(cuid())
+  resourceId  String
+  resource    Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+  platform    String
+  userId      String?
+  ipAddress   String
+
+  createdAt   DateTime @default(now())
+
+  @@index([resourceId])
+}
+
+model Report {
+  id          String   @id @default(cuid())
+  resourceId  String?
+  resource    Resource? @relation(fields: [resourceId], references: [id], onDelete: SetNull)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  reason      String
+  description String?
+  status      String   @default("PENDING")
+  resolvedAt  DateTime?
+
+  createdAt   DateTime @default(now())
+}
+
+// ============ NOTIFICATIONS ============
+model Notification {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type        String
+  title       String
+  message     String
+  link        String?
+  isRead      Boolean  @default(false)
+
+  createdAt   DateTime @default(now())
+
+  @@index([userId, isRead, createdAt])
+}
+
+// ============ NEWSLETTER ============
+model Newsletter {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+}
+
+// ============ SETTINGS ============
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
