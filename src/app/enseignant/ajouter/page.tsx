@@ -43,8 +43,7 @@ export default function AddResourcePage() {
       // For demo, submit without real file upload
       const res = await fetch('/api/teacher/resources', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form)
+        body: data
       });
       const result = await res.json();
       if (!res.ok) { toast.error(result.error); return; }

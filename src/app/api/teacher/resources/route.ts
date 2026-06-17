@@ -16,17 +16,45 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const formData = await req.formData();
-    const file = formData.get('file') as File | null;
-    const title = formData.get('title') as string;
-    const description = formData.get('description') as string | null;
-    const type = formData.get('type') as string;
-    const subjectSlug = formData.get('subject') as string;
-    const classSlug = formData.get('class') as string;
-    const sectionSlug = formData.get('section') as string | null;
-    const trimester = formData.get('trimester') as string | null;
-    const year = formData.get('year') as string | null;
-    const tags = formData.get('tags') as string | null;
+    // Parse form data (multipart/form-data) OR JSON body
+    let file: File | null = null;
+    let title = '';
+    let description: string | null = null;
+    let type = '';
+    let subjectSlug = '';
+    let classSlug = '';
+    let sectionSlug: string | null = null;
+    let trimester: string | null = null;
+    let year: string | null = null;
+    let tags: string | null = null;
+
+    const contentType = req.headers.get('content-type') || '';
+
+    if (contentType.includes('multipart/form-data')) {
+      const formData = await req.formData();
+      file = formData.get('file') as File | null;
+      title = formData.get('title') as string;
+      description = formData.get('description') as string | null;
+      type = formData.get('type') as string;
+      subjectSlug = formData.get('subject') as string;
+      classSlug = formData.get('class') as string;
+      sectionSlug = formData.get('section') as string | null;
+      trimester = formData.get('trimester') as string | null;
+      year = formData.get('year') as string | null;
+      tags = formData.get('tags') as string | null;
+    } else {
+      // Fallback: parse JSON body
+      const body = await req.json();
+      title = body.title;
+      description = body.description || null;
+      type = body.type;
+      subjectSlug = body.subject;
+      classSlug = body.class;
+      sectionSlug = body.section || null;
+      trimester = body.trimester || null;
+      year = body.year || null;
+      tags = body.tags || null;
+    }
 
     if (!title || !type || !subjectSlug || !classSlug) {
       return NextResponse.json({ error: 'Champs requis manquants' }, { status: 400 });
