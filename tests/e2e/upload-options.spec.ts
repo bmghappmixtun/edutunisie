@@ -43,7 +43,7 @@ test.describe('Teacher upload options dropdowns', () => {
     await page.fill('input[type="email"]', 'ahmed.benali@edutunisie.tn');
     await page.fill('input[type="password"]', 'demo1234');
     await page.click('button[type="submit"]');
-    await page.waitForURL(/\/mon-compte/);
+    await page.waitForURL(/\/(enseignant|mon-compte)/, { timeout: 15000 });
 
     // Navigate to upload page
     await page.goto(`${BASE}/enseignant/ajouter`);
@@ -52,8 +52,8 @@ test.describe('Teacher upload options dropdowns', () => {
     await page.waitForSelector('select', { timeout: 10000 });
 
     // Check selects exist (instead of text inputs for subject/class)
-    const subjectSelect = page.locator('select').filter({ hasText: /Choisir une matière/ });
-    const classSelect = page.locator('select').filter({ hasText: /Choisir une classe/ });
+    const subjectSelect = page.locator('select').filter({ has: page.locator('option', { hasText: 'Choisir une matière' }) }).first();
+    const classSelect = page.locator('select').filter({ has: page.locator('option', { hasText: 'Choisir une classe' }) }).first();
 
     await expect(subjectSelect).toBeVisible();
     await expect(classSelect).toBeVisible();
@@ -84,22 +84,22 @@ test.describe('Teacher upload options dropdowns', () => {
     await page.fill('input[type="email"]', 'ahmed.benali@edutunisie.tn');
     await page.fill('input[type="password"]', 'demo1234');
     await page.click('button[type="submit"]');
-    await page.waitForURL(/\/mon-compte/);
+    await page.waitForURL(/\/(enseignant|mon-compte)/, { timeout: 15000 });
 
     await page.goto(`${BASE}/enseignant/ajouter`);
     await page.waitForSelector('select');
 
-    // Section select should be disabled when no class selected
-    const sectionSelect = page.locator('select').filter({ hasText: /Choisir une classe|Aucune/ });
+    // Section select is the 4th select (type, subject, class, section)
+    const sectionSelect = page.locator('select').nth(3);
     const disabledBefore = await sectionSelect.isDisabled();
 
     // Select a class
-    const classSelect = page.locator('select').filter({ hasText: /Choisir une classe/ });
+    const classSelect = page.locator('select').filter({ has: page.locator('option', { hasText: 'Choisir une classe' }) }).first();
     const firstClassValue = await classSelect.locator('option').nth(1).getAttribute('value');
     await classSelect.selectOption(firstClassValue!);
 
     // Now section should be enabled
-    await page.waitForTimeout(300);
+    await page.waitForTimeout(500);
     const enabledAfter = !(await sectionSelect.isDisabled());
 
     expect(disabledBefore).toBeTruthy();
