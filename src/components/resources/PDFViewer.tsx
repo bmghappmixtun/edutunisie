@@ -15,10 +15,10 @@ const Page = dynamic(() => import('react-pdf').then(mod => mod.Page), {
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 
-// Configure PDF.js worker
+// Configure PDF.js worker (must match react-pdf's bundled version: 4.8.69)
 if (typeof window !== 'undefined') {
   import('react-pdf').then(({ pdfjs }) => {
-    pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@4.0.379/build/pdf.worker.min.mjs`;
+    pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@4.8.69/build/pdf.worker.min.mjs`;
   });
 }
 
@@ -201,7 +201,7 @@ export default function PDFViewer({ url, fileName, initialPage = 1, onDownload, 
               onLoadError={onDocumentLoadError}
               loading={<ViewerLoading />}
               options={{
-                cMapUrl: 'https://unpkg.com/pdfjs-dist@4.0.379/cmaps/',
+                cMapUrl: 'https://unpkg.com/pdfjs-dist@4.8.69/cmaps/',
                 cMapPacked: true,
               }}
               className="shadow-2xl"
