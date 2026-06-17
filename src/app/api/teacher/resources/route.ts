@@ -3,6 +3,7 @@ import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { uploadFile } from '@/lib/storage';
 import { nanoid } from 'nanoid';
+import { notifyAdminsNewResource } from '@/lib/admin-notify';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -76,19 +77,8 @@ export async function POST(req: NextRequest) {
       }
     });
 
-    // Notify admin
-    const admins = await prisma.user.findMany({ where: { role: 'ADMIN' } });
-    for (const admin of admins) {
-      await prisma.notification.create({
-        data: {
-          userId: admin.id,
-          type: 'new_resource_pending',
-          title: 'Nouvelle ressource en attente',
-          message: `${user.firstName} ${user.lastName} a ajouté "${title}"`,
-          link: `/admin/approbations`
-        }
-      });
-    }
+    // Notify admins (in-app + email)
+    await notifyAdminsNewResource(resource.id).catch(e => console.error('Admin notify error:', e));
 
     return NextResponse.json({ success: true, resource });
   } catch (e: any) {

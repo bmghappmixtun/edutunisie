@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { hashPassword, generateOTP, createSession, setSessionCookie } from '@/lib/auth';
 import { sendOTPEmail } from '@/lib/email';
+import { notifyAdminsNewTeacher } from '@/lib/admin-notify';
 
 export async function POST(req: NextRequest) {
   try {
@@ -56,6 +57,9 @@ export async function POST(req: NextRequest) {
         user: { id: user.id, email: user.email, role: user.role, firstName: user.firstName, lastName: user.lastName }
       });
     }
+
+    // Notify admins (in-app + email) about new teacher pending approval
+    await notifyAdminsNewTeacher(user.id).catch(e => console.error('Admin notify error:', e));
 
     return NextResponse.json({ success: true, message: 'Compte créé. Un code OTP a été envoyé à votre email.' });
   } catch (e: any) {
