@@ -59,7 +59,7 @@ export default function ResourceActions({ resourceId, slug, title }: { resourceI
         <button onClick={handleDownload} className="btn-primary justify-center text-sm">
           <Download className="w-4 h-4" /> Télécharger
         </button>
-        <button onClick={() => window.open(`/ressources/${slug}/viewer`, '_blank')} className="btn-secondary justify-center text-sm">
+        <button onClick={() => window.location.href = `/ressources/${slug}/viewer`} className="btn-secondary justify-center text-sm">
           <Eye className="w-4 h-4" /> Lire en ligne
         </button>
         <button onClick={handlePrint} className="btn-secondary justify-center text-sm">

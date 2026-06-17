@@ -1,0 +1,61 @@
+import { notFound } from 'next/navigation';
+import Link from 'next/link';
+import { prisma } from '@/lib/prisma';
+import PDFViewer from '@/components/resources/PDFViewer';
+import Header from '@/components/layout/Header';
+import { ChevronLeft, Download } from 'lucide-react';
+
+export const dynamic = 'force-dynamic';
+
+export default async function ResourceViewerPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const resource = await prisma.resource.findUnique({ where: { slug } });
+  if (!resource || resource.status !== 'PUBLISHED') notFound();
+
+  // Increment view
+  await prisma.view.create({ data: { resourceId: resource.id, ipAddress: 'viewer' } });
+  await prisma.resource.update({ where: { id: resource.id }, data: { viewsCount: { increment: 1 } } });
+
+  async function downloadAction() {
+    'use server';
+    await prisma.download.create({ data: { resourceId: resource!.id, ipAddress: 'download' } });
+    await prisma.resource.update({ where: { id: resource!.id }, data: { downloadsCount: { increment: 1 } } });
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-100 flex flex-col">
+      <Header />
+      <div className="pt-16 lg:pt-20 px-4 py-3 bg-white border-b border-slate-200">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 min-w-0">
+            <Link href={`/ressources/${slug}`} className="p-2 hover:bg-slate-100 rounded-lg">
+              <ChevronLeft className="w-5 h-5" />
+            </Link>
+            <div className="min-w-0">
+              <h1 className="font-bold truncate">{resource.title}</h1>
+              <p className="text-xs text-slate-500">Mode lecture</p>
+            </div>
+          </div>
+          <a
+            href={resource.fileUrl}
+            download={`${resource.title}.pdf`}
+            className="btn-primary text-sm"
+          >
+            <Download className="w-4 h-4" /> Télécharger
+          </a>
+        </div>
+      </div>
+      <div className="flex-1 p-4">
+        <div className="max-w-7xl mx-auto">
+          <PDFViewer
+            url={resource.fileUrl}
+            fileName={`${resource.title}.pdf`}
+          />
+          <div className="mt-3 text-center text-xs text-slate-500">
+            💡 Astuces : ← → pour naviguer, +/- pour zoomer, Échap pour quitter le plein écran
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import ResourceActions from '@/components/resources/ResourceActions';
+import PDFViewer from '@/components/resources/PDFViewer';
 import RatingSection from '@/components/resources/RatingSection';
 import CommentsSection from '@/components/resources/CommentsSection';
 import { formatNumber, fileSize, formatDate, timeAgo, RESOURCE_TYPE_LABELS } from '@/lib/utils';
@@ -111,16 +112,19 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
               </div>
 
               {/* Aperçu PDF */}
-              <div className="bg-white rounded-2xl border border-slate-100 p-6 lg:p-8 mb-4">
-                <h2 className="font-bold text-lg mb-4 flex items-center gap-2"><FileText className="w-5 h-5 text-primary-600" /> Aperçu du document</h2>
-                <div className="aspect-[3/4] bg-gradient-to-br from-slate-100 to-slate-50 rounded-xl flex items-center justify-center border border-slate-200">
-                  <div className="text-center">
-                    <FileText className="w-20 h-20 text-slate-300 mx-auto mb-3" />
-                    <div className="text-slate-500 text-sm">{resource.pageCount} pages</div>
-                    <div className="text-slate-400 text-xs mt-1">{fileSize(resource.fileSize)}</div>
-                  </div>
+              <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden mb-4">
+                <div className="px-6 lg:px-8 py-4 border-b border-slate-100 flex items-center justify-between">
+                  <h2 className="font-bold text-lg flex items-center gap-2"><FileText className="w-5 h-5 text-primary-600" /> Aperçu du document</h2>
+                  <Link href={`/ressources/${resource.slug}/viewer`} className="text-sm text-primary-600 font-semibold hover:underline">
+                    Ouvrir en plein écran →
+                  </Link>
                 </div>
-                <div className="text-center text-xs text-slate-400 mt-3">Aperçu généré automatiquement</div>
+                <div className="p-0">
+                  <PDFViewer
+                    url={resource.fileUrl}
+                    fileName={`${resource.title}.pdf`}
+                  />
+                </div>
               </div>
 
               {/* Notation */}
