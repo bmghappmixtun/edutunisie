@@ -26,7 +26,7 @@ export default async function AdminUsersPage(props: { params: Promise<any>; sear
       take: 20,
       skip: (page - 1) * 20,
       orderBy: { createdAt: 'desc' },
-      select: { id: true, email: true, firstName: true, lastName: true, role: true, status: true, isVerifiedTeacher: true, schoolName: true, createdAt: true, lastLoginAt: true }
+      select: { id: true, email: true, firstName: true, lastName: true, role: true, status: true, isVerifiedTeacher: true, schoolName: true, createdAt: true, lastLoginAt: true, _count: { select: { uploadedFiles: true } } }
     }),
     prisma.user.count({ where })
   ]);
@@ -101,6 +101,7 @@ export default async function AdminUsersPage(props: { params: Promise<any>; sear
                       userId={u.id}
                       userName={`${u.firstName || ''} ${u.lastName || ''}`.trim() || u.email}
                       isAdmin={u.role === 'ADMIN'}
+                      resourcesCount={u._count?.uploadedFiles || 0}
                     />
                   </div>
                 </td>

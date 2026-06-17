@@ -21,27 +21,59 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     return NextResponse.json({ error: 'Impossible de vous supprimer vous-même' }, { status: 403 });
   }
 
+  // Parse options from request body
+  let keepFiles = false;
   try {
-    // Cascade: delete user's resources, files, comments, ratings, etc.
-    // First, get all resource files to delete from storage
-    const resources = await prisma.resource.findMany({
+    const contentType = req.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      const body = await req.json();
+      keepFiles = body.keepFiles === true;
+    } else {
+      const formData = await req.formData();
+      keepFiles = formData.get('keepFiles') === 'true';
+    }
+  } catch {
+    // default to false (delete everything)
+    keepFiles = false;
+  }
+
+  try {
+    const teacherResources = await prisma.resource.findMany({
       where: { teacherId: id },
-      select: { fileKey: true, fileUrl: true }
+      select: { id: true, fileKey: true, fileUrl: true, title: true }
     });
 
-    // Delete the user (cascading deletes are handled by Prisma schema)
-    await prisma.user.delete({ where: { id } });
+    if (keepFiles) {
+      // Transfer resources to the admin who's deleting
+      // Keep them visible but now attributed to admin
+      await prisma.resource.updateMany({
+        where: { teacherId: id },
+        data: { teacherId: user.id }
+      });
 
-    // Cleanup: delete files from blob storage in background
-    Promise.all(
-      resources.map(r => deleteFile(r.fileUrl).catch(e => console.error('File delete error:', e)))
-    ).catch(() => {});
+      // Delete the teacher user (comments/ratings cascade by Prisma)
+      await prisma.user.delete({ where: { id } });
 
-    return NextResponse.json({
-      success: true,
-      message: `Utilisateur ${target.firstName} ${target.lastName} supprimé définitivement`,
-      deletedUser: { id: target.id, email: target.email }
-    });
+      return NextResponse.json({
+        success: true,
+        message: `Utilisateur supprimé. ${teacherResources.length} ressource(s) transférée(s) à votre compte.`,
+        transferredResources: teacherResources.length,
+      });
+    } else {
+      // Hard delete everything
+      await prisma.user.delete({ where: { id } });
+
+      // Delete files from blob storage in background
+      Promise.all(
+        teacherResources.map(r => deleteFile(r.fileUrl).catch(e => console.error('File delete error:', e)))
+      ).catch(() => {});
+
+      return NextResponse.json({
+        success: true,
+        message: `Utilisateur et ${teacherResources.length} ressource(s) supprimé(s) définitivement`,
+        deletedResources: teacherResources.length,
+      });
+    }
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
