@@ -43,6 +43,15 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       select: { id: true, fileKey: true, fileUrl: true, title: true }
     });
 
+    // Clean up foreign-key dependencies that don't have onDelete: Cascade in the schema
+    // (Comment, Rating, View, Download, Report). This prevents FK constraint violations
+    // when deleting a user that has interacted with the platform.
+    await prisma.comment.deleteMany({ where: { userId: id } });
+    await prisma.rating.deleteMany({ where: { userId: id } });
+    await prisma.view.deleteMany({ where: { userId: id } });
+    await prisma.download.deleteMany({ where: { userId: id } });
+    await prisma.report.deleteMany({ where: { userId: id } });
+
     if (keepFiles) {
       // Transfer resources to the admin who's deleting
       // Keep them visible but now attributed to admin
@@ -51,7 +60,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         data: { teacherId: user.id }
       });
 
-      // Delete the teacher user (comments/ratings cascade by Prisma)
+      // Resources that the user authored are no longer theirs (transferred above).
+      // Resources that the user previously approved (approvedById is nullable, SetNull).
       await prisma.user.delete({ where: { id } });
 
       return NextResponse.json({

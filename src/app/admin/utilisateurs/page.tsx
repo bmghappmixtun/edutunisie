@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
-import { Search, Shield, UserCheck, UserX, Eye, Trash2 } from 'lucide-react';
+import { Search, UserCheck, UserX, Trash2 } from 'lucide-react';
 import { timeAgo } from '@/lib/utils';
 import DeleteUserButton from '@/components/admin/DeleteUserButton';
 

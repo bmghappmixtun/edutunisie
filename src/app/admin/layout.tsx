@@ -3,7 +3,7 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { getCurrentUser } from '@/lib/auth';
 import Link from 'next/link';
-import { Shield, Users, FileText, BarChart3, Bell, Settings, CheckCircle, XCircle, Flag } from 'lucide-react';
+import { Shield, Users, FileText, BarChart3, CheckCircle, Flag } from 'lucide-react';
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser();

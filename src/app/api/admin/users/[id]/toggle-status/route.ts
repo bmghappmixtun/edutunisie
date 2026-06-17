@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { getRequestOrigin } from '@/lib/origin';
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const user = await getCurrentUser();
@@ -14,5 +15,5 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const newStatus = target.status === 'ACTIVE' ? 'SUSPENDED' : 'ACTIVE';
   await prisma.user.update({ where: { id }, data: { status: newStatus } });
 
-  return NextResponse.redirect(new URL('/admin/utilisateurs', process.env.NEXTAUTH_URL || 'http://localhost:3000'));
+  return NextResponse.redirect(new URL('/admin/utilisateurs', getRequestOrigin(req)));
 }

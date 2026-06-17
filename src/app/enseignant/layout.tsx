@@ -3,7 +3,7 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { getCurrentUser } from '@/lib/auth';
 import Link from 'next/link';
-import { LayoutDashboard, Upload, FileText, BarChart3, User, Bell, Settings, Shield } from 'lucide-react';
+import { LayoutDashboard, Upload, FileText, BarChart3, Shield } from 'lucide-react';
 
 export default async function TeacherLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser();

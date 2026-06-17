@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
 import Link from 'next/link';
-import { Users, FileText, GraduationCap, Star, Download, Eye, TrendingUp, Clock, AlertCircle } from 'lucide-react';
+import { Users, FileText, Star, Download, AlertCircle } from 'lucide-react';
 import { formatNumber, timeAgo } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
