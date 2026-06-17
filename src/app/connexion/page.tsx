@@ -5,9 +5,11 @@ import { useRouter } from 'next/navigation';
 import { GraduationCap, Eye, EyeOff } from 'lucide-react';
 import toast from 'react-hot-toast';
 import OAuthButtons from '@/components/auth/OAuthButtons';
+import { useI18n } from '@/lib/i18n';
 
 export default function LoginPage() {
   const router = useRouter();
+  const { t } = useI18n();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPw, setShowPw] = useState(false);
@@ -23,12 +25,12 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password })
       });
       const data = await res.json();
-      if (!res.ok) { toast.error(data.error || 'Erreur'); return; }
+      if (!res.ok) { toast.error(data.error || t('auth.invalidCredentials')); return; }
       toast.success('Bienvenue ! 🎉');
       if (data.user.role === 'ADMIN') router.push('/admin');
       else if (data.user.role === 'TEACHER') router.push('/enseignant');
       else router.push('/mon-compte');
-    } catch { toast.error('Erreur de connexion'); }
+    } catch { toast.error(t('common.error')); }
     finally { setLoading(false); }
   }
 
@@ -41,17 +43,17 @@ export default function LoginPage() {
               <GraduationCap className="w-7 h-7 text-white" />
             </div>
           </Link>
-          <h1 className="text-2xl font-extrabold">Connexion</h1>
-          <p className="text-slate-500 mt-1">Accédez à votre compte EduTunisie</p>
+          <h1 className="text-2xl font-extrabold">{t('auth.loginTitle')}</h1>
+          <p className="text-slate-500 mt-1">{t('auth.loginSubtitle')}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="bg-white rounded-2xl p-6 lg:p-8 shadow-xl border border-slate-100">
           <div className="mb-4">
-            <label className="label">Adresse email</label>
+            <label className="label">{t('auth.email')}</label>
             <input type="email" value={email} onChange={e => setEmail(e.target.value)} required className="input" placeholder="votre@email.com" />
           </div>
           <div className="mb-6">
-            <label className="label">Mot de passe</label>
+            <label className="label">{t('auth.password')}</label>
             <div className="relative">
               <input type={showPw ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} required className="input pr-10" placeholder="••••••••" />
               <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
@@ -60,22 +62,22 @@ export default function LoginPage() {
             </div>
           </div>
           <button type="submit" disabled={loading} className="btn-primary w-full justify-center py-3 text-base">
-            {loading ? 'Connexion...' : 'Se connecter'}
+            {loading ? '...' : t('auth.loginButton')}
           </button>
 
           <OAuthButtons />
 
           <div className="text-center mt-4">
-            <Link href="/mot-de-passe-oublie" className="text-sm text-primary-600 hover:underline">Mot de passe oublié ?</Link>
+            <Link href="/mot-de-passe-oublie" className="text-sm text-primary-600 hover:underline">{t('auth.forgotPassword')}</Link>
           </div>
         </form>
 
         <p className="text-center mt-6 text-sm text-slate-500">
-          Pas de compte ? <Link href="/inscription" className="text-primary-600 font-semibold hover:underline">Inscrivez-vous gratuitement</Link>
+          {t('auth.noAccount')} <Link href="/inscription" className="text-primary-600 font-semibold hover:underline">{t('auth.signupNow')}</Link>
         </p>
 
         <div className="mt-6 bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm">
-          <p className="font-bold text-amber-800 mb-2">🔑 Comptes de démonstration :</p>
+          <p className="font-bold text-amber-800 mb-2">{t('auth.demoAccounts')}</p>
           <div className="space-y-1 text-amber-700 font-mono text-xs">
             <div>Admin : admin@edutunisie.tn / demo1234</div>
             <div>Enseignant : ahmed.benali@edutunisie.tn / demo1234</div>

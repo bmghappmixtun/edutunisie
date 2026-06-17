@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { GraduationCap, Facebook, Twitter, Instagram, Youtube, Mail } from 'lucide-react';
+import { GraduationCap, Facebook, Twitter, Instagram, Youtube } from 'lucide-react';
+import T from '@/components/i18n/T';
 
 export default function Footer() {
   return (
@@ -12,12 +13,12 @@ export default function Footer() {
                 <GraduationCap className="w-6 h-6 text-white" />
               </div>
               <div>
-                <div className="font-extrabold text-lg text-white">EduTunisie</div>
-                <div className="text-[10px] text-slate-400">Plateforme pédagogique</div>
+                <div className="font-extrabold text-lg text-white"><T k="common.appName" /></div>
+                <div className="text-[10px] text-slate-400"><T k="common.appTagline" /></div>
               </div>
             </Link>
             <p className="text-sm text-slate-400 mb-4 max-w-sm">
-              La plateforme #1 de ressources pédagogiques en Tunisie. Cours, devoirs, séries et corrigés gratuits pour tous les niveaux.
+              <T k="footer.madeWith" />
             </p>
             <div className="flex gap-2">
               {[Facebook, Twitter, Instagram, Youtube].map((Icon, i) => (
@@ -29,42 +30,39 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="font-bold text-white mb-4 text-sm">Navigation</h4>
+            <h4 className="font-bold text-white mb-4 text-sm"><T k="footer.navigation" /></h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/" className="hover:text-primary-400 transition">Accueil</Link></li>
-              <li><Link href="/ressources" className="hover:text-primary-400 transition">Ressources</Link></li>
-              <li><Link href="/niveaux" className="hover:text-primary-400 transition">Niveaux</Link></li>
-              <li><Link href="/matieres" className="hover:text-primary-400 transition">Matières</Link></li>
-              <li><Link href="/professeurs" className="hover:text-primary-400 transition">Professeurs</Link></li>
+              <li><Link href="/" className="hover:text-primary-400 transition"><T k="nav.home" /></Link></li>
+              <li><Link href="/ressources" className="hover:text-primary-400 transition"><T k="nav.resources" /></Link></li>
+              <li><Link href="/niveaux" className="hover:text-primary-400 transition"><T k="nav.levels" /></Link></li>
+              <li><Link href="/matieres" className="hover:text-primary-400 transition"><T k="nav.subjects" /></Link></li>
+              <li><Link href="/professeurs" className="hover:text-primary-400 transition"><T k="nav.teachers" /></Link></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="font-bold text-white mb-4 text-sm">Ressources</h4>
+            <h4 className="font-bold text-white mb-4 text-sm"><T k="footer.resources" /></h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/ressources?type=COURSE" className="hover:text-primary-400 transition">Cours</Link></li>
+              <li><Link href="/ressources?type=COURSE" className="hover:text-primary-400 transition"><T k="resource.type" /></Link></li>
               <li><Link href="/ressources?type=HOMEWORK" className="hover:text-primary-400 transition">Devoirs</Link></li>
-              <li><Link href="/ressources?type=EXERCISE" className="hover:text-primary-400 transition">Séries d'exercices</Link></li>
               <li><Link href="/ressources?type=BAC_SUBJECT" className="hover:text-primary-400 transition">Sujets Bac</Link></li>
               <li><Link href="/ressources?type=CORRECTION" className="hover:text-primary-400 transition">Corrigés</Link></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="font-bold text-white mb-4 text-sm">À propos</h4>
+            <h4 className="font-bold text-white mb-4 text-sm"><T k="footer.about" /></h4>
             <ul className="space-y-2 text-sm">
-              <li><a href="#" className="hover:text-primary-400 transition">Qui sommes-nous</a></li>
-              <li><a href="#" className="hover:text-primary-400 transition">Contact</a></li>
               <li><a href="#" className="hover:text-primary-400 transition">CGU</a></li>
-              <li><a href="#" className="hover:text-primary-400 transition">Confidentialité</a></li>
-              <li><a href="#" className="hover:text-primary-400 transition">Mentions légales</a></li>
+              <li><a href="#" className="hover:text-primary-400 transition"><T k="footer.about" /></a></li>
+              <li><a href="#" className="hover:text-primary-400 transition">Contact</a></li>
             </ul>
           </div>
         </div>
 
         <div className="pt-6 border-t border-slate-800 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-          <p className="text-xs text-slate-500">© {new Date().getFullYear()} EduTunisie. Tous droits réservés.</p>
-          <p className="text-xs text-slate-500">Conçu avec ❤️ en Tunisie 🇹🇳 pour les élèves tunisiens</p>
+          <p className="text-xs text-slate-500"><T k="footer.copyright" vars={{ year: String(new Date().getFullYear()) }} /></p>
+          <p className="text-xs text-slate-500"><T k="footer.madeWith" /></p>
         </div>
       </div>
     </footer>

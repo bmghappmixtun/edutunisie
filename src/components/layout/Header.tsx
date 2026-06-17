@@ -1,13 +1,18 @@
 import Link from 'next/link';
-import { GraduationCap, Search, User, LogOut, Menu, X } from 'lucide-react';
+import { GraduationCap, Search } from 'lucide-react';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import UserMenu from './UserMenu';
 import MobileMenu from './MobileMenu';
 import LanguageSwitcher from './LanguageSwitcher';
+import T from '@/components/i18n/T';
+import { getDict, getT } from '@/lib/i18n-server';
+
+export const dynamic = 'force-dynamic';
 
 export default async function Header() {
   const user = await getCurrentUser();
+  const t = getT();
   const unreadNotifications = user
     ? await prisma.notification.count({ where: { userId: user.id, isRead: false } })
     : 0;
@@ -21,16 +26,16 @@ export default async function Header() {
               <GraduationCap className="w-6 h-6 text-white" />
             </div>
             <div className="hidden sm:block">
-              <div className="font-extrabold text-lg text-slate-900 leading-none">EduTunisie</div>
-              <div className="text-[10px] text-slate-500 leading-none mt-0.5">Plateforme pédagogique</div>
+              <div className="font-extrabold text-lg text-slate-900 leading-none"><T k="common.appName" /></div>
+              <div className="text-[10px] text-slate-500 leading-none mt-0.5"><T k="common.appTagline" /></div>
             </div>
           </Link>
 
           <nav className="hidden lg:flex items-center gap-7">
-            <Link href="/ressources" className="text-sm font-medium text-slate-700 hover:text-primary-600 transition">Ressources</Link>
-            <Link href="/niveaux" className="text-sm font-medium text-slate-700 hover:text-primary-600 transition">Niveaux</Link>
-            <Link href="/matieres" className="text-sm font-medium text-slate-700 hover:text-primary-600 transition">Matières</Link>
-            <Link href="/professeurs" className="text-sm font-medium text-slate-700 hover:text-primary-600 transition">Professeurs</Link>
+            <Link href="/ressources" className="text-sm font-medium text-slate-700 hover:text-primary-600 transition"><T k="nav.resources" /></Link>
+            <Link href="/niveaux" className="text-sm font-medium text-slate-700 hover:text-primary-600 transition"><T k="nav.levels" /></Link>
+            <Link href="/matieres" className="text-sm font-medium text-slate-700 hover:text-primary-600 transition"><T k="nav.subjects" /></Link>
+            <Link href="/professeurs" className="text-sm font-medium text-slate-700 hover:text-primary-600 transition"><T k="nav.teachers" /></Link>
           </nav>
 
           <div className="flex items-center gap-2">
@@ -44,10 +49,10 @@ export default async function Header() {
             ) : (
               <>
                 <Link href="/connexion" className="hidden sm:block text-sm font-semibold text-slate-700 hover:text-primary-600 px-3 py-2 transition">
-                  Connexion
+                  <T k="nav.login" />
                 </Link>
                 <Link href="/inscription" className="btn-primary text-sm">
-                  Inscription
+                  <T k="nav.signup" />
                 </Link>
               </>
             )}
