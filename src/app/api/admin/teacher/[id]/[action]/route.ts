@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { sendTeacherApprovalEmail } from '@/lib/email';
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string; action: string }> }) {
   const user = await getCurrentUser();
@@ -30,6 +31,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         link: '/enseignant'
       }
     });
+    if (teacher.email && teacher.firstName) {
+      await sendTeacherApprovalEmail(teacher.email, teacher.firstName, true);
+    }
   } else {
     await prisma.user.update({ where: { id }, data: { status: 'SUSPENDED' } });
     await prisma.notification.create({
@@ -40,6 +44,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         message: 'Votre demande de compte enseignant n\'a pas été acceptée.',
       }
     });
+    if (teacher.email && teacher.firstName) {
+      await sendTeacherApprovalEmail(teacher.email, teacher.firstName, false);
+    }
   }
 
   return NextResponse.json({ success: true });

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { GraduationCap, Eye, EyeOff } from 'lucide-react';
 import toast from 'react-hot-toast';
+import OAuthButtons from '@/components/auth/OAuthButtons';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -61,6 +62,8 @@ export default function LoginPage() {
           <button type="submit" disabled={loading} className="btn-primary w-full justify-center py-3 text-base">
             {loading ? 'Connexion...' : 'Se connecter'}
           </button>
+
+          <OAuthButtons />
 
           <div className="text-center mt-4">
             <Link href="/mot-de-passe-oublie" className="text-sm text-primary-600 hover:underline">Mot de passe oublié ?</Link>

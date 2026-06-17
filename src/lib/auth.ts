@@ -65,9 +65,3 @@ export async function clearSessionCookie() {
 export function generateOTP(): string {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
-
-export async function sendOTPEmail(email: string, code: string, purpose: string) {
-  // In production, use Resend/SendGrid. For demo, log to console.
-  console.log(`\n📧 [EMAIL] To: ${email}`);
-  console.log(`   Code: ${code} (${purpose})\n`);
-}

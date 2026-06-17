@@ -10,6 +10,14 @@
     @apply bg-white text-slate-900 antialiased;
     font-family: 'Inter', system-ui, sans-serif;
   }
+  body.rtl {
+    font-family: 'Cairo', 'Inter', system-ui, sans-serif;
+  }
+  /* RTL adjustments */
+  body.rtl {
+    text-align: right;
+  }
+  body.rtl .ltr-only { display: none; }
 }
 
 @layer components {

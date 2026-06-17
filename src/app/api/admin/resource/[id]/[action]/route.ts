@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { sendResourceApprovedEmail } from '@/lib/email';
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string; action: string }> }) {
   const user = await getCurrentUser();
@@ -25,6 +26,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
           link: `/ressources/${resource.slug}`
         }
       });
+      const teacher = await prisma.user.findUnique({ where: { id: resource.teacherId } });
+      if (teacher?.email && teacher.firstName) {
+        await sendResourceApprovedEmail(teacher.email, teacher.firstName, resource.title, resource.slug);
+      }
     }
   } else if (action === 'reject') {
     await prisma.resource.update({ where: { id }, data: { status: 'REJECTED' } });

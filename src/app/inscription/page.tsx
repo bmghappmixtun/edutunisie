@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { GraduationCap, Eye, EyeOff } from 'lucide-react';
 import toast from 'react-hot-toast';
+import OAuthButtons from '@/components/auth/OAuthButtons';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -96,6 +97,8 @@ export default function RegisterPage() {
           <button type="submit" disabled={loading} className="btn-primary w-full justify-center py-3 text-base">
             {loading ? 'Création...' : 'Créer mon compte'}
           </button>
+
+          <OAuthButtons />
           <p className="text-xs text-slate-400 text-center mt-3">
             En vous inscrivant, vous acceptez nos <a href="#" className="underline">CGU</a> et notre <a href="#" className="underline">politique de confidentialité</a>.
           </p>
