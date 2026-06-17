@@ -115,7 +115,7 @@ test.describe('Complete account creation flows', () => {
     test('7. Admin can see pending teachers', async ({ page, request }) => {
       // Login as admin
       const loginRes = await request.post(`${BASE}/api/auth/login`, {
-        data: { email: 'admin@edutunisie.tn', password: 'demo1234' }
+        data: { email: 'boutiti.mehdi@gmail.com', password: 'demo1234' }
       });
       expect(loginRes.ok()).toBeTruthy();
 
@@ -145,7 +145,7 @@ test.describe('Complete account creation flows', () => {
 
       // Get the user from DB via admin login
       const loginRes = await request.post(`${BASE}/api/auth/login`, {
-        data: { email: 'admin@edutunisie.tn', password: 'demo1234' }
+        data: { email: 'boutiti.mehdi@gmail.com', password: 'demo1234' }
       });
       const cookies = loginRes.headers()['set-cookie'];
 
@@ -208,7 +208,7 @@ test.describe('Complete account creation flows', () => {
   test.describe('Admin approval workflow', () => {
     test('11. Admin dashboard shows pending teachers and resources', async ({ page, request }) => {
       await page.goto(`${BASE}/connexion`);
-      await page.fill('input[type="email"]', 'admin@edutunisie.tn');
+      await page.fill('input[type="email"]', 'boutiti.mehdi@gmail.com');
       await page.fill('input[type="password"]', 'demo1234');
       await page.click('button[type="submit"]');
       await page.waitForURL(/\/admin/, { timeout: 15000 });

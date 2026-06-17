@@ -5,7 +5,7 @@ const BASE = process.env.BASE_URL || 'http://localhost:3000';
 test.describe('Authentication flow', () => {
   test('Login with admin credentials', async ({ page }) => {
     await page.goto(`${BASE}/connexion`);
-    await page.fill('input[type="email"]', 'admin@edutunisie.tn');
+    await page.fill('input[type="email"]', 'boutiti.mehdi@gmail.com');
     await page.fill('input[type="password"]', 'demo1234');
     await page.click('button[type="submit"]');
     // Wait for navigation
@@ -26,7 +26,7 @@ test.describe('Authentication flow', () => {
   test('Logout from admin dashboard', async ({ page, context }) => {
     // Login first
     await page.goto(`${BASE}/connexion`);
-    await page.fill('input[type="email"]', 'admin@edutunisie.tn');
+    await page.fill('input[type="email"]', 'boutiti.mehdi@gmail.com');
     await page.fill('input[type="password"]', 'demo1234');
     await page.click('button[type="submit"]');
     await page.waitForURL(/\/admin/, { timeout: 10000 });

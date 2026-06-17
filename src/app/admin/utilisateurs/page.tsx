@@ -1,8 +1,9 @@
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
-import { Search, Shield, UserCheck, UserX, Eye } from 'lucide-react';
+import { Search, Shield, UserCheck, UserX, Eye, Trash2 } from 'lucide-react';
 import { timeAgo } from '@/lib/utils';
+import DeleteUserButton from '@/components/admin/DeleteUserButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -90,12 +91,17 @@ export default async function AdminUsersPage(props: { params: Promise<any>; sear
                 <td className="px-4 py-3 text-slate-500 hidden sm:table-cell">{timeAgo(u.createdAt)}</td>
                 <td className="px-4 py-3 text-slate-500 hidden md:table-cell">{u.lastLoginAt ? timeAgo(u.lastLoginAt) : '—'}</td>
                 <td className="px-4 py-3">
-                  <div className="flex gap-1">
+                  <div className="flex gap-1 items-center">
                     <form action={`/api/admin/users/${u.id}/toggle-status`} method="POST">
-                      <button className="p-1.5 hover:bg-slate-100 rounded text-xs">
-                        {u.status === 'ACTIVE' ? <UserX className="w-4 h-4 text-red-500" /> : <UserCheck className="w-4 h-4 text-emerald-500" />}
+                      <button className="p-1.5 hover:bg-slate-100 rounded text-xs" title={u.status === 'ACTIVE' ? 'Suspendre' : 'Réactiver'}>
+                        {u.status === 'ACTIVE' ? <UserX className="w-4 h-4 text-amber-500" /> : <UserCheck className="w-4 h-4 text-emerald-500" />}
                       </button>
                     </form>
+                    <DeleteUserButton
+                      userId={u.id}
+                      userName={`${u.firstName || ''} ${u.lastName || ''}`.trim() || u.email}
+                      isAdmin={u.role === 'ADMIN'}
+                    />
                   </div>
                 </td>
               </tr>

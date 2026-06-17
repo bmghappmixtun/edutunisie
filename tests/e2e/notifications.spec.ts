@@ -9,7 +9,7 @@ test.describe('Admin email notifications verification', () => {
   test('Admin receives in-app notification when a teacher registers', async ({ request }) => {
     // First, login as admin to capture admin user ID
     const loginRes = await request.post(`${BASE}/api/auth/login`, {
-      data: { email: 'admin@edutunisie.tn', password: 'demo1234' }
+      data: { email: 'boutiti.mehdi@gmail.com', password: 'demo1234' }
     });
     expect(loginRes.ok()).toBeTruthy();
     const cookies = loginRes.headers()['set-cookie'];
