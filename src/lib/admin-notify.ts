@@ -1,6 +1,7 @@
 import { Resend } from 'resend';
 import { renderNewTeacherEmail, renderNewResourceEmail } from './email-templates';
 import { prisma } from './prisma';
+import { getAdminEmailsFromConfig } from './admin-config';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 const FROM = process.env.EMAIL_FROM || 'EduTunisie <onboarding@resend.dev>';
@@ -29,8 +30,9 @@ export async function notifyAdminsNewTeacher(teacherId: string) {
   }
 
   // Email notifications
+  const adminEmails = getAdminEmailsFromConfig();
   if (!resend) {
-    console.log(`\n📧 [ADMIN EMAIL - DEV] New teacher: ${teacher.firstName} ${teacher.lastName} (${teacher.email})\n`);
+    console.log(`\n📧 [ADMIN EMAIL - DEV] New teacher: ${teacher.firstName} ${teacher.lastName} → ${adminEmails.join(', ')}\n`);
     return;
   }
 
@@ -41,15 +43,18 @@ export async function notifyAdminsNewTeacher(teacherId: string) {
       teacher.email,
       teacher.schoolName
     );
+    // Send to BOTH DB admins + hardcoded fallback
+    const recipients = new Set<string>(adminEmails);
     for (const admin of admins) {
-      if (!admin.email) continue;
-      await resend.emails.send({
-        from: FROM,
-        to: [admin.email],
-        subject: `👨‍🏫 Nouveau professeur à approuver : ${teacher.firstName} ${teacher.lastName}`,
-        html,
-      });
+      if (admin.email) recipients.add(admin.email);
     }
+    if (recipients.size === 0) return;
+    await resend.emails.send({
+      from: FROM,
+      to: Array.from(recipients),
+      subject: `👨‍🏫 Nouveau professeur à approuver : ${teacher.firstName} ${teacher.lastName}`,
+      html,
+    });
   } catch (e) {
     console.error('Failed to notify admins of new teacher:', e);
   }
@@ -82,8 +87,9 @@ export async function notifyAdminsNewResource(resourceId: string) {
   }
 
   // Email notifications
+  const adminEmails = getAdminEmailsFromConfig();
   if (!resend) {
-    console.log(`\n📧 [ADMIN EMAIL - DEV] New resource: ${resource.title}\n`);
+    console.log(`\n📧 [ADMIN EMAIL - DEV] New resource: ${resource.title} → ${adminEmails.join(', ')}\n`);
     return;
   }
 
@@ -93,15 +99,18 @@ export async function notifyAdminsNewResource(resourceId: string) {
       resource.title,
       resource.subject.nameFr
     );
+    // Send to BOTH DB admins + hardcoded fallback
+    const recipients = new Set<string>(adminEmails);
     for (const admin of admins) {
-      if (!admin.email) continue;
-      await resend.emails.send({
-        from: FROM,
-        to: [admin.email],
-        subject: `📄 Nouvelle ressource à valider : ${resource.title}`,
-        html,
-      });
+      if (admin.email) recipients.add(admin.email);
     }
+    if (recipients.size === 0) return;
+    await resend.emails.send({
+      from: FROM,
+      to: Array.from(recipients),
+      subject: `📄 Nouvelle ressource à valider : ${resource.title}`,
+      html,
+    });
   } catch (e) {
     console.error('Failed to notify admins of new resource:', e);
   }
