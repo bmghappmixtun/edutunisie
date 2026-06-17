@@ -24,11 +24,21 @@ function getNested(obj: any, path: string): any {
 export function I18nProvider({ children }: { children: React.ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>('fr');
 
-  // Load saved locale
+  // Load saved locale (from localStorage OR cookie)
   useEffect(() => {
+    // Priority: localStorage > cookie > default 'fr'
     const saved = localStorage.getItem('locale') as Locale | null;
     if (saved && (saved === 'fr' || saved === 'ar')) {
       setLocaleState(saved);
+      return;
+    }
+    // Fallback to cookie (in case user switched via server-rendered page)
+    const cookieLocale = document.cookie
+      .split('; ')
+      .find(c => c.startsWith('locale='))
+      ?.split('=')[1] as Locale | undefined;
+    if (cookieLocale && (cookieLocale === 'fr' || cookieLocale === 'ar')) {
+      setLocaleState(cookieLocale);
     }
   }, []);
 
