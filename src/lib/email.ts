@@ -54,6 +54,50 @@ export async function sendWelcomeEmail(to: string, firstName: string, role: stri
   }
 }
 
+// Contact form email - sent to admin when user submits /contact form
+export async function sendContactEmail(data: { name: string; email: string; subject: string; message: string }) {
+  if (process.env.DISABLE_EMAILS === 'true' || process.env.NODE_ENV === 'test') {
+    console.log(`[EMAIL SKIP] Contact from ${data.name} (${data.email})`);
+    return { id: 'test-mode' };
+  }
+  const subjectLabels: Record<string, string> = { question: 'Question générale', bug: 'Signalement de bug', teacher: 'Devenir enseignant', partnership: 'Partenariat', copyright: "Droit d'auteur (DMCA)", other: 'Autre' };
+  const label = subjectLabels[data.subject] || data.subject;
+  const html = `<!DOCTYPE html><html><body style="margin:0;padding:0;font-family:Arial;background:#F0F9FF;">
+<table width="100%"><tr><td align="center" style="padding:40px 20px;">
+<table width="600" style="background:white;border-radius:24px;overflow:hidden;">
+<tr><td style="background:linear-gradient(135deg,#0EA5E9,#0369A1);padding:32px;text-align:center;">
+<h1 style="margin:0;color:white;">📬 Nouveau message de contact</h1></td></tr>
+<tr><td style="padding:32px;">
+<p><strong>De :</strong> ${data.name}</p>
+<p><strong>Email :</strong> <a href="mailto:${data.email}">${data.email}</a></p>
+<p><strong>Sujet :</strong> ${label}</p>
+<div style="background:#F8FAFC;border-left:4px solid #0EA5E9;padding:20px;border-radius:8px;margin:16px 0;">
+<div style="color:#475569;font-size:12px;text-transform:uppercase;margin-bottom:8px;">Message :</div>
+<div style="white-space:pre-wrap;">${data.message}</div>
+</div>
+<div style="text-align:center;margin-top:24px;">
+<a href="mailto:${data.email}?subject=Re: ${encodeURIComponent(label)}" style="background:#0EA5E9;color:white;padding:12px 32px;border-radius:12px;text-decoration:none;font-weight:bold;display:inline-block;">Répondre à ${data.name}</a>
+</div>
+</td></tr></table></td></tr></table></body></html>`;
+
+  if (!resend) {
+    console.log(`📧 [EMAIL - DEV] Contact from ${data.name}`);
+    return { id: 'dev-mode' };
+  }
+  try {
+    const adminEmail = 'boutiti.mehdi@gmail.com';
+    return await resend.emails.send({
+      from: FROM,
+      to: [adminEmail],
+      replyTo: data.email,
+      subject: `[Contact] ${data.name} — ${label}`,
+      html,
+    });
+  } catch (e) {
+    console.error('Contact email error:', e);
+  }
+}
+
 // Confirmation email - sent after OTP verification succeeds
 export async function sendWelcomeConfirmedEmail(to: string, firstName: string, role: string) {
   if (process.env.DISABLE_EMAILS === 'true' || process.env.NODE_ENV === 'test') {

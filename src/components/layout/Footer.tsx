@@ -53,9 +53,9 @@ export default function Footer() {
           <div>
             <h4 className="font-bold text-white mb-4 text-sm"><T k="footer.about" /></h4>
             <ul className="space-y-2 text-sm">
-              <li><a href="#" className="hover:text-primary-400 transition">CGU</a></li>
-              <li><a href="#" className="hover:text-primary-400 transition"><T k="footer.about" /></a></li>
-              <li><a href="#" className="hover:text-primary-400 transition">Contact</a></li>
+              <li><Link href="/cgu" className="hover:text-primary-400 transition">CGU</Link></li>
+              <li><Link href="/a-propos" className="hover:text-primary-400 transition"><T k="footer.about" /></Link></li>
+              <li><Link href="/contact" className="hover:text-primary-400 transition">Contact</Link></li>
             </ul>
           </div>
         </div>

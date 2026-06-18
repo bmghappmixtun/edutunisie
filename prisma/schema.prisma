@@ -395,3 +395,20 @@ model Message {
 
   @@index([conversationId, createdAt])
 }
+
+// ============ CONTACT MESSAGES ============
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  subject   String   @default("other")
+  message   String
+  ip        String?
+  userAgent String?
+  isRead    Boolean  @default(false)
+  repliedAt DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([isRead])
+}
