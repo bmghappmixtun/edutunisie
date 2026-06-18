@@ -43,38 +43,46 @@ export async function GET(req: NextRequest) {
   let total: number;
 
   if (q.trim()) {
-    // Full-text search with rank
-    const trimmed = q.trim();
-    const ftsResults = await prisma.$queryRaw<any[]>`
-      SELECT 
-        r.*,
-        ts_rank(r.search_vector, websearch_to_tsquery('french', ${trimmed})) as rank
-      FROM "Resource" r
-      WHERE r.status = 'PUBLISHED'
-        AND r.search_vector @@ websearch_to_tsquery('french', ${trimmed})
-        ${subjectId ? prisma.$queryRaw`AND r."subjectId" = ${subjectId}` : prisma.$queryRaw``}
-        ${classId ? prisma.$queryRaw`AND r."classId" = ${classId}` : prisma.$queryRaw``}
-        ${teacherId ? prisma.$queryRaw`AND r."teacherId" = ${teacherId}` : prisma.$queryRaw``}
-        ${sectionId ? prisma.$queryRaw`AND r."sectionId" = ${sectionId}` : prisma.$queryRaw``}
-        ${type ? prisma.$queryRaw`AND r.type = ${type}` : prisma.$queryRaw``}
-      ORDER BY ${sort === 'relevance' ? prisma.$queryRaw`rank DESC` : 
-                sort === 'recent' ? prisma.$queryRaw`r."publishedAt" DESC NULLS LAST` :
-                sort === 'popular' ? prisma.$queryRaw`r."viewsCount" DESC` :
-                sort === 'downloads' ? prisma.$queryRaw`r."downloadsCount" DESC` :
-                prisma.$queryRaw`r."publishedAt" DESC NULLS LAST`}
-      LIMIT ${limit} OFFSET ${(page - 1) * limit}
-    `;
-    
-    results = ftsResults;
-    total = ftsResults.length; // Approximate - use a separate count query in production
+    // Sanitize query for FTS: max 200 chars, strip non-word chars
+    const trimmed = q.trim().slice(0, 200).replace(/[^\w\s\-àâäéèêëïîôöùûüÿçñ]/gi, ' ');
+
+    try {
+      const ftsResults = await prisma.$queryRaw<any[]>`
+        SELECT
+          r.*,
+          ts_rank(r.search_vector, websearch_to_tsquery('french', ${trimmed})) as rank
+        FROM "Resource" r
+        WHERE r.status = 'PUBLISHED'
+          AND r.search_vector @@ websearch_to_tsquery('french', ${trimmed})
+          ${subjectId ? prisma.$queryRaw`AND r."subjectId" = ${subjectId}` : prisma.$queryRaw``}
+          ${classId ? prisma.$queryRaw`AND r."classId" = ${classId}` : prisma.$queryRaw``}
+          ${teacherId ? prisma.$queryRaw`AND r."teacherId" = ${teacherId}` : prisma.$queryRaw``}
+          ${sectionId ? prisma.$queryRaw`AND r."sectionId" = ${sectionId}` : prisma.$queryRaw``}
+          ${type ? prisma.$queryRaw`AND r.type = ${type}` : prisma.$queryRaw``}
+        ORDER BY ${sort === 'relevance' ? prisma.$queryRaw`rank DESC` :
+                  sort === 'recent' ? prisma.$queryRaw`r."publishedAt" DESC NULLS LAST` :
+                  sort === 'popular' ? prisma.$queryRaw`r."viewsCount" DESC` :
+                  sort === 'downloads' ? prisma.$queryRaw`r."downloadsCount" DESC` :
+                  prisma.$queryRaw`r."publishedAt" DESC NULLS LAST`}
+        LIMIT ${limit} OFFSET ${(page - 1) * limit}
+      `;
+
+      results = ftsResults;
+      total = ftsResults.length;
+    } catch (ftsError: any) {
+      // FTS failed (e.g., no match, syntax error) - return empty result
+      console.warn('[search] FTS error for query:', trimmed, ftsError?.message);
+      results = [];
+      total = 0;
+    }
   } else {
     // No search query - just filters
-    const orderBy: any = 
+    const orderBy: any =
       sort === 'recent' ? { publishedAt: 'desc' } :
       sort === 'popular' ? { viewsCount: 'desc' } :
       sort === 'downloads' ? { downloadsCount: 'desc' } :
       { publishedAt: 'desc' };
-    
+
     [results, total] = await Promise.all([
       prisma.resource.findMany({
         where,
@@ -131,7 +139,6 @@ export async function GET(req: NextRequest) {
     })
   ]);
 
-  // Use raw results directly
   return NextResponse.json({
     query: q,
     page,
