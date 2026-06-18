@@ -1,68 +1,139 @@
-import Link from 'next/link';
+import { Suspense } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
-import ResourceCard from '@/components/resources/ResourceCard';
+import SearchBar from '@/components/search/SearchBar';
+import SearchResults from '@/components/search/SearchResults';
 import { prisma } from '@/lib/prisma';
-import { Search } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
-export default async function SearchPage(props: { params: Promise<any>; searchParams: Promise<any> }) {
-  const sp = await props.searchParams;
-  const q = sp?.q || '';
+export const metadata = {
+  title: 'Recherche — EduTunisie',
+  description: 'Recherchez parmi des milliers de ressources pédagogiques gratuites : cours, devoirs, exercices, sujets de bac et corrigés.'
+};
 
+async function getInitialData(searchParams: any) {
+  const q = searchParams.q || '';
+  const subjectId = searchParams.subject || '';
+  const classId = searchParams.class || '';
+  const teacherId = searchParams.teacher || '';
+  const type = searchParams.type || '';
+  const year = searchParams.year || '';
+  const sort = searchParams.sort || 'recent';
+  const page = parseInt(searchParams.page || '1');
+  const limit = 12;
+
+  // Build where
   const where: any = { status: 'PUBLISHED' };
-  if (q) {
-    where.OR = [
-      { title: { contains: q, mode: 'insensitive' } },
-      { description: { contains: q, mode: 'insensitive' } },
-      { tags: { contains: q } },
-    ];
-  }
+  if (subjectId) where.subjectId = subjectId;
+  if (classId) where.classId = classId;
+  if (teacherId) where.teacherId = teacherId;
+  if (type) where.type = type;
+  if (year) where.year = parseInt(year);
 
-  const resources = await prisma.resource.findMany({
-    where,
-    take: 30,
-    orderBy: { publishedAt: 'desc' },
-    include: { subject: true, class: true, teacher: { select: { firstName: true, lastName: true } } }
-  });
+  const orderBy: any =
+    sort === 'popular' ? { viewsCount: 'desc' } :
+    sort === 'downloads' ? { downloadsCount: 'desc' } :
+    { publishedAt: 'desc' };
+
+  const [results, total, subjects, classes, teachers, types, years, subjectFacets, classFacets, typeFacets, yearFacets, teacherFacets] = await Promise.all([
+    prisma.resource.findMany({
+      where,
+      orderBy,
+      skip: (page - 1) * limit,
+      take: limit,
+      include: {
+        subject: { select: { nameFr: true, nameAr: true, slug: true, color: true, icon: true } },
+        class: { select: { nameFr: true, nameAr: true, slug: true } },
+        section: { select: { nameFr: true, nameAr: true, slug: true } },
+        teacher: { select: { id: true, firstName: true, lastName: true, avatarUrl: true, schoolName: true } }
+      }
+    }),
+    prisma.resource.count({ where }),
+    prisma.subject.findMany({ orderBy: { order: 'asc' }, select: { id: true, nameFr: true, icon: true } }),
+    prisma.class.findMany({ orderBy: { order: 'asc' }, select: { id: true, nameFr: true } }),
+    prisma.user.findMany({
+      where: { role: 'TEACHER', status: 'ACTIVE' },
+      select: { id: true, firstName: true, lastName: true },
+      take: 30
+    }),
+    prisma.resource.groupBy({ by: ['type'], where: { status: 'PUBLISHED' }, _count: { _all: true } }),
+    prisma.resource.groupBy({
+      by: ['year'],
+      where: { status: 'PUBLISHED', year: { not: null } },
+      _count: { _all: true },
+      orderBy: { year: 'desc' }
+    }),
+    prisma.resource.groupBy({ by: ['subjectId'], where: { status: 'PUBLISHED' }, _count: { _all: true } }),
+    prisma.resource.groupBy({ by: ['classId'], where: { status: 'PUBLISHED', classId: { not: null } }, _count: { _all: true } }),
+    prisma.resource.groupBy({ by: ['type'], where: { status: 'PUBLISHED' }, _count: { _all: true } }),
+    prisma.resource.groupBy({ by: ['year'], where: { status: 'PUBLISHED', year: { not: null } }, _count: { _all: true } }),
+    prisma.resource.groupBy({
+      by: ['teacherId'],
+      where: { status: 'PUBLISHED' },
+      _count: { _all: true },
+      orderBy: { _count: { teacherId: 'desc' } },
+      take: 20
+    })
+  ]);
+
+  return {
+    initialData: {
+      results: JSON.parse(JSON.stringify(results)),
+      total,
+      totalPages: Math.ceil(total / limit),
+      page,
+      limit,
+      sort,
+      took: 0
+    },
+    initialFacets: {
+      subjects: subjectFacets.map((s: any) => ({ id: s.subjectId, count: s._count._all })),
+      classes: classFacets.map((c: any) => ({ id: c.classId, count: c._count._all })),
+      teachers: teacherFacets.map((t: any) => ({ id: t.teacherId, count: t._count._all })),
+      types: typeFacets.map((t: any) => ({ value: t.type, count: t._count._all })),
+      years: yearFacets.map((y: any) => ({ value: y.year, count: y._count._all }))
+    },
+    initialOptions: {
+      subjects: subjects.filter((s: any) => subjectFacets.some((f: any) => f.subjectId === s.id && f._count._all > 0)),
+      classes: classes.filter((c: any) => classFacets.some((f: any) => f.classId === c.id && f._count._all > 0)),
+      teachers: teachers.filter((t: any) => teacherFacets.some((f: any) => f.teacherId === t.id && f._count._all > 0))
+        .map((t: any) => ({ id: t.id, name: `${t.firstName} ${t.lastName}` })),
+      types,
+      years
+    }
+  };
+}
+
+export default async function SearchPage({ searchParams }: { searchParams: Promise<any> }) {
+  const params = await searchParams;
+  const { initialData, initialFacets, initialOptions } = await getInitialData(params);
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-slate-50">
       <Header />
-      <main className="flex-1 pt-20">
-        <div className="bg-gradient-to-br from-primary-50 to-sky-50 py-12">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h1 className="text-3xl lg:text-4xl font-extrabold mb-4">
-              {q ? `Résultats pour "${q}"` : 'Recherche'}
-            </h1>
-            <form action="/recherche" method="GET" className="bg-white rounded-2xl p-2 shadow-lg flex gap-2 max-w-2xl">
-              <div className="flex-1 flex items-center gap-2 px-4 py-2">
-                <Search className="w-5 h-5 text-slate-400" />
-                <input name="q" defaultValue={q} type="text" placeholder="Rechercher..." className="flex-1 bg-transparent outline-none" />
-              </div>
-              <button type="submit" className="btn-primary">Rechercher</button>
-            </form>
+
+      {/* Search bar at top */}
+      <div className="bg-white border-b border-slate-200 pt-20 pb-4">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <SearchBar size="lg" />
+        </div>
+      </div>
+
+      <main className="flex-1">
+        <Suspense fallback={
+          <div className="flex items-center justify-center py-20">
+            <div className="animate-spin w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full" />
           </div>
-        </div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-          {q && <p className="text-slate-600 mb-6">{resources.length} résultat{resources.length > 1 ? 's' : ''}</p>}
-
-          {resources.length === 0 ? (
-            <div className="bg-white rounded-2xl p-12 text-center border border-slate-100">
-              <div className="text-5xl mb-3">🔍</div>
-              <h3 className="font-bold text-xl mb-2">{q ? 'Aucun résultat' : 'Lancez une recherche'}</h3>
-              <p className="text-slate-500 mb-4">{q ? 'Essayez d\'autres mots-clés' : 'Tapez un terme ci-dessus pour commencer'}</p>
-              <Link href="/ressources" className="btn-primary">Voir toutes les ressources</Link>
-            </div>
-          ) : (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-              {resources.map(r => <ResourceCard key={r.id} resource={r as any} />)}
-            </div>
-          )}
-        </div>
+        }>
+          <SearchResults
+            initialData={initialData}
+            initialFacets={initialFacets}
+            initialOptions={initialOptions}
+          />
+        </Suspense>
       </main>
+
       <Footer />
     </div>
   );
