@@ -1,7 +1,6 @@
 import { Suspense } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
-import SearchBar from '@/components/search/SearchBar';
 import HideOnScrollSearchBar from '@/components/search/HideOnScrollSearchBar';
 import SearchResults from '@/components/search/SearchResults';
 import { prisma } from '@/lib/prisma';
@@ -20,11 +19,11 @@ async function getInitialData(searchParams: any) {
   const teacherId = searchParams.teacher || '';
   const type = searchParams.type || '';
   const year = searchParams.year || '';
-  const sort = searchParams.sort || 'recent';
+  const sort = searchParams.sort || 'relevance';
   const page = parseInt(searchParams.page || '1');
   const limit = 12;
 
-  // Build where
+  // Build base where (used when no q)
   const where: any = { status: 'PUBLISHED' };
   if (subjectId) where.subjectId = subjectId;
   if (classId) where.classId = classId;
@@ -32,25 +31,76 @@ async function getInitialData(searchParams: any) {
   if (type) where.type = type;
   if (year) where.year = parseInt(year);
 
-  const orderBy: any =
-    sort === 'popular' ? { viewsCount: 'desc' } :
-    sort === 'downloads' ? { downloadsCount: 'desc' } :
-    { publishedAt: 'desc' };
+  let results: any[];
+  let total: number;
 
-  const [results, total, subjects, classes, teachers, subjectFacets, classFacets, typeFacets, yearFacets, teacherFacets] = await Promise.all([
-    prisma.resource.findMany({
-      where,
-      orderBy,
-      skip: (page - 1) * limit,
-      take: limit,
-      include: {
-        subject: { select: { nameFr: true, nameAr: true, slug: true, color: true, icon: true } },
-        class: { select: { nameFr: true, nameAr: true, slug: true } },
-        section: { select: { nameFr: true, nameAr: true, slug: true } },
-        teacher: { select: { id: true, firstName: true, lastName: true, avatarUrl: true, schoolName: true } }
-      }
-    }),
-    prisma.resource.count({ where }),
+  if (q.trim()) {
+    // FTS with safe fallback
+    const trimmed = q.trim().slice(0, 200).replace(/[^\w\s\-àâäéèêëïîôöùûüÿçñ]/gi, ' ');
+    try {
+      const ftsResults: any[] = await prisma.$queryRaw`
+        SELECT
+          r.id,
+          ts_rank(r.search_vector, websearch_to_tsquery('french', ${trimmed})) as rank
+        FROM "Resource" r
+        WHERE r.status = 'PUBLISHED'
+          AND r.search_vector @@ websearch_to_tsquery('french', ${trimmed})
+          ${subjectId ? prisma.$queryRaw`AND r."subjectId" = ${subjectId}` : prisma.$queryRaw``}
+          ${classId ? prisma.$queryRaw`AND r."classId" = ${classId}` : prisma.$queryRaw``}
+          ${teacherId ? prisma.$queryRaw`AND r."teacherId" = ${teacherId}` : prisma.$queryRaw``}
+          ${type ? prisma.$queryRaw`AND r.type = ${type}` : prisma.$queryRaw``}
+        ORDER BY rank DESC
+        LIMIT ${limit} OFFSET ${(page - 1) * limit}
+      `;
+      // Hydrate relations
+      const ids = ftsResults.map((r: any) => r.id);
+      const full = await prisma.resource.findMany({
+        where: { id: { in: ids } },
+        include: {
+          subject: { select: { nameFr: true, nameAr: true, slug: true, color: true, icon: true } },
+          class: { select: { nameFr: true, nameAr: true, slug: true } },
+          section: { select: { nameFr: true, nameAr: true, slug: true } },
+          teacher: { select: { id: true, firstName: true, lastName: true, avatarUrl: true, schoolName: true } }
+        }
+      });
+      const byId = new Map(full.map((r: any) => [r.id, r]));
+      results = ftsResults.map((r: any) => ({
+        ...byId.get(r.id),
+        rank: r.rank
+      })).filter(Boolean);
+      total = ftsResults.length;
+    } catch (e) {
+      console.warn('[search-page] FTS error:', (e as any)?.message);
+      results = [];
+      total = 0;
+    }
+  } else {
+    // No query: just filters
+    const orderBy: any =
+      sort === 'recent' ? { publishedAt: 'desc' } :
+      sort === 'popular' ? { viewsCount: 'desc' } :
+      sort === 'downloads' ? { downloadsCount: 'desc' } :
+      sort === 'relevance' ? { publishedAt: 'desc' } :
+      { publishedAt: 'desc' };
+
+    [results, total] = await Promise.all([
+      prisma.resource.findMany({
+        where,
+        orderBy,
+        skip: (page - 1) * limit,
+        take: limit,
+        include: {
+          subject: { select: { nameFr: true, nameAr: true, slug: true, color: true, icon: true } },
+          class: { select: { nameFr: true, nameAr: true, slug: true } },
+          section: { select: { nameFr: true, nameAr: true, slug: true } },
+          teacher: { select: { id: true, firstName: true, lastName: true, avatarUrl: true, schoolName: true } }
+        }
+      }),
+      prisma.resource.count({ where })
+    ]);
+  }
+
+  const [subjects, classes, teachers, subjectFacets, classFacets, typeFacets, yearFacets, teacherFacets] = await Promise.all([
     prisma.subject.findMany({ orderBy: { order: 'asc' }, select: { id: true, nameFr: true, icon: true } }),
     prisma.class.findMany({ orderBy: { order: 'asc' }, select: { id: true, nameFr: true } }),
     prisma.user.findMany({
@@ -75,7 +125,7 @@ async function getInitialData(searchParams: any) {
     initialData: {
       results: JSON.parse(JSON.stringify(results)),
       total,
-      totalPages: Math.ceil(total / limit),
+      totalPages: Math.max(1, Math.ceil(total / limit)),
       page,
       limit,
       sort,
