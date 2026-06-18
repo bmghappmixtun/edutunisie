@@ -13,3 +13,4 @@ public/uploads/*
 !public/uploads/.gitkeep
 .vercel
 coverage/
+tsconfig.tsbuildinfo
