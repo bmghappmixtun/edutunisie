@@ -1,7 +1,6 @@
 import { Suspense } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
-import SearchBar from '@/components/search/SearchBar';
 import SearchResults from '@/components/search/SearchResults';
 import { prisma } from '@/lib/prisma';
 
@@ -36,7 +35,7 @@ async function getInitialData(searchParams: any) {
     sort === 'downloads' ? { downloadsCount: 'desc' } :
     { publishedAt: 'desc' };
 
-  const [results, total, subjects, classes, teachers, types, years, subjectFacets, classFacets, typeFacets, yearFacets, teacherFacets] = await Promise.all([
+  const [results, total, subjects, classes, teachers, subjectFacets, classFacets, typeFacets, yearFacets, teacherFacets] = await Promise.all([
     prisma.resource.findMany({
       where,
       orderBy,
@@ -57,17 +56,10 @@ async function getInitialData(searchParams: any) {
       select: { id: true, firstName: true, lastName: true },
       take: 30
     }),
-    prisma.resource.groupBy({ by: ['type'], where: { status: 'PUBLISHED' }, _count: { _all: true } }),
-    prisma.resource.groupBy({
-      by: ['year'],
-      where: { status: 'PUBLISHED', year: { not: null } },
-      _count: { _all: true },
-      orderBy: { year: 'desc' }
-    }),
     prisma.resource.groupBy({ by: ['subjectId'], where: { status: 'PUBLISHED' }, _count: { _all: true } }),
     prisma.resource.groupBy({ by: ['classId'], where: { status: 'PUBLISHED', classId: { not: null } }, _count: { _all: true } }),
     prisma.resource.groupBy({ by: ['type'], where: { status: 'PUBLISHED' }, _count: { _all: true } }),
-    prisma.resource.groupBy({ by: ['year'], where: { status: 'PUBLISHED', year: { not: null } }, _count: { _all: true } }),
+    prisma.resource.groupBy({ by: ['year'], where: { status: 'PUBLISHED', year: { not: null } }, _count: { _all: true }, orderBy: { year: 'desc' } }),
     prisma.resource.groupBy({
       by: ['teacherId'],
       where: { status: 'PUBLISHED' },
@@ -99,8 +91,8 @@ async function getInitialData(searchParams: any) {
       classes: classes.filter((c: any) => classFacets.some((f: any) => f.classId === c.id && f._count._all > 0)),
       teachers: teachers.filter((t: any) => teacherFacets.some((f: any) => f.teacherId === t.id && f._count._all > 0))
         .map((t: any) => ({ id: t.id, name: `${t.firstName} ${t.lastName}` })),
-      types,
-      years
+      types: typeFacets,
+      years: yearFacets
     }
   };
 }
@@ -113,14 +105,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
     <div className="min-h-screen flex flex-col bg-slate-50">
       <Header />
 
-      {/* Search bar at top */}
-      <div className="bg-white border-b border-slate-200 pt-20 pb-4">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <SearchBar size="lg" />
-        </div>
-      </div>
-
-      <main className="flex-1">
+      <main className="flex-1 pt-24">
         <Suspense fallback={
           <div className="flex items-center justify-center py-20">
             <div className="animate-spin w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full" />

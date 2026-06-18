@@ -109,7 +109,7 @@ export default function SearchResults({ initialData, initialFacets, initialOptio
   const activeFilters = [currentSubject, currentClass, currentTeacher, currentType, currentYear].filter(Boolean).length;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
       {/* Header with stats + view toggle */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
         <div>
@@ -168,9 +168,9 @@ export default function SearchResults({ initialData, initialFacets, initialOptio
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-[280px_1fr] gap-6">
+      <div className="grid lg:grid-cols-[260px_1fr] gap-4">
         {/* Sidebar filters */}
-        <aside className={`${showFilters ? 'block' : 'hidden'} lg:block space-y-4`}>
+        <aside className={`${showFilters ? 'block' : 'hidden'} lg:block space-y-3 lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto`}>
           {/* Active filters */}
           {activeFilters > 0 && (
             <div className="bg-white rounded-2xl border border-slate-200 p-4">
