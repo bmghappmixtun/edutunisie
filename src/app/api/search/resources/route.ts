@@ -92,8 +92,8 @@ export async function GET(req: NextRequest) {
     ]);
   }
 
-  // Get filter options (counts)
-  const [subjectCounts, classCounts, typeCounts, yearCounts, teacherCounts] = await Promise.all([
+  // Get filter options (counts) + lookup names
+  const [subjectCounts, classCounts, typeCounts, yearCounts, teacherCounts, allSubjects, allClasses, allTeachers] = await Promise.all([
     prisma.resource.groupBy({
       by: ['subjectId'],
       where: { status: 'PUBLISHED' },
@@ -121,9 +121,17 @@ export async function GET(req: NextRequest) {
       _count: { _all: true },
       take: 20,
       orderBy: { _count: { teacherId: 'desc' } }
+    }),
+    prisma.subject.findMany({ orderBy: { order: 'asc' }, select: { id: true, nameFr: true, icon: true } }),
+    prisma.class.findMany({ orderBy: { order: 'asc' }, select: { id: true, nameFr: true } }),
+    prisma.user.findMany({
+      where: { role: 'TEACHER', status: 'ACTIVE' },
+      select: { id: true, firstName: true, lastName: true },
+      take: 30
     })
   ]);
 
+  // Use raw results directly
   return NextResponse.json({
     query: q,
     page,
@@ -157,6 +165,15 @@ export async function GET(req: NextRequest) {
       types: typeCounts.map(t => ({ value: t.type, count: t._count._all })),
       years: yearCounts.map(y => ({ value: y.year, count: y._count._all })),
       teachers: teacherCounts.map(t => ({ id: t.teacherId, count: t._count._all }))
+    },
+    options: {
+      subjects: allSubjects.filter(s => subjectCounts.some(c => c.subjectId === s.id && c._count._all > 0)),
+      classes: allClasses.filter(c => classCounts.some(cc => cc.classId === c.id && cc._count._all > 0)),
+      teachers: allTeachers
+        .filter(t => teacherCounts.some(tc => tc.teacherId === t.id && tc._count._all > 0))
+        .map(t => ({ id: t.id, name: `${t.firstName} ${t.lastName}` })),
+      types: typeCounts,
+      years: yearCounts
     },
     took: Date.now() - start
   });
