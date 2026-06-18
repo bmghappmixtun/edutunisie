@@ -304,8 +304,8 @@ export default function PDFViewer({
                 pageNumber={pageNumber}
                 scale={scale}
                 width={containerWidth > 0 ? Math.min(containerWidth, 1200) : undefined}
-                renderTextLayer={true}
-                renderAnnotationLayer={true}
+                renderTextLayer={false}
+                renderAnnotationLayer={false}
                 loading={
                   <div className="flex items-center justify-center min-h-[500px] bg-white shadow-2xl rounded">
                     <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />

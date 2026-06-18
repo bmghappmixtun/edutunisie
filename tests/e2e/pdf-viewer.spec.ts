@@ -8,22 +8,22 @@ test.describe('PDF Viewer', () => {
   test.beforeAll(async ({ playwright }) => {
     const ctx = await playwright.request.newContext({ baseURL: BASE });
     try {
-      // Get a PDF resource from /ressources
+      // Get a list of resources from the public page
       const res = await ctx.get(`${BASE}/ressources`);
       const html = await res.text();
-      const match = html.match(/\/ressources\/([a-z0-9-]+)\/viewer/);
-      // Fallback: get a resource slug
-      const slugMatch = html.match(/\/ressources\/([a-z0-9-]+)(?!["])/);
-      resourceSlug = slugMatch ? slugMatch[1] : '';
-      // Filter out non-resource links
-      if (resourceSlug && !resourceSlug.includes('-')) resourceSlug = '';
 
-      // If no viewer link, get any resource link and add /viewer
-      if (!resourceSlug) {
+      // Look for resource cards - they have specific format
+      // Try to find any "e2e-self-approve-test" or similar
+      // Better: use the resources API or pick the first GHARBI resource
+      const gharbiMatch = html.match(/\/ressources\/([a-z0-9-]+gharbi[a-z0-9-]+)/i);
+      if (gharbiMatch) {
+        resourceSlug = gharbiMatch[1];
+      } else {
+        // Fallback: any resource slug
         const allMatches = Array.from(html.matchAll(/\/ressources\/([a-z0-9-]+)/g));
         for (const m of allMatches) {
           const slug = m[1];
-          if (slug !== 'page' && slug.length > 5) {
+          if (slug !== 'page' && !slug.includes('e2e-self-approve') && slug.length > 10) {
             resourceSlug = slug;
             break;
           }
