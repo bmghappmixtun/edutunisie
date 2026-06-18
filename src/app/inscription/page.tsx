@@ -26,17 +26,11 @@ export default function RegisterPage() {
       });
       const data = await res.json();
       if (!res.ok) { toast.error(data.error); return; }
-      toast.success('Compte créé ! 🎉');
-      if (data.user) {
-        if (data.user.role === 'TEACHER') {
-          toast.success('Compte en attente d\'approbation admin');
-          router.push('/connexion');
-        } else {
-          if (data.user.role === 'ADMIN') router.push('/admin');
-          else router.push('/mon-compte');
-        }
+      toast.success('Compte créé ! Vérifiez votre email.');
+      // Always go to OTP verification (both students and teachers)
+      if (data.requiresVerification) {
+        router.push(`/verifier?email=${encodeURIComponent(form.email)}`);
       } else {
-        toast.success('Code OTP envoyé à votre email');
         router.push('/connexion');
       }
     } catch { toast.error('Erreur'); }

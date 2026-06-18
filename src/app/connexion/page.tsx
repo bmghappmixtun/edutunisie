@@ -25,7 +25,21 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password })
       });
       const data = await res.json();
-      if (!res.ok) { toast.error(data.error || t('auth.invalidCredentials')); return; }
+      if (!res.ok) {
+        // Special handling: redirect to OTP verification if account is pending
+        if (data.code === 'PENDING_OTP' && data.email) {
+          toast.error(data.error || t('auth.invalidCredentials'));
+          router.push(`/verifier?email=${encodeURIComponent(data.email)}`);
+          return;
+        }
+        if (data.code === 'PENDING_APPROVAL') {
+          toast.error(data.error || t('auth.invalidCredentials'));
+          router.push('/en-attente');
+          return;
+        }
+        toast.error(data.error || t('auth.invalidCredentials'));
+        return;
+      }
       toast.success('Bienvenue ! 🎉');
       if (data.user.role === 'ADMIN') router.push('/admin');
       else if (data.user.role === 'TEACHER') router.push('/enseignant');

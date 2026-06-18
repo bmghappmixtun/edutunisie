@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { hashPassword, generateOTP, createSession, setSessionCookie } from '@/lib/auth';
-import { sendOTPEmail } from '@/lib/email';
+import { hashPassword, generateOTP } from '@/lib/auth';
+import { sendOTPEmail, sendWelcomeEmail } from '@/lib/email';
 import { notifyAdminsNewTeacher } from '@/lib/admin-notify';
 
 export async function POST(req: NextRequest) {
@@ -14,55 +14,67 @@ export async function POST(req: NextRequest) {
     if (password.length < 6) {
       return NextResponse.json({ error: 'Le mot de passe doit contenir au moins 6 caractères' }, { status: 400 });
     }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return NextResponse.json({ error: 'Email invalide' }, { status: 400 });
+    }
 
-    const existing = await prisma.user.findUnique({ where: { email } });
+    const existing = await prisma.user.findUnique({ where: { email: email.toLowerCase() } });
     if (existing) {
       return NextResponse.json({ error: 'Cet email est déjà utilisé' }, { status: 409 });
     }
 
     const passwordHash = await hashPassword(password);
     const otpCode = generateOTP();
-    const status = role === 'TEACHER' ? 'PENDING_APPROVAL' : 'PENDING_OTP';
+    // Both students AND teachers require OTP verification first
+    const status = 'PENDING_OTP';
 
     const user = await prisma.user.create({
       data: {
-        email,
+        email: email.toLowerCase(),
         passwordHash,
         firstName,
-        lastName,
+        lastName: lastName || '',
         role,
         status,
-        emailVerifiedAt: role !== 'TEACHER' ? new Date() : null,
+        emailVerifiedAt: null,
       }
     });
 
+    // Create OTP code (10 min expiry)
     await prisma.otpCode.create({
       data: {
         userId: user.id,
         code: otpCode,
-        purpose: role === 'TEACHER' ? 'email_verification' : 'email_verification',
+        purpose: 'email_verification',
         expiresAt: new Date(Date.now() + 10 * 60 * 1000),
       }
     });
 
-    await sendOTPEmail(email, otpCode, 'verification');
+    // Send OTP (for verification)
+    await sendOTPEmail(user.email, otpCode, user.firstName ?? undefined).catch(e =>
+      console.error('OTP email error:', e)
+    );
 
-    // Auto-activate non-teachers for demo
-    if (role !== 'TEACHER') {
-      await prisma.user.update({ where: { id: user.id }, data: { status: 'ACTIVE', emailVerifiedAt: new Date() } });
-      const { token, expiresAt } = await createSession(user.id);
-      await setSessionCookie(token, expiresAt);
-      return NextResponse.json({
-        success: true,
-        user: { id: user.id, email: user.email, role: user.role, firstName: user.firstName, lastName: user.lastName }
-      });
+    // Send welcome email (different purpose - confirms account creation)
+    await sendWelcomeEmail(user.email, user.firstName ?? '', user.role).catch(e =>
+      console.error('Welcome email error:', e)
+    );
+
+    // If teacher, notify admins in-app
+    if (user.role === 'TEACHER') {
+      await notifyAdminsNewTeacher(user.id).catch(e =>
+        console.error('Admin notify error:', e)
+      );
     }
 
-    // Notify admins (in-app + email) about new teacher pending approval
-    await notifyAdminsNewTeacher(user.id).catch(e => console.error('Admin notify error:', e));
-
-    return NextResponse.json({ success: true, message: 'Compte créé. Un code OTP a été envoyé à votre email.' });
+    return NextResponse.json({
+      success: true,
+      requiresVerification: true,
+      message: 'Compte créé. Un code de vérification a été envoyé à votre email.',
+      email: user.email,
+    });
   } catch (e: any) {
+    console.error('Register error:', e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
