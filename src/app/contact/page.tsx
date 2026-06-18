@@ -1,0 +1,158 @@
+import { Mail, MessageSquare, Phone, MapPin, Clock } from 'lucide-react';
+import Header from '@/components/layout/Header';
+import Footer from '@/components/layout/Footer';
+import ContactForm from '@/components/contact/ContactForm';
+
+export const dynamic = 'force-dynamic';
+
+export const metadata = {
+  title: 'Contact — EduTunisie',
+  description: 'Contactez l\'équipe EduTunisie. Une question, un bug, une suggestion ? Nous vous répondons sous 24-48h.'
+};
+
+export default function ContactPage() {
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Header />
+
+      <main className="flex-1 pt-16 lg:pt-20">
+        {/* HERO */}
+        <section className="bg-gradient-to-br from-primary-50 via-white to-sky-50 py-16">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div className="inline-flex items-center gap-2 bg-white border border-primary-200 rounded-full px-4 py-2 mb-6 shadow-sm">
+              <Mail className="w-4 h-4 text-primary-600" />
+              <span className="text-xs font-semibold text-slate-700">Nous sommes à votre écoute</span>
+            </div>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-4">
+              Contactez-<span className="gradient-text">nous</span>
+            </h1>
+            <p className="text-lg lg:text-xl text-slate-600 max-w-2xl mx-auto">
+              Une question, une suggestion, un bug à signaler ? Notre équipe vous répond sous 24-48h.
+            </p>
+          </div>
+        </section>
+
+        {/* Contact info + form */}
+        <section className="py-16 bg-white">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid lg:grid-cols-3 gap-8">
+
+              {/* Coordonnées */}
+              <div className="space-y-4">
+                <h2 className="text-2xl font-extrabold mb-6">Nos coordonnées</h2>
+
+                <div className="bg-white rounded-2xl border border-slate-200 p-5 hover:border-primary-300 transition">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-primary-100 text-primary-600 flex items-center justify-center flex-shrink-0">
+                      <Mail className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-semibold text-slate-500 mb-1">Email</div>
+                      <a href="mailto:contact@edutunisie.tn" className="text-slate-900 font-semibold hover:text-primary-600">
+                        contact@edutunisie.tn
+                      </a>
+                      <div className="text-xs text-slate-500 mt-1">Réponse sous 24-48h</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-2xl border border-slate-200 p-5 hover:border-primary-300 transition">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center flex-shrink-0">
+                      <Phone className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-semibold text-slate-500 mb-1">Téléphone</div>
+                      <div className="text-slate-900 font-semibold">+216 50 000 000</div>
+                      <div className="text-xs text-slate-500 mt-1">Lun-Ven 9h-17h</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-2xl border border-slate-200 p-5 hover:border-primary-300 transition">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center flex-shrink-0">
+                      <MapPin className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-semibold text-slate-500 mb-1">Adresse</div>
+                      <div className="text-slate-900 font-semibold">Tunis, Tunisie</div>
+                      <div className="text-xs text-slate-500 mt-1">Siège social</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-2xl border border-slate-200 p-5 hover:border-primary-300 transition">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center flex-shrink-0">
+                      <Clock className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-semibold text-slate-500 mb-1">Temps de réponse</div>
+                      <div className="text-slate-900 font-semibold">24-48 heures</div>
+                      <div className="text-xs text-slate-500 mt-1">Jours ouvrés</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Réseaux sociaux */}
+                <div className="mt-6">
+                  <div className="text-sm font-semibold text-slate-500 mb-3">Suivez-nous</div>
+                  <div className="flex gap-2">
+                    {[
+                      { name: 'Facebook', icon: '📘', url: '#' },
+                      { name: 'Twitter', icon: '🐦', url: '#' },
+                      { name: 'Instagram', icon: '📷', url: '#' },
+                      { name: 'YouTube', icon: '▶️', url: '#' }
+                    ].map(s => (
+                      <a
+                        key={s.name}
+                        href={s.url}
+                        aria-label={s.name}
+                        className="w-10 h-10 rounded-full bg-white border border-slate-200 hover:border-primary-400 hover:bg-primary-50 flex items-center justify-center transition text-xl"
+                      >
+                        {s.icon}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Formulaire */}
+              <div className="lg:col-span-2">
+                <div className="bg-white rounded-2xl border border-slate-200 p-6 lg:p-8 shadow-sm">
+                  <div className="flex items-center gap-2 mb-6">
+                    <MessageSquare className="w-5 h-5 text-primary-600" />
+                    <h2 className="text-2xl font-extrabold">Envoyez-nous un message</h2>
+                  </div>
+
+                  <ContactForm />
+                </div>
+
+                {/* FAQ rapide */}
+                <div className="mt-6 grid sm:grid-cols-2 gap-4">
+                  {[
+                    { q: 'Comment signaler un contenu abusif ?', a: 'Utilisez le bouton "Signaler" sur chaque ressource ou le formulaire ci-dessus avec sujet "bug".' },
+                    { q: 'Puis-je devenir enseignant ?', a: 'Oui ! Créez un compte, sélectionnez "Enseignant" lors de l\'inscription. Notre équipe examine votre demande sous 24-48h.' },
+                    { q: 'Vos données sont-elles protégées ?', a: 'Absolument. Conformément à la loi tunisienne 2004-63. Voir nos CGU pour les détails.' },
+                    { q: 'Comment supprimer mon compte ?', a: 'Allez dans Paramètres → Compte → Zone dangereuse → Supprimer mon compte.' }
+                  ].map((f, i) => (
+                    <details key={i} className="bg-slate-50 rounded-xl p-4 cursor-pointer group">
+                      <summary className="font-semibold text-slate-900 flex items-center justify-between">
+                        {f.q}
+                        <span className="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                      </summary>
+                      <p className="mt-2 text-sm text-slate-600">{f.a}</p>
+                    </details>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <Footer />
+    </div>
+  );
+}
