@@ -1,5 +1,8 @@
 import { test, expect } from '@playwright/test';
 
+// Prevent real email sends during E2E tests
+process.env.DISABLE_EMAILS = 'true';
+
 const BASE = process.env.BASE_URL || 'http://localhost:3000';
 const TEST_EMAIL = `test-otp-${Date.now()}@example.com`;
 
