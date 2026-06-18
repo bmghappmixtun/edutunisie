@@ -1,10 +1,11 @@
 import Link from 'next/link';
-import { GraduationCap, Search } from 'lucide-react';
+import { GraduationCap } from 'lucide-react';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import UserMenu from './UserMenu';
 import MobileMenu from './MobileMenu';
 import LanguageSwitcher from './LanguageSwitcher';
+import SearchBar from '@/components/search/SearchBar';
 import T from '@/components/i18n/T';
 import { getDict, getT } from '@/lib/i18n-server';
 
@@ -38,12 +39,12 @@ export default async function Header() {
             <Link href="/professeurs" className="text-sm font-medium text-slate-700 hover:text-primary-600 transition"><T k="nav.teachers" /></Link>
           </nav>
 
-          <div className="flex items-center gap-2">
-            <LanguageSwitcher />
-            <Link href="/recherche" className="hidden md:flex items-center gap-2 px-3 py-2 text-sm text-slate-500 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition">
-              <Search className="w-4 h-4" />
+          <div className="flex items-center gap-2 flex-1 max-w-2xl mx-4">
+            <SearchBar className="hidden md:block flex-1" size="sm" />
+            <Link href="/recherche" className="md:hidden flex items-center gap-2 px-3 py-2 text-sm text-slate-500 hover:text-primary-600">
+              <span>🔍</span>
             </Link>
-
+            <LanguageSwitcher />
             {user ? (
               <UserMenu user={user} unreadCount={unreadNotifications} />
             ) : (
