@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
 import Link from 'next/link';
-import { Users, FileText, Star, Download, AlertCircle } from 'lucide-react';
+import { Users, FileText, Star, Download, AlertCircle, Settings } from 'lucide-react';
 import { formatNumber, timeAgo } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
@@ -43,6 +43,14 @@ export default async function AdminDashboard() {
   return (
     <div>
       <h1 className="text-2xl font-extrabold mb-6">🛡️ Dashboard Administrateur</h1>
+
+      {/* Quick admin links */}
+      <div className="mb-6 flex flex-wrap gap-2">
+        <Link href="/admin/parametres" className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl hover:border-primary-400 hover:bg-primary-50 transition text-sm font-semibold">
+          <Settings className="w-4 h-4" />
+          Catalogue (matières, classes, sections, niveaux)
+        </Link>
+      </div>
 
       {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
