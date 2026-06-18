@@ -10,9 +10,9 @@ import {
 } from 'lucide-react';
 
 // Configure PDF.js worker ONCE at module load (before any Document renders)
-// Match pdfjs-dist version (4.8.69)
+// Use local worker file (same-origin, no CORS issues, guaranteed version match)
 if (typeof window !== 'undefined' && pdfjs?.GlobalWorkerOptions) {
-  pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@4.8.69/build/pdf.worker.min.mjs`;
+  pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
 }
 
 const MIN_SCALE = 0.5;
