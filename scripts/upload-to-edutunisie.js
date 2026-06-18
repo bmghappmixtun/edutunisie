@@ -145,15 +145,22 @@ async function uploadOne(session, file) {
   const year = yearMatch ? `${yearMatch[1]}-${yearMatch[2]}` : '2024-2025';
 
   // Build multipart body
+  // NOTE: Attribution is automatic via the teacher account, so no
+  // need to embed teacher/source info in the title or description.
   const parts = [];
   const fields = {
-    title: file.title.replace(/\s*Mr\s+\w+(\s+\w+)?\.?$/i, '').replace(/\.pdf$/i, '').trim() + ` - ${file.teacher}`,
-    description: `📚 Ressource partagée par ${file.teacher}\n🔗 Source: ${file.sourcePage}\n📅 Année: ${year}`,
+    title: file.title
+      .replace(/\s*Mr\s+\w+(\s+\w+)?\.?$/i, '')
+      .replace(/\.pdf$/i, '')
+      .replace(/\s*-\s*(Mr\s+)?Gharbi\s+Ridha\s*$/i, '')
+      .replace(/\s*-\s*(Mr\s+)?GHARBI\s+RIDHA\s*$/i, '')
+      .trim() + ` (${year})`,
+    description: '', // Empty - attribution via teacher account
     type,
     subject: subjectSlug,
     class: classSlug,
     year,
-    tags: `import,gharbi-ridha,tunisiecollege,${type.toLowerCase()}`
+    tags: `import,${file.teacher.toLowerCase().replace(/\s+/g, '-')},tunisiecollege,${type.toLowerCase()}`
   };
 
   for (const [name, value] of Object.entries(fields)) {
