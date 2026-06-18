@@ -4,6 +4,11 @@ const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KE
 const FROM = process.env.EMAIL_FROM || 'EduTunisie <noreply@edutunisie.tn>';
 
 export async function sendOTPEmail(to: string, code: string, firstName?: string) {
+  // Skip real sending if disabled (tests, dev, quota exceeded)
+  if (process.env.DISABLE_EMAILS === 'true' || process.env.NODE_ENV === 'test') {
+    console.log(`[EMAIL SKIP] OTP for ${to}: ${code}`);
+    return { id: 'test-mode', status: 'skipped' };
+  }
   const html = renderOTPEmail(code, firstName || '');
   if (!resend) {
     console.log(`\n📧 [EMAIL - DEV] To: ${to}`);
@@ -28,6 +33,10 @@ export async function sendOTPEmail(to: string, code: string, firstName?: string)
 
 // Welcome email - sent right after account creation (before OTP verification)
 export async function sendWelcomeEmail(to: string, firstName: string, role: string) {
+  if (process.env.DISABLE_EMAILS === 'true' || process.env.NODE_ENV === 'test') {
+    console.log(`[EMAIL SKIP] Welcome for ${to}`);
+    return { id: 'test-mode' };
+  }
   const html = renderWelcomeEmail(firstName, role);
   if (!resend) {
     console.log(`\n📧 [EMAIL - DEV] To: ${to} | Welcome (${role}) - awaiting OTP\n`);
@@ -47,6 +56,10 @@ export async function sendWelcomeEmail(to: string, firstName: string, role: stri
 
 // Confirmation email - sent after OTP verification succeeds
 export async function sendWelcomeConfirmedEmail(to: string, firstName: string, role: string) {
+  if (process.env.DISABLE_EMAILS === 'true' || process.env.NODE_ENV === 'test') {
+    console.log(`[EMAIL SKIP] Confirmation for ${to}`);
+    return { id: 'test-mode' };
+  }
   const html = renderWelcomeConfirmedEmail(firstName, role);
   if (!resend) {
     console.log(`\n📧 [EMAIL - DEV] To: ${to} | Account confirmed (${role})\n`);
@@ -65,6 +78,10 @@ export async function sendWelcomeConfirmedEmail(to: string, firstName: string, r
 }
 
 export async function sendTeacherApprovalEmail(to: string, firstName: string, approved: boolean, reason?: string) {
+  if (process.env.DISABLE_EMAILS === 'true' || process.env.NODE_ENV === 'test') {
+    console.log(`[EMAIL SKIP] Teacher ${approved ? 'APPROVED' : 'REJECTED'} for ${to}`);
+    return { id: 'test-mode' };
+  }
   const html = approved
     ? renderTeacherApprovedEmail(firstName)
     : renderTeacherRejectedEmail(firstName, reason);
@@ -85,6 +102,10 @@ export async function sendTeacherApprovalEmail(to: string, firstName: string, ap
 }
 
 export async function sendResourceApprovedEmail(to: string, firstName: string, title: string, slug: string) {
+  if (process.env.DISABLE_EMAILS === 'true' || process.env.NODE_ENV === 'test') {
+    console.log(`[EMAIL SKIP] Resource approved for ${to}: ${title}`);
+    return { id: 'test-mode' };
+  }
   const html = renderResourceApprovedEmail(firstName, title);
   if (!resend) {
     console.log(`\n📧 [EMAIL - DEV] Resource approved for ${to}: ${title}\n`);

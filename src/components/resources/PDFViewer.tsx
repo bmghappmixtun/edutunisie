@@ -6,19 +6,20 @@ import 'react-pdf/dist/Page/TextLayer.css';
 import {
   ZoomIn, ZoomOut, Maximize2, Minimize2,
   ChevronLeft, ChevronRight, Download,
-  Loader2, AlertCircle, RefreshCw, FileWarning
+  Loader2, AlertCircle, RefreshCw, FileWarning,
+  Maximize, Minimize
 } from 'lucide-react';
 
 // Configure PDF.js worker ONCE at module load (before any Document renders)
-// Use local worker file (same-origin, no CORS issues, guaranteed version match)
 if (typeof window !== 'undefined' && pdfjs?.GlobalWorkerOptions) {
   pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
 }
 
-const MIN_SCALE = 0.5;
-const MAX_SCALE = 3;
+const MIN_SCALE = 0.25;
+const MAX_SCALE = 4;
 const SCALE_STEP = 0.25;
-const DEFAULT_SCALE = 1.2;
+
+type FitMode = 'width' | 'height' | 'page' | 'manual';
 
 interface PDFViewerProps {
   url: string;
@@ -37,25 +38,62 @@ export default function PDFViewer({
 }: PDFViewerProps) {
   const [numPages, setNumPages] = useState<number | null>(null);
   const [pageNumber, setPageNumber] = useState<number>(initialPage);
-  const [scale, setScale] = useState<number>(DEFAULT_SCALE);
+  const [scale, setScale] = useState<number>(1);
+  const [fitMode, setFitMode] = useState<FitMode>('width');
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [containerWidth, setContainerWidth] = useState<number>(0);
+  const [containerWidth, setContainerWidth] = useState<number>(800);
+  const [containerHeight, setContainerHeight] = useState<number>(600);
+  const [pageNaturalSize, setPageNaturalSize] = useState<{ width: number; height: number } | null>(null);
 
   const containerRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Detect container width responsively
+  // Detect container size responsively
   useEffect(() => {
     const update = () => {
       if (containerRef.current) {
+        // Account for padding (p-4 = 16px on each side)
         setContainerWidth(containerRef.current.clientWidth - 32);
+        setContainerHeight(containerRef.current.clientHeight - 32);
       }
     };
     update();
     window.addEventListener('resize', update);
-    return () => window.removeEventListener('resize', update);
+
+    // ResizeObserver for more reliable tracking
+    const ro = new ResizeObserver(update);
+    if (containerRef.current) ro.observe(containerRef.current);
+
+    return () => {
+      window.removeEventListener('resize', update);
+      ro.disconnect();
+    };
   }, [isFullscreen]);
+
+  // Compute actual scale based on fit mode
+  useEffect(() => {
+    if (!pageNaturalSize) return;
+
+    let newScale = scale;
+    if (fitMode === 'width' && pageNaturalSize.width > 0) {
+      newScale = containerWidth / pageNaturalSize.width;
+    } else if (fitMode === 'height' && pageNaturalSize.height > 0) {
+      newScale = containerHeight / pageNaturalSize.height;
+    } else if (fitMode === 'page') {
+      const scaleW = containerWidth / pageNaturalSize.width;
+      const scaleH = containerHeight / pageNaturalSize.height;
+      newScale = Math.min(scaleW, scaleH) * 0.95;
+    }
+    // For 'manual', keep current scale
+
+    if (fitMode !== 'manual') {
+      newScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, newScale));
+      setScale(newScale);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fitMode, containerWidth, containerHeight, pageNaturalSize]);
 
   // Detect fullscreen changes
   useEffect(() => {
@@ -68,7 +106,6 @@ export default function PDFViewer({
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement)?.tagName;
-      // Don't intercept when typing in input
       if (tag === 'INPUT' || tag === 'TEXTAREA') return;
       if (!numPages) return;
 
@@ -87,11 +124,11 @@ export default function PDFViewer({
         case '+':
         case '=':
           e.preventDefault();
-          setScale(s => Math.min(MAX_SCALE, +(s + SCALE_STEP).toFixed(2)));
+          zoomIn();
           break;
         case '-':
           e.preventDefault();
-          setScale(s => Math.max(MIN_SCALE, +(s - SCALE_STEP).toFixed(2)));
+          zoomOut();
           break;
         case 'Home':
           e.preventDefault();
@@ -101,10 +138,15 @@ export default function PDFViewer({
           e.preventDefault();
           setPageNumber(numPages);
           break;
+        case '0':
+          e.preventDefault();
+          fitToWidth();
+          break;
       }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [numPages]);
 
   const toggleFullscreen = useCallback(async () => {
@@ -120,15 +162,21 @@ export default function PDFViewer({
   }, []);
 
   const zoomIn = useCallback(() => {
+    setFitMode('manual');
     setScale(s => Math.min(MAX_SCALE, +(s + SCALE_STEP).toFixed(2)));
   }, []);
 
   const zoomOut = useCallback(() => {
+    setFitMode('manual');
     setScale(s => Math.max(MIN_SCALE, +(s - SCALE_STEP).toFixed(2)));
   }, []);
 
-  const resetZoom = useCallback(() => {
-    setScale(DEFAULT_SCALE);
+  const fitToWidth = useCallback(() => {
+    setFitMode('width');
+  }, []);
+
+  const fitToPage = useCallback(() => {
+    setFitMode('page');
   }, []);
 
   const prevPage = useCallback(() => {
@@ -149,6 +197,12 @@ export default function PDFViewer({
     console.error('PDF load error:', err);
     setError(err?.message || 'Erreur de chargement');
     setLoading(false);
+  }, []);
+
+  // When page loads, capture its natural size to compute fit
+  const onPageLoadSuccess = useCallback((page: any) => {
+    const viewport = page.getViewport({ scale: 1 });
+    setPageNaturalSize({ width: viewport.width, height: viewport.height });
   }, []);
 
   return (
@@ -214,12 +268,12 @@ export default function PDFViewer({
           </button>
           <button
             type="button"
-            onClick={resetZoom}
-            className="px-2 py-1 hover:bg-white/10 rounded-lg text-xs font-mono min-w-[55px] transition"
-            title="Réinitialiser le zoom"
-            aria-label="Réinitialiser le zoom"
+            onClick={fitToWidth}
+            className={`px-2 py-1 hover:bg-white/10 rounded-lg text-xs font-mono min-w-[55px] transition ${fitMode === 'width' ? 'bg-white/20' : ''}`}
+            title="Ajuster à la largeur (0)"
+            aria-label="Ajuster à la largeur"
           >
-            {Math.round(scale * 100)}%
+            {fitMode === 'manual' ? `${Math.round(scale * 100)}%` : '⤢ Auto'}
           </button>
           <button
             type="button"
@@ -230,6 +284,15 @@ export default function PDFViewer({
             aria-label="Zoom avant"
           >
             <ZoomIn className="w-4 h-4" />
+          </button>
+          <button
+            type="button"
+            onClick={fitToPage}
+            className={`p-2 hover:bg-white/10 rounded-lg transition ${fitMode === 'page' ? 'bg-white/20' : ''}`}
+            title="Ajuster à la page"
+            aria-label="Ajuster à la page"
+          >
+            {fitMode === 'page' ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
           </button>
         </div>
 
@@ -258,10 +321,10 @@ export default function PDFViewer({
         </div>
       </div>
 
-      {/* PDF Container */}
+      {/* PDF Container - allow horizontal scroll when zoomed in */}
       <div
         ref={containerRef}
-        className="bg-slate-100 overflow-auto pdf-viewer-container"
+        className="bg-slate-200 overflow-auto pdf-viewer-container"
         style={{ height: isFullscreen ? '100vh' : '70vh', minHeight: '500px' }}
       >
         {error ? (
@@ -280,7 +343,10 @@ export default function PDFViewer({
             </div>
           </div>
         ) : (
-          <div className="flex justify-center p-4 min-h-full">
+          <div
+            ref={scrollRef}
+            className="flex justify-center items-start min-h-full p-4"
+          >
             <Document
               file={url}
               onLoadSuccess={onLoadSuccess}
@@ -303,9 +369,9 @@ export default function PDFViewer({
               <Page
                 pageNumber={pageNumber}
                 scale={scale}
-                width={containerWidth > 0 ? Math.min(containerWidth, 1200) : undefined}
                 renderTextLayer={false}
                 renderAnnotationLayer={false}
+                onLoadSuccess={onPageLoadSuccess}
                 loading={
                   <div className="flex items-center justify-center min-h-[500px] bg-white shadow-2xl rounded">
                     <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
@@ -333,7 +399,11 @@ export default function PDFViewer({
           <span className="text-slate-300">|</span>
           <span>Page {pageNumber} sur {numPages}</span>
           <span className="text-slate-300">|</span>
-          <span className="hidden sm:inline">⌨️ ← → / +/- / Home / End</span>
+          <span className="font-mono">
+            {fitMode === 'manual' ? `${Math.round(scale * 100)}%` : `Auto (${fitMode === 'width' ? 'largeur' : 'page'})`}
+          </span>
+          <span className="text-slate-300">|</span>
+          <span className="hidden sm:inline">⌨️ ← → / +/- / 0 = auto</span>
         </div>
       )}
     </div>
