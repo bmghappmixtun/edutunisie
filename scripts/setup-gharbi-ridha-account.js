@@ -11,6 +11,8 @@
 
 const https = require('https');
 const { URL } = require('url');
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
 
 const BASE_URL = process.env.BASE_URL || 'https://edutunisie.vercel.app';
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'boutiti.mehdi@gmail.com';
@@ -89,26 +91,28 @@ async function login(email, password) {
   return { cookie, user: data.user };
 }
 
-async function registerGharbi() {
+async function registerGharbi(adminSession) {
   console.log('1️⃣  Registering GHARBI RIDHA...');
+
+  // Check if account already exists in DB
+  const existing = await prisma.user.findUnique({ where: { email: GHARBI_ACCOUNT.email } });
+  if (existing) {
+    console.log(`   ⚠️  Account already exists (status: ${existing.status})`);
+    console.log(`   ✓ Using existing user: ${existing.id}`);
+    return { user: existing, wasCreated: false };
+  }
+
   const res = await makeRequest(`${BASE_URL}/api/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' }
   }, GHARBI_ACCOUNT);
 
   const data = res.json();
-  if (res.status === 409 || data.error?.includes('existe déjà')) {
-    console.log('   ⚠️  Account already exists, fetching it...');
-    // Login instead
-    const session = await login(GHARBI_ACCOUNT.email, GHARBI_ACCOUNT.password);
-    return { user: session.user, wasCreated: false };
-  }
-
   if (!res.status.toString().startsWith('2')) {
     throw new Error(`Registration failed: ${JSON.stringify(data)}`);
   }
 
-  console.log(`   ✓ Created user ID: ${data.user.id}`);
+  console.log(`   ✓ Created user ID: ${data.user?.id}`);
   return { user: data.user, wasCreated: true };
 }
 
@@ -233,7 +237,7 @@ async function main() {
   console.log('');
 
   // Step 2: Register GHARBI RIDHA
-  const { user: gharbi, wasCreated } = await registerGharbi();
+  const { user: gharbi, wasCreated } = await registerGharbi(adminSession);
   console.log('');
 
   // Step 3: Approve teacher
@@ -270,4 +274,4 @@ main().catch(e => {
   console.error('Fatal error:', e.message);
   console.error(e.stack);
   process.exit(1);
-});
+}).finally(() => prisma.$disconnect());
