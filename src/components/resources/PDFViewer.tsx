@@ -1,5 +1,5 @@
 'use client';
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef, Component, ReactNode } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
@@ -7,7 +7,7 @@ import {
   ZoomIn, ZoomOut, Maximize2, Minimize2,
   ChevronLeft, ChevronRight, Download,
   Loader2, AlertCircle, RefreshCw, FileWarning,
-  Maximize, Minimize
+  Maximize, Minimize, Search, X, Copy, Check
 } from 'lucide-react';
 
 // Configure PDF.js worker ONCE at module load (before any Document renders)
@@ -20,6 +20,23 @@ const MAX_SCALE = 4;
 const SCALE_STEP = 0.25;
 
 type FitMode = 'width' | 'height' | 'page' | 'manual';
+
+// Error boundary to prevent text-layer crashes from breaking the whole viewer
+class PageErrorBoundary extends Component<
+  { children: ReactNode; onError: () => void },
+  { hasError: boolean }
+> {
+  state = { hasError: false };
+  static getDerivedStateFromError() { return { hasError: true }; }
+  componentDidCatch(error: Error) {
+    console.warn('Page layer error (text/annotation auto-disabled):', error);
+    this.props.onError();
+  }
+  render() {
+    if (this.state.hasError) return this.props.children;
+    return this.props.children;
+  }
+}
 
 interface PDFViewerProps {
   url: string;
@@ -46,6 +63,11 @@ export default function PDFViewer({
   const [containerWidth, setContainerWidth] = useState<number>(800);
   const [containerHeight, setContainerHeight] = useState<number>(600);
   const [pageNaturalSize, setPageNaturalSize] = useState<{ width: number; height: number } | null>(null);
+  const [textLayerEnabled, setTextLayerEnabled] = useState(true);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<{ count: number; active: number }>({ count: 0, active: 0 });
+  const [copySuccess, setCopySuccess] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -205,6 +227,57 @@ export default function PDFViewer({
     setPageNaturalSize({ width: viewport.width, height: viewport.height });
   }, []);
 
+  // Search in PDF text layer
+  useEffect(() => {
+    if (!searchOpen) {
+      // Clear highlights when closing
+      const marks = document.querySelectorAll('.pdf-search-mark, .pdf-search-current');
+      marks.forEach(m => {
+        const parent = m.parentNode;
+        if (parent) {
+          parent.replaceChild(document.createTextNode(m.textContent || ''), m);
+          parent.normalize();
+        }
+      });
+      setSearchResults({ count: 0, active: 0 });
+      return;
+    }
+    if (!searchQuery.trim()) {
+      setSearchResults({ count: 0, active: 0 });
+      return;
+    }
+    // Wait for text layer to render
+    const timer = setTimeout(() => {
+      const textLayer = document.querySelector('.react-pdf__Page__textContent');
+      if (!textLayer) {
+        setSearchResults({ count: 0, active: 0 });
+        return;
+      }
+      const text = textLayer.textContent || '';
+      const regex = new RegExp(searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+      const matches = text.match(regex);
+      setSearchResults({
+        count: matches?.length || 0,
+        active: 1
+      });
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery, searchOpen, pageNumber]);
+
+  // Copy text from selection
+  const handleCopy = useCallback(async () => {
+    const selection = window.getSelection();
+    if (selection && selection.toString()) {
+      try {
+        await navigator.clipboard.writeText(selection.toString());
+        setCopySuccess(true);
+        setTimeout(() => setCopySuccess(false), 2000);
+      } catch {
+        // Fallback: select is preserved
+      }
+    }
+  }, []);
+
   return (
     <div className={`bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm ${className}`}>
       {/* Toolbar */}
@@ -300,6 +373,24 @@ export default function PDFViewer({
         <div className="flex items-center gap-1">
           <button
             type="button"
+            onClick={() => setSearchOpen(o => !o)}
+            className={`p-2 hover:bg-white/10 rounded-lg transition ${searchOpen ? 'bg-white/20' : ''}`}
+            title="Rechercher dans le PDF (Ctrl+F)"
+            aria-label="Rechercher"
+          >
+            <Search className="w-4 h-4" />
+          </button>
+          <button
+            type="button"
+            onClick={handleCopy}
+            className="p-2 hover:bg-white/10 rounded-lg transition relative"
+            title="Copier la sélection"
+            aria-label="Copier"
+          >
+            {copySuccess ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+          </button>
+          <button
+            type="button"
             onClick={toggleFullscreen}
             className="p-2 hover:bg-white/10 rounded-lg transition"
             title="Plein écran"
@@ -320,6 +411,34 @@ export default function PDFViewer({
           )}
         </div>
       </div>
+
+      {/* Search bar */}
+      {searchOpen && (
+        <div className="bg-slate-800 text-white px-3 py-2 flex items-center gap-2 border-t border-slate-700">
+          <Search className="w-4 h-4 text-slate-400 flex-shrink-0" />
+          <input
+            type="search"
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            placeholder="Rechercher dans cette page..."
+            className="flex-1 bg-transparent outline-none text-sm placeholder-slate-400"
+            autoFocus
+          />
+          {searchQuery && (
+            <span className="text-xs text-slate-400 font-mono">
+              {searchResults.count > 0 ? `${searchResults.count} résultat(s)` : 'Aucun'}
+            </span>
+          )}
+          <button
+            type="button"
+            onClick={() => { setSearchOpen(false); setSearchQuery(''); }}
+            className="p-1 hover:bg-white/10 rounded transition"
+            aria-label="Fermer la recherche"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
 
       {/* PDF Container - allow horizontal scroll when zoomed in */}
       <div
@@ -366,27 +485,34 @@ export default function PDFViewer({
               }}
               externalLinkTarget="_blank"
             >
-              <Page
-                pageNumber={pageNumber}
-                scale={scale}
-                renderTextLayer={false}
-                renderAnnotationLayer={false}
-                onLoadSuccess={onPageLoadSuccess}
-                loading={
-                  <div className="flex items-center justify-center min-h-[500px] bg-white shadow-2xl rounded">
-                    <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
-                  </div>
-                }
-                error={
-                  <div className="flex items-center justify-center min-h-[500px] bg-white shadow-2xl rounded p-8">
-                    <div className="text-center">
-                      <AlertCircle className="w-10 h-10 mx-auto mb-2 text-red-500" />
-                      <p className="text-sm text-slate-600">Erreur de rendu de la page</p>
+              <PageErrorBoundary
+                onError={() => {
+                  console.warn('Auto-disabling text/annotation layers');
+                  setTextLayerEnabled(false);
+                }}
+              >
+                <Page
+                  pageNumber={pageNumber}
+                  scale={scale}
+                  renderTextLayer={textLayerEnabled}
+                  renderAnnotationLayer={textLayerEnabled}
+                  onLoadSuccess={onPageLoadSuccess}
+                  loading={
+                    <div className="flex items-center justify-center min-h-[500px] bg-white shadow-2xl rounded">
+                      <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
                     </div>
-                  </div>
-                }
-                className="bg-white shadow-2xl"
-              />
+                  }
+                  error={
+                    <div className="flex items-center justify-center min-h-[500px] bg-white shadow-2xl rounded p-8">
+                      <div className="text-center">
+                        <AlertCircle className="w-10 h-10 mx-auto mb-2 text-red-500" />
+                        <p className="text-sm text-slate-600">Erreur de rendu de la page</p>
+                      </div>
+                    </div>
+                  }
+                  className="bg-white shadow-2xl"
+                />
+              </PageErrorBoundary>
             </Document>
           </div>
         )}
