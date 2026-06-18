@@ -68,6 +68,36 @@ export default function SearchResults({ initialData, initialFacets, initialOptio
   const [facets, setFacets] = useState<any>(initialFacets);
   const [options, setOptions] = useState<any>(initialOptions);
   const [loading, setLoading] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Auto-refetch on URL change
+  const searchString = searchParams.toString();
+  useEffect(() => {
+    // Skip first render (initialData already loaded server-side)
+    if (searchString === (initialData?._searchString ?? '')) return;
+    
+    setIsRefreshing(true);
+    const controller = new AbortController();
+    
+    fetch(`/api/search/resources?${searchString}`, { signal: controller.signal })
+      .then(r => r.json())
+      .then(result => {
+        if (result.success) {
+          setData(result.data);
+          setFacets(result.facets);
+          setOptions(result.options);
+        }
+      })
+      .catch(err => {
+        if (err.name !== 'AbortError') {
+          console.error('Search refetch failed:', err);
+          toast.error('Erreur de recherche');
+        }
+      })
+      .finally(() => setIsRefreshing(false));
+    
+    return () => controller.abort();
+  }, [searchString, initialData?._searchString]);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
 

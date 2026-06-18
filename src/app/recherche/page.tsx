@@ -1,6 +1,8 @@
 import { Suspense } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import SearchBar from '@/components/search/SearchBar';
+import HideOnScrollSearchBar from '@/components/search/HideOnScrollSearchBar';
 import SearchResults from '@/components/search/SearchResults';
 import { prisma } from '@/lib/prisma';
 
@@ -77,7 +79,8 @@ async function getInitialData(searchParams: any) {
       page,
       limit,
       sort,
-      took: 0
+      took: 0,
+      _searchString: new URLSearchParams(searchParams as any).toString()
     },
     initialFacets: {
       subjects: subjectFacets.map((s: any) => ({ id: s.subjectId, count: s._count._all })),
@@ -100,12 +103,19 @@ async function getInitialData(searchParams: any) {
 export default async function SearchPage({ searchParams }: { searchParams: Promise<any> }) {
   const params = await searchParams;
   const { initialData, initialFacets, initialOptions } = await getInitialData(params);
+  const currentQ = params.q || '';
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50">
       <Header />
 
-      <main className="flex-1 pt-24">
+      {/* Spacer for fixed header */}
+      <div className="h-20" />
+
+      {/* Search bar - hides on scroll down, shows on scroll up */}
+      <HideOnScrollSearchBar initialQuery={currentQ} />
+
+      <main className="flex-1 mt-6">
         <Suspense fallback={
           <div className="flex items-center justify-center py-20">
             <div className="animate-spin w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full" />
