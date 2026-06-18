@@ -21,11 +21,22 @@ export async function POST(req: NextRequest) {
     }
 
     if (user.status === 'PENDING_APPROVAL') {
-      return NextResponse.json({ error: 'Votre compte enseignant est en attente d\'approbation par l\'administrateur.' }, { status: 403 });
+      return NextResponse.json({
+        error: 'Votre compte enseignant est en attente d\'approbation par l\'administrateur.',
+        code: 'PENDING_APPROVAL',
+        status: user.status,
+        role: user.role
+      }, { status: 403 });
     }
 
     if (user.status === 'PENDING_OTP') {
-      return NextResponse.json({ error: 'Veuillez vérifier votre email avec le code OTP.' }, { status: 403 });
+      return NextResponse.json({
+        error: 'Veuillez vérifier votre email avec le code OTP.',
+        code: 'PENDING_OTP',
+        status: user.status,
+        role: user.role,
+        email: user.email
+      }, { status: 403 });
     }
 
     const { token, expiresAt } = await createSession(user.id, req.headers.get('user-agent') || undefined);
