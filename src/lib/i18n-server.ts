@@ -1,34 +1,59 @@
-import { cookies } from 'next/headers';
+// Server-side i18n utilities (for Server Components)
+import { headers, cookies } from 'next/headers';
 import fr from '@/messages/fr.json';
 import ar from '@/messages/ar.json';
 
-const dictionaries = { fr, ar };
-export type Locale = 'fr' | 'ar';
+type Locale = 'fr' | 'ar';
+type Messages = typeof fr;
 
-export function getLocaleFromCookies(): Locale {
-  const cookieStore = cookies();
-  const locale = cookieStore.get('locale')?.value as Locale | undefined;
-  return locale === 'ar' ? 'ar' : 'fr';
+const messages: Record<Locale, Messages> = { fr, ar };
+
+function getNested(obj: any, path: string): any {
+  return path.split('.').reduce((acc, key) => acc?.[key], obj);
 }
 
-export function getDict(locale?: Locale) {
-  const l = locale || getLocaleFromCookies();
-  return dictionaries[l];
+export function getServerLocale(): Locale {
+  try {
+    const cookieStore = cookies();
+    const cookieLocale = cookieStore.get('locale')?.value as Locale | undefined;
+    if (cookieLocale === 'fr' || cookieLocale === 'ar') return cookieLocale;
+
+    const headerStore = headers();
+    const accept = headerStore.get('accept-language') || '';
+    if (accept.startsWith('ar')) return 'ar';
+  } catch {
+    // cookies/headers not available (e.g. in tests/build)
+  }
+  return 'fr';
 }
 
-export function getT(locale?: Locale) {
-  const dict = getDict(locale);
+export function getServerMessages(): Messages {
+  return messages[getServerLocale()];
+}
+
+export function tServer(key: string, vars?: Record<string, string>, locale?: Locale): string {
+  const loc = locale || getServerLocale();
+  const value = getNested(messages[loc], key);
+  if (typeof value !== 'string') return key;
+  if (!vars) return value;
+  return Object.entries(vars).reduce(
+    (acc, [k, v]) => acc.replace(new RegExp(`\\{${k}\\}`, 'g'), v),
+    value
+  );
+}
+
+// Backward-compat APIs (used by Header.tsx and others)
+export function getDict(): Messages {
+  return getServerMessages();
+}
+
+export function getT() {
+  const locale = getServerLocale();
   return function t(key: string, vars?: Record<string, string>): string {
-    const keys = key.split('.');
-    let value: any = dict;
-    for (const k of keys) {
-      value = value?.[k];
-    }
-    if (typeof value !== 'string') return key;
-    if (!vars) return value;
-    return Object.entries(vars).reduce(
-      (acc, [k, v]) => acc.replace(new RegExp(`\\{${k}\\}`, 'g'), v),
-      value
-    );
+    return tServer(key, vars, locale);
   };
+}
+
+export function getLocale(): Locale {
+  return getServerLocale();
 }
