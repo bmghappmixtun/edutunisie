@@ -83,3 +83,48 @@
 ::-webkit-scrollbar-track { background: #F1F5F9; }
 ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+
+/* PDF.js text layer — make text selectable and look natural */
+.react-pdf__Page__textContent {
+  user-select: text !important;
+  -webkit-user-select: text !important;
+}
+
+.react-pdf__Page__textContent span,
+.react-pdf__Page__textContent span[role="presentation"] {
+  color: transparent !important;
+  position: absolute;
+  white-space: pre;
+  cursor: text;
+  transform-origin: 0% 0%;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+}
+
+.react-pdf__Page__textContent ::selection {
+  background: rgba(14, 165, 233, 0.35) !important;
+  color: transparent !important;
+}
+
+.react-pdf__Page__textContent *::selection {
+  background: rgba(14, 165, 233, 0.35) !important;
+}
+
+/* Hide text layer during loading to prevent flash */
+.react-pdf__Page__textContent.loading {
+  opacity: 0;
+}
+
+/* Annotation layer (links, form fields) */
+.react-pdf__Page__annotations {
+  user-select: none;
+}
+
+.react-pdf__Page__annotations a {
+  color: transparent;
+  cursor: pointer;
+}
+
+.react-pdf__Page__annotations a:hover {
+  background: rgba(14, 165, 233, 0.1);
+}
