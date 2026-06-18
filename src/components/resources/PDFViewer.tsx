@@ -1,26 +1,24 @@
 'use client';
-import { useState, useCallback, useEffect } from 'react';
-import dynamic from 'next/dynamic';
-import { ZoomIn, ZoomOut, Maximize2, Minimize2, ChevronLeft, ChevronRight, Download, Loader2, AlertCircle } from 'lucide-react';
-
-// Dynamic import to avoid SSR issues with PDF.js
-const Document = dynamic(() => import('react-pdf').then(mod => mod.Document), {
-  ssr: false,
-  loading: () => <ViewerLoading />
-});
-const Page = dynamic(() => import('react-pdf').then(mod => mod.Page), {
-  ssr: false,
-});
-
+import { useState, useCallback, useEffect, useRef } from 'react';
+import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
+import {
+  ZoomIn, ZoomOut, Maximize2, Minimize2,
+  ChevronLeft, ChevronRight, Download,
+  Loader2, AlertCircle, RefreshCw, FileWarning
+} from 'lucide-react';
 
-// Configure PDF.js worker (must match react-pdf's bundled version: 4.8.69)
-if (typeof window !== 'undefined') {
-  import('react-pdf').then(({ pdfjs }) => {
-    pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@4.8.69/build/pdf.worker.min.mjs`;
-  });
+// Configure PDF.js worker ONCE at module load (before any Document renders)
+// Match pdfjs-dist version (4.8.69)
+if (typeof window !== 'undefined' && pdfjs?.GlobalWorkerOptions) {
+  pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@4.8.69/build/pdf.worker.min.mjs`;
 }
+
+const MIN_SCALE = 0.5;
+const MAX_SCALE = 3;
+const SCALE_STEP = 0.25;
+const DEFAULT_SCALE = 1.2;
 
 interface PDFViewerProps {
   url: string;
@@ -30,145 +28,229 @@ interface PDFViewerProps {
   className?: string;
 }
 
-function ViewerLoading() {
-  return (
-    <div className="flex items-center justify-center h-96 bg-slate-50 rounded-xl">
-      <div className="text-center">
-        <Loader2 className="w-10 h-10 mx-auto mb-2 text-primary-500 animate-spin" />
-        <p className="text-sm text-slate-500">Chargement du PDF...</p>
-      </div>
-    </div>
-  );
-}
-
-export default function PDFViewer({ url, fileName, initialPage = 1, onDownload, className = '' }: PDFViewerProps) {
+export default function PDFViewer({
+  url,
+  fileName,
+  initialPage = 1,
+  onDownload,
+  className = ''
+}: PDFViewerProps) {
   const [numPages, setNumPages] = useState<number | null>(null);
   const [pageNumber, setPageNumber] = useState<number>(initialPage);
-  const [scale, setScale] = useState<number>(1.2);
+  const [scale, setScale] = useState<number>(DEFAULT_SCALE);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
   const [containerWidth, setContainerWidth] = useState<number>(0);
 
-  // Detect container width for responsive rendering
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Detect container width responsively
   useEffect(() => {
-    const updateWidth = () => {
-      const container = document.getElementById('pdf-container');
-      if (container) setContainerWidth(container.clientWidth - 32);
+    const update = () => {
+      if (containerRef.current) {
+        setContainerWidth(containerRef.current.clientWidth - 32);
+      }
     };
-    updateWidth();
-    window.addEventListener('resize', updateWidth);
-    return () => window.removeEventListener('resize', updateWidth);
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
   }, [isFullscreen]);
 
-  // Fullscreen toggle
-  const toggleFullscreen = useCallback(() => {
-    if (!isFullscreen) {
-      document.documentElement.requestFullscreen?.().catch(() => {});
-    } else {
-      document.exitFullscreen?.();
-    }
-    setIsFullscreen(!isFullscreen);
-  }, [isFullscreen]);
+  // Detect fullscreen changes
+  useEffect(() => {
+    const onChange = () => setIsFullscreen(!!document.fullscreenElement);
+    document.addEventListener('fullscreenchange', onChange);
+    return () => document.removeEventListener('fullscreenchange', onChange);
+  }, []);
 
   // Keyboard navigation
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement)?.tagName;
+      // Don't intercept when typing in input
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
       if (!numPages) return;
-      if (e.key === 'ArrowRight' || e.key === 'PageDown') {
-        setPageNumber(p => Math.min(numPages, p + 1));
-      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
-        setPageNumber(p => Math.max(1, p - 1));
-      } else if (e.key === '+' || e.key === '=') {
-        setScale(s => Math.min(3, s + 0.2));
-      } else if (e.key === '-') {
-        setScale(s => Math.max(0.5, s - 0.2));
-      } else if (e.key === 'Escape' && isFullscreen) {
-        setIsFullscreen(false);
-      } else if (e.key === 'Home') {
-        setPageNumber(1);
-      } else if (e.key === 'End') {
-        setPageNumber(numPages);
+
+      switch (e.key) {
+        case 'ArrowRight':
+        case 'PageDown':
+        case ' ':
+          e.preventDefault();
+          setPageNumber(p => Math.min(numPages, p + 1));
+          break;
+        case 'ArrowLeft':
+        case 'PageUp':
+          e.preventDefault();
+          setPageNumber(p => Math.max(1, p - 1));
+          break;
+        case '+':
+        case '=':
+          e.preventDefault();
+          setScale(s => Math.min(MAX_SCALE, +(s + SCALE_STEP).toFixed(2)));
+          break;
+        case '-':
+          e.preventDefault();
+          setScale(s => Math.max(MIN_SCALE, +(s - SCALE_STEP).toFixed(2)));
+          break;
+        case 'Home':
+          e.preventDefault();
+          setPageNumber(1);
+          break;
+        case 'End':
+          e.preventDefault();
+          setPageNumber(numPages);
+          break;
       }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [numPages, isFullscreen]);
+  }, [numPages]);
 
-  function onDocumentLoadSuccess({ numPages: n }: { numPages: number }) {
+  const toggleFullscreen = useCallback(async () => {
+    try {
+      if (!document.fullscreenElement) {
+        await containerRef.current?.requestFullscreen?.();
+      } else {
+        await document.exitFullscreen();
+      }
+    } catch (e) {
+      console.warn('Fullscreen error:', e);
+    }
+  }, []);
+
+  const zoomIn = useCallback(() => {
+    setScale(s => Math.min(MAX_SCALE, +(s + SCALE_STEP).toFixed(2)));
+  }, []);
+
+  const zoomOut = useCallback(() => {
+    setScale(s => Math.max(MIN_SCALE, +(s - SCALE_STEP).toFixed(2)));
+  }, []);
+
+  const resetZoom = useCallback(() => {
+    setScale(DEFAULT_SCALE);
+  }, []);
+
+  const prevPage = useCallback(() => {
+    setPageNumber(p => Math.max(1, p - 1));
+  }, []);
+
+  const nextPage = useCallback(() => {
+    setPageNumber(p => Math.min(numPages || 1, p + 1));
+  }, [numPages]);
+
+  const onLoadSuccess = useCallback(({ numPages: n }: { numPages: number }) => {
     setNumPages(n);
-    setIsLoading(false);
+    setLoading(false);
     setError(null);
-  }
+  }, []);
 
-  function onDocumentLoadError(err: Error) {
-    setError(err.message);
-    setIsLoading(false);
-  }
+  const onLoadError = useCallback((err: Error) => {
+    console.error('PDF load error:', err);
+    setError(err?.message || 'Erreur de chargement');
+    setLoading(false);
+  }, []);
 
   return (
-    <div className={`bg-white rounded-2xl border border-slate-200 overflow-hidden ${className}`}>
+    <div className={`bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm ${className}`}>
       {/* Toolbar */}
-      <div className="bg-slate-900 text-white px-3 py-2 flex items-center justify-between gap-2 flex-wrap">
-        <div className="flex items-center gap-2 text-sm">
+      <div className="bg-slate-900 text-white px-2 sm:px-3 py-2 flex items-center justify-between gap-1 sm:gap-2 flex-wrap">
+        {/* Page navigation */}
+        <div className="flex items-center gap-1">
           <button
-            onClick={() => setPageNumber(p => Math.max(1, p - 1))}
-            disabled={pageNumber <= 1}
-            className="p-1.5 hover:bg-white/10 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition"
-            title="Page précédente"
+            type="button"
+            onClick={prevPage}
+            disabled={!numPages || pageNumber <= 1}
+            className="p-2 hover:bg-white/10 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition"
+            title="Page précédente (←)"
+            aria-label="Page précédente"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
-          <span className="font-mono text-xs min-w-[60px] text-center">
-            {numPages ? `${pageNumber} / ${numPages}` : '...'}
-          </span>
+          <div className="px-2 py-1 text-xs font-mono min-w-[70px] text-center">
+            {numPages ? (
+              <>
+                <input
+                  type="number"
+                  min={1}
+                  max={numPages}
+                  value={pageNumber}
+                  onChange={(e) => {
+                    const p = parseInt(e.target.value);
+                    if (p >= 1 && p <= numPages) setPageNumber(p);
+                  }}
+                  className="w-10 bg-transparent text-center text-white border-b border-white/30 focus:border-white outline-none"
+                  aria-label="Numéro de page"
+                />
+                <span className="text-slate-400"> / {numPages}</span>
+              </>
+            ) : (
+              <span className="text-slate-400">… / …</span>
+            )}
+          </div>
           <button
-            onClick={() => setPageNumber(p => Math.min(numPages || 1, p + 1))}
+            type="button"
+            onClick={nextPage}
             disabled={!numPages || pageNumber >= numPages}
-            className="p-1.5 hover:bg-white/10 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition"
-            title="Page suivante"
+            className="p-2 hover:bg-white/10 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition"
+            title="Page suivante (→)"
+            aria-label="Page suivante"
           >
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
 
-        <div className="flex items-center gap-1 text-sm">
+        {/* Zoom controls */}
+        <div className="flex items-center gap-1">
           <button
-            onClick={() => setScale(s => Math.max(0.5, s - 0.2))}
-            className="p-1.5 hover:bg-white/10 rounded-lg transition"
-            title="Zoom arrière"
+            type="button"
+            onClick={zoomOut}
+            disabled={scale <= MIN_SCALE}
+            className="p-2 hover:bg-white/10 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition"
+            title="Zoom arrière (-)"
+            aria-label="Zoom arrière"
           >
             <ZoomOut className="w-4 h-4" />
           </button>
-          <span className="font-mono text-xs min-w-[50px] text-center">
-            {Math.round(scale * 100)}%
-          </span>
           <button
-            onClick={() => setScale(s => Math.min(3, s + 0.2))}
-            className="p-1.5 hover:bg-white/10 rounded-lg transition"
-            title="Zoom avant"
+            type="button"
+            onClick={resetZoom}
+            className="px-2 py-1 hover:bg-white/10 rounded-lg text-xs font-mono min-w-[55px] transition"
+            title="Réinitialiser le zoom"
+            aria-label="Réinitialiser le zoom"
+          >
+            {Math.round(scale * 100)}%
+          </button>
+          <button
+            type="button"
+            onClick={zoomIn}
+            disabled={scale >= MAX_SCALE}
+            className="p-2 hover:bg-white/10 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition"
+            title="Zoom avant (+)"
+            aria-label="Zoom avant"
           >
             <ZoomIn className="w-4 h-4" />
           </button>
+        </div>
+
+        {/* Right-side actions */}
+        <div className="flex items-center gap-1">
           <button
-            onClick={() => setScale(1.2)}
-            className="px-2 py-1 hover:bg-white/10 rounded-lg text-xs transition"
-            title="Taille réelle"
-          >
-            100%
-          </button>
-          <button
+            type="button"
             onClick={toggleFullscreen}
-            className="p-1.5 hover:bg-white/10 rounded-lg transition ml-1"
-            title={isFullscreen ? 'Quitter le plein écran' : 'Plein écran'}
+            className="p-2 hover:bg-white/10 rounded-lg transition"
+            title="Plein écran"
+            aria-label="Plein écran"
           >
             {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
           </button>
           {onDownload && (
             <button
+              type="button"
               onClick={onDownload}
-              className="p-1.5 hover:bg-white/10 rounded-lg transition ml-1"
+              className="p-2 hover:bg-white/10 rounded-lg transition"
               title="Télécharger"
+              aria-label="Télécharger"
             >
               <Download className="w-4 h-4" />
             </button>
@@ -178,33 +260,45 @@ export default function PDFViewer({ url, fileName, initialPage = 1, onDownload, 
 
       {/* PDF Container */}
       <div
-        id="pdf-container"
-        className="bg-slate-100 overflow-auto"
-        style={{ height: isFullscreen ? 'calc(100vh - 56px)' : '70vh', minHeight: '500px' }}
+        ref={containerRef}
+        className="bg-slate-100 overflow-auto pdf-viewer-container"
+        style={{ height: isFullscreen ? '100vh' : '70vh', minHeight: '500px' }}
       >
         {error ? (
           <div className="flex items-center justify-center h-full p-8">
             <div className="text-center max-w-md">
-              <AlertCircle className="w-12 h-12 mx-auto mb-3 text-red-500" />
+              <FileWarning className="w-12 h-12 mx-auto mb-3 text-red-500" />
               <h3 className="font-bold text-lg mb-2">Impossible de charger le PDF</h3>
               <p className="text-sm text-slate-500 mb-4">{error}</p>
-              <button onClick={() => window.location.reload()} className="btn-primary text-sm">
-                Réessayer
+              <button
+                type="button"
+                onClick={() => window.location.reload()}
+                className="btn-primary text-sm inline-flex items-center gap-2"
+              >
+                <RefreshCw className="w-4 h-4" /> Réessayer
               </button>
             </div>
           </div>
         ) : (
-          <div className="flex justify-center p-4">
+          <div className="flex justify-center p-4 min-h-full">
             <Document
               file={url}
-              onLoadSuccess={onDocumentLoadSuccess}
-              onLoadError={onDocumentLoadError}
-              loading={<ViewerLoading />}
+              onLoadSuccess={onLoadSuccess}
+              onLoadError={onLoadError}
+              loading={
+                <div className="flex items-center justify-center min-h-[500px]">
+                  <div className="text-center">
+                    <Loader2 className="w-10 h-10 mx-auto mb-2 text-primary-500 animate-spin" />
+                    <p className="text-sm text-slate-500">Chargement du PDF…</p>
+                  </div>
+                </div>
+              }
               options={{
                 cMapUrl: 'https://unpkg.com/pdfjs-dist@4.8.69/cmaps/',
                 cMapPacked: true,
+                standardFontDataUrl: 'https://unpkg.com/pdfjs-dist@4.8.69/standard_fonts/',
               }}
-              className="shadow-2xl"
+              externalLinkTarget="_blank"
             >
               <Page
                 pageNumber={pageNumber}
@@ -212,30 +306,34 @@ export default function PDFViewer({ url, fileName, initialPage = 1, onDownload, 
                 width={containerWidth > 0 ? Math.min(containerWidth, 1200) : undefined}
                 renderTextLayer={true}
                 renderAnnotationLayer={true}
-                loading={<ViewerLoading />}
-                className="bg-white"
+                loading={
+                  <div className="flex items-center justify-center min-h-[500px] bg-white shadow-2xl rounded">
+                    <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
+                  </div>
+                }
+                error={
+                  <div className="flex items-center justify-center min-h-[500px] bg-white shadow-2xl rounded p-8">
+                    <div className="text-center">
+                      <AlertCircle className="w-10 h-10 mx-auto mb-2 text-red-500" />
+                      <p className="text-sm text-slate-600">Erreur de rendu de la page</p>
+                    </div>
+                  </div>
+                }
+                className="bg-white shadow-2xl"
               />
             </Document>
           </div>
         )}
       </div>
 
-      {/* Bottom controls (page input) */}
-      {numPages && (
-        <div className="bg-slate-50 border-t border-slate-200 px-3 py-2 flex items-center justify-center gap-2 text-sm">
-          <span className="text-slate-500">Aller à la page :</span>
-          <input
-            type="number"
-            min={1}
-            max={numPages}
-            value={pageNumber}
-            onChange={(e) => {
-              const p = parseInt(e.target.value);
-              if (p >= 1 && p <= numPages) setPageNumber(p);
-            }}
-            className="w-16 px-2 py-1 border border-slate-200 rounded text-center text-xs font-mono focus:border-primary-400 outline-none"
-          />
-          <span className="text-slate-400">/ {numPages}</span>
+      {/* Status bar */}
+      {numPages && !error && (
+        <div className="bg-slate-50 border-t border-slate-200 px-3 py-1.5 flex items-center justify-center gap-3 text-xs text-slate-500">
+          <span>📄 {numPages} page{numPages > 1 ? 's' : ''}</span>
+          <span className="text-slate-300">|</span>
+          <span>Page {pageNumber} sur {numPages}</span>
+          <span className="text-slate-300">|</span>
+          <span className="hidden sm:inline">⌨️ ← → / +/- / Home / End</span>
         </div>
       )}
     </div>
