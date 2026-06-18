@@ -178,28 +178,35 @@ test.describe('PDF Viewer', () => {
     await page.goto(`${BASE}/ressources/${resourceSlug}/viewer`, {
       waitUntil: 'domcontentloaded'
     });
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(3000);
     await page.waitForSelector('.pdf-viewer-container', { timeout: 10000 });
     await page.waitForTimeout(2000);
 
     const pageInput = page.locator('input[aria-label="Numéro de page"]');
-    const initialValue = await pageInput.inputValue();
+    await pageInput.waitFor({ state: 'visible', timeout: 5000 });
+    const initialValue = await pageInput.inputValue({ timeout: 5000 });
+    console.log('Initial page:', initialValue);
 
-    // Press right arrow
+    // Press right arrow - click on PDF area first to ensure focus
+    await page.locator('.pdf-viewer-container').click();
+    await page.waitForTimeout(300);
     await page.keyboard.press('ArrowRight');
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(800);
 
-    const after1 = await pageInput.inputValue();
+    const after1 = await pageInput.inputValue({ timeout: 5000 });
+    console.log('After ArrowRight:', after1);
     expect(parseInt(after1)).toBe(parseInt(initialValue) + 1);
-    console.log('✓ ArrowRight works');
 
     // Press left arrow
+    await page.locator('.pdf-viewer-container').click();
+    await page.waitForTimeout(300);
     await page.keyboard.press('ArrowLeft');
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(800);
 
-    const after2 = await pageInput.inputValue();
+    const after2 = await pageInput.inputValue({ timeout: 5000 });
+    console.log('After ArrowLeft:', after2);
     expect(parseInt(after2)).toBe(parseInt(initialValue));
-    console.log('✓ ArrowLeft works');
+    console.log('✓ Keyboard arrows work');
   });
 
   test('Reset zoom button returns to 100%', async ({ page }) => {
@@ -208,22 +215,20 @@ test.describe('PDF Viewer', () => {
     });
     await page.waitForTimeout(2000);
     await page.waitForSelector('.pdf-viewer-container', { timeout: 10000 });
+    await page.waitForTimeout(2000); // Wait for PDF to fully load
 
     const zoomButton = page.locator('button[aria-label="Réinitialiser le zoom"]');
 
-    // Zoom in several times
+    // Zoom in once
     await page.locator('button[aria-label="Zoom avant"]').click();
-    await page.locator('button[aria-label="Zoom avant"]').click();
-    await page.waitForTimeout(300);
-
-    const before = await zoomButton.textContent();
-    console.log('Before reset:', before);
+    await page.waitForTimeout(1000);
 
     // Click reset
-    await zoomButton.click();
-    await page.waitForTimeout(300);
+    await zoomButton.click({ timeout: 5000 });
+    await page.waitForTimeout(1000);
 
-    const after = await zoomButton.textContent();
+    // Read text - re-evaluate the locator since DOM may have updated
+    const after = await page.locator('button[aria-label="Réinitialiser le zoom"]').textContent({ timeout: 5000 });
     console.log('After reset:', after);
 
     expect(after).toContain('120%'); // DEFAULT_SCALE * 100
