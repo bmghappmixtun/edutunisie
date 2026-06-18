@@ -36,6 +36,7 @@ model User {
   avatarUrl       String?
   bio             String?
   phone           String?
+  website         String?
   schoolLevel     String?
   classLevel      String?
   section         String?
@@ -70,6 +71,11 @@ model User {
   otpCodes        OtpCode[]
   sessions        Session[]
   notifications   Notification[]
+  following       Follow[]       @relation("Follower")
+  followers       Follow[]       @relation("Following")
+  convAsStudent   Conversation[] @relation("ConvStudent")
+  convAsTeacher   Conversation[] @relation("ConvTeacher")
+  sentMessages    Message[]      @relation("MessageSender")
 
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
@@ -342,4 +348,49 @@ model Setting {
   key       String   @id
   value     String
   updatedAt DateTime @updatedAt
+}
+
+// ============ FOLLOWS (Students follow teachers) ============
+model Follow {
+  id           String   @id @default(cuid())
+  followerId   String
+  follower     User     @relation("Follower", fields: [followerId], references: [id], onDelete: Cascade)
+  followingId  String
+  following    User     @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+
+  @@unique([followerId, followingId])
+  @@index([followingId, createdAt])
+}
+
+// ============ CONVERSATIONS ============
+model Conversation {
+  id          String    @id @default(cuid())
+  studentId   String
+  student     User      @relation("ConvStudent", fields: [studentId], references: [id], onDelete: Cascade)
+  teacherId   String
+  teacher     User      @relation("ConvTeacher", fields: [teacherId], references: [id], onDelete: Cascade)
+  subject     String?
+  lastMessageAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  messages    Message[]
+
+  @@unique([studentId, teacherId])
+  @@index([studentId, lastMessageAt])
+  @@index([teacherId, lastMessageAt])
+}
+
+// ============ MESSAGES ============
+model Message {
+  id              String       @id @default(cuid())
+  conversationId  String
+  conversation    Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId        String
+  sender          User         @relation("MessageSender", fields: [senderId], references: [id])
+  content         String
+  isRead          Boolean      @default(false)
+  createdAt       DateTime     @default(now())
+
+  @@index([conversationId, createdAt])
 }

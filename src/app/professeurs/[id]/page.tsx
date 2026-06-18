@@ -3,12 +3,15 @@ import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { prisma } from '@/lib/prisma';
+import { getCurrentUser } from '@/lib/auth';
 import {
   GraduationCap, MapPin, BookOpen, FileText, Star,
   Award, Mail, Calendar, Download, Eye,
   Briefcase, Layers, MessageSquare, Share2, CheckCircle
 } from 'lucide-react';
 import ShareButton from '@/components/share/ShareButton';
+import FollowButton from '@/components/social/FollowButton';
+import MessageTeacherButton from '@/components/social/MessageTeacherButton';
 import { timeAgo } from '@/lib/utils';
 import ResourceCard from '@/components/resources/ResourceCard';
 
@@ -51,6 +54,18 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
   });
 
   if (!teacher) notFound();
+
+  // Get current user for follow/message state
+  const currentUser = await getCurrentUser();
+  let isFollowing = false;
+  let followersCount = 0;
+  if (currentUser) {
+    const follow = await prisma.follow.findUnique({
+      where: { followerId_followingId: { followerId: currentUser.id, followingId: id } }
+    });
+    isFollowing = !!follow;
+  }
+  followersCount = await prisma.follow.count({ where: { followingId: id } });
 
   // Get all published resources by this teacher
   const resources = await prisma.resource.findMany({
@@ -182,6 +197,17 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
                     description={`Découvrez les ressources de ${teacher.firstName} ${teacher.lastName}`}
                   />
                 </div>
+
+                {currentUser && currentUser.id !== teacher.id && (
+                  <div className="flex gap-2 mt-3">
+                    <FollowButton
+                      teacherId={teacher.id}
+                      initialFollowing={isFollowing}
+                      initialCount={followersCount}
+                    />
+                    <MessageTeacherButton teacherId={teacher.id} />
+                  </div>
+                )}
 
                 {/* Bio */}
                 {teacher.bio && (
