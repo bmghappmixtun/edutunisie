@@ -1,7 +1,7 @@
 'use client';
 import { signIn } from 'next-auth/react';
 
-export default function OAuthButtons({ callbackUrl = '/' }: { callbackUrl?: string }) {
+export default function OAuthButtons({ callbackUrl = "/", mode = "login" }: { callbackUrl?: string; mode?: string }) {
   async function handleOAuth(provider: string) {
     await signIn(provider, { callbackUrl });
   }

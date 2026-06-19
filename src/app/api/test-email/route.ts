@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     } else if (type === 'teacher-rejected') {
       await sendTeacherApprovalEmail(email, 'Ahmed', false);
     } else if (type === 'resource-approved') {
-      await sendResourceApprovedEmail(email, 'Ahmed', 'Devoir de Mathématiques Bac 2024', 'test-slug');
+      await sendResourceApprovedEmail(email, 'Ahmed', 'Devoir de Mathématiques Bac 2024', true);
     }
     return NextResponse.json({ success: true, message: `Email de type "${type}" envoyé à ${email}` });
   } catch (e: any) {

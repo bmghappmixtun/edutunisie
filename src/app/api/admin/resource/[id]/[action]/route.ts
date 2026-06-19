@@ -28,7 +28,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       });
       const teacher = await prisma.user.findUnique({ where: { id: resource.teacherId } });
       if (teacher?.email && teacher.firstName) {
-        await sendResourceApprovedEmail(teacher.email, teacher.firstName, resource.title, resource.slug);
+        await sendResourceApprovedEmail(teacher.email, teacher.firstName, resource.title, true);
       }
     }
   } else if (action === 'reject') {
