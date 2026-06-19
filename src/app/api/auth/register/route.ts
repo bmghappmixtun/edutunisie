@@ -40,25 +40,22 @@ export async function POST(req: NextRequest) {
       }
     });
 
-    // Create OTP code (10 min expiry)
+    // Create OTP code (30 min expiry)
     await prisma.otpCode.create({
       data: {
         userId: user.id,
         code: otpCode,
         purpose: 'email_verification',
-        expiresAt: new Date(Date.now() + 10 * 60 * 1000),
+        expiresAt: new Date(Date.now() + 30 * 60 * 1000),
       }
     });
 
-    // Send OTP (for verification)
-    await sendOTPEmail(user.email, otpCode, user.firstName ?? undefined).catch(e =>
-      console.error('OTP email error:', e)
-    );
+    // Send OTP (for verification) - await so we know if it failed
+    const otpResult = await sendOTPEmail(user.email, otpCode, user.firstName ?? undefined);
+    console.log(`[register] OTP email result for ${user.email}: success=${otpResult.success} id=${otpResult.id} devCode=${otpResult.devCode ? 'YES' : 'NO'}`);
 
     // Send welcome email (different purpose - confirms account creation)
-    await sendWelcomeEmail(user.email, user.firstName ?? '', user.role).catch(e =>
-      console.error('Welcome email error:', e)
-    );
+    await sendWelcomeEmail(user.email, user.firstName ?? '', user.role);
 
     // If teacher, notify admins in-app
     if (user.role === 'TEACHER') {
@@ -67,12 +64,27 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    return NextResponse.json({
+    // Build response - in dev mode OR if email failed, expose the OTP
+    // so the user can verify without checking email
+    const response: any = {
       success: true,
       requiresVerification: true,
       message: 'Compte créé. Un code de vérification a été envoyé à votre email.',
       email: user.email,
-    });
+    };
+
+    // Expose devCode when:
+    // - NODE_ENV is not production
+    // - OR Resend is in testing mode (failed to send to non-owner)
+    if (otpResult.devCode) {
+      response.devCode = otpResult.devCode;
+      response.devMode = true;
+      if (!otpResult.success) {
+        response.message = `Compte créé. ⚠️ Email non envoyé (${otpResult.error}). En dev, utilisez le code ci-dessous.`;
+      }
+    }
+
+    return NextResponse.json(response);
   } catch (e: any) {
     console.error('Register error:', e);
     return NextResponse.json({ error: e.message }, { status: 500 });
