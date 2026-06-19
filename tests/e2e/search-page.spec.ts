@@ -82,10 +82,10 @@ test.describe('Search Page - Complete E2E', () => {
   // 4. TYPE FILTER
   // ==========================================================================
   test('4. Type filter toggles correctly', async ({ page }) => {
-    // Click on "Devoir" filter
-    const devoirFilter = page.locator('button:has-text("Devoir")').first();
+    // Click on "Devoir" filter in sidebar
+    const devoirFilter = page.locator('aside button:has-text("Devoir")').first();
     await devoirFilter.click();
-    await page.waitForTimeout(500);
+    await page.waitForURL(/type=HOMEWORK/, { timeout: 5000 });
 
     // URL should have type=HOMEWORK
     expect(page.url()).toContain('type=HOMEWORK');
@@ -100,14 +100,16 @@ test.describe('Search Page - Complete E2E', () => {
   });
 
   test('5. Multiple type filters can be selected sequentially', async ({ page }) => {
-    // Click "Cours"
-    await page.locator('button:has-text("Cours")').first().click();
-    await page.waitForTimeout(500);
+    // Click "Cours" in the Type section (sidebar, not header)
+    const sidebarCours = page.locator('aside button:has-text("Cours")').first();
+    await sidebarCours.click();
+    await page.waitForURL(/type=COURSE/, { timeout: 5000 });
     expect(page.url()).toContain('type=COURSE');
 
     // Click "Exercice" - should switch
-    await page.locator('button:has-text("Exercice")').first().click();
-    await page.waitForTimeout(500);
+    const sidebarExo = page.locator('aside button:has-text("Exercice")').first();
+    await sidebarExo.click();
+    await page.waitForURL(/type=EXERCISE/, { timeout: 5000 });
     expect(page.url()).toContain('type=EXERCISE');
     expect(page.url()).not.toContain('type=COURSE');
   });
@@ -346,9 +348,11 @@ test.describe('Search Page - Complete E2E', () => {
   // 20. COMBINED FILTERS
   // ==========================================================================
   test('20. Multiple filters combine correctly', async ({ page }) => {
-    // Apply type + subject
-    await page.locator('button:has-text("Devoir")').first().click();
-    await page.waitForTimeout(300);
+    // Apply type (Devoir in sidebar)
+    const sidebarDevoir = page.locator('aside button:has-text("Devoir")').first();
+    await sidebarDevoir.click();
+    await page.waitForURL(/type=HOMEWORK/, { timeout: 5000 });
+    await page.waitForTimeout(500);
 
     const math = page.locator('aside button:has-text("Mathématiques")').first();
     if (await math.count() > 0) {

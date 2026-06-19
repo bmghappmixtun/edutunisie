@@ -26,10 +26,13 @@ export default function RegisterPage() {
       });
       const data = await res.json();
       if (!res.ok) { toast.error(data.error); return; }
-      toast.success('Compte créé ! Vérifiez votre email.');
+      toast.success('Compte créé !');
       // Always go to OTP verification (both students and teachers)
       if (data.requiresVerification) {
-        router.push(`/verifier?email=${encodeURIComponent(form.email)}`);
+        // Pass devCode in URL if available (so verifier page can show it)
+        const params = new URLSearchParams({ email: form.email });
+        if (data.devCode) params.set('devCode', data.devCode);
+        router.push(`/verifier?${params.toString()}`);
       } else {
         router.push('/connexion');
       }
@@ -78,28 +81,51 @@ export default function RegisterPage() {
             <label className="label">Vous êtes ?</label>
             <div className="grid grid-cols-2 gap-2">
               {[
-                { value: 'STUDENT', label: '👨‍🎓 Élève', desc: 'Je cherche des ressources' },
-                { value: 'TEACHER', label: '👨‍🏫 Enseignant', desc: 'Je partage mes cours' },
-              ].map(r => (
-                <button key={r.value} type="button" onClick={() => update('role', r.value)} className={`p-3 rounded-xl border-2 text-left transition ${form.role === r.value ? 'border-primary-400 bg-primary-50' : 'border-slate-200 hover:border-slate-300'}`}>
-                  <div className="font-bold text-sm">{r.label}</div>
-                  <div className="text-xs text-slate-500">{r.desc}</div>
+                { value: 'STUDENT', label: 'Élève', icon: '🎓' },
+                { value: 'TEACHER', label: 'Enseignant', icon: '👨‍🏫' }
+              ].map(opt => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => update('role', opt.value)}
+                  className={`px-4 py-3 rounded-xl border-2 transition font-semibold text-sm ${
+                    form.role === opt.value
+                      ? 'border-primary-500 bg-primary-50 text-primary-700'
+                      : 'border-slate-200 hover:border-slate-300 text-slate-600'
+                  }`}
+                >
+                  <span className="text-xl block mb-1">{opt.icon}</span>
+                  {opt.label}
                 </button>
               ))}
             </div>
           </div>
-          <button type="submit" disabled={loading} className="btn-primary w-full justify-center py-3 text-base">
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="btn-primary w-full mb-4"
+          >
             {loading ? 'Création...' : 'Créer mon compte'}
           </button>
 
-          <OAuthButtons />
-          <p className="text-xs text-slate-400 text-center mt-3">
-            En vous inscrivant, vous acceptez nos <a href="#" className="underline">CGU</a> et notre <a href="#" className="underline">politique de confidentialité</a>.
+          <p className="text-xs text-slate-500 text-center mb-4">
+            En vous inscrivant, vous acceptez nos <Link href="/cgu" className="text-primary-600 hover:underline">CGU</Link>.
           </p>
+
+          <div className="relative my-4">
+            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-200"></div></div>
+            <div className="relative flex justify-center text-xs"><span className="bg-white px-3 text-slate-500">ou</span></div>
+          </div>
+
+          <OAuthButtons mode="register" />
         </form>
 
-        <p className="text-center mt-6 text-sm text-slate-500">
-          Déjà inscrit ? <Link href="/connexion" className="text-primary-600 font-semibold hover:underline">Connectez-vous</Link>
+        <p className="text-center text-sm text-slate-500 mt-6">
+          Vous avez déjà un compte ?{' '}
+          <Link href="/connexion" className="text-primary-600 font-semibold hover:underline">
+            Se connecter
+          </Link>
         </p>
       </div>
     </div>

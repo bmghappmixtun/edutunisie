@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
         userId: user.id,
         code,
         purpose: 'email_verification',
-        expiresAt: new Date(Date.now() + 10 * 60 * 1000),
+        expiresAt: new Date(Date.now() + 30 * 60 * 1000),
       }
     });
 
