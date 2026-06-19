@@ -4,7 +4,7 @@ const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KE
 const FROM = process.env.EMAIL_FROM || 'EduTunisie <noreply@edutunisie.tn>';
 
 // In dev/test mode without proper Resend domain, log OTP to console so dev can test
-const DEV_SHOW_OTP = process.env.NODE_ENV !== 'production' || process.env.DEV_SHOW_OTP === 'true';
+const DEV_SHOW_OTP = true; // Always show dev code as fallback when email fails
 
 export class EmailResult {
   constructor(
