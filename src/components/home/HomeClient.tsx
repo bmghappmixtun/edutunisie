@@ -4,7 +4,8 @@ import Link from 'next/link';
 import {
   Search, BookOpen, Upload, Star, Download, Eye,
   Shield, Smartphone, Printer, Share2, ArrowRight, Sparkles,
-  Users, FileText, TrendingUp, Award, Mail
+  Users, FileText, TrendingUp, Award, Mail,
+  Library, Globe
 } from 'lucide-react';
 import { useI18n } from '@/lib/i18n';
 import ResourceCard from '@/components/resources/ResourceCard';

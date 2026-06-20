@@ -15,10 +15,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     new URL(req.url).searchParams.get('original') === '1';
 
   if (wantsOriginal && resource.originalFileKey) {
-    // Only the teacher (owner) or an admin can download the original file
-    if (!user || (user.id !== resource.teacherId && user.role !== 'ADMIN')) {
+    // Only verified TEACHERs and ADMINs can download original Office files
+    // (this is the teacher-to-teacher sharing ecosystem - originals never
+    // accessible to students)
+    if (!user || (user.role !== 'TEACHER' && user.role !== 'ADMIN')) {
       return NextResponse.json(
-        { error: 'Seul l\'enseignant peut télécharger l\'original' },
+        { error: 'Les fichiers originaux Office sont réservés à la communauté des enseignants' },
         { status: 403 }
       );
     }
@@ -50,8 +52,12 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   if (!resource) return NextResponse.json({ error: 'Non trouvé' }, { status: 404 });
 
   if (wantsOriginal) {
-    if (!user || (user.id !== resource.teacherId && user.role !== 'ADMIN')) {
-      return NextResponse.json({ error: 'Non autorisé' }, { status: 403 });
+    // Only TEACHERs and ADMINs can download original Office files
+    if (!user || (user.role !== 'TEACHER' && user.role !== 'ADMIN')) {
+      return NextResponse.json(
+        { error: 'Réservé aux enseignants' },
+        { status: 403 }
+      );
     }
     if (!resource.originalFileKey) {
       return NextResponse.json({ error: 'Pas d\'original' }, { status: 404 });

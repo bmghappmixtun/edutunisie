@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
+import { getCurrentUser } from '@/lib/auth';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import ResourceActions from '@/components/resources/ResourceActions';
@@ -15,6 +16,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function ResourcePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
+  const userSession = await getCurrentUser();
   const resource = await prisma.resource.findUnique({
     where: { slug },
     include: {
@@ -117,6 +119,8 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
                   originalFileKey={resource.originalFileKey}
                   originalFileName={resource.originalFileName}
                   originalFormat={resource.originalFormat}
+                  isTeacher={userSession?.role === 'TEACHER' || userSession?.role === 'ADMIN'}
+                  isOwner={userSession?.id === resource.teacherId}
                 />
               </div>
 

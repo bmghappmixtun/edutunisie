@@ -12,9 +12,10 @@ type Props = {
   originalFileName?: string | null;
   originalFormat?: string | null;
   isTeacher?: boolean;
+  isOwner?: boolean;
 };
 
-export default function ResourceActions({ resourceId, slug, title, fileUrl, originalFileKey, originalFileName, originalFormat, isTeacher }: Props) {
+export default function ResourceActions({ resourceId, slug, title, fileUrl, originalFileKey, originalFileName, originalFormat, isTeacher, isOwner }: Props) {
   const [favorited, setFavorited] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -142,9 +143,10 @@ export default function ResourceActions({ resourceId, slug, title, fileUrl, orig
         <button onClick={handleDownload} className="btn-primary justify-center text-sm">
           <Download className="w-4 h-4" /> Télécharger PDF
         </button>
-        {originalFileKey && (
-          <button onClick={handleDownloadOriginal} className="btn-secondary justify-center text-sm border-blue-200 text-blue-700 hover:bg-blue-50" title={`Télécharger l'original ${originalFormat?.toUpperCase()}`}>
-            <Download className="w-4 h-4" /> Original ({originalFormat?.toUpperCase()})
+        {originalFileKey && isTeacher && (
+          <button onClick={handleDownloadOriginal} className="btn-secondary justify-center text-sm border-blue-200 text-blue-700 hover:bg-blue-50" title={isOwner ? `Votre original ${originalFormat?.toUpperCase()}` : `Original ${originalFormat?.toUpperCase()} — réservé aux enseignants`}>
+            <Download className="w-4 h-4" />
+            {isOwner ? `Original (${originalFormat?.toUpperCase()})` : `Original ${originalFormat?.toUpperCase()} 👨‍🏫`}
           </button>
         )}
         <button onClick={() => window.location.href = `/ressources/${slug}/viewer`} className="btn-secondary justify-center text-sm">

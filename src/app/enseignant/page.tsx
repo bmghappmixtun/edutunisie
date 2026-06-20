@@ -47,6 +47,27 @@ export default async function TeacherDashboard() {
         </Link>
       </div>
 
+      {/* Quick links to new features */}
+      <div className="grid sm:grid-cols-2 gap-3 mb-6">
+        <Link href="/enseignant/bibliotheque" className="group flex items-center gap-3 p-4 rounded-xl bg-gradient-to-br from-blue-50 to-cyan-50 border-2 border-blue-200 hover:border-blue-400 transition">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-2xl shadow-md group-hover:scale-110 transition">📚</div>
+          <div className="flex-1">
+            <div className="font-bold text-slate-900">Ma bibliothèque</div>
+            <div className="text-xs text-slate-600">Vos fichiers Word (.docx) originaux, jamais perdus</div>
+          </div>
+          <span className="text-blue-500 group-hover:translate-x-1 transition">→</span>
+        </Link>
+        <Link href="/enseignant/communaute" className="group flex items-center gap-3 p-4 rounded-xl bg-gradient-to-br from-emerald-50 to-teal-50 border-2 border-emerald-200 hover:border-emerald-400 transition relative overflow-hidden">
+          <div className="absolute top-2 right-2 px-1.5 py-0.5 bg-amber-400 text-amber-900 text-[9px] font-extrabold uppercase rounded">Exclusif</div>
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-2xl shadow-md group-hover:scale-110 transition">🤝</div>
+          <div className="flex-1">
+            <div className="font-bold text-slate-900">Communauté enseignants</div>
+            <div className="text-xs text-slate-600">Téléchargez les originaux des autres profs</div>
+          </div>
+          <span className="text-emerald-500 group-hover:translate-x-1 transition">→</span>
+        </Link>
+      </div>
+
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-8">
         {[
