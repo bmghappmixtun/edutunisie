@@ -219,6 +219,9 @@ model Resource {
   libraryFile          TeacherFile? @relation("FileResource")
 
   // Edit workflow (teacher can edit after publishing, needs admin re-approval)
+  // Full-text search (PostgreSQL tsvector, managed by trigger)
+  search_vector       Unsupported("tsvector")?
+
   pendingEdit         Json?     // Full proposed new resource
   editStatus          String?   // PENDING_EDIT_APPROVAL, EDIT_REJECTED, null
   editRequestedAt     DateTime?
@@ -245,6 +248,7 @@ model Resource {
   @@index([subjectId, classId])
   @@index([teacherId])
   @@index([type])
+  @@index([search_vector], type: Gin)
 }
 
 
