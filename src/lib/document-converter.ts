@@ -39,12 +39,13 @@ export async function convertDocxToPdf(
   } = {}
 ): Promise<ConversionResult> {
   const publicKey = process.env.I_LOVE_API_PUBLIC_KEY;
-  const secretKey = process.env.I_LOVE_API_SECRET_KEY;
+  // Backwards-compat: I_LOVE_API_KEY is the secret key (older var name)
+  const secretKey = process.env.I_LOVE_API_SECRET_KEY || process.env.I_LOVE_API_KEY;
   const warnings: string[] = [];
 
   if (!publicKey || !secretKey) {
     warnings.push(
-      'I_LOVE_API_PUBLIC_KEY et I_LOVE_API_SECRET_KEY non configurées. Le fichier original est sauvegardé, mais la conversion PDF est désactivée. Ré-uploadez le fichier en PDF manuellement.'
+      'I_LOVE_API_PUBLIC_KEY et I_LOVE_API_SECRET_KEY (ou I_LOVE_API_KEY) non configurées. Le fichier original est sauvegardé, mais la conversion PDF est désactivée. Ré-uploadez le fichier en PDF manuellement.'
     );
     return { warnings, provider: 'none' };
   }
