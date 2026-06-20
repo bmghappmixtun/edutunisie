@@ -3,16 +3,87 @@ import './globals.css';
 import { Toaster } from 'react-hot-toast';
 import I18nProviderWrapper from '@/components/layout/I18nProviderWrapper';
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
+
 export const metadata: Metadata = {
-  title: 'EduTunisie — La plateforme pédagogique #1 en Tunisie',
-  description: 'Cours, devoirs, séries, révisions, sujets bac et corrigés gratuits pour les élèves tunisiens.',
-  keywords: 'éducation tunisie, cours, devoirs, bac, collège, lycée, primaire, exercices',
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: 'Examanet — La plateforme pédagogique #1 en Tunisie',
+    template: '%s — Examanet'
+  },
+  description: 'Cours, devoirs, séries, révisions, sujets bac et corrigés — 100% gratuits pour les élèves du Primaire, Collège et Lycée en Tunisie.',
+  keywords: ['examanet', 'éducation tunisie', 'cours', 'devoirs', 'bac', 'collège', 'lycée', 'primaire', 'exercices', 'révisions'],
+  authors: [{ name: 'Examanet' }],
+  creator: 'Examanet',
+  publisher: 'Examanet',
+  applicationName: 'Examanet',
+  icons: {
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon-48x48.png', sizes: '48x48', type: 'image/png' },
+      { url: '/favicon-96x96.png', sizes: '96x96', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+    other: [
+      { url: '/favicon.ico', sizes: 'any' },
+    ],
+  },
+  manifest: '/manifest.json',
   openGraph: {
-    title: 'EduTunisie',
-    description: 'La plateforme pédagogique #1 en Tunisie',
     type: 'website',
     locale: 'fr_TN',
-  }
+    url: SITE_URL,
+    siteName: 'Examanet',
+    title: 'Examanet — La plateforme pédagogique #1 en Tunisie',
+    description: 'Cours, devoirs, séries, révisions, sujets bac et corrigés — 100% gratuits pour les élèves tunisiens.',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Examanet - Plateforme pédagogique tunisienne',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Examanet — La plateforme pédagogique #1 en Tunisie',
+    description: 'Cours, devoirs, séries, révisions, sujets bac et corrigés — 100% gratuits.',
+    images: ['/og-image.png'],
+    creator: '@examanet',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  alternates: {
+    canonical: SITE_URL,
+  },
+  other: {
+    'theme-color': '#0EA5E9',
+    'apple-mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-status-bar-style': 'default',
+    'apple-mobile-web-app-title': 'Examanet',
+    'mobile-web-app-capable': 'yes',
+    'format-detection': 'telephone=no',
+  },
+};
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: '#0EA5E9',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
