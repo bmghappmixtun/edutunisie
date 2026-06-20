@@ -60,6 +60,8 @@ model User {
 
   // Relations
   uploadedFiles   Resource[]    @relation("UploadedBy")
+  editsRequested  Resource[]   @relation("EditRequestedBy")
+  editsReviewed   Resource[]   @relation("EditReviewedBy")
   approvedFiles   Resource[]    @relation("ApprovedBy")
   approvedBy      User?         @relation("ApprovedUsers", fields: [approvedById], references: [id])
   approvedUsers   User[]        @relation("ApprovedUsers")
@@ -201,6 +203,18 @@ model Resource {
   approvedBy      User?          @relation("ApprovedBy", fields: [approvedById], references: [id])
   rejectionReason String?
   publishedAt     DateTime?
+
+  // Edit workflow (teacher can edit after publishing, needs admin re-approval)
+  pendingEdit         Json?     // Full proposed new resource
+  editStatus          String?   // PENDING_EDIT_APPROVAL, EDIT_REJECTED, null
+  editRequestedAt     DateTime?
+  editRequestedById   String?
+  editRequestedBy     User?     @relation("EditRequestedBy", fields: [editRequestedById], references: [id])
+  editReviewedAt      DateTime?
+  editReviewedById    String?
+  editReviewedBy      User?     @relation("EditReviewedBy", fields: [editReviewedById], references: [id])
+  editRejectionReason String?
+  editSummary         String?
 
   comments        Comment[]
   ratings         Rating[]
