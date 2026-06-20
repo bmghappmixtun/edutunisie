@@ -7,8 +7,9 @@ import ResourceActions from '@/components/resources/ResourceActions';
 import PDFViewer from '@/components/resources/PDFViewer';
 import RatingSection from '@/components/resources/RatingSection';
 import CommentsSection from '@/components/resources/CommentsSection';
-import { formatNumber, fileSize, formatDate, timeAgo, RESOURCE_TYPE_LABELS } from '@/lib/utils';
-import { Eye, Download, MessageCircle, Star, Calendar, User, FileText, Tag, Clock, Share2, Printer, Heart, Flag, ChevronLeft } from 'lucide-react';
+import ResourceInfoPanel from '@/components/resources/ResourceInfoPanel';
+import { formatNumber, RESOURCE_TYPE_LABELS } from '@/lib/utils';
+import { Eye, Download, MessageCircle, Star, FileText, ChevronLeft } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -172,7 +173,7 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
             </div>
 
             {/* SIDEBAR */}
-            <aside className="space-y-4 lg:sticky lg:top-24 h-fit">
+            <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto">
               {/* Prof */}
               {resource.teacher && (
                 <div className="card p-5">
@@ -191,30 +192,8 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
                 </div>
               )}
 
-              {/* Infos */}
-              <div className="card p-5">
-                <h3 className="font-bold text-sm mb-3 text-slate-500 uppercase">Informations</h3>
-                <dl className="space-y-2 text-sm">
-                  <div className="flex justify-between"><dt className="text-slate-500">Pages</dt><dd className="font-semibold">{resource.pageCount || '—'}</dd></div>
-                  <div className="flex justify-between"><dt className="text-slate-500">Taille</dt><dd className="font-semibold">{fileSize(resource.fileSize)}</dd></div>
-                  <div className="flex justify-between"><dt className="text-slate-500">Langue</dt><dd className="font-semibold">{resource.language === 'ar' ? 'Arabe' : 'Français'}</dd></div>
-                  {resource.trimester && <div className="flex justify-between"><dt className="text-slate-500">Trimestre</dt><dd className="font-semibold">T{resource.trimester}</dd></div>}
-                  {resource.year && <div className="flex justify-between"><dt className="text-slate-500">Année</dt><dd className="font-semibold">{resource.year}</dd></div>}
-                  <div className="flex justify-between"><dt className="text-slate-500">Publié</dt><dd className="font-semibold">{resource.publishedAt && timeAgo(resource.publishedAt)}</dd></div>
-                </dl>
-                {resource.tags && (
-                  <div className="mt-4 pt-4 border-t border-slate-100">
-                    <h4 className="text-xs font-bold text-slate-500 uppercase mb-2">Tags</h4>
-                    <div className="flex flex-wrap gap-1.5">
-                      {resource.tags.split(',').map(t => (
-                        <Link key={t} href={`/ressources?q=${encodeURIComponent(t.trim())}`} className="px-2 py-1 bg-slate-100 text-slate-600 text-xs rounded hover:bg-primary-100 hover:text-primary-700 transition">
-                          #{t.trim()}
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
+              {/* COMPLETE Info Panel */}
+              <ResourceInfoPanel resource={resource} />
             </aside>
           </div>
         </div>
