@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { GraduationCap } from 'lucide-react';
+import Image from 'next/image';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import UserMenu from './UserMenu';
@@ -25,11 +25,16 @@ export default async function Header() {
           {/* LEFT: Logo */}
           <div className="flex-1 flex justify-start min-w-0">
             <Link href="/" className="flex items-center gap-2.5 group shrink-0">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center shadow-lg shadow-primary-500/30 group-hover:scale-105 transition">
-                <GraduationCap className="w-6 h-6 text-white" />
-              </div>
+              <Image
+                src="/logo-examanet.png"
+                alt="Examanet"
+                width={40}
+                height={40}
+                className="w-10 h-10 rounded-xl shadow-lg shadow-primary-500/30 group-hover:scale-105 transition"
+                priority
+              />
               <div className="hidden sm:block">
-                <div className="font-extrabold text-lg text-slate-900 leading-none"><T k="common.appName" /></div>
+                <div className="font-extrabold text-lg text-slate-900 leading-none">Examanet</div>
                 <div className="text-[10px] text-slate-500 leading-none mt-0.5"><T k="common.appTagline" /></div>
               </div>
             </Link>
