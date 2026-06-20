@@ -38,19 +38,20 @@ export async function convertDocxToPdf(
     author?: string;
   } = {}
 ): Promise<ConversionResult> {
-  const apiKey = process.env.I_LOVE_API_KEY;
+  const publicKey = process.env.I_LOVE_API_PUBLIC_KEY;
+  const secretKey = process.env.I_LOVE_API_SECRET_KEY;
   const warnings: string[] = [];
 
-  if (!apiKey) {
+  if (!publicKey || !secretKey) {
     warnings.push(
-      'I_LOVE_API_KEY non configurée. Le fichier original est sauvegardé, mais la conversion PDF est désactivée. Ré-uploadez le fichier en PDF manuellement.'
+      'I_LOVE_API_PUBLIC_KEY et I_LOVE_API_SECRET_KEY non configurées. Le fichier original est sauvegardé, mais la conversion PDF est désactivée. Ré-uploadez le fichier en PDF manuellement.'
     );
     return { warnings, provider: 'none' };
   }
 
   try {
     const fileName = options.fileName || 'document.docx';
-    const result = await convertOfficeToPdfViaIloveapi(fileBuffer, fileName, apiKey);
+    const result = await convertOfficeToPdfViaIloveapi(fileBuffer, fileName, publicKey, secretKey);
     return {
       pdfBuffer: result.pdfBuffer,
       pdfSize: result.pdfSize,
