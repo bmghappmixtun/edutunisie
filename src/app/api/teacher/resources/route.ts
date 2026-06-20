@@ -169,13 +169,19 @@ export async function POST(req: NextRequest) {
           const { convertDocxToPdf } = await import('@/lib/document-converter');
           const result = await convertDocxToPdf(
             Buffer.from(await file.arrayBuffer()),
-            { title: file.name.replace(/\.[^.]+$/, '') }
+            { fileName: file.name, title: file.name.replace(/\.[^.]+$/, '') }
           );
+          if (!result.pdfBuffer) {
+            return NextResponse.json(
+              { error: 'Conversion PDF échouée. Uploadez le fichier en PDF manuellement.' },
+              { status: 400 }
+            );
+          }
           const pdfKey = `teacher-resources/${user.id}/${timestamp}-converted.pdf`;
           const pdfBlob = await uploadFile(pdfKey, result.pdfBuffer, 'application/pdf');
           fileUrl = pdfBlob.url;
           fileKey = pdfKey;
-          fileSize = result.pdfBuffer.length;
+          fileSize = result.pdfSize ?? result.pdfBuffer.length;
         } catch (convErr) {
           console.error('[teacher/resources] conversion failed:', convErr);
           return NextResponse.json(
