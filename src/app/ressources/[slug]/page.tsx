@@ -109,7 +109,15 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
                   </div>
                 </div>
 
-                <ResourceActions resourceId={resource.id} slug={resource.slug} title={resource.title} fileUrl={resource.fileUrl} />
+                <ResourceActions
+                  resourceId={resource.id}
+                  slug={resource.slug}
+                  title={resource.title}
+                  fileUrl={resource.fileUrl}
+                  originalFileKey={resource.originalFileKey}
+                  originalFileName={resource.originalFileName}
+                  originalFormat={resource.originalFormat}
+                />
               </div>
 
               {/* Aperçu PDF */}
