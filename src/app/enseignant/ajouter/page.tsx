@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Info, Loader2, BookOpen, GraduationCap, ChevronRight } from 'lucide-react';
+import { Info, Loader2, BookOpen, GraduationCap, ChevronRight, Library } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ModernUploader from '@/components/teacher/ModernUploader';
 
@@ -16,6 +16,16 @@ type Subject = { slug: string; name: string; icon?: string; color?: string };
 type ClassItem = { slug: string; name: string; levelSlug: string };
 type Section = { slug: string; name: string; classSlug: string };
 
+type UploadedFile = {
+  libraryFileId: string;
+  fileKey: string;          // PDF key (for the resource)
+  fileUrl: string;          // PDF URL
+  fileSize: number;
+  fileName: string;
+  originalFormat: string;
+  conversionStatus: string;
+};
+
 export default function AddResourcePage() {
   const router = useRouter();
   const [loadingOptions, setLoadingOptions] = useState(true);
@@ -26,7 +36,7 @@ export default function AddResourcePage() {
     title: '', description: '', type: 'COURSE', subject: '', class: '',
     section: '', trimester: '', year: '2023-2024', tags: ''
   });
-  const [uploadedFile, setUploadedFile] = useState<{ fileKey: string; fileUrl: string; fileSize: number; fileName: string } | null>(null);
+  const [uploadedFile, setUploadedFile] = useState<UploadedFile | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [resetKey, setResetKey] = useState(0);
 
@@ -60,7 +70,11 @@ export default function AddResourcePage() {
       return;
     }
     if (!uploadedFile) {
-      toast.error('Veuillez d\'abord uploader un fichier PDF');
+      toast.error("Veuillez d'abord uploader un fichier");
+      return;
+    }
+    if (uploadedFile.conversionStatus === 'FAILED') {
+      toast.error('Conversion PDF échouée pour ce fichier. Ré-uploadez en PDF.');
       return;
     }
     setSubmitting(true);
@@ -70,6 +84,9 @@ export default function AddResourcePage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...form,
+          // We pass libraryFileId so the server uses the stored PDF
+          // AND links the library file to the resource
+          libraryFileId: uploadedFile.libraryFileId,
           fileKey: uploadedFile.fileKey,
           fileUrl: uploadedFile.fileUrl,
           fileSize: uploadedFile.fileSize,
@@ -91,7 +108,8 @@ export default function AddResourcePage() {
       <div>
         <h1 className="text-3xl font-extrabold flex items-center gap-2">➕ Ajouter une ressource</h1>
         <p className="text-slate-500 mt-1">
-          Uploadez votre fichier, puis complétez les informations. Votre ressource sera publiée après approbation par un administrateur.
+          Uploadez votre fichier (PDF ou Word). Le fichier original est automatiquement
+          sauvegardé dans <a href="/enseignant/bibliotheque" className="text-primary-600 font-semibold underline">votre bibliothèque</a> pour réutilisation future.
         </p>
       </div>
 
@@ -99,30 +117,53 @@ export default function AddResourcePage() {
       <div>
         <div className="flex items-center gap-2 mb-3">
           <span className="w-7 h-7 rounded-full bg-primary-600 text-white font-bold text-sm flex items-center justify-center">1</span>
-          <h2 className="font-bold text-lg">Uploader le fichier PDF</h2>
+          <h2 className="font-bold text-lg">Uploader le fichier</h2>
         </div>
         <ModernUploader
-          endpoint="/api/teacher/resources/upload"
+          endpoint="/api/teacher/files/upload"
           fieldName="file"
           maxSizeMB={50}
-          accept="application/pdf"
+          accept=".pdf,.docx,.doc,.odt"
           formFields={{}}
           resetKey={resetKey}
           onSuccess={(data) => {
-            if (data.success && data.fileKey) {
+            if (data.success && data.libraryFileId) {
               setUploadedFile({
-                fileKey: data.fileKey,
-                fileUrl: data.fileUrl,
-                fileSize: data.fileSize,
-                fileName: data.fileName || 'fichier.pdf'
+                libraryFileId: data.libraryFileId,
+                fileKey: data.pdfKey || data.fileKey,
+                fileUrl: data.pdfUrl || data.fileUrl,
+                fileSize: data.file?.fileSize || 0,
+                fileName: data.file?.fileName || 'fichier',
+                originalFormat: data.originalFormat,
+                conversionStatus: data.conversionStatus,
               });
-              toast.success('📄 Fichier uploadé ! Remplissez les infos ci-dessous.');
+
+              if (data.conversionStatus === 'FAILED') {
+                toast.error('⚠️ Conversion PDF échouée. Vous pouvez ré-uploader le fichier en PDF manuellement.');
+              } else if (data.originalFormat !== 'pdf' && data.conversionStatus === 'SUCCESS') {
+                toast.success('📄 Fichier Word converti en PDF ! Sauvegardé dans votre bibliothèque.');
+              } else {
+                toast.success('📄 Fichier uploadé ! Sauvegardé dans votre bibliothèque.');
+              }
             }
           }}
           onError={(err) => {
             toast.error('Erreur upload: ' + (typeof err === 'string' ? err : 'inconnue'));
           }}
         />
+
+        {/* Show library hint when file is uploaded */}
+        {uploadedFile && uploadedFile.conversionStatus !== 'FAILED' && (
+          <div className="mt-3 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 flex items-start gap-2">
+            <Library className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+            <div className="text-sm text-blue-800 dark:text-blue-200">
+              <strong>Original sauvegardé.</strong> Vous retrouverez{' '}
+              <span className="font-mono text-xs">{uploadedFile.fileName}</span> dans votre{' '}
+              <a href="/enseignant/bibliotheque" className="font-bold underline">bibliothèque</a>
+              {' '}pour le télécharger ou le réutiliser plus tard.
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Step 2: Metadata */}
@@ -232,9 +273,20 @@ export default function AddResourcePage() {
         <div className="bg-white rounded-2xl border border-slate-200 p-6 flex items-center justify-between gap-4">
           <div className="text-sm text-slate-500">
             {uploadedFile ? (
-              <span>✅ Fichier <span className="font-bold text-slate-900">{uploadedFile.fileName}</span> uploadé. Prêt à publier.</span>
+              uploadedFile.conversionStatus === 'FAILED' ? (
+                <span className="text-amber-700">⚠️ Conversion échouée. Ré-uploadez en PDF.</span>
+              ) : (
+                <span>
+                  ✅ Fichier <span className="font-bold text-slate-900">{uploadedFile.fileName}</span> prêt à publier.
+                  {uploadedFile.originalFormat !== 'pdf' && (
+                    <span className="ml-1 text-blue-600">
+                      (original {uploadedFile.originalFormat.toUpperCase()} sauvegardé)
+                    </span>
+                  )}
+                </span>
+              )
             ) : (
-              <span>⚠️ Uploadez d'abord un fichier PDF à l'étape 1</span>
+              <span>⚠️ Uploadez d'abord un fichier à l'étape 1</span>
             )}
           </div>
           <div className="flex gap-2">
@@ -250,7 +302,7 @@ export default function AddResourcePage() {
             </button>
             <button
               type="submit"
-              disabled={submitting || !uploadedFile}
+              disabled={submitting || !uploadedFile || uploadedFile.conversionStatus === 'FAILED'}
               className="btn-primary inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {submitting ? <><Loader2 className="w-4 h-4 animate-spin" /> Publication...</> : <>Publier la ressource <ChevronRight className="w-4 h-4" /></>}

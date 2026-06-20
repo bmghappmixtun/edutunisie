@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { uploadFile } from '@/lib/storage';
 import { nanoid } from 'nanoid';
 import { notifyAdminsNewResource } from '@/lib/admin-notify';
+import { detectFormat } from '@/lib/document-converter';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -27,6 +28,10 @@ export async function POST(req: NextRequest) {
     let trimester: string | null = null;
     let year: string | null = null;
     let tags: string | null = null;
+    let fileKey: string | null = null;
+    let fileUrl: string | null = null;
+    let fileSize = 0;
+    let libraryFileId: string | null = null; // <- NEW: link to teacher library file
 
     const contentType = req.headers.get('content-type') || '';
 
@@ -42,8 +47,8 @@ export async function POST(req: NextRequest) {
       trimester = formData.get('trimester') as string | null;
       year = formData.get('year') as string | null;
       tags = formData.get('tags') as string | null;
+      libraryFileId = (formData.get('libraryFileId') as string | null) || null;
     } else {
-      // Fallback: parse JSON body
       const body = await req.json();
       title = body.title;
       description = body.description || null;
@@ -54,6 +59,10 @@ export async function POST(req: NextRequest) {
       trimester = body.trimester || null;
       year = body.year || null;
       tags = body.tags || null;
+      fileKey = body.fileKey || null;
+      fileUrl = body.fileUrl || null;
+      fileSize = body.fileSize || 0;
+      libraryFileId = body.libraryFileId || null;
     }
 
     if (!title || !type || !subjectSlug || !classSlug) {
@@ -62,37 +71,128 @@ export async function POST(req: NextRequest) {
 
     const subjectRec = await prisma.subject.findUnique({ where: { slug: subjectSlug } });
     const classRec = await prisma.class.findUnique({ where: { slug: classSlug } });
-    if (!subjectRec || !classRec) return NextResponse.json({ error: 'Matière ou classe invalide' }, { status: 400 });
+    if (!subjectRec || !classRec) {
+      return NextResponse.json({ error: 'Matière ou classe invalide' }, { status: 400 });
+    }
 
-    const sectionRec = sectionSlug ? await prisma.section.findFirst({ where: { classId: classRec.id, slug: sectionSlug } }) : null;
-    const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').substring(0, 60) + '-' + nanoid(5);
+    const sectionRec = sectionSlug
+      ? await prisma.section.findFirst({ where: { classId: classRec.id, slug: sectionSlug } })
+      : null;
+    const slug =
+      title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '')
+        .substring(0, 60) +
+      '-' +
+      nanoid(5);
 
-    // File: either from form (file in multipart) OR pre-uploaded (fileKey in JSON)
-    let fileUrl = '/sample-pdf.pdf';
-    let fileKey = 'sample';
-    let fileSize = 0;
-    if (file) {
-      // Multipart: file was uploaded as part of this request
-      if (file.type !== 'application/pdf') {
-        return NextResponse.json({ error: 'Seuls les PDF sont acceptés' }, { status: 400 });
+    // Original file metadata (will be copied from library file if used)
+    let originalFileKey: string | null = null;
+    let originalFileName: string | null = null;
+    let originalFormat: string | null = null;
+    let originalFileSize: number | null = null;
+
+    // ===== FILE HANDLING =====
+    // 3 cases:
+    //   A) libraryFileId provided → use the library file's PDF (and copy original metadata)
+    //   B) multipart with file → upload now (PDF or converted docx)
+    //   C) JSON with fileKey/fileUrl → use pre-uploaded file (already handled)
+
+    if (libraryFileId) {
+      const libFile = await prisma.teacherFile.findUnique({ where: { id: libraryFileId } });
+      if (!libFile || libFile.teacherId !== user.id) {
+        return NextResponse.json({ error: 'Fichier de bibliothèque invalide' }, { status: 400 });
+      }
+      if (libFile.resourceId) {
+        return NextResponse.json(
+          { error: 'Ce fichier a déjà été utilisé pour publier une ressource' },
+          { status: 409 }
+        );
+      }
+
+      // Use the PDF (converted or original)
+      if (!libFile.pdfUrl || !libFile.pdfKey) {
+        return NextResponse.json(
+          {
+            error: 'Conversion PDF échouée. Ré-uploadez le fichier en PDF manuellement.',
+          },
+          { status: 400 }
+        );
+      }
+      fileUrl = libFile.pdfUrl;
+      fileKey = libFile.pdfKey;
+      fileSize = libFile.pdfSize || libFile.fileSize;
+
+      // Copy original metadata
+      originalFileKey = libFile.fileKey;
+      originalFileName = libFile.fileName;
+      originalFormat = libFile.originalFormat;
+      originalFileSize = libFile.fileSize;
+    } else if (file) {
+      // Direct upload in this request
+      const fmt = detectFormat(file.name, file.type);
+      if (fmt.format === 'unknown') {
+        return NextResponse.json(
+          { error: 'Format non supporté. Formats acceptés: .pdf, .docx, .doc, .odt' },
+          { status: 400 }
+        );
       }
       if (file.size > 50 * 1024 * 1024) {
         return NextResponse.json({ error: 'Le fichier doit faire moins de 50 Mo' }, { status: 400 });
       }
-      const upload = await uploadFile(file.name, file, file.type);
-      fileUrl = upload.url;
-      fileKey = upload.key;
-      fileSize = file.size;
-    } else if (!contentType.includes('multipart/form-data') && req.headers.get('content-type')?.includes('application/json')) {
-      // JSON: file was uploaded separately via /api/teacher/resources/upload
-      const body = await req.json();
-      if (body.fileKey && body.fileUrl) {
-        fileKey = body.fileKey;
-        fileUrl = body.fileUrl;
-        fileSize = body.fileSize || 0;
+
+      // PDF: upload as-is. Word: upload as-is too (will be in originalFileKey)
+      originalFileName = file.name;
+      originalFormat = fmt.format;
+      originalFileSize = file.size;
+
+      const timestamp = Date.now();
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+
+      // Always save the original file (so teacher keeps their source)
+      const originalKey = `teacher-library/${user.id}/${timestamp}-${safeName}`;
+      const originalBlob = await uploadFile(
+        originalKey,
+        Buffer.from(await file.arrayBuffer()),
+        file.type || 'application/octet-stream'
+      );
+      originalFileKey = originalKey;
+
+      if (fmt.isPdf) {
+        fileUrl = originalBlob.url;
+        fileKey = originalKey;
+        fileSize = file.size;
       } else {
-        return NextResponse.json({ error: 'Aucun fichier fourni. Uploadez d.abord le PDF.' }, { status: 400 });
+        // Convert non-PDF to PDF on the fly
+        try {
+          const { convertDocxToPdf } = await import('@/lib/document-converter');
+          const result = await convertDocxToPdf(
+            Buffer.from(await file.arrayBuffer()),
+            { title: file.name.replace(/\.[^.]+$/, '') }
+          );
+          const pdfKey = `teacher-resources/${user.id}/${timestamp}-converted.pdf`;
+          const pdfBlob = await uploadFile(pdfKey, result.pdfBuffer, 'application/pdf');
+          fileUrl = pdfBlob.url;
+          fileKey = pdfKey;
+          fileSize = result.pdfBuffer.length;
+        } catch (convErr) {
+          console.error('[teacher/resources] conversion failed:', convErr);
+          return NextResponse.json(
+            {
+              error:
+                'Conversion PDF échouée. Uploadez le fichier en PDF manuellement.',
+            },
+            { status: 400 }
+          );
+        }
       }
+    } else if (fileKey && fileUrl) {
+      // JSON path with pre-uploaded file
+      // (existing behavior - file was uploaded via /api/teacher/resources/upload)
+      // No original file in this case (legacy flow)
+    } else {
+      return NextResponse.json({ error: 'Aucun fichier fourni' }, { status: 400 });
     }
 
     const resource = await prisma.resource.create({
@@ -102,8 +202,8 @@ export async function POST(req: NextRequest) {
         description,
         type,
         status: 'PENDING_APPROVAL',
-        fileKey,
-        fileUrl,
+        fileKey: fileKey!,
+        fileUrl: fileUrl!,
         fileSize,
         subjectId: subjectRec.id,
         classId: classRec.id,
@@ -113,14 +213,30 @@ export async function POST(req: NextRequest) {
         year,
         tags,
         pageCount: 10,
-      }
+        // Original file (kept in library for teacher)
+        originalFileKey,
+        originalFileName,
+        originalFormat,
+        originalFileSize,
+      },
     });
 
-    // Notify admins (in-app + email)
-    await notifyAdminsNewResource(resource.id).catch(e => console.error('Admin notify error:', e));
+    // Link library file → resource (so the library page knows this file is "used")
+    if (libraryFileId) {
+      await prisma.teacherFile.update({
+        where: { id: libraryFileId },
+        data: { resourceId: resource.id },
+      });
+    }
+
+    // Notify admins
+    await notifyAdminsNewResource(resource.id).catch((e) =>
+      console.error('Admin notify error:', e)
+    );
 
     return NextResponse.json({ success: true, resource });
   } catch (e: any) {
+    console.error('[teacher/resources] POST', e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }

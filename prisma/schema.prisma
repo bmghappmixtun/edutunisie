@@ -62,6 +62,7 @@ model User {
   uploadedFiles   Resource[]    @relation("UploadedBy")
   editsRequested  Resource[]   @relation("EditRequestedBy")
   editsReviewed   Resource[]   @relation("EditReviewedBy")
+  library         TeacherFile[] @relation("TeacherLibrary")
   approvedFiles   Resource[]    @relation("ApprovedBy")
   approvedBy      User?         @relation("ApprovedUsers", fields: [approvedById], references: [id])
   approvedUsers   User[]        @relation("ApprovedUsers")
@@ -134,7 +135,8 @@ model Class {
   nameAr    String
   order     Int      @default(0)
   sections  Section[]
-  resources Resource[]
+  resources       Resource[]
+  teacherFiles    TeacherFile[]
 }
 
 model Section {
@@ -144,20 +146,22 @@ model Section {
   slug      String
   nameFr    String
   nameAr    String
-  resources Resource[]
+  resources     Resource[]
+  teacherFiles  TeacherFile[]
 
   @@unique([classId, slug])
 }
 
 model Subject {
-  id        String   @id @default(cuid())
-  slug      String   @unique
-  nameFr    String
-  nameAr    String
-  icon      String?
-  color     String?
-  order     Int      @default(0)
-  resources Resource[]
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  nameFr       String
+  nameAr       String
+  icon         String?
+  color        String?
+  order        Int      @default(0)
+  resources    Resource[]
+  teacherFiles TeacherFile[]
 }
 
 // ============ RESOURCES ============
@@ -204,6 +208,16 @@ model Resource {
   rejectionReason String?
   publishedAt     DateTime?
 
+  // Original file (Word, etc.) - kept in teacher's library
+  originalFileKey     String?
+  originalFileName     String?
+  originalFormat       String?  // docx, doc, etc.
+  originalFileSize     Int?
+
+  // Library link (if this resource was created from a teacher library file)
+  libraryFileId        String?  @unique
+  libraryFile          TeacherFile? @relation("FileResource")
+
   // Edit workflow (teacher can edit after publishing, needs admin re-approval)
   pendingEdit         Json?     // Full proposed new resource
   editStatus          String?   // PENDING_EDIT_APPROVAL, EDIT_REJECTED, null
@@ -231,6 +245,56 @@ model Resource {
   @@index([subjectId, classId])
   @@index([teacherId])
   @@index([type])
+}
+
+
+// =============================================================================
+// TEACHER LIBRARY - personal file archive (Word, PDF, etc.)
+// =============================================================================
+model TeacherFile {
+  id                String   @id @default(cuid())
+
+  // Original file
+  fileName          String
+  originalFormat    String   // docx, doc, pdf, odt, etc.
+  fileKey           String   // storage key for the original file
+  fileUrl           String   // public URL
+  fileSize          Int
+
+  // Optional generated PDF (if we converted from Word)
+  pdfKey            String?  // storage key for the generated PDF
+  pdfUrl            String?
+  pdfSize           Int?
+  conversionStatus  String?  // PENDING, SUCCESS, FAILED
+
+  // Categorization (matches Resource so teacher can re-publish later)
+  type              String?  // COURSE, HOMEWORK, EXERCISE, etc.
+  classId           String?
+  class             Class?   @relation(fields: [classId], references: [id])
+  sectionId         String?
+  section           Section? @relation(fields: [sectionId], references: [id])
+  subjectId         String?
+  subject           Subject? @relation(fields: [subjectId], references: [id])
+  trimester         String?
+  year              String?
+  tags              String?  // comma-separated
+  notes             String?  // teacher's personal notes
+
+  // Teacher
+  teacherId         String
+  teacher           User     @relation("TeacherLibrary", fields: [teacherId], references: [id], onDelete: Cascade)
+
+  // If this file was used to create a Resource
+  resourceId        String?  @unique
+  resource          Resource? @relation("FileResource", fields: [resourceId], references: [id])
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([teacherId, createdAt])
+  @@index([teacherId, type])
+  @@index([teacherId, classId])
+  @@index([originalFormat])
 }
 
 // ============ ENGAGEMENT ============

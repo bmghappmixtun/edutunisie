@@ -49,7 +49,7 @@ export default function ModernUploader({
   endpoint,
   fieldName = 'file',
   maxSizeMB = 50,
-  accept = 'application/pdf',
+  accept = '.pdf,.docx,.doc,.odt',
   onSuccess,
   onError,
   formFields = {},
@@ -111,10 +111,21 @@ export default function ModernUploader({
     return samples.reduce((a, b) => a + b, 0) / samples.length;
   }, []);
 
+  const ALLOWED_EXT = ['.pdf', '.docx', '.doc', '.odt'];
+  const ALLOWED_MIME = [
+    'application/pdf',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/msword',
+    'application/vnd.oasis.opendocument.text',
+  ];
+  const ALLOWED_LABEL = 'PDF, Word (.docx, .doc), OpenOffice (.odt)';
+
   function selectFile(f: File | null) {
     if (!f) return;
-    if (f.type !== accept && !f.name.endsWith('.pdf')) {
-      toast.error('Type de fichier non supporté');
+    const ext = '.' + (f.name.split('.').pop() || '').toLowerCase();
+    const ok = ALLOWED_EXT.includes(ext) || ALLOWED_MIME.includes(f.type);
+    if (!ok) {
+      toast.error(`Type non supporté. Formats acceptés: ${ALLOWED_LABEL}`);
       return;
     }
     if (f.size > maxSizeMB * 1024 * 1024) {
@@ -342,10 +353,13 @@ export default function ModernUploader({
               <p className="text-sm text-slate-500 mt-2">
                 ou <span className="text-primary-600 font-bold underline decoration-2 underline-offset-4">cliquez pour parcourir</span>
               </p>
-              <div className="flex items-center justify-center gap-3 mt-3 text-xs text-slate-400">
-                <span className="px-2 py-0.5 bg-slate-100 rounded-full">PDF</span>
-                <span>Max {maxSizeMB} Mo</span>
-                <span className="flex items-center gap-1"><Zap className="w-3 h-3" /> Upload rapide</span>
+              <div className="flex items-center justify-center gap-2 mt-3 text-xs text-slate-400 flex-wrap">
+                <span className="px-2 py-0.5 bg-red-50 text-red-700 rounded-full">PDF</span>
+                <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full">DOCX</span>
+                <span className="px-2 py-0.5 bg-slate-100 text-slate-700 rounded-full">DOC</span>
+                <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-full">ODT</span>
+                <span className="text-slate-400">• Max {maxSizeMB} Mo</span>
+                <span className="flex items-center gap-1 text-amber-500"><Zap className="w-3 h-3" /> Word → PDF auto</span>
               </div>
             </div>
           </div>

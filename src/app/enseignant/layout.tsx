@@ -6,7 +6,7 @@ import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import {
   LayoutDashboard, Upload, FileText, BarChart3, User, MessageSquare, Bell, Shield,
-  ChevronRight, BookOpen, HelpCircle
+  ChevronRight, BookOpen, HelpCircle, Library
 } from 'lucide-react';
 
 export default async function TeacherLayout({ children }: { children: React.ReactNode }) {
@@ -15,11 +15,12 @@ export default async function TeacherLayout({ children }: { children: React.Reac
   if (user.role !== 'TEACHER' && user.role !== 'ADMIN') redirect('/');
 
   // Get counts for the sidebar
-  const [myResources, pendingEdits, rejectedEdits, unreadNotifs] = await Promise.all([
+  const [myResources, pendingEdits, rejectedEdits, unreadNotifs, libraryCount] = await Promise.all([
     prisma.resource.count({ where: { teacherId: user.id } }),
     prisma.resource.count({ where: { teacherId: user.id, editStatus: 'PENDING_EDIT_APPROVAL' } }),
     prisma.resource.count({ where: { teacherId: user.id, editStatus: 'EDIT_REJECTED' } }),
     prisma.notification.count({ where: { userId: user.id, isRead: false } }),
+    prisma.teacherFile.count({ where: { teacherId: user.id } }),
   ]);
 
   const initials = (user.firstName?.[0] || user.email[0]).toUpperCase() + (user.lastName?.[0] || '').toUpperCase();
@@ -85,6 +86,7 @@ export default async function TeacherLayout({ children }: { children: React.Reac
                   />
                 )}
                 <SidebarLink href="/enseignant/ajouter" icon={Upload} label="Ajouter une ressource" highlight />
+                <SidebarLink href="/enseignant/bibliotheque" icon={Library} label="Ma bibliothèque" badge={libraryCount} badgeColor="bg-blue-500" />
               </SidebarGroup>
 
               {/* === ACTIVITÉ === */}
