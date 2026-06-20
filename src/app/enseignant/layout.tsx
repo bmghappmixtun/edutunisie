@@ -6,7 +6,7 @@ import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import {
   LayoutDashboard, Upload, FileText, BarChart3, User, MessageSquare, Bell, Shield,
-  ChevronRight, BookOpen, HelpCircle, Library
+  ChevronRight, BookOpen, HelpCircle, Library, Users
 } from 'lucide-react';
 
 export default async function TeacherLayout({ children }: { children: React.ReactNode }) {
@@ -15,12 +15,13 @@ export default async function TeacherLayout({ children }: { children: React.Reac
   if (user.role !== 'TEACHER' && user.role !== 'ADMIN') redirect('/');
 
   // Get counts for the sidebar
-  const [myResources, pendingEdits, rejectedEdits, unreadNotifs, libraryCount] = await Promise.all([
+  const [myResources, pendingEdits, rejectedEdits, unreadNotifs, libraryCount, communityCount] = await Promise.all([
     prisma.resource.count({ where: { teacherId: user.id } }),
     prisma.resource.count({ where: { teacherId: user.id, editStatus: 'PENDING_EDIT_APPROVAL' } }),
     prisma.resource.count({ where: { teacherId: user.id, editStatus: 'EDIT_REJECTED' } }),
     prisma.notification.count({ where: { userId: user.id, isRead: false } }),
     prisma.teacherFile.count({ where: { teacherId: user.id } }),
+    prisma.teacherFile.count({ where: { teacherId: { not: user.id }, pdfUrl: { not: null }, conversionStatus: 'SUCCESS' } }),
   ]);
 
   const initials = (user.firstName?.[0] || user.email[0]).toUpperCase() + (user.lastName?.[0] || '').toUpperCase();
@@ -87,6 +88,7 @@ export default async function TeacherLayout({ children }: { children: React.Reac
                 )}
                 <SidebarLink href="/enseignant/ajouter" icon={Upload} label="Ajouter une ressource" highlight />
                 <SidebarLink href="/enseignant/bibliotheque" icon={Library} label="Ma bibliothèque" badge={libraryCount} badgeColor="bg-blue-500" />
+                <SidebarLink href="/enseignant/communaute" icon={Users} label="Communauté" badge={communityCount} badgeColor="bg-emerald-500" highlightText="Partage" />
               </SidebarGroup>
 
               {/* === ACTIVITÉ === */}
@@ -144,7 +146,7 @@ function SidebarGroup({ title, icon: Icon, children }: { title: string; icon: an
 }
 
 function SidebarLink({
-  href, icon: Icon, label, exact, badge, badgeColor, dotClass, highlight
+  href, icon: Icon, label, exact, badge, badgeColor, dotClass, highlight, highlightText
 }: {
   href: string;
   icon: any;
@@ -154,6 +156,7 @@ function SidebarLink({
   badgeColor?: string;
   dotClass?: string;
   highlight?: boolean;
+  highlightText?: string;
 }) {
   return (
     <Link
@@ -167,6 +170,9 @@ function SidebarLink({
       <Icon className="w-4 h-4 flex-shrink-0" />
       {dotClass && <span className={`w-1.5 h-1.5 rounded-full ${dotClass}`} />}
       <span className="flex-1 truncate">{label}</span>
+      {highlightText && (
+        <span className="px-1.5 py-0.5 text-[9px] font-extrabold uppercase bg-amber-400 text-amber-900 rounded">{highlightText}</span>
+      )}
       {badge !== undefined && badge > 0 && (
         <span className={`px-1.5 py-0.5 text-white text-[10px] font-bold rounded-full ${badgeColor || 'bg-slate-500'}`}>
           {badge}

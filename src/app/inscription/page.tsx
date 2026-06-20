@@ -99,6 +99,76 @@ export default function RegisterPage() {
                 </button>
               ))}
             </div>
+
+            {/* Teacher motivation banner */}
+            {form.role === 'TEACHER' && (
+              <div className="mt-4 p-4 rounded-xl bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 border-2 border-amber-200">
+                <div className="flex items-start gap-3">
+                  <div className="text-3xl flex-shrink-0">👨‍🏫</div>
+                  <div className="flex-1">
+                    <h3 className="font-bold text-amber-900 mb-1">
+                      Rejoignez la communauté des enseignants tunisiens !
+                    </h3>
+                    <p className="text-sm text-amber-800 mb-2">
+                      En créant votre compte enseignant, vous débloquez :
+                    </p>
+                    <ul className="text-xs text-amber-900 space-y-1">
+                      <li className="flex items-start gap-1.5">
+                        <span className="text-amber-500">✓</span>
+                        <span><strong>Bibliothèque personnelle</strong> — gardez vos fichiers Word (.docx) originaux, jamais perdus</span>
+                      </li>
+                      <li className="flex items-start gap-1.5">
+                        <span className="text-amber-500">✓</span>
+                        <span><strong>Conversion Word → PDF automatique</strong> pour publier en quelques secondes</span>
+                      </li>
+                      <li className="flex items-start gap-1.5">
+                        <span className="text-amber-500">✓</span>
+                        <span><strong>Communauté unique en Tunisie</strong> — téléchargez les originaux Office des autres enseignants pour préparer vos cours</span>
+                      </li>
+                      <li className="flex items-start gap-1.5">
+                        <span className="text-amber-500">✓</span>
+                        <span><strong>Badge vérifié ✓</strong> une fois approuvé par notre équipe</span>
+                      </li>
+                    </ul>
+                    <p className="text-xs text-amber-700 mt-2 italic">
+                      Vos fichiers Word ne sont accessibles qu'aux enseignants, jamais aux élèves.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Student motivation banner */}
+            {form.role === 'STUDENT' && (
+              <div className="mt-4 p-4 rounded-xl bg-gradient-to-br from-sky-50 via-blue-50 to-cyan-50 border-2 border-sky-200">
+                <div className="flex items-start gap-3">
+                  <div className="text-3xl flex-shrink-0">🎓</div>
+                  <div className="flex-1">
+                    <h3 className="font-bold text-sky-900 mb-1">
+                      Des milliers de ressources gratuites pour réussir !
+                    </h3>
+                    <ul className="text-xs text-sky-900 space-y-1">
+                      <li className="flex items-start gap-1.5">
+                        <span className="text-sky-500">✓</span>
+                        <span><strong>+200 cours, devoirs, séries, examens</strong> dans toutes les matières</span>
+                      </li>
+                      <li className="flex items-start gap-1.5">
+                        <span className="text-sky-500">✓</span>
+                        <span><strong>Recherche multilingue</strong> (français + arabe)</span>
+                      </li>
+                      <li className="flex items-start gap-1.5">
+                        <span className="text-sky-500">✓</span>
+                        <span><strong>100% gratuit</strong>, aucun paiement requis</span>
+                      </li>
+                      <li className="flex items-start gap-1.5">
+                        <span className="text-sky-500">✓</span>
+                        <span><strong>Favoris</strong>, notes, commentaires pour organiser ton travail</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           <button
