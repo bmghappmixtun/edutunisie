@@ -38,10 +38,20 @@ export async function convertDocxToPdf(
     author?: string;
   } = {}
 ): Promise<ConversionResult> {
+  const warnings: string[] = [];
+
+  // Defensive check: skip PDF files (no conversion needed)
+  if (options.fileName) {
+    const fmt = detectFormat(options.fileName);
+    if (fmt.isPdf) {
+      // Already a PDF - never send to iLoveAPI
+      return { warnings, provider: 'none' };
+    }
+  }
+
   const publicKey = process.env.I_LOVE_API_PUBLIC_KEY;
   // Backwards-compat: I_LOVE_API_KEY is the secret key (older var name)
   const secretKey = process.env.I_LOVE_API_SECRET_KEY || process.env.I_LOVE_API_KEY;
-  const warnings: string[] = [];
 
   if (!publicKey || !secretKey) {
     warnings.push(
