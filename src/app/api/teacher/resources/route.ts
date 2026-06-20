@@ -67,11 +67,12 @@ export async function POST(req: NextRequest) {
     const sectionRec = sectionSlug ? await prisma.section.findFirst({ where: { classId: classRec.id, slug: sectionSlug } }) : null;
     const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').substring(0, 60) + '-' + nanoid(5);
 
-    // Upload file if provided
+    // File: either from form (file in multipart) OR pre-uploaded (fileKey in JSON)
     let fileUrl = '/sample-pdf.pdf';
     let fileKey = 'sample';
     let fileSize = 0;
     if (file) {
+      // Multipart: file was uploaded as part of this request
       if (file.type !== 'application/pdf') {
         return NextResponse.json({ error: 'Seuls les PDF sont acceptés' }, { status: 400 });
       }
@@ -82,6 +83,16 @@ export async function POST(req: NextRequest) {
       fileUrl = upload.url;
       fileKey = upload.key;
       fileSize = file.size;
+    } else if (!contentType.includes('multipart/form-data') && req.headers.get('content-type')?.includes('application/json')) {
+      // JSON: file was uploaded separately via /api/teacher/resources/upload
+      const body = await req.json();
+      if (body.fileKey && body.fileUrl) {
+        fileKey = body.fileKey;
+        fileUrl = body.fileUrl;
+        fileSize = body.fileSize || 0;
+      } else {
+        return NextResponse.json({ error: 'Aucun fichier fourni. Uploadez d.abord le PDF.' }, { status: 400 });
+      }
     }
 
     const resource = await prisma.resource.create({
