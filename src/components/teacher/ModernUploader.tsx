@@ -185,7 +185,7 @@ export default function ModernUploader({
           if (xhr.status >= 200 && xhr.status < 300) {
             setStage('success');
             triggerConfetti();
-            toast.success('🎉 Fichier envoyé avec succès !');
+            toast.success('📄 Fichier uploadé ! Remplissez les infos puis cliquez sur Publier.');
             onSuccess?.(data);
           } else {
             const err = data?.error || `Erreur ${xhr.status}`;
@@ -511,7 +511,7 @@ export default function ModernUploader({
             {stage === 'success' && (
               <div className="mt-3 p-3 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2 text-sm text-emerald-700 animate-fade-in">
                 <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
-                <div className="flex-1 font-semibold">Ressource envoyée avec succès ! En attente d'approbation.</div>
+                <div className="flex-1 font-semibold">Fichier uploadé avec succès ! Remplissez les infos et cliquez sur Publier pour soumettre à approbation.</div>
               </div>
             )}
           </div>
