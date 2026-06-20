@@ -115,14 +115,21 @@ export async function POST(req: NextRequest) {
     } else if (format.isConvertible) {
       try {
         const result = await convertDocxToPdf(fileBuffer, {
+          fileName: file.name,
           title: file.name.replace(/\.[^.]+$/, ''),
         });
-        pdfKey = `teacher-library/${teacherId}/${timestamp}-converted.pdf`;
-        const pdfBlob = await uploadFile(pdfKey, result.pdfBuffer, 'application/pdf');
-        pdfUrl = pdfBlob.url;
-        pdfSize = result.pdfBuffer.length;
-        conversionStatus = 'SUCCESS';
-        warnings.push(...result.warnings);
+        if (!result.pdfBuffer) {
+          conversionStatus = 'FAILED';
+          warnings.push(...result.warnings);
+          warnings.push('Conversion PDF indisponible. L\'original est sauvegardé.');
+        } else {
+          pdfKey = `teacher-library/${teacherId}/${timestamp}-converted.pdf`;
+          const pdfBlob = await uploadFile(pdfKey, result.pdfBuffer, 'application/pdf');
+          pdfUrl = pdfBlob.url;
+          pdfSize = result.pdfSize ?? result.pdfBuffer.length;
+          conversionStatus = 'SUCCESS';
+          warnings.push(...result.warnings);
+        }
       } catch (convErr) {
         console.error('[teacher/files/upload] Conversion failed:', convErr);
         conversionStatus = 'FAILED';
