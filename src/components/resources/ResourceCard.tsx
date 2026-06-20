@@ -1,6 +1,7 @@
 import Link from 'next/link';
-import { FileText, Star, Eye, Download, MessageCircle, Heart } from 'lucide-react';
+import { Star, Eye, Download, MessageCircle } from 'lucide-react';
 import { formatNumber, RESOURCE_TYPE_LABELS } from '@/lib/utils';
+import PDFThumbnail from './PDFThumbnail';
 
 export interface ResourceCardData {
   id: string;
@@ -12,7 +13,8 @@ export interface ResourceCardData {
   avgRating: number;
   ratingCount: number;
   commentsCount: number;
-  subject: { slug: string; nameFr: string; color: string | null };
+  fileUrl?: string | null;
+  subject: { slug: string; nameFr: string; color: string | null; icon?: string | null };
   class: { slug: string; nameFr: string } | null;
   teacher: { firstName: string | null; lastName: string | null } | null;
 }
@@ -25,30 +27,40 @@ export default function ResourceCard({ resource }: { resource: ResourceCardData 
 
   return (
     <Link href={`/ressources/${resource.slug}`} className="card card-hover overflow-hidden group block">
-      <div className="aspect-[4/3] bg-gradient-to-br from-slate-50 to-slate-100 relative flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 opacity-10" style={{ background: resource.subject.color || '#0EA5E9' }} />
-        <FileText className="w-16 h-16 text-slate-300 group-hover:scale-110 transition-transform relative z-10" />
-        <div className="absolute top-2 left-2 px-2 py-1 bg-slate-900/80 text-white text-[10px] font-bold rounded">
+      {/* THUMBNAIL - real PDF page 1 or fallback */}
+      <div className="aspect-[4/3] bg-gradient-to-br from-slate-50 to-slate-100 relative overflow-hidden">
+        {resource.fileUrl ? (
+          <PDFThumbnail
+            url={resource.fileUrl}
+            title={resource.title}
+            className="w-full h-full"
+            width={320}
+            height={427}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <div className="absolute inset-0 opacity-10" style={{ background: resource.subject.color || '#0EA5E9' }} />
+            <span className="text-6xl relative z-10">{resource.subject.icon || '📄'}</span>
+          </div>
+        )}
+        <div className="absolute top-2 left-2 px-2 py-1 bg-slate-900/80 backdrop-blur text-white text-[10px] font-bold rounded z-20">
           {typeLabel.fr}
         </div>
-        <div className="absolute top-2 right-2 flex gap-1">
+        <div className="absolute top-2 right-2 flex gap-1 z-20">
           {resource.class && (
             <span className="px-2 py-1 bg-white/90 backdrop-blur text-[10px] font-bold text-slate-700 rounded">
               {resource.class.nameFr.split(' ')[0]}
             </span>
           )}
         </div>
+        {resource.subject.icon && (
+          <div className="absolute bottom-2 left-2 px-2 py-1 bg-white/90 backdrop-blur text-[10px] font-bold rounded text-slate-700 z-20">
+            {resource.subject.icon} {resource.subject.nameFr}
+          </div>
+        )}
       </div>
 
       <div className="p-4">
-        <div className="flex items-center gap-1.5 mb-2">
-          <span
-            className="text-[10px] font-bold px-2 py-0.5 rounded text-white"
-            style={{ background: resource.subject.color || '#0EA5E9' }}
-          >
-            {resource.subject.nameFr}
-          </span>
-        </div>
         <h3 className="font-bold text-sm text-slate-900 mb-2 line-clamp-2 group-hover:text-primary-600 transition min-h-[2.5rem]">
           {resource.title}
         </h3>
