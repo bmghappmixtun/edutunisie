@@ -28,7 +28,6 @@ export default async function AdminUsersPage(props: { params: Promise<any>; sear
   const [users, teacherCount, studentCount, adminCount] = await Promise.all([
     prisma.user.findMany({
       where,
-      take: 100,
       orderBy: { createdAt: 'desc' },
       select: {
         id: true,
