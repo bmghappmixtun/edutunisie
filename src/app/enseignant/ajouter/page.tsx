@@ -232,10 +232,16 @@ export default function AddResourcePage() {
               </div>
               <div>
                 <label className="label">Section</label>
-                <select value={form.section} onChange={e => update('section', e.target.value)} className="input" disabled={!form.class}>
+                <select
+                  key={`sections-${form.class}`}
+                  value={form.section}
+                  onChange={e => update('section', e.target.value)}
+                  className="input"
+                  disabled={!form.class}
+                >
                   <option value="">— Aucune —</option>
                   {filteredSections.map(s => (
-                    <option key={s.slug} value={s.slug}>{s.name}</option>
+                    <option key={`${s.classSlug}-${s.slug}`} value={s.slug} data-class-slug={s.classSlug}>{s.name}</option>
                   ))}
                 </select>
               </div>
