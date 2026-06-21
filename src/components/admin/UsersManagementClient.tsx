@@ -79,14 +79,20 @@ export default function UsersManagementClient({
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [users, setUsers] = useState<User[]>(initialUsers);
   const [counts, setCounts] = useState<Counts>(initialCounts);
+  const [users, setUsers] = useState<User[]>(initialUsers);
   const [activeTab, setActiveTab] = useState<string>(initialRole);
   const [search, setSearch] = useState<string>(initialSearch);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
   const [bulkLoading, setBulkLoading] = useState(false);
   const [confirmAction, setConfirmAction] = useState<{ action: string; title: string; description: string } | null>(null);
+
+  // Sync state with props when parent re-renders (e.g. after router.push triggers SSR re-fetch)
+  useEffect(() => {
+    setCounts(initialCounts);
+    setUsers(initialUsers);
+  }, [initialCounts, initialUsers]);
 
   // Sync local state from URL when navigation happens
   useEffect(() => {
@@ -173,8 +179,9 @@ export default function UsersManagementClient({
       } else {
         toast(`${data.succeeded} réussi(s), ${data.failed} échec(s)`, { icon: '⚠️' });
       }
-      // Refresh the page
+      // Refresh the page (router.push + router.refresh to force SSR data re-fetch)
       navigate(activeTab, search);
+      router.refresh();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Erreur réseau');
     } finally {
