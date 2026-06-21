@@ -107,7 +107,7 @@ export default function RegisterPage() {
                   <div className="text-3xl flex-shrink-0">👨‍🏫</div>
                   <div className="flex-1">
                     <h3 className="font-bold text-amber-900 mb-1">
-                      Rejoignez la communauté des enseignants tunisiens !
+                      Pourquoi devenir enseignant sur Examanet ?
                     </h3>
                     <p className="text-sm text-amber-800 mb-2">
                       En créant votre compte enseignant, vous débloquez :
@@ -123,7 +123,7 @@ export default function RegisterPage() {
                       </li>
                       <li className="flex items-start gap-1.5">
                         <span className="text-amber-500">✓</span>
-                        <span><strong>Communauté unique en Tunisie</strong> — téléchargez les originaux Office des autres enseignants pour préparer vos cours</span>
+                        <span><strong>Téléchargement de l'original Office</strong> — sur chaque ressource, accédez au fichier Word (.docx) source pour le modifier</span>
                       </li>
                       <li className="flex items-start gap-1.5">
                         <span className="text-amber-500">✓</span>
@@ -131,7 +131,7 @@ export default function RegisterPage() {
                       </li>
                     </ul>
                     <p className="text-xs text-amber-700 mt-2 italic">
-                      Vos fichiers Word ne sont accessibles qu'aux enseignants, jamais aux élèves.
+                      Les fichiers Word originaux ne sont accessibles qu'aux enseignants, jamais aux élèves.
                     </p>
                   </div>
                 </div>
