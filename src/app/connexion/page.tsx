@@ -89,15 +89,6 @@ export default function LoginPage() {
         <p className="text-center mt-6 text-sm text-slate-500">
           {t('auth.noAccount')} <Link href="/inscription" className="text-primary-600 font-semibold hover:underline">{t('auth.signupNow')}</Link>
         </p>
-
-        <div className="mt-6 bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm">
-          <p className="font-bold text-amber-800 mb-2">{t('auth.demoAccounts')}</p>
-          <div className="space-y-1 text-amber-700 font-mono text-xs">
-            <div>Admin : admin@edutunisie.tn / demo1234</div>
-            <div>Enseignant : ahmed.benali@edutunisie.tn / demo1234</div>
-            <div>Élève : yassine@example.com / demo1234</div>
-          </div>
-        </div>
       </div>
     </div>
   );
