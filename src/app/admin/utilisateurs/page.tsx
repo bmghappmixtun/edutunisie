@@ -5,6 +5,8 @@ import UsersManagementClient from '@/components/admin/UsersManagementClient';
 
 export const dynamic = 'force-dynamic';
 
+const ALLOWED_PAGE_SIZES = [10, 25, 50, 100];
+
 export default async function AdminUsersPage(props: { params: Promise<any>; searchParams: Promise<any> }) {
   const sp = await props.searchParams;
   const user = await getCurrentUser();
@@ -13,6 +15,10 @@ export default async function AdminUsersPage(props: { params: Promise<any>; sear
 
   const q = sp?.q || '';
   const role = sp?.role || 'TEACHER';
+  const page = Math.max(1, parseInt(sp?.page || '1'));
+  const requestedSize = parseInt(sp?.size || '25');
+  const pageSize = ALLOWED_PAGE_SIZES.includes(requestedSize) ? requestedSize : 25;
+  const skip = (page - 1) * pageSize;
 
   // Build where clause based on role + search
   const where: any = { role };
@@ -24,10 +30,12 @@ export default async function AdminUsersPage(props: { params: Promise<any>; sear
     ];
   }
 
-  // Fetch users for the selected tab + counts for all tabs (in parallel)
-  const [users, teacherCount, studentCount, adminCount] = await Promise.all([
+  // Fetch users (paginated) + counts for all tabs (in parallel)
+  const [users, filteredTotal, teacherCount, studentCount, adminCount] = await Promise.all([
     prisma.user.findMany({
       where,
+      take: pageSize,
+      skip,
       orderBy: { createdAt: 'desc' },
       select: {
         id: true,
@@ -43,6 +51,7 @@ export default async function AdminUsersPage(props: { params: Promise<any>; sear
         _count: { select: { uploadedFiles: true } },
       },
     }),
+    prisma.user.count({ where }),
     prisma.user.count({ where: { role: 'TEACHER' } }),
     prisma.user.count({ where: { role: 'STUDENT' } }),
     prisma.user.count({ where: { role: 'ADMIN' } }),
@@ -61,6 +70,9 @@ export default async function AdminUsersPage(props: { params: Promise<any>; sear
       initialCounts={counts}
       initialRole={role}
       initialSearch={q}
+      initialPage={page}
+      initialPageSize={pageSize}
+      totalFiltered={filteredTotal}
     />
   );
 }

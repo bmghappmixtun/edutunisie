@@ -7,7 +7,7 @@ import toast from 'react-hot-toast';
 import {
   Search, UserCheck, UserX, Trash2, Shield, CheckCircle2, Ban,
   GraduationCap, Users, MoreHorizontal, ChevronDown, X, AlertTriangle,
-  CheckSquare, Square
+  CheckSquare, Square, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight
 } from 'lucide-react';
 import { timeAgo } from '@/lib/utils';
 import DeleteUserButton from './DeleteUserButton';
@@ -70,11 +70,17 @@ export default function UsersManagementClient({
   initialCounts,
   initialRole,
   initialSearch,
+  initialPage,
+  initialPageSize,
+  totalFiltered,
 }: {
   initialUsers: User[];
   initialCounts: Counts;
   initialRole: string;
   initialSearch: string;
+  initialPage: number;
+  initialPageSize: number;
+  totalFiltered: number;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -83,10 +89,18 @@ export default function UsersManagementClient({
   const [users, setUsers] = useState<User[]>(initialUsers);
   const [activeTab, setActiveTab] = useState<string>(initialRole);
   const [search, setSearch] = useState<string>(initialSearch);
+  const [page, setPage] = useState<number>(initialPage);
+  const [pageSize, setPageSize] = useState<number>(initialPageSize);
+  const [total, setTotal] = useState<number>(totalFiltered);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
   const [bulkLoading, setBulkLoading] = useState(false);
   const [confirmAction, setConfirmAction] = useState<{ action: string; title: string; description: string } | null>(null);
+
+  // Pagination
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const startIndex = total === 0 ? 0 : (page - 1) * pageSize + 1;
+  const endIndex = Math.min(page * pageSize, total);
 
   // Sync state with props when parent re-renders (e.g. after router.push triggers SSR re-fetch)
   useEffect(() => {
@@ -94,12 +108,22 @@ export default function UsersManagementClient({
     setUsers(initialUsers);
   }, [initialCounts, initialUsers]);
 
+  useEffect(() => {
+    setPage(initialPage);
+    setPageSize(initialPageSize);
+    setTotal(totalFiltered);
+  }, [initialPage, initialPageSize, totalFiltered]);
+
   // Sync local state from URL when navigation happens
   useEffect(() => {
     const r = searchParams.get('role') || 'TEACHER';
     const q = searchParams.get('q') || '';
+    const p = parseInt(searchParams.get('page') || '1');
+    const s = parseInt(searchParams.get('size') || '25');
     setActiveTab(r);
     setSearch(q);
+    setPage(p);
+    setPageSize(s);
   }, [searchParams]);
 
   // Filter displayed users by tab + search
@@ -132,12 +156,23 @@ export default function UsersManagementClient({
     setSelected(new Set());
   }
 
-  function navigate(tab: string, q?: string) {
+  function navigate(tab: string, q?: string, newPage = 1, newSize?: number) {
     clearSelection();
     const params = new URLSearchParams();
     params.set('role', tab);
     if (q) params.set('q', q);
+    params.set('page', String(newPage));
+    if (newSize) params.set('size', String(newSize));
+    else if (pageSize) params.set('size', String(pageSize));
     router.push(`/admin/utilisateurs?${params.toString()}`);
+  }
+
+  function goToPage(p: number) {
+    navigate(activeTab, search, p);
+  }
+
+  function changePageSize(s: number) {
+    navigate(activeTab, search, 1, s);
   }
 
   function handleSearch(e: React.FormEvent) {
@@ -327,7 +362,9 @@ export default function UsersManagementClient({
       <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
         <div className="p-4 border-b border-slate-100 text-sm text-slate-500 flex items-center justify-between">
           <span>
-            {filteredUsers.length} {tab.label.toLowerCase()} trouvé{filteredUsers.length > 1 ? 's' : ''}
+            {total === 0
+              ? `0 ${tab.label.toLowerCase()} trouvé${total > 1 ? 's' : ''}`
+              : `${startIndex}–${endIndex} sur ${total} ${tab.label.toLowerCase()}`}
           </span>
           {filteredUsers.length > 0 && (
             <button
@@ -447,6 +484,100 @@ export default function UsersManagementClient({
           </div>
         )}
       </div>
+
+      {/* Pagination footer */}
+      {total > 0 && (
+        <div className="mt-4 bg-white rounded-2xl border border-slate-200 p-4 flex items-center justify-between flex-wrap gap-3">
+          {/* Page size selector */}
+          <div className="flex items-center gap-2 text-sm text-slate-600">
+            <span>Afficher par</span>
+            <div className="flex gap-1">
+              {[10, 25, 50, 100].map((s) => (
+                <button
+                  key={s}
+                  onClick={() => changePageSize(s)}
+                  className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition ${
+                    pageSize === s
+                      ? 'bg-primary-600 text-white shadow-sm'
+                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  }`}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Page info + nav */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-sm text-slate-600">
+              Page <strong>{page}</strong> sur <strong>{totalPages}</strong>
+            </span>
+            <div className="flex gap-1 ml-2">
+              <button
+                onClick={() => goToPage(1)}
+                disabled={page === 1}
+                className="p-2 rounded-lg hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition"
+                title="Première page"
+              >
+                <ChevronsLeft className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => goToPage(page - 1)}
+                disabled={page === 1}
+                className="p-2 rounded-lg hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition"
+                title="Page précédente"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+
+              {/* Page numbers (smart sliding window) */}
+              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                let pageNum;
+                if (totalPages <= 5) {
+                  pageNum = i + 1;
+                } else if (page <= 3) {
+                  pageNum = i + 1;
+                } else if (page >= totalPages - 2) {
+                  pageNum = totalPages - 4 + i;
+                } else {
+                  pageNum = page - 2 + i;
+                }
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => goToPage(pageNum)}
+                    className={`w-9 h-9 rounded-lg text-sm font-semibold transition ${
+                      page === pageNum
+                        ? 'bg-primary-600 text-white shadow-sm'
+                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+
+              <button
+                onClick={() => goToPage(page + 1)}
+                disabled={page >= totalPages}
+                className="p-2 rounded-lg hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition"
+                title="Page suivante"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => goToPage(totalPages)}
+                disabled={page >= totalPages}
+                className="p-2 rounded-lg hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition"
+                title="Dernière page"
+              >
+                <ChevronsRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Confirmation modal */}
       {confirmAction && (
