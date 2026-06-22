@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
 
     // Upload to Vercel Blob
     const safeName = filename.replace(/[^a-zA-Z0-9.\-_]/g, '_');
-    const key = `teacher-library/${teacherId}/jotform/${submissionId}-${safeName}`;
+    const key = `teacher-library/${teacherId}/jotform/${submissionId}-${Date.now()}-${safeName}`;
     const blob = await put(key, buffer, {
       access: 'public',
       addRandomSuffix: false,
