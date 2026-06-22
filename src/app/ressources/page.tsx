@@ -69,7 +69,7 @@ export default async function ResourcesPage(props: { params: Promise<any>; searc
               {q
                 ? `Résultats pour "${q}"`
                 : teacherId
-                  ? 'Ressources de l'enseignant'
+                  ? "Ressources de l'enseignant"
                   : 'Toutes les ressources'}
             </h1>
             <p className="text-slate-600">{total} ressource{total > 1 ? 's' : ''} disponible{total > 1 ? 's' : ''}</p>
