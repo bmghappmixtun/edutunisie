@@ -21,7 +21,7 @@ export default async function Header() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white/85 backdrop-blur-xl border-b border-slate-200/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center h-12 lg:h-14 gap-4">
+        <div className="flex items-center h-[62px] lg:h-[73px] gap-4">
           {/* LEFT: Logo */}
           <div className="flex-1 flex justify-start min-w-0">
             <Link href="/" className="flex items-center group shrink-0" aria-label="Examanet - accueil">
@@ -29,18 +29,18 @@ export default async function Header() {
               <Image
                 src="/icon-transparent.png"
                 alt=""
-                width={48}
-                height={48}
-                className="sm:hidden w-12 h-12 group-hover:scale-105 transition"
+                width={62}
+                height={62}
+                className="sm:hidden w-[62px] h-[62px] group-hover:scale-105 transition"
                 priority
               />
               {/* Desktop: full logo (icon + wordmark) — single SVG master */}
               <Image
                 src="/logo-transparent.png"
                 alt="Examanet"
-                width={207}
-                height={56}
-                className="hidden sm:block h-12 lg:h-14 w-auto group-hover:scale-[1.02] transition-transform"
+                width={269}
+                height={73}
+                className="hidden sm:block h-[62px] lg:h-[73px] w-auto group-hover:scale-[1.02] transition-transform"
                 priority
               />
             </Link>
