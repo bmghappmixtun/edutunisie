@@ -11,7 +11,7 @@ export default function Footer() {
           <div className="lg:col-span-2">
             <Link href="/" className="flex items-center gap-2 mb-4">
               <div className="w-10 h-10 rounded-xl overflow-hidden bg-white/10 flex items-center justify-center">
-                <Image src="/logo-examanet.png" alt="Examanet" width={40} height={40} className="w-10 h-10 object-cover" />
+                <Image src="/icon-transparent.png" alt="Examanet" width={40} height={40} className="w-10 h-10" />
               </div>
               <div className="leading-none">
                 <div className="font-extrabold text-lg tracking-tight" style={{ fontFamily: 'Nunito, Inter, sans-serif' }}>

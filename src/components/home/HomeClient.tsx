@@ -40,7 +40,7 @@ export default function HomeClient({
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="animate-fade-in-up">
               <div className="flex items-center gap-3 mb-6">
-                <Image src="/logo-examanet.png" alt="Examanet" width={48} height={48} className="w-12 h-12 rounded-2xl shadow-lg" priority />
+                <Image src="/icon-transparent.png" alt="Examanet" width={48} height={48} className="w-12 h-12" priority />
                 <div className="leading-none">
                   <div className="font-extrabold text-2xl tracking-tight" style={{ fontFamily: 'Nunito, Inter, sans-serif' }}>
                     <span style={{ color: 'var(--brand-navy)' }}>exam</span><span style={{ color: 'var(--brand-orange)' }}>anet</span>
