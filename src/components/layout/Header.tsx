@@ -27,19 +27,19 @@ export default async function Header() {
             <Link href="/" className="flex items-center group shrink-0" aria-label="Examanet - accueil">
               {/* Mobile: icon only */}
               <Image
-                src="/logo-examanet.png"
+                src="/icon-transparent.png"
                 alt=""
                 width={128}
                 height={128}
-                className="sm:hidden w-32 h-32 rounded-2xl shadow-md group-hover:scale-105 transition"
+                className="sm:hidden w-32 h-32 group-hover:scale-105 transition"
                 priority
               />
               {/* Desktop: full logo (icon + wordmark) — single SVG master */}
               <Image
-                src="/logo.svg"
+                src="/logo-transparent.png"
                 alt="Examanet"
-                width={288}
-                height={160}
+                width={576}
+                height={320}
                 className="hidden sm:block h-32 lg:h-40 w-auto group-hover:scale-[1.02] transition-transform"
                 priority
               />
