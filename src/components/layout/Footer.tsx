@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { GraduationCap, Facebook, Twitter, Instagram, Youtube } from 'lucide-react';
 import T from '@/components/i18n/T';
 
@@ -9,12 +10,14 @@ export default function Footer() {
         <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-8 mb-10">
           <div className="lg:col-span-2">
             <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center">
-                <GraduationCap className="w-6 h-6 text-white" />
+              <div className="w-10 h-10 rounded-xl overflow-hidden bg-white/10 flex items-center justify-center">
+                <Image src="/logo-examanet.png" alt="Examanet" width={40} height={40} className="w-10 h-10 object-cover" />
               </div>
-              <div>
-                <div className="font-extrabold text-lg text-white"><T k="common.appName" /></div>
-                <div className="text-[10px] text-slate-400"><T k="common.appTagline" /></div>
+              <div className="leading-none">
+                <div className="font-extrabold text-lg tracking-tight">
+                  <span style={{ color: 'var(--brand-cream)' }}>exam</span><span style={{ color: 'var(--brand-orange)' }}>anet</span>
+                </div>
+                <div className="text-[10px] leading-none mt-1 text-slate-400"><T k="common.appTagline" /></div>
               </div>
             </Link>
             <p className="text-sm text-slate-400 mb-4 max-w-sm">
