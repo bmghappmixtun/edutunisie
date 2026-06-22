@@ -42,10 +42,10 @@ export default function HomeClient({
               <div className="flex items-center gap-3 mb-6">
                 <Image src="/logo-examanet.png" alt="Examanet" width={48} height={48} className="w-12 h-12 rounded-2xl shadow-lg" priority />
                 <div className="leading-none">
-                  <div className="font-extrabold text-2xl tracking-tight">
+                  <div className="font-extrabold text-2xl tracking-tight" style={{ fontFamily: 'Nunito, Inter, sans-serif' }}>
                     <span style={{ color: 'var(--brand-navy)' }}>exam</span><span style={{ color: 'var(--brand-orange)' }}>anet</span>
                   </div>
-                  <div className="text-xs leading-none mt-1" style={{ color: 'var(--brand-grey)' }}>
+                  <div className="text-xs leading-none mt-1 uppercase tracking-wider font-semibold" style={{ color: 'var(--brand-grey)' }}>
                     {t('common.appTagline')}
                   </div>
                 </div>
