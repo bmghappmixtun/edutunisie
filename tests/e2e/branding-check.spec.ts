@@ -1,26 +1,17 @@
 import { test, expect } from '@playwright/test';
 
-test('brand kit visible on home + header', async ({ page }) => {
+test('brand kit visible on home + header (full logo SVG)', async ({ page }) => {
   await page.goto('/');
   await page.waitForLoadState('networkidle');
 
-  // Header wordmark: 'exam' navy + 'anet' orange
-  const exam = page.locator('header span:text-is("exam")').first();
-  const anet = page.locator('header span:text-is("anet")').first();
-  await expect(exam).toBeVisible();
-  await expect(anet).toBeVisible();
+  // Full logo SVG must be visible in the header (desktop)
+  const fullLogo = page.locator('header img[alt="Examanet"][src*="/logo.svg"]');
+  await expect(fullLogo).toBeVisible();
 
-  const examColor = await exam.evaluate(el => getComputedStyle(el).color);
-  const anetColor = await anet.evaluate(el => getComputedStyle(el).color);
-  console.log('exam color:', examColor);
-  console.log('anet color:', anetColor);
-  // exam should be navy-ish (close to rgb(6, 38, 78))
-  expect(examColor).toMatch(/rgb\(6,\s*38,\s*78\)/);
-  // anet should be orange-ish (close to rgb(250, 140, 49))
-  expect(anetColor).toMatch(/rgb\(250,\s*140,\s*49\)/);
-
-  // Home hero should show the brand logo
-  await expect(page.locator('img[alt="Examanet"]').first()).toBeVisible();
+  // The logo SVG must have loaded with real dimensions
+  const logoBox = await fullLogo.boundingBox();
+  expect(logoBox?.width).toBeGreaterThan(80);
+  expect(logoBox?.height).toBeGreaterThan(20);
 
   // OG image available
   const ogResp = await page.request.get('/og-image.png');
