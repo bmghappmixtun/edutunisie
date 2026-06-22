@@ -9,16 +9,15 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-8 mb-10">
           <div className="lg:col-span-2">
-            <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-xl overflow-hidden bg-white/10 flex items-center justify-center">
-                <Image src="/icon-transparent.png" alt="Examanet" width={40} height={40} className="w-10 h-10" />
-              </div>
-              <div className="leading-none">
-                <div className="font-extrabold text-lg tracking-tight" style={{ fontFamily: 'Nunito, Inter, sans-serif' }}>
-                  <span style={{ color: 'var(--brand-cream)' }}>exam</span><span style={{ color: 'var(--brand-orange)' }}>anet</span>
-                </div>
-                <div className="text-[10px] leading-none mt-1 text-slate-400 uppercase tracking-wider font-semibold"><T k="common.appTagline" /></div>
-              </div>
+            <Link href="/" className="inline-block mb-4 group" aria-label="Examanet - accueil">
+              <Image
+                src="/logo-cream-on-dark.png"
+                alt="Examanet - Plateforme pédagogique tunisienne"
+                width={159}
+                height={60}
+                className="h-[60px] w-auto opacity-95 group-hover:opacity-100 transition"
+                priority={false}
+              />
             </Link>
             <p className="text-sm text-slate-400 mb-4 max-w-sm">
               <T k="footer.madeWith" />
