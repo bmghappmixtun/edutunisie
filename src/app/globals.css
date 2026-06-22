@@ -2,6 +2,32 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================================
+   EXAMANET BRAND TOKENS
+   - Primary palette: cyan (devoirat.net inspired) + amber accent
+   - Brand kit overlay: navy/orange/teal from official wordmark (educational,
+     academic, trustworthy)
+   - Both palettes coexist; primary keeps the cyan identity, brand tokens are
+     used for marketing surfaces (home hero, OG image, footer, email signature).
+   ============================================================================ */
+@layer base {
+  :root {
+    /* Brand kit overlay (from /workspace/branding_v4/examanet-brand-kit.zip) */
+    --brand-navy: #06264E;       /* wordmark "exam", body text */
+    --brand-orange: #FA8C31;     /* wordmark "net", CTAs */
+    --brand-teal: #045068;       /* pencil shaft main */
+    --brand-grey: #898889;       /* tagline */
+    --brand-charcoal: #1a1f2e;   /* dark mode bg */
+    --brand-cream: #FDF8F2;      /* cream-on-dark wordmark */
+
+    /* Operational primary (cyan) + accent (amber) */
+    --color-primary: #0EA5E9;
+    --color-primary-dark: #0369A1;
+    --color-accent: #F59E0B;
+    --color-accent-dark: #D97706;
+  }
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;

@@ -33,9 +33,13 @@ export default async function Header() {
                 className="w-10 h-10 rounded-xl shadow-lg shadow-primary-500/30 group-hover:scale-105 transition"
                 priority
               />
-              <div className="hidden sm:block">
-                <div className="font-extrabold text-lg text-slate-900 leading-none">Examanet</div>
-                <div className="text-[10px] text-slate-500 leading-none mt-0.5"><T k="common.appTagline" /></div>
+              <div className="hidden sm:block leading-none">
+                <div className="font-extrabold text-lg tracking-tight">
+                  <span style={{ color: 'var(--brand-navy)' }}>exam</span><span style={{ color: 'var(--brand-orange)' }}>anet</span>
+                </div>
+                <div className="text-[10px] leading-none mt-0.5" style={{ color: 'var(--brand-grey)' }}>
+                  <T k="common.appTagline" />
+                </div>
               </div>
             </Link>
           </div>
