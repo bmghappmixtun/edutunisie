@@ -14,10 +14,10 @@ export default function Footer() {
                 <Image src="/logo-examanet.png" alt="Examanet" width={40} height={40} className="w-10 h-10 object-cover" />
               </div>
               <div className="leading-none">
-                <div className="font-extrabold text-lg tracking-tight">
+                <div className="font-extrabold text-lg tracking-tight" style={{ fontFamily: 'Nunito, Inter, sans-serif' }}>
                   <span style={{ color: 'var(--brand-cream)' }}>exam</span><span style={{ color: 'var(--brand-orange)' }}>anet</span>
                 </div>
-                <div className="text-[10px] leading-none mt-1 text-slate-400"><T k="common.appTagline" /></div>
+                <div className="text-[10px] leading-none mt-1 text-slate-400 uppercase tracking-wider font-semibold"><T k="common.appTagline" /></div>
               </div>
             </Link>
             <p className="text-sm text-slate-400 mb-4 max-w-sm">
