@@ -38,7 +38,7 @@ export default async function Header() {
               <Image
                 src="/logo-transparent.png"
                 alt="Examanet"
-                width={344}
+                width={708}
                 height={192}
                 className="hidden sm:block h-40 lg:h-48 w-auto group-hover:scale-[1.02] transition-transform"
                 priority
