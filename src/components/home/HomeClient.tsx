@@ -39,18 +39,6 @@ export default function HomeClient({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 relative">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="animate-fade-in-up">
-              <div className="flex items-center gap-3 mb-6">
-                <Image src="/icon-transparent.png" alt="Examanet" width={48} height={48} className="w-12 h-12" priority />
-                <div className="leading-none">
-                  <div className="font-extrabold text-2xl tracking-tight" style={{ fontFamily: 'Nunito, Inter, sans-serif' }}>
-                    <span style={{ color: 'var(--brand-navy)' }}>exam</span><span style={{ color: 'var(--brand-orange)' }}>anet</span>
-                  </div>
-                  <div className="text-xs leading-none mt-1 uppercase tracking-wider font-semibold" style={{ color: 'var(--brand-grey)' }}>
-                    {t('common.appTagline')}
-                  </div>
-                </div>
-              </div>
-
               <div className="inline-flex items-center gap-2 bg-white border border-primary-200 rounded-full px-4 py-2 mb-6 shadow-sm">
                 <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
                 <span className="text-xs font-semibold text-slate-700">+{formatNumber(resourceCount)} {t('home.sections.popularTitle').toLowerCase()}</span>
