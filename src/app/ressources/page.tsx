@@ -66,7 +66,11 @@ export default async function ResourcesPage(props: { params: Promise<any>; searc
           {/* Header */}
           <div className="mb-6">
             <h1 className="text-3xl lg:text-4xl font-extrabold mb-2">
-              {q ? `Résultats pour "${q}"` : 'Toutes les ressources'}
+              {q
+                ? `Résultats pour "${q}"`
+                : teacherId
+                  ? 'Ressources de l'enseignant'
+                  : 'Toutes les ressources'}
             </h1>
             <p className="text-slate-600">{total} ressource{total > 1 ? 's' : ''} disponible{total > 1 ? 's' : ''}</p>
           </div>
