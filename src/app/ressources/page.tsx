@@ -22,6 +22,8 @@ export default async function ResourcesPage(props: { params: Promise<any>; searc
   const type = sp?.type || '';
   const subject = sp?.subject || '';
   const classSlug = sp?.class || '';
+  const teacherId = sp?.teacher || '';
+  const teacherSlug = sp?.teacherSlug || '';
   const sort = sp?.sort || 'recent';
   const page = parseInt(sp?.page || '1');
 
@@ -33,6 +35,7 @@ export default async function ResourcesPage(props: { params: Promise<any>; searc
   if (type) where.type = type;
   if (subject) where.subject = { slug: subject };
   if (classSlug) where.class = { slug: classSlug };
+  if (teacherId) where.teacherId = teacherId;
 
   const orderBy: any = sort === 'popular' ? { viewsCount: 'desc' }
     : sort === 'downloads' ? { downloadsCount: 'desc' }
