@@ -24,23 +24,25 @@ export default async function Header() {
         <div className="flex items-center h-16 lg:h-20 gap-4">
           {/* LEFT: Logo */}
           <div className="flex-1 flex justify-start min-w-0">
-            <Link href="/" className="flex items-center gap-2.5 group shrink-0">
+            <Link href="/" className="flex items-center group shrink-0" aria-label="Examanet - accueil">
+              {/* Mobile: icon only */}
               <Image
                 src="/logo-examanet.png"
-                alt="Examanet"
+                alt=""
                 width={40}
                 height={40}
-                className="w-10 h-10 rounded-xl shadow-md group-hover:scale-105 transition"
+                className="sm:hidden w-10 h-10 rounded-xl shadow-md group-hover:scale-105 transition"
                 priority
               />
-              <div className="hidden sm:block leading-none">
-                <div className="font-extrabold text-lg tracking-tight" style={{ fontFamily: 'Nunito, Inter, sans-serif' }}>
-                  <span style={{ color: 'var(--brand-navy)' }}>exam</span><span style={{ color: 'var(--brand-orange)' }}>anet</span>
-                </div>
-                <div className="text-[10px] leading-none mt-0.5 uppercase tracking-wider font-semibold" style={{ color: 'var(--brand-grey)' }}>
-                  <T k="common.appTagline" />
-                </div>
-              </div>
+              {/* Desktop: full logo (icon + wordmark) — single SVG master */}
+              <Image
+                src="/logo.svg"
+                alt="Examanet"
+                width={144}
+                height={80}
+                className="hidden sm:block h-10 lg:h-12 w-auto group-hover:scale-[1.02] transition-transform"
+                priority
+              />
             </Link>
           </div>
 

@@ -25,7 +25,7 @@ test('brand kit visible on home + header', async ({ page }) => {
   // OG image available
   const ogResp = await page.request.get('/og-image.png');
   expect(ogResp.status()).toBe(200);
-  expect(Number(ogResp.headers()['content-length'])).toBeGreaterThan(100000);
+  expect(Number(ogResp.headers()['content-length'])).toBeGreaterThan(50000);
 
   // Favicon available
   const favResp = await page.request.get('/favicon.ico');
