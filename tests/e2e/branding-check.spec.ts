@@ -1,11 +1,11 @@
 import { test, expect } from '@playwright/test';
 
-test('brand kit visible on home + header (full logo SVG)', async ({ page }) => {
+test('brand kit visible on home + header (full logo PNG)', async ({ page }) => {
   await page.goto('/');
   await page.waitForLoadState('networkidle');
 
   // Full logo SVG must be visible in the header (desktop)
-  const fullLogo = page.locator('header img[alt="Examanet"][src*="/logo.svg"]');
+  const fullLogo = page.locator('header img[alt="Examanet"][src*="logo-transparent.png"]');
   await expect(fullLogo).toBeVisible();
 
   // The logo SVG must have loaded with real dimensions
