@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
 import { Prisma } from '@prisma/client';
@@ -58,6 +59,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       };
 
       await prisma.resource.update({ where: { id }, data: updateData });
+      // Force revalidation of all relevant pages
+      revalidatePath('/ressources');
+      revalidatePath(`/ressources/${resource.slug}`);
+      revalidatePath('/');
+      revalidatePath('/enseignant/ressources');
+      revalidatePath('/admin/ressources/editions');
+      revalidatePath('/admin/ressources');
+      if (resource.teacherId) revalidatePath(`/professeurs/${resource.teacherId}`);
 
       const finalUrl = `${siteUrl}/ressources/${newSlug(pending)}`;
 
@@ -103,6 +112,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
           editRejectionReason: finalReason,
         }
       });
+      revalidatePath('/admin/ressources/editions');
+      revalidatePath('/enseignant/ressources');
+      if (resource.teacherId) revalidatePath(`/professeurs/${resource.teacherId}`);
 
       // Notify teacher
       if (resource.editRequestedById) {
