@@ -111,8 +111,12 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      // Use the PDF (converted or original)
-      if (!libFile.pdfUrl || !libFile.pdfKey) {
+      // Use the PDF (converted or original).
+      // Fall back to the original file if pdfUrl is not set (happens for old
+      // TeacherFile records where pdfKey/pdfUrl were left null even for PDFs).
+      const finalPdfUrl = libFile.pdfUrl || libFile.fileUrl;
+      const finalPdfKey = libFile.pdfKey || libFile.fileKey;
+      if (!finalPdfUrl || !finalPdfKey) {
         return NextResponse.json(
           {
             error: 'Conversion PDF échouée. Ré-uploadez le fichier en PDF manuellement.',
@@ -120,8 +124,8 @@ export async function POST(req: NextRequest) {
           { status: 400 }
         );
       }
-      fileUrl = libFile.pdfUrl;
-      fileKey = libFile.pdfKey;
+      fileUrl = finalPdfUrl;
+      fileKey = finalPdfKey;
       fileSize = libFile.pdfSize || libFile.fileSize;
 
       // Copy original metadata
