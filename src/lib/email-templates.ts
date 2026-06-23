@@ -1,4 +1,6 @@
 // Templates additionnels pour notifications admin
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
+
 export function renderNewTeacherEmail(firstName: string, lastName: string, email: string, school: string | null): string {
   return `<!DOCTYPE html>
 <html><body style="margin:0;font-family:Arial,sans-serif;background:#FFF7ED;">
@@ -18,7 +20,7 @@ ${school ? `<p style="margin:4px 0;color:#78350F;font-size:14px;"><strong>Établ
 </div>
 <p style="color:#475569;font-size:14px;">Connectez-vous à votre dashboard admin pour examiner et approuver ce compte.</p>
 <div style="text-align:center;margin:24px 0;">
-<a href="https://edutunisie.vercel.app/admin/approbations" style="background:linear-gradient(135deg,#F59E0B,#D97706);color:white;text-decoration:none;padding:14px 28px;border-radius:12px;font-weight:bold;display:inline-block;">Voir les approbations</a>
+<a href="${SITE_URL}/admin/approbations" style="background:linear-gradient(135deg,#F59E0B,#D97706);color:white;text-decoration:none;padding:14px 28px;border-radius:12px;font-weight:bold;display:inline-block;">Voir les approbations</a>
 </div>
 <hr style="border:none;border-top:1px solid #E2E8F0;margin:24px 0;">
 <p style="margin:0;color:#94A3B8;font-size:12px;text-align:center;">EduTunisie · Système de notification admin</p>
@@ -46,7 +48,7 @@ export function renderNewResourceEmail(teacherName: string, title: string, subje
 <p style="margin:4px 0;color:#1E3A8A;font-size:14px;"><strong>Enseignant :</strong> ${teacherName}</p>
 </div>
 <div style="text-align:center;margin:24px 0;">
-<a href="https://edutunisie.vercel.app/admin/approbations" style="background:linear-gradient(135deg,#3B82F6,#2563EB);color:white;text-decoration:none;padding:14px 28px;border-radius:12px;font-weight:bold;display:inline-block;">Examiner la ressource</a>
+<a href="${SITE_URL}/admin/approbations" style="background:linear-gradient(135deg,#3B82F6,#2563EB);color:white;text-decoration:none;padding:14px 28px;border-radius:12px;font-weight:bold;display:inline-block;">Examiner la ressource</a>
 </div>
 </td></tr>
 </table>
