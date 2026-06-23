@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
+import { sendNewEditPendingEmail } from '@/lib/email';
 import { prisma } from '@/lib/prisma';
 
 export const runtime = 'nodejs';
@@ -67,6 +68,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       ? changes.map(c => c).join(', ')
       : 'aucun changement détecté';
 
+    // Was this edit previously rejected? If so, surface the reason in the
+    // admin notification + email so the admin knows what was fixed.
+    const wasPreviouslyRejected = resource.editStatus === 'EDIT_REJECTED';
+    const previousRejectionReason = resource.editRejectionReason || undefined;
+
     // Admins can apply directly; teachers create a pending edit
     if (user.role === 'ADMIN') {
       const updated = await prisma.resource.update({
@@ -102,17 +108,37 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       }
     });
 
-    // Notify all admins
-    const admins = await prisma.user.findMany({ where: { role: 'ADMIN' }, select: { id: true } });
+    // Notify all admins (in-app + email)
+    const admins = await prisma.user.findMany({ where: { role: 'ADMIN' }, select: { id: true, email: true, firstName: true } });
     await prisma.notification.createMany({
       data: admins.map(a => ({
         userId: a.id,
         type: 'edit_pending',
-        title: 'Modification en attente ✏️',
-        message: `${user.firstName} ${user.lastName} a modifié "${resource.title}" — en attente d'approbation.`,
+        title: wasPreviouslyRejected
+          ? 'Modification re-soumise 🔄'
+          : 'Modification en attente ✏️',
+        message: `${user.firstName} ${user.lastName} a ${wasPreviouslyRejected ? 're-soumis une modification sur' : 'modifié'} "${resource.title}" — en attente d'approbation.`,
         link: `/admin/ressources/editions`
       }))
     });
+
+    // Send email to all admins
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
+    const reviewUrl = `${siteUrl}/admin/ressources/editions`;
+    const teacherFullName = `${user.firstName || ''} ${user.lastName || ''}`.trim();
+    for (const admin of admins) {
+      if (admin.email && admin.firstName) {
+        await sendNewEditPendingEmail(
+          admin.email,
+          teacherFullName,
+          resource.title,
+          summary,
+          reviewUrl,
+          wasPreviouslyRejected,
+          previousRejectionReason
+        );
+      }
+    }
 
     return NextResponse.json({
       success: true,

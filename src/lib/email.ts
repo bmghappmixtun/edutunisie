@@ -1,5 +1,5 @@
 import { Resend } from 'resend';
-import { renderResourceRejectedEmail, renderEditApprovedEmail, renderEditRejectedEmail } from './email-templates';
+import { renderResourceRejectedEmail, renderEditApprovedEmail, renderEditRejectedEmail, renderNewEditPendingEmail } from './email-templates';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 const FROM = process.env.EMAIL_FROM || 'EduTunisie <noreply@edutunisie.tn>';
@@ -305,4 +305,47 @@ export async function sendEditRejectedEmail(
     return new EmailResult(false, 'threw', e?.message);
   }
 }
+
+
+export async function sendNewEditPendingEmail(
+  to: string,
+  teacherName: string,
+  resourceTitle: string,
+  editSummary: string,
+  resourceUrl: string,
+  wasPreviouslyRejected: boolean,
+  previousRejectionReason?: string
+): Promise<EmailResult> {
+  if (process.env.DISABLE_EMAILS === 'true' || process.env.NODE_ENV === 'test') {
+    console.log(`[EMAIL SKIP] New edit pending for ${to}: ${resourceTitle}`);
+    return new EmailResult(true, 'test-mode');
+  }
+  const html = renderNewEditPendingEmail(
+    teacherName, resourceTitle, editSummary, resourceUrl,
+    wasPreviouslyRejected, previousRejectionReason
+  );
+  if (!resend) {
+    console.log(`\n📧 [EMAIL - DEV] To: ${to} | NEW EDIT PENDING (rejected=${wasPreviouslyRejected}): ${resourceTitle}\n`);
+    return new EmailResult(true, 'dev-mode');
+  }
+  try {
+    const result: any = await resend.emails.send({
+      from: FROM,
+      to: [to],
+      subject: wasPreviouslyRejected
+        ? `🔄 Re-soumission à valider — ${resourceTitle.slice(0, 40)}`
+        : `✏️ Nouvelle modification à valider — ${resourceTitle.slice(0, 40)}`,
+      html,
+    });
+    if (result.error) {
+      console.error('📧 [NEW EDIT PENDING ERROR]', to, '→', result.error.message);
+      return new EmailResult(false, 'failed', result.error.message);
+    }
+    return new EmailResult(true, result.data?.id || 'sent');
+  } catch (e: any) {
+    console.error('📧 [NEW EDIT PENDING THROW]', to, '→', e?.message);
+    return new EmailResult(false, 'threw', e?.message);
+  }
+}
+
 
