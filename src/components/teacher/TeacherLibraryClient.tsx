@@ -24,6 +24,7 @@ type TeacherFile = {
   tags?: string | null;
   notes?: string | null;
   resourceId?: string | null;
+  resource?: { id: string; status: string } | null;
   createdAt: string;
   class?: { id: string; nameFr: string; nameAr: string } | null;
   section?: { id: string; nameFr: string; nameAr: string } | null;
@@ -391,9 +392,19 @@ function FileCard({
             <span>⚠️</span> Conversion échouée
           </div>
         )}
-        {file.resourceId && (
+        {file.resource && file.resource.status === 'PUBLISHED' && (
           <div className="mb-3 px-2 py-1 rounded-md bg-violet-50 dark:bg-violet-900/20 text-xs text-violet-700 dark:text-violet-300 flex items-center gap-1">
             <span>📤</span> Ressource publiée
+          </div>
+        )}
+        {file.resource && file.resource.status === 'PENDING_APPROVAL' && (
+          <div className="mb-3 px-2 py-1 rounded-md bg-amber-50 dark:bg-amber-900/20 text-xs text-amber-700 dark:text-amber-300 flex items-center gap-1">
+            <span>⏳</span> En attente d'approbation
+          </div>
+        )}
+        {file.resource && (file.resource.status === 'REJECTED' || file.resource.status === 'DRAFT') && (
+          <div className="mb-3 px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-xs text-slate-600 dark:text-slate-400 flex items-center gap-1">
+            <span>📝</span> Brouillon / Rejeté
           </div>
         )}
 
