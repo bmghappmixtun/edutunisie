@@ -111,6 +111,12 @@ export async function POST(req: NextRequest) {
 
     if (format.isPdf) {
       // Already a PDF - no conversion
+      // Set pdfKey/pdfUrl to the same as the original since the original IS the PDF.
+      // Without this, /api/teacher/resources rejects the publish with
+      // "Conversion PDF échouée. Ré-uploadez en PDF." (false positive)
+      pdfKey = originalKey;
+      pdfUrl = originalUrl;
+      pdfSize = file.size;
       conversionStatus = 'SKIPPED';
     } else if (format.isConvertible) {
       try {
