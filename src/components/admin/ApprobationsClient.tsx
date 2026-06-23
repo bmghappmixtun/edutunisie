@@ -22,6 +22,7 @@ type Resource = {
   description: string | null;
   type: string;
   fileKey: string;
+  fileUrl: string;
   subject: { nameFr: string };
   class: { nameFr: string } | null;
   teacher: { firstName: string | null; lastName: string | null; email: string; schoolName: string | null } | null;
@@ -304,7 +305,7 @@ export default function ApprobationsClient({
                             <span>⏱️ {formatDate(r.createdAt)}</span>
                           </div>
                           <a
-                            href={r.fileKey}
+                            href={r.fileUrl}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-1 text-xs text-primary-600 hover:underline mt-2"
