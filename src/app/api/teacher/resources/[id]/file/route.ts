@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { uploadFile } from '@/lib/storage';
+import { sendNewEditPendingEmail } from '@/lib/email';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -78,6 +79,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       });
     }
 
+    // Track if the previous edit was rejected (for the admin email context)
+    const wasPreviouslyRejected = resource.editStatus === 'EDIT_REJECTED';
+    const previousRejectionReason = resource.editRejectionReason || undefined;
+    const fileSummary = `fichier remplacé (${(file.size / 1024 / 1024).toFixed(1)} MB)`;
+
     // Teacher: pending edit
     await prisma.resource.update({
       where: { id },
@@ -86,24 +92,42 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         editStatus: 'PENDING_EDIT_APPROVAL',
         editRequestedAt: new Date(),
         editRequestedById: user.id,
-        editSummary: `fichier remplacé (${(file.size / 1024 / 1024).toFixed(1)} MB)`,
+        editSummary: fileSummary,
         editRejectionReason: null,
         editReviewedAt: null,
         editReviewedById: null,
       }
     });
 
-    // Notify admins
-    const admins = await prisma.user.findMany({ where: { role: 'ADMIN' }, select: { id: true } });
+    // Notify admins (in-app + email)
+    const admins = await prisma.user.findMany({ where: { role: 'ADMIN' }, select: { id: true, email: true, firstName: true } });
     await prisma.notification.createMany({
       data: admins.map(a => ({
         userId: a.id,
         type: 'edit_pending',
-        title: 'Fichier remplacé (en attente) ✏️',
-        message: `${user.firstName} ${user.lastName} a remplacé le fichier de "${resource.title}" — en attente d'approbation.`,
+        title: wasPreviouslyRejected ? 'Fichier re-soumis 🔄' : 'Fichier remplacé (en attente) ✏️',
+        message: `${user.firstName} ${user.lastName} a ${wasPreviouslyRejected ? 're-soumis le fichier de' : 'remplacé le fichier de'} "${resource.title}" — en attente d'approbation.`,
         link: `/admin/ressources/editions`
       }))
     });
+
+    // Send email to all admins
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
+    const reviewUrl = `${siteUrl}/admin/ressources/editions`;
+    const teacherFullName = `${user.firstName || ''} ${user.lastName || ''}`.trim();
+    for (const admin of admins) {
+      if (admin.email && admin.firstName) {
+        await sendNewEditPendingEmail(
+          admin.email,
+          teacherFullName,
+          resource.title,
+          fileSummary,
+          reviewUrl,
+          wasPreviouslyRejected,
+          previousRejectionReason
+        );
+      }
+    }
 
     return NextResponse.json({
       success: true,

@@ -291,3 +291,81 @@ export function renderEditRejectedEmail(
 </table>
 </body></html>`;
 }
+
+export function renderNewEditPendingEmail(
+  teacherName: string,
+  resourceTitle: string,
+  editSummary: string,
+  resourceUrl: string,
+  wasPreviouslyRejected: boolean,
+  previousRejectionReason?: string
+): string {
+  const safeTitle = resourceTitle.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const safeSummary = (editSummary || 'modification').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const safeTeacher = teacherName.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const safePrevReason = (previousRejectionReason || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+  return `<!DOCTYPE html>
+<html><body style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#EFF6FF 0%,#DBEAFE 100%);padding:0;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:linear-gradient(135deg,#EFF6FF 0%,#DBEAFE 100%);padding:40px 20px;">
+<tr><td align="center">
+<table role="presentation" width="520" cellpadding="0" cellspacing="0" style="background:white;border-radius:24px;overflow:hidden;box-shadow:0 20px 60px rgba(59,130,246,0.15);">
+  <tr><td style="background:linear-gradient(135deg,#3B82F6 0%,#2563EB 50%,#1D4ED8 100%);padding:40px 32px;text-align:center;">
+    <div style="width:80px;height:80px;margin:0 auto 16px;background:rgba(255,255,255,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(10px);">
+      <div style="font-size:42px;line-height:80px;">${wasPreviouslyRejected ? '🔄' : '✏️'}</div>
+    </div>
+    <h1 style="margin:0;color:white;font-size:24px;font-weight:800;letter-spacing:-0.5px;">${wasPreviouslyRejected ? 'Nouvelle soumission à valider' : 'Modification à valider'}</h1>
+    <p style="margin:8px 0 0;color:rgba(255,255,255,0.9);font-size:14px;">${wasPreviouslyRejected ? 'Le prof a corrigé et re-soumis sa modification' : 'Un enseignant a soumis une modification'}</p>
+  </td></tr>
+  <tr><td style="padding:32px;">
+    <p style="margin:0 0 8px;color:#0F172A;font-size:16px;">Bonjour Admin,</p>
+    <p style="margin:0 0 24px;color:#475569;font-size:15px;line-height:1.6;">
+      ${wasPreviouslyRejected
+        ? `L'enseignant <strong>${safeTeacher}</strong> a corrigé sa modification suite à votre refus et l'a re-soumise pour validation.`
+        : `L'enseignant <strong>${safeTeacher}</strong> a soumis une modification sur la ressource ci-dessous.`}
+    </p>
+
+    ${wasPreviouslyRejected && safePrevReason ? `
+    <!-- Previous rejection reason (for context) -->
+    <div style="background:#FEF2F2;border-left:4px solid #EF4444;border-radius:0 12px 12px 0;padding:16px;margin:0 0 16px;">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#B91C1C;margin-bottom:6px;">⚠️ Motif du refus précédent</div>
+      <div style="color:#7F1D1D;font-size:13px;line-height:1.5;font-style:italic;">${safePrevReason}</div>
+    </div>
+    ` : ''}
+
+    <!-- Resource card -->
+    <div style="background:linear-gradient(135deg,#F8FAFC 0%,#F1F5F9 100%);border:1px solid #E2E8F0;border-radius:16px;padding:20px;margin:0 0 16px;">
+      <div style="display:flex;align-items:flex-start;gap:12px;">
+        <div style="width:40px;height:40px;background:linear-gradient(135deg,#0EA5E9,#0369A1);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <div style="color:white;font-size:20px;line-height:40px;text-align:center;width:100%;">📄</div>
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#3B82F6;margin-bottom:4px;">Ressource modifiée</div>
+          <div style="font-weight:700;color:#0F172A;font-size:15px;line-height:1.4;word-break:break-word;">${safeTitle}</div>
+          <div style="font-size:12px;color:#64748B;margin-top:6px;">📝 ${safeSummary}</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin:0 0 16px;">
+      <a href="${resourceUrl}" style="display:inline-block;background:linear-gradient(135deg,#3B82F6,#2563EB);color:white;text-decoration:none;padding:14px 32px;border-radius:12px;font-weight:700;font-size:15px;box-shadow:0 8px 24px rgba(59,130,246,0.3);">Examiner la modification</a>
+    </div>
+  </td></tr>
+  <tr><td style="background:#F8FAFC;padding:24px 32px;border-top:1px solid #E2E8F0;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td>
+          <div style="font-weight:800;color:#0F172A;font-size:16px;letter-spacing:-0.5px;">Examanet</div>
+          <div style="color:#94A3B8;font-size:12px;margin-top:2px;">Plateforme pédagogique #1 en Tunisie</div>
+        </td>
+        <td align="right" style="color:#94A3B8;font-size:11px;">
+          Conçu avec ❤️<br>pour les élèves tunisiens
+        </td>
+      </tr>
+    </table>
+  </td></tr>
+</table>
+</td></tr>
+</table>
+</body></html>`;
+}
