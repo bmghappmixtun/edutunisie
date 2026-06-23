@@ -55,3 +55,98 @@ export function renderNewResourceEmail(teacherName: string, title: string, subje
 </td></tr>
 </table></body></html>`;
 }
+
+export function renderResourceRejectedEmail(
+  firstName: string,
+  resourceTitle: string,
+  reason: string,
+  resourceUrl?: string
+): string {
+  const safeReason = (reason || 'Aucun motif fourni').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return `<!DOCTYPE html>
+<html><body style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#FEF2F2 0%,#FEE2E2 100%);padding:0;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:linear-gradient(135deg,#FEF2F2 0%,#FEE2E2 100%);padding:40px 20px;">
+<tr><td align="center">
+<table role="presentation" width="520" cellpadding="0" cellspacing="0" style="background:white;border-radius:24px;overflow:hidden;box-shadow:0 20px 60px rgba(220,38,38,0.15);">
+  <!-- Header with warning gradient -->
+  <tr><td style="background:linear-gradient(135deg,#EF4444 0%,#DC2626 50%,#B91C1C 100%);padding:40px 32px;text-align:center;position:relative;">
+    <div style="width:80px;height:80px;margin:0 auto 16px;background:rgba(255,255,255,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(10px);">
+      <div style="font-size:42px;line-height:80px;">❌</div>
+    </div>
+    <h1 style="margin:0;color:white;font-size:24px;font-weight:800;letter-spacing:-0.5px;">Ressource non validée</h1>
+    <p style="margin:8px 0 0;color:rgba(255,255,255,0.9);font-size:14px;">Votre demande nécessite des corrections</p>
+  </td></tr>
+
+  <!-- Body -->
+  <tr><td style="padding:32px;">
+    <p style="margin:0 0 8px;color:#0F172A;font-size:16px;">Bonjour <strong style="color:#0F172A;">${firstName}</strong>,</p>
+    <p style="margin:0 0 24px;color:#475569;font-size:15px;line-height:1.6;">
+      Après examen, votre ressource n'a malheureusement pas pu être validée en l'état. Pas d'inquiétude, c'est tout à fait réversible !
+    </p>
+
+    <!-- Resource card -->
+    <div style="background:linear-gradient(135deg,#F8FAFC 0%,#F1F5F9 100%);border:1px solid #E2E8F0;border-radius:16px;padding:20px;margin:0 0 24px;">
+      <div style="display:flex;align-items:flex-start;gap:12px;">
+        <div style="width:40px;height:40px;background:linear-gradient(135deg,#0EA5E9,#0369A1);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <div style="color:white;font-size:20px;line-height:40px;text-align:center;width:100%;">📄</div>
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#EF4444;margin-bottom:4px;">Ressource concernée</div>
+          <div style="font-weight:700;color:#0F172A;font-size:15px;line-height:1.4;word-break:break-word;">${resourceTitle.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reason block -->
+    <div style="background:#FEF2F2;border-left:4px solid #EF4444;border-radius:0 12px 12px 0;padding:20px;margin:0 0 24px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+        <div style="width:32px;height:32px;background:white;border-radius:8px;display:flex;align-items:center;justify-content:center;">
+          <div style="font-size:18px;line-height:32px;text-align:center;width:100%;">💬</div>
+        </div>
+        <div style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#B91C1C;">Motif du refus</div>
+      </div>
+      <div style="color:#7F1D1D;font-size:14px;line-height:1.6;font-style:italic;padding:4px 0 0 40px;border-left:2px solid rgba(239,68,68,0.2);margin-left:16px;padding-left:16px;padding-top:0;">
+        ${safeReason}
+      </div>
+    </div>
+
+    ${resourceUrl ? `
+    <div style="text-align:center;margin:0 0 24px;">
+      <a href="${resourceUrl}" style="display:inline-block;background:linear-gradient(135deg,#0EA5E9,#0369A1);color:white;text-decoration:none;padding:14px 32px;border-radius:12px;font-weight:700;font-size:15px;box-shadow:0 8px 24px rgba(14,165,233,0.3);">Voir la ressource</a>
+    </div>
+    ` : ''}
+
+    <!-- Next steps -->
+    <div style="background:linear-gradient(135deg,#F0F9FF 0%,#E0F2FE 100%);border:1px solid #BAE6FD;border-radius:16px;padding:20px;margin:0 0 24px;">
+      <div style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#0369A1;margin-bottom:12px;">💡 Et maintenant ?</div>
+      <ul style="margin:0;padding-left:20px;color:#0F172A;font-size:14px;line-height:1.8;">
+        <li>Relisez attentivement le motif ci-dessus</li>
+        <li>Corrigez votre fichier en conséquence</li>
+        <li>Soumettez à nouveau votre ressource</li>
+      </ul>
+    </div>
+
+    <p style="margin:0;color:#475569;font-size:14px;line-height:1.6;">
+      Besoin d'aide ou de précisions ? Répondez simplement à cet email, notre équipe vous accompagnera volontiers.
+    </p>
+  </td></tr>
+
+  <!-- Footer -->
+  <tr><td style="background:#F8FAFC;padding:24px 32px;border-top:1px solid #E2E8F0;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td>
+          <div style="font-weight:800;color:#0F172A;font-size:16px;letter-spacing:-0.5px;">Examanet</div>
+          <div style="color:#94A3B8;font-size:12px;margin-top:2px;">Plateforme pédagogique #1 en Tunisie</div>
+        </td>
+        <td align="right" style="color:#94A3B8;font-size:11px;">
+          Conçu avec ❤️<br>pour les élèves tunisiens
+        </td>
+      </tr>
+    </table>
+  </td></tr>
+</table>
+</td></tr>
+</table>
+</body></html>`;
+}

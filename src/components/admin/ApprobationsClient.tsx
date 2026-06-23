@@ -42,6 +42,8 @@ export default function ApprobationsClient({
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState<string | null>(null);
   const [bulkLoading, setBulkLoading] = useState<'approve' | 'reject' | null>(null);
+  const [rejectModal, setRejectModal] = useState<{ ids: string[]; isBulk: boolean; itemTitle?: string } | null>(null);
+  const [rejectReason, setRejectReason] = useState('');
   const [search, setSearch] = useState('');
 
   const currentList = tab === 'teachers' ? teachers : resources;
@@ -70,6 +72,12 @@ export default function ApprobationsClient({
   }
 
   async function handleSingle(id: string, action: 'approve' | 'reject') {
+    if (action === 'reject' && tab === 'resources') {
+      const item = resources.find(r => r.id === id);
+      setRejectModal({ ids: [id], isBulk: false, itemTitle: item?.title });
+      setRejectReason('');
+      return;
+    }
     setLoading(`${id}-${action}`);
     try {
       const type = tab === 'teachers' ? 'teacher' : 'resource';
@@ -88,6 +96,45 @@ export default function ApprobationsClient({
       toast.error('Erreur réseau');
     } finally {
       setLoading(null);
+    }
+  }
+
+  async function confirmReject() {
+    if (!rejectModal) return;
+    if (!rejectReason.trim()) {
+      toast.error('Le motif est obligatoire');
+      return;
+    }
+    setBulkLoading('reject');
+    try {
+      const promises = rejectModal.ids.map(id =>
+        fetch(`/api/admin/resource/${id}/reject`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reason: rejectReason.trim() }),
+        })
+          .then(r => r.json())
+          .then(d => ({ id, ok: d.success === true }))
+          .catch(() => ({ id, ok: false }))
+      );
+      const results = await Promise.all(promises);
+      const success = results.filter(r => r.ok).length;
+      const failed = results.length - success;
+      if (success > 0) toast.success(`❌ ${success} rejeté(s)${failed > 0 ? `, ${failed} échec(s)` : ''}`);
+      if (failed > 0) toast.error(`${failed} échec(s)`);
+      // Remove rejected items from list
+      setResources(rs => rs.filter(r => !results.find(x => x.id === r.id && x.ok)));
+      setSelected(s => {
+        const n = new Set(s);
+        results.filter(x => x.ok).forEach(x => n.delete(x.id));
+        return n;
+      });
+      setRejectModal(null);
+      setRejectReason('');
+    } catch (e) {
+      toast.error('Erreur réseau');
+    } finally {
+      setBulkLoading(null);
     }
   }
 
@@ -343,6 +390,65 @@ export default function ApprobationsClient({
             })}
           </div>
         </>
+      )}
+
+      {/* Reject reason modal */}
+      {rejectModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" onClick={() => setRejectModal(null)}>
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden" onClick={e => e.stopPropagation()}>
+            <div className="bg-gradient-to-br from-red-500 to-red-700 p-6 text-white">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-2xl">
+                  ❌
+                </div>
+                <div>
+                  <h2 className="text-xl font-extrabold leading-tight">Rejeter {rejectModal.isBulk ? `${rejectModal.ids.length} ressource(s)` : 'la ressource'}</h2>
+                  {rejectModal.itemTitle && !rejectModal.isBulk && (
+                    <p className="text-sm text-red-100 mt-1 line-clamp-1">{rejectModal.itemTitle}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="p-6">
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Motif du refus <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                value={rejectReason}
+                onChange={e => setRejectReason(e.target.value)}
+                placeholder="Ex: Le fichier contient des erreurs de mise en page. Veuillez utiliser le format PDF et vérifier l'orthographe avant de re-soumettre."
+                className="w-full border-2 border-slate-200 rounded-xl p-3 text-sm focus:border-red-400 focus:ring-4 focus:ring-red-100 outline-none resize-none"
+                rows={5}
+                autoFocus
+                maxLength={500}
+              />
+              <div className="text-xs text-slate-400 mt-1 text-right">{rejectReason.length}/500</div>
+              <p className="text-xs text-slate-500 mt-3">
+                💡 Le motif sera envoyé par email au prof et affiché dans sa bibliothèque.
+              </p>
+            </div>
+            <div className="bg-slate-50 px-6 py-4 flex gap-2 justify-end border-t border-slate-100">
+              <button
+                onClick={() => { setRejectModal(null); setRejectReason(''); }}
+                className="px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-200 rounded-lg"
+                disabled={bulkLoading === 'reject'}
+              >
+                Annuler
+              </button>
+              <button
+                onClick={confirmReject}
+                disabled={!rejectReason.trim() || bulkLoading === 'reject'}
+                className="px-4 py-2 text-sm font-bold text-white bg-gradient-to-r from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed shadow-md flex items-center gap-2"
+              >
+                {bulkLoading === 'reject' ? (
+                  <><Loader2 className="w-4 h-4 animate-spin" /> Envoi...</>
+                ) : (
+                  <><XCircle className="w-4 h-4" /> Confirmer le refus</>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
