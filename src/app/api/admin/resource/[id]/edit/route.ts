@@ -47,6 +47,15 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       const pending = (resource.pendingEdit as any) || {};
 
       // Apply the pending edit
+      // CRITICAL: When the original resource is REJECTED or DRAFT, the
+      // teacher was previously submitting a fresh new resource. They
+      // got rejected, then re-submitted a corrected version via the
+      // edit form (because the modifier page allows editing REJECTED
+      // resources). After admin approves this "edit", we must ALSO
+      // flip the status to PUBLISHED — otherwise the corrected file
+      // stays invisible on the platform.
+      const mustPublish = resource.status === 'REJECTED' || resource.status === 'DRAFT' || resource.status === 'PENDING_APPROVAL';
+
       const updateData: any = {
         ...pending,
         pendingEdit: Prisma.JsonNull,
@@ -57,6 +66,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         // If title changed, update the slug
         slug: newSlug(pending),
       };
+      if (mustPublish) {
+        updateData.status = 'PUBLISHED';
+        updateData.approvedAt = new Date();
+        updateData.approvedById = user.id;
+        if (!resource.publishedAt) updateData.publishedAt = new Date();
+      }
 
       await prisma.resource.update({ where: { id }, data: updateData });
       // Force revalidation of all relevant pages
