@@ -32,7 +32,14 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
       }
     }
   });
-  if (!resource || resource.status !== 'PUBLISHED') notFound();
+  if (!resource) notFound();
+  // Only PUBLISHED resources are public.
+  // Owner (teacher) and admins can see their own DRAFT/PENDING/REJECTED resources.
+  if (resource.status !== 'PUBLISHED') {
+    if (!userSession || (userSession.id !== resource.teacherId && userSession.role !== 'ADMIN')) {
+      notFound();
+    }
+  }
 
   // Track view
   await prisma.view.create({ data: { resourceId: resource.id, ipAddress: 'visitor' } });
