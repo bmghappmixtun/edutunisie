@@ -114,7 +114,7 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
   // Latest resources (top 6)
   const latestResources = resources.slice(0, 6);
 
-  const profileUrl = `https://edutunisie.vercel.app/professeurs/${teacher.id}`;
+  const profileUrl = `${SITE_URL}/professeurs/${teacher.id}`;
   const initials = `${teacher.firstName?.[0] || ''}${teacher.lastName?.[0] || ''}`.toUpperCase();
 
   return (
