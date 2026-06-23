@@ -17,6 +17,8 @@ import ResourceCard from '@/components/resources/ResourceCard';
 
 export const dynamic = 'force-dynamic';
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
+
 const TYPE_LABELS: Record<string, string> = {
   COURSE: 'Cours', HOMEWORK: 'Devoir', EXERCISE: "Série d'exercices",
   REVISION: 'Révision', EXAM: 'Contrôle/Examen', BAC_SUBJECT: 'Sujet Bac',
