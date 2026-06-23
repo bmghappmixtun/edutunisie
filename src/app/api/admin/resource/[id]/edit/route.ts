@@ -2,13 +2,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
 import { Prisma } from '@prisma/client';
+import { sendEditApprovedEmail, sendEditRejectedEmail } from '@/lib/email';
 
 export const runtime = 'nodejs';
 
 /**
  * POST /api/admin/resource/[id]/edit
- * Approve or reject a pending edit.
+ * Approve or reject a pending edit (same workflow as new resource approval).
  * Body: { action: 'approve' | 'reject', reason?: string }
+ *
+ * - Approve: applies the pendingEdit JSON to the resource, clears the edit
+ *   state, sends an approval email + in-app notification to the teacher.
+ * - Reject: clears pendingEdit, marks as EDIT_REJECTED, saves the reason,
+ *   sends a rejection email (with the reason) + in-app notification.
  */
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -29,6 +35,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       return NextResponse.json({ error: 'Aucune modification en attente' }, { status: 400 });
     }
 
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
+    const newSlug = (pending: any) =>
+      pending.title && pending.title !== resource.title
+        ? `${pending.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}-${Date.now().toString(36)}`
+        : resource.slug;
+    const resourceUrl = `${siteUrl}/ressources/${resource.slug}`;
+
     if (action === 'approve') {
       const pending = (resource.pendingEdit as any) || {};
 
@@ -41,12 +54,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         editReviewedById: user.id,
         editRejectionReason: null,
         // If title changed, update the slug
-        slug: pending.title && pending.title !== resource.title
-          ? `${pending.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}-${Date.now().toString(36)}`
-          : resource.slug,
+        slug: newSlug(pending),
       };
 
       await prisma.resource.update({ where: { id }, data: updateData });
+
+      const finalUrl = `${siteUrl}/ressources/${newSlug(pending)}`;
 
       // Notify teacher
       if (resource.editRequestedById) {
@@ -56,9 +69,20 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
             type: 'edit_approved',
             title: 'Modification approuvée ✅',
             message: `Votre modification sur "${pending.title || resource.title}" a été approuvée et publiée.`,
-            link: `/ressources/${resource.slug}`
+            link: `/ressources/${newSlug(pending)}`
           }
         });
+
+        // Send email to teacher
+        const teacher = await prisma.user.findUnique({ where: { id: resource.editRequestedById } });
+        if (teacher?.email && teacher.firstName) {
+          await sendEditApprovedEmail(
+            teacher.email,
+            teacher.firstName,
+            pending.title || resource.title,
+            finalUrl
+          );
+        }
       }
 
       return NextResponse.json({
@@ -68,6 +92,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     }
 
     if (action === 'reject') {
+      const finalReason = reason?.trim() || 'Modification refusée par l\'administrateur.';
       await prisma.resource.update({
         where: { id },
         data: {
@@ -75,7 +100,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
           editStatus: 'EDIT_REJECTED',
           editReviewedAt: new Date(),
           editReviewedById: user.id,
-          editRejectionReason: reason || 'Modification refusée par l\'administrateur.',
+          editRejectionReason: finalReason,
         }
       });
 
@@ -86,10 +111,22 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
             userId: resource.editRequestedById,
             type: 'edit_rejected',
             title: 'Modification refusée ❌',
-            message: `Votre modification sur "${resource.title}" a été refusée.${reason ? ` Raison : ${reason}` : ''}`,
+            message: `Votre modification sur "${resource.title}" a été refusée.${finalReason ? ` Motif : ${finalReason.slice(0, 100)}` : ''}`,
             link: `/enseignant/ressources`
           }
         });
+
+        // Send email to teacher
+        const teacher = await prisma.user.findUnique({ where: { id: resource.editRequestedById } });
+        if (teacher?.email && teacher.firstName) {
+          await sendEditRejectedEmail(
+            teacher.email,
+            teacher.firstName,
+            resource.title,
+            finalReason,
+            resourceUrl
+          );
+        }
       }
 
       return NextResponse.json({

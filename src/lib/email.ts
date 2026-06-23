@@ -1,5 +1,5 @@
 import { Resend } from 'resend';
-import { renderResourceRejectedEmail } from './email-templates';
+import { renderResourceRejectedEmail, renderEditApprovedEmail, renderEditRejectedEmail } from './email-templates';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 const FROM = process.env.EMAIL_FROM || 'EduTunisie <noreply@edutunisie.tn>';
@@ -238,3 +238,71 @@ export async function sendResourceRejectedEmail(
     return new EmailResult(false, 'threw', e?.message);
   }
 }
+
+export async function sendEditApprovedEmail(
+  to: string,
+  firstName: string,
+  resourceTitle: string,
+  resourceUrl: string
+): Promise<EmailResult> {
+  if (process.env.DISABLE_EMAILS === 'true' || process.env.NODE_ENV === 'test') {
+    console.log(`[EMAIL SKIP] Edit approved for ${to}: ${resourceTitle}`);
+    return new EmailResult(true, 'test-mode');
+  }
+  const html = renderEditApprovedEmail(firstName, resourceTitle, resourceUrl);
+  if (!resend) {
+    console.log(`\n📧 [EMAIL - DEV] To: ${to} | EDIT APPROVED: ${resourceTitle}\n`);
+    return new EmailResult(true, 'dev-mode');
+  }
+  try {
+    const result: any = await resend.emails.send({
+      from: FROM,
+      to: [to],
+      subject: `✅ Modification approuvée — ${resourceTitle.slice(0, 40)}`,
+      html,
+    });
+    if (result.error) {
+      console.error('📧 [EDIT APPROVED ERROR]', to, '→', result.error.message);
+      return new EmailResult(false, 'failed', result.error.message);
+    }
+    return new EmailResult(true, result.data?.id || 'sent');
+  } catch (e: any) {
+    console.error('📧 [EDIT APPROVED THROW]', to, '→', e?.message);
+    return new EmailResult(false, 'threw', e?.message);
+  }
+}
+
+export async function sendEditRejectedEmail(
+  to: string,
+  firstName: string,
+  resourceTitle: string,
+  reason: string,
+  resourceUrl: string
+): Promise<EmailResult> {
+  if (process.env.DISABLE_EMAILS === 'true' || process.env.NODE_ENV === 'test') {
+    console.log(`[EMAIL SKIP] Edit rejected for ${to}: ${resourceTitle} - ${reason?.slice(0, 50)}`);
+    return new EmailResult(true, 'test-mode');
+  }
+  const html = renderEditRejectedEmail(firstName, resourceTitle, reason, resourceUrl);
+  if (!resend) {
+    console.log(`\n📧 [EMAIL - DEV] To: ${to} | EDIT REJECTED: ${resourceTitle}\n   Reason: ${reason}\n`);
+    return new EmailResult(true, 'dev-mode');
+  }
+  try {
+    const result: any = await resend.emails.send({
+      from: FROM,
+      to: [to],
+      subject: `❌ Modification refusée — ${resourceTitle.slice(0, 40)}`,
+      html,
+    });
+    if (result.error) {
+      console.error('📧 [EDIT REJECTED ERROR]', to, '→', result.error.message);
+      return new EmailResult(false, 'failed', result.error.message);
+    }
+    return new EmailResult(true, result.data?.id || 'sent');
+  } catch (e: any) {
+    console.error('📧 [EDIT REJECTED THROW]', to, '→', e?.message);
+    return new EmailResult(false, 'threw', e?.message);
+  }
+}
+
