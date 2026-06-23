@@ -1,3 +1,4 @@
+import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
 import { FileText, Heart, MessageCircle, Star, TrendingUp } from 'lucide-react';
@@ -7,6 +8,11 @@ export const dynamic = 'force-dynamic';
 export default async function AccountDashboard() {
   const user = await getCurrentUser();
   if (!user) return null;
+
+  // For teachers, the unified profile page lives at /enseignant/profil
+  if (user.role === 'TEACHER' || user.role === 'ADMIN') {
+    redirect('/enseignant/profil');
+  }
 
   const [favoritesCount, commentsCount, ratingsCount, recentActivity] = await Promise.all([
     prisma.favorite.count({ where: { userId: user.id } }),

@@ -1,12 +1,13 @@
 import { redirect } from 'next/navigation';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import FloatingUploadButton from '@/components/layout/FloatingUploadButton';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import {
-  LayoutDashboard, Upload, FileText, BarChart3, User, MessageSquare, Bell, Shield,
-  ChevronRight, BookOpen, HelpCircle, Library
+  LayoutDashboard, Upload, FileText, BarChart3, User, Bell, Shield,
+  ChevronRight, BookOpen, Settings, Heart, Plus, CheckCircle2
 } from 'lucide-react';
 
 export default async function TeacherLayout({ children }: { children: React.ReactNode }) {
@@ -14,16 +15,28 @@ export default async function TeacherLayout({ children }: { children: React.Reac
   if (!user) redirect('/connexion');
   if (user.role !== 'TEACHER' && user.role !== 'ADMIN') redirect('/');
 
-  // Get counts for the sidebar
-  const [myResources, pendingEdits, rejectedEdits, unreadNotifs, libraryCount] = await Promise.all([
+  // Get counts for the sidebar (in parallel)
+  const [
+    myResources,
+    publishedResources,
+    pendingApproval,
+    pendingEdits,
+    rejectedEdits,
+    unreadNotifs,
+    libraryCount,
+    favoritesCount,
+  ] = await Promise.all([
     prisma.resource.count({ where: { teacherId: user.id } }),
+    prisma.resource.count({ where: { teacherId: user.id, status: 'PUBLISHED' } }),
+    prisma.resource.count({ where: { teacherId: user.id, status: 'PENDING_APPROVAL' } }),
     prisma.resource.count({ where: { teacherId: user.id, editStatus: 'PENDING_EDIT_APPROVAL' } }),
     prisma.resource.count({ where: { teacherId: user.id, editStatus: 'EDIT_REJECTED' } }),
     prisma.notification.count({ where: { userId: user.id, isRead: false } }),
     prisma.teacherFile.count({ where: { teacherId: user.id } }),
+    prisma.favorite.count({ where: { userId: user.id } }),
   ]);
 
-  const initials = (user.firstName?.[0] || user.email[0]).toUpperCase() + (user.lastName?.[0] || '').toUpperCase();
+  const initials = ((user.firstName?.[0] || user.email[0]) + (user.lastName?.[0] || '')).toUpperCase();
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50">
@@ -31,10 +44,13 @@ export default async function TeacherLayout({ children }: { children: React.Reac
       <div className="flex-1 pt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="grid lg:grid-cols-[280px_1fr] gap-6">
-            {/* ================ UNIFIED SIDEBAR ================ */}
+            {/* ================ SIMPLIFIED SIDEBAR (8 items) ================ */}
             <aside className="lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto space-y-2">
-              {/* Profile card */}
-              <Link href="/enseignant/profil" className="block bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl p-4 text-white shadow-md hover:shadow-lg transition group">
+              {/* ===== Profile card with live counters ===== */}
+              <Link
+                href="/enseignant/profil"
+                className="block bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl p-4 text-white shadow-md hover:shadow-lg transition group"
+              >
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center font-extrabold text-xl flex-shrink-0">
                     {initials}
@@ -45,57 +61,60 @@ export default async function TeacherLayout({ children }: { children: React.Reac
                   </div>
                   <ChevronRight className="w-4 h-4 opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition" />
                 </div>
-                <div className="mt-3 flex items-center gap-2 text-xs">
-                  <span className="px-2 py-0.5 bg-white/20 rounded-full font-bold">👨‍🏫 Enseignant{user.isVerifiedTeacher ? ' ✓' : ''}</span>
-                  {!user.isVerifiedTeacher && <span className="text-amber-100">non vérifié</span>}
+
+                {/* Live counters (option 4) */}
+                <div className="mt-3 pt-3 border-t border-white/20 flex items-center gap-2 text-xs">
+                  <span className="px-2 py-1 bg-white/20 rounded-md font-bold flex items-center gap-1">
+                    <CheckCircle2 className="w-3 h-3" />
+                    {publishedResources} publiées
+                  </span>
+                  {pendingApproval + pendingEdits > 0 && (
+                    <span className="px-2 py-1 bg-white/30 rounded-md font-bold flex items-center gap-1">
+                      ⏳ {pendingApproval + pendingEdits} en attente
+                    </span>
+                  )}
                 </div>
               </Link>
 
-              {/* === CONTENU (mes ressources) === */}
+              {/* ===== MES RESSOURCES (4 items) ===== */}
               <SidebarGroup title="Mes ressources" icon={BookOpen}>
-                <SidebarLink href="/enseignant" icon={LayoutDashboard} label="Tableau de bord" exact />
-                <SidebarLink href="/enseignant/ressources" icon={FileText} label="Toutes mes ressources" badge={myResources} />
                 <SidebarLink
-                  href="/enseignant/ressources?status=PUBLISHED"
-                  icon={FileText}
-                  label="Publiées"
-                  dotClass="bg-emerald-500"
+                  href="/enseignant"
+                  icon={LayoutDashboard}
+                  label="Tableau de bord"
+                  exact
                 />
                 <SidebarLink
-                  href="/enseignant/ressources?status=PENDING_APPROVAL"
+                  href="/enseignant/ressources"
                   icon={FileText}
-                  label="En attente"
-                  dotClass="bg-amber-500"
+                  label="Mes ressources"
+                  badge={myResources}
+                  badgeColor="bg-slate-500"
                 />
-                {rejectedEdits > 0 && (
-                  <SidebarLink
-                    href="/enseignant/ressources?editStatus=EDIT_REJECTED"
-                    icon={FileText}
-                    label="Modifications refusées"
-                    badge={rejectedEdits}
-                    badgeColor="bg-red-500"
-                  />
-                )}
-                {pendingEdits > 0 && (
-                  <SidebarLink
-                    href="/enseignant/ressources?editStatus=PENDING_EDIT_APPROVAL"
-                    icon={FileText}
-                    label="Modifs en attente"
-                    badge={pendingEdits}
-                    badgeColor="bg-amber-500"
-                  />
-                )}
-                <SidebarLink href="/enseignant/ajouter" icon={Upload} label="Ajouter une ressource" highlight />
-                <SidebarLink href="/enseignant/bibliotheque" icon={Library} label="Ma bibliothèque" badge={libraryCount} badgeColor="bg-blue-500" />
+                <SidebarLink
+                  href="/enseignant/bibliotheque"
+                  icon={BookOpen}
+                  label="Ma bibliothèque"
+                  badge={libraryCount}
+                  badgeColor="bg-blue-500"
+                />
+                <SidebarLink
+                  href="/enseignant/ajouter"
+                  icon={Plus}
+                  label="Ajouter"
+                  highlight
+                />
               </SidebarGroup>
 
-              {/* === ACTIVITÉ === */}
-              <SidebarGroup title="Activité" icon={BarChart3}>
-                <SidebarLink href="/enseignant/stats" icon={BarChart3} label="Statistiques" />
-                <SidebarLink href="/enseignant/analytics" icon={BarChart3} label="Analytics détaillées" />
-                <SidebarLink href="/messages" icon={MessageSquare} label="Messages" />
+              {/* ===== MON ACTIVITÉ (2 items) ===== */}
+              <SidebarGroup title="Mon activité" icon={BarChart3}>
                 <SidebarLink
-                  href="/mon-compte/notifications"
+                  href="/enseignant/stats"
+                  icon={BarChart3}
+                  label="Statistiques"
+                />
+                <SidebarLink
+                  href="/enseignant/notifications"
                   icon={Bell}
                   label="Notifications"
                   badge={unreadNotifs > 0 ? unreadNotifs : undefined}
@@ -103,13 +122,25 @@ export default async function TeacherLayout({ children }: { children: React.Reac
                 />
               </SidebarGroup>
 
-              {/* === COMPTE === */}
+              {/* ===== MON COMPTE (3 items) ===== */}
               <SidebarGroup title="Mon compte" icon={User}>
-                <SidebarLink href="/mon-compte" icon={User} label="Profil général" />
-                <SidebarLink href="/enseignant/profil" icon={User} label="Profil enseignant" />
-                <SidebarLink href="/mon-compte/parametres" icon={User} label="Paramètres" />
-                <SidebarLink href="/mon-compte/favoris" icon={BookOpen} label="Mes favoris" />
-                <SidebarLink href="/a-propos" icon={HelpCircle} label="À propos" />
+                <SidebarLink
+                  href="/enseignant/profil"
+                  icon={User}
+                  label="Mon profil"
+                />
+                <SidebarLink
+                  href="/enseignant/favoris"
+                  icon={Heart}
+                  label="Mes favoris"
+                  badge={favoritesCount}
+                  badgeColor="bg-pink-500"
+                />
+                <SidebarLink
+                  href="/enseignant/parametres"
+                  icon={Settings}
+                  label="Paramètres"
+                />
               </SidebarGroup>
 
               {user.role === 'ADMIN' && (
@@ -127,6 +158,9 @@ export default async function TeacherLayout({ children }: { children: React.Reac
         </div>
       </div>
       <Footer />
+
+      {/* ===== Floating Action Button (option 3) ===== */}
+      <FloatingUploadButton />
     </div>
   );
 }
@@ -144,7 +178,7 @@ function SidebarGroup({ title, icon: Icon, children }: { title: string; icon: an
 }
 
 function SidebarLink({
-  href, icon: Icon, label, exact, badge, badgeColor, dotClass, highlight
+  href, icon: Icon, label, exact, badge, badgeColor, highlight
 }: {
   href: string;
   icon: any;
@@ -152,7 +186,6 @@ function SidebarLink({
   exact?: boolean;
   badge?: number;
   badgeColor?: string;
-  dotClass?: string;
   highlight?: boolean;
 }) {
   return (
@@ -160,12 +193,11 @@ function SidebarLink({
       href={href}
       className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition ${
         highlight
-          ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:shadow-md'
+          ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:shadow-md font-bold'
           : 'text-slate-700 hover:bg-amber-50 hover:text-amber-700'
       }`}
     >
-      <Icon className="w-4 h-4 flex-shrink-0" />
-      {dotClass && <span className={`w-1.5 h-1.5 rounded-full ${dotClass}`} />}
+      <Icon className="w-4 h-4 flex-shrink-0" strokeWidth={highlight ? 2.5 : 2} />
       <span className="flex-1 truncate">{label}</span>
 
       {badge !== undefined && badge > 0 && (

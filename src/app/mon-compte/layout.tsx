@@ -9,6 +9,12 @@ export default async function AccountLayout({ children }: { children: React.Reac
   const user = await getCurrentUser();
   if (!user) redirect('/connexion');
 
+  // For teachers/admins, /mon-compte/* pages are also accessible under
+  // /enseignant/* with the teacher sidebar. Don't double the sidebar here.
+  if (user.role === 'TEACHER' || user.role === 'ADMIN') {
+    return <>{children}</>;
+  }
+
   const initials = (user.firstName?.[0] || user.email[0]).toUpperCase() + (user.lastName?.[0] || '').toUpperCase();
 
   const navItems = [
