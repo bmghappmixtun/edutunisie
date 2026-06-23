@@ -1,4 +1,5 @@
 import { Resend } from 'resend';
+import { renderResourceRejectedEmail } from './email-templates';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 const FROM = process.env.EMAIL_FROM || 'EduTunisie <noreply@edutunisie.tn>';
@@ -201,4 +202,39 @@ function renderTeacherApprovalEmail(firstName: string, approved: boolean): strin
 
 function renderResourceApprovedEmail(firstName: string, resourceTitle: string, approved: boolean): string {
   return `<!DOCTYPE html><html><body><h2>${approved ? 'Ressource approuvée' : 'Ressource refusée'}</h2><p>${resourceTitle}</p></body></html>`;
+}
+
+
+export async function sendResourceRejectedEmail(
+  to: string,
+  firstName: string,
+  resourceTitle: string,
+  reason: string,
+  resourceUrl?: string
+): Promise<EmailResult> {
+  if (process.env.DISABLE_EMAILS === 'true' || process.env.NODE_ENV === 'test') {
+    console.log(`[EMAIL SKIP] Rejection for ${to}: ${resourceTitle} - ${reason?.slice(0, 50)}`);
+    return new EmailResult(true, 'test-mode');
+  }
+  const html = renderResourceRejectedEmail(firstName, resourceTitle, reason, resourceUrl);
+  if (!resend) {
+    console.log(`\n📧 [EMAIL - DEV] To: ${to} | REJECTED: ${resourceTitle}\n   Reason: ${reason}\n`);
+    return new EmailResult(true, 'dev-mode');
+  }
+  try {
+    const result: any = await resend.emails.send({
+      from: FROM,
+      to: [to],
+      subject: `❌ Votre ressource n'a pas été validée — ${resourceTitle.slice(0, 40)}`,
+      html,
+    });
+    if (result.error) {
+      console.error('📧 [REJECTION ERROR]', to, '→', result.error.message);
+      return new EmailResult(false, 'failed', result.error.message);
+    }
+    return new EmailResult(true, result.data?.id || 'sent');
+  } catch (e: any) {
+    console.error('📧 [REJECTION THROW]', to, '→', e?.message);
+    return new EmailResult(false, 'threw', e?.message);
+  }
 }
