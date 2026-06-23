@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { sendResourceApprovedEmail, sendResourceRejectedEmail } from '@/lib/email';
@@ -24,6 +25,17 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       where: { id },
       data: { status: 'PUBLISHED', approvedAt: new Date(), approvedById: user.id, publishedAt: new Date() }
     });
+    // Force revalidation of all relevant pages (public list + detail + filters)
+    revalidatePath('/ressources');
+    revalidatePath(`/ressources/${resource.slug}`);
+    revalidatePath('/');
+    revalidatePath('/enseignant/ressources');
+    revalidatePath('/admin/approbations');
+    revalidatePath('/admin/ressources');
+    revalidatePath('/admin');
+    if (resource.teacherId) {
+      revalidatePath(`/professeurs/${resource.teacherId}`);
+    }
     if (resource.teacherId) {
       await prisma.notification.create({
         data: {
