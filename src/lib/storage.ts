@@ -3,15 +3,14 @@ import { promises as fs } from 'fs';
 import path from 'path';
 
 const IS_VERCEL = process.env.VERCEL === '1';
-const BLOB_TOKEN = process.env.BLOB_READ_WRITE_TOKEN;
 
 export async function uploadFile(
   filename: string,
   data: Buffer | Blob,
   contentType = 'application/pdf'
 ): Promise<{ url: string; key: string }> {
-  // Production: Vercel Blob
-  if (IS_VERCEL && BLOB_TOKEN) {
+  // Production: Vercel Blob (uses OIDC auto-detection, no token needed)
+  if (IS_VERCEL) {
     const blob = await put(filename, data, {
       access: 'public',
       contentType,
@@ -32,7 +31,7 @@ export async function uploadFile(
 }
 
 export async function deleteFile(keyOrUrl: string): Promise<void> {
-  if (IS_VERCEL && BLOB_TOKEN && keyOrUrl.startsWith('http')) {
+  if (IS_VERCEL && keyOrUrl.startsWith('http')) {
     try { await del(keyOrUrl); } catch {}
     return;
   }
