@@ -155,7 +155,7 @@ export async function POST(req: NextRequest) {
     const pdfBuffer = Buffer.from(await file.arrayBuffer());
     const blob = await put(filePath, pdfBuffer, {
       access: 'public',
-      addRandomSuffix: false,
+      addRandomSuffix: true,
       // Don't pass token - let @vercel/blob SDK auto-detect from OIDC in production
       // Falls back to process.env.BLOB_READ_WRITE_TOKEN in dev
     });
