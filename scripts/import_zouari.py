@@ -23,9 +23,12 @@ from PIL import Image
 from datetime import datetime
 
 # === Configuration ===
-DATABASE_URL = "postgresql://neondb_owner:***REMOVED***@ep-round-art-asyh88wq.c-4.eu-central-1.aws.neon.tech/neondb?sslmode=require"
-BLOB_TOKEN = "vercel_blob_rw_KMy1h6Us8L7BG7bG_EzUeWUec2V20Jt8qMHFvzRgm8SdpjR"
-SITE_URL = "https://examanet.com/"
+# All sensitive values come from environment variables — NEVER hardcode.
+import os
+
+DATABASE_URL = os.environ["DATABASE_URL"]  # Set in env (never commit)
+BLOB_TOKEN = os.environ["BLOB_READ_WRITE_TOKEN"]  # Set in env (never commit)
+SITE_URL = os.environ.get("EXAMANET_SITE_URL", "https://examanet.com/")
 LOGO_PATH = "/tmp/examanet-branding/examanet-logo-small.png"
 PASSWORD = "***REMOVED***"
 DOWNLOAD_BASE = "https://www.tunisiecollege.net/app/download/{fileId}/"

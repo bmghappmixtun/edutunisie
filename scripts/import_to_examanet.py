@@ -21,11 +21,14 @@ from PIL import Image
 from datetime import datetime
 
 # === Configuration ===
-EXAMANET_API = "https://examanet.com/api/admin/tunisiecollege-import"
-SEED_TOKEN = "cffa7e495ff6a441d253b03b8cf1efa7"
-LOGO_PATH = "/tmp/examanet-branding/examanet-logo-small.png"
-PASSWORD = "***REMOVED***"
-SITE_URL = "https://examanet.com/"
+# All sensitive values come from environment variables — NEVER hardcode.
+import os
+
+EXAMANET_API = os.environ.get("EXAMANET_API_URL", "https://examanet.com/api/admin/tunisiecollege-import")
+SEED_TOKEN = os.environ["SEED_TOKEN"]  # Set in env or .env (never commit)
+LOGO_PATH = os.environ.get("EXAMANET_LOGO_PATH", "/tmp/examanet-branding/examanet-logo-small.png")
+PASSWORD = os.environ.get("TUNISIECOLLEGE_PDF_PASSWORD", "***REMOVED***")
+SITE_URL = os.environ.get("EXAMANET_SITE_URL", "https://examanet.com/")
 
 # Global stats
 STATS = {
