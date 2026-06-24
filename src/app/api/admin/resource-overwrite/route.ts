@@ -1,12 +1,12 @@
 /**
  * POST /api/admin/resource-overwrite
  * Overwrite the file for an existing Resource with a new PDF.
- * Used to re-strip watermarks on already-imported files.
+ * Uses a NEW path to bypass Vercel Blob CDN cache (which is 30 days).
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
-import { put } from '@vercel/blob';
+import { put, del } from '@vercel/blob';
 
 export const maxDuration = 60;
 export const runtime = 'nodejs';
@@ -45,29 +45,37 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Resource non trouvée' }, { status: 404 });
     }
 
-    const fileKey = resource.fileKey;
-    if (!fileKey) {
-      return NextResponse.json({ error: 'Resource fileKey manquante' }, { status: 400 });
-    }
+    const oldKey = resource.fileKey;
+    const oldUrl = resource.fileUrl;
 
-    // Upload new PDF to the SAME path (allowOverwrite:true)
+    // Strategy: upload to NEW path with random suffix to bypass CDN cache
+    // Then delete old blob (after confirming new is live)
     const pdfBuffer = Buffer.from(await file.arrayBuffer());
-    const blob = await put(fileKey, pdfBuffer, {
+    
+    // Get directory from old key (e.g., "teacher-library/teacherId/imported/")
+    const keyDir = oldKey?.substring(0, oldKey.lastIndexOf('/') + 1) || 
+                   `teacher-library/${resource.teacherId}/imported/`;
+    
+    // New filename: timestamp + nanoid to ensure CDN freshness
+    const newFilename = `${Date.now()}-${Math.random().toString(36).substring(2, 10)}-${resourceId.substring(0, 6)}.pdf`;
+    const newKey = `${keyDir}${newFilename}`;
+    
+    const blob = await put(newKey, pdfBuffer, {
       access: 'public',
       addRandomSuffix: false,
-      allowOverwrite: true,
     });
 
-    // Update resource
+    // Update resource with new key
     await prisma.resource.update({
       where: { id: resourceId },
       data: {
+        fileKey: blob.pathname,
         fileUrl: blob.url,
         fileSize: pdfBuffer.length,
       },
     });
 
-    // Also update the TeacherFile if exists
+    // Also update TeacherFile
     await prisma.teacherFile.updateMany({
       where: { resourceId },
       data: {
@@ -76,9 +84,20 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // Try to delete old blob (best effort - might fail if not yet expired)
+    if (oldKey && oldKey !== blob.pathname) {
+      try {
+        await del(oldUrl);
+      } catch (e) {
+        // Ignore - old blob will expire naturally
+      }
+    }
+
     return NextResponse.json({
       success: true,
       resourceId,
+      oldKey,
+      newKey: blob.pathname,
       newUrl: blob.url,
       oldSize: resource.fileSize,
       newSize: pdfBuffer.length,
