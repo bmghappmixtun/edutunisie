@@ -2,10 +2,10 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Search, Filter, X, ChevronDown, Grid, List, Loader2, Eye, Download, Star, Calendar, User, BookOpen, ChevronRight, ChevronLeft } from 'lucide-react';
+import { Search, Filter, X, ChevronDown, Grid, List, Loader2, Eye, Download, Star, Calendar, User, BookOpen, ChevronRight, ChevronLeft, CheckCircle2, GraduationCap } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useI18n } from '@/lib/i18n';
-import { formatNumber, timeAgo } from '@/lib/utils';
+import { formatNumber, timeAgo, HOMEWORK_SUBTYPE_LABELS } from '@/lib/utils';
 
 type Resource = {
   id: string;
@@ -20,6 +20,13 @@ type Resource = {
   downloadsCount: number;
   averageRating: number;
   publishedAt: string | null;
+  // Homework & school metadata (NEW)
+  homeworkSubtype?: string | null;
+  homeworkNumber?: number | null;
+  schoolType?: string | null;
+  product?: string | null;
+  hasCorrection?: boolean;
+  correctionSummary?: string | null;
   subject: { nameFr: string; slug: string; color?: string; icon?: string };
   class: { nameFr: string; slug: string } | null;
   section: { nameFr: string; slug: string } | null;
@@ -474,10 +481,29 @@ function ResourceCard({ r }: { r: Resource }) {
       className="bg-white rounded-2xl border border-slate-200 hover:border-primary-300 hover:shadow-lg transition overflow-hidden group"
     >
       <div className="p-4">
-        <div className="flex items-center gap-2 mb-3">
+        <div className="flex items-center gap-2 mb-3 flex-wrap">
           <span className={`px-2 py-0.5 rounded text-xs font-bold ${TYPE_COLORS[r.type]}`}>
             {TYPE_ICONS[r.type]} {TYPE_LABELS[r.type] || r.type}
           </span>
+          {/* Homework subtype badge */}
+          {r.type === 'HOMEWORK' && r.homeworkSubtype && HOMEWORK_SUBTYPE_LABELS[r.homeworkSubtype] && (
+            <span className={`px-2 py-0.5 rounded text-xs font-bold ${HOMEWORK_SUBTYPE_LABELS[r.homeworkSubtype].color}`}>
+              {HOMEWORK_SUBTYPE_LABELS[r.homeworkSubtype].fr}
+              {r.homeworkNumber ? ` N°${r.homeworkNumber}` : ''}
+            </span>
+          )}
+          {/* Correction badge */}
+          {r.hasCorrection && (
+            <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded text-xs font-bold inline-flex items-center gap-1">
+              <CheckCircle2 className="w-3 h-3" /> Corrigé
+            </span>
+          )}
+          {/* Pilote badge */}
+          {r.schoolType === 'PILOTE' && (
+            <span className="px-2 py-0.5 bg-amber-100 text-amber-800 rounded text-xs font-bold inline-flex items-center gap-1">
+              <GraduationCap className="w-3 h-3" /> Pilote
+            </span>
+          )}
           {r.year && (
             <span className="text-xs text-slate-500">{r.year - 1}-{r.year}</span>
           )}

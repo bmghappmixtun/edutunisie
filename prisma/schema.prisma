@@ -194,6 +194,21 @@ model Resource {
   tags            String?        // comma-separated
   language        String         @default("fr")
 
+  // Homework subtype: only when type=HOMEWORK
+  // CONTROL = Devoir de Contrôle, SYNTHESIS = Devoir de Synthèse, HOUSEWORK = Devoir de Maison
+  homeworkSubtype     String?  // "CONTROL" | "SYNTHESIS" | "HOUSEWORK"
+  homeworkNumber      Int?     // N°1, N°2, N°3, ... (4, 5+ allowed for college/lycée)
+
+  // School type (only display "Pilote" badge, never "Public")
+  schoolType          String?  // "PUBLIC" | "PILOTE"
+
+  // Technology product (المنتج) - free text, in Arabic, only meaningful for college technologie
+  product             String?
+
+  // Whether the file contains a correction/corrigé integrated in the same PDF
+  hasCorrection       Boolean  @default(false)
+  correctionSummary   String?  // Optional description of the correction contents
+
   viewsCount      Int            @default(0)
   downloadsCount  Int            @default(0)
   sharesCount     Int            @default(0)
@@ -217,6 +232,12 @@ model Resource {
   // Library link (if this resource was created from a teacher library file)
   libraryFileId        String?  @unique
   libraryFile          TeacherFile? @relation("FileResource")
+
+  // Admin import (from tunisiecollege.net, devoirat.net, etc.)
+  importedByAdmin      Boolean   @default(false)
+  importedAt           DateTime?
+  importedFrom          String?   // "tunisiecollege.net" | "devoirat.net" | "jotform"
+  originalSubmissionId String?   // JotForm submission ID (if applicable)
 
   // Edit workflow (teacher can edit after publishing, needs admin re-approval)
   // Full-text search (PostgreSQL tsvector, managed by trigger)
@@ -291,6 +312,13 @@ model TeacherFile {
   // If this file was used to create a Resource
   resourceId        String?  @unique
   resource          Resource? @relation("FileResource", fields: [resourceId], references: [id])
+
+  // Admin import (from tunisiecollege.net, devoirat.net, etc.)
+  importedByAdmin      Boolean   @default(false)
+  importedAt           DateTime?
+  importedFrom         String?   // "tunisiecollege.net" | "devoirat.net" | "jotform"
+  originalSubmissionId String?   // JotForm submission ID
+  readOnly             Boolean   @default(false)  // imported files can't be modified/deleted by teacher
 
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt

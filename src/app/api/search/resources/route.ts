@@ -24,6 +24,9 @@ export async function GET(req: NextRequest) {
   const fromDate = params.get('from');
   const toDate = params.get('to');
   const hasFile = params.get('hasFile') === 'true';
+  const hasCorrection = params.get('hasCorrection'); // 'true' | 'false' | null
+  const homeworkSubtype = params.get('homeworkSubtype'); // CONTROL | SYNTHESIS | HOUSEWORK
+  const schoolType = params.get('schoolType'); // PUBLIC | PILOTE
 
   // Build filter conditions
   const where: any = { status: 'PUBLISHED' };
@@ -33,6 +36,14 @@ export async function GET(req: NextRequest) {
   if (sectionId) where.sectionId = sectionId;
   if (type) where.type = type;
   if (year) where.year = parseInt(year);
+  if (hasCorrection === 'true') where.hasCorrection = true;
+  if (hasCorrection === 'false') where.hasCorrection = false;
+  if (homeworkSubtype && ['CONTROL', 'SYNTHESIS', 'HOUSEWORK'].includes(homeworkSubtype)) {
+    where.homeworkSubtype = homeworkSubtype;
+  }
+  if (schoolType && ['PUBLIC', 'PILOTE'].includes(schoolType)) {
+    where.schoolType = schoolType;
+  }
   if (fromDate || toDate) {
     where.publishedAt = {};
     if (fromDate) where.publishedAt.gte = new Date(fromDate);
@@ -154,12 +165,20 @@ export async function GET(req: NextRequest) {
       description: r.description,
       type: r.type,
       year: r.year,
+      trimester: r.trimester,
       pageCount: r.pageCount,
       fileSize: r.fileSize,
       viewsCount: r.viewsCount,
       downloadsCount: r.downloadsCount,
       averageRating: r.averageRating || 0,
       publishedAt: r.publishedAt,
+      // Homework & school metadata (NEW)
+      homeworkSubtype: r.homeworkSubtype,
+      homeworkNumber: r.homeworkNumber,
+      schoolType: r.schoolType,
+      product: r.product,
+      hasCorrection: r.hasCorrection,
+      correctionSummary: r.correctionSummary,
       subject: r.subject,
       class: r.class,
       section: r.section,

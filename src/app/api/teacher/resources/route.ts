@@ -33,6 +33,14 @@ export async function POST(req: NextRequest) {
     let fileSize = 0;
     let libraryFileId: string | null = null; // <- NEW: link to teacher library file
 
+    // Homework & school metadata (NEW)
+    let homeworkSubtype: string | null = null;       // CONTROL | SYNTHESIS | HOUSEWORK
+    let homeworkNumber: number | null = null;        // 1, 2, 3, 4, 5+ ...
+    let schoolType: string | null = null;            // PUBLIC | PILOTE
+    let product: string | null = null;               // المنتج (Arabic text)
+    let hasCorrection: boolean = false;              // file contains corrigé
+    let correctionSummary: string | null = null;     // description of correction
+
     const contentType = req.headers.get('content-type') || '';
 
     if (contentType.includes('multipart/form-data')) {
@@ -48,6 +56,34 @@ export async function POST(req: NextRequest) {
       year = formData.get('year') as string | null;
       tags = formData.get('tags') as string | null;
       libraryFileId = (formData.get('libraryFileId') as string | null) || null;
+      // Homework & school metadata (NEW)
+      const rawSubtype = formData.get('homeworkSubtype');
+      const rawNumber = formData.get('homeworkNumber');
+      const rawSchoolType = formData.get('schoolType');
+      const rawProduct = formData.get('product');
+      const rawHasCorrection = formData.get('hasCorrection');
+      const rawCorrectionSummary = formData.get('correctionSummary');
+      if (rawSubtype && typeof rawSubtype === 'string' && rawSubtype.trim()) {
+        const allowed = ['CONTROL', 'SYNTHESIS', 'HOUSEWORK'];
+        if (allowed.includes(rawSubtype)) homeworkSubtype = rawSubtype;
+      }
+      if (rawNumber) {
+        const n = parseInt(String(rawNumber), 10);
+        if (Number.isFinite(n) && n >= 1 && n <= 20) homeworkNumber = n;
+      }
+      if (rawSchoolType && typeof rawSchoolType === 'string' && rawSchoolType.trim()) {
+        const allowed = ['PUBLIC', 'PILOTE'];
+        if (allowed.includes(rawSchoolType)) schoolType = rawSchoolType;
+      }
+      if (rawProduct && typeof rawProduct === 'string' && rawProduct.trim()) {
+        product = String(rawProduct).trim().substring(0, 200);
+      }
+      if (rawHasCorrection === 'true' || rawHasCorrection === 'on' || rawHasCorrection === '1') {
+        hasCorrection = true;
+        if (rawCorrectionSummary && typeof rawCorrectionSummary === 'string' && rawCorrectionSummary.trim()) {
+          correctionSummary = String(rawCorrectionSummary).trim().substring(0, 500);
+        }
+      }
     } else {
       const body = await req.json();
       title = body.title;
@@ -63,6 +99,20 @@ export async function POST(req: NextRequest) {
       fileUrl = body.fileUrl || null;
       fileSize = body.fileSize || 0;
       libraryFileId = body.libraryFileId || null;
+      // Homework & school metadata (NEW)
+      const allowedSubtypes = ['CONTROL', 'SYNTHESIS', 'HOUSEWORK'];
+      if (allowedSubtypes.includes(body.homeworkSubtype)) homeworkSubtype = body.homeworkSubtype;
+      if (body.homeworkNumber) {
+        const n = parseInt(String(body.homeworkNumber), 10);
+        if (Number.isFinite(n) && n >= 1 && n <= 20) homeworkNumber = n;
+      }
+      const allowedSchool = ['PUBLIC', 'PILOTE'];
+      if (allowedSchool.includes(body.schoolType)) schoolType = body.schoolType;
+      if (body.product && typeof body.product === 'string') product = body.product.trim().substring(0, 200);
+      hasCorrection = body.hasCorrection === true || body.hasCorrection === 'true';
+      if (body.correctionSummary && typeof body.correctionSummary === 'string') {
+        correctionSummary = body.correctionSummary.trim().substring(0, 500);
+      }
     }
 
     if (!title || !type || !subjectSlug || !classSlug) {
@@ -223,6 +273,13 @@ export async function POST(req: NextRequest) {
         year,
         tags,
         pageCount: 10,
+        // Homework & school metadata (NEW)
+        homeworkSubtype: type === 'HOMEWORK' ? homeworkSubtype : null,
+        homeworkNumber,
+        schoolType,
+        product,
+        hasCorrection,
+        correctionSummary,
         // Original file (kept in library for teacher)
         originalFileKey,
         originalFileName,

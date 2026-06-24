@@ -24,9 +24,9 @@ const COMMON_SUBJECTS = [
 ];
 
 const COMMON_LEVELS = [
-  'Primaire', 'Collège', 'Lycée', 'Bac',
-  '1ère année', '2ème année', '3ème année', '4ème année',
-  '7ème année', '8ème année', '9ème année'
+  'Collège', 'Lycée', 'Bac',
+  '7ème année', '8ème année', '9ème année',
+  '1ère année secondaire', '2ème année secondaire', '3ème année secondaire', '4ème année secondaire'
 ];
 
 export default function EditProfilePage() {

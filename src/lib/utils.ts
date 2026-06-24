@@ -63,6 +63,13 @@ export const RESOURCE_TYPE_LABELS: Record<string, { fr: string; ar: string; colo
   OTHER:         { fr: 'Autre',           ar: 'آخر',           color: 'bg-slate-100 text-slate-700' },
 };
 
+// Homework subtype — only relevant when type=HOMEWORK
+export const HOMEWORK_SUBTYPE_LABELS: Record<string, { fr: string; ar: string; color: string }> = {
+  CONTROL:       { fr: 'Contrôle',        ar: 'فرض مراقبة',     color: 'bg-red-100 text-red-700' },
+  SYNTHESIS:     { fr: 'Synthèse',        ar: 'فرض تأليفي',     color: 'bg-violet-100 text-violet-700' },
+  HOUSEWORK:     { fr: 'Maison',          ar: 'واجب منزلي',     color: 'bg-orange-100 text-orange-700' },
+};
+
 export const GOVERNORATES = [
   'Tunis', 'Ariana', 'Ben Arous', 'Manouba', 'Nabeul', 'Zaghouan', 'Bizerte',
   'Béja', 'Jendouba', 'Kef', 'Siliana', 'Sousse', 'Monastir', 'Mahdia',

@@ -98,10 +98,17 @@ export default async function EditResourcePage({ params }: { params: Promise<{ i
           fileSize: resource.fileSize,
           status: resource.status,
           editStatus: resource.editStatus,
+          // Homework & school metadata (NEW)
+          homeworkSubtype: resource.homeworkSubtype,
+          homeworkNumber: resource.homeworkNumber,
+          schoolType: resource.schoolType,
+          product: resource.product,
+          hasCorrection: resource.hasCorrection,
+          correctionSummary: resource.correctionSummary,
         }}
         pending={pending}
-        subjects={subjects.map(s => ({ id: s.id, nameFr: s.nameFr, icon: s.icon || undefined }))}
-        classes={classes.map(c => ({ id: c.id, nameFr: c.nameFr }))}
+        subjects={subjects.map(s => ({ id: s.id, slug: s.slug, nameFr: s.nameFr, icon: s.icon || undefined }))}
+        classes={classes.map(c => ({ id: c.id, slug: c.slug, nameFr: c.nameFr }))}
         sections={sections.map(s => ({ id: s.id, nameFr: s.nameFr, classId: s.classId }))}
         readOnly={hasPending}
       />

@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { Download, Eye, Star, FileText, User, Calendar, HardDrive } from 'lucide-react';
+import { Download, Eye, Star, FileText, User, Calendar, HardDrive, CheckCircle2, GraduationCap } from 'lucide-react';
+import { HOMEWORK_SUBTYPE_LABELS } from '@/lib/utils';
 
 type Resource = {
   id: string;
@@ -13,6 +14,11 @@ type Resource = {
   avgRating: number;
   ratingCount: number;
   publishedAt: Date | string | null;
+  // Homework & school metadata (NEW)
+  homeworkSubtype?: string | null;
+  homeworkNumber?: number | null;
+  schoolType?: string | null;
+  hasCorrection?: boolean;
   subject: { slug: string; nameFr: string; color: string | null; icon: string | null } | null;
   class: { slug: string; nameFr: string } | null;
   teacher: { firstName: string | null; lastName: string | null } | null;
@@ -72,6 +78,21 @@ export default function ResourceListItem({ resource }: { resource: Resource }) {
               <span className="text-slate-300">•</span>
               <span className="text-xs text-slate-500">{resource.class.nameFr}</span>
             </>
+          )}
+          {resource.type === 'HOMEWORK' && resource.homeworkSubtype && HOMEWORK_SUBTYPE_LABELS[resource.homeworkSubtype] && (
+            <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${HOMEWORK_SUBTYPE_LABELS[resource.homeworkSubtype].color}`}>
+              {HOMEWORK_SUBTYPE_LABELS[resource.homeworkSubtype].fr}{resource.homeworkNumber ? ` N°${resource.homeworkNumber}` : ''}
+            </span>
+          )}
+          {resource.hasCorrection && (
+            <span className="px-1.5 py-0.5 bg-emerald-100 text-emerald-700 rounded text-[10px] font-bold inline-flex items-center gap-0.5">
+              <CheckCircle2 className="w-2.5 h-2.5" /> Corrigé
+            </span>
+          )}
+          {resource.schoolType === 'PILOTE' && (
+            <span className="px-1.5 py-0.5 bg-amber-100 text-amber-800 rounded text-[10px] font-bold inline-flex items-center gap-0.5">
+              <GraduationCap className="w-2.5 h-2.5" /> Pilote
+            </span>
           )}
         </div>
         <h3 className="font-semibold text-slate-900 line-clamp-1 group-hover:text-primary-600 transition">
