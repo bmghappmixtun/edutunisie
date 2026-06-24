@@ -22,9 +22,16 @@ type Resource = {
   fileSize: number;
   status: string;
   editStatus: string | null;
+  // Homework & school metadata (NEW)
+  homeworkSubtype?: string | null;
+  homeworkNumber?: number | null;
+  schoolType?: string | null;
+  product?: string | null;
+  hasCorrection?: boolean;
+  correctionSummary?: string | null;
 };
 
-type Option = { id: string; nameFr: string; icon?: string; classId?: string };
+type Option = { id: string; slug?: string; nameFr: string; icon?: string; classId?: string };
 
 const TYPES = [
   { v: 'COURSE', l: '📖 Cours' },
@@ -75,6 +82,18 @@ export default function EditResourceForm({
   const [year, setYear] = useState(resource.year || '');
   const [tags, setTags] = useState(resource.tags || '');
   const [language, setLanguage] = useState(resource.language);
+  // Homework & school metadata (NEW)
+  const [homeworkSubtype, setHomeworkSubtype] = useState<string>(resource.homeworkSubtype || '');
+  const [homeworkNumber, setHomeworkNumber] = useState<number | ''>(resource.homeworkNumber || '');
+  const [schoolType, setSchoolType] = useState<string>(resource.schoolType || 'PUBLIC');
+  const [product, setProduct] = useState<string>(resource.product || '');
+  const [hasCorrection, setHasCorrection] = useState<boolean>(resource.hasCorrection || false);
+  const [correctionSummary, setCorrectionSummary] = useState<string>(resource.correctionSummary || '');
+
+  // Look up class slug to determine if college technologie
+  const selectedClass = classes.find(c => c.id === classId);
+  const selectedSubject = subjects.find(s => s.id === subjectId);
+  const showProductField = selectedSubject?.slug === 'technologie' && ['7eme', '8eme', '9eme'].includes(selectedClass?.slug || '');
 
   // Filter sections by selected class
   const filteredSections = classId ? sections.filter(s => s.classId === classId) : sections;
@@ -96,6 +115,13 @@ export default function EditResourceForm({
           year: year || null,
           tags: tags || null,
           language,
+          // Homework & school metadata (NEW)
+          homeworkSubtype: type === 'HOMEWORK' && homeworkSubtype ? homeworkSubtype : null,
+          homeworkNumber: type === 'HOMEWORK' && homeworkNumber ? Number(homeworkNumber) : null,
+          schoolType: schoolType || 'PUBLIC',
+          product: showProductField && product ? product : null,
+          hasCorrection,
+          correctionSummary: hasCorrection && correctionSummary ? correctionSummary : null,
         })
       });
       const data = await res.json();
@@ -245,6 +271,121 @@ export default function EditResourceForm({
         <Field label="Tags (séparés par des virgules)">
           <input type="text" value={tags} onChange={e => setTags(e.target.value)} placeholder="math, bac, 2024" className="input" />
         </Field>
+
+        {/* Homework subtype + number — only when type=HOMEWORK */}
+        {type === 'HOMEWORK' && (
+          <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 space-y-3">
+            <div className="font-bold text-amber-900 text-sm">📝 Détails du devoir</div>
+            <div>
+              <label className="label">Type de devoir</label>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { value: 'CONTROL', label: '📋 Contrôle', cls: 'red' },
+                  { value: 'SYNTHESIS', label: '📝 Synthèse', cls: 'violet' },
+                  { value: 'HOUSEWORK', label: '🏠 Maison', cls: 'orange' },
+                ].map(opt => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setHomeworkSubtype(opt.value)}
+                    className={`px-3 py-2 rounded-lg text-sm font-bold border transition ${
+                      homeworkSubtype === opt.value
+                        ? opt.cls === 'red' ? 'bg-red-100 border-red-400 text-red-800'
+                        : opt.cls === 'violet' ? 'bg-violet-100 border-violet-400 text-violet-800'
+                        : 'bg-orange-100 border-orange-400 text-orange-800'
+                        : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <label className="label">Numéro du devoir</label>
+              <select
+                value={homeworkNumber}
+                onChange={e => setHomeworkNumber(e.target.value ? parseInt(e.target.value, 10) : '')}
+                className="input"
+              >
+                <option value="">— Non spécifié —</option>
+                {[1,2,3,4,5,6,7,8,9,10].map(n => (
+                  <option key={n} value={n}>N°{n}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+        )}
+
+        {/* School type */}
+        <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+          <div className="font-bold text-slate-900 text-sm">🏫 Type d'école</div>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => setSchoolType('PUBLIC')}
+              className={`flex-1 px-3 py-2 rounded-lg text-sm font-bold border transition ${
+                schoolType === 'PUBLIC' || !schoolType
+                  ? 'bg-slate-200 border-slate-400 text-slate-900'
+                  : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+              }`}
+            >
+              🏫 École publique
+            </button>
+            <button
+              type="button"
+              onClick={() => setSchoolType('PILOTE')}
+              className={`flex-1 px-3 py-2 rounded-lg text-sm font-bold border transition ${
+                schoolType === 'PILOTE'
+                  ? 'bg-amber-200 border-amber-500 text-amber-900'
+                  : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+              }`}
+            >
+              🎓 Lycée/Collège Pilote
+            </button>
+          </div>
+        </div>
+
+        {/* Product (Technologie collège) */}
+        {showProductField && (
+          <div className="p-4 rounded-xl bg-orange-50 border border-orange-200 space-y-3">
+            <div className="font-bold text-orange-900 text-sm">🔧 المنتج / Produit réalisé</div>
+            <input
+              type="text"
+              value={product}
+              onChange={e => setProduct(e.target.value)}
+              className="input text-right"
+              dir="rtl"
+              placeholder="مثال: مطوية، برنامج سكراتش..."
+              maxLength={200}
+            />
+          </div>
+        )}
+
+        {/* Correction */}
+        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 space-y-3">
+          <label className="flex items-start gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={hasCorrection}
+              onChange={e => setHasCorrection(e.target.checked)}
+              className="mt-1 w-5 h-5 rounded text-emerald-600"
+            />
+            <div>
+              <div className="font-bold text-emerald-900 text-sm">✅ Ce document contient un corrigé</div>
+              <div className="text-xs text-emerald-700">Un badge vert proéminent sera affiché.</div>
+            </div>
+          </label>
+          {hasCorrection && (
+            <textarea
+              value={correctionSummary}
+              onChange={e => setCorrectionSummary(e.target.value)}
+              className="input min-h-[60px] resize-none text-sm"
+              placeholder="Description du corrigé..."
+              maxLength={500}
+            />
+          )}
+        </div>
       </div>
 
       {/* Submit */}

@@ -1,7 +1,7 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { Info, Loader2, BookOpen, GraduationCap, ChevronRight, Library } from 'lucide-react';
+import { Info, Loader2, BookOpen, GraduationCap, ChevronRight, Library, CheckCircle2, Wrench, School } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ModernUploader from '@/components/teacher/ModernUploader';
 
@@ -36,9 +36,57 @@ export default function AddResourcePage() {
     title: '', description: '', type: 'COURSE', subject: '', class: '',
     section: '', trimester: '', year: '2023-2024', tags: ''
   });
+  // Homework & school metadata
+  const [homeworkSubtype, setHomeworkSubtype] = useState<string>(''); // CONTROL | SYNTHESIS | HOUSEWORK
+  const [homeworkNumber, setHomeworkNumber] = useState<number | ''>('');
+  const [schoolType, setSchoolType] = useState<string>('PUBLIC');
+  const [product, setProduct] = useState<string>('');
+  const [hasCorrection, setHasCorrection] = useState<boolean>(false);
+  const [correctionSummary, setCorrectionSummary] = useState<string>('');
+
   const [uploadedFile, setUploadedFile] = useState<UploadedFile | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [resetKey, setResetKey] = useState(0);
+
+  // Show product field only for technologie + 7-8-9ème (collège)
+  const showProductField = useMemo(() => {
+    return form.subject === 'technologie' && ['7eme', '8eme', '9eme'].includes(form.class);
+  }, [form.subject, form.class]);
+
+  // Auto-inference: when title changes, detect homework subtype + number + trimester
+  useEffect(() => {
+    const title = form.title;
+    if (!title) return;
+    let detectedSubtype = '';
+    let detectedNumber: number | '' = '';
+    let detectedTrimester = '';
+    const lower = title.toLowerCase();
+
+    // Subtype detection
+    if (/contr[oô]le|controle/i.test(title)) detectedSubtype = 'CONTROL';
+    else if (/synth[eè]se|synthese|synt[eè]se/i.test(title)) detectedSubtype = 'SYNTHESIS';
+    else if (/\bmaison\b/i.test(title)) detectedSubtype = 'HOUSEWORK';
+
+    // Number detection: "N°1", "N 1", "n°2", "numéro 3", etc.
+    const numMatch = title.match(/N[°o\u00ba]\s*(\d+)|num[eé]ro\s*(\d+)|n[\.\s]+(\d+)/i);
+    if (numMatch) {
+      const n = parseInt(numMatch[1] || numMatch[2] || numMatch[3], 10);
+      if (Number.isFinite(n) && n >= 1 && n <= 20) detectedNumber = n;
+    }
+    // Trimester auto-fill from number (only when not set by user)
+    if (detectedNumber && !form.trimester) {
+      if (detectedNumber === 1) detectedTrimester = 'T1';
+      else if (detectedNumber === 2) detectedTrimester = 'T2';
+      else if (detectedNumber >= 3) detectedTrimester = 'T3';
+    }
+
+    if (detectedSubtype && !homeworkSubtype) setHomeworkSubtype(detectedSubtype);
+    if (detectedNumber && !homeworkNumber) setHomeworkNumber(detectedNumber);
+    if (detectedTrimester) {
+      setForm(p => p.trimester ? p : { ...p, trimester: detectedTrimester });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.title]);
 
   // Load dropdown options
   useEffect(() => {
@@ -90,6 +138,13 @@ export default function AddResourcePage() {
           fileKey: uploadedFile.fileKey,
           fileUrl: uploadedFile.fileUrl,
           fileSize: uploadedFile.fileSize,
+          // Homework & school metadata (NEW)
+          homeworkSubtype: form.type === 'HOMEWORK' && homeworkSubtype ? homeworkSubtype : null,
+          homeworkNumber: form.type === 'HOMEWORK' && homeworkNumber ? Number(homeworkNumber) : null,
+          schoolType: schoolType || 'PUBLIC',
+          product: showProductField && product ? product : null,
+          hasCorrection,
+          correctionSummary: hasCorrection && correctionSummary ? correctionSummary : null,
         })
       });
       const result = await res.json();
@@ -265,6 +320,163 @@ export default function AddResourcePage() {
                 <label className="label">Tags</label>
                 <input type="text" value={form.tags} onChange={e => update('tags', e.target.value)} className="input" placeholder="math, bac, 2024" />
               </div>
+            </div>
+
+            {/* ===== HOMEWORK & SCHOOL METADATA (NEW) ===== */}
+
+            {/* Homework subtype + number — only when type=HOMEWORK */}
+            {form.type === 'HOMEWORK' && (
+              <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 space-y-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">📝</span>
+                  <span className="font-bold text-amber-900 dark:text-amber-200">Détails du devoir</span>
+                  <span className="text-xs text-amber-700 ml-auto">
+                    Auto-détecté depuis le titre — modifiable
+                  </span>
+                </div>
+                <div>
+                  <label className="label">Type de devoir</label>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { value: 'CONTROL', label: '📋 Devoir de Contrôle', color: 'red' },
+                      { value: 'SYNTHESIS', label: '📝 Devoir de Synthèse', color: 'violet' },
+                      { value: 'HOUSEWORK', label: '🏠 Devoir de Maison', color: 'orange' },
+                    ].map(opt => (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => setHomeworkSubtype(opt.value)}
+                        className={`px-3 py-2 rounded-lg text-sm font-bold border transition ${
+                          homeworkSubtype === opt.value
+                            ? opt.color === 'red' ? 'bg-red-100 border-red-400 text-red-800'
+                            : opt.color === 'violet' ? 'bg-violet-100 border-violet-400 text-violet-800'
+                            : 'bg-orange-100 border-orange-400 text-orange-800'
+                            : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="label">Numéro du devoir (optionnel)</label>
+                    <select
+                      value={homeworkNumber}
+                      onChange={e => setHomeworkNumber(e.target.value ? parseInt(e.target.value, 10) : '')}
+                      className="input"
+                    >
+                      <option value="">— Non spécifié —</option>
+                      {[1,2,3,4,5,6,7,8,9,10].map(n => (
+                        <option key={n} value={n}>N°{n}</option>
+                      ))}
+                    </select>
+                    <p className="text-xs text-amber-700 mt-1">
+                      💡 Le numéro indique le trimestre (N°1 = T1, N°2 = T2, N°3+ = T3)
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* School type */}
+            <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/20 border border-slate-200 dark:border-slate-800 space-y-3">
+              <div className="flex items-center gap-2">
+                <School className="w-5 h-5 text-slate-700" />
+                <span className="font-bold text-slate-900 dark:text-slate-200">Type d'école</span>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setSchoolType('PUBLIC')}
+                  className={`flex-1 px-3 py-2 rounded-lg text-sm font-bold border transition ${
+                    schoolType === 'PUBLIC' || !schoolType
+                      ? 'bg-slate-200 border-slate-400 text-slate-900'
+                      : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                  }`}
+                >
+                  🏫 École publique
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSchoolType('PILOTE')}
+                  className={`flex-1 px-3 py-2 rounded-lg text-sm font-bold border transition ${
+                    schoolType === 'PILOTE'
+                      ? 'bg-amber-200 border-amber-500 text-amber-900'
+                      : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                  }`}
+                >
+                  🎓 Lycée/Collège Pilote
+                </button>
+              </div>
+              {schoolType === 'PILOTE' && (
+                <p className="text-xs text-amber-700">
+                  ⓘ Le badge “🏫 Pilote” sera affiché sur la fiche de la ressource.
+                </p>
+              )}
+            </div>
+
+            {/* Product (المنتج) — only for technologie + 7-8-9ème */}
+            {showProductField && (
+              <div className="p-4 rounded-xl bg-orange-50 dark:bg-orange-900/10 border border-orange-200 dark:border-orange-800 space-y-3">
+                <div className="flex items-center gap-2">
+                  <Wrench className="w-5 h-5 text-orange-700" />
+                  <span className="font-bold text-orange-900 dark:text-orange-200">المنتج / Produit réalisé</span>
+                  <span className="text-xs text-orange-700">(Technologie collège — optionnel)</span>
+                </div>
+                <input
+                  type="text"
+                  value={product}
+                  onChange={e => setProduct(e.target.value)}
+                  className="input text-right"
+                  dir="rtl"
+                  placeholder="مثال: مطوية، برنامج سكراتش، موقع إلكتروني..."
+                  maxLength={200}
+                />
+                <p className="text-xs text-orange-700">
+                  💡 Décrit le produit/livrable du projet de technologie (en arabe).
+                </p>
+              </div>
+            )}
+
+            {/* Correction (optionnel) */}
+            <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-200 dark:border-emerald-800 space-y-3">
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={hasCorrection}
+                  onChange={e => setHasCorrection(e.target.checked)}
+                  className="mt-1 w-5 h-5 rounded text-emerald-600 focus:ring-emerald-500"
+                />
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-700" />
+                    <span className="font-bold text-emerald-900 dark:text-emerald-200">
+                      Ce document contient un corrigé
+                    </span>
+                    <span className="text-xs bg-emerald-200 text-emerald-800 px-2 py-0.5 rounded-full font-bold">
+                      Très recherché par les élèves 🔥
+                    </span>
+                  </div>
+                  <p className="text-xs text-emerald-700 mt-1">
+                    Cochez si votre PDF inclut le corrigé détaillé à la fin du document. Un badge vert proéminent
+                    sera affiché pour aider les élèves à le trouver.
+                  </p>
+                </div>
+              </label>
+              {hasCorrection && (
+                <div>
+                  <label className="label">Description du corrigé (optionnel)</label>
+                  <textarea
+                    value={correctionSummary}
+                    onChange={e => setCorrectionSummary(e.target.value)}
+                    className="input min-h-[60px] resize-none text-sm"
+                    placeholder="Ex: Corrigé détaillé des exercices 1 à 4 avec barème et explications..."
+                    maxLength={500}
+                  />
+                </div>
+              )}
             </div>
           </div>
         )}

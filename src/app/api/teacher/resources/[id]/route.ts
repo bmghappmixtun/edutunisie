@@ -46,7 +46,31 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       year: body.year,
       tags: body.tags,
       language: body.language,
+      // Homework & school metadata (NEW)
+      homeworkSubtype: body.homeworkSubtype,
+      homeworkNumber: body.homeworkNumber,
+      schoolType: body.schoolType,
+      product: body.product,
+      hasCorrection: body.hasCorrection,
+      correctionSummary: body.correctionSummary,
     };
+
+    // Validate enums and ranges
+    if (allowed.homeworkSubtype !== undefined) {
+      const ok = ['CONTROL', 'SYNTHESIS', 'HOUSEWORK', null].includes(allowed.homeworkSubtype);
+      if (!ok) delete allowed.homeworkSubtype;
+    }
+    if (allowed.homeworkNumber !== undefined) {
+      const n = parseInt(String(allowed.homeworkNumber), 10);
+      allowed.homeworkNumber = Number.isFinite(n) && n >= 1 && n <= 20 ? n : null;
+    }
+    if (allowed.schoolType !== undefined) {
+      const ok = ['PUBLIC', 'PILOTE', null].includes(allowed.schoolType);
+      if (!ok) delete allowed.schoolType;
+    }
+    if (allowed.hasCorrection !== undefined) {
+      allowed.hasCorrection = allowed.hasCorrection === true || allowed.hasCorrection === 'true';
+    }
 
     // Strip undefined values
     const pendingEdit: any = {};

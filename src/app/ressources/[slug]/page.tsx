@@ -9,8 +9,8 @@ import PDFViewer from '@/components/resources/PDFViewer';
 import RatingSection from '@/components/resources/RatingSection';
 import CommentsSection from '@/components/resources/CommentsSection';
 import ResourceInfoPanel from '@/components/resources/ResourceInfoPanel';
-import { formatNumber, RESOURCE_TYPE_LABELS } from '@/lib/utils';
-import { Eye, Download, MessageCircle, Star, FileText, ChevronLeft } from 'lucide-react';
+import { formatNumber, RESOURCE_TYPE_LABELS, HOMEWORK_SUBTYPE_LABELS } from '@/lib/utils';
+import { Eye, Download, MessageCircle, Star, FileText, ChevronLeft, CheckCircle2, Pencil, GraduationCap, Wrench } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -72,11 +72,39 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
           <div className="grid lg:grid-cols-[1fr_360px] gap-6">
             {/* MAIN */}
             <div>
+              {/* PROMINENT correction banner — students search corrected homeworks */}
+              {resource.hasCorrection && (
+                <div className="bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 text-white rounded-2xl p-5 mb-4 shadow-lg border-2 border-emerald-400/50">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                      <CheckCircle2 className="w-6 h-6" />
+                    </div>
+                    <div className="flex-1">
+                      <h2 className="font-extrabold text-lg mb-1">✅ Ce document contient un corrigé</h2>
+                      {resource.correctionSummary ? (
+                        <p className="text-sm text-emerald-50">{resource.correctionSummary}</p>
+                      ) : (
+                        <p className="text-sm text-emerald-50">
+                          Le corrigé détaillé est intégré à la fin du document. Faites défiler pour le consulter.
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div className="bg-white rounded-2xl border border-slate-100 p-6 lg:p-8 mb-4">
                 <div className="flex flex-wrap items-center gap-2 mb-4">
                   <span className={`px-3 py-1 rounded-full text-xs font-bold ${RESOURCE_TYPE_LABELS[resource.type]?.color}`}>
                     {RESOURCE_TYPE_LABELS[resource.type]?.fr}
                   </span>
+                  {/* Homework subtype badge (only when HOMEWORK) */}
+                  {resource.type === 'HOMEWORK' && resource.homeworkSubtype && HOMEWORK_SUBTYPE_LABELS[resource.homeworkSubtype] && (
+                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${HOMEWORK_SUBTYPE_LABELS[resource.homeworkSubtype].color}`}>
+                      {HOMEWORK_SUBTYPE_LABELS[resource.homeworkSubtype].fr}
+                      {resource.homeworkNumber ? ` N°${resource.homeworkNumber}` : ''}
+                    </span>
+                  )}
                   {resource.class && (
                     <span className="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-bold">
                       {resource.class.nameFr}
@@ -93,10 +121,26 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
                   >
                     {resource.subject.nameFr}
                   </span>
+                  {/* Pilote badge — only shown if PILOTE (never PUBLIC) */}
+                  {resource.schoolType === 'PILOTE' && (
+                    <span className="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-xs font-bold inline-flex items-center gap-1">
+                      <GraduationCap className="w-3 h-3" />
+                      Lycée/Collège Pilote
+                    </span>
+                  )}
                 </div>
 
                 <h1 className="text-2xl lg:text-3xl font-extrabold text-slate-900 mb-3 leading-tight">{resource.title}</h1>
                 {resource.description && <p className="text-slate-600 mb-4 leading-relaxed">{resource.description}</p>}
+
+                {/* Product (المنتج) — only for technologie + college */}
+                {resource.product && resource.subject?.slug === 'technologie' && resource.class && ['7eme', '8eme', '9eme'].includes(resource.class.slug) && (
+                  <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg inline-flex items-center gap-2 text-sm">
+                    <Wrench className="w-4 h-4 text-amber-700" />
+                    <span className="font-bold text-amber-900">المنتج / Produit :</span>
+                    <span className="text-amber-800" dir="rtl">{resource.product}</span>
+                  </div>
+                )}
 
                 {/* Stats row */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 py-4 border-y border-slate-100">

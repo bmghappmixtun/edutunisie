@@ -40,19 +40,12 @@ export async function POST(req: NextRequest) {
     await prisma.newsletter.deleteMany();
     await prisma.setting.deleteMany();
 
-    // Levels
-    const primaire = await prisma.level.create({ data: { slug: 'primaire', nameFr: 'Primaire', nameAr: 'الابتدائي', order: 1 } });
+    // Levels (Primaire cycle removed — focus on Collège + Lycée)
     const college = await prisma.level.create({ data: { slug: 'college', nameFr: 'Collège', nameAr: 'الإعدادي', order: 2 } });
     const lycee = await prisma.level.create({ data: { slug: 'lycee', nameFr: 'Lycée', nameAr: 'الثانوي', order: 3 } });
 
     // Classes
     const classes = await Promise.all([
-      prisma.class.create({ data: { levelId: primaire.id, slug: '1ere', nameFr: '1ère année', nameAr: 'الأول ابتدائي', order: 1 } }),
-      prisma.class.create({ data: { levelId: primaire.id, slug: '2eme', nameFr: '2ème année', nameAr: 'الثاني ابتدائي', order: 2 } }),
-      prisma.class.create({ data: { levelId: primaire.id, slug: '3eme', nameFr: '3ème année', nameAr: 'الثالث ابتدائي', order: 3 } }),
-      prisma.class.create({ data: { levelId: primaire.id, slug: '4eme', nameFr: '4ème année', nameAr: 'الرابع ابتدائي', order: 4 } }),
-      prisma.class.create({ data: { levelId: primaire.id, slug: '5eme', nameFr: '5ème année', nameAr: 'الخامس ابتدائي', order: 5 } }),
-      prisma.class.create({ data: { levelId: primaire.id, slug: '6eme', nameFr: '6ème année', nameAr: 'السادس ابتدائي', order: 6 } }),
       prisma.class.create({ data: { levelId: college.id, slug: '7eme', nameFr: '7ème année de base', nameAr: 'السابع أساسي', order: 1 } }),
       prisma.class.create({ data: { levelId: college.id, slug: '8eme', nameFr: '8ème année de base', nameAr: 'الثامن أساسي', order: 2 } }),
       prisma.class.create({ data: { levelId: college.id, slug: '9eme', nameFr: '9ème année de base', nameAr: 'التاسع أساسي', order: 3 } }),
