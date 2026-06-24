@@ -14,7 +14,7 @@ const { URL } = require('url');
 const BASE_URL = process.env.BASE_URL || 'https://edutunisie.vercel.app';
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'boutiti.mehdi@gmail.com';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'demo1234';
-const SEED_TOKEN = process.env.SEED_TOKEN || 'cffa7e495ff6a441d253b03b8cf1efa7';
+const SEED_TOKEN = process.env.SEED_TOKEN; // Required from env — never hardcode
 
 // Default mapping from filename pattern to EduTunisie slug
 const SUBJECT_MAP = {
