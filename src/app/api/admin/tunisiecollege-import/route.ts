@@ -51,10 +51,27 @@ async function ensureTeacher(name: string, teacherId?: string) {
     const existing = await prisma.user.findUnique({ where: { id: teacherId } });
     if (existing) return existing;
   }
-  const parts = name.replace(/^(Mr|Mme|Mlle|Prof|Professeur)\.?\s+/i, '').trim().split(/\s+/);
+  // Normalize the name (uppercase, trimmed, no extra spaces)
+  const cleanedName = name.replace(/^(Mr|Mme|Mlle|Prof|Professeur)\.?\s+/i, '').trim().replace(/\s+/g, ' ');
+  const parts = cleanedName.split(' ');
   const firstName = parts[0] || 'Unknown';
   const lastName = parts.slice(1).join(' ') || 'Unknown';
-  const email = `import.${firstName.toLowerCase()}.${lastName.replace(/\s+/g, '')}.${nanoid(5)}@examanet-import.local`;
+  const normalized = `${firstName} ${lastName}`.toLowerCase();
+
+  // Try to find existing teacher by case-insensitive name match
+  const candidates = await prisma.user.findMany({
+    where: {
+      email: { contains: 'examanet-import.local' },
+      role: 'TEACHER',
+    },
+  });
+  for (const c of candidates) {
+    const cName = `${c.firstName || ''} ${c.lastName || ''}`.toLowerCase().trim();
+    if (cName === normalized) return c;
+  }
+
+  // Create new teacher with clean email (no random suffix if name matches)
+  const email = `import.${firstName.toLowerCase()}.${lastName.replace(/\s+/g, '')}@examanet-import.local`;
 
   return await prisma.user.create({
     data: {
