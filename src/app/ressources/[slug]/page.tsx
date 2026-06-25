@@ -24,12 +24,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
   const description = resource.description
-    || `${resource.title} — Ressource pédagogique gratuite${resource.subject ? ' en ' + resource.subject.name : ''}${resource.class ? ' pour ' + resource.class.name : ''} sur Examanet Tunisie.`;
+    || `${resource.title} — Ressource pédagogique gratuite${resource.subject ? ' en ' + resource.subject.nameFr : ''}${resource.class ? ' pour ' + resource.class.nameFr : ''} sur Examanet Tunisie.`;
 
   return {
     title: resource.title,
     description: description.slice(0, 160),
-    keywords: [resource.subject?.name, resource.class?.name, resource.type, 'Tunisie', 'examanet'].filter(Boolean),
+    keywords: [resource.subject?.nameFr, resource.class?.nameFr, resource.type, 'Tunisie', 'examanet'].filter(Boolean),
     alternates: {
       canonical: `${baseUrl}/ressources/${resource.slug}`,
     },
@@ -105,7 +105,7 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
     description: resource.description || `${resource.title} — Ressource pédagogique gratuite sur Examanet`,
     url: resourceUrl,
     inLanguage: resource.language || 'fr',
-    educationalLevel: resource.class?.name || 'Collège',
+    educationalLevel: resource.class?.nameFr || 'Collège',
     learningResourceType: resource.type === 'HOMEWORK' ? 'Assessment' : 'Educational Resource',
     audience: {
       '@type': 'EducationalAudience',
@@ -123,7 +123,7 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
     dateModified: resource.updatedAt?.toISOString(),
     datePublished: resource.publishedAt?.toISOString(),
     isAccessibleForFree: true,
-    keywords: [resource.subject?.name, resource.class?.name, resource.type, resource.year].filter(Boolean).join(', '),
+    keywords: [resource.subject?.nameFr, resource.class?.nameFr, resource.type, resource.year].filter(Boolean).join(', '),
   };
 
   return (
