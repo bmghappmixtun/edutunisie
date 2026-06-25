@@ -14,6 +14,41 @@ import { Eye, Download, MessageCircle, Star, FileText, ChevronLeft, CheckCircle2
 
 export const dynamic = 'force-dynamic';
 
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const resource = await prisma.resource.findUnique({
+    where: { slug },
+    include: { subject: true, class: true, teacher: true },
+  });
+  if (!resource) return { title: 'Ressource non trouvée' };
+
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
+  const description = resource.description
+    || `${resource.title} — Ressource pédagogique gratuite${resource.subject ? ' en ' + resource.subject.name : ''}${resource.class ? ' pour ' + resource.class.name : ''} sur Examanet Tunisie.`;
+
+  return {
+    title: resource.title,
+    description: description.slice(0, 160),
+    keywords: [resource.subject?.name, resource.class?.name, resource.type, 'Tunisie', 'examanet'].filter(Boolean),
+    alternates: {
+      canonical: `${baseUrl}/ressources/${resource.slug}`,
+    },
+    openGraph: {
+      title: resource.title,
+      description: description.slice(0, 160),
+      url: `${baseUrl}/ressources/${resource.slug}`,
+      siteName: 'Examanet',
+      locale: 'fr_TN',
+      type: 'article',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: resource.title,
+      description: description.slice(0, 160),
+    },
+  };
+}
+
 export default async function ResourcePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const userSession = await getCurrentUser();
@@ -60,8 +95,43 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
   }));
   const maxCount = Math.max(...dist.map(d => d.count), 1);
 
+  // JSON-LD structured data for SEO (LearningResource schema)
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
+  const resourceUrl = `${baseUrl}/ressources/${resource.slug}`;
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'LearningResource',
+    name: resource.title,
+    description: resource.description || `${resource.title} — Ressource pédagogique gratuite sur Examanet`,
+    url: resourceUrl,
+    inLanguage: resource.language || 'fr',
+    educationalLevel: resource.class?.name || 'Collège',
+    learningResourceType: resource.type === 'HOMEWORK' ? 'Assessment' : 'Educational Resource',
+    audience: {
+      '@type': 'EducationalAudience',
+      educationalRole: 'student',
+    },
+    provider: {
+      '@type': 'Organization',
+      name: 'Examanet',
+      url: baseUrl,
+    },
+    creator: resource.teacher ? {
+      '@type': 'Person',
+      name: `${resource.teacher.firstName} ${resource.teacher.lastName}`,
+    } : undefined,
+    dateModified: resource.updatedAt?.toISOString(),
+    datePublished: resource.publishedAt?.toISOString(),
+    isAccessibleForFree: true,
+    keywords: [resource.subject?.name, resource.class?.name, resource.type, resource.year].filter(Boolean).join(', '),
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Header />
       <main className="flex-1 pt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
