@@ -7,6 +7,28 @@ import { ChevronRight, BookOpen } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
+export async function generateMetadata({ params }: { params: Promise<{ subject: string }> }) {
+  const { subject: subjectSlug } = await params;
+  const subject = await prisma.subject.findUnique({
+    where: { slug: subjectSlug },
+    select: { nameFr: true, nameAr: true, slug: true },
+  });
+  if (!subject) return { title: 'Matière non trouvée' };
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
+  return {
+    title: `${subject.nameFr} — Cours, Devoirs et Exercices gratuits`,
+    description: `Ressources pédagogiques gratuites en ${subject.nameFr} pour les élèves tunisiens : cours, devoirs, séries d'exercices, sujets bac et corrigés.`,
+    alternates: { canonical: `${baseUrl}/matieres/${subject.slug}` },
+    openGraph: {
+      title: `${subject.nameFr} — Examanet`,
+      description: `Cours, devoirs et exercices gratuits en ${subject.nameFr}.`,
+      url: `${baseUrl}/matieres/${subject.slug}`,
+      locale: 'fr_TN',
+      type: 'website',
+    },
+  };
+}
+
 export default async function SubjectPage({ params }: { params: Promise<{ subject: string }> }) {
   const { subject: subjectSlug } = await params;
   const subject = await prisma.subject.findUnique({ where: { slug: subjectSlug } });
