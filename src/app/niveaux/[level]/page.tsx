@@ -7,6 +7,28 @@ import { ChevronRight } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
+export async function generateMetadata({ params }: { params: Promise<{ level: string }> }) {
+  const { level: levelSlug } = await params;
+  const level = await prisma.level.findUnique({
+    where: { slug: levelSlug },
+    select: { nameFr: true, nameAr: true, slug: true },
+  });
+  if (!level) return { title: 'Niveau non trouvé' };
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
+  return {
+    title: `${level.nameFr} — Cours et Devoirs gratuits`,
+    description: `Ressources pédagogiques gratuites pour ${level.nameFr} en Tunisie : cours, devoirs, exercices et corrigés.`,
+    alternates: { canonical: `${baseUrl}/niveaux/${level.slug}` },
+    openGraph: {
+      title: `${level.nameFr} — Examanet`,
+      description: `Cours et devoirs gratuits pour ${level.nameFr}.`,
+      url: `${baseUrl}/niveaux/${level.slug}`,
+      locale: 'fr_TN',
+      type: 'website',
+    },
+  };
+}
+
 export default async function LevelPage({ params }: { params: Promise<{ level: string }> }) {
   const { level: levelSlug } = await params;
   const level = await prisma.level.findUnique({ where: { slug: levelSlug } });

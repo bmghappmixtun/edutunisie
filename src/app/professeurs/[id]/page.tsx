@@ -19,6 +19,31 @@ export const dynamic = 'force-dynamic';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
 
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const teacher = await prisma.user.findUnique({
+    where: { id },
+    select: { firstName: true, lastName: true, bio: true, schoolName: true },
+  });
+  if (!teacher) return { title: 'Enseignant non trouvé' };
+  const fullName = `${teacher.firstName} ${teacher.lastName}`;
+  const description = teacher.bio
+    ? teacher.bio.slice(0, 160)
+    : `${fullName}${teacher.schoolName ? ' - ' + teacher.schoolName : ''} — Enseignant sur Examanet. Cours, devoirs et exercices gratuits.`;
+  return {
+    title: `${fullName} — Enseignant`,
+    description,
+    alternates: { canonical: `${SITE_URL}/professeurs/${id}` },
+    openGraph: {
+      title: `${fullName} — Enseignant sur Examanet`,
+      description,
+      url: `${SITE_URL}/professeurs/${id}`,
+      locale: 'fr_TN',
+      type: 'profile',
+    },
+  };
+}
+
 const TYPE_LABELS: Record<string, string> = {
   COURSE: 'Cours', HOMEWORK: 'Devoir', EXERCISE: "Série d'exercices",
   REVISION: 'Révision', EXAM: 'Contrôle/Examen', BAC_SUBJECT: 'Sujet Bac',
