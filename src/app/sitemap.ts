@@ -18,22 +18,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   
   // Subjects (matieres)
   const subjects = await prisma.subject.findMany({
-    select: { slug: true, updatedAt: true },
+    select: { slug: true },
   });
   const subjectPages: MetadataRoute.Sitemap = subjects.map(s => ({
     url: `${baseUrl}/matieres/${s.slug}`,
-    lastModified: s.updatedAt,
     changeFrequency: 'weekly' as const,
     priority: 0.7,
   }));
-  
+
   // Classes (niveaux)
   const classes = await prisma.class.findMany({
-    select: { slug: true, updatedAt: true },
+    select: { slug: true },
   });
   const classPages: MetadataRoute.Sitemap = classes.map(c => ({
     url: `${baseUrl}/niveaux/${c.slug}`,
-    lastModified: c.updatedAt,
     changeFrequency: 'weekly' as const,
     priority: 0.7,
   }));
