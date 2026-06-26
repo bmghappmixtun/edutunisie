@@ -8,6 +8,8 @@ interface AiDescriptionProps {
   text: string;
   /** Origin of the description: 'agent-v2-multilingual' | 'manual' | null */
   source: string | null | undefined;
+  /** Resource language code ('ar' | 'fr' | 'en'). Drives RTL direction. */
+  language?: string | null;
   /** Optional CSS class for the description text wrapper. */
   className?: string;
 }
@@ -21,13 +23,20 @@ interface AiDescriptionProps {
  * - No header noise.
  * - Just a tiny sparkles icon + tooltip on hover that explains the origin.
  */
-export default function AiDescription({ text, source, className = '' }: AiDescriptionProps) {
+export default function AiDescription({ text, source, language, className = '' }: AiDescriptionProps) {
   const [tooltipOpen, setTooltipOpen] = useState(false);
   const isAi = !!source && source.startsWith('agent-');
+  const isRtl = language === 'ar';
 
   return (
     <div className={`flex items-start gap-2 ${className}`}>
-      <p className="flex-1 text-slate-600 leading-relaxed">{text}</p>
+      <p
+        dir={isRtl ? 'rtl' : 'ltr'}
+        lang={language || 'fr'}
+        className={`flex-1 text-slate-600 leading-relaxed ${isRtl ? 'text-right' : ''}`}
+      >
+        {text}
+      </p>
 
       {isAi && (
         <div

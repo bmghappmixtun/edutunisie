@@ -207,6 +207,7 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
                     <AiDescription
                       text={resource.description}
                       source={resource.descriptionSource}
+                      language={resource.language}
                     />
                   </div>
                 )}
