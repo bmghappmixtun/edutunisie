@@ -10,7 +10,7 @@ export default async function TeachersPage() {
   const teachers = await prisma.user.findMany({
     where: { role: 'TEACHER', status: 'ACTIVE', isVerifiedTeacher: true },
     select: {
-      id: true, firstName: true, lastName: true, avatarUrl: true, bio: true,
+      id: true, firstName: true, lastName: true, firstNameAr: true, lastNameAr: true, avatarUrl: true, bio: true,
       schoolName: true, governorate: true,
       _count: { select: { uploadedFiles: { where: { status: 'PUBLISHED' } } } }
     }
@@ -50,6 +50,11 @@ export default async function TeachersPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <h3 className="font-bold text-lg group-hover:text-primary-600 transition truncate">{t.firstName} {t.lastName}</h3>
+                    {(t.firstNameAr || t.lastNameAr) && (
+                      <p className="text-sm text-slate-500 truncate" dir="rtl" lang="ar">
+                        {t.firstNameAr} {t.lastNameAr}
+                      </p>
+                    )}
                       <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded font-bold flex-shrink-0">✓</span>
                     </div>
                     {t.schoolName && <p className="text-sm text-slate-500 truncate">{t.schoolName}</p>}
