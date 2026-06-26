@@ -80,7 +80,7 @@ async function ensureTeacher(name: string, teacherId?: string) {
       lastName,
       role: 'TEACHER',
       status: 'ACTIVE',
-      schoolName: 'Lycée Pilote (importé)',
+      schoolName: null,
       teachingSubjects: JSON.stringify(['mathematiques']),
       teachingLevels: JSON.stringify(['7eme', '8eme', '9eme']),
       bio: 'Professeur importé depuis tunisiecollege.net',
