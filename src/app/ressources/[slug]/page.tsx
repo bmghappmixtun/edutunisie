@@ -9,6 +9,7 @@ import PDFViewer from '@/components/resources/PDFViewer';
 import RatingSection from '@/components/resources/RatingSection';
 import CommentsSection from '@/components/resources/CommentsSection';
 import ResourceInfoPanel from '@/components/resources/ResourceInfoPanel';
+import AiDescription from '@/components/resources/AiDescription';
 import { formatNumber, RESOURCE_TYPE_LABELS, HOMEWORK_SUBTYPE_LABELS } from '@/lib/utils';
 import { Eye, Download, MessageCircle, Star, FileText, ChevronLeft, CheckCircle2, Pencil, GraduationCap, Wrench } from 'lucide-react';
 
@@ -201,7 +202,14 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
                 </div>
 
                 <h1 className="text-2xl lg:text-3xl font-extrabold text-slate-900 mb-3 leading-tight">{resource.title}</h1>
-                {resource.description && <p className="text-slate-600 mb-4 leading-relaxed">{resource.description}</p>}
+                {resource.description && (
+                  <div className="mb-4">
+                    <AiDescription
+                      text={resource.description}
+                      source={resource.descriptionSource}
+                    />
+                  </div>
+                )}
 
                 {/* Product (المنتج) — only for technologie + college */}
                 {resource.product && resource.subject?.slug === 'technologie' && resource.class && ['7eme', '8eme', '9eme'].includes(resource.class.slug) && (
