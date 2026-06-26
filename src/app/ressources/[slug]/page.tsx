@@ -41,11 +41,20 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       siteName: 'Examanet',
       locale: 'fr_TN',
       type: 'article',
+      images: [
+        {
+          url: `${baseUrl}/api/og/resource/${resource.slug}`,
+          width: 1200,
+          height: 630,
+          alt: resource.title,
+        },
+      ],
     },
     twitter: {
       card: 'summary_large_image',
       title: resource.title,
       description: description.slice(0, 160),
+      images: [`${baseUrl}/api/og/resource/${resource.slug}`],
     },
   };
 }
