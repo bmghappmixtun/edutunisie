@@ -68,7 +68,7 @@ export default async function ResourcesPage(props: { params: Promise<any>; searc
       take: 24,
       skip: (page - 1) * 24,
       orderBy,
-      include: { subject: true, class: true, teacher: { select: { firstName: true, lastName: true } } },
+      include: { subject: true, class: true, teacher: { select: { firstName: true, lastName: true, firstNameAr: true, lastNameAr: true } } },
     }),
     prisma.resource.count({ where }),
     // Fetch all resources matching the base filter (no type/subject/class/q)

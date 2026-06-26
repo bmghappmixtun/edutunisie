@@ -133,12 +133,22 @@ export default function EditProfilePage() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="label">Prénom *</label>
-              <input type="text" value={profile.firstName || ''} onChange={e => setProfile({ ...profile, firstName: e.target.value })} required className="input" />
+              <label className="label">Prénom (FR)</label>
+              <input type="text" value={profile.firstName || ''} onChange={e => setProfile({ ...profile, firstName: e.target.value })} className="input" />
             </div>
             <div>
-              <label className="label">Nom *</label>
-              <input type="text" value={profile.lastName || ''} onChange={e => setProfile({ ...profile, lastName: e.target.value })} required className="input" />
+              <label className="label">Nom (FR)</label>
+              <input type="text" value={profile.lastName || ''} onChange={e => setProfile({ ...profile, lastName: e.target.value })} className="input" />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="label" dir="rtl">الاسم (AR)</label>
+              <input type="text" value={profile.firstNameAr || ''} onChange={e => setProfile({ ...profile, firstNameAr: e.target.value })} className="input" dir="rtl" placeholder="الاسم" />
+            </div>
+            <div>
+              <label className="label" dir="rtl">اللقب (AR)</label>
+              <input type="text" value={profile.lastNameAr || ''} onChange={e => setProfile({ ...profile, lastNameAr: e.target.value })} className="input" dir="rtl" placeholder="اللقب" />
             </div>
           </div>
         </div>
@@ -165,6 +175,10 @@ export default function EditProfilePage() {
           <div>
             <label className="label">Nom de l'établissement</label>
             <input type="text" value={profile.schoolName || ''} onChange={e => setProfile({ ...profile, schoolName: e.target.value })} className="input" placeholder="Ex: Lycée Bourguiba, Tunis" />
+          </div>
+          <div>
+            <label className="label" dir="rtl">اسم المؤسسة بالعربية</label>
+            <input type="text" value={profile.schoolNameAr || ''} onChange={e => setProfile({ ...profile, schoolNameAr: e.target.value })} className="input" dir="rtl" placeholder="مثال: المعهد الثانوي بورقيبة" />
           </div>
 
           <div className="grid grid-cols-2 gap-4">

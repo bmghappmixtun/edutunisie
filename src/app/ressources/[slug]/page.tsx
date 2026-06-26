@@ -95,7 +95,7 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
     where: { status: 'PUBLISHED', subjectId: resource.subjectId, NOT: { id: resource.id } },
     take: 4,
     orderBy: { viewsCount: 'desc' },
-    include: { subject: true, class: true, teacher: { select: { firstName: true, lastName: true } } }
+    include: { subject: true, class: true, teacher: { select: { firstName: true, lastName: true, firstNameAr: true, lastNameAr: true, schoolName: true, schoolNameAr: true } } }
   });
 
   // Star distribution
@@ -334,8 +334,22 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
                       {resource.teacher.firstName?.[0]}{resource.teacher.lastName?.[0]}
                     </div>
                     <div>
-                      <div className="font-bold">{resource.teacher.firstName} {resource.teacher.lastName}</div>
-                      <div className="text-xs text-slate-500">{resource.teacher.schoolName}</div>
+                      <div className="font-bold">
+                        {resource.teacher.firstName} {resource.teacher.lastName}
+                      </div>
+                      {(resource.teacher.firstNameAr || resource.teacher.lastNameAr) && (
+                        <div className="text-sm text-slate-600" dir="rtl" lang="ar">
+                          {resource.teacher.firstNameAr} {resource.teacher.lastNameAr}
+                        </div>
+                      )}
+                      {(resource.teacher.schoolName || resource.teacher.schoolNameAr) && (
+                        <div className="text-xs text-slate-500 mt-1">
+                          {resource.teacher.schoolName}
+                          {resource.teacher.schoolNameAr && (
+                            <span className="block text-slate-400" dir="rtl" lang="ar">{resource.teacher.schoolNameAr}</span>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
                   {resource.teacher.bio && <p className="text-sm text-slate-600 line-clamp-3">{resource.teacher.bio}</p>}

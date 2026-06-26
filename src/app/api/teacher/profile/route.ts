@@ -14,8 +14,8 @@ export async function GET() {
   const profile = await prisma.user.findUnique({
     where: { id: user.id },
     select: {
-      id: true, firstName: true, lastName: true, email: true,
-      bio: true, schoolName: true, governorate: true, diploma: true,
+      id: true, firstName: true, lastName: true, firstNameAr: true, lastNameAr: true, email: true,
+      bio: true, schoolName: true, schoolNameAr: true, governorate: true, diploma: true,
       teachingSubjects: true, teachingLevels: true, avatarUrl: true,
       phone: true, website: true
     }
@@ -33,7 +33,7 @@ export async function PATCH(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const allowed = ['firstName', 'lastName', 'bio', 'schoolName', 'governorate', 'diploma', 'avatarUrl', 'phone', 'website'];
+    const allowed = ['firstName', 'lastName', 'firstNameAr', 'lastNameAr', 'bio', 'schoolName', 'schoolNameAr', 'governorate', 'diploma', 'avatarUrl', 'phone', 'website'];
     const updateData: any = {};
     for (const k of allowed) {
       if (body[k] !== undefined) updateData[k] = body[k]?.toString().trim() || null;
@@ -65,8 +65,8 @@ export async function PATCH(req: NextRequest) {
     const updated = await prisma.user.update({
       where: { id: user.id },
       select: {
-        id: true, firstName: true, lastName: true, bio: true,
-        schoolName: true, governorate: true, diploma: true,
+        id: true, firstName: true, lastName: true, firstNameAr: true, lastNameAr: true, bio: true,
+        schoolName: true, schoolNameAr: true, governorate: true, diploma: true,
         teachingSubjects: true, teachingLevels: true, avatarUrl: true,
         phone: true, website: true
       },

@@ -16,7 +16,7 @@ export interface ResourceCardData {
   fileUrl?: string | null;
   subject: { slug: string; nameFr: string; color: string | null; icon?: string | null };
   class: { slug: string; nameFr: string } | null;
-  teacher: { firstName: string | null; lastName: string | null } | null;
+  teacher: { firstName: string | null; lastName: string | null; firstNameAr?: string | null; lastNameAr?: string | null } | null;
   // Homework & school metadata (NEW)
   homeworkSubtype?: string | null;
   homeworkNumber?: number | null;

@@ -33,6 +33,9 @@ model User {
   // Profile
   firstName       String?
   lastName        String?
+  // Bilingual names: French (Latin) + Arabic (for Tunisian teachers who teach in Arabic)
+  firstNameAr     String?
+  lastNameAr      String?
   avatarUrl       String?
   bio             String?
   phone           String?
@@ -41,6 +44,7 @@ model User {
   classLevel      String?
   section         String?
   schoolName      String?
+  schoolNameAr    String?
   governorate     String?
 
   // Teacher specific
