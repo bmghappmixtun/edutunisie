@@ -194,6 +194,11 @@ model Resource {
   tags            String?        // comma-separated
   language        String         @default("fr")
 
+  // AI-generated SEO fields
+  metaDescription    String?       // SEO meta description (≤155 chars), same language as description
+  descriptionGeneratedAt DateTime? // When the AI description was last generated
+  descriptionSource  String?       // "agent-v2-multilingual" | "manual" | etc.
+
   // Homework subtype: only when type=HOMEWORK
   // CONTROL = Devoir de Contrôle, SYNTHESIS = Devoir de Synthèse, HOUSEWORK = Devoir de Maison
   homeworkSubtype     String?  // "CONTROL" | "SYNTHESIS" | "HOUSEWORK"
