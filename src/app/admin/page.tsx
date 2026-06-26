@@ -31,7 +31,7 @@ export default async function AdminDashboard() {
     where: { status: { in: ['PENDING_APPROVAL', 'PUBLISHED'] } },
     take: 8,
     orderBy: { createdAt: 'desc' },
-    include: { subject: true, teacher: { select: { firstName: true, lastName: true } } }
+    include: { subject: true, teacher: { select: { firstName: true, lastName: true, firstNameAr: true, lastNameAr: true } } }
   });
 
   const recentUsers = await prisma.user.findMany({
