@@ -91,7 +91,12 @@ export default function ResourceCard({ resource }: { resource: ResourceCardData 
             </span>
           </div>
         )}
-        <p className="text-xs text-slate-500 mb-3 truncate">Par {teacherName}</p>
+        <p className="text-xs text-slate-500 mb-1 truncate">Par {teacherName}</p>
+        {resource.teacher && (resource.teacher.firstNameAr || resource.teacher.lastNameAr) && (
+          <p className="text-xs text-slate-400 mb-3 truncate" dir="rtl" lang="ar">
+            {resource.teacher.firstNameAr} {resource.teacher.lastNameAr}
+          </p>
+        )}
 
         <div className="flex items-center gap-1 mb-3">
           {[1, 2, 3, 4, 5].map(i => (

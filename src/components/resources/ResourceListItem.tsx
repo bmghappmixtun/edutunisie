@@ -99,9 +99,16 @@ export default function ResourceListItem({ resource }: { resource: Resource }) {
           {resource.title}
         </h3>
         {teacherName && (
-          <p className="text-xs text-slate-500 mt-0.5 flex items-center gap-1">
-            <User className="w-3 h-3" /> {teacherName}
-          </p>
+          <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+            <p className="text-xs text-slate-500 flex items-center gap-1">
+              <User className="w-3 h-3" /> {teacherName}
+            </p>
+            {resource.teacher && (resource.teacher.firstNameAr || resource.teacher.lastNameAr) && (
+              <span className="text-xs text-slate-400" dir="rtl" lang="ar">
+                {resource.teacher.firstNameAr} {resource.teacher.lastNameAr}
+              </span>
+            )}
+          </div>
         )}
       </div>
 
