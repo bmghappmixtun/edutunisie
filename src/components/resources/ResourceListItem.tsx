@@ -21,7 +21,7 @@ type Resource = {
   hasCorrection?: boolean;
   subject: { slug: string; nameFr: string; color: string | null; icon: string | null } | null;
   class: { slug: string; nameFr: string } | null;
-  teacher: { firstName: string | null; lastName: string | null } | null;
+  teacher: { firstName: string | null; lastName: string | null; firstNameAr?: string | null; lastNameAr?: string | null } | null;
 };
 
 const TYPE_LABELS: Record<string, string> = {

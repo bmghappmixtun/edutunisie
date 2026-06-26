@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const { id } = await params;
   const teacher = await prisma.user.findUnique({
     where: { id },
-    select: { firstName: true, lastName: true, bio: true, schoolName: true },
+    select: { firstName: true, lastName: true, firstNameAr: true, lastNameAr: true, bio: true, schoolName: true, schoolNameAr: true },
   });
   if (!teacher) return { title: 'Enseignant non trouvé' };
   const fullName = `${teacher.firstName} ${teacher.lastName}`;
@@ -73,8 +73,8 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
       OR: [{ status: 'ACTIVE' }, { isVerifiedTeacher: true }]
     },
     select: {
-      id: true, firstName: true, lastName: true, avatarUrl: true, bio: true,
-      email: true, schoolName: true, governorate: true, diploma: true,
+      id: true, firstName: true, lastName: true, firstNameAr: true, lastNameAr: true, avatarUrl: true, bio: true,
+      email: true, schoolName: true, schoolNameAr: true, governorate: true, diploma: true,
       teachingSubjects: true, teachingLevels: true, createdAt: true,
       lastLoginAt: true
     }
@@ -191,12 +191,20 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
                     <h1 className="text-3xl md:text-5xl font-extrabold text-slate-900 mb-2">
                       {teacher.firstName} {teacher.lastName}
                     </h1>
+                    {(teacher.firstNameAr || teacher.lastNameAr) && (
+                      <h2 className="text-xl md:text-2xl font-bold text-slate-600 mb-2" dir="rtl" lang="ar">
+                        {teacher.firstNameAr} {teacher.lastNameAr}
+                      </h2>
+                    )}
 
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-600 mt-3">
-                      {teacher.schoolName && (
+                      {(teacher.schoolName || teacher.schoolNameAr) && (
                         <div className="flex items-center gap-1.5">
                           <Briefcase className="w-4 h-4 text-slate-400" />
-                          <span className="font-semibold">{teacher.schoolName}</span>
+                          <div className="flex flex-col">
+                            {teacher.schoolName && <span className="font-semibold">{teacher.schoolName}</span>}
+                            {teacher.schoolNameAr && <span className="text-xs text-slate-500" dir="rtl" lang="ar">{teacher.schoolNameAr}</span>}
+                          </div>
                         </div>
                       )}
                       {teacher.governorate && (
