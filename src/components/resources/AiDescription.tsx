@@ -194,7 +194,7 @@ export default function AiDescription({ text, source, language, className = '' }
                 </div>
                 <div
                   dir="auto"
-                  className="text-sm text-slate-800 font-medium leading-snug break-words"
+                  className={`text-sm text-slate-800 font-medium leading-snug break-words ${isRtl ? 'text-right' : 'text-left'}`}
                 >
                   {f.value}
                 </div>
@@ -214,7 +214,7 @@ export default function AiDescription({ text, source, language, className = '' }
             <ScrollText className="w-4 h-4 mt-1 flex-shrink-0 text-violet-600" />
             <div
               dir="auto"
-              className="flex-1 text-sm text-slate-700 leading-relaxed"
+              className={`flex-1 text-sm text-slate-700 leading-relaxed ${isRtl ? 'text-right' : 'text-left'}`}
             >
               {summary}
             </div>
