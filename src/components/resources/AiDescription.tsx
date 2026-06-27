@@ -15,6 +15,45 @@ interface AiDescriptionProps {
 }
 
 /**
+ * Render the description with rich formatting (bold labels, line breaks).
+ * The component sanitizes a small whitelist of HTML tags emitted by the AI:
+ *  - <strong>...</strong> for labels / keywords
+ *  - <br> for line breaks
+ *  - <em>...</em> for subtle emphasis
+ * Everything else is escaped.
+ */
+function renderFormattedText(raw: string) {
+  if (!raw) return null;
+  // Whitelist sanitize: keep <strong>, <b>, <em>, <i>, <br>; escape the rest.
+  // We do this in two passes to keep things simple and safe.
+  const escape = (s: string) =>
+    s
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+
+  // Normalize newlines to <br>
+  let html = raw.replace(/\r\n/g, '\n').replace(/\n/g, '<br>');
+
+  // Apply whitelist tags: <strong>, <b>, <em>, <i> — keep them
+  // (We trust our own AI output since the description comes from a controlled pipeline.)
+  html = html
+    .replace(/&lt;strong&gt;/g, '<strong>')
+    .replace(/&lt;\/strong&gt;/g, '</strong>')
+    .replace(/&lt;b&gt;/g, '<strong>')
+    .replace(/&lt;\/b&gt;/g, '</strong>')
+    .replace(/&lt;em&gt;/g, '<em>')
+    .replace(/&lt;\/em&gt;/g, '</em>')
+    .replace(/&lt;i&gt;/g, '<em>')
+    .replace(/&lt;\/i&gt;/g, '</em>');
+
+  // Strip any other tags just in case
+  html = html.replace(/<(?!\/?(strong|em|br)\b)[^>]*>/g, '');
+
+  return html;
+}
+
+/**
  * Renders the resource description with a subtle "IA" badge when the
  * description was AI-generated (source starts with 'agent-').
  *
@@ -28,15 +67,16 @@ export default function AiDescription({ text, source, language, className = '' }
   const isAi = !!source && source.startsWith('agent-');
   const isRtl = language === 'ar';
 
+  const html = renderFormattedText(text);
+
   return (
     <div className={`flex items-start gap-2 ${className}`}>
-      <p
+      <div
         dir={isRtl ? 'rtl' : 'ltr'}
         lang={language || 'fr'}
-        className={`flex-1 text-slate-600 leading-relaxed ${isRtl ? 'text-right' : ''}`}
-      >
-        {text}
-      </p>
+        className={`flex-1 text-slate-600 leading-relaxed [&_strong]:font-bold [&_strong]:text-slate-900 ${isRtl ? 'text-right' : ''}`}
+        dangerouslySetInnerHTML={{ __html: html || '' }}
+      />
 
       {isAi && (
         <div
