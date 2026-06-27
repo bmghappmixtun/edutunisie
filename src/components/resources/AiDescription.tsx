@@ -67,7 +67,7 @@ function parseFields(html: string, isAr: boolean): { fields: Field[]; summary: s
   // Strip HTML tags but preserve <br> as newlines
   const text = html
     .replace(/<br\s*\/?>/gi, '\n')
-    .replace(/<strong>([^<]+)<\/strong>/gi, '$1:')
+    .replace(/<strong>([^<]+)<\/strong>/gi, '$1')
     .replace(/<[^>]+>/g, '');
 
   const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
