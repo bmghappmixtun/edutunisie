@@ -145,7 +145,10 @@ export default function AiDescription({ text, source, language, className = '' }
       className={`relative rounded-xl border border-violet-200/60 bg-gradient-to-br from-violet-50/50 via-white to-indigo-50/30 p-4 shadow-sm ${className}`}
     >
       {/* Header */}
-      <div className={`flex items-center gap-2 mb-3 pb-2 border-b border-violet-100 ${isRtl ? 'flex-row-reverse' : ''}`}>
+      <div
+        dir={isRtl ? 'rtl' : 'ltr'}
+        className={`flex items-center gap-2 mb-3 pb-2 border-b border-violet-100 ${isRtl ? 'flex-row-reverse' : ''}`}
+      >
         <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 text-white shadow-sm">
           <Sparkles className="w-3.5 h-3.5" />
         </span>
@@ -182,15 +185,28 @@ export default function AiDescription({ text, source, language, className = '' }
 
       {/* Info grid */}
       {fields.length > 0 && (
-        <div className={`grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 mb-3 ${isRtl ? 'text-right' : ''}`}>
+        <div
+          dir={isRtl ? 'rtl' : 'ltr'}
+          className={`grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3 mb-3 ${isRtl ? 'text-right' : 'text-left'}`}
+        >
           {fields.map((f, i) => (
-            <div key={i} className={`flex items-start gap-2 ${isRtl ? 'flex-row-reverse' : ''}`}>
+            <div
+              key={i}
+              dir={isRtl ? 'rtl' : 'ltr'}
+              className={`flex items-start gap-2 ${isRtl ? 'flex-row-reverse' : ''}`}
+            >
               <f.Icon className={`w-4 h-4 mt-0.5 flex-shrink-0 ${iconColor(f.Icon)}`} />
-              <div className="flex-1 min-w-0">
+              <div
+                dir={isRtl ? 'rtl' : 'ltr'}
+                className={`flex-1 min-w-0 ${isRtl ? 'text-right' : 'text-left'}`}
+              >
                 <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wide leading-none mb-0.5">
                   {f.label}
                 </div>
-                <div className="text-sm text-slate-800 font-medium leading-snug break-words">
+                <div
+                  dir="auto"
+                  className="text-sm text-slate-800 font-medium leading-snug break-words"
+                >
                   {f.value}
                 </div>
               </div>
@@ -201,10 +217,16 @@ export default function AiDescription({ text, source, language, className = '' }
 
       {/* Summary block */}
       {summary && (
-        <div className={`mt-3 pt-3 border-t border-violet-100 ${isRtl ? 'text-right' : ''}`}>
+        <div
+          dir={isRtl ? 'rtl' : 'ltr'}
+          className={`mt-3 pt-3 border-t border-violet-100 ${isRtl ? 'text-right' : 'text-left'}`}
+        >
           <div className={`flex items-start gap-2 ${isRtl ? 'flex-row-reverse' : ''}`}>
             <ScrollText className="w-4 h-4 mt-0.5 flex-shrink-0 text-violet-600" />
-            <div className="flex-1 text-sm text-slate-700 leading-relaxed">
+            <div
+              dir="auto"
+              className={`flex-1 text-sm text-slate-700 leading-relaxed ${isRtl ? 'text-right' : 'text-left'}`}
+            >
               {summary}
             </div>
           </div>
