@@ -183,7 +183,7 @@ export default function AiDescription({ text, source, language, className = '' }
       {fields.length > 0 && (
         <div
           dir={isRtl ? 'rtl' : 'ltr'}
-          className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3 mb-3"
+          className="grid grid-cols-1 gap-y-3 mb-3"
         >
           {fields.map((f, i) => (
             <div key={i} className="flex items-start gap-2">
