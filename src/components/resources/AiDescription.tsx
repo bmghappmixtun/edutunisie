@@ -84,10 +84,8 @@ function parseFields(html: string, isAr: boolean): { fields: Field[]; summary: s
   };
 
   for (const line of lines) {
-    // Try to match "Label : value" or "Label: value"
     let matched = false;
     for (const [key, label] of Object.entries(labels)) {
-      // Match either "Label :" or "Label:"
       const re = new RegExp(`^${escapeRe(label)}\\s*[:：]\\s*(.+)$`, 'i');
       const m = line.match(re);
       if (m && m[1]) {
@@ -103,13 +101,10 @@ function parseFields(html: string, isAr: boolean): { fields: Field[]; summary: s
         break;
       }
     }
-    // If a line didn't match a label, it might be a continuation of summary
     if (!matched && fields.length > 0 && !line.match(/^[\u0600-\u06FFa-zA-Z]+\s*[:：]/)) {
-      // Continuation line — append to last field value
       const last = fields[fields.length - 1];
       if (last) last.value = `${last.value} ${line}`;
     } else if (!matched && fields.length === 0 && line) {
-      // No labels matched — treat everything as summary
       summary = summary ? `${summary} ${line}` : line;
     }
   }
@@ -123,15 +118,17 @@ function escapeRe(s: string) {
 
 /**
  * Render the resource description as a beautiful info card with icons.
- * Each piece of info (teacher, school, level, etc.) gets its own icon.
- * The summary is in a separate highlighted block at the bottom.
+ *
+ * RTL handling: We rely on the browser's natural RTL flow via `dir="rtl"`.
+ * - In RTL: the icon (first child in DOM) appears on the RIGHT
+ * - In LTR: the icon appears on the LEFT
+ * No flex-row-reverse needed — the dir attribute handles it correctly.
  */
 export default function AiDescription({ text, source, language, className = '' }: AiDescriptionProps) {
   const [tooltipOpen, setTooltipOpen] = useState(false);
   const isAi = !!source && source.startsWith('agent-');
   const isRtl = language === 'ar';
 
-  // Parse the raw text into structured fields
   const html = text
     .replace(/\r\n/g, '\n')
     .replace(/\n/g, '<br>')
@@ -147,19 +144,18 @@ export default function AiDescription({ text, source, language, className = '' }
       {/* Header */}
       <div
         dir={isRtl ? 'rtl' : 'ltr'}
-        className={`flex items-center gap-2 mb-3 pb-2 border-b border-violet-100 ${isRtl ? 'flex-row-reverse' : ''}`}
+        className="flex items-center gap-2 mb-3 pb-2 border-b border-violet-100"
       >
-        <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 text-white shadow-sm">
+        <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 text-white shadow-sm flex-shrink-0">
           <Sparkles className="w-3.5 h-3.5" />
         </span>
-        <span className="font-bold text-sm text-slate-800">
+        <span className="font-bold text-sm text-slate-800 flex-1">
           {isRtl ? 'ملخص ذكي' : 'Résumé intelligent'}
         </span>
 
-        {/* AI badge with tooltip */}
         {isAi && (
           <div
-            className={`relative ${isRtl ? 'mr-auto' : 'ml-auto'}`}
+            className="relative flex-shrink-0"
             onMouseEnter={() => setTooltipOpen(true)}
             onMouseLeave={() => setTooltipOpen(false)}
           >
@@ -167,7 +163,7 @@ export default function AiDescription({ text, source, language, className = '' }
               IA
             </span>
             {tooltipOpen && (
-              <span className={`absolute z-50 ${isRtl ? 'left-0' : 'right-0'} top-full mt-1.5 w-56 px-3 py-2 rounded-lg bg-slate-900 text-white text-xs leading-relaxed shadow-xl pointer-events-none`}>
+              <span className={`absolute z-50 top-full mt-1.5 w-56 px-3 py-2 rounded-lg bg-slate-900 text-white text-xs leading-relaxed shadow-xl pointer-events-none ${isRtl ? 'left-0' : 'right-0'}`}>
                 <span className="block font-semibold mb-0.5">
                   {isRtl ? '✨ ملخص مُولَّد بالذكاء الاصطناعي' : '✨ Résumé généré par IA'}
                 </span>
@@ -176,31 +172,24 @@ export default function AiDescription({ text, source, language, className = '' }
                     ? 'ملخص تلقائي لمحتوى الـ PDF لمساعدتك في إيجاد المورد المناسب.'
                     : 'Résumé automatique du contenu du PDF pour vous aider à trouver la bonne ressource.'}
                 </span>
-                <span className={`absolute -top-1 ${isRtl ? 'left-3' : 'right-3'} w-2 h-2 bg-slate-900 rotate-45`} />
+                <span className={`absolute -top-1 w-2 h-2 bg-slate-900 rotate-45 ${isRtl ? 'left-3' : 'right-3'}`} />
               </span>
             )}
           </div>
         )}
       </div>
 
-      {/* Info grid */}
+      {/* Info grid — natural RTL flow via dir="rtl" */}
       {fields.length > 0 && (
         <div
           dir={isRtl ? 'rtl' : 'ltr'}
-          className={`grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3 mb-3 ${isRtl ? 'text-right' : 'text-left'}`}
+          className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3 mb-3"
         >
           {fields.map((f, i) => (
-            <div
-              key={i}
-              dir={isRtl ? 'rtl' : 'ltr'}
-              className={`flex items-start gap-2 ${isRtl ? 'flex-row-reverse' : ''}`}
-            >
-              <f.Icon className={`w-4 h-4 mt-0.5 flex-shrink-0 ${iconColor(f.Icon)}`} />
-              <div
-                dir={isRtl ? 'rtl' : 'ltr'}
-                className={`flex-1 min-w-0 ${isRtl ? 'text-right' : 'text-left'}`}
-              >
-                <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wide leading-none mb-0.5">
+            <div key={i} className="flex items-start gap-2">
+              <f.Icon className={`w-4 h-4 mt-1 flex-shrink-0 ${iconColor(f.Icon)}`} />
+              <div className="flex-1 min-w-0">
+                <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wide leading-none mb-1">
                   {f.label}
                 </div>
                 <div
@@ -219,13 +208,13 @@ export default function AiDescription({ text, source, language, className = '' }
       {summary && (
         <div
           dir={isRtl ? 'rtl' : 'ltr'}
-          className={`mt-3 pt-3 border-t border-violet-100 ${isRtl ? 'text-right' : 'text-left'}`}
+          className="mt-3 pt-3 border-t border-violet-100"
         >
-          <div className={`flex items-start gap-2 ${isRtl ? 'flex-row-reverse' : ''}`}>
-            <ScrollText className="w-4 h-4 mt-0.5 flex-shrink-0 text-violet-600" />
+          <div className="flex items-start gap-2">
+            <ScrollText className="w-4 h-4 mt-1 flex-shrink-0 text-violet-600" />
             <div
               dir="auto"
-              className={`flex-1 text-sm text-slate-700 leading-relaxed ${isRtl ? 'text-right' : 'text-left'}`}
+              className="flex-1 text-sm text-slate-700 leading-relaxed"
             >
               {summary}
             </div>
