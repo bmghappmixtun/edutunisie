@@ -127,7 +127,15 @@ function escapeRe(s: string) {
 export default function AiDescription({ text, source, language, className = '' }: AiDescriptionProps) {
   const [tooltipOpen, setTooltipOpen] = useState(false);
   const isAi = !!source && source.startsWith('agent-');
-  const isRtl = language === 'ar';
+
+  // Auto-detect language from content: count Arabic vs Latin characters.
+  // Some PDFs were imported with wrong language in DB (e.g. lang='fr' but
+  // description is in Arabic). This prevents the parser from picking the
+  // wrong label set and dumping everything into the summary.
+  const arabicCharCount = (text.match(/[\u0600-\u06FF]/g) || []).length;
+  const latinCharCount = (text.match(/[A-Za-zÀ-ÿ]/g) || []).length;
+  const detectedLang = arabicCharCount > latinCharCount * 0.3 ? 'ar' : (language || 'fr');
+  const isRtl = detectedLang === 'ar';
 
   const html = text
     .replace(/\r\n/g, '\n')
