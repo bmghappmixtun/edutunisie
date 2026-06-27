@@ -193,7 +193,7 @@ export default function AiDescription({ text, source, language, className = '' }
                   {f.label}
                 </div>
                 <div
-                  dir="auto"
+                  dir={isRtl ? 'ltr' : 'auto'}
                   className={`text-sm text-slate-800 font-medium leading-snug break-words ${isRtl ? 'text-right' : 'text-left'}`}
                 >
                   {f.value}
