@@ -283,3 +283,5 @@ function iconColor(Icon: typeof User): string {
   if (Icon === ScrollText) return 'text-violet-600';
   return 'text-slate-600';
 }
+
+// Force rebuild for bilingual parser - 1782666834
