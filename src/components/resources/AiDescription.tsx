@@ -33,26 +33,28 @@ type Field = {
   value: string;
 };
 
-const LABELS_AR: Record<string, string> = {
-  teacher: 'الأستاذ',
-  school: 'المؤسسة',
-  level: 'المستوى',
-  year: 'السنة الدراسية',
-  subject: 'المادة',
-  type: 'النوع',
-  exercises: 'التمارين',
-  summary: 'الملخص',
+const LABELS_AR: Record<string, string[]> = {
+  teacher: ['الأستاذ', 'الأستا ذ', 'المعلم'],
+  school: ['المؤسسة', 'المدرسة'],
+  level: ['الصف', 'المستوى', 'الصف', 'السنة', 'الفصل'],
+  year: ['السنة الدراسية', 'العام الدراسي'],
+  subject: ['المادة', 'المـادة'],
+  type: ['النوع', 'نوع'],
+  exercises: ['التمارين', 'التمرين'],
+  summary: ['ملخص', 'الملخص', 'الموضوع', 'ملخص الدرس'],
+  concepts: ['المفاهيم', 'المفاهيم/الشخصيات', 'المفاهيم/المهارات المكتسبة', 'المفاهيم المكتسبة', 'الأفكار الرئيسية'],
 };
 
-const LABELS_FR: Record<string, string> = {
-  teacher: 'Enseignant',
-  school: 'Établissement',
-  level: 'Classe',
-  year: 'Année scolaire',
-  subject: 'Matière',
-  type: 'Type',
-  exercises: 'Exercices',
-  summary: 'Résumé',
+const LABELS_FR: Record<string, string[]> = {
+  teacher: ['Enseignant', 'Professeur', 'Mr', 'Mme'],
+  school: ['Établissement', 'Lycée', 'Collège', 'École'],
+  level: ['Classe', 'Niveau', 'Année'],
+  year: ['Année scolaire', 'Année'],
+  subject: ['Matière', 'Matière', 'Subject'],
+  type: ['Type'],
+  exercises: ['Exercices', 'Exercice'],
+  summary: ['Résumé', 'Description', 'Aperçu', 'Contenu'],
+  concepts: ['Concepts', 'Notions clés', 'Points clés'],
 };
 
 /**
@@ -85,21 +87,30 @@ function parseFields(html: string, isAr: boolean): { fields: Field[]; summary: s
 
   for (const line of lines) {
     let matched = false;
-    for (const [key, label] of Object.entries(labels)) {
-      const re = new RegExp(`^${escapeRe(label)}\\s*[:：]\\s*(.+)$`, 'i');
-      const m = line.match(re);
-      if (m && m[1]) {
-        const value = m[1].trim();
-        if (value) {
-          if (key === 'summary') {
-            summary = value;
-          } else {
-            fields.push({ Icon: iconMap[key] || FileText, label, value });
+    for (const [key, labelVariants] of Object.entries(labels)) {
+      // Try each label variant for this key
+      for (const label of labelVariants) {
+        const re = new RegExp(`^${escapeRe(label)}\\s*[:：]\\s*(.+)$`, 'i');
+        const m = line.match(re);
+        if (m && m[1]) {
+          const value = m[1].trim();
+          if (value) {
+            // Use the first (canonical) label for display
+            const displayLabel = labels[key][0];
+            if (key === 'summary') {
+              summary = value;
+            } else if (key === 'concepts') {
+              // concepts go into the summary block (already formatted as <ul> in DB)
+              summary = summary ? `${summary}\n${value}` : value;
+            } else {
+              fields.push({ Icon: iconMap[key] || FileText, label: displayLabel, value });
+            }
           }
+          matched = true;
+          break;
         }
-        matched = true;
-        break;
       }
+      if (matched) break;
     }
     if (!matched && fields.length > 0 && !line.match(/^[\u0600-\u06FFa-zA-Z]+\s*[:：]/)) {
       const last = fields[fields.length - 1];
