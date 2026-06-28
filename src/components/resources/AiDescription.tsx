@@ -61,8 +61,11 @@ const LABELS_FR: Record<string, string[]> = {
  * Parse the AI-generated description into structured fields.
  * Each field has a label (in AR or FR) and a value.
  */
-function parseFields(html: string, isAr: boolean): { fields: Field[]; summary: string } {
-  const labels = isAr ? LABELS_AR : LABELS_FR;
+function parseFields(html: string, isAr: boolean, bilingual: boolean = false): { fields: Field[]; summary: string } {
+  // If bilingual mode, merge both label sets. Otherwise pick by detected language.
+  const labels: Record<string, string[]> = bilingual
+    ? mergeBilingualLabels(LABELS_AR, LABELS_FR, isAr)
+    : (isAr ? LABELS_AR : LABELS_FR);
   const fields: Field[] = [];
   let summary = '';
 
@@ -128,6 +131,26 @@ function escapeRe(s: string) {
 }
 
 /**
+ * Merge AR + FR label sets so the parser can handle bilingual descriptions.
+ * The display language (passed via isAr) decides which label is shown first.
+ */
+function mergeBilingualLabels(
+  ar: Record<string, string[]>,
+  fr: Record<string, string[]>,
+  isAr: boolean
+): Record<string, string[]> {
+  const merged: Record<string, string[]> = {};
+  const keys = new Set([...Object.keys(ar), ...Object.keys(fr)]);
+  for (const key of keys) {
+    const arLabels = ar[key] || [];
+    const frLabels = fr[key] || [];
+    // Put preferred language first (for display)
+    merged[key] = isAr ? [...arLabels, ...frLabels] : [...frLabels, ...arLabels];
+  }
+  return merged;
+}
+
+/**
  * Render the resource description as a beautiful info card with icons.
  *
  * RTL handling: We rely on the browser's natural RTL flow via `dir="rtl"`.
@@ -152,7 +175,9 @@ export default function AiDescription({ text, source, language, className = '' }
     .replace(/\r\n/g, '\n')
     .replace(/\n/g, '<br>')
     .replace(/<br>\s*<br>/g, '<br><br>');
-  const { fields, summary } = parseFields(html, isRtl);
+  // Try both AR and FR labels regardless of detected language, because
+  // many descriptions mix languages (FR labels with AR values, or vice versa).
+  const { fields, summary } = parseFields(html, isRtl, true);
 
   return (
     <div
