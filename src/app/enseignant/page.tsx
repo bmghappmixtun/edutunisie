@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
 import { FileText, Eye, Download, Star, Clock, TrendingUp, Upload, AlertCircle, CheckCircle } from 'lucide-react';
 import { formatNumber, timeAgo } from '@/lib/utils';
+import { isArabic } from '@/lib/text-utils';
 
 export const dynamic = 'force-dynamic';
 
@@ -102,7 +103,13 @@ export default async function TeacherDashboard() {
             <div className="space-y-2">
               {pendingResources.map(r => (
                 <div key={r.id} className="flex items-center justify-between bg-white rounded-lg p-3">
-                  <span className="text-sm font-medium truncate">{r.title}</span>
+                  <span
+                    className={`text-sm font-medium truncate ${isArabic(r.title) ? 'text-right' : 'text-left'}`}
+                    dir={isArabic(r.title) ? 'rtl' : 'ltr'}
+                    lang={isArabic(r.title) ? 'ar' : 'fr'}
+                  >
+                    {r.title}
+                  </span>
                   <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded font-bold flex-shrink-0">En attente</span>
                 </div>
               ))}
@@ -125,7 +132,13 @@ export default async function TeacherDashboard() {
                     <FileText className="w-5 h-5 text-slate-400" />
                   </div>
                   <div>
-                    <div className="font-semibold text-sm">{r.title}</div>
+                    <div
+                      className={`font-semibold text-sm ${isArabic(r.title) ? 'text-right' : 'text-left'}`}
+                      dir={isArabic(r.title) ? 'rtl' : 'ltr'}
+                      lang={isArabic(r.title) ? 'ar' : 'fr'}
+                    >
+                      {r.title}
+                    </div>
                     <div className="text-xs text-slate-500">{r.subject.nameFr} · {timeAgo(r.createdAt)}</div>
                   </div>
                 </div>

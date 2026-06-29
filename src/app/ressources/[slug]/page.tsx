@@ -11,6 +11,7 @@ import CommentsSection from '@/components/resources/CommentsSection';
 import ResourceInfoPanel from '@/components/resources/ResourceInfoPanel';
 import AiDescription from '@/components/resources/AiDescription';
 import { formatNumber, RESOURCE_TYPE_LABELS, HOMEWORK_SUBTYPE_LABELS } from '@/lib/utils';
+import { isArabic } from '@/lib/text-utils';
 import { Eye, Download, MessageCircle, Star, FileText, ChevronLeft, CheckCircle2, Pencil, GraduationCap, Wrench, Building2 } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -217,7 +218,13 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
                   )}
                 </div>
 
-                <h1 className="text-2xl lg:text-3xl font-extrabold text-slate-900 mb-3 leading-tight">{resource.title}</h1>
+                <h1
+                  className={`text-2xl lg:text-3xl font-extrabold text-slate-900 mb-3 leading-tight ${isArabic(resource.title) ? 'text-right' : 'text-left'}`}
+                  dir={isArabic(resource.title) ? 'rtl' : 'ltr'}
+                  lang={isArabic(resource.title) ? 'ar' : 'fr'}
+                >
+                  {resource.title}
+                </h1>
                 {resource.description && (
                   <div className="mb-4">
                     <AiDescription

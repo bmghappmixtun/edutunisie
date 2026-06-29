@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation';
+import { getInitials } from '@/lib/text-utils';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import FloatingUploadButton from '@/components/layout/FloatingUploadButton';
@@ -36,7 +37,7 @@ export default async function TeacherLayout({ children }: { children: React.Reac
     prisma.favorite.count({ where: { userId: user.id } }),
   ]);
 
-  const initials = ((user.firstName?.[0] || user.email[0]) + (user.lastName?.[0] || '')).toUpperCase();
+  const initials = getInitials(user.firstName, user.lastName);
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50">
