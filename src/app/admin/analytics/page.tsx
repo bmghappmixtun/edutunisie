@@ -18,8 +18,22 @@ export const metadata = {
 // Helpers
 // ---------------------------------------------------------------------------
 
+// Vercel Analytics URL — configurable via env var, with sensible fallback.
+//
+// To point to your actual project dashboard:
+//   1. Open https://vercel.com/dashboard and find your examanet project
+//   2. Click on the project → top tab "Analytics"
+//   3. Copy the URL from your browser
+//   4. Add NEXT_PUBLIC_VERCEL_ANALYTICS_URL=<that-url> in Vercel project settings
+//
+// Default fallback tries to derive the URL from Vercel runtime env vars:
+//   - VERCEL_GIT_REPO_OWNER (e.g. "bmghappmixtun")
+//   - VERCEL_GIT_REPO_SLUG (e.g. "edutunisie")
 const VERCEL_ANALYTICS_URL =
-  'https://vercel.com/dashboard/~/analytics/examanet';
+  process.env.NEXT_PUBLIC_VERCEL_ANALYTICS_URL ||
+  (process.env.VERCEL_GIT_REPO_OWNER && process.env.VERCEL_GIT_REPO_SLUG
+    ? `https://vercel.com/${process.env.VERCEL_GIT_REPO_OWNER}/${process.env.VERCEL_GIT_REPO_SLUG}/analytics`
+    : 'https://vercel.com/dashboard/analytics');
 
 function pct(current: number, previous: number): number | null {
   if (previous === 0) return current > 0 ? 100 : 0;
