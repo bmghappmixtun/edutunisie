@@ -22,6 +22,7 @@
     "@ilovepdf/ilovepdf-nodejs": "^0.3.1",
     "@prisma/client": "^5.18.0",
     "@types/pg": "^8.20.0",
+    "@vercel/analytics": "^2.0.1",
     "@vercel/blob": "^2.4.0",
     "@vercel/og": "^0.11.1",
     "bcryptjs": "^2.4.3",
