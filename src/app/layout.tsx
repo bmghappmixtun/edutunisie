@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from 'react-hot-toast';
-import { Analytics } from '@vercel/analytics/react';
+import AnalyticsWithOptOut from '@/components/analytics/AnalyticsWithOptOut';
 import I18nProviderWrapper from '@/components/layout/I18nProviderWrapper';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
@@ -98,7 +98,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Toaster position="top-right" toastOptions={{
           style: { borderRadius: '12px', background: '#0F172A', color: '#fff' }
         }} />
-        <Analytics />
+        <AnalyticsWithOptOut />
       </body>
     </html>
   );
