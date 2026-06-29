@@ -1,6 +1,8 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import { headers } from 'next/headers';
 import { prisma } from '@/lib/prisma';
+import { getVisitorIp, isBotOrPlaceholder } from '@/lib/visitor';
 import PDFViewer from '@/components/resources/PDFViewer';
 import Header from '@/components/layout/Header';
 import { ChevronLeft, Download } from 'lucide-react';
@@ -12,13 +14,20 @@ export default async function ResourceViewerPage({ params }: { params: Promise<{
   const resource = await prisma.resource.findUnique({ where: { slug } });
   if (!resource || resource.status !== 'PUBLISHED') notFound();
 
-  // Increment view
-  await prisma.view.create({ data: { resourceId: resource.id, ipAddress: 'viewer' } });
-  await prisma.resource.update({ where: { id: resource.id }, data: { viewsCount: { increment: 1 } } });
+  // Increment view (use real IP, skip bots)
+  const ip = getVisitorIp();
+  const ua = headers().get('user-agent');
+  if (!isBotOrPlaceholder(ip, ua)) {
+    await prisma.view.create({ data: { resourceId: resource.id, ipAddress: ip, userAgent: ua } });
+    await prisma.resource.update({ where: { id: resource.id }, data: { viewsCount: { increment: 1 } } });
+  }
 
   async function downloadAction() {
     'use server';
-    await prisma.download.create({ data: { resourceId: resource!.id, ipAddress: 'download' } });
+    const ip = getVisitorIp();
+    const ua = headers().get('user-agent');
+    if (isBotOrPlaceholder(ip, ua)) return;
+    await prisma.download.create({ data: { resourceId: resource!.id, ipAddress: ip } });
     await prisma.resource.update({ where: { id: resource!.id }, data: { downloadsCount: { increment: 1 } } });
   }
 
