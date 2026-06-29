@@ -7,11 +7,64 @@ Robust OCR pipeline:
 - Per-PDF timeout — fail-safe skip
 - Auto-cleanup of temp files
 - Status tracking: pending/done/failed/skipped
+- Auto-install missing deps
 """
 
-import os, sys, json, time, gc, signal, atexit
-import asyncio, asyncpg, requests
-import subprocess, hashlib as hl, glob, shutil
+import os, sys, subprocess
+
+# ---------------------------------------------------------------------------
+# Auto-install missing dependencies BEFORE other imports
+# ---------------------------------------------------------------------------
+REQUIRED_DEPS = {
+    # module_name : pip_package_name
+    'asyncpg': 'asyncpg',
+    'requests': 'requests',
+    'psycopg2': 'psycopg2-binary',
+    'psutil': 'psutil',
+    'PIL': 'Pillow',
+    'pikepdf': 'pikepdf',
+    'arabic_reshaper': 'arabic_reshaper',
+    'bidi': 'python-bidi',
+}
+
+def ensure_deps():
+    missing = []
+    for module, pkg in REQUIRED_DEPS.items():
+        try:
+            __import__(module)
+        except ImportError:
+            missing.append(pkg)
+    if missing:
+        print(f"📦 Installing missing deps: {missing}", flush=True)
+        # Try in user mode first (PEP 668 friendly), then break-system-packages
+        for cmd in (
+            [sys.executable, '-m', 'pip', 'install', '-q', '--user'] + missing,
+            [sys.executable, '-m', 'pip', 'install', '-q', '--break-system-packages'] + missing,
+        ):
+            try:
+                subprocess.check_call(cmd)
+                print("✅ Dependencies installed", flush=True)
+                break
+            except subprocess.CalledProcessError:
+                continue
+        # Verify after install
+        still_missing = []
+        for module in REQUIRED_DEPS:
+            try:
+                __import__(module)
+            except ImportError:
+                still_missing.append(module)
+        if still_missing:
+            print(f"⚠️ Still missing after install: {still_missing}", flush=True)
+            sys.exit(1)
+
+ensure_deps()
+
+# Now the real imports (post-deps)
+import json, time, gc, signal, atexit
+import asyncio
+import requests
+import hashlib as hl, glob, shutil
 import traceback
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutTimeout
