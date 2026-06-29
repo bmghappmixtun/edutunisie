@@ -1,7 +1,9 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import { headers } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
+import { getVisitorIp, isBotOrPlaceholder } from '@/lib/visitor';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import ResourceActions from '@/components/resources/ResourceActions';
@@ -86,9 +88,13 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
     }
   }
 
-  // Track view
-  await prisma.view.create({ data: { resourceId: resource.id, ipAddress: 'visitor' } });
-  await prisma.resource.update({ where: { id: resource.id }, data: { viewsCount: { increment: 1 } } });
+  // Track view (use real IP, skip bots)
+  const ip = getVisitorIp();
+  const ua = headers().get('user-agent');
+  if (!isBotOrPlaceholder(ip, ua)) {
+    await prisma.view.create({ data: { resourceId: resource.id, ipAddress: ip, userAgent: ua } });
+    await prisma.resource.update({ where: { id: resource.id }, data: { viewsCount: { increment: 1 } } });
+  }
 
   // Similar resources
   const similar = await prisma.resource.findMany({
