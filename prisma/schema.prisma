@@ -203,6 +203,10 @@ model Resource {
   descriptionGeneratedAt DateTime? // When the AI description was last generated
   descriptionSource  String?       // "agent-v2-multilingual" | "manual" | etc.
 
+  // Header data extracted from PDF text (school, teacher, level, year, type, etc.)
+  headerData         Json?         // Structured fields from PDF header via text extraction
+  schoolName         String?       // School name extracted from PDF header
+
   // Homework subtype: only when type=HOMEWORK
   // CONTROL = Devoir de Contrôle, SYNTHESIS = Devoir de Synthèse, HOUSEWORK = Devoir de Maison
   homeworkSubtype     String?  // "CONTROL" | "SYNTHESIS" | "HOUSEWORK"
