@@ -189,14 +189,32 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
                         </span>
                       )}
                     </div>
-                    <h1 className="text-3xl md:text-5xl font-extrabold text-slate-900 mb-2">
-                      {teacher.firstName} {teacher.lastName}
-                    </h1>
-                    {(teacher.firstNameAr || teacher.lastNameAr) && (
-                      <h2 className="text-xl md:text-2xl font-bold text-slate-600 mb-2" dir="rtl" lang="ar">
-                        {teacher.firstNameAr} {teacher.lastNameAr}
-                      </h2>
-                    )}
+                    {(() => {
+                      const hasFr = !!(teacher.firstName || teacher.lastName);
+                      const hasAr = !!(teacher.firstNameAr || teacher.lastNameAr);
+                      if (hasFr) {
+                        return (
+                          <>
+                            <h1 className="text-3xl md:text-5xl font-extrabold text-slate-900 mb-2">
+                              {teacher.firstName} {teacher.lastName}
+                            </h1>
+                            {hasAr && (
+                              <h2 className="text-xl md:text-2xl font-bold text-slate-600 mb-2" dir="rtl" lang="ar">
+                                {teacher.firstNameAr} {teacher.lastNameAr}
+                              </h2>
+                            )}
+                          </>
+                        );
+                      }
+                      if (hasAr) {
+                        return (
+                          <h1 className="text-3xl md:text-5xl font-extrabold text-slate-900 mb-2" dir="rtl" lang="ar">
+                            {teacher.firstNameAr} {teacher.lastNameAr}
+                          </h1>
+                        );
+                      }
+                      return <h1 className="text-3xl md:text-5xl font-extrabold text-slate-900 mb-2">Enseignant</h1>;
+                    })()}
 
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-600 mt-3">
                       {(teacher.schoolName || teacher.schoolNameAr) && (
