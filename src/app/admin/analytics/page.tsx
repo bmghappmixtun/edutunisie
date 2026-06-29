@@ -8,6 +8,7 @@ import {
   Star, MessageSquare, Award
 } from 'lucide-react';
 import { formatNumber, timeAgo } from '@/lib/utils';
+import OptOutCard from './OptOutCard';
 
 export const dynamic = 'force-dynamic';
 export const metadata = {
@@ -464,6 +465,9 @@ export default async function AdminAnalyticsPage({
           </div>
         </div>
       </div>
+
+      {/* Exclude your own visits (admin convenience) */}
+      <OptOutCard />
     </div>
   );
 }
