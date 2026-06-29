@@ -554,14 +554,31 @@ function Pagination({
   total: number;
   buildHref: (page: number) => string;
 }) {
-  // Smart windowing: show first, last, current +/-2
-  const pages = new Set<number>();
-  for (let p = 1; p <= total; p++) pages.add(p);
-  for (let p = Math.max(1, current - 2); p <= Math.min(total, current + 2); p++) pages.add(p);
-  const sorted = Array.from(pages).sort((a, b) => a - b);
+  // Smart windowing: always show first, last, current ±2.
+  // Pattern: 1 … 4 5 6 … 40 (when current=5)
+  //          1 2 3 4 5 6 7 … 40 (when current ≤ 4)
+  //          1 … 34 35 36 37 38 39 40 (when current ≥ total-3)
+  // If total is small (≤ 7), show all.
+  const siblings = 2;
+  const showAll = total <= 7;
+  const windowStart = Math.max(2, current - siblings);
+  const windowEnd = Math.min(total - 1, current + siblings);
+
+  type Item = { type: 'page'; n: number } | { type: 'ellipsis'; key: string };
+  const items: Item[] = [];
+
+  if (showAll) {
+    for (let n = 1; n <= total; n++) items.push({ type: 'page', n });
+  } else {
+    items.push({ type: 'page', n: 1 });
+    if (windowStart > 2) items.push({ type: 'ellipsis', key: 'left' });
+    for (let n = windowStart; n <= windowEnd; n++) items.push({ type: 'page', n });
+    if (windowEnd < total - 1) items.push({ type: 'ellipsis', key: 'right' });
+    items.push({ type: 'page', n: total });
+  }
 
   return (
-    <nav className="mt-10 flex items-center justify-center gap-1" aria-label="Pagination">
+    <nav className="mt-10 flex items-center justify-center gap-1 flex-wrap" aria-label="Pagination">
       <Link
         href={current > 1 ? buildHref(current - 1) : '#'}
         className={`p-2 border border-slate-200 rounded-lg ${current <= 1 ? 'opacity-30 pointer-events-none' : 'hover:bg-slate-50'}`}
@@ -570,24 +587,30 @@ function Pagination({
         <ChevronLeft className="w-4 h-4" />
       </Link>
 
-      <div className="flex items-center gap-1">
-        {sorted.map((p, i) => {
-          const prev = sorted[i - 1];
-          const gap = prev && p - prev > 1;
+      <div className="flex items-center gap-1 flex-wrap justify-center">
+        {items.map((item) => {
+          if (item.type === 'ellipsis') {
+            return (
+              <span key={item.key} className="px-1.5 text-slate-400 select-none" aria-hidden="true">
+                …
+              </span>
+            );
+          }
+          const p = item.n;
+          const active = p === current;
           return (
-            <span key={p} className="flex items-center gap-1">
-              {gap && <span className="px-2 text-slate-400">…</span>}
-              <Link
-                href={buildHref(p)}
-                className={`min-w-[2.25rem] h-9 px-2 flex items-center justify-center rounded-lg text-sm font-semibold transition ${
-                  p === current
-                    ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow'
-                    : 'text-slate-600 hover:bg-slate-50 border border-slate-200'
-                }`}
-              >
-                {p}
-              </Link>
-            </span>
+            <Link
+              key={p}
+              href={buildHref(p)}
+              aria-current={active ? 'page' : undefined}
+              className={`min-w-[2.25rem] h-9 px-2 flex items-center justify-center rounded-lg text-sm font-semibold transition ${
+                active
+                  ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow'
+                  : 'text-slate-600 hover:bg-slate-50 border border-slate-200'
+              }`}
+            >
+              {p}
+            </Link>
           );
         })}
       </div>
