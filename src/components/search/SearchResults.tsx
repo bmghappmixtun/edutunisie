@@ -6,6 +6,7 @@ import { Search, Filter, X, ChevronDown, Grid, List, Loader2, Eye, Download, Sta
 import toast from 'react-hot-toast';
 import { useI18n } from '@/lib/i18n';
 import { formatNumber, timeAgo, HOMEWORK_SUBTYPE_LABELS } from '@/lib/utils';
+import { isArabic } from '@/lib/text-utils';
 
 type Resource = {
   id: string;
@@ -509,7 +510,11 @@ function ResourceCard({ r }: { r: Resource }) {
           )}
         </div>
 
-        <h3 className="font-bold text-slate-900 line-clamp-2 group-hover:text-primary-600 transition mb-2">
+        <h3
+          className={`font-bold text-slate-900 line-clamp-2 group-hover:text-primary-600 transition mb-2 ${isArabic(r.title) ? 'text-right' : 'text-left'}`}
+          dir={isArabic(r.title) ? 'rtl' : 'ltr'}
+          lang={isArabic(r.title) ? 'ar' : 'fr'}
+        >
           {r.title}
         </h3>
 

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Download, Eye, Star, FileText, User, Calendar, HardDrive, CheckCircle2, GraduationCap } from 'lucide-react';
 import { HOMEWORK_SUBTYPE_LABELS } from '@/lib/utils';
+import { isArabic } from '@/lib/text-utils';
 
 type Resource = {
   id: string;
@@ -95,7 +96,11 @@ export default function ResourceListItem({ resource }: { resource: Resource }) {
             </span>
           )}
         </div>
-        <h3 className="font-semibold text-slate-900 line-clamp-1 group-hover:text-primary-600 transition">
+        <h3
+          className={`font-semibold text-slate-900 line-clamp-1 group-hover:text-primary-600 transition ${isArabic(resource.title) ? 'text-right' : 'text-left'}`}
+          dir={isArabic(resource.title) ? 'rtl' : 'ltr'}
+          lang={isArabic(resource.title) ? 'ar' : 'fr'}
+        >
           {resource.title}
         </h3>
         {teacherName && (

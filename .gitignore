@@ -27,3 +27,4 @@ __pycache__/
 .pytest_cache/
 .env*
 .temp-scripts-jun24/
+node_modules/
