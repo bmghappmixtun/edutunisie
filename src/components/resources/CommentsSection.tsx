@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { getInitials } from '@/lib/text-utils';
 import { MessageCircle, Send } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { timeAgo } from '@/lib/utils';
@@ -72,7 +73,7 @@ export default function CommentsSection({ resourceId, initialComments }: { resou
       ) : (
         <div className="space-y-4">
           {comments.map(c => {
-            const initials = (c.user.firstName?.[0] || '?') + (c.user.lastName?.[0] || '');
+            const initials = getInitials(c.user.firstName, c.user.lastName);
             return (
               <div key={c.id} className="flex gap-3">
                 <div className="w-10 h-10 flex-shrink-0 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 text-white font-bold text-sm flex items-center justify-center">

@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation';
+import { getInitials } from '@/lib/text-utils';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { getCurrentUser } from '@/lib/auth';
@@ -15,7 +16,7 @@ export default async function AccountLayout({ children }: { children: React.Reac
     return <>{children}</>;
   }
 
-  const initials = (user.firstName?.[0] || user.email[0]).toUpperCase() + (user.lastName?.[0] || '').toUpperCase();
+  const initials = getInitials(user.firstName, user.lastName);
 
   const navItems = [
     { href: '/mon-compte', icon: LayoutDashboard, label: 'Tableau de bord', exact: true },

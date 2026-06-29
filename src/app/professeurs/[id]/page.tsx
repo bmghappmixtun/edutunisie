@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import { getInitials } from '@/lib/text-utils';
 import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -142,7 +143,7 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
   const latestResources = resources.slice(0, 6);
 
   const profileUrl = `${SITE_URL}/professeurs/${teacher.id}`;
-  const initials = `${teacher.firstName?.[0] || ''}${teacher.lastName?.[0] || ''}`.toUpperCase();
+  const initials = getInitials(teacher.firstName, teacher.lastName);
 
   return (
     <div className="min-h-screen flex flex-col">
