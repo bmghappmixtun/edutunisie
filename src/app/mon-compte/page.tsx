@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
+import { isArabic } from '@/lib/text-utils';
 import { FileText, Heart, MessageCircle, Star, TrendingUp } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -63,7 +64,13 @@ export default async function AccountDashboard() {
                   <FileText className="w-5 h-5 text-slate-400" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="font-semibold text-sm truncate">{f.resource.title}</div>
+                  <div
+                    className={`font-semibold text-sm truncate ${isArabic(f.resource.title) ? 'text-right' : 'text-left'}`}
+                    dir={isArabic(f.resource.title) ? 'rtl' : 'ltr'}
+                    lang={isArabic(f.resource.title) ? 'ar' : 'fr'}
+                  >
+                    {f.resource.title}
+                  </div>
                   <div className="text-xs text-slate-500">{f.resource.subject.nameFr} · {f.resource.class?.nameFr}</div>
                 </div>
               </a>
