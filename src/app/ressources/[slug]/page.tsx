@@ -11,7 +11,7 @@ import CommentsSection from '@/components/resources/CommentsSection';
 import ResourceInfoPanel from '@/components/resources/ResourceInfoPanel';
 import AiDescription from '@/components/resources/AiDescription';
 import { formatNumber, RESOURCE_TYPE_LABELS, HOMEWORK_SUBTYPE_LABELS } from '@/lib/utils';
-import { Eye, Download, MessageCircle, Star, FileText, ChevronLeft, CheckCircle2, Pencil, GraduationCap, Wrench } from 'lucide-react';
+import { Eye, Download, MessageCircle, Star, FileText, ChevronLeft, CheckCircle2, Pencil, GraduationCap, Wrench, Building2 } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -208,6 +208,13 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
                       Lycée/Collège Pilote
                     </span>
                   )}
+                  {/* School name badge — shown when extracted from PDF header */}
+                  {resource.schoolName && (
+                    <span className="px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-xs font-medium inline-flex items-center gap-1" dir="rtl">
+                      <Building2 className="w-3 h-3" />
+                      {resource.schoolName}
+                    </span>
+                  )}
                 </div>
 
                 <h1 className="text-2xl lg:text-3xl font-extrabold text-slate-900 mb-3 leading-tight">{resource.title}</h1>
@@ -217,6 +224,7 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
                       text={resource.description}
                       source={resource.descriptionSource}
                       language={resource.language}
+                      headerData={resource.headerData as any}
                     />
                   </div>
                 )}

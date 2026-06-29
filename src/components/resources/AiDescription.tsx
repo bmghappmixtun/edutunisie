@@ -13,6 +13,15 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
+interface HeaderData {
+  school?: string | null;
+  teacher?: string | null;
+  level?: string | null;
+  subject?: string | null;
+  year?: string | null;
+  type?: string | null;
+}
+
 interface AiDescriptionProps {
   /** The description text (already in target language). */
   text: string;
@@ -22,6 +31,8 @@ interface AiDescriptionProps {
   language?: string | null;
   /** Optional CSS class for the description text wrapper. */
   className?: string;
+  /** Optional header data extracted from PDF (school/teacher/year etc.). */
+  headerData?: HeaderData | null;
 }
 
 type Field = {
@@ -158,7 +169,7 @@ function mergeBilingualLabels(
  * - In LTR: the icon appears on the LEFT
  * No flex-row-reverse needed — the dir attribute handles it correctly.
  */
-export default function AiDescription({ text, source, language, className = '' }: AiDescriptionProps) {
+export default function AiDescription({ text, source, language, className = '', headerData }: AiDescriptionProps) {
   const [tooltipOpen, setTooltipOpen] = useState(false);
   const isAi = !!source && source.startsWith('agent-');
 
@@ -177,7 +188,31 @@ export default function AiDescription({ text, source, language, className = '' }
     .replace(/<br>\s*<br>/g, '<br><br>');
   // Try both AR and FR labels regardless of detected language, because
   // many descriptions mix languages (FR labels with AR values, or vice versa).
-  const { fields, summary } = parseFields(html, isRtl, true);
+  const { fields: parsedFields, summary } = parseFields(html, isRtl, true);
+
+  // Merge headerData fields (PDF header extraction) into the field list.
+  // Skip any field that the AI description already provided (avoid duplication).
+  const existingLabels = new Set(parsedFields.map((f) => f.label));
+  const headerFields: Field[] = [];
+  if (headerData) {
+    const h = headerData;
+    const tryAdd = (labelAr: string, labelFr: string, val: string | null | undefined, Icon: typeof User) => {
+      if (!val || typeof val !== 'string') return;
+      const v = val.trim();
+      if (!v || v === 'null' || v === 'None') return;
+      const lbl = isRtl ? labelAr : labelFr;
+      if (existingLabels.has(lbl)) return;
+      headerFields.push({ Icon, label: lbl, value: v });
+      existingLabels.add(lbl);
+    };
+    tryAdd('\u0627\u0644\u0645\u062f\u0631\u0633\u0629', '\u00c9tablissement', h.school, Building2);
+    tryAdd('\u0627\u0644\u0623\u0633\u062a\u0627\u0630', 'Enseignant', h.teacher, User);
+    tryAdd('\u0627\u0644\u0645\u0633\u062a\u0648\u0649', 'Niveau', h.level, GraduationCap);
+    tryAdd('\u0627\u0644\u0633\u0646\u0629 \u0627\u0644\u062f\u0631\u0627\u0633\u064a\u0629', 'Ann\u00e9e scolaire', h.year, CalendarDays);
+    tryAdd('\u0627\u0644\u0645\u0627\u062f\u0629', 'Mati\u00e8re', h.subject, BookOpen);
+    tryAdd('\u0627\u0644\u0646\u0648\u0639', 'Type', h.type, FileText);
+  }
+  const fields = [...parsedFields, ...headerFields];
 
   return (
     <div
