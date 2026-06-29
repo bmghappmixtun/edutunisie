@@ -254,10 +254,11 @@ export default async function TeachersPage(props: { searchParams: Promise<Search
         createdAt: true,
       },
       orderBy,
-      take: PAGE_SIZE,
+      // When using custom sort (popular/rating/followers), fetch ALL matching teachers
+      // so we can reorder them in JS before paginating. Otherwise use DB pagination.
       ...(teacherIdOrder && teacherIdOrder.length > 0
-        ? { skip: 0 }
-        : { skip: (page - 1) * PAGE_SIZE }),
+        ? {}
+        : { take: PAGE_SIZE, skip: (page - 1) * PAGE_SIZE }),
     }),
     teacherCountFiltered,
   ]);
