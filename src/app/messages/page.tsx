@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation';
+import { getInitials } from '@/lib/text-utils';
 import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -71,7 +72,7 @@ export default async function MessagesInboxPage() {
               {convsWithUnread.map(conv => {
                 const other = user.id === conv.studentId ? conv.teacher : conv.student;
                 const otherName = `${other.firstName || ''} ${other.lastName || ''}`.trim() || 'Utilisateur';
-                const initials = `${other.firstName?.[0] || ''}${other.lastName?.[0] || ''}`.toUpperCase();
+                const initials = getInitials(other.firstName, other.lastName);
                 const lastMsg = conv.messages[0];
 
                 return (

@@ -7,6 +7,7 @@ import {
   AlertCircle, RefreshCw, Filter
 } from 'lucide-react';
 import { formatNumber, timeAgo } from '@/lib/utils';
+import { isArabic } from '@/lib/text-utils';
 import DeleteResourceButton from '@/components/teacher/DeleteResourceButton';
 
 export const dynamic = 'force-dynamic';
@@ -153,7 +154,12 @@ function ResourceRow({ r }: { r: any }) {
         {/* Info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap mb-1">
-            <Link href={`/ressources/${r.slug}`} className="font-bold text-slate-900 hover:text-primary-600 transition truncate">
+            <Link
+              href={`/ressources/${r.slug}`}
+              className={`font-bold text-slate-900 hover:text-primary-600 transition truncate ${isArabic(r.title) ? 'text-right' : 'text-left'}`}
+              dir={isArabic(r.title) ? 'rtl' : 'ltr'}
+              lang={isArabic(r.title) ? 'ar' : 'fr'}
+            >
               {r.title}
             </Link>
             <StatusBadge status={r.status} />

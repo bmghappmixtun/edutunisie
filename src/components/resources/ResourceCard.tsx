@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Star, Eye, Download, MessageCircle, CheckCircle2, GraduationCap } from 'lucide-react';
 import { formatNumber, RESOURCE_TYPE_LABELS, HOMEWORK_SUBTYPE_LABELS } from '@/lib/utils';
+import { isArabic } from '@/lib/text-utils';
 import PDFThumbnail from './PDFThumbnail';
 
 export interface ResourceCardData {
@@ -79,7 +80,11 @@ export default function ResourceCard({ resource }: { resource: ResourceCardData 
       </div>
 
       <div className="p-4">
-        <h3 className="font-bold text-sm text-slate-900 mb-2 line-clamp-2 group-hover:text-primary-600 transition min-h-[2.5rem]">
+        <h3
+          className={`font-bold text-sm text-slate-900 mb-2 line-clamp-2 group-hover:text-primary-600 transition min-h-[2.5rem] ${isArabic(resource.title) ? 'text-right' : 'text-left'}`}
+          dir={isArabic(resource.title) ? 'rtl' : 'ltr'}
+          lang={isArabic(resource.title) ? 'ar' : 'fr'}
+        >
           {resource.title}
         </h3>
         {/* Homework subtype badge (only when HOMEWORK) */}

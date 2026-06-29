@@ -4,7 +4,7 @@ import Footer from '@/components/layout/Footer';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
-import { Shield, Users, FileText, BarChart3, CheckCircle, Flag, Edit3, BookOpen, Settings, MessageSquare } from 'lucide-react';
+import { Shield, Users, FileText, BarChart3, CheckCircle, Flag, Edit3, BookOpen, Settings, MessageSquare, TrendingUp } from 'lucide-react';
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser();
@@ -22,6 +22,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const navItems: any[] = [
     { group: 'Vue d\'ensemble' },
     { href: '/admin', icon: BarChart3, label: 'Dashboard' },
+    { href: '/admin/analytics', icon: TrendingUp, label: 'Analytics' },
 
     { group: 'Contenu' },
     { href: '/admin/ressources', icon: FileText, label: 'Toutes les ressources' },

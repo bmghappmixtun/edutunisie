@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
 import { FileText, Search, Eye, Download, Star } from 'lucide-react';
 import { formatNumber, timeAgo } from '@/lib/utils';
+import { isArabic } from '@/lib/text-utils';
 
 export const dynamic = 'force-dynamic';
 
@@ -117,7 +118,13 @@ export default async function AdminResourcesPage(props: { params: Promise<any>; 
                         <FileText className="w-4 h-4 text-slate-400" />
                       </div>
                       <div className="min-w-0">
-                        <div className="font-semibold text-sm group-hover:text-primary-600 truncate max-w-xs">{r.title}</div>
+                        <div
+                          className={`font-semibold text-sm group-hover:text-primary-600 truncate max-w-xs ${isArabic(r.title) ? 'text-right' : 'text-left'}`}
+                          dir={isArabic(r.title) ? 'rtl' : 'ltr'}
+                          lang={isArabic(r.title) ? 'ar' : 'fr'}
+                        >
+                          {r.title}
+                        </div>
                         <div className="text-xs text-slate-500">{timeAgo(r.createdAt)}</div>
                       </div>
                     </Link>
