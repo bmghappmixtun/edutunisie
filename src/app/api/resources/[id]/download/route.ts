@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { getVisitorIpFromRequest, isBotOrPlaceholder } from '@/lib/visitor';
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const user = await getCurrentUser();
   const { id } = await params;
-  const ip = req.headers.get('x-forwarded-for') || 'visitor';
+  const ip = getVisitorIpFromRequest(req);
+  const ua = req.headers.get('user-agent');
+  const skipTracking = isBotOrPlaceholder(ip, ua);
 
   const resource = await prisma.resource.findUnique({ where: { id } });
   if (!resource) return NextResponse.json({ error: 'Non trouvé' }, { status: 404 });
@@ -16,8 +19,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   if (wantsOriginal && resource.originalFileKey) {
     // Only verified TEACHERs and ADMINs can download original Office files
-    // (this is the teacher-to-teacher sharing ecosystem - originals never
-    // accessible to students)
     if (!user || (user.role !== 'TEACHER' && user.role !== 'ADMIN')) {
       return NextResponse.json(
         { error: 'Les fichiers originaux Office sont réservés à la communauté des enseignants' },
@@ -25,7 +26,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       );
     }
 
-    await prisma.download.create({ data: { resourceId: id, userId: user.id, ipAddress: ip } });
+    if (!skipTracking) {
+      await prisma.download.create({ data: { resourceId: id, userId: user.id, ipAddress: ip} });
+    }
     return NextResponse.json({
       url: resource.fileUrl.replace(/\.pdf$/i, '').includes('.') ? resource.originalFileKey || resource.fileUrl : resource.originalFileKey,
       fileName: resource.originalFileName || resource.title,
@@ -34,8 +37,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     });
   }
 
-  await prisma.download.create({ data: { resourceId: id, userId: user?.id, ipAddress: ip } });
-  await prisma.resource.update({ where: { id }, data: { downloadsCount: { increment: 1 } } });
+  if (!skipTracking) {
+    await prisma.download.create({ data: { resourceId: id, userId: user?.id, ipAddress: ip} });
+    await prisma.resource.update({ where: { id }, data: { downloadsCount: { increment: 1 } } });
+  }
 
   return NextResponse.json({ url: resource.fileUrl, fileName: resource.title + '.pdf' });
 }
@@ -47,6 +52,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   const user = await getCurrentUser();
   const { id } = await params;
   const wantsOriginal = req.nextUrl.searchParams.get('original') === '1';
+  const ip = getVisitorIpFromRequest(req);
+  const ua = req.headers.get('user-agent');
+  const skipTracking = isBotOrPlaceholder(ip, ua);
 
   const resource = await prisma.resource.findUnique({ where: { id } });
   if (!resource) return NextResponse.json({ error: 'Non trouvé' }, { status: 404 });
@@ -63,10 +71,11 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       return NextResponse.json({ error: 'Pas d\'original' }, { status: 404 });
     }
 
-    await prisma.download.create({ data: { resourceId: id, userId: user.id, ipAddress: req.headers.get('x-forwarded-for') || 'visitor' } });
+    if (!skipTracking) {
+      await prisma.download.create({ data: { resourceId: id, userId: user.id, ipAddress: ip} });
+    }
 
     // Redirect to the original file URL
-    // We need to look up the library file to get the URL
     const libFile = await prisma.teacherFile.findFirst({
       where: { resourceId: id },
       select: { fileUrl: true, fileName: true },
@@ -78,7 +87,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   }
 
   // Default: redirect to PDF
-  await prisma.download.create({ data: { resourceId: id, userId: user?.id, ipAddress: req.headers.get('x-forwarded-for') || 'visitor' } });
-  await prisma.resource.update({ where: { id }, data: { downloadsCount: { increment: 1 } } });
+  if (!skipTracking) {
+    await prisma.download.create({ data: { resourceId: id, userId: user?.id, ipAddress: ip} });
+    await prisma.resource.update({ where: { id }, data: { downloadsCount: { increment: 1 } } });
+  }
   return NextResponse.redirect(resource.fileUrl);
 }
