@@ -1,5 +1,6 @@
 'use client';
 import Link from 'next/link';
+import { getInitials } from '@/lib/text-utils';
 import { useState, useRef, useEffect } from 'react';
 import { User, LogOut, Settings, Heart, Upload, LayoutDashboard, BookOpen, Shield, ChevronDown, Bell } from 'lucide-react';
 
@@ -15,7 +16,7 @@ export default function UserMenu({ user, unreadCount }: { user: any; unreadCount
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  const initials = (user.firstName?.[0] || user.email[0]).toUpperCase() + (user.lastName?.[0] || '').toUpperCase();
+  const initials = getInitials(user.firstName, user.lastName);
   const isTeacher = user.role === 'TEACHER';
   const isAdmin = user.role === 'ADMIN';
 

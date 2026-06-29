@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import { getInitials } from '@/lib/text-utils';
 import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -13,7 +14,6 @@ import ShareButton from '@/components/share/ShareButton';
 import FollowButton from '@/components/social/FollowButton';
 import MessageTeacherButton from '@/components/social/MessageTeacherButton';
 import { timeAgo } from '@/lib/utils';
-import { isArabic } from '@/lib/text-utils';
 import ResourceCard from '@/components/resources/ResourceCard';
 
 export const dynamic = 'force-dynamic';
@@ -143,7 +143,7 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
   const latestResources = resources.slice(0, 6);
 
   const profileUrl = `${SITE_URL}/professeurs/${teacher.id}`;
-  const initials = `${teacher.firstName?.[0] || ''}${teacher.lastName?.[0] || ''}`.toUpperCase();
+  const initials = getInitials(teacher.firstName, teacher.lastName);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -357,11 +357,7 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2">
-                            <h3
-                              className={`font-bold text-slate-900 group-hover:text-primary-600 transition line-clamp-1 ${isArabic(r.title) ? 'text-right' : 'text-left'}`}
-                              dir={isArabic(r.title) ? 'rtl' : 'ltr'}
-                              lang={isArabic(r.title) ? 'ar' : 'fr'}
-                            >
+                            <h3 className="font-bold text-slate-900 group-hover:text-primary-600 transition line-clamp-1">
                               {r.title}
                             </h3>
                             <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-semibold flex-shrink-0">
