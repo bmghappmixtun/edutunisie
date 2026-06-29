@@ -454,8 +454,23 @@ function TeacherCard({
   stats?: { files: number; downloads: number; views: number; rating: number; followers: number };
   featured?: boolean;
 }) {
-  const initials = `${(t.firstName?.[0] || '').toUpperCase()}${(t.lastName?.[0] || '').toUpperCase()}` || '؟';
-  const fullName = `${t.firstName || ''} ${t.lastName || ''}`.trim() || 'Enseignant';
+  const hasFr = !!(t.firstName || t.lastName);
+  const hasAr = !!(t.firstNameAr || t.lastNameAr);
+  const initials = (() => {
+    if (hasFr) {
+      return `${(t.firstName?.[0] || '').toUpperCase()}${(t.lastName?.[0] || '').toUpperCase()}` || '؟';
+    }
+    if (hasAr) {
+      const ar = `${t.firstNameAr || ''} ${t.lastNameAr || ''}`.trim();
+      const m = ar.match(/[\p{L}]/u);
+      const m2 = ar.match(/[\p{L}][\s\S]*?[\p{L}]/u);
+      return (m ? m[0] : '') + (m2 && m2[0] !== m2[1] ? m2[0].slice(-1) : '');
+    }
+    return '؟';
+  })();
+  const fullName = `${t.firstName || ''} ${t.lastName || ''}`.trim()
+    || `${t.firstNameAr || ''} ${t.lastNameAr || ''}`.trim()
+    || 'Enseignant';
 
   return (
     <Link
@@ -479,12 +494,20 @@ function TeacherCard({
         )}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <h3 className="font-bold text-lg group-hover:text-primary-600 transition truncate">{fullName}</h3>
+            {hasFr ? (
+              <h3 className="font-bold text-lg group-hover:text-primary-600 transition truncate">{fullName}</h3>
+            ) : hasAr ? (
+              <h3 className="font-bold text-2xl group-hover:text-primary-600 transition truncate" dir="rtl" lang="ar">
+                {t.firstNameAr} {t.lastNameAr}
+              </h3>
+            ) : (
+              <h3 className="font-bold text-lg group-hover:text-primary-600 transition truncate">{fullName}</h3>
+            )}
             {t.isVerifiedTeacher && (
               <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" aria-label="Enseignant vérifié" />
             )}
           </div>
-          {(t.firstNameAr || t.lastNameAr) && (
+          {hasFr && hasAr && (
             <p className="text-sm text-slate-500 truncate" dir="rtl" lang="ar">
               {t.firstNameAr} {t.lastNameAr}
             </p>
