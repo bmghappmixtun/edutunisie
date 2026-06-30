@@ -13,7 +13,7 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-const TEACHER_EMAIL = 'gharbi.ridha@edutunisie.tn';
+const TEACHER_EMAIL = 'gharbi.ridha@examanet.com';
 
 async function main() {
   console.log('');

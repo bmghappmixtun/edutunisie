@@ -13,7 +13,7 @@
 cp .env.example .env
 
 # Colle ton URL Neon dans DATABASE_URL, exemple :
-# DATABASE_URL="postgresql://user:pass@ep-xxx.eu-central-1.aws.neon.tech/edutunisie?sslmode=require"
+# DATABASE_URL="postgresql://user:pass@ep-xxx.eu-central-1.aws.neon.tech/examanet?sslmode=require"
 
 # Ajoute un NEXTAUTH_SECRET aléatoire :
 # NEXTAUTH_SECRET="colle-ici-32-caracteres-aleatoires"
@@ -35,8 +35,8 @@ npm run dev
 ### 5. Tester les comptes
 | Rôle | Email | Mot de passe |
 |------|-------|-------------|
-| Admin | `admin@edutunisie.tn` | `demo1234` |
-| Enseignant | `ahmed.benali@edutunisie.tn` | `demo1234` |
+| Admin | `admin@examanet.com` | `demo1234` |
+| Enseignant | `ahmed.benali@examanet.com` | `demo1234` |
 | Élève | `yassine@example.com` | `demo1234` |
 
 ---

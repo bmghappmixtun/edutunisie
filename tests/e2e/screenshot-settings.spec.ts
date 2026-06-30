@@ -1,9 +1,9 @@
 import { test } from '@playwright/test';
-const BASE = 'https://edutunisie.vercel.app';
+const BASE = 'https://examanet.com';
 
 test('screenshot settings', async ({ page }) => {
   await page.goto(`${BASE}/connexion`);
-  await page.fill('input[type="email"]', 'ahmed.benali@edutunisie.tn');
+  await page.fill('input[type="email"]', 'ahmed.benali@examanet.com');
   await page.fill('input[type="password"]', 'demo1234');
   await page.click('button[type="submit"]');
   await page.waitForURL(/\/enseignant/, { timeout: 15000 });

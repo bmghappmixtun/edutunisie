@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test('Phase 2 + 3: full catalog verification', async ({ page }) => {
   // 1. Login as teacher
   await page.goto('/connexion');
-  await page.fill('input[type="email"]', 'ahmed.benali@edutunisie.tn');
+  await page.fill('input[type="email"]', 'ahmed.benali@examanet.com');
   await page.fill('input[type="password"]', 'demo1234');
   await page.click('button[type="submit"]');
   await page.waitForURL(/mon-compte|enseignant/, { timeout: 15000 });

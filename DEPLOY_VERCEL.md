@@ -1,4 +1,4 @@
-# 🚀 Guide de Déploiement Vercel — EduTunisie
+# 🚀 Guide de Déploiement Vercel — Examanet
 
 > **5 minutes chrono** pour mettre en ligne ta plateforme sur Vercel
 
@@ -20,7 +20,7 @@ Tu as **3 options** au choix (toutes gratuites) :
 1. Va sur https://neon.tech → Sign up
 2. Crée un nouveau projet
 3. Choisis la région **Frankfurt** (proche de la Tunisie)
-4. Copie la **Connection String** (ressemble à : `postgresql://user:pass@ep-xxx.eu-central-1.aws.neon.tech/edutunisie?sslmode=require`)
+4. Copie la **Connection String** (ressemble à : `postgresql://user:pass@ep-xxx.eu-central-1.aws.neon.tech/examanet?sslmode=require`)
 
 ### Option B : Supabase
 1. Va sur https://supabase.com → New Project
@@ -41,7 +41,7 @@ Ouvre un terminal dans le dossier `edutunisie` :
 # Initialiser git (si pas déjà fait)
 git init
 git add .
-git commit -m "Initial commit - EduTunisie platform"
+git commit -m "Initial commit - Examanet platform"
 
 # Créer un repo sur GitHub (via l'interface web ou gh CLI)
 # Puis :
@@ -84,7 +84,7 @@ Dans la page de config Vercel, descends jusqu'à **"Environment Variables"** :
 
 1. Clique sur **"Deploy"**
 2. Attends 2-3 minutes pendant le build
-3. 🎉 Ton site est en ligne sur `https://edutunisie-xxx.vercel.app`
+3. 🎉 Ton site est en ligne sur `https://examanet-xxx.vercel.app`
 
 ---
 
@@ -120,7 +120,7 @@ DATABASE_URL="postgresql://..." npx tsx scripts/postgres-seed.ts
 
 ## 🎯 Étape 7 : Custom Domain (optionnel)
 
-Tu veux `www.edutunisie.tn` au lieu de `edutunisie-xxx.vercel.app` ?
+Tu veux `www.examanet.com` au lieu de `examanet-xxx.vercel.app` ?
 
 1. Achète le domaine (Namecheap, OVH, GoDaddy...)
 2. Dans Vercel → **Settings** → **Domains** → **Add**
@@ -131,7 +131,7 @@ Tu veux `www.edutunisie.tn` au lieu de `edutunisie-xxx.vercel.app` ?
 ## ✅ Checklist de vérification post-deploy
 
 - [ ] Le site se charge sur l'URL Vercel
-- [ ] Tu peux te connecter avec `admin@edutunisie.tn` / `demo1234`
+- [ ] Tu peux te connecter avec `admin@examanet.com` / `demo1234`
 - [ ] Les ressources s'affichent (sinon lance le seed)
 - [ ] Tu peux uploader un PDF (teste avec un compte enseignant)
 - [ ] Le partage social fonctionne (teste le bouton "Partager")

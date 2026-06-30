@@ -1,4 +1,4 @@
-# 🎓 EduTunisie — Plateforme Pédagogique Tunisienne
+# 🎓 Examanet — Plateforme Pédagogique Tunisienne
 
 > La plateforme éducative #1 en Tunisie — Cours, devoirs, séries, révisions, sujets Bac et corrigés gratuits.
 
@@ -53,8 +53,8 @@ Ouvrez http://localhost:3000
 
 | Rôle | Email | Mot de passe |
 |------|-------|-------------|
-| **Admin** | admin@edutunisie.tn | demo1234 |
-| **Enseignant** | ahmed.benali@edutunisie.tn | demo1234 |
+| **Admin** | admin@examanet.com | demo1234 |
+| **Enseignant** | ahmed.benali@examanet.com | demo1234 |
 | **Élève** | yassine@example.com | demo1234 |
 
 ---
@@ -151,4 +151,4 @@ npm run db:seed     # Réinsérer les données de demo
 
 ---
 
-**© 2024 EduTunisie** — Fait avec ❤️ en Tunisie 🇹🇳
+**© 2024 Examanet** — Fait avec ❤️ en Tunisie 🇹🇳

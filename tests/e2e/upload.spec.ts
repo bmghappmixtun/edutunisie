@@ -10,7 +10,7 @@ test.describe('Teacher resource upload', () => {
     try {
       // Login as teacher
       const loginRes = await context.post(`${BASE}/api/auth/login`, {
-        data: { email: 'ahmed.benali@edutunisie.tn', password: 'demo1234' }
+        data: { email: 'ahmed.benali@examanet.com', password: 'demo1234' }
       });
       expect(loginRes.ok()).toBeTruthy();
 
@@ -39,7 +39,7 @@ test.describe('Teacher resource upload', () => {
     const context = await playwright.request.newContext({ baseURL: BASE });
     try {
       const loginRes = await context.post(`${BASE}/api/auth/login`, {
-        data: { email: 'ahmed.benali@edutunisie.tn', password: 'demo1234' }
+        data: { email: 'ahmed.benali@examanet.com', password: 'demo1234' }
       });
       expect(loginRes.ok()).toBeTruthy();
 
@@ -67,7 +67,7 @@ test.describe('Teacher resource upload', () => {
     const context = await playwright.request.newContext({ baseURL: BASE });
     try {
       const loginRes = await context.post(`${BASE}/api/auth/login`, {
-        data: { email: 'ahmed.benali@edutunisie.tn', password: 'demo1234' }
+        data: { email: 'ahmed.benali@examanet.com', password: 'demo1234' }
       });
       expect(loginRes.ok()).toBeTruthy();
 

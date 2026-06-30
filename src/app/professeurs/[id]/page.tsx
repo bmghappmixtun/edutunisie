@@ -279,7 +279,7 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
 
                   <ShareButton
                     url={profileUrl}
-                    title={`${teacher.firstName} ${teacher.lastName} sur EduTunisie`}
+                    title={`${teacher.firstName} ${teacher.lastName} sur Examanet`}
                     description={`Découvrez les ressources de ${teacher.firstName} ${teacher.lastName}`}
                   />
                 </div>

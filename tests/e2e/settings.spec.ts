@@ -26,7 +26,7 @@ test.describe('Settings page', () => {
 
   test('Page loads for teacher with extra Enseignement section', async ({ page }) => {
     await page.goto(`${BASE}/connexion`);
-    await page.fill('input[type="email"]', 'ahmed.benali@edutunisie.tn');
+    await page.fill('input[type="email"]', 'ahmed.benali@examanet.com');
     await page.fill('input[type="password"]', 'demo1234');
     await page.click('button[type="submit"]');
     await page.waitForURL(/\/(enseignant|mon-compte)/, { timeout: 15000 });
@@ -188,7 +188,7 @@ test.describe('Settings page', () => {
     const ctx = await playwright.request.newContext({ baseURL: BASE });
     try {
       await ctx.post(`${BASE}/api/auth/login`, {
-        data: { email: 'ahmed.benali@edutunisie.tn', password: 'demo1234' }
+        data: { email: 'ahmed.benali@examanet.com', password: 'demo1234' }
       });
 
       const res = await ctx.patch(`${BASE}/api/user/account`, {

@@ -166,11 +166,11 @@ test.describe('Complete account creation flows', () => {
     test('9. Teacher can access upload form after approval', async ({ page, request }) => {
       // Login as approved teacher
       await request.post(`${BASE}/api/auth/login`, {
-        data: { email: 'ahmed.benali@edutunisie.tn', password: 'demo1234' }
+        data: { email: 'ahmed.benali@examanet.com', password: 'demo1234' }
       });
       // Need to capture cookies in page context
       await page.goto(`${BASE}/connexion`);
-      await page.fill('input[type="email"]', 'ahmed.benali@edutunisie.tn');
+      await page.fill('input[type="email"]', 'ahmed.benali@examanet.com');
       await page.fill('input[type="password"]', 'demo1234');
       await page.click('button[type="submit"]');
       await page.waitForURL(/\/enseignant/, { timeout: 15000 });
@@ -184,7 +184,7 @@ test.describe('Complete account creation flows', () => {
     test('10. Teacher can submit new resource via API (creates PENDING)', async ({ request }) => {
       // Login as approved teacher
       await request.post(`${BASE}/api/auth/login`, {
-        data: { email: 'ahmed.benali@edutunisie.tn', password: 'demo1234' }
+        data: { email: 'ahmed.benali@examanet.com', password: 'demo1234' }
       });
 
       const timestamp = Date.now();

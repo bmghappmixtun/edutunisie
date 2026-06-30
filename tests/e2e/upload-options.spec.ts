@@ -8,7 +8,7 @@ test.describe('Teacher upload options dropdowns', () => {
     try {
       // Login as teacher
       const loginRes = await context.post(`${BASE}/api/auth/login`, {
-        data: { email: 'ahmed.benali@edutunisie.tn', password: 'demo1234' }
+        data: { email: 'ahmed.benali@examanet.com', password: 'demo1234' }
       });
       expect(loginRes.ok()).toBeTruthy();
 
@@ -40,7 +40,7 @@ test.describe('Teacher upload options dropdowns', () => {
   test('Teacher upload form has dropdowns (not text inputs)', async ({ page }) => {
     // Login
     await page.goto(`${BASE}/connexion`);
-    await page.fill('input[type="email"]', 'ahmed.benali@edutunisie.tn');
+    await page.fill('input[type="email"]', 'ahmed.benali@examanet.com');
     await page.fill('input[type="password"]', 'demo1234');
     await page.click('button[type="submit"]');
     await page.waitForURL(/\/(enseignant|mon-compte)/, { timeout: 15000 });
@@ -81,7 +81,7 @@ test.describe('Teacher upload options dropdowns', () => {
 
   test('Section dropdown is filtered by selected class', async ({ page }) => {
     await page.goto(`${BASE}/connexion`);
-    await page.fill('input[type="email"]', 'ahmed.benali@edutunisie.tn');
+    await page.fill('input[type="email"]', 'ahmed.benali@examanet.com');
     await page.fill('input[type="password"]', 'demo1234');
     await page.click('button[type="submit"]');
     await page.waitForURL(/\/(enseignant|mon-compte)/, { timeout: 15000 });

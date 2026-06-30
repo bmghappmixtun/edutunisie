@@ -139,7 +139,7 @@ async function main() {
     console.log('');
     console.log('Next steps:');
     console.log(`   1. Download: node scripts/download-manifest.js "${manifestPath}"`);
-    console.log(`   2. Upload:   node scripts/upload-to-edutunisie.js "${manifestPath}"`);
+    console.log(`   2. Upload:   node scripts/upload-to-examanet.js "${manifestPath}"`);
   }
 }
 

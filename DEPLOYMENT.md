@@ -1,4 +1,4 @@
-# EduTunisie — Plateforme pédagogique tunisienne
+# Examanet — Plateforme pédagogique tunisienne
 
 > Successeur moderne de devoirat.net — Cours, devoirs, séries et corrigés gratuits
 
@@ -19,8 +19,8 @@ npm run dev
 
 | Rôle | Email | Mot de passe |
 |------|-------|-------------|
-| Admin | `admin@edutunisie.tn` | `demo1234` |
-| Enseignant | `ahmed.benali@edutunisie.tn` | `demo1234` |
+| Admin | `admin@examanet.com` | `demo1234` |
+| Enseignant | `ahmed.benali@examanet.com` | `demo1234` |
 | Élève | `yassine@example.com` | `demo1234` |
 
 ## 📦 Stack
@@ -71,4 +71,4 @@ npx tsx scripts/postgres-seed.ts  # Seed PostgreSQL
 
 ## 📜 License
 
-© 2024 EduTunisie — Tous droits réservés
+© 2024 Examanet — Tous droits réservés

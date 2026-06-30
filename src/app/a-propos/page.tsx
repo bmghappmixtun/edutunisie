@@ -6,8 +6,8 @@ import Footer from '@/components/layout/Footer';
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-  title: 'À propos — EduTunisie',
-  description: 'Découvrez EduTunisie, la plateforme pédagogique #1 en Tunisie. Notre mission, notre équipe, nos valeurs.'
+  title: 'À propos — Examanet',
+  description: 'Découvrez Examanet, la plateforme pédagogique #1 en Tunisie. Notre mission, notre équipe, nos valeurs.'
 };
 
 const team = [
@@ -41,7 +41,7 @@ export default function AboutPage() {
                 Notre mission : <span className="gradient-text">démocratiser l'éducation</span> en Tunisie
               </h1>
               <p className="text-lg lg:text-xl text-slate-600 max-w-3xl mx-auto">
-                EduTunisie est née d'un constat simple : trop d'élèves tunisiens n'ont pas accès à des ressources
+                Examanet est née d'un constat simple : trop d'élèves tunisiens n'ont pas accès à des ressources
                 pédagogiques de qualité. Nous avons décidé de changer ça.
               </p>
             </div>
@@ -86,7 +86,7 @@ export default function AboutPage() {
                 gratuite, sans pub, et faite par et pour les Tunisiens ? »</em>
               </p>
               <p>
-                En 2025, la première version voyait le jour. Aujourd'hui, EduTunisie héberge des milliers
+                En 2025, la première version voyait le jour. Aujourd'hui, Examanet héberge des milliers
                 de ressources partagées par des enseignants passionnés, et est devenue la référence pour
                 des dizaines de milliers d'élèves à travers le pays.
               </p>

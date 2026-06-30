@@ -192,8 +192,8 @@ async function downloadFiles(manifest) {
     if (action === 'all' && manifest.length > 0) {
       await downloadFiles(manifest);
       console.log('');
-      console.log('🎉 Done! To upload to EduTunisie:');
-      console.log(`   node scripts/upload-to-edutunisie.js "${OUTPUT_DIR}/manifest-${TEACHER_NAME.replace(/\s+/g, '-').toLowerCase()}.json"`);
+      console.log('🎉 Done! To upload to Examanet:');
+      console.log(`   node scripts/upload-to-examanet.js "${OUTPUT_DIR}/manifest-${TEACHER_NAME.replace(/\s+/g, '-').toLowerCase()}.json"`);
     }
   } else if (action === 'download') {
     const manifestPath = path.join(OUTPUT_DIR, `manifest-${TEACHER_NAME.replace(/\s+/g, '-').toLowerCase()}.json`);

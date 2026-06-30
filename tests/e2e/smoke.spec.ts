@@ -2,10 +2,10 @@ import { test, expect } from '@playwright/test';
 
 const BASE = process.env.BASE_URL || 'http://localhost:3000';
 
-test.describe('Smoke tests — EduTunisie', () => {
+test.describe('Smoke tests — Examanet', () => {
   test('Home page loads and shows hero', async ({ page }) => {
     await page.goto(BASE);
-    await expect(page).toHaveTitle(/EduTunisie/);
+    await expect(page).toHaveTitle(/Examanet/);
     await expect(page.locator('h1')).toContainText(/plateforme pédagogique/i);
     await expect(page.getByText(/100% gratuits/i)).toBeVisible();
   });

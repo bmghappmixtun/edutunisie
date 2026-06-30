@@ -11,7 +11,7 @@ export function renderNewTeacherEmail(firstName: string, lastName: string, email
 </td></tr>
 <tr><td style="padding:32px;">
 <h2 style="margin:0 0 16px;color:#0F172A;font-size:20px;">Bonjour Admin,</h2>
-<p style="color:#475569;font-size:15px;line-height:1.6;">Un nouvel enseignant vient de s'inscrire sur EduTunisie et attend votre approbation.</p>
+<p style="color:#475569;font-size:15px;line-height:1.6;">Un nouvel enseignant vient de s'inscrire sur Examanet et attend votre approbation.</p>
 <div style="background:#FEF3C7;border-left:4px solid #F59E0B;border-radius:8px;padding:16px;margin:20px 0;">
 <p style="margin:0 0 8px;color:#92400E;font-weight:bold;">📋 Informations du compte :</p>
 <p style="margin:4px 0;color:#78350F;font-size:14px;"><strong>Nom :</strong> ${firstName} ${lastName}</p>
@@ -23,7 +23,7 @@ ${school ? `<p style="margin:4px 0;color:#78350F;font-size:14px;"><strong>Établ
 <a href="${SITE_URL}/admin/approbations" style="background:linear-gradient(135deg,#F59E0B,#D97706);color:white;text-decoration:none;padding:14px 28px;border-radius:12px;font-weight:bold;display:inline-block;">Voir les approbations</a>
 </div>
 <hr style="border:none;border-top:1px solid #E2E8F0;margin:24px 0;">
-<p style="margin:0;color:#94A3B8;font-size:12px;text-align:center;">EduTunisie · Système de notification admin</p>
+<p style="margin:0;color:#94A3B8;font-size:12px;text-align:center;">Examanet · Système de notification admin</p>
 </td></tr>
 </table>
 </td></tr>
