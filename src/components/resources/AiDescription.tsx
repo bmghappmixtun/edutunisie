@@ -80,13 +80,28 @@ function parseFields(html: string, isAr: boolean, bilingual: boolean = false): {
   const fields: Field[] = [];
   let summary = '';
 
+  // First, convert <ul><li>X</li><li>Y</li></ul> into a comma-separated list
+  // so it survives the HTML stripping. We use a unique placeholder.
+  const lists: string[] = [];
+  let withPlaceholders = html.replace(/<ul>([\s\S]*?)<\/ul>/gi, (_m, inner) => {
+    const items = Array.from(inner.matchAll(/<li[^>]*>([\s\S]*?)<\/li>/gi)).map((mm) =>
+      mm[1].replace(/<[^>]+>/g, '').trim()
+    );
+    const joined = items.join(', ');
+    lists.push(joined);
+    return `\u0000LIST${lists.length - 1}\u0000`;
+  });
+
   // Strip HTML tags but preserve <br> as newlines
-  const text = html
+  const text = withPlaceholders
     .replace(/<br\s*\/?>/gi, '\n')
     .replace(/<strong>([^<]+)<\/strong>/gi, '$1')
     .replace(/<[^>]+>/g, '');
 
-  const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
+  // Restore list placeholders to their comma-separated values
+  const textWithLists = text.replace(/\u0000LIST(\d+)\u0000/g, (_m, idx) => lists[parseInt(idx)] || '');
+
+  const lines = textWithLists.split('\n').map((l) => l.trim()).filter(Boolean);
 
   const iconMap: Record<string, typeof User> = {
     teacher: User,
@@ -114,8 +129,9 @@ function parseFields(html: string, isAr: boolean, bilingual: boolean = false): {
             if (key === 'summary') {
               summary = value;
             } else if (key === 'concepts') {
-              // concepts go into the summary block (already formatted as <ul> in DB)
-              summary = summary ? `${summary}\n${value}` : value;
+              // Format concepts as a labeled, comma-separated line appended to summary
+              const conceptsLine = `${displayLabel} : ${value}`;
+              summary = summary ? `${summary}\n\n${conceptsLine}` : conceptsLine;
             } else {
               fields.push({ Icon: iconMap[key] || FileText, label: displayLabel, value });
             }
