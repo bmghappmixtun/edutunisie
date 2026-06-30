@@ -4,6 +4,7 @@ import Footer from '@/components/layout/Footer';
 import ResourceCard from '@/components/resources/ResourceCard';
 import { prisma } from '@/lib/prisma';
 import { ChevronRight } from 'lucide-react';
+import { breadcrumbSchema } from '@/lib/structured-data';
 
 export const dynamic = 'force-dynamic';
 
@@ -52,6 +53,11 @@ export default async function LevelPage({ params }: { params: Promise<{ level: s
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema([
+        { name: 'Accueil', url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com'}/` },
+        { name: 'Niveaux', url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com'}/niveaux` },
+        { name: level.nameFr, url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com'}/niveaux/${level.slug}` },
+      ])) }} />
       <main className="flex-1 pt-20">
         <div className="bg-gradient-to-br from-primary-50 to-sky-50 py-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

@@ -3,6 +3,7 @@ import './globals.css';
 import { Toaster } from 'react-hot-toast';
 import AnalyticsWithOptOut from '@/components/analytics/AnalyticsWithOptOut';
 import I18nProviderWrapper from '@/components/layout/I18nProviderWrapper';
+import { organizationSchema } from '@/lib/structured-data';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
 
@@ -98,6 +99,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Toaster position="top-right" toastOptions={{
           style: { borderRadius: '12px', background: '#0F172A', color: '#fff' }
         }} />
+        {/* Organization + WebSite + SearchAction JSON-LD — enables Google knowledge panel + sitelinks searchbox */}
+        {organizationSchema().map((schema, i) => (
+          <script
+            key={`org-schema-${i}`}
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+          />
+        ))}
         <AnalyticsWithOptOut />
       </body>
     </html>

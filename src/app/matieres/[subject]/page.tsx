@@ -4,6 +4,7 @@ import Footer from '@/components/layout/Footer';
 import ResourceCard from '@/components/resources/ResourceCard';
 import { prisma } from '@/lib/prisma';
 import { ChevronRight, BookOpen } from 'lucide-react';
+import { breadcrumbSchema } from '@/lib/structured-data';
 
 export const dynamic = 'force-dynamic';
 
@@ -52,6 +53,11 @@ export default async function SubjectPage({ params }: { params: Promise<{ subjec
 
   return (
     <div className="min-h-screen flex flex-col">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema([
+        { name: 'Accueil', url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com'}/` },
+        { name: 'Matières', url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com'}/matieres` },
+        { name: subject.nameFr, url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com'}/matieres/${subject.slug}` },
+      ])) }} />
       <Header />
       <main className="flex-1 pt-20">
         <div className="bg-gradient-to-br from-slate-50 to-primary-50 py-12" style={{ borderTop: `4px solid ${subject.color || '#0EA5E9'}` }}>
