@@ -7,7 +7,7 @@ import { faqSchema } from '@/lib/structured-data';
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
 
 export const metadata: Metadata = {
-  title: 'FAQ — Questions fréquentes sur Examanet',
+  title: 'FAQ — Questions fréquentes',
   description: 'Toutes les réponses à vos questions sur Examanet : cours gratuits, niveaux, matières, enseignants, téléchargement, et plus. La plateforme pédagogique #1 en Tunisie.',
   keywords: ['FAQ Examanet', 'questions fréquentes', 'aide', 'cours gratuits Tunisie', 'support'],
   alternates: { canonical: `${SITE_URL}/faq` },
