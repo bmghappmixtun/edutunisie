@@ -38,6 +38,10 @@ interface AiDescriptionProps {
   className?: string;
   /** Optional header data extracted from PDF (school/teacher/year etc.). */
   headerData?: HeaderData | null;
+  /** Override Classe value with the full class name (e.g. "9ème année de base"). */
+  classNameFr?: string | null;
+  /** Override Classe value with the full Arabic class name. */
+  classNameAr?: string | null;
 }
 
 type Field = {
@@ -192,7 +196,7 @@ function mergeBilingualLabels(
  * - In LTR: the icon appears on the LEFT
  * No flex-row-reverse needed — the dir attribute handles it correctly.
  */
-export default function AiDescription({ text, source, language, className = '', headerData }: AiDescriptionProps) {
+export default function AiDescription({ text, source, language, className = '', headerData, classNameFr, classNameAr }: AiDescriptionProps) {
   const [tooltipOpen, setTooltipOpen] = useState(false);
   const isAi = !!source && source.startsWith('agent-');
 
@@ -236,6 +240,22 @@ export default function AiDescription({ text, source, language, className = '', 
     tryAdd('\u0627\u0644\u0646\u0648\u0639', 'Type', h.type, FileText);
   }
   const fields = [...parsedFields, ...headerFields];
+
+  // Override Classe value with full class name from props (e.g. "9ème année de base")
+  // Some AI-generated descriptions have truncated values like "9ème année" — use the
+  // authoritative class name from the DB instead.
+  if (classNameFr || classNameAr) {
+    const fullClass = isRtl ? (classNameAr || classNameFr) : (classNameFr || classNameAr);
+    const classeLabel = isRtl ? 'الصف' : 'Classe';
+    const idx = fields.findIndex((f) => f.label === classeLabel);
+    if (fullClass) {
+      if (idx >= 0) {
+        fields[idx] = { ...fields[idx], value: fullClass };
+      } else {
+        fields.push({ Icon: GraduationCap, label: classeLabel, value: fullClass });
+      }
+    }
+  }
 
   return (
     <div
