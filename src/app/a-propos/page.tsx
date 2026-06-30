@@ -6,7 +6,7 @@ import Footer from '@/components/layout/Footer';
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-  title: 'À propos — Examanet',
+  title: 'À propos',
   description: 'Découvrez Examanet, la plateforme pédagogique #1 en Tunisie. Notre mission, notre équipe, nos valeurs.'
 };
 
