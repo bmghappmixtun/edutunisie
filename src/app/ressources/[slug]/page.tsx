@@ -232,6 +232,8 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
                       source={resource.descriptionSource}
                       language={resource.language}
                       headerData={resource.headerData as any}
+                      classNameFr={resource.class?.nameFr}
+                      classNameAr={resource.class?.nameAr}
                     />
                   </div>
                 )}
