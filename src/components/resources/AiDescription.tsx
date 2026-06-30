@@ -18,6 +18,10 @@ interface HeaderData {
   school?: string | null;
   teacher?: string | null;
   level?: string | null;
+  /** Educational cycle (Enseignement de base | Enseignement Secondaire) — FR */
+  cycle?: string | null;
+  /** Educational cycle in Arabic (التعليم الأساسي | التعليم الثانوي) */
+  cycleAr?: string | null;
   subject?: string | null;
   year?: string | null;
   type?: string | null;
@@ -48,7 +52,8 @@ type Field = {
 const LABELS_AR: Record<string, string[]> = {
   teacher: ['الأستاذ', 'الأستا ذ', 'المعلم'],
   school: ['المدرسة', 'المؤسسة'],
-  level: ['المستوى', 'الصف', 'السنة', 'الفصل'],
+  // 'المستوى' removed — cycle (التعليم الأساسي/الثانوي) is now sourced from headerData.cycleAr via tryAdd
+  level: ['الصف', 'السنة', 'الفصل'],
   year: ['السنة الدراسية', 'العام الدراسي'],
   subject: ['المادة', 'المـادة'],
   type: ['النوع', 'نوع'],
@@ -60,7 +65,8 @@ const LABELS_AR: Record<string, string[]> = {
 const LABELS_FR: Record<string, string[]> = {
   teacher: ['Enseignant', 'Professeur', 'Mr', 'Mme'],
   school: ['Établissement', 'Lycée', 'Collège', 'École'],
-  level: ['Classe', 'Niveau', 'Année'],
+  // 'Niveau' removed — cycle (Enseignement de base/Secondaire) is now sourced from headerData.cycle via tryAdd
+  level: ['Classe', 'Année'],
   year: ['Année scolaire', 'Année'],
   subject: ['Matière', 'Matière', 'Subject'],
   type: ['Type'],
@@ -224,7 +230,7 @@ export default function AiDescription({ text, source, language, className = '', 
     };
     tryAdd('\u0627\u0644\u0645\u062f\u0631\u0633\u0629', '\u00c9tablissement', h.school, Building2);
     tryAdd('\u0627\u0644\u0623\u0633\u062a\u0627\u0630', 'Enseignant', h.teacher, User);
-    tryAdd('\u0627\u0644\u0645\u0633\u062a\u0648\u0649', 'Niveau', h.level, GraduationCap);
+    tryAdd('\u0627\u0644\u0645\u0633\u062a\u0648\u0649', 'Niveau', h.cycle, GraduationCap);
     tryAdd('\u0627\u0644\u0633\u0646\u0629 \u0627\u0644\u062f\u0631\u0627\u0633\u064a\u0629', 'Ann\u00e9e scolaire', h.year, CalendarDays);
     tryAdd('\u0627\u0644\u0645\u0627\u062f\u0629', 'Mati\u00e8re', h.subject, BookOpen);
     tryAdd('\u0627\u0644\u0646\u0648\u0639', 'Type', h.type, FileText);

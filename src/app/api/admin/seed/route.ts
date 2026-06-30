@@ -40,9 +40,9 @@ export async function POST(req: NextRequest) {
     await prisma.newsletter.deleteMany();
     await prisma.setting.deleteMany();
 
-    // Levels (Primaire cycle removed — focus on Collège + Lycée)
-    const college = await prisma.level.create({ data: { slug: 'college', nameFr: 'Collège', nameAr: 'الإعدادي', order: 2 } });
-    const lycee = await prisma.level.create({ data: { slug: 'lycee', nameFr: 'Lycée', nameAr: 'الثانوي', order: 3 } });
+    // Levels (Enseignement de base = Collège cycle, Enseignement Secondaire = Lycée)
+    const college = await prisma.level.create({ data: { slug: 'college', nameFr: 'Enseignement de base', nameAr: 'التعليم الأساسي', order: 2 } });
+    const lycee = await prisma.level.create({ data: { slug: 'lycee', nameFr: 'Enseignement Secondaire', nameAr: 'التعليم الثانوي', order: 3 } });
 
     // Classes
     const classes = await Promise.all([

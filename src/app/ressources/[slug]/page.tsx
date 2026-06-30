@@ -116,7 +116,7 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
     description: resource.description || `${resource.title} — Ressource pédagogique gratuite sur Examanet`,
     url: resourceUrl,
     inLanguage: resource.language || 'fr',
-    educationalLevel: resource.class?.nameFr || 'Collège',
+    educationalLevel: resource.class?.nameFr || resource.class?.level?.nameFr || 'Enseignement de base',
     learningResourceType: resource.type === 'HOMEWORK' ? 'Assessment' : 'Educational Resource',
     audience: {
       '@type': 'EducationalAudience',
