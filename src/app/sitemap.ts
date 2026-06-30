@@ -14,6 +14,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/cgu`, changeFrequency: 'yearly', priority: 0.3 },
     { url: `${baseUrl}/matieres`, changeFrequency: 'weekly', priority: 0.8 },
     { url: `${baseUrl}/niveaux`, changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${baseUrl}/professeurs`, changeFrequency: 'weekly', priority: 0.7 },
+    { url: `${baseUrl}/faq`, changeFrequency: 'monthly', priority: 0.6 },
+    { url: `${baseUrl}/recherche`, changeFrequency: 'monthly', priority: 0.5 },
   ];
   
   // Subjects (matieres)
@@ -35,13 +38,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: 'weekly' as const,
     priority: 0.7,
   }));
+
+  // Teachers (top 200 by resource count)
+  const teachers = await prisma.user.findMany({
+    where: { uploadedFiles: { some: {} } },
+    select: { id: true },
+    take: 200,
+  });
+  const teacherPages: MetadataRoute.Sitemap = teachers.map(t => ({
+    url: `${baseUrl}/professeurs/${t.id}`,
+    changeFrequency: 'monthly' as const,
+    priority: 0.5,
+  }));
   
   // Resources - top 1000 (sitemap.xml limits)
   const resources = await prisma.resource.findMany({
     where: { status: 'PUBLISHED' },
     select: { slug: true, updatedAt: true, type: true },
     orderBy: { updatedAt: 'desc' },
-    take: 1000,
+    take: 5000,
   });
   const resourcePages: MetadataRoute.Sitemap = resources.map(r => ({
     url: `${baseUrl}/ressources/${r.slug}`,
@@ -50,5 +65,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
   
-  return [...staticPages, ...subjectPages, ...classPages, ...resourcePages];
+  return [...staticPages, ...subjectPages, ...classPages, ...teacherPages, ...resourcePages];
 }
