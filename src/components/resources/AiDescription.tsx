@@ -84,9 +84,9 @@ function parseFields(html: string, isAr: boolean, bilingual: boolean = false): {
   // First, convert <ul><li>X</li><li>Y</li></ul> into a comma-separated list
   // so it survives the HTML stripping. We use a unique placeholder.
   const lists: string[] = [];
-  let withPlaceholders = html.replace(/<ul>([\s\S]*?)<\/ul>/gi, (_m, inner) => {
-    const items = Array.from(inner.matchAll(/<li[^>]*>([\s\S]*?)<\/li>/gi)).map((mm) =>
-      mm[1].replace(/<[^>]+>/g, '').trim()
+  let withPlaceholders = html.replace(/<ul>([\s\S]*?)<\/ul>/gi, (_m: string, inner: string) => {
+    const items = Array.from(inner.matchAll(/<li[^>]*>([\s\S]*?)<\/li>/gi)).map((mm: RegExpMatchArray) =>
+      (mm[1] || '').replace(/<[^>]+>/g, '').trim()
     );
     const joined = items.join(', ');
     lists.push(joined);
