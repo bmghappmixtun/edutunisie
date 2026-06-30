@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-const TEACHER_EMAIL = 'mohamed.gharbi@edutunisie.tn';
+const TEACHER_EMAIL = 'mohamed.gharbi@examanet.com';
 const TEACHER_PASSWORD = 'demo1234';
 
 test('rejected resource: owner can view it (no 404)', async ({ page }) => {

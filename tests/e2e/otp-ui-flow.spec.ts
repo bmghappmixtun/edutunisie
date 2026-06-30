@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-const BASE_URL = 'https://edutunisie.vercel.app';
+const BASE_URL = 'https://examanet.com';
 const TEST_TOKEN = 'cffa7e495ff6a441d253b03b8cf1efa7';
 
 test('Full UI OTP flow - student', async ({ page, request }) => {

@@ -1,4 +1,4 @@
-// Prisma Schema - EduTunisie
+// Prisma Schema - Examanet
 // Plateforme pédagogique tunisienne
 
 generator client {

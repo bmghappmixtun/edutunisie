@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import * as fs from 'fs';
 import * as path from 'path';
 
-const TEACHER_EMAIL = 'fatma.trabelsi@edutunisie.tn';
+const TEACHER_EMAIL = 'fatma.trabelsi@examanet.com';
 const TEACHER_PASSWORD = 'demo1234';
 
 const TEST_PDF_PATH = path.join('/tmp', 'e2e-test.pdf');

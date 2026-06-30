@@ -34,7 +34,7 @@ test.describe('Mr GHARBI RIDHA Teacher Account', () => {
     // Fill the form
     const emailInput = page.locator('input[name="email"], input[type="email"]').first();
     const pwdInput = page.locator('input[name="password"], input[type="password"]').first();
-    await emailInput.fill('gharbi.ridha@edutunisie.tn');
+    await emailInput.fill('gharbi.ridha@examanet.com');
     await pwdInput.fill('GharbiRidha2026!');
     await page.locator('button[type="submit"]').first().click();
 
@@ -54,13 +54,13 @@ test.describe('Mr GHARBI RIDHA Teacher Account', () => {
     try {
       // Login as GHARBI
       const loginRes = await ctx.post(`${BASE}/api/auth/login`, {
-        data: { email: 'gharbi.ridha@edutunisie.tn', password: 'GharbiRidha2026!' }
+        data: { email: 'gharbi.ridha@examanet.com', password: 'GharbiRidha2026!' }
       });
       expect(loginRes.ok()).toBeTruthy();
 
       const meRes = await ctx.get(`${BASE}/api/auth/me`);
       const me = await meRes.json();
-      expect(me.user.email).toBe('gharbi.ridha@edutunisie.tn');
+      expect(me.user.email).toBe('gharbi.ridha@examanet.com');
       console.log('✓ Logged in as GHARBI RIDHA:', me.user.id);
 
       // Fetch his profile
@@ -79,7 +79,7 @@ test.describe('Mr GHARBI RIDHA Teacher Account', () => {
     const ctx = await playwright.request.newContext({ baseURL: BASE });
     try {
       const loginRes = await ctx.post(`${BASE}/api/auth/login`, {
-        data: { email: 'gharbi.ridha@edutunisie.tn', password: 'GharbiRidha2026!' }
+        data: { email: 'gharbi.ridha@examanet.com', password: 'GharbiRidha2026!' }
       });
       expect(loginRes.ok()).toBeTruthy();
 
@@ -111,7 +111,7 @@ test.describe('Mr GHARBI RIDHA Teacher Account', () => {
     const ctx = await playwright.request.newContext({ baseURL: BASE });
     try {
       await ctx.post(`${BASE}/api/auth/login`, {
-        data: { email: 'gharbi.ridha@edutunisie.tn', password: 'GharbiRidha2026!' }
+        data: { email: 'gharbi.ridha@examanet.com', password: 'GharbiRidha2026!' }
       });
 
       // Update bio
@@ -161,7 +161,7 @@ test.describe('Mr GHARBI RIDHA Teacher Account', () => {
 
       // Login as GHARBI
       const gharbiLogin = await targetCtx.post(`${BASE}/api/auth/login`, {
-        data: { email: 'gharbi.ridha@edutunisie.tn', password: 'GharbiRidha2026!' }
+        data: { email: 'gharbi.ridha@examanet.com', password: 'GharbiRidha2026!' }
       });
       expect(gharbiLogin.ok()).toBeTruthy();
       const gharbiMe = await targetCtx.get(`${BASE}/api/auth/me`);

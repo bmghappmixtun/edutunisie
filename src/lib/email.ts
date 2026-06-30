@@ -2,7 +2,7 @@ import { Resend } from 'resend';
 import { renderResourceRejectedEmail, renderEditApprovedEmail, renderEditRejectedEmail, renderNewEditPendingEmail } from './email-templates';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
-const FROM = process.env.EMAIL_FROM || 'EduTunisie <noreply@edutunisie.tn>';
+const FROM = process.env.EMAIL_FROM || 'Examanet <noreply@examanet.com>';
 
 // Always include dev code as fallback in case email is not delivered
 // (e.g., Resend test mode, custom domain not verified, spam folder)
@@ -34,7 +34,7 @@ export async function sendOTPEmail(to: string, code: string, firstName?: string)
     const result: any = await resend.emails.send({
       from: FROM,
       to: [to],
-      subject: `${code} — Votre code EduTunisie`,
+      subject: `${code} — Votre code Examanet`,
       html,
     });
     if (result.error) {
@@ -62,7 +62,7 @@ export async function sendWelcomeEmail(to: string, firstName: string, role: stri
     const result: any = await resend.emails.send({
       from: FROM,
       to: [to],
-      subject: `🎉 Bienvenue sur EduTunisie, ${firstName} !`,
+      subject: `🎉 Bienvenue sur Examanet, ${firstName} !`,
       html,
     });
     if (result.error) {

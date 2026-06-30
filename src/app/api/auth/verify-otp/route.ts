@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
       status: updated.status,
       role: updated.role,
       message: updated.status === 'ACTIVE'
-        ? 'Email vérifié ! Bienvenue sur EduTunisie.'
+        ? 'Email vérifié ! Bienvenue sur Examanet.'
         : 'Email vérifié ! Votre compte enseignant est en attente d\'approbation par un administrateur.'
     });
   } catch (e: any) {

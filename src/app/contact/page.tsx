@@ -6,8 +6,8 @@ import ContactForm from '@/components/contact/ContactForm';
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-  title: 'Contact — EduTunisie',
-  description: 'Contactez l\'équipe EduTunisie. Une question, un bug, une suggestion ? Nous vous répondons sous 24-48h.'
+  title: 'Contact — Examanet',
+  description: 'Contactez l\'équipe Examanet. Une question, un bug, une suggestion ? Nous vous répondons sous 24-48h.'
 };
 
 export default function ContactPage() {
@@ -48,8 +48,8 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <div className="text-sm font-semibold text-slate-500 mb-1">Email</div>
-                      <a href="mailto:contact@edutunisie.tn" className="text-slate-900 font-semibold hover:text-primary-600">
-                        contact@edutunisie.tn
+                      <a href="mailto:contact@examanet.com" className="text-slate-900 font-semibold hover:text-primary-600">
+                        contact@examanet.com
                       </a>
                       <div className="text-xs text-slate-500 mt-1">Réponse sous 24-48h</div>
                     </div>

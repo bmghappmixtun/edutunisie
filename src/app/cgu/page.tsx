@@ -6,8 +6,8 @@ import Footer from '@/components/layout/Footer';
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-  title: 'CGU — Conditions Générales d\'Utilisation — EduTunisie',
-  description: 'Conditions générales d\'utilisation de la plateforme EduTunisie'
+  title: 'CGU — Conditions Générales d\'Utilisation — Examanet',
+  description: 'Conditions générales d\'utilisation de la plateforme Examanet'
 };
 
 const sections = [
@@ -15,10 +15,10 @@ const sections = [
     id: 'objet',
     title: '1. Objet',
     content: `Les présentes Conditions Générales d'Utilisation (ci-après « CGU ») ont pour objet de définir
-    les modalités et conditions d'utilisation de la plateforme EduTunisie (ci-après « la Plateforme »),
-    éditée par EduTunisie SARL, ainsi que les droits et obligations des utilisateurs.
+    les modalités et conditions d'utilisation de la plateforme Examanet (ci-après « la Plateforme »),
+    éditée par Examanet SARL, ainsi que les droits et obligations des utilisateurs.
 
-    EduTunisie est une plateforme collaborative de partage de ressources pédagogiques destinée
+    Examanet est une plateforme collaborative de partage de ressources pédagogiques destinée
     aux élèves, enseignants et parents d'élèves du système éducatif tunisien.`
   },
   {
@@ -27,7 +27,7 @@ const sections = [
     content: `L'utilisation de la Plateforme implique l'acceptation pleine et entière des présentes CGU.
     Tout utilisateur qui ne souhaite pas accepter les présentes CGU doit s'abstenir d'utiliser la Plateforme.
 
-    EduTunisie se réserve le droit de modifier les présentes CGU à tout moment. Les utilisateurs
+    Examanet se réserve le droit de modifier les présentes CGU à tout moment. Les utilisateurs
     seront informés de toute modification par email et/ou par notification sur la Plateforme.`
   },
   {
@@ -55,7 +55,7 @@ const sections = [
     droits nécessaires, et qu'il ne porte pas atteinte aux droits de tiers (propriété intellectuelle,
     droit à l'image, etc.).
 
-    L'utilisateur cède à EduTunisie une licence non exclusive, mondiale et gratuite d'utilisation,
+    L'utilisateur cède à Examanet une licence non exclusive, mondiale et gratuite d'utilisation,
     de reproduction, de modification et de distribution du contenu publié, dans le cadre du
     fonctionnement de la Plateforme.`
   },
@@ -63,7 +63,7 @@ const sections = [
     id: 'propriete',
     title: '5. Propriété intellectuelle',
     content: `L'ensemble du contenu de la Plateforme (textes, images, logos, icônes, ainsi que le code
-    source) est protégé par le droit d'auteur et appartient à EduTunisie ou à ses partenaires.
+    source) est protégé par le droit d'auteur et appartient à Examanet ou à ses partenaires.
 
     Les ressources pédagogiques (PDF) restent la propriété de leurs auteurs. Toute reproduction
     sans autorisation est interdite, sauf usage personnel et pédagogique.
@@ -85,13 +85,13 @@ const sections = [
   {
     id: 'moderation',
     title: '7. Modération et sanctions',
-    content: `EduTunisie se réserve le droit de modérer, modifier ou supprimer tout contenu ne
+    content: `Examanet se réserve le droit de modérer, modifier ou supprimer tout contenu ne
     respectant pas les présentes CGU, sans préavis.
 
-    En cas de violation grave ou répétée, EduTunisie peut suspendre ou supprimer le compte de
+    En cas de violation grave ou répétée, Examanet peut suspendre ou supprimer le compte de
     l'utilisateur, et le cas échéant engager des poursuites judiciaires.
 
-    Les enseignants sont soumis à une approbation préalable par l'équipe d'EduTunisie avant de
+    Les enseignants sont soumis à une approbation préalable par l'équipe d'Examanet avant de
     pouvoir publier des ressources.`
   },
   {
@@ -102,15 +102,15 @@ const sections = [
     caractère personnel et à notre Politique de confidentialité.
 
     L'utilisateur dispose d'un droit d'accès, de rectification, d'opposition et de suppression
-    de ses données. Pour exercer ces droits : contact@edutunisie.tn`
+    de ses données. Pour exercer ces droits : contact@examanet.com`
   },
   {
     id: 'responsabilite',
     title: '9. Limitation de responsabilité',
-    content: `EduTunisie s'efforce d'assurer la disponibilité et la qualité de la Plateforme,
+    content: `Examanet s'efforce d'assurer la disponibilité et la qualité de la Plateforme,
     mais ne peut garantir une accessibilité 100% du temps.
 
-    EduTunisie ne peut être tenu responsable :
+    Examanet ne peut être tenu responsable :
     • Des dommages indirects liés à l'utilisation de la Plateforme
     • Du contenu publié par les utilisateurs
     • De l'exactitude pédagogique des ressources (chaque ressource reste sous la responsabilité de son auteur)
@@ -129,7 +129,7 @@ const sections = [
   {
     id: 'modifications',
     title: '11. Modification des CGU',
-    content: `EduTunisie se réserve le droit de modifier les présentes CGU à tout moment.
+    content: `Examanet se réserve le droit de modifier les présentes CGU à tout moment.
     Les utilisateurs seront informés par email et/ou par notification au moins 30 jours avant
     l'entrée en vigueur des modifications.
 
@@ -165,7 +165,7 @@ export default function CGUPage() {
               Dernière mise à jour : <strong>18 juin 2026</strong>
             </p>
             <p className="text-slate-500">
-              Merci de lire attentivement ces conditions avant d'utiliser EduTunisie.
+              Merci de lire attentivement ces conditions avant d'utiliser Examanet.
             </p>
           </div>
         </section>
@@ -206,10 +206,10 @@ export default function CGUPage() {
               <div className="flex items-start gap-3">
                 <CheckCircle className="w-6 h-6 text-primary-600 flex-shrink-0 mt-1" />
                 <div>
-                  <h3 className="font-bold text-slate-900 mb-2">En utilisant EduTunisie, vous acceptez ces CGU</h3>
+                  <h3 className="font-bold text-slate-900 mb-2">En utilisant Examanet, vous acceptez ces CGU</h3>
                   <p className="text-slate-600 text-sm">
                     Si vous avez des questions concernant ces conditions, contactez-nous à{' '}
-                    <a href="mailto:contact@edutunisie.tn" className="text-primary-600 font-semibold hover:underline">contact@edutunisie.tn</a>
+                    <a href="mailto:contact@examanet.com" className="text-primary-600 font-semibold hover:underline">contact@examanet.com</a>
                   </p>
                 </div>
               </div>

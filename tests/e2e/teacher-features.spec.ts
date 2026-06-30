@@ -7,7 +7,7 @@ test.describe('Feature: Edit Profile', () => {
     const ctx = await playwright.request.newContext({ baseURL: BASE });
     try {
       const login = await ctx.post(`${BASE}/api/auth/login`, {
-        data: { email: 'ahmed.benali@edutunisie.tn', password: 'demo1234' }
+        data: { email: 'ahmed.benali@examanet.com', password: 'demo1234' }
       });
       expect(login.ok()).toBeTruthy();
 
@@ -43,7 +43,7 @@ test.describe('Feature: Edit Profile', () => {
 
   test('Edit profile page loads in UI', async ({ page }) => {
     await page.goto(`${BASE}/connexion`);
-    await page.fill('input[type="email"]', 'ahmed.benali@edutunisie.tn');
+    await page.fill('input[type="email"]', 'ahmed.benali@examanet.com');
     await page.fill('input[type="password"]', 'demo1234');
     await page.click('button[type="submit"]');
     await page.waitForURL(/\/(enseignant|mon-compte)/, { timeout: 15000 });
@@ -177,7 +177,7 @@ test.describe('Feature: Messaging', () => {
     try {
       // Login teacher first to get their ID
       const teacherLogin = await teacherCtx.post(`${BASE}/api/auth/login`, {
-        data: { email: 'ahmed.benali@edutunisie.tn', password: 'demo1234' }
+        data: { email: 'ahmed.benali@examanet.com', password: 'demo1234' }
       });
       expect(teacherLogin.ok()).toBeTruthy();
       const teacherMe = await teacherCtx.get(`${BASE}/api/auth/me`);
@@ -225,7 +225,7 @@ test.describe('Feature: Messaging', () => {
     try {
       // Login teacher first to get ID
       await teacherCtx.post(`${BASE}/api/auth/login`, {
-        data: { email: 'ahmed.benali@edutunisie.tn', password: 'demo1234' }
+        data: { email: 'ahmed.benali@examanet.com', password: 'demo1234' }
       });
       const teacherMe = await teacherCtx.get(`${BASE}/api/auth/me`);
       const teacher = await teacherMe.json();
@@ -303,7 +303,7 @@ test.describe('Feature: Messaging', () => {
 test.describe('Feature: Analytics', () => {
   test('Teacher analytics page loads', async ({ page }) => {
     await page.goto(`${BASE}/connexion`);
-    await page.fill('input[type="email"]', 'ahmed.benali@edutunisie.tn');
+    await page.fill('input[type="email"]', 'ahmed.benali@examanet.com');
     await page.fill('input[type="password"]', 'demo1234');
     await page.click('button[type="submit"]');
     await page.waitForURL(/\/(enseignant|mon-compte)/, { timeout: 15000 });

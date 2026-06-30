@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 const BASE_URL = 'https://examanet.com';
-const TEACHER_EMAIL = 'ahmed.benali@edutunisie.tn';
+const TEACHER_EMAIL = 'ahmed.benali@examanet.com';
 const TEACHER_PASSWORD = 'demo1234';
 
 test('Teacher can edit a published resource (creates pending edit)', async ({ page }) => {

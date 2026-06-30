@@ -14,14 +14,14 @@ const { URL } = require('url');
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-const BASE_URL = process.env.BASE_URL || 'https://edutunisie.vercel.app';
+const BASE_URL = process.env.BASE_URL || 'https://examanet.com';
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'boutiti.mehdi@gmail.com';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'demo1234';
 
 // Credentials for the new GHARBI RIDHA account
 // ⚠️ These are TEMPORARY - the teacher should change them on first login
 const GHARBI_ACCOUNT = {
-  email: 'gharbi.ridha@edutunisie.tn',
+  email: 'gharbi.ridha@examanet.com',
   password: 'GharbiRidha2026!', // Temporary password
   firstName: 'Ridha',
   lastName: 'Gharbi',

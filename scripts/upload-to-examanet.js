@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
- * upload-to-edutunisie.js
- * Upload a manifest of PDFs to EduTunisie platform.
- * Usage: node upload-to-edutunisie.js <manifest.json>
+ * upload-to-examanet.js
+ * Upload a manifest of PDFs to Examanet platform.
+ * Usage: node upload-to-examanet.js <manifest.json>
  * Requires: BASE_URL env, ADMIN_TOKEN env (or login as teacher)
  */
 
@@ -11,12 +11,12 @@ const path = require('path');
 const https = require('https');
 const { URL } = require('url');
 
-const BASE_URL = process.env.BASE_URL || 'https://edutunisie.vercel.app';
+const BASE_URL = process.env.BASE_URL || 'https://examanet.com';
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'boutiti.mehdi@gmail.com';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'demo1234';
 const SEED_TOKEN = process.env.SEED_TOKEN; // Required from env — never hardcode
 
-// Default mapping from filename pattern to EduTunisie slug
+// Default mapping from filename pattern to Examanet slug
 const SUBJECT_MAP = {
   'math': 'mathematiques',
   'physique': 'physique',
@@ -214,7 +214,7 @@ async function approve(session, resourceId) {
 async function main() {
   const manifestPath = process.argv[2];
   if (!manifestPath) {
-    console.error('Usage: node upload-to-edutunisie.js <manifest.json>');
+    console.error('Usage: node upload-to-examanet.js <manifest.json>');
     process.exit(1);
   }
 

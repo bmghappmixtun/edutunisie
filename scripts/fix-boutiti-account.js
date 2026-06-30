@@ -40,9 +40,9 @@ const { Resend } = require('resend');
     const resend = new Resend(process.env.RESEND_API_KEY);
     try {
       const result = await resend.emails.send({
-        from: process.env.EMAIL_FROM || 'EduTunisie <onboarding@resend.dev>',
+        from: process.env.EMAIL_FROM || 'Examanet <onboarding@resend.dev>',
         to: [user.email],
-        subject: `${code} — Votre code EduTunisie (nouveau)`,
+        subject: `${code} — Votre code Examanet (nouveau)`,
         html: `
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <h1 style="color: #0EA5E9;">Bonjour ${user.firstName} 👋</h1>
@@ -52,7 +52,7 @@ const { Resend } = require('resend');
             </div>
             <p>Ce code est valide pendant <strong>30 minutes</strong>.</p>
             <p>Si vous n'avez pas créé de compte, ignorez cet email.</p>
-            <p style="color: #94a3b8; font-size: 12px; margin-top: 30px;">— L'équipe EduTunisie</p>
+            <p style="color: #94a3b8; font-size: 12px; margin-top: 30px;">— L'équipe Examanet</p>
           </div>
         `
       });

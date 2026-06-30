@@ -4,7 +4,7 @@ import path from 'path';
 test('teacher uploads Word file and library shows PDF converted', async ({ page }) => {
   // Login as teacher
   await page.goto('/connexion');
-  await page.fill('input[type="email"]', 'ahmed.benali@edutunisie.tn');
+  await page.fill('input[type="email"]', 'ahmed.benali@examanet.com');
   await page.fill('input[type="password"]', 'demo1234');
   await page.click('button[type="submit"]');
   await page.waitForURL(/\/(mon-compte|enseignant)/, { timeout: 15000 });

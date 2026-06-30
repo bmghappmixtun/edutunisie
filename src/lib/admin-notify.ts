@@ -4,7 +4,7 @@ import { prisma } from './prisma';
 import { getAdminEmailsFromConfig } from './admin-config';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
-const FROM = process.env.EMAIL_FROM || 'EduTunisie <onboarding@resend.dev>';
+const FROM = process.env.EMAIL_FROM || 'Examanet <onboarding@resend.dev>';
 
 /**
  * Notify all admins that a new teacher has registered and is awaiting approval.
