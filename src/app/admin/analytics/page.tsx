@@ -29,7 +29,7 @@ export const metadata = {
 //
 // Default fallback tries to derive the URL from Vercel runtime env vars:
 //   - VERCEL_GIT_REPO_OWNER (e.g. "bmghappmixtun")
-//   - VERCEL_GIT_REPO_SLUG (e.g. "edutunisie")
+//   - VERCEL_GIT_REPO_SLUG (e.g. "examanet")
 const VERCEL_ANALYTICS_URL =
   process.env.NEXT_PUBLIC_VERCEL_ANALYTICS_URL ||
   (process.env.VERCEL_GIT_REPO_OWNER && process.env.VERCEL_GIT_REPO_SLUG

@@ -5,7 +5,7 @@ test.describe('Teacher Personal Library', () => {
   test('teacher can upload Word file, see it in library, and download original', async ({ page, context }) => {
     // Login as teacher (Ahmed Ben Ali)
     await page.goto('/connexion');
-    await page.fill('input[type="email"]', 'ahmed.benali@edutunisie.tn');
+    await page.fill('input[type="email"]', 'ahmed.benali@examanet.com');
     await page.fill('input[type="password"]', 'demo1234');
     await page.click('button[type="submit"]');
     await page.waitForURL(/\/(mon-compte|enseignant)/, { timeout: 15000 });
@@ -56,7 +56,7 @@ test.describe('Teacher Personal Library', () => {
 
   test('library page filters work', async ({ page }) => {
     await page.goto('/connexion');
-    await page.fill('input[type="email"]', 'ahmed.benali@edutunisie.tn');
+    await page.fill('input[type="email"]', 'ahmed.benali@examanet.com');
     await page.fill('input[type="password"]', 'demo1234');
     await page.click('button[type="submit"]');
     await page.waitForURL(/\/(mon-compte|enseignant)/);

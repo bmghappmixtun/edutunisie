@@ -22,7 +22,7 @@ type GroupedResults = {
   section: SuggestResult[];
 };
 
-const RECENT_KEY = 'edutunisie_recent_searches';
+const RECENT_KEY = 'examanet_recent_searches';
 const MAX_RECENT = 5;
 
 const ICON_MAP: Record<string, any> = {

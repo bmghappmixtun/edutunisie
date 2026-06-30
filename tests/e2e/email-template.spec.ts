@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import * as fs from 'fs';
 import * as path from 'path';
 
-test('email templates use production domain, not edutunisie.vercel.app', async () => {
+test('email templates use production domain, not examanet.preview.app', async () => {
   // Read the email templates source
   const emailTemplates = fs.readFileSync(
     path.join(process.cwd(), 'src/lib/email-templates.ts'),
@@ -25,11 +25,11 @@ test('email templates use production domain, not edutunisie.vercel.app', async (
   console.log('New Teacher email length:', renderedTeacher.length);
   console.log('New Resource email length:', renderedResource.length);
 
-  // Check that emails reference examanet.com, not edutunisie.vercel.app
+  // Check that emails reference examanet.com, not examanet.preview.app
   expect(renderedTeacher).toContain('examanet.com');
   expect(renderedResource).toContain('examanet.com');
-  expect(renderedTeacher).not.toContain('edutunisie.vercel');
-  expect(renderedResource).not.toContain('edutunisie.vercel');
+  expect(renderedTeacher).not.toContain('examanet.preview');
+  expect(renderedResource).not.toContain('examanet.preview');
   expect(renderedTeacher).toContain('/admin/approbations');
   expect(renderedResource).toContain('/admin/approbations');
 });
@@ -39,8 +39,8 @@ test('professeurs profile share URL uses SITE_URL', async () => {
     path.join(process.cwd(), 'src/app/professeurs/[id]/page.tsx'),
     'utf-8'
   );
-  // Should not contain hardcoded edutunisie.vercel.app
-  expect(src).not.toContain('edutunisie.vercel.app');
+  // Should not contain hardcoded examanet.preview.app
+  expect(src).not.toContain('examanet.preview.app');
   // Should use ${SITE_URL}
   expect(src).toContain('${SITE_URL}');
 });

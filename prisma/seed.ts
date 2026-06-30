@@ -97,28 +97,28 @@ async function main() {
   // Admin
   const admin = await prisma.user.create({
     data: {
-      email: 'admin@edutunisie.tn',
+      email: 'admin@examanet.com',
       passwordHash,
       role: 'ADMIN',
       status: 'ACTIVE',
       emailVerifiedAt: new Date(),
       firstName: 'Admin',
       lastName: 'Principal',
-      schoolName: 'EduTunisie',
+      schoolName: 'Examanet',
       governorate: 'Tunis',
     }
   });
 
   // Teachers
   const teachersData = [
-    { email: 'ahmed.benali@edutunisie.tn', firstName: 'Ahmed', lastName: 'Ben Ali', subjects: ['mathematiques'], levels: ['lycee'], school: 'Lycée Bourguiba, Tunis', gov: 'Tunis' },
-    { email: 'fatma.trabelsi@edutunisie.tn', firstName: 'Fatma', lastName: 'Trabelsi', subjects: ['physique'], levels: ['lycee'], school: 'Lycée Carnot, Tunis', gov: 'Tunis' },
-    { email: 'mohamed.gharbi@edutunisie.tn', firstName: 'Mohamed', lastName: 'Gharbi', subjects: ['svt'], levels: ['college', 'lycee'], school: 'Collège Pilote, Sfax', gov: 'Sfax' },
-    { email: 'leila.bouzid@edutunisie.tn', firstName: 'Leila', lastName: 'Bouzid', subjects: ['francais', 'arabe'], levels: ['college'], school: 'Collège 7 Novembre, Sousse', gov: 'Sousse' },
-    { email: 'karim.jendoubi@edutunisie.tn', firstName: 'Karim', lastName: 'Jendoubi', subjects: ['anglais'], levels: ['lycee'], school: 'Lycée Technique, Monastir', gov: 'Monastir' },
-    { email: 'sarra.mansouri@edutunisie.tn', firstName: 'Sarra', lastName: 'Mansouri', subjects: ['philosophie', 'histoire'], levels: ['lycee'], school: 'Lycée Alaoui, Tunis', gov: 'Tunis' },
-    { email: 'youssef.daoud@edutunisie.tn', firstName: 'Youssef', lastName: 'Daoud', subjects: ['informatique', 'technologie'], levels: ['lycee'], school: 'Lycée Technique, Sfax', gov: 'Sfax' },
-    { email: 'amina.khelifi@edutunisie.tn', firstName: 'Amina', lastName: 'Khelifi', subjects: ['mathematiques', 'physique'], levels: ['college'], school: 'Collège Pilote, Nabeul', gov: 'Nabeul' },
+    { email: 'ahmed.benali@examanet.com', firstName: 'Ahmed', lastName: 'Ben Ali', subjects: ['mathematiques'], levels: ['lycee'], school: 'Lycée Bourguiba, Tunis', gov: 'Tunis' },
+    { email: 'fatma.trabelsi@examanet.com', firstName: 'Fatma', lastName: 'Trabelsi', subjects: ['physique'], levels: ['lycee'], school: 'Lycée Carnot, Tunis', gov: 'Tunis' },
+    { email: 'mohamed.gharbi@examanet.com', firstName: 'Mohamed', lastName: 'Gharbi', subjects: ['svt'], levels: ['college', 'lycee'], school: 'Collège Pilote, Sfax', gov: 'Sfax' },
+    { email: 'leila.bouzid@examanet.com', firstName: 'Leila', lastName: 'Bouzid', subjects: ['francais', 'arabe'], levels: ['college'], school: 'Collège 7 Novembre, Sousse', gov: 'Sousse' },
+    { email: 'karim.jendoubi@examanet.com', firstName: 'Karim', lastName: 'Jendoubi', subjects: ['anglais'], levels: ['lycee'], school: 'Lycée Technique, Monastir', gov: 'Monastir' },
+    { email: 'sarra.mansouri@examanet.com', firstName: 'Sarra', lastName: 'Mansouri', subjects: ['philosophie', 'histoire'], levels: ['lycee'], school: 'Lycée Alaoui, Tunis', gov: 'Tunis' },
+    { email: 'youssef.daoud@examanet.com', firstName: 'Youssef', lastName: 'Daoud', subjects: ['informatique', 'technologie'], levels: ['lycee'], school: 'Lycée Technique, Sfax', gov: 'Sfax' },
+    { email: 'amina.khelifi@examanet.com', firstName: 'Amina', lastName: 'Khelifi', subjects: ['mathematiques', 'physique'], levels: ['college'], school: 'Collège Pilote, Nabeul', gov: 'Nabeul' },
   ];
   const teachers = await Promise.all(
     teachersData.map(t => prisma.user.create({
@@ -289,9 +289,9 @@ async function main() {
   }
 
   // ============ SETTINGS ============
-  await prisma.setting.create({ data: { key: 'site_name', value: 'EduTunisie' } });
+  await prisma.setting.create({ data: { key: 'site_name', value: 'Examanet' } });
   await prisma.setting.create({ data: { key: 'site_tagline', value: 'La plateforme pédagogique #1 en Tunisie' } });
-  await prisma.setting.create({ data: { key: 'contact_email', value: 'contact@edutunisie.tn' } });
+  await prisma.setting.create({ data: { key: 'contact_email', value: 'contact@examanet.com' } });
   await prisma.setting.create({ data: { key: 'maintenance_mode', value: 'false' } });
 
   console.log('✅ Seed completed:');
@@ -303,8 +303,8 @@ async function main() {
   console.log(`   - ${await prisma.rating.count()} ratings`);
   console.log('');
   console.log('🔑 Demo accounts:');
-  console.log('   Admin    : admin@edutunisie.tn / demo1234');
-  console.log('   Teacher  : ahmed.benali@edutunisie.tn / demo1234');
+  console.log('   Admin    : admin@examanet.com / demo1234');
+  console.log('   Teacher  : ahmed.benali@examanet.com / demo1234');
   console.log('   Student  : yassine@example.com / demo1234');
 }
 

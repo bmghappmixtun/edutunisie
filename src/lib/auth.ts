@@ -2,7 +2,7 @@ import { cookies } from 'next/headers';
 import bcrypt from 'bcryptjs';
 import { prisma } from './prisma';
 
-const SESSION_COOKIE = 'edutunisie_session';
+const SESSION_COOKIE = 'examanet_session';
 const SESSION_DURATION = 30 * 24 * 60 * 60 * 1000; // 30 days
 
 export async function hashPassword(password: string): Promise<string> {

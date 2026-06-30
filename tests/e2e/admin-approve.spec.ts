@@ -10,7 +10,7 @@ test.describe('Admin approval flow', () => {
     try {
       // === STEP 1: Login as teacher ===
       const teacherLogin = await teacherCtx.post(`${BASE}/api/auth/login`, {
-        data: { email: 'ahmed.benali@edutunisie.tn', password: 'demo1234' }
+        data: { email: 'ahmed.benali@examanet.com', password: 'demo1234' }
       });
       expect(teacherLogin.ok()).toBeTruthy();
 
@@ -71,7 +71,7 @@ test.describe('Admin approval flow', () => {
     try {
       // Login teacher
       await teacherCtx.post(`${BASE}/api/auth/login`, {
-        data: { email: 'ahmed.benali@edutunisie.tn', password: 'demo1234' }
+        data: { email: 'ahmed.benali@examanet.com', password: 'demo1234' }
       });
 
       // Upload resource
@@ -110,7 +110,7 @@ test.describe('Admin approval flow', () => {
     try {
       // Login teacher
       await teacherCtx.post(`${BASE}/api/auth/login`, {
-        data: { email: 'ahmed.benali@edutunisie.tn', password: 'demo1234' }
+        data: { email: 'ahmed.benali@examanet.com', password: 'demo1234' }
       });
 
       // Upload

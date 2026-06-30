@@ -1,5 +1,5 @@
 import { test } from '@playwright/test';
-const BASE = 'https://edutunisie.vercel.app';
+const BASE = 'https://examanet.com';
 
 test('debug gharbi profile', async ({ page }) => {
   await page.goto(`${BASE}/professeurs`);

@@ -151,7 +151,7 @@
       "whyCommunityTitle": "Communauté active",
       "whyCommunityDesc": "Évaluez, commentez et partagez avec la communauté.",
       "ctaTeacherTitle": "Partagez votre savoir avec",
-      "ctaTeacherDesc": "Rejoignez +200 enseignants qui partagent déjà leurs ressources avec la communauté EduTunisie.",
+      "ctaTeacherDesc": "Rejoignez +200 enseignants qui partagent déjà leurs ressources avec la communauté Examanet.",
       "ctaTeacherBtn": "Devenir enseignant",
       "newsletterTitle": "Restez",
       "newsletterHighlight": "informé",
@@ -219,7 +219,7 @@
   },
   "auth": {
     "loginTitle": "Connexion",
-    "loginSubtitle": "Accédez à votre compte EduTunisie",
+    "loginSubtitle": "Accédez à votre compte Examanet",
     "signupTitle": "Inscription gratuite",
     "signupSubtitle": "Rejoignez +30 000 élèves et enseignants",
     "email": "Adresse email",
@@ -481,7 +481,7 @@
     "cgu": "CGU",
     "aboutUs": "À propos",
     "contact": "Contact",
-    "copyright": "© {year} EduTunisie. Tous droits réservés.",
+    "copyright": "© {year} Examanet. Tous droits réservés.",
     "madeWith": "Conçu avec ❤️ en Tunisie 🇹🇳 pour les élèves tunisiens"
   },
   "errors": {

@@ -5,7 +5,7 @@ const BASE_URL = 'https://examanet.com';
 test('upload progress bar appears during upload', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto(`${BASE_URL}/connexion`);
-  await page.fill('input[type="email"]', 'ahmed.benali@edutunisie.tn');
+  await page.fill('input[type="email"]', 'ahmed.benali@examanet.com');
   await page.fill('input[type="password"]', 'demo1234');
   await page.click('button[type="submit"]');
   await page.waitForURL(/\/(mon-compte|enseignant)/, { timeout: 10000 });
