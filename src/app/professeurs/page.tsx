@@ -25,7 +25,7 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
   const sp = await searchParams;
   const total = await prisma.user.count({ where: { role: 'TEACHER', status: 'ACTIVE' } });
   return {
-    title: `Professeurs — ${total} enseignants certifiés | Examanet`,
+    title: `Professeurs — ${total} enseignants certifiés`,
     description: `Découvrez nos ${total} professeurs certifiés et leurs ressources pédagogiques gratuites : cours, devoirs, exercices pour tous les niveaux en Tunisie.`,
     alternates: { canonical: 'https://examanet.com/professeurs' },
   };
