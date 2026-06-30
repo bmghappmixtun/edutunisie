@@ -15,6 +15,7 @@ import FollowButton from '@/components/social/FollowButton';
 import MessageTeacherButton from '@/components/social/MessageTeacherButton';
 import { timeAgo } from '@/lib/utils';
 import ResourceCard from '@/components/resources/ResourceCard';
+import { personSchema, breadcrumbSchema } from '@/lib/structured-data';
 
 export const dynamic = 'force-dynamic';
 
@@ -145,11 +146,42 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
   const profileUrl = `${SITE_URL}/professeurs/${teacher.id}`;
   const initials = getInitials(teacher.firstName, teacher.lastName);
 
+  // JSON-LD: Person schema + BreadcrumbList
+  const fullName = `${teacher.firstName} ${teacher.lastName}`.trim();
+  const personJsonLd = personSchema({
+    id: `${profileUrl}#person`,
+    name: fullName,
+    description: teacher.bio || `Enseignant sur Examanet — ${resources.length} ressources pédagogiques`,
+    url: profileUrl,
+    schoolName: teacher.schoolName,
+    schoolNameAr: teacher.schoolNameAr,
+    resourceCount: resources.length,
+    subjects: teachingSubjects.length > 0 ? teachingSubjects : Object.keys(bySubject),
+  });
+  const breadcrumbJsonLd = breadcrumbSchema([
+    { name: 'Accueil', url: SITE_URL },
+    { name: 'Professeurs', url: `${SITE_URL}/professeurs` },
+    { name: fullName, url: profileUrl },
+  ]);
+
   return (
     <div className="min-h-screen flex flex-col">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <Header />
 
       <main className="flex-1 pt-20">
+        {/* Visual breadcrumb (matches BreadcrumbList JSON-LD) */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+          <nav aria-label="Fil d'Ariane" className="flex items-center gap-1 text-xs text-slate-500 flex-wrap">
+            <Link href="/" className="hover:text-primary-600 transition">Accueil</Link>
+            <span className="text-slate-300">›</span>
+            <Link href="/professeurs" className="hover:text-primary-600 transition">Professeurs</Link>
+            <span className="text-slate-300">›</span>
+            <span className="text-slate-900 font-semibold truncate">{fullName}</span>
+          </nav>
+        </div>
+
         {/* Hero Header */}
         <div className="relative bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 overflow-hidden">
           <div className="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_30%_50%,rgba(245,158,11,0.15),transparent_50%)]" />

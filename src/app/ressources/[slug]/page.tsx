@@ -12,7 +12,8 @@ import ResourceInfoPanel from '@/components/resources/ResourceInfoPanel';
 import AiDescription from '@/components/resources/AiDescription';
 import { formatNumber, RESOURCE_TYPE_LABELS, HOMEWORK_SUBTYPE_LABELS } from '@/lib/utils';
 import { isArabic } from '@/lib/text-utils';
-import { Eye, Download, MessageCircle, Star, FileText, ChevronLeft, CheckCircle2, Pencil, GraduationCap, Wrench, Building2 } from 'lucide-react';
+import { courseSchema, breadcrumbSchema } from '@/lib/structured-data';
+import { Eye, Download, MessageCircle, Star, FileText, ChevronLeft, ChevronRight, CheckCircle2, Pencil, GraduationCap, Wrench, Building2 } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -109,46 +110,60 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
   // JSON-LD structured data for SEO (LearningResource schema)
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
   const resourceUrl = `${baseUrl}/ressources/${resource.slug}`;
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'LearningResource',
-    name: resource.title,
+  const courseJsonLd = courseSchema({
+    slug: resource.slug,
+    title: resource.title,
     description: resource.description || `${resource.title} — Ressource pédagogique gratuite sur Examanet`,
+    language: resource.language || 'fr',
+    level: resource.class?.nameFr || resource.class?.level?.nameFr || 'Enseignement de base',
+    cycle: (resource.headerData as any)?.cycle || resource.class?.level?.nameFr || 'Enseignement de base',
+    subject: resource.subject?.nameFr || 'Éducation',
+    type: resource.type,
+    year: resource.year,
+    teacher: resource.teacher ? `${resource.teacher.firstName} ${resource.teacher.lastName}`.trim() : null,
     url: resourceUrl,
-    inLanguage: resource.language || 'fr',
-    educationalLevel: resource.class?.nameFr || resource.class?.level?.nameFr || 'Enseignement de base',
-    learningResourceType: resource.type === 'HOMEWORK' ? 'Assessment' : 'Educational Resource',
-    audience: {
-      '@type': 'EducationalAudience',
-      educationalRole: 'student',
-    },
-    provider: {
-      '@type': 'Organization',
-      name: 'Examanet',
-      url: baseUrl,
-    },
-    creator: resource.teacher ? {
-      '@type': 'Person',
-      name: `${resource.teacher.firstName} ${resource.teacher.lastName}`,
-    } : undefined,
-    dateModified: resource.updatedAt?.toISOString(),
-    datePublished: resource.publishedAt?.toISOString(),
-    isAccessibleForFree: true,
-    keywords: [resource.subject?.nameFr, resource.class?.nameFr, resource.type, resource.year].filter(Boolean).join(', '),
-  };
+    datePublished: resource.publishedAt?.toISOString() || resource.createdAt?.toISOString(),
+    dateModified: resource.updatedAt?.toISOString() || resource.createdAt?.toISOString(),
+  });
+  const breadcrumbJsonLd = breadcrumbSchema([
+    { name: 'Accueil', url: baseUrl },
+    { name: 'Ressources', url: `${baseUrl}/ressources` },
+    ...(resource.subject ? [{ name: resource.subject.nameFr, url: `${baseUrl}/matieres/${resource.subject.slug}` }] : []),
+    ...(resource.class ? [{ name: resource.class.nameFr, url: `${baseUrl}/niveaux/${resource.class.level?.slug}?class=${resource.class.slug}` }] : []),
+    { name: resource.title, url: resourceUrl },
+  ]);
 
   return (
     <div className="min-h-screen flex flex-col">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(courseJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       <Header />
       <main className="flex-1 pt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <Link href="/ressources" className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-primary-600 mb-4">
-            <ChevronLeft className="w-4 h-4" /> Retour aux ressources
-          </Link>
+          {/* Visual breadcrumb (matches BreadcrumbList JSON-LD) */}
+          <nav aria-label="Fil d'Ariane" className="flex items-center gap-1 text-xs text-slate-500 mb-4 flex-wrap">
+            <Link href="/" className="hover:text-primary-600 transition">Accueil</Link>
+            <ChevronRight className="w-3 h-3 text-slate-300" />
+            <Link href="/ressources" className="hover:text-primary-600 transition">Ressources</Link>
+            {resource.subject && (
+              <>
+                <ChevronRight className="w-3 h-3 text-slate-300" />
+                <Link href={`/matieres/${resource.subject.slug}`} className="hover:text-primary-600 transition">{resource.subject.nameFr}</Link>
+              </>
+            )}
+            {resource.class && (
+              <>
+                <ChevronRight className="w-3 h-3 text-slate-300" />
+                <Link href={`/niveaux/${resource.class.level?.slug}`} className="hover:text-primary-600 transition">{resource.class.nameFr}</Link>
+              </>
+            )}
+          </nav>
 
           <div className="grid lg:grid-cols-[1fr_360px] gap-6">
             {/* MAIN */}
