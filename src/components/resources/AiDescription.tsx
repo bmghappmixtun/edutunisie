@@ -65,7 +65,7 @@ const LABELS_FR: Record<string, string[]> = {
   type: ['Type'],
   exercises: ['Exercices', 'Exercice'],
   summary: ['Résumé', 'Description', 'Aperçu', 'Contenu'],
-  concepts: ['Concepts', 'Notions clés', 'Points clés'],
+  concepts: ['Concepts', 'Concepts/Maîtrise', 'Notions clés', 'Points clés', 'Compétences'],
 };
 
 /**
