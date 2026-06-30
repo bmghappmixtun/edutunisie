@@ -6,7 +6,7 @@ import Footer from '@/components/layout/Footer';
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-  title: 'CGU — Conditions Générales d\'Utilisation — Examanet',
+  title: 'CGU — Conditions Générales d\'Utilisation',
   description: 'Conditions générales d\'utilisation de la plateforme Examanet'
 };
 

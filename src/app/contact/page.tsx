@@ -6,7 +6,7 @@ import ContactForm from '@/components/contact/ContactForm';
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-  title: 'Contact — Examanet',
+  title: 'Contact',
   description: 'Contactez l\'équipe Examanet. Une question, un bug, une suggestion ? Nous vous répondons sous 24-48h.'
 };
 

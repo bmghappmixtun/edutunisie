@@ -8,7 +8,7 @@ import { prisma } from '@/lib/prisma';
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-  title: 'Recherche — Examanet',
+  title: 'Recherche',
   description: 'Recherchez parmi des milliers de ressources pédagogiques gratuites : cours, devoirs, exercices, sujets de bac et corrigés.'
 };
 
