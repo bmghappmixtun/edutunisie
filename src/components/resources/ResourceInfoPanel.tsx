@@ -58,12 +58,7 @@ export default function ResourceInfoPanel({ resource }: { resource: any }) {
         {/* CLASSE */}
         {resource.class && (
           <Row icon={<GraduationCap className="w-4 h-4" />} label="Classe">
-            <span className="font-semibold text-slate-900">
-              {resource.class.nameFr}
-              {resource.class.level && (
-                <span className="text-xs text-slate-500 ml-1">({resource.class.level.nameFr})</span>
-              )}
-            </span>
+            <span className="font-semibold text-slate-900">{resource.class.nameFr}</span>
           </Row>
         )}
 
