@@ -310,7 +310,7 @@ export default function AiDescription({ text, source, language, className = '', 
             <ScrollText className="w-4 h-4 mt-1 flex-shrink-0 text-violet-600" />
             <div
               dir="auto"
-              style={{ unicodeBidi: 'isolate' }}
+              style={{ unicodeBidi: 'isolate', whiteSpace: 'pre-wrap' }}
               className={`flex-1 text-sm text-slate-700 leading-relaxed ${isRtl ? 'text-right' : 'text-left'}`}
             >
               {summary}
