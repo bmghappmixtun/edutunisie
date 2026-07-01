@@ -6,18 +6,28 @@
  * "concours 9ème" components MUST read from this file.
  *
  * ARCHITECTURE (future-proof):
- * - `getConcours9emeFiles()` reads the Vercel Blob manifest from /workspace/docs
+ * - `getConcours9emeFiles()` reads the static manifest from /public/data
  * - The pillar dynamically lists all available files per year × subject × voie × type
- * - Adding new corrigés = update the manifest + redeploy (no code change)
+ * - Adding new corrigés = update /public/data/concours-9eme-manifest.json + redeploy
  *
- * @see /workspace/docs/concours-9eme-blob-manifest.json
+ * For client components, use the same fetch URL via /data/concours-9eme-manifest.json
+ * Server components can call the helpers below directly.
+ *
+ * @see /public/data/concours-9eme-manifest.json
+ * @see /workspace/docs/concours-9eme-blob-manifest.json (workspace source)
  */
 
 import fs from 'node:fs';
 import path from 'node:path';
 
 const BLOB_BASE_URL = 'https://kmy1h6us8l7bg7bg.public.blob.vercel-storage.com';
-const MANIFEST_PATH = '/workspace/docs/concours-9eme-blob-manifest.json';
+
+// Try multiple manifest paths (server-side vs public)
+const MANIFEST_PATHS = [
+  path.join(process.cwd(), 'public', 'data', 'concours-9eme-manifest.json'),
+  '/workspace/docs/concours-9eme-blob-manifest.json',
+  path.join(process.cwd(), 'data', 'concours-9eme-manifest.json'),
+];
 
 export type ConcoursFile = {
   key: string;
@@ -34,86 +44,30 @@ export type ConcourStats = {
   totalCorriges: number;
   totalCorriges2020Plus: number;
   years: number[];
-  yearsAvailable: string[]; // 2001-2026 minus 2014
+  yearsAvailable: string[];
   voies: Array<'general' | 'technique'>;
   sources: Array<{ name: string; count: number }>;
   gold2020Corrige: ConcoursFile | null;
 };
 
 export type ConcourSubject = {
-  slug: string; // 'math', 'arabe', etc.
+  slug: string;
   nameFr: string;
   nameAr: string;
   icon: string;
-  color: string; // tailwind/text color
-  bgColor: string; // bg color
+  color: string;
+  bgColor: string;
   descFr: string;
 };
 
 export const CONCOURS_SUBJECTS: ConcourSubject[] = [
-  {
-    slug: 'math',
-    nameFr: 'Mathématiques',
-    nameAr: 'الرياضيات',
-    icon: '📐',
-    color: 'text-blue-600',
-    bgColor: 'bg-blue-50',
-    descFr: 'Algèbre, géométrie, fonctions, statistiques',
-  },
-  {
-    slug: 'arabe',
-    nameFr: 'Arabe',
-    nameAr: 'العربية',
-    icon: '📚',
-    color: 'text-amber-600',
-    bgColor: 'bg-amber-50',
-    descFr: 'قواعد، بلاغة، تعبير، قراءة',
-  },
-  {
-    slug: 'francais',
-    nameFr: 'Français',
-    nameAr: 'الفرنسية',
-    icon: '📖',
-    color: 'text-rose-600',
-    bgColor: 'bg-rose-50',
-    descFr: 'Grammaire, conjugaison, rédaction, lecture',
-  },
-  {
-    slug: 'svt',
-    nameFr: 'Sciences de la Vie et de la Terre',
-    nameAr: 'علوم الحياة والأرض',
-    icon: '🧬',
-    color: 'text-emerald-600',
-    bgColor: 'bg-emerald-50',
-    descFr: 'Biologie, géologie, écologie',
-  },
-  {
-    slug: 'physique',
-    nameFr: 'Physique',
-    nameAr: 'علوم فيزيائية',
-    icon: '⚛️',
-    color: 'text-purple-600',
-    bgColor: 'bg-purple-50',
-    descFr: 'Mécanique, électricité, optique',
-  },
-  {
-    slug: 'anglais',
-    nameFr: 'Anglais',
-    nameAr: 'الإنجليزية',
-    icon: '🌍',
-    color: 'text-cyan-600',
-    bgColor: 'bg-cyan-50',
-    descFr: 'Grammar, vocabulary, comprehension',
-  },
-  {
-    slug: 'histoire',
-    nameFr: 'Histoire-Géographie',
-    nameAr: 'التاريخ والجغرافيا',
-    icon: '🏛️',
-    color: 'text-violet-600',
-    bgColor: 'bg-violet-50',
-    descFr: 'Histoire, géographie, éducation civique',
-  },
+  { slug: 'math', nameFr: 'Mathématiques', nameAr: 'الرياضيات', icon: '📐', color: 'text-blue-600', bgColor: 'bg-blue-50', descFr: 'Algèbre, géométrie, fonctions, statistiques' },
+  { slug: 'arabe', nameFr: 'Arabe', nameAr: 'العربية', icon: '📚', color: 'text-amber-600', bgColor: 'bg-amber-50', descFr: 'قواعد، بلاغة، تعبير، قراءة' },
+  { slug: 'francais', nameFr: 'Français', nameAr: 'الفرنسية', icon: '📖', color: 'text-rose-600', bgColor: 'bg-rose-50', descFr: 'Grammaire, conjugaison, rédaction, lecture' },
+  { slug: 'svt', nameFr: 'Sciences de la Vie et de la Terre', nameAr: 'علوم الحياة والأرض', icon: '🧬', color: 'text-emerald-600', bgColor: 'bg-emerald-50', descFr: 'Biologie, géologie, écologie' },
+  { slug: 'physique', nameFr: 'Physique', nameAr: 'علوم فيزيائية', icon: '⚛️', color: 'text-purple-600', bgColor: 'bg-purple-50', descFr: 'Mécanique, électricité, optique' },
+  { slug: 'anglais', nameFr: 'Anglais', nameAr: 'الإنجليزية', icon: '🌍', color: 'text-cyan-600', bgColor: 'bg-cyan-50', descFr: 'Grammar, vocabulary, comprehension' },
+  { slug: 'histoire', nameFr: 'Histoire-Géographie', nameAr: 'التاريخ والجغرافيا', icon: '🏛️', color: 'text-violet-600', bgColor: 'bg-violet-50', descFr: 'Histoire, géographie, éducation civique' },
 ];
 
 export const CONCOURS_VOIES = [
@@ -122,28 +76,22 @@ export const CONCOURS_VOIES = [
 ] as const;
 
 let _manifest: any = null;
-let _manifestMtime = 0;
 
 function loadManifest(): any {
-  // Read at runtime; cache but re-read if file mtime changes
-  try {
-    const stat = fs.statSync(MANIFEST_PATH);
-    if (_manifest && _manifestMtime === stat.mtimeMs) {
+  if (_manifest) return _manifest;
+  for (const p of MANIFEST_PATHS) {
+    try {
+      const raw = fs.readFileSync(p, 'utf-8');
+      _manifest = JSON.parse(raw);
       return _manifest;
+    } catch (e) {
+      // continue trying
     }
-    const raw = fs.readFileSync(MANIFEST_PATH, 'utf-8');
-    _manifest = JSON.parse(raw);
-    _manifestMtime = stat.mtimeMs;
-    return _manifest;
-  } catch (e) {
-    console.error('[concours-9eme-data] failed to load manifest:', e);
-    return { uploaded: [], failed: [], namespaces: {} };
   }
+  console.error('[concours-9eme-data] failed to load manifest from any path');
+  return { uploaded: [], failed: [], namespaces: {} };
 }
 
-/**
- * Get ALL Concours 9ème files from the manifest.
- */
 export function getConcours9emeFiles(): ConcoursFile[] {
   const m = loadManifest();
   return (m.uploaded || []).map((u: any) => ({
@@ -156,9 +104,6 @@ export function getConcours9emeFiles(): ConcoursFile[] {
   }));
 }
 
-/**
- * Get corrigés only (type includes 'corrig' or 'sujets+correction' or 'correction').
- */
 export function getCorriges(): ConcoursFile[] {
   return getConcours9emeFiles().filter((f) => {
     const parts = f.key.split('/');
@@ -167,10 +112,6 @@ export function getCorriges(): ConcoursFile[] {
   });
 }
 
-/**
- * Get corrigés 2020+ (gold tier, SEO priority).
- * If empty, returns []. UI should show "Plus de corrigés à venir" placeholder.
- */
 export function getCorriges2020Plus(): ConcoursFile[] {
   return getCorriges().filter((f) => {
     const parts = f.key.split('/');
@@ -179,9 +120,6 @@ export function getCorriges2020Plus(): ConcoursFile[] {
   });
 }
 
-/**
- * Group files by year → voie → subject → { sujet, corrige }
- */
 export type YearGroup = {
   year: number;
   voies: {
@@ -189,7 +127,7 @@ export type YearGroup = {
       [subject: string]: {
         sujet?: ConcoursFile;
         corrige?: ConcoursFile;
-        sujetPlusCorrige?: ConcoursFile; // for combo files like "sujets+correction"
+        sujetPlusCorrige?: ConcoursFile;
       };
     };
   };
@@ -222,21 +160,16 @@ export function groupByYear(): YearGroup[] {
   return Object.values(grouped).sort((a, b) => b.year - a.year);
 }
 
-/**
- * Stats: counts, gold corrigé, sources, etc.
- */
 export function getConcoursStats(): ConcourStats {
   const files = getConcours9emeFiles();
   const corriges2020Plus = getCorriges2020Plus();
   const allCorriges = getCorriges();
 
-  // Sources
   const sourcesMap: Record<string, number> = {};
   for (const f of files) {
     if (f.source) sourcesMap[f.source] = (sourcesMap[f.source] || 0) + 1;
   }
 
-  // Years available (sort, exclude 2014 since 9web has nothing for 2014)
   const years = Array.from(new Set(files.map((f) => parseInt(f.key.split('/')[2] || '0', 10))))
     .filter((y) => y > 0)
     .sort((a, b) => a - b);
@@ -254,24 +187,15 @@ export function getConcoursStats(): ConcourStats {
   };
 }
 
-/**
- * Human-friendly subject display name.
- */
 export function getSubjectMeta(slug: string): ConcourSubject | null {
   return CONCOURS_SUBJECTS.find((s) => s.slug === slug) || null;
 }
 
-/**
- * Future-proofing: returns a placeholder structure for years/subjects that
- * have NO corrigés yet. Used by the Pillar to render "Plus de corrigés à venir" cards.
- */
 export function getUpcomingCorriges(): Array<{
   year: number;
   subject: string;
   status: 'placeholder';
 }> {
-  // Years 2020-2026: 7 years × 6 subjects = 42 placeholders max
-  // We can show a representative subset to keep the page compact
   const placeholders: Array<{ year: number; subject: string; status: 'placeholder' }> = [];
   const recentYears = [2026, 2025, 2024, 2023, 2022, 2021, 2020];
   const coreSubjects = ['math', 'francais', 'arabe', 'svt', 'physique', 'anglais'];
@@ -287,5 +211,5 @@ export function getUpcomingCorriges(): Array<{
       }
     }
   }
-  return placeholders.slice(0, 6); // Show 6 representative placeholders
+  return placeholders.slice(0, 6);
 }
