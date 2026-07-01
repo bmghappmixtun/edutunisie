@@ -2,6 +2,10 @@ import Link from 'next/link';
 import { Clock, Mail, ArrowLeft, CheckCircle2 } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
+export const metadata = {
+  robots: { index: false, follow: false },
+  title: 'En attente d\'approbation',
+};
 
 export default function EnAttentePage() {
   return (
