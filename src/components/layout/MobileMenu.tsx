@@ -47,6 +47,7 @@ export default function MobileMenu({ user }: { user: any }) {
             <nav className="p-2">
               <Link href="/ressources" onClick={() => setOpen(false)} className="block px-4 py-3 hover:bg-slate-50 rounded-lg font-medium">Ressources</Link>
               <Link href="/college" onClick={() => setOpen(false)} className="block px-4 py-3 hover:bg-slate-50 rounded-lg font-medium">Collège</Link>
+              <Link href="/concours-9eme-tunisie" onClick={() => setOpen(false)} className="block px-4 py-3 hover:bg-amber-50 rounded-lg font-medium bg-amber-50/50">🎯 Concours 9ème</Link>
               <Link href="/niveaux" onClick={() => setOpen(false)} className="block px-4 py-3 hover:bg-slate-50 rounded-lg font-medium">Niveaux</Link>
               <Link href="/matieres" onClick={() => setOpen(false)} className="block px-4 py-3 hover:bg-slate-50 rounded-lg font-medium">Matières</Link>
               <Link href="/professeurs" onClick={() => setOpen(false)} className="block px-4 py-3 hover:bg-slate-50 rounded-lg font-medium">Professeurs</Link>
