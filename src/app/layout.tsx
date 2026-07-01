@@ -78,6 +78,8 @@ export const metadata: Metadata = {
     'format-detection': 'telephone=no',
     // Google Search Console verification (added 2026-07-01)
     'google-site-verification': 'GXE5A9gq9-K7q7IztCatkSHhYrgtWWBbPloJymofPUY',
+    // Bing Webmaster Tools verification (added 2026-07-02)
+    'msvalidate.01': 'C04AC04227DB04DAC96552F4A27BCD73',
   },
 };
 
@@ -97,6 +99,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Cairo:wght@300;400;600;700;900&family=Nunito:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
         {/* Explicit Google site verification meta tag (HTML tag verification) */}
         <meta name="google-site-verification" content="GXE5A9gq9-K7q7IztCatkSHhYrgtWWBbPloJymofPUY" />
+        {/* Bing Webmaster Tools verification meta tag (HTML tag verification) */}
+        <meta name="msvalidate.01" content="C04AC04227DB04DAC96552F4A27BCD73" />
       </head>
       <body>
         <I18nProviderWrapper>{children}</I18nProviderWrapper>
