@@ -76,6 +76,8 @@ export const metadata: Metadata = {
     'apple-mobile-web-app-title': 'Examanet',
     'mobile-web-app-capable': 'yes',
     'format-detection': 'telephone=no',
+    // Google Search Console verification (added 2026-07-01)
+    'google-site-verification': 'GXE5A9gq9-K7q7IztCatkSHhYrgtWWBbPloJymofPUY',
   },
 };
 
@@ -93,6 +95,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Cairo:wght@300;400;600;700;900&family=Nunito:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
+        {/* Explicit Google site verification meta tag (HTML tag verification) */}
+        <meta name="google-site-verification" content="GXE5A9gq9-K7q7IztCatkSHhYrgtWWBbPloJymofPUY" />
       </head>
       <body>
         <I18nProviderWrapper>{children}</I18nProviderWrapper>
