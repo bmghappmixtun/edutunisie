@@ -474,7 +474,7 @@ export default function Concours9emePillar() {
               {METHODOLOGIE.map((m) => (
                 <div
                   key={m.subject}
-                  className={`bg-white rounded-2xl p-6 border-l-4 ${m.colorClass} shadow-sm hover:shadow-md transition`}
+                  className={`bg-white rounded-2xl p-6 ${locale === 'ar' ? 'border-r-4' : 'border-l-4'} ${m.colorClass} shadow-sm hover:shadow-md transition`}
                 >
                   <div className="flex items-center gap-3 mb-4">
                     <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl ${m.iconBg}`}>
@@ -493,7 +493,11 @@ export default function Concours9emePillar() {
                     {m.points.map((p, i) => {
                       const isAr = /[\u0600-\u06FF]/.test(p);
                       return (
-                        <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
+                        <li
+                          key={i}
+                          dir={isAr ? 'rtl' : 'ltr'}
+                          className="flex items-start gap-2 text-sm text-slate-700"
+                        >
                           <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
                           <span
                             dir={isAr ? 'rtl' : 'ltr'}
