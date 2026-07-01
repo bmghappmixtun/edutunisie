@@ -542,5 +542,217 @@
     "searchInResources": "Ressources",
     "searchInTeachers": "Professeurs",
     "searchInSubjects": "Matières"
+  },
+  "concours": {
+    "meta": {
+      "title": "Concours 9ème Tunisie 2027 — Sujets + Corrigés depuis 2001 | Examanet",
+      "description": "🎓 Prépare le concours 9ème année en Tunisie : +{total} sujets et corrigés (math, arabe, français, SVT, physique, anglais) depuis 2001. Méthodologie, calendrier 2027, voies générale & technique. 100% gratuit."
+    },
+    "breadcrumb": {
+      "concours9eme": "Concours 9ème",
+      "sujetsPasses": "Sujets & corrigés"
+    },
+    "hero": {
+      "badge": "مناظرة ختم التعليم الأساسي — Session 2027",
+      "titleMain": "Concours {highlight}9ème année Tunisie",
+      "titleSub": "Sujets & corrigés depuis 2001",
+      "description": "Prépare le {strong}concours national de la 9ème année de base{strongEnd} avec {strongHighlight}+{total} PDF{strongHighlightEnd} collectés depuis 2001 : sujets officiels, corrigés, méthodologie par matière, calendrier 2027 et conseils d'orientation.",
+      "descriptionAr": "تحضير لمناظرة السنة التاسعة أساسي في تونس — مواضيع رسمية + إصلاحات + منهجية",
+      "ctaSujets": "Voir les sujets",
+      "ctaMethodo": "Méthodologie par matière",
+      "stats": {
+        "pdf": "PDF disponibles",
+        "years": "Années (2001-2026)",
+        "corriges": "Corrigés",
+        "matieres": "Matières",
+        "voies": "Voies (Générale/Technique)"
+      }
+    },
+    "about": {
+      "title": "Le concours qui决定 ton avenir scolaire",
+      "p1": "Le {strong}concours de la 9ème année de base{strongEnd} (أو {ar}مناظرة ختم التعليم الأساسي{arEnd}) est l'examen national qui marque la fin de l'{strong}enseignement de base{strongEnd} en Tunisie. Il se déroule chaque année en {strong}juin{strongEnd} et ouvre la porte vers le {strong}lycée{strongEnd}.",
+      "p2": "Depuis {strong}2001{strongEnd}, le Ministère de l'Éducation publie annuellement les sujets du concours. Examanet centralise {strong}25 ans d'archives{strongEnd} pour t'aider à réviser efficacement, avec un accent particulier sur les {strong}sujets et corrigés 2017-2026{strongEnd} (programme actuel).",
+      "p3": "Sur cette page, tu trouveras : {strong}tous les sujets depuis 2001{strongEnd}, les corrigés collectés auprès d'enseignants, une {strong}méthodologie par matière{strongEnd}, le{strong} calendrier 2027{strongEnd} et un comparateur {strong}générale vs technique{strongEnd}.",
+      "features": {
+        "f1t": "25 ans de sujets (2001-2026)",
+        "f1d": "Archives complètes du Ministère de l'Éducation tunisien",
+        "f2t": "{count} corrigés détaillés",
+        "f2d": "Vérifiés par des enseignants tunisiens",
+        "f3t": "Focus 2027 (programme actuel)",
+        "f3d": "Méthodologie alignée sur les épreuves récentes",
+        "f4t": "Bilingue FR + AR",
+        "f4d": "Supports adaptés aux deux langues d'enseignement",
+        "f5t": "Mise à jour continue",
+        "f5d": "Plus de corrigés 2020+ ajoutés régulièrement",
+        "f6t": "100% gratuit",
+        "f6d": "Accès libre, sans inscription, sans publicité"
+      }
+    },
+    "subjects": {
+      "title": "Toutes les matières du concours",
+      "subtitle": "6 matières évaluées chaque année — clique sur la tienne pour voir les sujets et corrigés."
+    },
+    "methodology": {
+      "title": "Méthodologie par matière",
+      "subtitle": "Les {strong}points clés{strongEnd} à maîtriser pour chaque matière.",
+      "subtitleAr": "المنهجية لكل مادة"
+    },
+    "pyramid": {
+      "title": "Pyramide de révision",
+      "subtitle": "Suis cette progression pour {strong}maximiser tes chances de réussite{strongEnd} au concours 9ème 2027.",
+      "levels": {
+        "l1": "1. Relire les cours + formules",
+        "l2": "2. Maîtriser les exercices d'application",
+        "l3": "3. Sujets d'années précédentes (2020-2023)",
+        "l4": "4. Sujets récents (2024-2026) en conditions réelles",
+        "l5": "5. Concours blanc final (mai 2027)"
+      },
+      "tipTitle": "💡 Conseil de pro",
+      "tipDesc": "Ne néglige {strong}aucune matière{strongEnd} : le classement final prend en compte la moyenne générale, pas seulement les notes individuelles. Une note faible en SVT peut être compensée par une note élevée en Math, et vice-versa."
+    },
+    "calendar": {
+      "title": "Les grandes étapes du concours 2027",
+      "subtitle": "Note ces dates dans ton agenda et prépare-toi {strong}3 mois à l'avance{strongEnd}.",
+      "events": {
+        "inscription": {
+          "date": "Mars 2027",
+          "event": "Inscriptions au concours 9ème"
+        },
+        "announcement": {
+          "date": "Avril 2027",
+          "event": "Publication des dates officielles"
+        },
+        "revision": {
+          "date": "Mai 2027",
+          "event": "Révisions intensives + Concours blancs"
+        },
+        "exam": {
+          "date": "Début juin 2027",
+          "event": "Épreuves écrites du concours"
+        },
+        "results": {
+          "date": "Mi-juin 2027",
+          "event": "Publication des résultats"
+        },
+        "orientation": {
+          "date": "Juillet 2027",
+          "event": "Orientation vers le lycée"
+        }
+      }
+    },
+    "comparison": {
+      "title": "Voie générale vs Voie technique",
+      "subtitle": "Comprendre la différence pour {strong}mieux choisir{strongEnd} selon ton projet d'orientation.",
+      "general": {
+        "title": "Voie Générale",
+        "subtitle": "الشعبة العامة",
+        "desc": "Orientée vers les {strong}lycées généraux{strongEnd} et les classes de 1ère année (sciences, lettres, économie). Idéale si tu envisages des études longues.",
+        "epreuvesTitle": "📚 Épreuves"
+      },
+      "technique": {
+        "title": "Voie Technique",
+        "subtitle": "الشعبة التقنية",
+        "desc": "Orientée vers les {strong}lycées techniques{strongEnd} et les formations professionnelles. Parfaite si tu aimes la technologie, l'électronique ou la mécanique.",
+        "epreuvesTitle": "📚 Épreuves"
+      }
+    },
+    "gold": {
+      "badge": "⭐ Corrigés Gold 2020+",
+      "title": "Corrigés des sessions récentes",
+      "subtitle": "Les corrigés des concours {strong}2020 et après{strongEnd} (les plus alignés sur le programme 2027).",
+      "subtitleAr": "إصلاحات الدورات الأخيرة",
+      "placeholderTitle": "Plus de corrigés à venir",
+      "placeholderDesc": "Nous collectons activement des corrigés auprès d'enseignants tunisiens. Voici les prochains que nous prévoyons d'ajouter :",
+      "placeholderSoon": "Bientôt disponible",
+      "corrigeLabel": "Corrigé {subject} {year}",
+      "download": "Télécharger le PDF"
+    },
+    "list": {
+      "title": "Aperçu : Les 10 dernières années",
+      "subtitle": "Pour accéder à {strong}tous les sujets depuis 2001{strongEnd}, rends-toi sur la page dédiée.",
+      "ctaAll": "Voir TOUS les sujets depuis 2001",
+      "yearFiles": "{count} fichier(s) disponible(s)"
+    },
+    "faq": {
+      "title": "Questions fréquentes — Concours 9ème",
+      "items": [
+        {
+          "q": "C'est quoi le concours 9ème année en Tunisie ?",
+          "a": "Le concours de la 9ème année (أو مناظرة ختم التعليم الأساسي) est l'examen national de fin d'enseignement de base. Il a lieu chaque année en juin et couvre 6 matières : Mathématiques, Arabe, Français, SVT, Physique (technique) et Anglais. Les élèves choisissent entre la voie générale et la voie technique."
+        },
+        {
+          "q": "Quand aura lieu le concours 9ème 2027 ?",
+          "a": "Le concours 9ème 2027 devrait se tenir début juin 2027 (les dates exactes sont publiées par le Ministère de l'Éducation en avril). Les inscriptions se font généralement en mars."
+        },
+        {
+          "q": "Quelle est la différence entre voie générale et voie technique ?",
+          "a": "La voie générale couvre l'arabe, le français, les mathématiques, les SVT, l'histoire-géo et l'anglais. La voie technique ajoute la physique technique et l'éducation technologique à la place de certaines matières. Le choix se fait en 9ème année en fonction du projet d'orientation."
+        },
+        {
+          "q": "Comment réviser efficacement le concours 9ème ?",
+          "a": "1) Fais les sujets des 5 dernières années (2022-2026) en conditions réelles (chrono 2h, sans aide). 2) Vérifie tes réponses avec les corrigés. 3) Identifie tes lacunes par matière et refais les exercices ratés. 4) Programme 1h de révision par jour pendant les 3 derniers mois."
+        },
+        {
+          "q": "Les corrigés sont-ils gratuits ?",
+          "a": "Oui, tous les corrigés disponibles sur Examanet sont 100% gratuits. Pour les concours 2020+, certains corrigés sont encore en cours de collecte auprès des enseignants et seront ajoutés progressivement à la page /sujets-passes."
+        },
+        {
+          "q": "D'où viennent les sujets et corrigés ?",
+          "a": "Les sujets sont collectés depuis le portail officiel du Ministère de l'Éducation (9web.edunet.tn) et le site éducatif 9raya.tn. Les corrigés proviennent de sources tunisiennes vérifiées (enseignants contributeurs, sites spécialisés)."
+        },
+        {
+          "q": "Y a-t-il des épreuves pour la voie technique ?",
+          "a": "Oui, depuis 2017 le concours propose la voie technique avec une épreuve de Physique technique. Sur Examanet, tu trouveras les sujets 2017-2026 pour les deux voies (générale et technique)."
+        },
+        {
+          "q": "Que se passe-t-il après le concours 9ème ?",
+          "a": "À l'issue du concours, les élèves sont orientés vers le lycée selon leur moyenne et leur voie. Les meilleurs résultats ouvrent l'accès aux lycées pilotes et aux classes de 1ère année secondaire (générale ou technique)."
+        }
+      ]
+    },
+    "cta": {
+      "title": "Prêt à réussir le concours 9ème 2027 ?",
+      "subtitle": "Télécharge les sujets, suis la méthodologie, et atteins le lycée de tes rêves.",
+      "btn1": "Télécharger les sujets",
+      "btn2": "Toutes les ressources 9ème"
+    },
+    "passes": {
+      "title": "Sujets & Corrigés du {highlight}Concours 9ème",
+      "backToPillar": "Retour au pillar",
+      "statSujets": "{count} sujets",
+      "statCorriges": "{count} corrigés",
+      "statGold": "⭐ {count} corrigés 2020+",
+      "filters": {
+        "search": "Rechercher (ex: math 2024, svt 2020, corrigé...)",
+        "allYears": "Toutes années",
+        "allMatieres": "Toutes matières",
+        "allVoies": "Toutes voies",
+        "allTypes": "Sujets + Corrigés",
+        "sujetsOnly": "Sujets seulement",
+        "corrigesOnly": "Corrigés seulement",
+        "voieGenerale": "🎓 Générale",
+        "voieTechnique": "🔧 Technique"
+      },
+      "actions": {
+        "reset": "Réinitialiser",
+        "expandAll": "Tout ouvrir",
+        "collapseAll": "Tout fermer",
+        "resultCount": "<bold>{count}</bold> résultat(s) sur {total} fichiers",
+        "totalCount": "<bold>{total}</bold> fichiers au total — {years} années couvertes"
+      },
+      "noResults": {
+        "title": "Aucun fichier trouvé",
+        "desc": "Aucun sujet ou corrigé ne correspond à tes critères. Essaie de modifier les filtres.",
+        "btn": "Réinitialiser les filtres"
+      },
+      "cards": {
+        "sujet": "Sujet",
+        "corrige": "Corrigé",
+        "sujetCorrige": "Sujet + Corrigé",
+        "voieGenerale": "Voie générale",
+        "voieTechnique": "Voie technique",
+        "yearHeader": "Concours 9ème {year}"
+      }
+    }
   }
 }
