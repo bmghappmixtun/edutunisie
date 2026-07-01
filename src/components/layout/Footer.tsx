@@ -47,6 +47,7 @@ export default function Footer() {
             <ul className="space-y-2 text-sm">
               <li><Link href="/ressources?type=COURSE" className="hover:text-primary-400 transition"><T k="resource.type" /></Link></li>
               <li><Link href="/college" className="hover:text-primary-400 transition">Collège</Link></li>
+              <li><Link href="/concours-9eme-tunisie" className="hover:text-primary-400 transition">🎯 Concours 9ème</Link></li>
               <li><Link href="/ressources?type=BAC_SUBJECT" className="hover:text-primary-400 transition">Sujets Bac</Link></li>
               <li><Link href="/ressources?type=CORRECTION" className="hover:text-primary-400 transition">Corrigés</Link></li>
               <li><Link href="/faq" className="hover:text-primary-400 transition">FAQ</Link></li>
