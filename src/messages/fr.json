@@ -545,7 +545,7 @@
   },
   "concours": {
     "meta": {
-      "title": "Concours 9ème Tunisie 2027 — {total} Sujets + Corrigés PDF depuis 2001",
+      "title": "Concours 9ème Tunisie 2027 — {total} Sujets et Corrigés",
       "description": "🎓 Prépare le concours 9ème année en Tunisie : +{total} sujets et corrigés (math, arabe, français, SVT, physique, anglais) depuis 2001. Méthodologie, calendrier 2027, voies générale & technique. 100% gratuit."
     },
     "breadcrumb": {
@@ -554,7 +554,7 @@
     },
     "hero": {
       "badge": "مناظرة ختم التعليم الأساسي — Session 2027",
-      "titleMain": "Concours {highlight}9ème année Tunisie",
+      "titleMain": "Concours {highlight}9ème Tunisie",
       "titleSub": "Sujets & corrigés depuis 2001",
       "description": "Prépare le {strong}concours national de la 9ème année de base{strongEnd} avec {strongHighlight}+{total} PDF{strongHighlightEnd} collectés depuis 2001 : sujets officiels, corrigés, méthodologie par matière, calendrier 2027 et conseils d'orientation.",
       "descriptionAr": "تحضير لمناظرة السنة التاسعة أساسي في تونس — مواضيع رسمية + إصلاحات + منهجية",
@@ -717,7 +717,7 @@
       "btn2": "Toutes les ressources 9ème"
     },
     "passes": {
-      "title": "Sujets & Corrigés Concours 9ème Tunisie depuis 2001 ({total} fichiers)",
+      "title": "Sujets et Corrigés Concours 9ème Tunisie ({total} fichiers)",
       "backToPillar": "Retour au pillar",
       "statSujets": "{count} sujets",
       "statCorriges": "{count} corrigés",
