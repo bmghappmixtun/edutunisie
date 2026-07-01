@@ -78,6 +78,7 @@ export async function generateMetadata(): Promise<Metadata> {
 // ============================================================================
 export default function Concours9emePillar() {
   const t = getT();
+  const locale = getLocale();
   const stats = getConcoursStats();
   const corriges2020Plus = getCorriges2020Plus();
   const upcoming = getUpcomingCorriges();
@@ -436,8 +437,17 @@ export default function Concours9emePillar() {
                     </div>
                     <ArrowRight className="w-5 h-5 text-slate-300 group-hover:text-primary-600 group-hover:translate-x-1 transition-all" />
                   </div>
-                  <h3 className="font-bold text-lg mb-1 text-slate-900 group-hover:text-primary-600 transition">{m.nameFr}</h3>
-                  <p dir="rtl" className="text-sm text-slate-500 mb-2">{m.nameAr}</p>
+                  {locale === 'ar' ? (
+                    <>
+                      <h3 dir="rtl" className="font-bold text-lg mb-1 text-slate-900 group-hover:text-primary-600 transition text-right">{m.nameAr}</h3>
+                      <p className="text-sm text-slate-500 mb-2">{m.nameFr}</p>
+                    </>
+                  ) : (
+                    <>
+                      <h3 className="font-bold text-lg mb-1 text-slate-900 group-hover:text-primary-600 transition">{m.nameFr}</h3>
+                      <p dir="rtl" className="text-sm text-slate-500 mb-2">{m.nameAr}</p>
+                    </>
+                  )}
                   <p className="text-xs text-slate-500">{m.descFr}</p>
                 </Link>
               ))}
@@ -471,8 +481,12 @@ export default function Concours9emePillar() {
                       {m.icon}
                     </div>
                     <div>
-                      <h3 className="font-bold text-lg text-slate-900">{m.titleFr}</h3>
-                      <p dir="rtl" className="text-xs text-slate-500">{m.titleAr}</p>
+                      <h3 className={`font-bold text-lg text-slate-900 ${locale === 'ar' ? 'text-right' : ''}`} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+                        {locale === 'ar' ? m.titleAr : m.titleFr}
+                      </h3>
+                      <p className="text-xs text-slate-500" dir={locale === 'ar' ? 'ltr' : 'rtl'}>
+                        {locale === 'ar' ? m.titleFr : m.titleAr}
+                      </p>
                     </div>
                   </div>
                   <ul className="space-y-2">
@@ -654,7 +668,7 @@ export default function Concours9emePillar() {
                         <span className="text-xs font-bold text-amber-700 bg-amber-100 rounded-full px-3 py-1">{year}</span>
                       </div>
                       <h3 className="font-bold text-lg text-slate-900 mb-1 group-hover:text-amber-700 transition">
-                        {t('concours.gold.corrigeLabel').replace('{subject}', subjectMeta?.nameFr || subject).replace('{year}', year)}
+                        {t('concours.gold.corrigeLabel').replace('{subject}', (locale === 'ar' ? subjectMeta?.nameAr : subjectMeta?.nameFr) || subject).replace('{year}', year)}
                       </h3>
                       <p className="text-xs text-slate-500 mb-3">{f.note || 'Sujet + corrigé combo'}</p>
                       <div className="flex items-center gap-2 text-sm font-semibold text-amber-700">
@@ -680,8 +694,8 @@ export default function Concours9emePillar() {
                       <div key={i} className="bg-white rounded-lg p-3 border border-slate-200 flex items-center gap-2">
                         <span className="text-xl opacity-50">{meta?.icon || '📄'}</span>
                         <div className="flex-1 min-w-0">
-                          <div className="text-sm font-medium text-slate-700 truncate">
-                            {meta?.nameFr || u.subject} {u.year}
+                          <div className="text-sm font-medium text-slate-700 truncate" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+                            {(locale === 'ar' ? meta?.nameAr : meta?.nameFr) || u.subject} {u.year}
                           </div>
                           <div className="text-xs text-slate-500">{t('concours.gold.placeholderSoon')}</div>
                         </div>
@@ -741,8 +755,8 @@ export default function Concours9emePillar() {
                             const meta = getSubjectMeta(subject);
                             return (
                               <div key={`${voie}-${subject}`} className="flex flex-col gap-1.5 bg-slate-50 rounded-lg p-3">
-                                <div className="text-xs font-bold text-slate-500 uppercase">
-                                  {meta?.nameFr || subject} ({voie === 'general' ? 'Voie générale' : 'Voie technique'})
+                                <div className="text-xs font-bold text-slate-500 uppercase" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+                                  {(locale === 'ar' ? meta?.nameAr : meta?.nameFr) || subject} ({voie === 'general' ? t('concours.passes.cards.voieGenerale') : t('concours.passes.cards.voieTechnique')})
                                 </div>
                                 <div className="flex flex-wrap gap-2">
                                   {files.sujet && (
