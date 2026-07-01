@@ -35,9 +35,11 @@ export async function generateMetadata(): Promise<Metadata> {
   const t = getT();
   const locale = getLocale();
   const stats = getConcoursStats();
+  const title = t('concours.meta.title').replace('{total}', String(stats.totalFiles));
+  const desc = t('concours.meta.description').replace('{total}', String(stats.totalFiles));
   return {
-    title: t('concours.meta.title'),
-    description: t('concours.meta.description').replace('{total}', String(stats.totalFiles)),
+    title,
+    description: desc,
     keywords: locale === 'ar' ? [
       'مناظرة التاسعة تونس', 'مناظرة السنة التاسعة', 'امتحان التاسعة تونس',
       'مواضيع التاسعة', 'إصلاحات التاسعة تونس', 'مناظرة التاسعة 2027',
@@ -58,8 +60,8 @@ export async function generateMetadata(): Promise<Metadata> {
       },
     },
     openGraph: {
-      title: t('concours.meta.title'),
-      description: t('concours.meta.description').replace('{total}', String(stats.totalFiles)),
+      title,
+      description: desc,
       url: PAGE_URL,
       siteName: 'Examanet',
       locale: locale === 'ar' ? 'ar_TN' : 'fr_TN',
@@ -67,8 +69,8 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     twitter: {
       card: 'summary_large_image',
-      title: t('concours.meta.title'),
-      description: t('concours.meta.description').replace('{total}', String(stats.totalFiles)),
+      title,
+      description: desc,
     },
   };
 }
@@ -244,7 +246,7 @@ export default function Concours9emePillar() {
   // ========================================================================
   const courseJsonLd = courseSchema({
     slug: 'concours-9eme-tunisie',
-    title: t('concours.meta.title'),
+    title: t('concours.meta.title').replace('{total}', String(stats.totalFiles)),
     description: t('concours.meta.description').replace('{total}', String(stats.totalFiles)),
     language: getLocale(),
     level: '9ème année de base',
@@ -267,7 +269,7 @@ export default function Concours9emePillar() {
   ]);
 
   const itemListJsonLd = itemListSchema({
-    name: t('concours.meta.title'),
+    name: t('concours.meta.title').replace('{total}', String(stats.totalFiles)),
     description: `Liste des sujets et corrigés du concours 9ème année en Tunisie depuis 2001`,
     url: PAGE_URL,
     items: stats.gold2020Corrige ? [
