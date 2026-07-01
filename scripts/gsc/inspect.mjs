@@ -27,7 +27,7 @@ const TARGETS = arg
 async function main() {
   const a = new auth.GoogleAuth({
     keyFile: '/workspace/.secrets/gsc-key.json',
-    scopes: ['https://www.googleapis.com/auth/webmasters.readonly'],
+    scopes: ['https://www.googleapis.com/auth/webmasters'],
   });
   const gsc = searchconsole({ version: 'v1', auth: a });
 
