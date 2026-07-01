@@ -26,9 +26,13 @@ export async function generateMetadata(): Promise<Metadata> {
   const t = getT();
   const stats = getConcoursStats();
   const locale = getLocale();
+  const title = t('concours.passes.title')
+    .replace('{highlight}', '')
+    .replace('{total}', String(stats.totalFiles));
+  const desc = `📥 ${stats.totalFiles} fichiers collectés depuis 2001 — filtre, recherche, téléchargement direct.`;
   return {
-    title: t('concours.passes.title').replace('{highlight}', '') + ' | Examanet',
-    description: `📥 ${t('concours.passes.title').replace('{highlight}', '')} : ${stats.totalFiles} fichiers collectés depuis 2001 — filtre, recherche, téléchargement direct.`,
+    title,
+    description: desc,
     keywords: locale === 'ar' ? [
       'مواضيع التاسعة', 'إصلاحات التاسعة تونس', 'مناظرة التاسعة 2001',
       'مناظرة التاسعة 2024', 'مناظرة التاسعة 2025', 'مناظرة التاسعة 2026',
@@ -43,8 +47,8 @@ export async function generateMetadata(): Promise<Metadata> {
       languages: { 'fr': PAGE_URL, 'ar': PAGE_URL, 'x-default': PAGE_URL },
     },
     openGraph: {
-      title: t('concours.passes.title').replace('{highlight}', ''),
-      description: `${stats.totalFiles} fichiers — filtre, recherche, téléchargement.`,
+      title,
+      description: desc,
       url: PAGE_URL,
       siteName: 'Examanet',
       locale: locale === 'ar' ? 'ar_TN' : 'fr_TN',
@@ -112,7 +116,7 @@ export default function ConcoursSujetsPassesPage({ searchParams }: PageProps) {
       ).slice(0, 50);
 
   const itemListJsonLd = itemListSchema({
-    name: t('concours.passes.title').replace('{highlight}', ''),
+    name: t('concours.passes.title').replace('{highlight}', '').replace('{total}', String(stats.totalFiles)),
     description: `Liste complète des ${stats.totalFiles} sujets et corrigés du concours 9ème depuis 2001`,
     url: PAGE_URL,
     items: allFiles.map((f: any) => ({
@@ -160,7 +164,7 @@ export default function ConcoursSujetsPassesPage({ searchParams }: PageProps) {
               <div>
                 <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight mb-2">
                   {(() => {
-                    const title = t('concours.passes.title');
+                    const title = t('concours.passes.title').replace('{total}', String(stats.totalFiles));
                     const parts = title.split('{highlight}');
                     return (<>
                       {parts[0]}

@@ -545,7 +545,7 @@
   },
   "concours": {
     "meta": {
-      "title": "Concours 9ème Tunisie 2027 — Sujets + Corrigés depuis 2001 | Examanet",
+      "title": "Concours 9ème Tunisie 2027 — {total} Sujets + Corrigés PDF depuis 2001",
       "description": "🎓 Prépare le concours 9ème année en Tunisie : +{total} sujets et corrigés (math, arabe, français, SVT, physique, anglais) depuis 2001. Méthodologie, calendrier 2027, voies générale & technique. 100% gratuit."
     },
     "breadcrumb": {
@@ -717,7 +717,7 @@
       "btn2": "Toutes les ressources 9ème"
     },
     "passes": {
-      "title": "Sujets & Corrigés du {highlight}Concours 9ème",
+      "title": "Sujets & Corrigés Concours 9ème Tunisie depuis 2001 ({total} fichiers)",
       "backToPillar": "Retour au pillar",
       "statSujets": "{count} sujets",
       "statCorriges": "{count} corrigés",
