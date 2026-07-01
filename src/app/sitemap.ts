@@ -14,6 +14,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/cgu`, changeFrequency: 'yearly', priority: 0.3 },
     { url: `${baseUrl}/matieres`, changeFrequency: 'weekly', priority: 0.8 },
     { url: `${baseUrl}/niveaux`, changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${baseUrl}/college`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
     { url: `${baseUrl}/professeurs`, changeFrequency: 'weekly', priority: 0.7 },
     { url: `${baseUrl}/faq`, changeFrequency: 'monthly', priority: 0.6 },
     { url: `${baseUrl}/recherche`, changeFrequency: 'monthly', priority: 0.5 },

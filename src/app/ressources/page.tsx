@@ -7,8 +7,9 @@ import ResourceListItem from '@/components/resources/ResourceListItem';
 import ResourcesViewClient from '@/components/resources/ResourcesViewClient';
 import { prisma } from '@/lib/prisma';
 import { RESOURCE_TYPE_LABELS } from '@/lib/utils';
+import { itemListSchema } from '@/lib/structured-data';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 60; // 1 min cache - new uploads
 
 const TYPE_LABELS_FR: Record<string, string> = Object.fromEntries(
   Object.entries(RESOURCE_TYPE_LABELS).map(([k, v]) => [k, (v as any).fr])
@@ -110,8 +111,24 @@ export default async function ResourcesPage(props: { params: Promise<any>; searc
     ? `${teacher.firstName || ''} ${teacher.lastName || ''}`.trim()
     : null;
 
+  // JSON-LD: ItemList of resources for rich SERP results
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
+  const resourcesListJsonLd = resources.length > 0 ? itemListSchema({
+    name: 'Toutes les ressources pédagogiques — Examanet',
+    description: `Catalogue de ${total.toLocaleString('fr-TN')} ressources pédagogiques gratuites du système éducatif tunisien.`,
+    url: `${baseUrl}/ressources`,
+    items: resources.slice(0, 50).map((r) => ({
+      name: r.title,
+      url: `${baseUrl}/ressources/${r.slug}`,
+      description: r.description?.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 200) || undefined,
+    })),
+  }) : null;
+
   return (
     <div className="min-h-screen flex flex-col">
+      {resourcesListJsonLd && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(resourcesListJsonLd) }} />
+      )}
       <Header />
 
       <main className="flex-1 pt-24 lg:pt-28 bg-slate-50">

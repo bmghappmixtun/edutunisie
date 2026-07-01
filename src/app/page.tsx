@@ -3,7 +3,7 @@ import Footer from '@/components/layout/Footer';
 import HomeClient from '@/components/home/HomeClient';
 import { prisma } from '@/lib/prisma';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 300; // 5 min cache
 
 async function getHomeData() {
   const [popular, recent, statsArr, subjects] = await Promise.all([

@@ -2,13 +2,14 @@ import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { prisma } from '@/lib/prisma';
+import { itemListSchema } from '@/lib/structured-data';
 import { GraduationCap, MapPin, Star, Search, ChevronLeft, ChevronRight, Award, Sparkles, Users, CheckCircle2, X, BookOpen } from 'lucide-react';
 import type { Prisma } from '@prisma/client';
 import TeachersSearchBar from './TeachersSearchBar';
 import TeachersFilters from './TeachersFilters';
 import TeachersSort from './TeachersSort';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 300; // 5 min cache
 
 const PAGE_SIZE = 24;
 
@@ -318,8 +319,24 @@ export default async function TeachersPage(props: { searchParams: Promise<Search
   // -------- 7. Render --------
   const hasFilters = q || subjectSlugs.length > 0 || classSlugs.length > 0 || verifiedOnly;
 
+  // JSON-LD: ItemList of teachers for rich SERP results
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
+  const teacherListJsonLd = teachers.length > 0 ? itemListSchema({
+    name: hasFilters ? `Professeurs filtrés — Examanet` : `Tous les enseignants — Examanet`,
+    description: `Découvrez ${totalMatching} enseignants tunisiens sur Examanet`,
+    url: `${baseUrl}/professeurs`,
+    items: teachers.slice(0, 50).map((t) => ({
+      name: `${t.firstName} ${t.lastName || ''}`.trim(),
+      url: `${baseUrl}/professeurs/${t.id}`,
+      description: t.bio || (t.schoolName ? `Enseignant à ${t.schoolName}` : `Enseignant sur Examanet`),
+    })),
+  }) : null;
+
   return (
     <div className="min-h-screen flex flex-col">
+      {teacherListJsonLd && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(teacherListJsonLd) }} />
+      )}
       <Header />
       <main className="flex-1 pt-20">
         {/* HERO */}

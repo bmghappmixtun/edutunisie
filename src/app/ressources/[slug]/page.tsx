@@ -79,6 +79,15 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
       }
     }
   });
+
+  // Aggregate ratings for JSON-LD (avg + count) — only shown if there are ratings
+  const ratings = resource?.ratings ?? [];
+  const aggregateRating = ratings.length > 0
+    ? {
+        ratingCount: ratings.length,
+        ratingValue: Math.round((ratings.reduce((s, r) => s + r.stars, 0) / ratings.length) * 10) / 10,
+      }
+    : null;
   if (!resource) notFound();
   // Only PUBLISHED resources are public.
   // Owner (teacher) and admins can see their own DRAFT/PENDING/REJECTED resources.
@@ -124,6 +133,7 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
     url: resourceUrl,
     datePublished: resource.publishedAt?.toISOString() || resource.createdAt?.toISOString(),
     dateModified: resource.updatedAt?.toISOString() || resource.createdAt?.toISOString(),
+    aggregateRating,
   });
   const breadcrumbJsonLd = breadcrumbSchema([
     { name: 'Accueil', url: baseUrl },

@@ -3,7 +3,7 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import ContactForm from '@/components/contact/ContactForm';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600; // 1 hour cache
 
 export const metadata = {
   title: 'Contact',
