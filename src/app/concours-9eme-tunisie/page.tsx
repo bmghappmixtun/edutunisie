@@ -322,8 +322,21 @@ export default function Concours9emePillar() {
               </div>
 
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-6">
-                {t('concours.hero.titleMain').replace('{highlight}', '')}
-                <span className="gradient-text">{t('concours.hero.titleMain').match(/\{highlight\}([^{]*)/)?.[1] || '9ème année Tunisie'}</span>
+                {(() => {
+                  const full = t('concours.hero.titleMain');
+                  const splitIdx = full.indexOf('{highlight}');
+                  if (splitIdx >= 0) {
+                    const before = full.slice(0, splitIdx);
+                    const after = full.slice(splitIdx + '{highlight}'.length);
+                    return (
+                      <>
+                        {before}
+                        <span className="gradient-text">{after}</span>
+                      </>
+                    );
+                  }
+                  return <>{full}</>;
+                })()}
                 <br />
                 <span className="text-2xl sm:text-3xl lg:text-4xl text-slate-700">{t('concours.hero.titleSub')}</span>
               </h1>
