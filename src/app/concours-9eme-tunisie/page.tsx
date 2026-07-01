@@ -495,8 +495,7 @@ export default function Concours9emePillar() {
                       return (
                         <li
                           key={i}
-                          dir={isAr ? 'rtl' : 'ltr'}
-                          className="flex items-start gap-2 text-sm text-slate-700"
+                          className={`flex items-start gap-2 text-sm text-slate-700 ${isAr ? 'flex-row-reverse' : ''}`}
                         >
                           <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
                           <span
