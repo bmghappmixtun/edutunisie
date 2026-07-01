@@ -490,12 +490,20 @@ export default function Concours9emePillar() {
                     </div>
                   </div>
                   <ul className="space-y-2">
-                    {m.points.map((p, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
-                        <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
-                        <span className={p.match(/[\u0600-\u06FF]/) ? 'text-right' : ''} dir={p.match(/[\u0600-\u06FF]/) ? 'rtl' : 'ltr'}>{p}</span>
-                      </li>
-                    ))}
+                    {m.points.map((p, i) => {
+                      const isAr = /[\u0600-\u06FF]/.test(p);
+                      return (
+                        <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
+                          <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
+                          <span
+                            dir={isAr ? 'rtl' : 'ltr'}
+                            className={`flex-1 ${isAr ? 'text-right' : 'text-left'}`}
+                          >
+                            {p}
+                          </span>
+                        </li>
+                      );
+                    })}
                   </ul>
                 </div>
               ))}
