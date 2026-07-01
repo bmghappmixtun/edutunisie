@@ -491,12 +491,12 @@ export default function Concours9emePillar() {
                   key={m.subject}
                   className={`bg-white rounded-2xl p-6 ${locale === 'ar' ? 'border-r-4' : 'border-l-4'} ${m.colorClass} shadow-sm hover:shadow-md transition`}
                 >
-                  <div className="flex items-center gap-3 mb-4">
+                  <div className={`flex items-center gap-3 mb-4 ${locale === 'ar' ? 'flex-row-reverse' : ''}`}>
                     <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl ${m.iconBg}`}>
                       {m.icon}
                     </div>
-                    <div>
-                      <h3 className={`font-bold text-lg text-slate-900 ${locale === 'ar' ? 'text-right' : ''}`} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+                    <div className={`flex-1 ${locale === 'ar' ? 'text-right' : 'text-left'}`}>
+                      <h3 className="font-bold text-lg text-slate-900" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
                         {locale === 'ar' ? m.titleAr : m.titleFr}
                       </h3>
                       <p className="text-xs text-slate-500" dir={locale === 'ar' ? 'ltr' : 'rtl'}>
