@@ -242,24 +242,37 @@ export default async function CollegePillar() {
 
             <div className="grid md:grid-cols-3 gap-6">
               {classStats.map((cls) => (
-                <Link
+                <div
                   key={cls.id}
-                  href={`/ressources?class=${cls.slug}`}
                   className="group bg-white rounded-3xl p-8 shadow-sm border-2 border-slate-100 hover:border-primary-400 hover:shadow-xl transition-all"
                 >
-                  <div className="text-5xl mb-4">{cls.slug === '7eme' ? '📗' : cls.slug === '8eme' ? '📘' : '📕'}</div>
-                  <div className="text-xs font-bold uppercase tracking-wider text-primary-600 mb-2">{cls.nameAr}</div>
-                  <h3 className="text-2xl font-extrabold text-slate-900 mb-3">{cls.nameFr}</h3>
-                  <p className="text-slate-600 mb-4 text-sm">
-                    {cls.slug === '7eme' && "Première année du collège. Adaptation, nouvelles matières, méthodes de travail."}
-                    {cls.slug === '8eme' && "Approfondissement. Préparation progressive aux évaluations nationales."}
-                    {cls.slug === '9eme' && "Année charnière. Préparation intensive au passage vers le lycée."}
-                  </p>
-                  <div className="flex items-center justify-between pt-4 border-t border-slate-100">
-                    <div className="font-bold text-primary-600">+{cls._count.resources.toLocaleString('fr-TN')} ressources</div>
-                    <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-primary-600 group-hover:translate-x-1 transition-all" />
-                  </div>
-                </Link>
+                  <Link href={`/ressources?class=${cls.slug}`} className="block">
+                    <div className="text-5xl mb-4">{cls.slug === '7eme' ? '📗' : cls.slug === '8eme' ? '📘' : '📕'}</div>
+                    <div className="text-xs font-bold uppercase tracking-wider text-primary-600 mb-2">{cls.nameAr}</div>
+                    <h3 className="text-2xl font-extrabold text-slate-900 mb-3">{cls.nameFr}</h3>
+                    <p className="text-slate-600 mb-4 text-sm">
+                      {cls.slug === '7eme' && "Première année du collège. Adaptation, nouvelles matières, méthodes de travail."}
+                      {cls.slug === '8eme' && "Approfondissement. Préparation progressive aux évaluations nationales."}
+                      {cls.slug === '9eme' && "Année charnière. Préparation intensive au passage vers le lycée."}
+                    </p>
+                    <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+                      <div className="font-bold text-primary-600">+{cls._count.resources.toLocaleString('fr-TN')} ressources</div>
+                      <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-primary-600 group-hover:translate-x-1 transition-all" />
+                    </div>
+                  </Link>
+                  {cls.slug === '9eme' && (
+                    <Link
+                      href="/concours-9eme-tunisie"
+                      className="mt-4 flex items-center justify-between gap-2 bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-xl px-4 py-3 hover:from-amber-100 hover:to-yellow-100 transition"
+                    >
+                      <div>
+                        <div className="text-xs font-bold text-amber-700 uppercase">🎯 Préparation concours</div>
+                        <div className="text-sm font-bold text-amber-900">Concours 9ème 2027</div>
+                      </div>
+                      <ChevronRight className="w-5 h-5 text-amber-600" />
+                    </Link>
+                  )}
+                </div>
               ))}
             </div>
           </div>
