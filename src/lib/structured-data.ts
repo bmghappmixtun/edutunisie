@@ -134,8 +134,9 @@ export function courseSchema(opts: {
   url: string;
   datePublished: string;
   dateModified: string;
+  aggregateRating?: { ratingCount: number; ratingValue: number } | null;
 }) {
-  return {
+  const data: Record<string, unknown> = {
     '@context': 'https://schema.org',
     '@type': 'Course',
     name: opts.title,
@@ -143,7 +144,6 @@ export function courseSchema(opts: {
     url: opts.url,
     inLanguage: opts.language,
     educationalLevel: opts.level,
-    educationalCredentialAwarded: undefined,
     isAccessibleForFree: true,
     provider: { '@id': `${SITE_URL}#organization` },
     hasCourseInstance: {
@@ -169,6 +169,17 @@ export function courseSchema(opts: {
     dateModified: opts.dateModified,
     isPartOf: { '@id': `${SITE_URL}#website` },
   };
+  // Add AggregateRating only if there are ratings (don't show 0-star in SERPs)
+  if (opts.aggregateRating && opts.aggregateRating.ratingCount > 0) {
+    data.aggregateRating = {
+      '@type': 'AggregateRating',
+      ratingValue: opts.aggregateRating.ratingValue,
+      ratingCount: opts.aggregateRating.ratingCount,
+      bestRating: 5,
+      worstRating: 1,
+    };
+  }
+  return data;
 }
 
 /**

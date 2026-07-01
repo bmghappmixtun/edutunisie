@@ -3,8 +3,9 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { prisma } from '@/lib/prisma';
 import { GraduationCap, BookOpen, ArrowRight, Baby, Library } from 'lucide-react';
+import { itemListSchema } from '@/lib/structured-data';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 300; // 5 min cache
 
 export default async function NiveauxPage() {
   const levels = await prisma.level.findMany({
@@ -24,8 +25,25 @@ export default async function NiveauxPage() {
     lycee: 'from-amber-50 to-orange-50 border-amber-200',
   };
 
+  // JSON-LD: ItemList of all classes (flat across cycles) for rich SERP results
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
+  const allClasses = levels.flatMap((lvl) =>
+    lvl.classes.map((c) => ({
+      name: `${c.nameFr} — ${lvl.nameFr}`,
+      url: `${baseUrl}/niveaux/${lvl.slug}`,
+      description: `${c._count.resources} ressources en ${c.nameFr}`,
+    }))
+  );
+  const niveauxListJsonLd = itemListSchema({
+    name: 'Tous les niveaux scolaires — Examanet',
+    description: 'Explorez les ressources pédagogiques gratuites par niveau et classe (Enseignement de base et Enseignement Secondaire).',
+    url: `${baseUrl}/niveaux`,
+    items: allClasses.slice(0, 50),
+  });
+
   return (
     <div className="min-h-screen flex flex-col">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(niveauxListJsonLd) }} />
       <Header />
       <main className="flex-1 pt-20">
         <div className="bg-gradient-to-br from-primary-50 to-sky-50 py-12">

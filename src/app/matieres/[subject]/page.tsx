@@ -6,7 +6,7 @@ import { prisma } from '@/lib/prisma';
 import { ChevronRight, BookOpen } from 'lucide-react';
 import { breadcrumbSchema } from '@/lib/structured-data';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 300; // 5 min cache
 
 export async function generateMetadata({ params }: { params: Promise<{ subject: string }> }) {
   const { subject: subjectSlug } = await params;

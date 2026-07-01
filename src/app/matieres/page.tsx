@@ -3,8 +3,9 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { prisma } from '@/lib/prisma';
 import { BookOpen, ChevronRight } from 'lucide-react';
+import { itemListSchema } from '@/lib/structured-data';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 300; // 5 min cache
 
 export default async function SubjectsPage() {
   const subjects = await prisma.subject.findMany({
@@ -12,8 +13,22 @@ export default async function SubjectsPage() {
     include: { _count: { select: { resources: { where: { status: 'PUBLISHED' } } } } }
   });
 
+  // JSON-LD: ItemList of subjects for rich SERP results
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
+  const subjectListJsonLd = itemListSchema({
+    name: 'Toutes les matières — Examanet',
+    description: `${subjects.length} matières disponibles : cours, devoirs, exercices et corrigés gratuits pour le système éducatif tunisien.`,
+    url: `${baseUrl}/matieres`,
+    items: subjects.slice(0, 50).map((s) => ({
+      name: s.nameFr,
+      url: `${baseUrl}/matieres/${s.slug}`,
+      description: `${s._count.resources} ressources en ${s.nameFr}`,
+    })),
+  });
+
   return (
     <div className="min-h-screen flex flex-col">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(subjectListJsonLd) }} />
       <Header />
       <main className="flex-1 pt-20">
         <div className="bg-gradient-to-br from-primary-50 to-sky-50 py-12">
