@@ -28,3 +28,4 @@ __pycache__/
 .env*
 .temp-scripts-jun24/
 node_modules/
+.secrets/
