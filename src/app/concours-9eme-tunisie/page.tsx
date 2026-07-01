@@ -17,6 +17,7 @@ import {
   itemListSchema,
   SITE_URL,
 } from '@/lib/structured-data';
+import { getT, getLocale } from '@/lib/i18n-server';
 import {
   ChevronRight, BookOpen, Sparkles, Award, Clock, Target, CheckCircle,
   ArrowRight, Calendar, Trophy, FileText, Download, Star, Zap,
@@ -28,214 +29,223 @@ export const revalidate = 3600; // ISR: refresh every hour
 const PAGE_URL = `${SITE_URL}/concours-9eme-tunisie`;
 
 // ============================================================================
-// METADATA
+// METADATA — generated dynamically based on locale
 // ============================================================================
-export const metadata: Metadata = {
-  title: 'Concours 9ème Tunisie 2027 — Sujets + Corrigés depuis 2001 | Examanet',
-  description:
-    "🎓 Prépare le concours 9ème année en Tunisie : +250 sujets et corrigés (math, arabe, français, SVT, physique, anglais) depuis 2001. Méthodologie, calendrier 2027, voies générale & technique. 100% gratuit.",
-  keywords: [
-    'concours 9ème tunisie',
-    'concours 9ème année',
-    'examen 9ème tunisie',
-    'sujets 9ème année',
-    'corrigés 9ème tunisie',
-    'concours 9eme 2027',
-    'brevet tunisie',
-    '9ème année de base',
-    'concours noviam',
-    'مناظرة التاسعة أساسي تونس',
-    'إصلاح مناظرة السنة التاسعة',
-    'examanet concours',
-  ],
-  alternates: { canonical: PAGE_URL },
-  openGraph: {
-    title: 'Concours 9ème Tunisie 2027 — Sujets + Corrigés depuis 2001',
-    description: '+250 sujets et corrigés du concours 9ème en Tunisie depuis 2001. Préparation 2027 : méthodologie, calendrier, voies générale & technique.',
-    url: PAGE_URL,
-    siteName: 'Examanet',
-    locale: 'fr_TN',
-    type: 'website',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Concours 9ème Tunisie 2027 — Sujets + Corrigés depuis 2001',
-    description: '+250 sujets et corrigés (math, arabe, français, SVT, physique, anglais) depuis 2001. Préparation 2027 : méthodologie, calendrier.',
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = getT();
+  const locale = getLocale();
+  const stats = getConcoursStats();
+  return {
+    title: t('concours.meta.title'),
+    description: t('concours.meta.description').replace('{total}', String(stats.totalFiles)),
+    keywords: locale === 'ar' ? [
+      'مناظرة التاسعة تونس', 'مناظرة السنة التاسعة', 'امتحان التاسعة تونس',
+      'مواضيع التاسعة', 'إصلاحات التاسعة تونس', 'مناظرة التاسعة 2027',
+      'brevet tunisie', 'تاسعة أساسي', 'concours noviam', 'مناظرة ختم التعليم الأساسي',
+      'examanet concours',
+    ] : [
+      'concours 9ème tunisie', 'concours 9ème année', 'examen 9ème tunisie',
+      'sujets 9ème année', 'corrigés 9ème tunisie', 'concours 9eme 2027',
+      'brevet tunisie', '9ème année de base', 'concours noviam',
+      'مناظرة التاسعة أساسي تونس', 'إصلاح مناظرة السنة التاسعة', 'examanet concours',
+    ],
+    alternates: {
+      canonical: PAGE_URL,
+      languages: {
+        'fr': PAGE_URL,
+        'ar': PAGE_URL,
+        'x-default': PAGE_URL,
+      },
+    },
+    openGraph: {
+      title: t('concours.meta.title'),
+      description: t('concours.meta.description').replace('{total}', String(stats.totalFiles)),
+      url: PAGE_URL,
+      siteName: 'Examanet',
+      locale: locale === 'ar' ? 'ar_TN' : 'fr_TN',
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: t('concours.meta.title'),
+      description: t('concours.meta.description').replace('{total}', String(stats.totalFiles)),
+    },
+  };
+}
 
 // ============================================================================
-// FAQ DATA
-// ============================================================================
-const FAQS = [
-  {
-    q: "C'est quoi le concours 9ème année en Tunisie ?",
-    a: "Le concours de la 9ème année (أو مناظرة ختم التعليم الأساسي) est l'examen national de fin d'enseignement de base. Il a lieu chaque année en juin et couvre 6 matières : Mathématiques, Arabe, Français, SVT, Physique (technique) et Anglais. Les élèves choisissent entre la voie générale et la voie technique.",
-  },
-  {
-    q: "Quand aura lieu le concours 9ème 2027 ?",
-    a: "Le concours 9ème 2027 devrait se tenir début juin 2027 (les dates exactes sont publiées par le Ministère de l'Éducation en avril). Les inscriptions se font généralement en mars.",
-  },
-  {
-    q: "Quelle est la différence entre voie générale et voie technique ?",
-    a: "La voie générale couvre l'arabe, le français, les mathématiques, les SVT, l'histoire-géo et l'anglais. La voie technique ajoute la physique technique et l'éducation technologique à la place de certaines matières. Le choix se fait en 9ème année en fonction du projet d'orientation.",
-  },
-  {
-    q: "Comment réviser efficacement le concours 9ème ?",
-    a: "1) Fais les sujets des 5 dernières années (2022-2026) en conditions réelles (chrono 2h, sans aide). 2) Vérifie tes réponses avec les corrigés. 3) Identifie tes lacunes par matière et refais les exercices ratés. 4) Programme 1h de révision par jour pendant les 3 derniers mois.",
-  },
-  {
-    q: "Les corrigés sont-ils gratuits ?",
-    a: "Oui, tous les corrigés disponibles sur Examanet sont 100% gratuits. Pour les concours 2020+, certains corrigés sont encore en cours de collecte auprès des enseignants et seront ajoutés progressivement à la page /sujets-passes.",
-  },
-  {
-    q: "D'où viennent les sujets et corrigés ?",
-    a: "Les sujets sont collectés depuis le portail officiel du Ministère de l'Éducation (9web.edunet.tn) et le site éducatif 9raya.tn. Les corrigés proviennent de sources tunisiennes vérifiées (enseignants contributeurs, sites spécialisés).",
-  },
-  {
-    q: "Y a-t-il des épreuves pour la voie technique ?",
-    a: "Oui, depuis 2017 le concours propose la voie technique avec une épreuve de Physique technique. Sur Examanet, tu trouveras les sujets 2017-2026 pour les deux voies (générale et technique).",
-  },
-  {
-    q: "Que se passe-t-il après le concours 9ème ?",
-    a: "À l'issue du concours, les élèves sont orientés vers le lycée selon leur moyenne et leur voie. Les meilleurs résultats ouvrent l'accès aux lycées pilotes et aux classes de 1ère année secondaire (générale ou technique).",
-  },
-];
-
-// ============================================================================
-// METHODOLOGIE PAR MATIÈRE
-// ============================================================================
-const METHODOLOGIE = [
-  {
-    subject: 'math',
-    titleFr: 'Mathématiques',
-    titleAr: 'الرياضيات',
-    color: 'blue',
-    icon: '📐',
-    points: [
-      "Maîtrise les 4 opérations (fractions, puissances, racines carrées)",
-      "Algèbre : équations 1er et 2nd degré, systèmes linéaires",
-      "Géométrie : Pythagore, Thalès, trigonométrie, aires et volumes",
-      "Statistiques : moyenne, médiane, étendue, lecture de graphiques",
-    ],
-    colorClass: 'border-blue-400 bg-blue-50',
-    iconBg: 'bg-blue-100 text-blue-600',
-  },
-  {
-    subject: 'arabe',
-    titleFr: 'Arabe',
-    titleAr: 'العربية',
-    color: 'amber',
-    icon: '📚',
-    points: [
-      "قراءة نصوص أدبية مع أسئلة الفهم والتحليل",
-      "قواعد النحو : الإعراب، المبتدأ والخبر، الفاعل والمفعول",
-      "البلاغة : التشبيه، الاستعارة، الكناية",
-      "الإنتاج الكتابي : كتابة مقالات وفق منهجية واضحة",
-    ],
-    colorClass: 'border-amber-400 bg-amber-50',
-    iconBg: 'bg-amber-100 text-amber-600',
-  },
-  {
-    subject: 'francais',
-    titleFr: 'Français',
-    titleAr: 'الفرنسية',
-    color: 'rose',
-    icon: '📖',
-    points: [
-      "Compréhension écrite : identifier les idées principales d'un texte",
-      "Grammaire : analyse logique et grammaticale, classes de mots",
-      "Conjugaison : tous les temps du mode indicatif + subjonctif",
-      "Expression écrite : dissertation, texte argumentatif, récit",
-    ],
-    colorClass: 'border-rose-400 bg-rose-50',
-    iconBg: 'bg-rose-100 text-rose-600',
-  },
-  {
-    subject: 'svt',
-    titleFr: 'Sciences de la Vie et de la Terre',
-    titleAr: 'علوم الحياة والأرض',
-    color: 'emerald',
-    icon: '🧬',
-    points: [
-      "Biologie : cellule, ADN, génétique, immunologie",
-      "Géologie : séismes, volcans, structure interne de la Terre",
-      "Écologie : écosystèmes, chaînes alimentaires, environnement",
-      "Méthode : schémas bilan + mémorisation des définitions",
-    ],
-    colorClass: 'border-emerald-400 bg-emerald-50',
-    iconBg: 'bg-emerald-100 text-emerald-600',
-  },
-  {
-    subject: 'physique',
-    titleFr: 'Physique (voie technique)',
-    titleAr: 'علوم فيزيائية',
-    color: 'purple',
-    icon: '⚛️',
-    points: [
-      "Mécanique : forces, mouvements, équilibre, énergie",
-      "Électricité : circuits, loi d'Ohm, puissance, énergie électrique",
-      "Optique : propagation, lentilles, réflexion, réfraction",
-      "Résolution : appliquer la démarche scientifique (observation → hypothèse → expérience → conclusion)",
-    ],
-    colorClass: 'border-purple-400 bg-purple-50',
-    iconBg: 'bg-purple-100 text-purple-600',
-  },
-  {
-    subject: 'anglais',
-    titleFr: 'Anglais',
-    titleAr: 'الإنجليزية',
-    color: 'cyan',
-    icon: '🌍',
-    points: [
-      "Reading comprehension : repérer les mots-clés et inférer le sens",
-      "Grammar : tenses (present/past/future), modals, conditionals",
-      "Vocabulary : everyday topics (school, family, hobbies, environment)",
-      "Writing : emails, short essays (80-120 words)",
-    ],
-    colorClass: 'border-cyan-400 bg-cyan-50',
-    iconBg: 'bg-cyan-100 text-cyan-600',
-  },
-];
-
-// ============================================================================
-// PYRAMIDE DE RÉVISION
-// ============================================================================
-const PYRAMIDE_LEVELS = [
-  { level: 1, label: '1. Relire les cours + formules', color: 'from-blue-200 to-blue-300', width: 'w-3/4' },
-  { level: 2, label: '2. Maîtriser les exercices d\'application', color: 'from-blue-300 to-blue-400', width: 'w-2/3' },
-  { level: 3, label: '3. Sujets d\'années précédentes (2020-2023)', color: 'from-blue-400 to-blue-500', width: 'w-1/2' },
-  { level: 4, label: '4. Sujets récents (2024-2026) en conditions réelles', color: 'from-blue-500 to-blue-600', width: 'w-2/5' },
-  { level: 5, label: '5. Concours blanc final (mai 2027)', color: 'from-blue-600 to-blue-700', width: 'w-1/3' },
-];
-
-// ============================================================================
-// CALENDRIER 2027
-// ============================================================================
-const CALENDAR_2027 = [
-  { date: 'Mars 2027', event: 'Inscriptions au concours 9ème', icon: '📝' },
-  { date: 'Avril 2027', event: 'Publication des dates officielles', icon: '📅' },
-  { date: 'Mai 2027', event: 'Révisions intensives + Concours blancs', icon: '📚' },
-  { date: 'Début juin 2027', event: 'Épreuves écrites du concours', icon: '✍️' },
-  { date: 'Mi-juin 2027', event: 'Publication des résultats', icon: '🎉' },
-  { date: 'Juillet 2027', event: 'Orientation vers le lycée', icon: '🏫' },
-];
-
-// ============================================================================
-// COMPONENT
+// PAGE
 // ============================================================================
 export default function Concours9emePillar() {
+  const t = getT();
   const stats = getConcoursStats();
   const corriges2020Plus = getCorriges2020Plus();
   const upcoming = getUpcomingCorriges();
-  const yearGroups = groupByYear().slice(0, 10); // Last 10 years for the download list
+  const yearGroups = groupByYear().slice(0, 10);
 
-  // JSON-LD: Course (for the pillar as a whole)
+  // ========================================================================
+  // SUBJECT DATA (i18n-driven)
+  // ========================================================================
+  const SUBJECTS = [
+    { slug: 'math', nameFr: 'Mathématiques', nameAr: 'الرياضيات', icon: '📐', color: 'text-blue-600', bg: 'bg-blue-100', descFr: 'Algèbre, géométrie, fonctions' },
+    { slug: 'arabe', nameFr: 'Arabe', nameAr: 'العربية', icon: '📚', color: 'text-amber-600', bg: 'bg-amber-100', descFr: 'قواعد، بلاغة، تعبير' },
+    { slug: 'francais', nameFr: 'Français', nameAr: 'الفرنسية', icon: '📖', color: 'text-rose-600', bg: 'bg-rose-100', descFr: 'Grammaire, expression, lecture' },
+    { slug: 'svt', nameFr: 'Sciences de la Vie et de la Terre', nameAr: 'علوم الحياة والأرض', icon: '🧬', color: 'text-emerald-600', bg: 'bg-emerald-100', descFr: 'Biologie, géologie, écologie' },
+    { slug: 'physique', nameFr: 'Physique (technique)', nameAr: 'علوم فيزيائية', icon: '⚛️', color: 'text-purple-600', bg: 'bg-purple-100', descFr: 'Mécanique, électricité, optique' },
+    { slug: 'anglais', nameFr: 'Anglais', nameAr: 'الإنجليزية', icon: '🌍', color: 'text-cyan-600', bg: 'bg-cyan-100', descFr: 'Grammar, vocabulary, comprehension' },
+  ];
+
+  // ========================================================================
+  // METHODOLOGY (i18n-driven)
+  // ========================================================================
+  const METHODOLOGIE = [
+    {
+      subject: 'math', titleFr: 'Mathématiques', titleAr: 'الرياضيات',
+      icon: '📐', colorClass: 'border-blue-400 bg-blue-50', iconBg: 'bg-blue-100 text-blue-600',
+      points: [
+        'Maîtrise les 4 opérations (fractions, puissances, racines carrées)',
+        'Algèbre : équations 1er et 2nd degré, systèmes linéaires',
+        'Géométrie : Pythagore, Thalès, trigonométrie, aires et volumes',
+        'Statistiques : moyenne, médiane, étendue, lecture de graphiques',
+      ],
+    },
+    {
+      subject: 'arabe', titleFr: 'Arabe', titleAr: 'العربية',
+      icon: '📚', colorClass: 'border-amber-400 bg-amber-50', iconBg: 'bg-amber-100 text-amber-600',
+      points: [
+        'قراءة نصوص أدبية مع أسئلة الفهم والتحليل',
+        'قواعد النحو : الإعراب، المبتدأ والخبر، الفاعل والمفعول',
+        'البلاغة : التشبيه، الاستعارة، الكناية',
+        'الإنتاج الكتابي : كتابة مقالات وفق منهجية واضحة',
+      ],
+    },
+    {
+      subject: 'francais', titleFr: 'Français', titleAr: 'الفرنسية',
+      icon: '📖', colorClass: 'border-rose-400 bg-rose-50', iconBg: 'bg-rose-100 text-rose-600',
+      points: [
+        'Compréhension écrite : identifier les idées principales d\'un texte',
+        'Grammaire : analyse logique et grammaticale, classes de mots',
+        'Conjugaison : tous les temps du mode indicatif + subjonctif',
+        'Expression écrite : dissertation, texte argumentatif, récit',
+      ],
+    },
+    {
+      subject: 'svt', titleFr: 'Sciences de la Vie et de la Terre', titleAr: 'علوم الحياة والأرض',
+      icon: '🧬', colorClass: 'border-emerald-400 bg-emerald-50', iconBg: 'bg-emerald-100 text-emerald-600',
+      points: [
+        'Biologie : cellule, ADN, génétique, immunologie',
+        'Géologie : séismes, volcans, structure interne de la Terre',
+        'Écologie : écosystèmes, chaînes alimentaires, environnement',
+        'Méthode : schémas bilan + mémorisation des définitions',
+      ],
+    },
+    {
+      subject: 'physique', titleFr: 'Physique (voie technique)', titleAr: 'علوم فيزيائية',
+      icon: '⚛️', colorClass: 'border-purple-400 bg-purple-50', iconBg: 'bg-purple-100 text-purple-600',
+      points: [
+        'Mécanique : forces, mouvements, équilibre, énergie',
+        'Électricité : circuits, loi d\'Ohm, puissance, énergie électrique',
+        'Optique : propagation, lentilles, réflexion, réfraction',
+        'Résolution : appliquer la démarche scientifique',
+      ],
+    },
+    {
+      subject: 'anglais', titleFr: 'Anglais', titleAr: 'الإنجليزية',
+      icon: '🌍', colorClass: 'border-cyan-400 bg-cyan-50', iconBg: 'bg-cyan-100 text-cyan-600',
+      points: [
+        'Reading comprehension : repérer les mots-clés et inférer le sens',
+        'Grammar : tenses (present/past/future), modals, conditionals',
+        'Vocabulary : everyday topics (school, family, hobbies, environment)',
+        'Writing : emails, short essays (80-120 words)',
+      ],
+    },
+  ];
+
+  const PYRAMIDE_LEVELS = [
+    { level: 1, key: 'l1', color: 'from-blue-200 to-blue-300', width: 'w-3/4' },
+    { level: 2, key: 'l2', color: 'from-blue-300 to-blue-400', width: 'w-2/3' },
+    { level: 3, key: 'l3', color: 'from-blue-400 to-blue-500', width: 'w-1/2' },
+    { level: 4, key: 'l4', color: 'from-blue-500 to-blue-600', width: 'w-2/5' },
+    { level: 5, key: 'l5', color: 'from-blue-600 to-blue-700', width: 'w-1/3' },
+  ];
+
+  const CALENDAR_2027_KEYS = ['inscription', 'announcement', 'revision', 'exam', 'results', 'orientation'];
+  const CALENDAR_EMOJI = ['📝', '📅', '📚', '✍️', '🎉', '🏫'];
+
+  // ========================================================================
+  // COMPARISON (i18n-driven)
+  // ========================================================================
+  const COMPARISON = {
+    general: {
+      title: t('concours.comparison.general.title'),
+      subtitle: t('concours.comparison.general.subtitle'),
+      desc: t('concours.comparison.general.desc'),
+      icon: '🎓',
+      color: 'indigo',
+      epreuves: [
+        { name: 'Mathématiques (coeff. 2)' },
+        { name: 'Arabe (coeff. 2)' },
+        { name: 'Français (coeff. 2)' },
+        { name: 'SVT (coeff. 1.5)' },
+        { name: 'Anglais (coeff. 1.5)' },
+        { name: 'Histoire-Géographie (coeff. 1)' },
+      ],
+    },
+    technique: {
+      title: t('concours.comparison.technique.title'),
+      subtitle: t('concours.comparison.technique.subtitle'),
+      desc: t('concours.comparison.technique.desc'),
+      icon: '🔧',
+      color: 'orange',
+      epreuves: [
+        { name: 'Mathématiques (coeff. 2)' },
+        { name: 'Arabe (coeff. 1.5)' },
+        { name: 'Français (coeff. 1.5)' },
+        { name: 'Physique technique (coeff. 2)' },
+        { name: 'Technologie (coeff. 1)' },
+        { name: 'Anglais (coeff. 1)' },
+      ],
+    },
+  };
+
+  // ========================================================================
+  // FAQS — loaded from i18n
+  // ========================================================================
+  const faqItems = [
+    t('concours.faq.items.0.q'), t('concours.faq.items.0.a'),
+    t('concours.faq.items.1.q'), t('concours.faq.items.1.a'),
+    t('concours.faq.items.2.q'), t('concours.faq.items.2.a'),
+    t('concours.faq.items.3.q'), t('concours.faq.items.3.a'),
+    t('concours.faq.items.4.q'), t('concours.faq.items.4.a'),
+    t('concours.faq.items.5.q'), t('concours.faq.items.5.a'),
+    t('concours.faq.items.6.q'), t('concours.faq.items.6.a'),
+    t('concours.faq.items.7.q'), t('concours.faq.items.7.a'),
+  ];
+  const FAQS = [];
+  for (let i = 0; i < faqItems.length; i += 2) {
+    FAQS.push({ q: faqItems[i], a: faqItems[i + 1] });
+  }
+
+  // ========================================================================
+  // FEATURES
+  // ========================================================================
+  const FEATURES = [
+    { icon: CheckCircle, title: t('concours.about.features.f1t'), desc: t('concours.about.features.f1d') },
+    { icon: Award, title: t('concours.about.features.f2t').replace('{count}', String(stats.totalCorriges)), desc: t('concours.about.features.f2d') },
+    { icon: Target, title: t('concours.about.features.f3t'), desc: t('concours.about.features.f3d') },
+    { icon: Sparkles, title: t('concours.about.features.f4t'), desc: t('concours.about.features.f4d') },
+    { icon: Clock, title: t('concours.about.features.f5t'), desc: t('concours.about.features.f5d') },
+    { icon: Trophy, title: t('concours.about.features.f6t'), desc: t('concours.about.features.f6d') },
+  ];
+
+  // ========================================================================
+  // JSON-LD
+  // ========================================================================
   const courseJsonLd = courseSchema({
     slug: 'concours-9eme-tunisie',
-    title: 'Préparation au Concours 9ème année en Tunisie',
-    description: 'Préparation complète au concours national de la 9ème année en Tunisie : sujets, corrigés, méthodologie, calendrier 2027.',
-    language: 'fr',
+    title: t('concours.meta.title'),
+    description: t('concours.meta.description').replace('{total}', String(stats.totalFiles)),
+    language: getLocale(),
     level: '9ème année de base',
     cycle: 'Enseignement de base',
     subject: 'Multidisciplinaire',
@@ -244,27 +254,20 @@ export default function Concours9emePillar() {
     url: PAGE_URL,
     datePublished: '2026-07-01',
     dateModified: new Date().toISOString().split('T')[0],
-    aggregateRating: {
-      ratingCount: 1250,
-      ratingValue: 4.7,
-    },
+    aggregateRating: { ratingCount: 1250, ratingValue: 4.7 },
   });
 
-  // JSON-LD: FAQ
   const faqJsonLd = faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })));
-
-  // JSON-LD: Breadcrumb
   const breadcrumbJsonLd = breadcrumbSchema([
     { name: 'Accueil', url: SITE_URL },
     { name: 'Collège', url: `${SITE_URL}/college` },
     { name: '9ème année', url: `${SITE_URL}/ressources?class=9eme` },
-    { name: 'Concours 9ème', url: PAGE_URL },
+    { name: t('concours.breadcrumb.concours9eme'), url: PAGE_URL },
   ]);
 
-  // JSON-LD: ItemList (sujets + corrigés)
   const itemListJsonLd = itemListSchema({
-    name: 'Sujets et corrigés du Concours 9ème Tunisie',
-    description: 'Liste des sujets et corrigés du concours 9ème année en Tunisie depuis 2001',
+    name: t('concours.meta.title'),
+    description: `Liste des sujets et corrigés du concours 9ème année en Tunisie depuis 2001`,
     url: PAGE_URL,
     items: stats.gold2020Corrige ? [
       {
@@ -282,9 +285,11 @@ export default function Concours9emePillar() {
     })),
   });
 
+  // ========================================================================
+  // RENDER
+  // ========================================================================
   return (
     <div className="min-h-screen flex flex-col">
-      {/* ========== JSON-LD SCRIPTS ========== */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(courseJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
@@ -300,39 +305,40 @@ export default function Concours9emePillar() {
 
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative">
             <nav aria-label="Fil d'Ariane" className="flex items-center gap-1 text-xs text-slate-500 mb-6 flex-wrap">
-              <Link href="/" className="hover:text-primary-600 transition">Accueil</Link>
+              <Link href="/" className="hover:text-primary-600 transition">{t('nav.home') || 'Accueil'}</Link>
               <ChevronRight className="w-3 h-3 text-slate-300" />
               <Link href="/college" className="hover:text-primary-600 transition">Collège</Link>
               <ChevronRight className="w-3 h-3 text-slate-300" />
-              <span className="text-slate-900 font-semibold">Concours 9ème</span>
+              <span className="text-slate-900 font-semibold">{t('concours.breadcrumb.concours9eme')}</span>
             </nav>
 
             <div className="text-center mb-12">
               <div className="inline-flex items-center gap-2 bg-white border border-amber-200 rounded-full px-4 py-2 mb-6 shadow-sm">
                 <Trophy className="w-4 h-4 text-amber-600" />
-                <span className="text-xs font-semibold text-slate-700">مناظرة ختم التعليم الأساسي — Session 2027</span>
+                <span className="text-xs font-semibold text-slate-700">{t('concours.hero.badge')}</span>
               </div>
 
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-6">
-                Concours <span className="gradient-text">9ème année Tunisie</span>
+                {t('concours.hero.titleMain').replace('{highlight}', '')}
+                <span className="gradient-text">{t('concours.hero.titleMain').match(/\{highlight\}([^{]*)/)?.[1] || '9ème année Tunisie'}</span>
                 <br />
-                <span className="text-2xl sm:text-3xl lg:text-4xl text-slate-700">Sujets & corrigés depuis 2001</span>
+                <span className="text-2xl sm:text-3xl lg:text-4xl text-slate-700">{t('concours.hero.titleSub')}</span>
               </h1>
 
-              <p className="text-lg lg:text-xl text-slate-600 max-w-3xl mx-auto mb-8">
-                Prépare le <strong>concours national de la 9ème année de base</strong> avec{' '}
-                <strong className="text-primary-600">+{stats.totalFiles} PDF</strong> collectés depuis 2001 :
-                sujets officiels, corrigés, méthodologie par matière, calendrier 2027 et conseils d'orientation.
-                <span dir="rtl" className="block mt-2 text-slate-500 text-base">
-                  تحضير لمناظرة السنة التاسعة أساسي في تونس — مواضيع رسمية + إصلاحات + منهجية
-                </span>
-              </p>
+              <p className="text-lg lg:text-xl text-slate-600 max-w-3xl mx-auto mb-8" dangerouslySetInnerHTML={{
+                __html: t('concours.hero.description')
+                  .replace('{strong}', '<strong>')
+                  .replace('{strongEnd}', '</strong>')
+                  .replace('{strongHighlight}', '<strong class="text-primary-600">')
+                  .replace('{strongHighlightEnd}', '</strong>')
+                  .replace('{total}', String(stats.totalFiles)),
+              }} />
 
               <div className="flex flex-wrap items-center justify-center gap-4">
                 <Link href="/concours-9eme-tunisie/sujets-passes" className="btn-primary text-base inline-flex items-center gap-2">
-                  <Download className="w-4 h-4" /> Voir les sujets
+                  <Download className="w-4 h-4" /> {t('concours.hero.ctaSujets')}
                 </Link>
-                <a href="#methodologie" className="btn-secondary text-base">Méthodologie par matière</a>
+                <a href="#methodologie" className="btn-secondary text-base">{t('concours.hero.ctaMethodo')}</a>
               </div>
             </div>
 
@@ -340,23 +346,23 @@ export default function Concours9emePillar() {
             <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 max-w-5xl mx-auto">
               <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 text-center">
                 <div className="text-3xl lg:text-4xl font-extrabold text-primary-600 mb-1">{stats.totalFiles}</div>
-                <div className="text-xs text-slate-500 font-semibold uppercase">PDF disponibles</div>
+                <div className="text-xs text-slate-500 font-semibold uppercase">{t('concours.hero.stats.pdf')}</div>
               </div>
               <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 text-center">
                 <div className="text-3xl lg:text-4xl font-extrabold text-emerald-600 mb-1">{stats.yearsAvailable.length}</div>
-                <div className="text-xs text-slate-500 font-semibold uppercase">Années (2001-2026)</div>
+                <div className="text-xs text-slate-500 font-semibold uppercase">{t('concours.hero.stats.years')}</div>
               </div>
               <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 text-center">
                 <div className="text-3xl lg:text-4xl font-extrabold text-amber-600 mb-1">{stats.totalCorriges}</div>
-                <div className="text-xs text-slate-500 font-semibold uppercase">Corrigés</div>
+                <div className="text-xs text-slate-500 font-semibold uppercase">{t('concours.hero.stats.corriges')}</div>
               </div>
               <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 text-center">
                 <div className="text-3xl lg:text-4xl font-extrabold text-purple-600 mb-1">6</div>
-                <div className="text-xs text-slate-500 font-semibold uppercase">Matières</div>
+                <div className="text-xs text-slate-500 font-semibold uppercase">{t('concours.hero.stats.matieres')}</div>
               </div>
               <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 text-center">
                 <div className="text-3xl lg:text-4xl font-extrabold text-rose-600 mb-1">2</div>
-                <div className="text-xs text-slate-500 font-semibold uppercase">Voies (Générale/Technique)</div>
+                <div className="text-xs text-slate-500 font-semibold uppercase">{t('concours.hero.stats.voies')}</div>
               </div>
             </div>
           </div>
@@ -368,33 +374,28 @@ export default function Concours9emePillar() {
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <div>
                 <h2 className="text-3xl font-extrabold mb-6 text-slate-900">
-                  Le concours qui决定 ton avenir scolaire
+                  {t('concours.about.title')}
                 </h2>
-                <p className="text-slate-700 leading-relaxed mb-4">
-                  Le <strong>concours de la 9ème année de base</strong> (أو <span dir="rtl">مناظرة ختم التعليم الأساسي</span>)
-                  est l'examen national qui marque la fin de l'<strong>enseignement de base</strong> en Tunisie.
-                  Il se déroule chaque année en <strong>juin</strong> et ouvre la porte vers le <strong>lycée</strong>.
-                </p>
-                <p className="text-slate-700 leading-relaxed mb-4">
-                  Depuis <strong>2001</strong>, le Ministère de l'Éducation publie annuellement les sujets du concours.
-                  Examanet centralise <strong>25 ans d'archives</strong> pour t'aider à réviser efficacement,
-                  avec un accent particulier sur les <strong>sujets et corrigés 2017-2026</strong> (programme actuel).
-                </p>
-                <p className="text-slate-700 leading-relaxed">
-                  Sur cette page, tu trouveras : <strong>tous les sujets depuis 2001</strong>, les corrigés
-                  collectés auprès d'enseignants, une <strong>méthodologie par matière</strong>, le
-                  <strong> calendrier 2027</strong> et un comparateur <strong>générale vs technique</strong>.
-                </p>
+                <p className="text-slate-700 leading-relaxed mb-4" dangerouslySetInnerHTML={{
+                  __html: t('concours.about.p1')
+                    .replace(/\{strong\}/g, '<strong>')
+                    .replace(/\{strongEnd\}/g, '</strong>')
+                    .replace(/\{ar\}/g, '<span dir="rtl">')
+                    .replace(/\{arEnd\}/g, '</span>'),
+                }} />
+                <p className="text-slate-700 leading-relaxed mb-4" dangerouslySetInnerHTML={{
+                  __html: t('concours.about.p2')
+                    .replace(/\{strong\}/g, '<strong>')
+                    .replace(/\{strongEnd\}/g, '</strong>'),
+                }} />
+                <p className="text-slate-700 leading-relaxed" dangerouslySetInnerHTML={{
+                  __html: t('concours.about.p3')
+                    .replace(/\{strong\}/g, '<strong>')
+                    .replace(/\{strongEnd\}/g, '</strong>'),
+                }} />
               </div>
               <div className="space-y-3">
-                {[
-                  { icon: CheckCircle, title: '25 ans de sujets (2001-2026)', desc: 'Archives complètes du Ministère de l\'Éducation tunisien' },
-                  { icon: Award, title: `${stats.totalCorriges} corrigés détaillés`, desc: 'Vérifiés par des enseignants tunisiens' },
-                  { icon: Target, title: 'Focus 2027 (programme actuel)', desc: 'Méthodologie alignée sur les épreuves récentes' },
-                  { icon: Sparkles, title: 'Bilingue FR + AR', desc: 'Supports adaptés aux deux langues d\'enseignement' },
-                  { icon: Clock, title: 'Mise à jour continue', desc: 'Plus de corrigés 2020+ ajoutés régulièrement' },
-                  { icon: Trophy, title: '100% gratuit', desc: 'Accès libre, sans inscription, sans publicité' },
-                ].map((f, i) => (
+                {FEATURES.map((f, i) => (
                   <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-slate-50">
                     <div className="w-10 h-10 rounded-lg bg-primary-100 text-primary-600 flex items-center justify-center flex-shrink-0">
                       <f.icon className="w-5 h-5" />
@@ -410,27 +411,20 @@ export default function Concours9emePillar() {
           </div>
         </section>
 
-        {/* ========== MATIÈRES (Tabs URLs) ========== */}
+        {/* ========== MATIÈRES ========== */}
         <section id="matieres" className="py-16 bg-gradient-to-br from-slate-50 to-primary-50 scroll-mt-20">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <h2 className="text-3xl lg:text-4xl font-extrabold mb-3 text-slate-900">
-                Toutes les matières du concours
+                {t('concours.subjects.title')}
               </h2>
               <p className="text-lg text-slate-600">
-                6 matières évaluées chaque année — clique sur la tienne pour voir les sujets et corrigés.
+                {t('concours.subjects.subtitle')}
               </p>
             </div>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {[
-                { slug: 'math', nameFr: 'Mathématiques', nameAr: 'الرياضيات', color: 'text-blue-600', bg: 'bg-blue-100', desc: 'Algèbre, géométrie, fonctions' },
-                { slug: 'arabe', nameFr: 'Arabe', nameAr: 'العربية', color: 'text-amber-600', bg: 'bg-amber-100', desc: 'قواعد، بلاغة، تعبير' },
-                { slug: 'francais', nameFr: 'Français', nameAr: 'الفرنسية', color: 'text-rose-600', bg: 'bg-rose-100', desc: 'Grammaire, expression, lecture' },
-                { slug: 'svt', nameFr: 'Sciences de la Vie et de la Terre', nameAr: 'علوم الحياة والأرض', color: 'text-emerald-600', bg: 'bg-emerald-100', desc: 'Biologie, géologie, écologie' },
-                { slug: 'physique', nameFr: 'Physique (technique)', nameAr: 'علوم فيزيائية', color: 'text-purple-600', bg: 'bg-purple-100', desc: 'Mécanique, électricité, optique' },
-                { slug: 'anglais', nameFr: 'Anglais', nameAr: 'الإنجليزية', color: 'text-cyan-600', bg: 'bg-cyan-100', desc: 'Grammar, vocabulary, comprehension' },
-              ].map((m) => (
+              {SUBJECTS.map((m) => (
                 <Link
                   key={m.slug}
                   href={`/concours-9eme-tunisie/sujets-passes?subject=${m.slug}`}
@@ -438,13 +432,13 @@ export default function Concours9emePillar() {
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl ${m.bg}`}>
-                      {m.slug === 'math' ? '📐' : m.slug === 'arabe' ? '📚' : m.slug === 'francais' ? '📖' : m.slug === 'svt' ? '🧬' : m.slug === 'physique' ? '⚛️' : '🌍'}
+                      {m.icon}
                     </div>
                     <ArrowRight className="w-5 h-5 text-slate-300 group-hover:text-primary-600 group-hover:translate-x-1 transition-all" />
                   </div>
                   <h3 className="font-bold text-lg mb-1 text-slate-900 group-hover:text-primary-600 transition">{m.nameFr}</h3>
                   <p dir="rtl" className="text-sm text-slate-500 mb-2">{m.nameAr}</p>
-                  <p className="text-xs text-slate-500">{m.desc}</p>
+                  <p className="text-xs text-slate-500">{m.descFr}</p>
                 </Link>
               ))}
             </div>
@@ -456,12 +450,14 @@ export default function Concours9emePillar() {
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <h2 className="text-3xl lg:text-4xl font-extrabold mb-3 text-slate-900">
-                Méthodologie par matière
+                {t('concours.methodology.title')}
               </h2>
-              <p className="text-lg text-slate-600 max-w-3xl mx-auto">
-                Les <strong>points clés</strong> à maîtriser pour chaque matière.
-                <span dir="rtl" className="block mt-2 text-slate-500 text-base">المنهجية لكل مادة</span>
-              </p>
+              <p className="text-lg text-slate-600 max-w-3xl mx-auto" dangerouslySetInnerHTML={{
+                __html: t('concours.methodology.subtitle')
+                  .replace(/\{strong\}/g, '<strong>')
+                  .replace(/\{strongEnd\}/g, '</strong>'),
+              }} />
+              <p dir="rtl" className="block mt-2 text-slate-500 text-base">{t('concours.methodology.subtitleAr')}</p>
             </div>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -498,20 +494,22 @@ export default function Concours9emePillar() {
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <h2 className="text-3xl lg:text-4xl font-extrabold mb-3 text-slate-900">
-                Pyramide de révision
+                {t('concours.pyramid.title')}
               </h2>
-              <p className="text-lg text-slate-600">
-                Suis cette progression pour <strong>maximiser tes chances de réussite</strong> au concours 9ème 2027.
-              </p>
+              <p className="text-lg text-slate-600" dangerouslySetInnerHTML={{
+                __html: t('concours.pyramid.subtitle')
+                  .replace(/\{strong\}/g, '<strong>')
+                  .replace(/\{strongEnd\}/g, '</strong>'),
+              }} />
             </div>
 
             <div className="flex flex-col items-center gap-3">
-              {PYRAMIDE_LEVELS.map((p, i) => (
+              {PYRAMIDE_LEVELS.map((p) => (
                 <div
                   key={p.level}
                   className={`${p.width} bg-gradient-to-r ${p.color} text-white font-bold text-center py-4 px-6 rounded-xl shadow-md hover:shadow-lg transition`}
                 >
-                  <span className="text-sm sm:text-base">{p.label}</span>
+                  <span className="text-sm sm:text-base">{t(`concours.pyramid.levels.${p.key}`)}</span>
                 </div>
               ))}
             </div>
@@ -519,12 +517,12 @@ export default function Concours9emePillar() {
             <div className="mt-10 bg-amber-50 border border-amber-200 rounded-2xl p-6 flex items-start gap-3">
               <Zap className="w-6 h-6 text-amber-600 flex-shrink-0 mt-1" />
               <div>
-                <h3 className="font-bold text-amber-900 mb-1">💡 Conseil de pro</h3>
-                <p className="text-sm text-amber-800">
-                  Ne néglige <strong>aucune matière</strong> : le classement final prend en compte la moyenne générale,
-                  pas seulement les notes individuelles. Une note faible en SVT peut être compensée par une note
-                  élevée en Math, et vice-versa.
-                </p>
+                <h3 className="font-bold text-amber-900 mb-1">{t('concours.pyramid.tipTitle')}</h3>
+                <p className="text-sm text-amber-800" dangerouslySetInnerHTML={{
+                  __html: t('concours.pyramid.tipDesc')
+                    .replace(/\{strong\}/g, '<strong>')
+                    .replace(/\{strongEnd\}/g, '</strong>'),
+                }} />
               </div>
             </div>
           </div>
@@ -539,24 +537,26 @@ export default function Concours9emePillar() {
                 <span className="text-xs font-bold uppercase">Calendrier 2027</span>
               </div>
               <h2 className="text-3xl lg:text-4xl font-extrabold mb-3 text-slate-900">
-                Les grandes étapes du concours 2027
+                {t('concours.calendar.title')}
               </h2>
-              <p className="text-lg text-slate-600">
-                Note ces dates dans ton agenda et prépare-toi <strong>3 mois à l'avance</strong>.
-              </p>
+              <p className="text-lg text-slate-600" dangerouslySetInnerHTML={{
+                __html: t('concours.calendar.subtitle')
+                  .replace(/\{strong\}/g, '<strong>')
+                  .replace(/\{strongEnd\}/g, '</strong>'),
+              }} />
             </div>
 
             <div className="relative">
               <div className="absolute left-6 sm:left-1/2 top-0 bottom-0 w-0.5 bg-primary-200 sm:-translate-x-1/2" />
               <div className="space-y-6">
-                {CALENDAR_2027.map((c, i) => (
-                  <div key={i} className="relative flex items-start gap-4 sm:gap-6">
+                {CALENDAR_2027_KEYS.map((key, i) => (
+                  <div key={key} className="relative flex items-start gap-4 sm:gap-6">
                     <div className="flex-shrink-0 w-12 h-12 rounded-full bg-white border-4 border-primary-200 flex items-center justify-center text-2xl z-10">
-                      {c.icon}
+                      {CALENDAR_EMOJI[i]}
                     </div>
                     <div className="flex-1 bg-slate-50 rounded-2xl p-5 hover:bg-slate-100 transition">
-                      <div className="font-bold text-primary-600 text-sm uppercase mb-1">{c.date}</div>
-                      <div className="text-slate-900 font-semibold">{c.event}</div>
+                      <div className="font-bold text-primary-600 text-sm uppercase mb-1">{t(`concours.calendar.events.${key}.date`)}</div>
+                      <div className="text-slate-900 font-semibold">{t(`concours.calendar.events.${key}.event`)}</div>
                     </div>
                   </div>
                 ))}
@@ -570,65 +570,47 @@ export default function Concours9emePillar() {
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <h2 className="text-3xl lg:text-4xl font-extrabold mb-3 text-slate-900">
-                Voie générale vs Voie technique
+                {t('concours.comparison.title')}
               </h2>
-              <p className="text-lg text-slate-600 max-w-3xl mx-auto">
-                Comprendre la différence pour <strong>mieux choisir</strong> selon ton projet d'orientation.
-              </p>
+              <p className="text-lg text-slate-600 max-w-3xl mx-auto" dangerouslySetInnerHTML={{
+                __html: t('concours.comparison.subtitle')
+                  .replace(/\{strong\}/g, '<strong>')
+                  .replace(/\{strongEnd\}/g, '</strong>'),
+              }} />
             </div>
 
             <div className="grid md:grid-cols-2 gap-6">
-              {/* GÉNÉRALE */}
-              <div className="bg-white rounded-3xl p-7 shadow-md border-2 border-indigo-100 hover:border-indigo-300 transition">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-2xl">🎓</div>
-                  <div>
-                    <h3 className="font-extrabold text-2xl text-slate-900">Voie Générale</h3>
-                    <p dir="rtl" className="text-sm text-slate-500">الشعبة العامة</p>
+              {Object.entries(COMPARISON).map(([key, voie]) => (
+                <div
+                  key={key}
+                  className={`bg-white rounded-3xl p-7 shadow-md border-2 ${
+                    key === 'general' ? 'border-indigo-100 hover:border-indigo-300' : 'border-orange-100 hover:border-orange-300'
+                  } transition`}
+                >
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className={`w-12 h-12 rounded-xl ${
+                      key === 'general' ? 'bg-indigo-100 text-indigo-600' : 'bg-orange-100 text-orange-600'
+                    } flex items-center justify-center text-2xl`}>{voie.icon}</div>
+                    <div>
+                      <h3 className="font-extrabold text-2xl text-slate-900">{voie.title}</h3>
+                      <p dir="rtl" className="text-sm text-slate-500">{voie.subtitle}</p>
+                    </div>
+                  </div>
+                  <p className="text-slate-700 mb-4" dangerouslySetInnerHTML={{
+                    __html: voie.desc.replace(/\{strong\}/g, '<strong>').replace(/\{strongEnd\}/g, '</strong>'),
+                  }} />
+                  <div className="space-y-2">
+                    <h4 className="font-bold text-sm text-slate-900 uppercase">{t(`concours.comparison.${key}.epreuvesTitle`)}</h4>
+                    <ul className="text-sm text-slate-700 space-y-1.5">
+                      {voie.epreuves.map((e, i) => (
+                        <li key={i} className="flex items-start gap-2">
+                          <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" /> {e.name}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 </div>
-                <p className="text-slate-700 mb-4">
-                  Orientée vers les <strong>lycées généraux</strong> et les classes de 1ère année
-                  (sciences, lettres, économie). Idéale si tu envisages des études longues.
-                </p>
-                <div className="space-y-2">
-                  <h4 className="font-bold text-sm text-slate-900 uppercase">📚 Épreuves</h4>
-                  <ul className="text-sm text-slate-700 space-y-1.5">
-                    <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" /> Mathématiques (coeff. 2)</li>
-                    <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" /> Arabe (coeff. 2)</li>
-                    <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" /> Français (coeff. 2)</li>
-                    <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" /> SVT (coeff. 1.5)</li>
-                    <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" /> Anglais (coeff. 1.5)</li>
-                    <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" /> Histoire-Géographie (coeff. 1)</li>
-                  </ul>
-                </div>
-              </div>
-
-              {/* TECHNIQUE */}
-              <div className="bg-white rounded-3xl p-7 shadow-md border-2 border-orange-100 hover:border-orange-300 transition">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center text-2xl">🔧</div>
-                  <div>
-                    <h3 className="font-extrabold text-2xl text-slate-900">Voie Technique</h3>
-                    <p dir="rtl" className="text-sm text-slate-500">الشعبة التقنية</p>
-                  </div>
-                </div>
-                <p className="text-slate-700 mb-4">
-                  Orientée vers les <strong>lycées techniques</strong> et les formations professionnelles.
-                  Parfaite si tu aimes la technologie, l'électronique ou la mécanique.
-                </p>
-                <div className="space-y-2">
-                  <h4 className="font-bold text-sm text-slate-900 uppercase">📚 Épreuves</h4>
-                  <ul className="text-sm text-slate-700 space-y-1.5">
-                    <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" /> Mathématiques (coeff. 2)</li>
-                    <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" /> Arabe (coeff. 1.5)</li>
-                    <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" /> Français (coeff. 1.5)</li>
-                    <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" /> Physique technique (coeff. 2)</li>
-                    <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" /> Technologie (coeff. 1)</li>
-                    <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" /> Anglais (coeff. 1)</li>
-                  </ul>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </section>
@@ -639,18 +621,20 @@ export default function Concours9emePillar() {
             <div className="text-center mb-10">
               <div className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-400 to-amber-600 text-white rounded-full px-4 py-2 mb-4 shadow-md">
                 <Star className="w-4 h-4 fill-white" />
-                <span className="text-xs font-bold uppercase">⭐ Corrigés Gold 2020+</span>
+                <span className="text-xs font-bold uppercase">{t('concours.gold.badge')}</span>
               </div>
               <h2 className="text-3xl lg:text-4xl font-extrabold mb-3 text-slate-900">
-                Corrigés des sessions récentes
+                {t('concours.gold.title')}
               </h2>
-              <p className="text-lg text-slate-600 max-w-3xl mx-auto">
-                Les corrigés des concours <strong>2020 et après</strong> (les plus alignés sur le programme 2027).
-                <span dir="rtl" className="block mt-2 text-slate-500 text-base">إصلاحات الدورات الأخيرة</span>
-              </p>
+              <p className="text-lg text-slate-600 max-w-3xl mx-auto" dangerouslySetInnerHTML={{
+                __html: t('concours.gold.subtitle')
+                  .replace(/\{strong\}/g, '<strong>')
+                  .replace(/\{strongEnd\}/g, '</strong>'),
+              }} />
+              <p dir="rtl" className="block mt-2 text-slate-500 text-base">{t('concours.gold.subtitleAr')}</p>
             </div>
 
-            {corriges2020Plus.length > 0 ? (
+            {corriges2020Plus.length > 0 && (
               <div className="grid sm:grid-cols-2 gap-4 mb-8">
                 {corriges2020Plus.map((f) => {
                   const parts = f.key.split('/');
@@ -667,35 +651,28 @@ export default function Concours9emePillar() {
                     >
                       <div className="flex items-start justify-between mb-3">
                         <div className="text-3xl">{subjectMeta?.icon || '📄'}</div>
-                        <span className="text-xs font-bold text-amber-700 bg-amber-100 rounded-full px-3 py-1">
-                          {year}
-                        </span>
+                        <span className="text-xs font-bold text-amber-700 bg-amber-100 rounded-full px-3 py-1">{year}</span>
                       </div>
                       <h3 className="font-bold text-lg text-slate-900 mb-1 group-hover:text-amber-700 transition">
-                        Corrigé {subjectMeta?.nameFr || subject} {year}
+                        {t('concours.gold.corrigeLabel').replace('{subject}', subjectMeta?.nameFr || subject).replace('{year}', year)}
                       </h3>
                       <p className="text-xs text-slate-500 mb-3">{f.note || 'Sujet + corrigé combo'}</p>
                       <div className="flex items-center gap-2 text-sm font-semibold text-amber-700">
-                        <Download className="w-4 h-4" />
-                        Télécharger le PDF
+                        <Download className="w-4 h-4" /> {t('concours.gold.download')}
                       </div>
                     </a>
                   );
                 })}
               </div>
-            ) : null}
+            )}
 
-            {/* Placeholders for upcoming corrigés (future-proof) */}
             {upcoming.length > 0 && (
               <div className="bg-slate-50 border-2 border-dashed border-slate-300 rounded-2xl p-6">
                 <h3 className="font-bold text-lg mb-3 text-slate-700 flex items-center gap-2">
                   <AlertCircle className="w-5 h-5 text-amber-500" />
-                  Plus de corrigés à venir
+                  {t('concours.gold.placeholderTitle')}
                 </h3>
-                <p className="text-sm text-slate-600 mb-4">
-                  Nous collectons activement des corrigés auprès d'enseignants tunisiens. Voici les prochains
-                  que nous prévoyons d'ajouter :
-                </p>
+                <p className="text-sm text-slate-600 mb-4">{t('concours.gold.placeholderDesc')}</p>
                 <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-2">
                   {upcoming.map((u, i) => {
                     const meta = getSubjectMeta(u.subject);
@@ -706,7 +683,7 @@ export default function Concours9emePillar() {
                           <div className="text-sm font-medium text-slate-700 truncate">
                             {meta?.nameFr || u.subject} {u.year}
                           </div>
-                          <div className="text-xs text-slate-500">Bientôt disponible</div>
+                          <div className="text-xs text-slate-500">{t('concours.gold.placeholderSoon')}</div>
                         </div>
                         <Clock className="w-4 h-4 text-slate-400" />
                       </div>
@@ -718,16 +695,18 @@ export default function Concours9emePillar() {
           </div>
         </section>
 
-        {/* ========== DOWNLOAD LIST (preview of /sujets-passes) ========== */}
+        {/* ========== DOWNLOAD LIST (preview) ========== */}
         <section className="py-16 bg-gradient-to-br from-primary-50 to-sky-50">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-10">
               <h2 className="text-3xl lg:text-4xl font-extrabold mb-3 text-slate-900">
-                Aperçu : Les 10 dernières années
+                {t('concours.list.title')}
               </h2>
-              <p className="text-lg text-slate-600">
-                Pour accéder à <strong>tous les sujets depuis 2001</strong>, rends-toi sur la page dédiée.
-              </p>
+              <p className="text-lg text-slate-600" dangerouslySetInnerHTML={{
+                __html: t('concours.list.subtitle')
+                  .replace(/\{strong\}/g, '<strong>')
+                  .replace(/\{strongEnd\}/g, '</strong>'),
+              }} />
             </div>
 
             <div className="space-y-3 mb-8">
@@ -740,16 +719,16 @@ export default function Concours9emePillar() {
                   0,
                 );
                 return (
-                  <details key={yg.year} className="group bg-white rounded-2xl border border-slate-200 hover:border-primary-300 transition">
+                  <details key={yg.year} className="group bg-white rounded-2xl border border-slate-200 hover:border-primary-300 transition shadow-sm">
                     <summary className="cursor-pointer p-5 flex items-center justify-between gap-3 list-none">
                       <div className="flex items-center gap-3">
                         <div className="w-12 h-12 rounded-xl bg-primary-100 text-primary-600 font-extrabold flex items-center justify-center">
                           {String(yg.year).slice(-2)}
                         </div>
                         <div>
-                          <div className="font-bold text-lg text-slate-900">Concours 9ème {yg.year}</div>
+                          <div className="font-bold text-lg text-slate-900">{t('concours.passes.cards.yearHeader').replace('{year}', String(yg.year))}</div>
                           <div className="text-xs text-slate-500">
-                            {yearTotal} fichier{yearTotal > 1 ? 's' : ''} disponible{yearTotal > 1 ? 's' : ''}
+                            {t('concours.list.yearFiles').replace('{count}', String(yearTotal))}
                           </div>
                         </div>
                       </div>
@@ -763,22 +742,22 @@ export default function Concours9emePillar() {
                             return (
                               <div key={`${voie}-${subject}`} className="flex flex-col gap-1.5 bg-slate-50 rounded-lg p-3">
                                 <div className="text-xs font-bold text-slate-500 uppercase">
-                                  {meta?.nameFr || subject} ({voie})
+                                  {meta?.nameFr || subject} ({voie === 'general' ? 'Voie générale' : 'Voie technique'})
                                 </div>
                                 <div className="flex flex-wrap gap-2">
                                   {files.sujet && (
                                     <a href={files.sujet.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs bg-blue-100 text-blue-700 rounded-full px-2.5 py-1 hover:bg-blue-200">
-                                      <FileText className="w-3 h-3" /> Sujet
+                                      <FileText className="w-3 h-3" /> {t('concours.passes.cards.sujet')}
                                     </a>
                                   )}
                                   {files.corrige && (
                                     <a href={files.corrige.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs bg-emerald-100 text-emerald-700 rounded-full px-2.5 py-1 hover:bg-emerald-200">
-                                      <CheckCircle className="w-3 h-3" /> Corrigé
+                                      <CheckCircle className="w-3 h-3" /> {t('concours.passes.cards.corrige')}
                                     </a>
                                   )}
                                   {files.sujetPlusCorrige && (
                                     <a href={files.sujetPlusCorrige.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs bg-amber-100 text-amber-700 rounded-full px-2.5 py-1 hover:bg-amber-200">
-                                      <Star className="w-3 h-3" /> Sujet + Corrigé
+                                      <Star className="w-3 h-3" /> {t('concours.passes.cards.sujetCorrige')}
                                     </a>
                                   )}
                                 </div>
@@ -798,7 +777,7 @@ export default function Concours9emePillar() {
                 href="/concours-9eme-tunisie/sujets-passes"
                 className="inline-flex items-center gap-2 px-7 py-3 bg-primary-600 text-white font-bold rounded-xl hover:bg-primary-700 transition shadow-lg"
               >
-                Voir TOUS les sujets depuis 2001
+                {t('concours.list.ctaAll')}
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
@@ -809,7 +788,7 @@ export default function Concours9emePillar() {
         <section className="py-16 bg-white">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-3xl lg:text-4xl font-extrabold mb-8 text-center text-slate-900">
-              Questions fréquentes — Concours 9ème
+              {t('concours.faq.title')}
             </h2>
             <div className="space-y-3">
               {FAQS.map((faq, i) => (
@@ -831,17 +810,17 @@ export default function Concours9emePillar() {
         <section className="py-16 bg-gradient-to-br from-primary-600 to-amber-700 text-white">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-3xl lg:text-4xl font-extrabold mb-4">
-              Prêt à réussir le concours 9ème 2027 ?
+              {t('concours.cta.title')}
             </h2>
             <p className="text-lg lg:text-xl text-primary-100 mb-8">
-              Télécharge les sujets, suis la méthodologie, et atteins le lycée de tes rêves.
+              {t('concours.cta.subtitle')}
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4">
               <Link href="/concours-9eme-tunisie/sujets-passes" className="bg-white text-primary-700 font-bold px-7 py-3 rounded-xl hover:bg-primary-50 transition shadow-lg inline-flex items-center gap-2">
-                <Download className="w-4 h-4" /> Télécharger les sujets
+                <Download className="w-4 h-4" /> {t('concours.cta.btn1')}
               </Link>
               <Link href="/ressources?class=9eme" className="bg-primary-500 text-white font-bold px-7 py-3 rounded-xl hover:bg-primary-400 transition border-2 border-primary-300">
-                Toutes les ressources 9ème
+                {t('concours.cta.btn2')}
               </Link>
             </div>
           </div>
