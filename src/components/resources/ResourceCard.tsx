@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Star, Eye, Download, CheckCircle2, GraduationCap, Clock } from 'lucide-react';
+import { Star, Eye, Download, CheckCircle2, GraduationCap } from 'lucide-react';
 import { RESOURCE_TYPE_LABELS, HOMEWORK_SUBTYPE_LABELS } from '@/lib/utils';
 import { isArabic } from '@/lib/text-utils';
 
@@ -49,6 +49,12 @@ function timeAgo(date: Date | string | null | undefined): string {
   return `${Math.floor(days / 365)}an`;
 }
 
+function langBadge(lang?: string): string {
+  if (lang === 'ar') return '🇸🇦';
+  if (lang === 'fr+ar' || lang === 'ar+fr') return '🇫🇷+🇹🇳';
+  return '🇫🇷';
+}
+
 export default function ResourceCard({ resource }: { resource: ResourceCardData }) {
   const typeLabel = RESOURCE_TYPE_LABELS[resource.type] || RESOURCE_TYPE_LABELS.OTHER;
   const teacherName = resource.teacher
@@ -58,53 +64,45 @@ export default function ResourceCard({ resource }: { resource: ResourceCardData 
     ? `${resource.teacher.firstNameAr || ''} ${resource.teacher.lastNameAr || ''}`.trim()
     : null;
   const subjectColor = resource.subject.color || '#0EA5E9';
-  const typeShortFr = typeLabel.fr;
   const titleIsAr = isArabic(resource.title);
   const summaryIsAr = resource.summary ? isArabic(resource.summary) : false;
 
   return (
     <Link
       href={`/ressources/${resource.slug}`}
-      className="group block relative overflow-hidden rounded-2xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl"
-      style={{
-        background: `
-          radial-gradient(at 20% 20%, ${subjectColor}20 0px, transparent 50%),
-          radial-gradient(at 80% 0%, ${subjectColor}15 0px, transparent 50%),
-          radial-gradient(at 0% 100%, ${subjectColor}10 0px, transparent 50%),
-          white
-        `,
-        boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.04)',
-      }}
+      className="group block relative overflow-hidden rounded-2xl bg-white border border-slate-200 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:border-slate-300"
     >
-      {/* Subtle gradient overlay on hover */}
+      {/* Accent bar top — subject color */}
       <div
-        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-        style={{
-          background: `radial-gradient(at 80% 80%, ${subjectColor}15 0px, transparent 50%)`,
-        }}
+        className="absolute top-0 left-0 right-0 h-1 opacity-90"
+        style={{ background: subjectColor }}
       />
 
-      <div className="relative p-5">
-        {/* Header: type + class + date */}
-        <div className="flex items-center justify-between gap-2 mb-3">
-          <div className="flex items-center gap-1.5 flex-wrap min-w-0">
-            <span className="px-2.5 py-1 bg-slate-900/90 text-white text-[10px] font-bold uppercase tracking-wider rounded-full whitespace-nowrap">
-              {typeShortFr}
-            </span>
-            {resource.class && (
-              <span className="px-2.5 py-1 bg-slate-900/90 text-white text-[10px] font-bold uppercase tracking-wider rounded-full whitespace-nowrap">
-                {resource.class.nameFr}
-              </span>
-            )}
-            {resource.year && (
-              <span className="px-2.5 py-1 bg-white/60 backdrop-blur text-slate-700 text-[10px] font-bold rounded-full whitespace-nowrap">
-                {resource.year}
-              </span>
-            )}
-          </div>
-          <span className="text-[10px] font-bold text-slate-500 shrink-0">
-            {timeAgo(resource.publishedAt)}
+      <div className="p-5">
+        {/* Pills row */}
+        <div className="flex flex-wrap items-center gap-1.5 mb-3">
+          <span className="px-2.5 py-1 bg-blue-50 text-blue-700 text-[10px] font-bold uppercase tracking-wider rounded-full">
+            {typeLabel.fr}
           </span>
+          {resource.class && (
+            <span className="px-2.5 py-1 bg-slate-100 text-slate-700 text-[10px] font-bold uppercase tracking-wider rounded-full">
+              {resource.class.nameFr}
+            </span>
+          )}
+          <span
+            className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full"
+            style={{
+              background: `${subjectColor}15`,
+              color: subjectColor,
+            }}
+          >
+            {resource.subject.icon || '📄'} {resource.subject.nameFr}
+          </span>
+          {resource.hasCorrection && (
+            <span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 text-[10px] font-bold uppercase tracking-wider rounded-full inline-flex items-center gap-1">
+              <CheckCircle2 className="w-2.5 h-2.5" /> Corrigé
+            </span>
+          )}
         </div>
 
         {/* Homework subtype */}
@@ -119,56 +117,48 @@ export default function ResourceCard({ resource }: { resource: ResourceCardData 
 
         {/* Title */}
         <h3
-          className={`text-base font-extrabold text-slate-900 leading-snug mb-2 group-hover:text-indigo-600 transition-colors line-clamp-2 ${titleIsAr ? 'text-right' : 'text-left'}`}
+          className={`text-base font-extrabold text-slate-900 leading-snug mb-2 group-hover:text-blue-600 transition-colors line-clamp-2 ${titleIsAr ? 'text-right' : 'text-left'}`}
           dir={titleIsAr ? 'rtl' : 'ltr'}
           lang={titleIsAr ? 'ar' : 'fr'}
         >
           {resource.title}
         </h3>
 
-        {/* Subject + metadata line */}
-        <div className="flex items-center gap-1.5 text-[11px] text-slate-500 mb-3 flex-wrap">
-          {resource.subject.icon && <span>{resource.subject.icon}</span>}
-          <span className="font-semibold" style={{ color: subjectColor }}>
-            {resource.subject.nameFr}
-          </span>
-          {resource.pageCount != null && resource.pageCount > 0 && (
-            <>
-              <span className="text-slate-300">·</span>
-              <span>📄 {resource.pageCount} p</span>
-            </>
-          )}
-          {resource.fileSize && (
-            <>
-              <span className="text-slate-300">·</span>
-              <span>💾 {formatSize(resource.fileSize)}</span>
-            </>
-          )}
-          {resource.language && (
-            <>
-              <span className="text-slate-300">·</span>
-              <span>{resource.language === 'ar' ? '🇸🇦' : resource.language === 'fr+ar' ? '🇫🇷+🇹🇳' : '🇫🇷'}</span>
-            </>
-          )}
-        </div>
-
-        {/* Summary - KEY FEATURE */}
-        {resource.summary && (
+        {/* Summary */}
+        {resource.summary ? (
           <p
-            className={`text-sm text-slate-700 leading-relaxed mb-4 line-clamp-2 ${summaryIsAr ? 'text-right' : 'text-left'}`}
+            className={`text-sm text-slate-600 leading-relaxed mb-3 line-clamp-2 ${summaryIsAr ? 'text-right' : 'text-left'}`}
             dir={summaryIsAr ? 'rtl' : 'ltr'}
             lang={summaryIsAr ? 'ar' : 'fr'}
           >
             {resource.summary}
           </p>
+        ) : (
+          <p className="text-sm text-slate-400 italic mb-3 line-clamp-2">Pas de résumé disponible.</p>
         )}
+
+        {/* Metadata chips */}
+        <div className="flex items-center gap-1.5 mb-3 flex-wrap">
+          {resource.year && (
+            <span className="text-[11px] text-slate-500 bg-slate-50 px-2 py-0.5 rounded">📅 {resource.year}</span>
+          )}
+          {resource.pageCount != null && resource.pageCount > 0 && (
+            <span className="text-[11px] text-slate-500 bg-slate-50 px-2 py-0.5 rounded">
+              📄 {resource.pageCount} {summaryIsAr ? 'ص' : 'p'}
+            </span>
+          )}
+          {resource.fileSize && (
+            <span className="text-[11px] text-slate-500 bg-slate-50 px-2 py-0.5 rounded">💾 {formatSize(resource.fileSize)}</span>
+          )}
+          <span className="text-[11px] text-slate-500 bg-slate-50 px-2 py-0.5 rounded">{langBadge(resource.language)}</span>
+        </div>
 
         {/* Teacher */}
         {teacherName && (
-          <div className="flex items-center gap-2 mb-3 flex-wrap text-xs">
-            <span className="text-slate-500">Par</span>
-            <span className="font-bold text-slate-700">{teacherName}</span>
-            {teacherNameAr && (
+          <div className="flex items-center gap-2 mb-4 flex-wrap text-xs">
+            <span className="text-slate-500">{summaryIsAr ? 'الأستاذ' : 'Par'}</span>
+            <span className="font-semibold text-slate-700">{teacherName}</span>
+            {teacherNameAr && !summaryIsAr && (
               <span className="text-slate-400" dir="rtl" lang="ar">
                 · {teacherNameAr}
               </span>
@@ -181,36 +171,30 @@ export default function ResourceCard({ resource }: { resource: ResourceCardData 
           </div>
         )}
 
-        {/* Bottom: stats (Vues / DL / Note) + Corrigé badge */}
-        <div className="flex items-end justify-between pt-3 border-t border-slate-200/60">
-          <div className="flex items-center gap-4">
-            <div className="text-center">
-              <div className="text-lg font-extrabold text-slate-900 leading-tight">
-                {resource.viewsCount >= 1000 ? `${(resource.viewsCount / 1000).toFixed(1)}k` : resource.viewsCount}
-              </div>
-              <div className="text-[9px] text-slate-500 uppercase font-bold tracking-wider">Vues</div>
-            </div>
-            <div className="text-center">
-              <div className="text-lg font-extrabold text-slate-900 leading-tight">
-                {resource.downloadsCount >= 1000 ? `${(resource.downloadsCount / 1000).toFixed(1)}k` : resource.downloadsCount}
-              </div>
-              <div className="text-[9px] text-slate-500 uppercase font-bold tracking-wider">DL</div>
-            </div>
+        {/* Stats footer */}
+        <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+          <div className="flex items-center gap-3 text-xs text-slate-500">
+            <span className="flex items-center gap-1">
+              <Eye className="w-3 h-3" />
+              <span className="text-slate-900 font-bold">{resource.viewsCount >= 1000 ? `${(resource.viewsCount / 1000).toFixed(1)}k` : resource.viewsCount}</span>
+            </span>
+            <span className="text-slate-300">·</span>
+            <span className="flex items-center gap-1">
+              <Download className="w-3 h-3" />
+              <span className="text-slate-900 font-bold">{resource.downloadsCount >= 1000 ? `${(resource.downloadsCount / 1000).toFixed(1)}k` : resource.downloadsCount}</span>
+            </span>
             {resource.ratingCount > 0 && (
-              <div className="text-center">
-                <div className="text-lg font-extrabold text-amber-500 leading-tight flex items-center gap-0.5">
-                  <Star className="w-3.5 h-3.5 fill-current" />
-                  {resource.avgRating.toFixed(1)}
-                </div>
-                <div className="text-[9px] text-slate-500 uppercase font-bold tracking-wider">{resource.ratingCount} notes</div>
-              </div>
+              <>
+                <span className="text-slate-300">·</span>
+                <span className="flex items-center gap-1 text-amber-500">
+                  <Star className="w-3 h-3 fill-current" />
+                  <span className="text-slate-900 font-bold">{resource.avgRating.toFixed(1)}</span>
+                  <span className="text-slate-400">({resource.ratingCount})</span>
+                </span>
+              </>
             )}
           </div>
-          {resource.hasCorrection && (
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-500 text-white text-[10px] font-bold rounded-full shadow-sm">
-              <CheckCircle2 className="w-3 h-3" /> Corrigé
-            </span>
-          )}
+          <span className="text-[10px] text-slate-400">{timeAgo(resource.publishedAt)}</span>
         </div>
       </div>
     </Link>
