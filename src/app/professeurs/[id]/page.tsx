@@ -415,7 +415,10 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
                             </span>
                           </div>
                           {r.description && (
-                            <p className="text-sm text-slate-500 mt-1 line-clamp-2">{r.description}</p>
+                            <p
+                              className="text-sm text-slate-500 mt-1 line-clamp-2"
+                              dangerouslySetInnerHTML={{ __html: r.description }}
+                            />
                           )}
                           <div className="flex items-center gap-4 mt-2 text-xs text-slate-500">
                             {r.subject && (
