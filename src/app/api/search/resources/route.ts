@@ -57,11 +57,11 @@ export async function GET(req: NextRequest) {
     // Sanitize query for FTS: max 200 chars, strip non-word chars
     const trimmed = q.trim().slice(0, 200).replace(/[^\w\s\-àâäéèêëïîôöùûüÿçñ]/gi, ' ');
 
-    // Build WHERE conditions for filters (skip search_vector which is tsvector = Unsupported)
+    // Build WHERE conditions for filters
+    // $1 = trimmed (always), filters use $2..$N, limit and offset are the last 2
     const filterConditions: string[] = [];
     const filterParams: any[] = [];
-    let paramIndex = 1; // $1 = trimmed, $2 = limit, $3 = offset
-    paramIndex++; // trimmed is $1
+    let paramIndex = 1; // $1 = trimmed
     if (subjectId) { filterConditions.push(`AND r."subjectId" = $${++paramIndex}`); filterParams.push(subjectId); }
     if (classId) { filterConditions.push(`AND r."classId" = $${++paramIndex}`); filterParams.push(classId); }
     if (teacherId) { filterConditions.push(`AND r."teacherId" = $${++paramIndex}`); filterParams.push(teacherId); }
