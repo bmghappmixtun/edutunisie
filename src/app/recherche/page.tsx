@@ -37,21 +37,31 @@ async function getInitialData(searchParams: any) {
   if (q.trim()) {
     // FTS with safe fallback
     const trimmed = q.trim().slice(0, 200).replace(/[^\w\s\-àâäéèêëïîôöùûüÿçñ]/gi, ' ');
+    
+    // Build dynamic filter conditions (skip empty values)
+    const filterConditions: string[] = [];
+    const filterParams: any[] = [];
+    let paramIndex = 1; // $1 = trimmed
+    if (subjectId) { filterConditions.push(`AND r."subjectId" = $${++paramIndex}`); filterParams.push(subjectId); }
+    if (classId) { filterConditions.push(`AND r."classId" = $${++paramIndex}`); filterParams.push(classId); }
+    if (teacherId) { filterConditions.push(`AND r."teacherId" = $${++paramIndex}`); filterParams.push(teacherId); }
+    if (type) { filterConditions.push(`AND r.type = $${++paramIndex}`); filterParams.push(type); }
+    if (year) { filterConditions.push(`AND r.year = $${++paramIndex}`); filterParams.push(parseInt(year)); }
+    
+    const sql = `
+      SELECT
+        r.id,
+        ts_rank(r.search_vector, websearch_to_tsquery('french', $1)) as rank
+      FROM "Resource" r
+      WHERE r.status = 'PUBLISHED'
+        AND r.search_vector @@ websearch_to_tsquery('french', $1)
+        ${filterConditions.join('\n        ')}
+      ORDER BY rank DESC
+      LIMIT $${++paramIndex} OFFSET $${++paramIndex}
+    `;
+    
     try {
-      const ftsResults: any[] = await prisma.$queryRaw`
-        SELECT
-          r.id,
-          ts_rank(r.search_vector, websearch_to_tsquery('french', ${trimmed})) as rank
-        FROM "Resource" r
-        WHERE r.status = 'PUBLISHED'
-          AND r.search_vector @@ websearch_to_tsquery('french', ${trimmed})
-          ${subjectId ? prisma.$queryRaw`AND r."subjectId" = ${subjectId}` : prisma.$queryRaw``}
-          ${classId ? prisma.$queryRaw`AND r."classId" = ${classId}` : prisma.$queryRaw``}
-          ${teacherId ? prisma.$queryRaw`AND r."teacherId" = ${teacherId}` : prisma.$queryRaw``}
-          ${type ? prisma.$queryRaw`AND r.type = ${type}` : prisma.$queryRaw``}
-        ORDER BY rank DESC
-        LIMIT ${limit} OFFSET ${(page - 1) * limit}
-      `;
+      const ftsResults: any[] = await prisma.$queryRawUnsafe(sql, trimmed, ...filterParams, limit, (page - 1) * limit);
       // Hydrate relations
       const ids = ftsResults.map((r: any) => r.id);
       const full = await prisma.resource.findMany({

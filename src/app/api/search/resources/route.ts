@@ -57,29 +57,63 @@ export async function GET(req: NextRequest) {
     // Sanitize query for FTS: max 200 chars, strip non-word chars
     const trimmed = q.trim().slice(0, 200).replace(/[^\w\s\-àâäéèêëïîôöùûüÿçñ]/gi, ' ');
 
-    try {
-      const ftsResults = await prisma.$queryRaw<any[]>`
-        SELECT
-          r.*,
-          ts_rank(r.search_vector, websearch_to_tsquery('french', ${trimmed})) as rank
-        FROM "Resource" r
-        WHERE r.status = 'PUBLISHED'
-          AND r.search_vector @@ websearch_to_tsquery('french', ${trimmed})
-          ${subjectId ? prisma.$queryRaw`AND r."subjectId" = ${subjectId}` : prisma.$queryRaw``}
-          ${classId ? prisma.$queryRaw`AND r."classId" = ${classId}` : prisma.$queryRaw``}
-          ${teacherId ? prisma.$queryRaw`AND r."teacherId" = ${teacherId}` : prisma.$queryRaw``}
-          ${sectionId ? prisma.$queryRaw`AND r."sectionId" = ${sectionId}` : prisma.$queryRaw``}
-          ${type ? prisma.$queryRaw`AND r.type = ${type}` : prisma.$queryRaw``}
-        ORDER BY ${sort === 'relevance' ? prisma.$queryRaw`rank DESC` :
-                  sort === 'recent' ? prisma.$queryRaw`r."publishedAt" DESC NULLS LAST` :
-                  sort === 'popular' ? prisma.$queryRaw`r."viewsCount" DESC` :
-                  sort === 'downloads' ? prisma.$queryRaw`r."downloadsCount" DESC` :
-                  prisma.$queryRaw`r."publishedAt" DESC NULLS LAST`}
-        LIMIT ${limit} OFFSET ${(page - 1) * limit}
-      `;
+    // Build WHERE conditions for filters (skip search_vector which is tsvector = Unsupported)
+    const filterConditions: string[] = [];
+    const filterParams: any[] = [];
+    let paramIndex = 1; // $1 = trimmed, $2 = limit, $3 = offset
+    paramIndex++; // trimmed is $1
+    if (subjectId) { filterConditions.push(`AND r."subjectId" = $${++paramIndex}`); filterParams.push(subjectId); }
+    if (classId) { filterConditions.push(`AND r."classId" = $${++paramIndex}`); filterParams.push(classId); }
+    if (teacherId) { filterConditions.push(`AND r."teacherId" = $${++paramIndex}`); filterParams.push(teacherId); }
+    if (sectionId) { filterConditions.push(`AND r."sectionId" = $${++paramIndex}`); filterParams.push(sectionId); }
+    if (type) { filterConditions.push(`AND r.type = $${++paramIndex}`); filterParams.push(type); }
+    if (year) { filterConditions.push(`AND r.year = $${++paramIndex}`); filterParams.push(parseInt(year)); }
+    if (hasCorrection === 'true') filterConditions.push(`AND r."hasCorrection" = true`);
+    if (hasCorrection === 'false') filterConditions.push(`AND r."hasCorrection" = false`);
+    if (homeworkSubtype) { filterConditions.push(`AND r."homeworkSubtype" = $${++paramIndex}`); filterParams.push(homeworkSubtype); }
+    if (schoolType) { filterConditions.push(`AND r."schoolType" = $${++paramIndex}`); filterParams.push(schoolType); }
+    if (fromDate) { filterConditions.push(`AND r."publishedAt" >= $${++paramIndex}`); filterParams.push(new Date(fromDate)); }
+    if (toDate) { filterConditions.push(`AND r."publishedAt" <= $${++paramIndex}`); filterParams.push(new Date(toDate)); }
+    const limitParam = ++paramIndex;
+    const offsetParam = ++paramIndex;
+    const orderByClause = sort === 'popular' ? 'r."viewsCount" DESC'
+      : sort === 'downloads' ? 'r."downloadsCount" DESC'
+      : sort === 'recent' ? 'r."publishedAt" DESC NULLS LAST'
+      : 'rank DESC';
+    
+    const sql = `
+      SELECT
+        r.id, r.slug, r.title, r.description, r.summary, r.type, r.status,
+        r."fileKey", r."fileUrl", r."fileSize", r."pageCount",
+        r."classId", r."subjectId", r."teacherId", r."trimester", r.year,
+        r.tags, r.language, r."metaDescription", r."headerData",
+        r."homeworkSubtype", r."homeworkNumber", r."schoolType", r.product,
+        r."hasCorrection", r."viewsCount", r."downloadsCount", r."ratingCount",
+        r."avgRating", r."commentsCount", r."favoritesCount",
+        r."createdAt", r."updatedAt", r."publishedAt",
+        ts_rank(r.search_vector, websearch_to_tsquery('french', $1)) as rank
+      FROM "Resource" r
+      WHERE r.status = 'PUBLISHED'
+        AND r.search_vector @@ websearch_to_tsquery('french', $1)
+        ${filterConditions.join('\n        ')}
+      ORDER BY ${orderByClause}
+      LIMIT $${limitParam} OFFSET $${offsetParam}
+    `;
+    
+    const countSql = `
+      SELECT COUNT(*)::int as total
+      FROM "Resource" r
+      WHERE r.status = 'PUBLISHED'
+        AND r.search_vector @@ websearch_to_tsquery('french', $1)
+        ${filterConditions.join('\n        ')}
+    `;
 
+    try {
+      const ftsResults = await prisma.$queryRawUnsafe<any[]>(sql, trimmed, ...filterParams, limit, (page - 1) * limit);
+      const countResult = await prisma.$queryRawUnsafe<any[]>(countSql, trimmed, ...filterParams);
+      
       results = ftsResults;
-      total = ftsResults.length;
+      total = Number(countResult[0]?.total || 0);
     } catch (ftsError: any) {
       // FTS failed (e.g., no match, syntax error) - return empty result
       console.warn('[search] FTS error for query:', trimmed, ftsError?.message);
