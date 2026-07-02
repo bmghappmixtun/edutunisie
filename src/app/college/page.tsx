@@ -4,6 +4,7 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import ResourceCard from '@/components/resources/ResourceCard';
 import { prisma } from '@/lib/prisma';
+import { getUserFavorites, decorateWithFavorites } from '@/lib/resource-helpers';
 import { ChevronRight, BookOpen, GraduationCap, Sparkles, Award, Clock, Users, Target, CheckCircle, ArrowRight } from 'lucide-react';
 import { itemListSchema } from '@/lib/structured-data';
 
@@ -106,6 +107,10 @@ export default async function CollegePillar() {
   });
 
   const totalResources = classStats.reduce((s, c) => s + c._count.resources, 0);
+
+  // Decorate topResources with isFavorited
+  const topFavIds = await getUserFavorites(topResources.map(r => r.id));
+  const decoratedTopResources = decorateWithFavorites(topResources, topFavIds);
 
   // JSON-LD: ItemList of top resources
   const resourcesListJsonLd = topResources.length > 0 ? itemListSchema({
@@ -326,7 +331,7 @@ export default async function CollegePillar() {
             </div>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {topResources.map((r) => (
+              {decoratedTopResources.map((r) => (
                 <ResourceCard key={r.id} resource={r as any} />
               ))}
             </div>

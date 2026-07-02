@@ -3,6 +3,7 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import ResourceCard from '@/components/resources/ResourceCard';
 import { prisma } from '@/lib/prisma';
+import { getUserFavorites, decorateWithFavorites } from '@/lib/resource-helpers';
 import { ChevronRight } from 'lucide-react';
 import { breadcrumbSchema } from '@/lib/structured-data';
 
@@ -50,6 +51,10 @@ export default async function LevelPage({ params }: { params: Promise<{ level: s
     include: { subject: true, class: true, teacher: { select: { firstName: true, lastName: true, firstNameAr: true, lastNameAr: true } },}
   });
 
+  // Decorate with isFavorited
+  const levelFavIds = await getUserFavorites(recentResources.map(r => r.id));
+  const decoratedLevelResources = decorateWithFavorites(recentResources, levelFavIds);
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -92,7 +97,7 @@ export default async function LevelPage({ params }: { params: Promise<{ level: s
                 <div className="mb-8">
                   <h2 className="text-2xl font-bold mb-4">Dernières ressources</h2>
                   <div className="grid sm:grid-cols-2 gap-4">
-                    {recentResources.map(r => <ResourceCard key={r.id} resource={r as any} />)}
+                    {decoratedLevelResources.map(r => <ResourceCard key={r.id} resource={r as any} />)}
                   </div>
                 </div>
               )}

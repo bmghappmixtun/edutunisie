@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { prisma } from '@/lib/prisma';
+import { getUserFavorites, decorateWithFavorites } from '@/lib/resource-helpers';
 import { getCurrentUser } from '@/lib/auth';
 import {
   GraduationCap, MapPin, BookOpen, FileText, Star,
@@ -117,6 +118,10 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
   const totalFavorites = await prisma.favorite.count({
     where: { resource: { teacherId: teacher.id } }
   });
+
+  // Decorate with isFavorited
+  const profFavIds = await getUserFavorites(resources.map(r => r.id));
+  const decoratedProfResources = decorateWithFavorites(resources, profFavIds);
 
   // Group by type
   const byType = resources.reduce((acc, r) => {

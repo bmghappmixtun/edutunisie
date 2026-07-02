@@ -6,6 +6,7 @@ import ResourceCard from '@/components/resources/ResourceCard';
 import ResourceListItem from '@/components/resources/ResourceListItem';
 import ResourcesViewClient from '@/components/resources/ResourcesViewClient';
 import { prisma } from '@/lib/prisma';
+import { getUserFavorites, decorateWithFavorites } from '@/lib/resource-helpers';
 import { RESOURCE_TYPE_LABELS } from '@/lib/utils';
 import { itemListSchema } from '@/lib/structured-data';
 
@@ -108,6 +109,10 @@ export default async function ResourcesPage(props: { params: Promise<any>; searc
     .sort((a, b) => a.nameFr.localeCompare(b.nameFr, 'fr'));
   const availableClasses = Array.from(availableClassesMap.values())
     .sort((a, b) => a.nameFr.localeCompare(b.nameFr, 'fr'));
+
+  // Decorate resources with isFavorited for current user
+  const favoriteIds = await getUserFavorites(resources.map(r => r.id));
+  const decoratedResources = decorateWithFavorites(resources, favoriteIds);
 
   const totalPages = Math.ceil(total / 24);
   const activeFilters = [type, subject, classSlug, q].filter(Boolean).length;
@@ -242,7 +247,7 @@ export default async function ResourcesPage(props: { params: Promise<any>; searc
               {/* Sort + View toggle */}
               <div className="flex items-center justify-between mb-4 bg-white rounded-xl p-3 border border-slate-100 gap-2 flex-wrap">
                 <div className="text-sm text-slate-600">
-                  <span className="font-semibold text-slate-900">{resources.length}</span> sur {total} résultats
+                  <span className="font-semibold text-slate-900">{decoratedResources.length}</span> sur {total} résultats
                 </div>
                 <div className="flex items-center gap-2 text-sm flex-wrap">
                   <ResourcesViewClient
@@ -271,7 +276,7 @@ export default async function ResourcesPage(props: { params: Promise<any>; searc
               )}
 
               {/* Grid or List view */}
-              {resources.length === 0 ? (
+              {decoratedResources.length === 0 ? (
                 <div className="bg-white rounded-2xl p-12 text-center border border-slate-100">
                   <div className="text-5xl mb-3">🔍</div>
                   <h3 className="font-bold text-xl mb-2">Aucun résultat</h3>
@@ -280,11 +285,11 @@ export default async function ResourcesPage(props: { params: Promise<any>; searc
                 </div>
               ) : view === 'list' ? (
                 <div className="space-y-2">
-                  {resources.map(r => <ResourceListItem key={r.id} resource={r as any} />)}
+                  {decoratedResources.map(r => <ResourceListItem key={r.id} resource={r as any} />)}
                 </div>
               ) : (
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                  {resources.map(r => <ResourceCard key={r.id} resource={r as any} />)}
+                  {decoratedResources.map(r => <ResourceCard key={r.id} resource={r as any} />)}
                 </div>
               )}
 
