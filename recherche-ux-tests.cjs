@@ -181,18 +181,15 @@ async function log(name, status, message = '') {
   {
     const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 } });
     const page = await ctx.newPage();
-    // Find a subject slug first
-    await page.goto('https://examanet.com/recherche?t=' + Date.now(), { waitUntil: 'domcontentloaded', timeout: 30000 });
+    // Use direct URL with known subject ID
+    await page.goto('https://examanet.com/recherche?subject=cmqi8nr2z00252n4aoa8vuwmy&t=' + Date.now(), { waitUntil: 'domcontentloaded', timeout: 30000 });
     await page.waitForTimeout(3000);
-    const subjects = await page.locator('a[href*="subject="]').first().getAttribute('href').catch(() => null);
-
-    if (subjects) {
-      await page.goto('https://examanet.com' + subjects + '&t=' + Date.now(), { waitUntil: 'domcontentloaded', timeout: 30000 });
-      await page.waitForTimeout(2000);
-      const noCrash = !(await page.evaluate(() => document.body.textContent.includes('Application error')));
-      await log('T9: Filter by subject', noCrash ? 'PASS' : 'FAIL', `URL: ${subjects}`);
+    const noCrash = !(await page.evaluate(() => document.body.textContent.includes('Application error')));
+    const hasResults = await page.evaluate(() => /[\d.]+k?\s+ressources?/i.test(document.body.textContent));
+    if (noCrash && hasResults) {
+      await log('T9: Filter by subject', 'PASS', '?subject=cmqi8nr2z00252n4aoa8vuwmy');
     } else {
-      await log('T9: Filter by subject', 'WARN', 'No subject links found to test');
+      await log('T9: Filter by subject', 'FAIL', `noCrash=${noCrash}, hasResults=${hasResults}`);
     }
     await ctx.close();
   }
@@ -476,8 +473,8 @@ async function log(name, status, message = '') {
 
     const hasCount = await page.evaluate(() => {
       const text = document.body.textContent;
-      // Should show "X résultats" or similar
-      return /\d+\s+(ressources?|résultats?|results?)/i.test(text) || /\bsur\s+\d+/i.test(text);
+      // Should show "X ressources" or "1.5k ressources" or "12 sur 3829"
+      return /[\d.]+k?\s+(ressources?|résultats?|results?)/i.test(text) || /\bsur\s+\d+/i.test(text);
     });
 
     if (hasCount) {
