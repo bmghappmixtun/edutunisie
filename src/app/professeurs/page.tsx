@@ -326,7 +326,7 @@ export default async function TeachersPage(props: { searchParams: Promise<Search
     description: `Découvrez ${totalMatching} enseignants tunisiens sur Examanet`,
     url: `${baseUrl}/professeurs`,
     items: teachers.slice(0, 50).map((t) => ({
-      name: `${t.firstName} ${t.lastName || ''}`.trim(),
+      name: `${t.firstName || ''} ${t.lastName || ''}`.replace(/\s+/g, ' ').trim(),
       url: `${baseUrl}/professeurs/${t.id}`,
       description: t.bio || (t.schoolName ? `Enseignant à ${t.schoolName}` : `Enseignant sur Examanet`),
     })),

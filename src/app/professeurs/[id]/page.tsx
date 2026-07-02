@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     select: { firstName: true, lastName: true, firstNameAr: true, lastNameAr: true, bio: true, schoolName: true, schoolNameAr: true },
   });
   if (!teacher) return { title: 'Enseignant non trouvé' };
-  const fullName = `${teacher.firstName} ${teacher.lastName}`;
+  const fullName = `${teacher.firstName || ''} ${teacher.lastName || ''}`.replace(/\s+/g, ' ').trim();
   const description = teacher.bio
     ? teacher.bio.slice(0, 160)
     : `${fullName}${teacher.schoolName ? ' - ' + teacher.schoolName : ''} — Enseignant sur Examanet. Cours, devoirs et exercices gratuits.`;
@@ -147,7 +147,7 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
   const initials = getInitials(teacher.firstName, teacher.lastName);
 
   // JSON-LD: Person schema + BreadcrumbList
-  const fullName = `${teacher.firstName} ${teacher.lastName}`.trim();
+  const fullName = `${teacher.firstName || ''} ${teacher.lastName || ''}`.replace(/\s+/g, ' ').trim();
   const personJsonLd = personSchema({
     id: `${profileUrl}#person`,
     name: fullName,
