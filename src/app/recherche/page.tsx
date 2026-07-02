@@ -29,7 +29,7 @@ async function getInitialData(searchParams: any) {
   if (classId) where.classId = classId;
   if (teacherId) where.teacherId = teacherId;
   if (type) where.type = type;
-  if (year) where.year = parseInt(year);
+  if (year) where.year = year;
 
   let results: any[];
   let total: number;
@@ -46,7 +46,7 @@ async function getInitialData(searchParams: any) {
     if (classId) { filterConditions.push(`AND r."classId" = $${++paramIndex}`); filterParams.push(classId); }
     if (teacherId) { filterConditions.push(`AND r."teacherId" = $${++paramIndex}`); filterParams.push(teacherId); }
     if (type) { filterConditions.push(`AND r.type = $${++paramIndex}`); filterParams.push(type); }
-    if (year) { filterConditions.push(`AND r.year = $${++paramIndex}`); filterParams.push(parseInt(year)); }
+    if (year) { filterConditions.push(`AND r.year = $${++paramIndex}`); filterParams.push(year); }
     
     const sql = `
       SELECT
@@ -193,3 +193,5 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
     </div>
   );
 }
+
+// year fix deployed 1783014623

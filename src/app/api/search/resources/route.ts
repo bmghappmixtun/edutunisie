@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
   if (teacherId) where.teacherId = teacherId;
   if (sectionId) where.sectionId = sectionId;
   if (type) where.type = type;
-  if (year) where.year = parseInt(year);
+  if (year) where.year = year;
   if (hasCorrection === 'true') where.hasCorrection = true;
   if (hasCorrection === 'false') where.hasCorrection = false;
   if (homeworkSubtype && ['CONTROL', 'SYNTHESIS', 'HOUSEWORK'].includes(homeworkSubtype)) {
@@ -67,7 +67,7 @@ export async function GET(req: NextRequest) {
     if (teacherId) { filterConditions.push(`AND r."teacherId" = $${++paramIndex}`); filterParams.push(teacherId); }
     if (sectionId) { filterConditions.push(`AND r."sectionId" = $${++paramIndex}`); filterParams.push(sectionId); }
     if (type) { filterConditions.push(`AND r.type = $${++paramIndex}`); filterParams.push(type); }
-    if (year) { filterConditions.push(`AND r.year = $${++paramIndex}`); filterParams.push(parseInt(year)); }
+    if (year) { filterConditions.push(`AND r.year = $${++paramIndex}`); filterParams.push(year); }
     if (hasCorrection === 'true') filterConditions.push(`AND r."hasCorrection" = true`);
     if (hasCorrection === 'false') filterConditions.push(`AND r."hasCorrection" = false`);
     if (homeworkSubtype) { filterConditions.push(`AND r."homeworkSubtype" = $${++paramIndex}`); filterParams.push(homeworkSubtype); }
@@ -239,3 +239,5 @@ export async function GET(req: NextRequest) {
 }
 
 // cache bust 1783013641
+
+// year fix deployed 1783014623
