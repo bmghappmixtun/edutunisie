@@ -106,7 +106,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         userId: a.id,
         type: 'edit_pending',
         title: wasPreviouslyRejected ? 'Fichier re-soumis 🔄' : 'Fichier remplacé (en attente) ✏️',
-        message: `${user.firstName} ${user.lastName} a ${wasPreviouslyRejected ? 're-soumis le fichier de' : 'remplacé le fichier de'} "${resource.title}" — en attente d'approbation.`,
+        message: `${user.firstName || ""} ${user.lastName || ""} a ${wasPreviouslyRejected ? 're-soumis le fichier de' : 'remplacé le fichier de'} "${resource.title}" — en attente d'approbation.`,
         link: `/admin/ressources/editions`
       }))
     });

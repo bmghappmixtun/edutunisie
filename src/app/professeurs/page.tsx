@@ -515,7 +515,7 @@ function TeacherCard({
               <h3 className="font-bold text-lg group-hover:text-primary-600 transition truncate">{fullName}</h3>
             ) : hasAr ? (
               <h3 className="font-bold text-2xl group-hover:text-primary-600 transition truncate" dir="rtl" lang="ar">
-                {t.firstNameAr} {t.lastNameAr}
+                {(t.firstNameAr || "") + " " + (t.lastNameAr || "")}
               </h3>
             ) : (
               <h3 className="font-bold text-lg group-hover:text-primary-600 transition truncate">{fullName}</h3>
@@ -526,7 +526,7 @@ function TeacherCard({
           </div>
           {hasFr && hasAr && (
             <p className="text-sm text-slate-500 truncate" dir="rtl" lang="ar">
-              {t.firstNameAr} {t.lastNameAr}
+              {(t.firstNameAr || "") + " " + (t.lastNameAr || "")}
             </p>
           )}
           {t.schoolName && <p className="text-sm text-slate-500 truncate">{t.schoolName}</p>}
