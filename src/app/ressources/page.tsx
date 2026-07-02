@@ -176,12 +176,12 @@ export default async function ResourcesPage(props: { params: Promise<any>; searc
               <Search className="w-5 h-5 text-slate-400" />
               <input name="q" type="text" defaultValue={q} placeholder="Rechercher..." className="flex-1 bg-transparent outline-none text-slate-700 placeholder-slate-400 text-sm" />
             </div>
-            <button type="submit" className="btn-primary">Rechercher</button>
+            <button type="submit" className="btn-primary whitespace-nowrap"><span className="hidden sm:inline">Rechercher</span><Search className="w-4 h-4 sm:hidden" /></button>
           </form>
 
           <div className="grid lg:grid-cols-[280px_1fr] gap-6">
             {/* Sidebar filters - DYNAMIC: only show filters with data */}
-            <aside className="bg-white rounded-2xl p-5 border border-slate-100 h-fit lg:sticky lg:top-24">
+            <aside className="hidden lg:block bg-white rounded-2xl p-5 border border-slate-100 h-fit lg:sticky lg:top-24">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-bold text-lg flex items-center gap-2"><Filter className="w-4 h-4" /> Filtres</h3>
                 {activeFilters > 0 && <Link href={teacherId ? `/ressources?teacher=${teacherId}` : '/ressources'} className="text-xs text-primary-600 font-semibold">Réinitialiser</Link>}
@@ -241,6 +241,55 @@ export default async function ResourcesPage(props: { params: Promise<any>; searc
                 <p className="text-sm text-slate-500 italic">Aucun filtre disponible</p>
               )}
             </aside>
+
+            {/* Mobile filter trigger (only shows on mobile/tablet) */}
+            <details className="lg:hidden bg-white rounded-2xl border border-slate-100 mb-4 overflow-hidden">
+              <summary className="px-5 py-3 font-bold text-sm cursor-pointer flex items-center gap-2 hover:bg-slate-50">
+                <Filter className="w-4 h-4" /> Filtres {activeFilters > 0 && <span className="ml-auto text-xs bg-primary-100 text-primary-700 px-2 py-0.5 rounded-full">{activeFilters} actif{activeFilters > 1 ? 's' : ''}</span>}
+              </summary>
+              <div className="px-5 pb-5 border-t border-slate-100 pt-4 space-y-5">
+                {/* Type filter */}
+                {availableTypes.size > 1 && (
+                  <div>
+                    <h4 className="font-semibold text-sm mb-2 text-slate-700">Type ({availableTypes.size})</h4>
+                    <div className="flex flex-wrap gap-1.5">
+                      {Array.from(availableTypes).sort().map(t => (
+                        <Link key={t} href={`/ressources?${new URLSearchParams({ ...sp, type: t === type ? '' : t, page: '1' }).toString()}`} className={`px-2.5 py-1 rounded-full text-xs font-bold transition ${type === t ? 'bg-primary-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>
+                          {TYPE_LABELS_FR[t] || t}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {/* Subject filter */}
+                {availableSubjects.length > 1 && (
+                  <div>
+                    <h4 className="font-semibold text-sm mb-2 text-slate-700">Matière ({availableSubjects.length})</h4>
+                    <div className="flex flex-wrap gap-1.5">
+                      {availableSubjects.map(s => (
+                        <Link key={s.slug} href={`/ressources?${new URLSearchParams({ ...sp, subject: s.slug === subject ? '' : s.slug, page: '1' }).toString()}`} className={`px-2.5 py-1 rounded-full text-xs font-bold transition ${subject === s.slug ? 'bg-primary-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>
+                          {s.icon && <span className="mr-1">{s.icon}</span>}{s.nameFr}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {/* Class filter */}
+                {availableClasses.length > 1 && (
+                  <div>
+                    <h4 className="font-semibold text-sm mb-2 text-slate-700">Classe ({availableClasses.length})</h4>
+                    <div className="flex flex-wrap gap-1.5">
+                      {availableClasses.map(c => (
+                        <Link key={c.slug} href={`/ressources?${new URLSearchParams({ ...sp, class: c.slug === classSlug ? '' : c.slug, page: '1' }).toString()}`} className={`px-2.5 py-1 rounded-full text-xs font-bold transition ${classSlug === c.slug ? 'bg-primary-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>
+                          {c.nameFr}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </details>
+
 
             {/* Main */}
             <div>
