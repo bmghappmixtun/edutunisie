@@ -540,7 +540,7 @@ function ResourceCard({ r }: { r: Resource }) {
         <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
           <span className="flex items-center gap-1">
             <User className="w-3 h-3" />
-            {r.teacher.firstName} {r.teacher.lastName.charAt(0)}.
+            {(r.teacher.firstName || "")} {(r.teacher.lastName || "").charAt(0)}.
           </span>
           <div className="flex items-center gap-3">
             <span className="flex items-center gap-1">
@@ -583,7 +583,7 @@ function ResourceListItem({ r }: { r: Resource }) {
           <span>{TYPE_LABELS[r.type]}</span>
           {r.subject && <span>· {r.subject.nameFr}</span>}
           {r.class && <span>· {r.class.nameFr}</span>}
-          <span>· {r.teacher.firstName} {r.teacher.lastName.charAt(0)}.</span>
+          <span>· {(r.teacher.firstName || "")} {(r.teacher.lastName || "").charAt(0)}.</span>
         </div>
       </div>
       <div className="hidden sm:flex items-center gap-3 text-xs text-slate-500 flex-shrink-0">
