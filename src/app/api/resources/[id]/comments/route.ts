@@ -38,7 +38,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         userId: resource.teacherId,
         type: 'new_comment',
         title: 'Nouveau commentaire',
-        message: `${user.firstName} ${user.lastName} a commenté votre ressource "${resource.title}"`,
+        message: `${user.firstName || ""} ${user.lastName || ""} a commenté votre ressource "${resource.title}"`,
         link: `/ressources/${resource.slug}`
       }
     });

@@ -197,7 +197,7 @@ export async function GET(req: NextRequest) {
       classes: allClasses.filter(c => classCounts.some(cc => cc.classId === c.id && cc._count._all > 0)),
       teachers: allTeachers
         .filter(t => teacherCounts.some(tc => tc.teacherId === t.id && tc._count._all > 0))
-        .map(t => ({ id: t.id, name: `${t.firstName} ${t.lastName}` })),
+        .map(t => ({ id: t.id, name: `${t.firstName || ""} ${t.lastName || ""}` })),
       types: typeCounts,
       years: yearCounts
     },
