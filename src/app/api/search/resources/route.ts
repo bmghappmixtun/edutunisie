@@ -104,8 +104,7 @@ export async function GET(req: NextRequest) {
           subject: { select: { nameFr: true, nameAr: true, slug: true, color: true, icon: true } },
           class: { select: { nameFr: true, nameAr: true, slug: true } },
           section: { select: { nameFr: true, nameAr: true, slug: true } },
-          teacher: { select: { id: true, firstName: true, lastName: true, avatarUrl: true, schoolName: true } }
-        }
+          teacher: { select: { id: true, firstName: true, lastName: true, firstNameAr: true, lastNameAr: true, avatarUrl: true, schoolName: true } },}
       }),
       prisma.resource.count({ where })
     ]);

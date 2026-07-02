@@ -64,8 +64,7 @@ export default async function CollegePillar() {
     include: {
       subject: true,
       class: { include: { level: true } },
-      teacher: { select: { firstName: true, lastName: true } },
-    },
+      teacher: { select: { firstName: true, lastName: true, firstNameAr: true, lastNameAr: true } },},
   });
 
   // Resources by class

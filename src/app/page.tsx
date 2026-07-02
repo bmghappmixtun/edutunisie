@@ -11,13 +11,13 @@ async function getHomeData() {
       where: { status: 'PUBLISHED' },
       take: 8,
       orderBy: [{ viewsCount: 'desc' }, { publishedAt: 'desc' }],
-      include: { subject: true, class: true, teacher: { select: { firstName: true, lastName: true } } }
+      include: { subject: true, class: true, teacher: { select: { firstName: true, lastName: true, firstNameAr: true, lastNameAr: true } },}
     }),
     prisma.resource.findMany({
       where: { status: 'PUBLISHED' },
       take: 8,
       orderBy: { publishedAt: 'desc' },
-      include: { subject: true, class: true, teacher: { select: { firstName: true, lastName: true } } }
+      include: { subject: true, class: true, teacher: { select: { firstName: true, lastName: true, firstNameAr: true, lastNameAr: true } },}
     }),
     Promise.all([
       prisma.resource.count({ where: { status: 'PUBLISHED' } }),
