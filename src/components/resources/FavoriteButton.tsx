@@ -45,7 +45,7 @@ export default function FavoriteButton({
         setFavorited(prevFavorited);
         setCount(prevCount);
         // Optional: redirect to login after a moment
-        setTimeout(() => { window.location.href = '/login'; }, 800);
+        setTimeout(() => { window.location.href = '/connexion'; }, 800);
         return;
       }
       if (!res.ok) throw new Error('Failed');
