@@ -86,7 +86,7 @@ async function searchTeachers(q: string, limit: number): Promise<SuggestResult[]
   return (results as any[]).map(u => ({
     type: 'teacher' as SuggestType,
     id: u.id,
-    title: `${u.firstName} ${u.lastName}`,
+    title: `${u.firstName || ""} ${u.lastName || ""}`,
     subtitle: [u.schoolName, `${u.resourceCount} ressource(s)`].filter(Boolean).join(' · '),
     href: `/professeurs/${u.id}`,
     icon: '👨‍🏫'

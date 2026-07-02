@@ -141,7 +141,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         title: wasPreviouslyRejected
           ? 'Modification re-soumise 🔄'
           : 'Modification en attente ✏️',
-        message: `${user.firstName} ${user.lastName} a ${wasPreviouslyRejected ? 're-soumis une modification sur' : 'modifié'} "${resource.title}" — en attente d'approbation.`,
+        message: `${user.firstName || ""} ${user.lastName || ""} a ${wasPreviouslyRejected ? 're-soumis une modification sur' : 'modifié'} "${resource.title}" — en attente d'approbation.`,
         link: `/admin/ressources/editions`
       }))
     });

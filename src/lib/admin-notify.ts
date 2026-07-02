@@ -32,7 +32,7 @@ export async function notifyAdminsNewTeacher(teacherId: string) {
   // Email notifications
   const adminEmails = getAdminEmailsFromConfig();
   if (!resend) {
-    console.log(`\n📧 [ADMIN EMAIL - DEV] New teacher: ${teacher.firstName} ${teacher.lastName} → ${adminEmails.join(', ')}\n`);
+    console.log(`\n📧 [ADMIN EMAIL - DEV] New teacher: ${teacher.firstName || ""} ${teacher.lastName || ""} → ${adminEmails.join(', ')}\n`);
     return;
   }
 
@@ -52,7 +52,7 @@ export async function notifyAdminsNewTeacher(teacherId: string) {
     await resend.emails.send({
       from: FROM,
       to: Array.from(recipients),
-      subject: `👨‍🏫 Nouveau professeur à approuver : ${teacher.firstName} ${teacher.lastName}`,
+      subject: `👨‍🏫 Nouveau professeur à approuver : ${teacher.firstName || ""} ${teacher.lastName || ""}`,
       html,
     });
   } catch (e) {

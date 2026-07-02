@@ -143,7 +143,7 @@ async function getInitialData(searchParams: any) {
       subjects: subjects.filter((s: any) => subjectFacets.some((f: any) => f.subjectId === s.id && f._count._all > 0)),
       classes: classes.filter((c: any) => classFacets.some((f: any) => f.classId === c.id && f._count._all > 0)),
       teachers: teachers.filter((t: any) => teacherFacets.some((f: any) => f.teacherId === t.id && f._count._all > 0))
-        .map((t: any) => ({ id: t.id, name: `${t.firstName} ${t.lastName}` })),
+        .map((t: any) => ({ id: t.id, name: `${t.firstName || ""} ${t.lastName || ""}` })),
       types: typeFacets,
       years: yearFacets
     }

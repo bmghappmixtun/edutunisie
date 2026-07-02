@@ -194,7 +194,7 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={teacher.avatarUrl}
-                    alt={`${teacher.firstName} ${teacher.lastName}`}
+                    alt={`${teacher.firstName || ''} ${teacher.lastName || ''}`.replace(/\s+/g, ' ').trim()}
                     className="w-32 h-32 md:w-40 md:h-40 rounded-3xl object-cover shadow-2xl border-4 border-white"
                   />
                 ) : (
@@ -228,11 +228,11 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
                         return (
                           <>
                             <h1 className="text-3xl md:text-5xl font-extrabold text-slate-900 mb-2">
-                              {teacher.firstName} {teacher.lastName}
+                              {(teacher.firstName || "") + " " + (teacher.lastName || "")}
                             </h1>
                             {hasAr && (
                               <h2 className="text-xl md:text-2xl font-bold text-slate-600 mb-2" dir="rtl" lang="ar">
-                                {teacher.firstNameAr} {teacher.lastNameAr}
+                                {(teacher.firstNameAr || "") + " " + (teacher.lastNameAr || "")}
                               </h2>
                             )}
                           </>
@@ -279,8 +279,8 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
 
                   <ShareButton
                     url={profileUrl}
-                    title={`${teacher.firstName} ${teacher.lastName} sur Examanet`}
-                    description={`Découvrez les ressources de ${teacher.firstName} ${teacher.lastName}`}
+                    title={`${teacher.firstName || ""} ${teacher.lastName || ""} sur Examanet`}
+                    description={`Découvrez les ressources de ${teacher.firstName || ""} ${teacher.lastName || ""}`}
                   />
                 </div>
 
