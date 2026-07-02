@@ -152,3 +152,4 @@ npm run db:seed     # Réinsérer les données de demo
 ---
 
 **© 2024 Examanet** — Fait avec ❤️ en Tunisie 🇹🇳
+# force redeploy 1783013492
