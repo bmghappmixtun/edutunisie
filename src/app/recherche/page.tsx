@@ -20,7 +20,7 @@ async function getInitialData(searchParams: any) {
   const type = searchParams.type || '';
   const year = searchParams.year || '';
   const sort = searchParams.sort || 'relevance';
-  const page = parseInt(searchParams.page || '1');
+  const page = Math.max(1, parseInt(searchParams.page || "1"));
   const limit = 12;
 
   // Build base where (used when no q)
