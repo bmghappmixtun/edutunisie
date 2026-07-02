@@ -29,3 +29,8 @@ __pycache__/
 .temp-scripts-jun24/
 node_modules/
 .secrets/
+
+
+# One-off scripts with potentially sensitive operations
+extract-*.cjs
+*-extract.cjs
