@@ -104,8 +104,7 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
       subject: { select: { slug: true, nameFr: true, color: true, icon: true } },
       class: { select: { slug: true, nameFr: true } },
       section: { select: { slug: true, nameFr: true } },
-      _count: { select: { comments: true, ratings: true } }
-    }
+      _count: { select: { comments: true, ratings: true } },}
   });
 
   // Stats

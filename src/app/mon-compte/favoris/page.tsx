@@ -13,7 +13,7 @@ export default async function FavoritesPage() {
     orderBy: { createdAt: 'desc' },
     include: {
       resource: {
-        include: { subject: true, class: true, teacher: { select: { firstName: true, lastName: true } } }
+        include: { subject: true, class: true, teacher: { select: { firstName: true, lastName: true, firstNameAr: true, lastNameAr: true } },}
       }
     }
   });

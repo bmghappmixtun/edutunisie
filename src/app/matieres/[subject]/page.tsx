@@ -39,7 +39,7 @@ export default async function SubjectPage({ params }: { params: Promise<{ subjec
     where: { subjectId: subject.id, status: 'PUBLISHED' },
     take: 24,
     orderBy: { publishedAt: 'desc' },
-    include: { subject: true, class: true, teacher: { select: { firstName: true, lastName: true } } }
+    include: { subject: true, class: true, teacher: { select: { firstName: true, lastName: true, firstNameAr: true, lastNameAr: true } },}
   });
 
   const teachers = await prisma.user.findMany({

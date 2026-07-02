@@ -47,7 +47,7 @@ export default async function LevelPage({ params }: { params: Promise<{ level: s
     where: { class: { level: { slug: levelSlug } }, status: 'PUBLISHED' },
     take: 8,
     orderBy: { publishedAt: 'desc' },
-    include: { subject: true, class: true, teacher: { select: { firstName: true, lastName: true } } }
+    include: { subject: true, class: true, teacher: { select: { firstName: true, lastName: true, firstNameAr: true, lastNameAr: true } },}
   });
 
   return (
