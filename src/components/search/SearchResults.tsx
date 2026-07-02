@@ -519,7 +519,7 @@ function ResourceCard({ r }: { r: Resource }) {
         </h3>
 
         {r.description && (
-          <p className="text-xs text-slate-500 line-clamp-2 mb-3">{r.description}</p>
+          <p className="text-xs text-slate-500 line-clamp-2 mb-3" dangerouslySetInnerHTML={{ __html: r.description }} />
         )}
 
         <div className="flex items-center gap-3 text-xs text-slate-500">
