@@ -6,6 +6,7 @@ import UserMenu from './UserMenu';
 import MobileMenu from './MobileMenu';
 import LanguageSwitcher from './LanguageSwitcher';
 import HoverSearchBar from '@/components/search/HoverSearchBar';
+import MobileSearchTrigger from '@/components/search/MobileSearchTrigger';
 import T from '@/components/i18n/T';
 import { getT } from '@/lib/i18n-server';
 
@@ -57,9 +58,7 @@ export default async function Header() {
           {/* RIGHT: Search + actions */}
           <div className="flex-1 flex items-center justify-end gap-2 min-w-0">
             <HoverSearchBar />
-            <Link href="/recherche" className="md:hidden flex items-center gap-2 px-3 py-2 text-sm text-slate-500 hover:text-primary-600">
-              <span>🔍</span>
-            </Link>
+            <MobileSearchTrigger />
             <LanguageSwitcher />
             {user ? (
               <UserMenu user={user} unreadCount={unreadNotifications} />
