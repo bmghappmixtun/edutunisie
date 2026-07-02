@@ -78,7 +78,7 @@ export default function ResourceCard({ resource }: { resource: ResourceCardData 
   return (
     <Link
       href={`/ressources/${resource.slug}`}
-      className="group block relative overflow-hidden rounded-2xl bg-white border border-slate-200 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:border-slate-300"
+      className="group block relative overflow-hidden rounded-2xl bg-white border border-slate-200 min-w-0 max-w-full w-full transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:border-slate-300"
     >
       {/* Accent bar top — subject color */}
       <div
