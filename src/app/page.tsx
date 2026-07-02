@@ -2,10 +2,14 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import HomeClient from '@/components/home/HomeClient';
 import { prisma } from '@/lib/prisma';
+import { getUserFavorites, decorateWithFavorites } from '@/lib/resource-helpers';
 
 export const revalidate = 300; // 5 min cache
 
 async function getHomeData() {
+  const allResourceIds = await prisma.resource.findMany({ where: { status: 'PUBLISHED' }, select: { id: true }, take: 16, orderBy: [{ viewsCount: 'desc' }, { publishedAt: 'desc' }] }).then(r => r.map(x => x.id));
+  const homeFavIds = await getUserFavorites(allResourceIds);
+
   const [popular, recent, statsArr, subjects] = await Promise.all([
     prisma.resource.findMany({
       where: { status: 'PUBLISHED' },
@@ -29,8 +33,8 @@ async function getHomeData() {
   ]);
   const [resourceCount, teacherCount, studentCount, downloads] = statsArr;
   return {
-    popular: JSON.parse(JSON.stringify(popular)),
-    recent: JSON.parse(JSON.stringify(recent)),
+    popular: JSON.parse(JSON.stringify(decorateWithFavorites(popular, homeFavIds))),
+    recent: JSON.parse(JSON.stringify(decorateWithFavorites(recent, homeFavIds))),
     subjects: JSON.parse(JSON.stringify(subjects)),
     stats: {
       resources: resourceCount,

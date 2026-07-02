@@ -3,6 +3,7 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import ResourceCard from '@/components/resources/ResourceCard';
 import { prisma } from '@/lib/prisma';
+import { getUserFavorites, decorateWithFavorites } from '@/lib/resource-helpers';
 import { ChevronRight, BookOpen } from 'lucide-react';
 import { breadcrumbSchema } from '@/lib/structured-data';
 
@@ -41,6 +42,10 @@ export default async function SubjectPage({ params }: { params: Promise<{ subjec
     orderBy: { publishedAt: 'desc' },
     include: { subject: true, class: true, teacher: { select: { firstName: true, lastName: true, firstNameAr: true, lastNameAr: true } },}
   });
+
+  // Decorate with isFavorited
+  const subjectFavIds = await getUserFavorites(resources.map(r => r.id));
+  const decoratedSubjectResources = decorateWithFavorites(resources, subjectFavIds);
 
   const teachers = await prisma.user.findMany({
     where: { role: 'TEACHER', status: 'ACTIVE', isVerifiedTeacher: true },
@@ -84,7 +89,7 @@ export default async function SubjectPage({ params }: { params: Promise<{ subjec
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
           {resources.length > 0 ? (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-              {resources.map(r => <ResourceCard key={r.id} resource={r as any} />)}
+              {decoratedSubjectResources.map(r => <ResourceCard key={r.id} resource={r as any} />)}
             </div>
           ) : (
             <div className="bg-white rounded-2xl p-12 text-center border border-slate-100">

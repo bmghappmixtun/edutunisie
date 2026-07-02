@@ -1,7 +1,8 @@
 import Link from 'next/link';
-import { Star, Eye, Download, CheckCircle2, GraduationCap } from 'lucide-react';
+import { Star, Eye, Download, CheckCircle2, GraduationCap, MessageCircle } from 'lucide-react';
 import { RESOURCE_TYPE_LABELS, HOMEWORK_SUBTYPE_LABELS } from '@/lib/utils';
 import { isArabic } from '@/lib/text-utils';
+import FavoriteButton from './FavoriteButton';
 
 export interface ResourceCardData {
   id: string;
@@ -13,7 +14,9 @@ export interface ResourceCardData {
   downloadsCount: number;
   avgRating: number;
   ratingCount: number;
-  commentsCount?: number;
+  commentsCount: number;
+  favoritesCount?: number;
+  isFavorited?: boolean;
   fileSize?: number;
   pageCount?: number | null;
   language?: string;
@@ -49,6 +52,10 @@ function timeAgo(date: Date | string | null | undefined): string {
   return `${Math.floor(days / 365)}an`;
 }
 
+function formatCount(n: number): string {
+  return n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n);
+}
+
 function langBadge(lang?: string): string {
   if (lang === 'ar') return '🇸🇦';
   if (lang === 'fr+ar' || lang === 'ar+fr') return '🇫🇷+🇹🇳';
@@ -66,6 +73,7 @@ export default function ResourceCard({ resource }: { resource: ResourceCardData 
   const subjectColor = resource.subject.color || '#0EA5E9';
   const titleIsAr = isArabic(resource.title);
   const summaryIsAr = resource.summary ? isArabic(resource.summary) : false;
+  const isAr = titleIsAr || summaryIsAr;
 
   return (
     <Link
@@ -78,9 +86,18 @@ export default function ResourceCard({ resource }: { resource: ResourceCardData 
         style={{ background: subjectColor }}
       />
 
+      {/* Favorite button — top right */}
+      <div className="absolute top-2 right-2 z-10">
+        <FavoriteButton
+          resourceId={resource.id}
+          initialFavorited={resource.isFavorited ?? false}
+          initialCount={resource.favoritesCount ?? 0}
+        />
+      </div>
+
       <div className="p-5">
         {/* Pills row */}
-        <div className="flex flex-wrap items-center gap-1.5 mb-3">
+        <div className="flex flex-wrap items-center gap-1.5 mb-3 pr-10">
           <span className="px-2.5 py-1 bg-blue-50 text-blue-700 text-[10px] font-bold uppercase tracking-wider rounded-full">
             {typeLabel.fr}
           </span>
@@ -144,7 +161,7 @@ export default function ResourceCard({ resource }: { resource: ResourceCardData 
           )}
           {resource.pageCount != null && resource.pageCount > 0 && (
             <span className="text-[11px] text-slate-500 bg-slate-50 px-2 py-0.5 rounded">
-              📄 {resource.pageCount} {summaryIsAr ? 'ص' : 'p'}
+              📄 {resource.pageCount} {isAr ? 'ص' : 'p'}
             </span>
           )}
           {resource.fileSize && (
@@ -156,9 +173,9 @@ export default function ResourceCard({ resource }: { resource: ResourceCardData 
         {/* Teacher */}
         {teacherName && (
           <div className="flex items-center gap-2 mb-4 flex-wrap text-xs">
-            <span className="text-slate-500">{summaryIsAr ? 'الأستاذ' : 'Par'}</span>
+            <span className="text-slate-500">{isAr ? 'الأستاذ' : 'Par'}</span>
             <span className="font-semibold text-slate-700">{teacherName}</span>
-            {teacherNameAr && !summaryIsAr && (
+            {teacherNameAr && !isAr && (
               <span className="text-slate-400" dir="rtl" lang="ar">
                 · {teacherNameAr}
               </span>
@@ -171,28 +188,32 @@ export default function ResourceCard({ resource }: { resource: ResourceCardData 
           </div>
         )}
 
-        {/* Stats footer */}
+        {/* Stats footer — ALWAYS show all 4 counters */}
         <div className="flex items-center justify-between pt-3 border-t border-slate-100">
-          <div className="flex items-center gap-3 text-xs text-slate-500">
-            <span className="flex items-center gap-1">
+          <div className="flex items-center gap-2.5 text-xs text-slate-500">
+            <span className="flex items-center gap-1" title="Vues">
               <Eye className="w-3 h-3" />
-              <span className="text-slate-900 font-bold">{resource.viewsCount >= 1000 ? `${(resource.viewsCount / 1000).toFixed(1)}k` : resource.viewsCount}</span>
+              <span className="text-slate-900 font-bold">{formatCount(resource.viewsCount)}</span>
             </span>
             <span className="text-slate-300">·</span>
-            <span className="flex items-center gap-1">
+            <span className="flex items-center gap-1" title="Téléchargements">
               <Download className="w-3 h-3" />
-              <span className="text-slate-900 font-bold">{resource.downloadsCount >= 1000 ? `${(resource.downloadsCount / 1000).toFixed(1)}k` : resource.downloadsCount}</span>
+              <span className="text-slate-900 font-bold">{formatCount(resource.downloadsCount)}</span>
             </span>
-            {resource.ratingCount > 0 && (
-              <>
-                <span className="text-slate-300">·</span>
-                <span className="flex items-center gap-1 text-amber-500">
-                  <Star className="w-3 h-3 fill-current" />
-                  <span className="text-slate-900 font-bold">{resource.avgRating.toFixed(1)}</span>
-                  <span className="text-slate-400">({resource.ratingCount})</span>
-                </span>
-              </>
-            )}
+            <span className="text-slate-300">·</span>
+            <span className="flex items-center gap-1" title={`${resource.ratingCount} avis`}>
+              <Star className={`w-3 h-3 ${resource.ratingCount > 0 ? 'fill-amber-400 text-amber-400' : 'text-slate-300'}`} />
+              <span className={resource.ratingCount > 0 ? 'text-slate-900 font-bold' : 'text-slate-400'}>
+                {resource.ratingCount > 0 ? resource.avgRating.toFixed(1) : '—'}
+              </span>
+            </span>
+            <span className="text-slate-300">·</span>
+            <span className="flex items-center gap-1" title={`${resource.commentsCount} commentaires`}>
+              <MessageCircle className={`w-3 h-3 ${resource.commentsCount > 0 ? 'text-slate-700' : 'text-slate-300'}`} />
+              <span className={resource.commentsCount > 0 ? 'text-slate-900 font-bold' : 'text-slate-400'}>
+                {resource.commentsCount || 0}
+              </span>
+            </span>
           </div>
           <span className="text-[10px] text-slate-400">{timeAgo(resource.publishedAt)}</span>
         </div>
