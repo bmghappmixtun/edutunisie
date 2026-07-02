@@ -345,7 +345,7 @@ export default function ApprobationsClient({
                               <div className="text-xs text-slate-500 truncate">{r.subject?.nameFr} · {r.class?.nameFr} · {r.type}</div>
                             </div>
                           </div>
-                          {r.description && <p className="text-sm text-slate-600 mb-2 line-clamp-2">{r.description}</p>}
+                          {r.description && <p className="text-sm text-slate-600 mb-2 line-clamp-2" dangerouslySetInnerHTML={{ __html: r.description }} />}
                           <div className="text-xs text-slate-500 flex flex-wrap gap-x-3">
                             <span>👤 {r.teacher?.firstName} {r.teacher?.lastName}</span>
                             {r.teacher?.schoolName && <span>🏫 {r.teacher.schoolName}</span>}
