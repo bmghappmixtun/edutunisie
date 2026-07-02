@@ -232,9 +232,25 @@ export default function AiDescription({ text, source, language, className = '', 
       headerFields.push({ Icon, label: lbl, value: v });
       existingLabels.add(lbl);
     };
+    // tryOverride: always set/override the value (used for fields we want authoritative)
+    const tryOverride = (labelAr: string, labelFr: string, val: string | null | undefined, Icon: typeof User) => {
+      if (!val || typeof val !== 'string') return;
+      const v = val.trim();
+      if (!v || v === 'null' || v === 'None') return;
+      const lbl = isRtl ? labelAr : labelFr;
+      const idx = parsedFields.findIndex((f) => f.label === lbl);
+      if (idx >= 0) {
+        parsedFields[idx] = { ...parsedFields[idx], value: v };
+      } else {
+        headerFields.push({ Icon, label: lbl, value: v });
+        existingLabels.add(lbl);
+      }
+    };
     tryAdd('\u0627\u0644\u0645\u062f\u0631\u0633\u0629', '\u00c9tablissement', h.school, Building2);
     tryAdd('\u0627\u0644\u0623\u0633\u062a\u0627\u0630', 'Enseignant', h.teacher, User);
-    tryAdd('\u0627\u0644\u0645\u0633\u062a\u0648\u0649', 'Niveau', isRtl ? (h.cycleAr || h.cycle) : h.cycle, GraduationCap);
+    // Override 'المستوى'/'Niveau' with the authoritative cycle from headerData
+    // (AI description sometimes uses the class name as level, but they are different)
+    tryOverride('\u0627\u0644\u0645\u0633\u062a\u0648\u0649', 'Niveau', isRtl ? (h.cycleAr || h.cycle) : h.cycle, GraduationCap);
     tryAdd('\u0627\u0644\u0633\u0646\u0629 \u0627\u0644\u062f\u0631\u0627\u0633\u064a\u0629', 'Ann\u00e9e scolaire', h.year, CalendarDays);
     tryAdd('\u0627\u0644\u0645\u0627\u062f\u0629', 'Mati\u00e8re', h.subject, BookOpen);
     tryAdd('\u0627\u0644\u0646\u0648\u0639', 'Type', h.type, FileText);
