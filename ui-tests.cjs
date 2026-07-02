@@ -122,7 +122,7 @@ async function log(name, status, message = '') {
     
     // Should redirect to login
     const url = page.url();
-    if (url.includes('/login') || url.includes('connect')) {
+    if (url.includes('/login') || url.includes('/connexion')) {
       await log('Favorite not-logged-in redirects to login', 'PASS', `URL: ${url}`);
     } else {
       await log('Favorite not-logged-in redirects to login', 'WARN', `URL after click: ${url}`);
@@ -214,17 +214,24 @@ async function log(name, status, message = '') {
   console.log('\n=== TEST 9: AR card rendering ===');
   {
     const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+    // Set locale cookie to AR before navigating
+    await ctx.addCookies([{ name: 'locale', value: 'ar', domain: 'examanet.com', path: '/' }]);
     const page = await ctx.newPage();
-    // Switch to AR
-    await page.goto('https://examanet.com/ar/ressources?cb=' + Date.now(), { waitUntil: 'domcontentloaded', timeout: 30000 });
+    await page.goto('https://examanet.com/ressources?cb=' + Date.now(), { waitUntil: 'domcontentloaded', timeout: 30000 });
+    await page.waitForTimeout(4000);
+    
     await page.screenshot({ path: '/workspace/edutunisie/public/__test-ar.png', fullPage: false });
     
-    // Check for rtl elements
-    const rtlCount = await page.locator('[dir="rtl"]').count();
-    if (rtlCount > 0) {
-      await log('AR mode RTL elements', 'PASS', `${rtlCount} RTL elements`);
+    const debugInfo = await page.evaluate(() => ({
+      htmlDir: document.documentElement.getAttribute('dir'),
+      cookies: document.cookie,
+      rtlCount: document.querySelectorAll('[dir="rtl"]').length,
+    }));
+    
+    if (debugInfo.htmlDir === 'rtl' || debugInfo.rtlCount > 0) {
+      await log('AR mode RTL elements', 'PASS', `htmlDir=${debugInfo.htmlDir}, rtlCount=${debugInfo.rtlCount}`);
     } else {
-      await log('AR mode RTL elements', 'FAIL', 'No RTL found');
+      await log('AR mode RTL elements', 'FAIL', JSON.stringify(debugInfo));
     }
     await ctx.close();
   }
@@ -239,14 +246,105 @@ async function log(name, status, message = '') {
     // Cards with no summary (should show "Pas de résumé disponible")
     const noSummaryCount = await page.locator('text="Pas de résumé disponible"').count();
     await log('No-summary cards display fallback', 'PASS', `${noSummaryCount} cards with fallback text`);
-    
+
     // Check accent bar visible on every card
     const cardsCount = await page.locator('a[href^="/ressources/"]').count();
     await log('All cards have accent bar', 'PASS', `${cardsCount} cards`);
-    
+
     await ctx.close();
   }
-  
+
+  // ========== TEST 11: /recherche empty shouldn't crash ==========
+  console.log('\n=== TEST 11: /recherche empty no crash ===');
+  {
+    const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+    const page = await ctx.newPage();
+    const errors = [];
+    page.on('pageerror', err => errors.push(err.message));
+
+    await page.goto('https://examanet.com/recherche?cb=' + Date.now(), { waitUntil: 'domcontentloaded', timeout: 30000 });
+    await page.waitForTimeout(5000);
+
+    const hasAppError = await page.evaluate(() =>
+      document.body.textContent.includes('Application error') ||
+      document.body.textContent.includes('client-side exception')
+    );
+
+    if (hasAppError) {
+      await log('/recherche empty no crash', 'FAIL', 'Application error still rendered');
+    } else if (errors.length > 0) {
+      const relevantError = errors.find(e => e.includes('charAt') || e.includes('TypeError'));
+      if (relevantError) {
+        await log('/recherche empty no crash', 'FAIL', relevantError.substring(0, 200));
+      } else {
+        await log('/recherche empty no crash', 'PASS', `${errors.length} non-critical errors`);
+      }
+    } else {
+      const title = await page.title();
+      await log('/recherche empty no crash', 'PASS', `Title: ${title}`);
+    }
+
+    await page.screenshot({ path: '/workspace/edutunisie/public/__test-recherche.png', fullPage: false });
+    await ctx.close();
+  }
+
+  // ========== TEST 12: Mobile search button opens overlay ==========
+  console.log('\n=== TEST 12: Mobile search button ===');
+  {
+    const ctx = await browser.newContext({ viewport: { width: 375, height: 667 } });
+    const page = await ctx.newPage();
+
+    await page.goto('https://examanet.com/?cb=' + Date.now(), { waitUntil: 'domcontentloaded', timeout: 30000 });
+    await page.waitForTimeout(3000);
+
+    // Find the mobile-specific search button
+    const mobileBtn = page.locator('button[aria-label="Ouvrir la recherche"]');
+    const count = await mobileBtn.count();
+
+    if (count === 0) {
+      await log('Mobile search button visible', 'FAIL', 'No button with aria-label="Ouvrir la recherche"');
+    } else {
+      const isVisible = await mobileBtn.first().isVisible();
+
+      if (!isVisible) {
+        await log('Mobile search button visible', 'FAIL', 'Button exists but not visible on mobile');
+      } else {
+        await log('Mobile search button visible', 'PASS');
+
+        // Click and verify overlay opens
+        await mobileBtn.first().click();
+        await page.waitForTimeout(2000);
+
+        const overlay = page.locator('[aria-label="Recherche"]');
+        const overlayVisible = await overlay.isVisible().catch(() => false);
+
+        if (overlayVisible) {
+          await log('Mobile search overlay opens', 'PASS', 'Full-screen overlay visible');
+
+          // Check the close button works
+          const closeBtn = page.locator('button[aria-label="Fermer la recherche"]');
+          const closeCount = await closeBtn.count();
+          if (closeCount > 0) {
+            await closeBtn.first().click();
+            await page.waitForTimeout(1000);
+            const closedOverlay = await overlay.isVisible().catch(() => false);
+            if (!closedOverlay) {
+              await log('Mobile search close button works', 'PASS');
+            } else {
+              await log('Mobile search close button works', 'FAIL', 'Overlay still visible after close');
+            }
+          }
+        } else {
+          await log('Mobile search overlay opens', 'FAIL', 'Overlay not visible after click');
+        }
+
+        await page.screenshot({ path: '/workspace/edutunisie/public/__test-mobile-search.png', fullPage: false });
+      }
+    }
+
+    await ctx.close();
+  }
+
   // ========== SUMMARY ==========
   console.log('\n=== TEST SUMMARY ===');
   const passed = TEST_RESULTS.filter(r => r.status === 'PASS').length;
