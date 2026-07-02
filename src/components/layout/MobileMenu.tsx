@@ -1,78 +1,113 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { Menu, X, LogIn, UserPlus } from 'lucide-react';
 
 export default function MobileMenu({ user }: { user: any }) {
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const isTeacher = user?.role === 'TEACHER';
   const isAdmin = user?.role === 'ADMIN';
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Close on Escape
+  useEffect(() => {
+    if (!open) return;
+    const handleKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
+    document.addEventListener('keydown', handleKey);
+    return () => document.removeEventListener('keydown', handleKey);
+  }, [open]);
+
+  // Lock body scroll when open
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [open]);
+
+  const menuContent = open ? (
+    <div className="fixed inset-0 z-[100] lg:hidden" role="dialog" aria-modal="true">
+      <div className="absolute inset-0 bg-slate-900/50" onClick={() => setOpen(false)} />
+      <div className="absolute right-0 top-0 bottom-0 w-80 max-w-[85vw] bg-white shadow-2xl overflow-y-auto flex flex-col">
+        <div className="flex items-center justify-between p-4 border-b border-slate-100 flex-shrink-0">
+          <span className="font-extrabold text-lg">Menu</span>
+          <button onClick={() => setOpen(false)} className="p-2 hover:bg-slate-100 rounded-lg" aria-label="Fermer le menu">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {user ? (
+          <div className="p-4 bg-gradient-to-br from-primary-50 to-white flex-shrink-0">
+            <div className="font-bold">{user.firstName} {user.lastName}</div>
+            <div className="text-xs text-slate-500 truncate">{user.email}</div>
+          </div>
+        ) : (
+          <div className="p-4 grid grid-cols-2 gap-2 border-b border-slate-100 flex-shrink-0">
+            <Link href="/connexion" onClick={() => setOpen(false)} className="flex items-center justify-center gap-2 py-2.5 border border-slate-200 rounded-xl text-sm font-semibold hover:bg-slate-50 transition">
+              <LogIn className="w-4 h-4" /> Connexion
+            </Link>
+            <Link href="/inscription" onClick={() => setOpen(false)} className="flex items-center justify-center gap-2 py-2.5 bg-primary-500 text-white rounded-xl text-sm font-semibold hover:bg-primary-600 transition">
+              <UserPlus className="w-4 h-4" /> Inscription
+            </Link>
+          </div>
+        )}
+
+        <nav className="p-2 flex-1">
+          <Link href="/ressources" onClick={() => setOpen(false)} className="block px-4 py-3 hover:bg-slate-50 rounded-lg font-medium">📚 Ressources</Link>
+          <Link href="/college" onClick={() => setOpen(false)} className="block px-4 py-3 hover:bg-slate-50 rounded-lg font-medium">🏫 Collège</Link>
+          <Link href="/concours-9eme-tunisie" onClick={() => setOpen(false)} className="block px-4 py-3 hover:bg-amber-50 rounded-lg font-medium bg-amber-50/50 border-r-4 border-amber-400">🎯 Concours 9ème</Link>
+          <Link href="/niveaux" onClick={() => setOpen(false)} className="block px-4 py-3 hover:bg-slate-50 rounded-lg font-medium">📊 Niveaux</Link>
+          <Link href="/matieres" onClick={() => setOpen(false)} className="block px-4 py-3 hover:bg-slate-50 rounded-lg font-medium">📖 Matières</Link>
+          <Link href="/professeurs" onClick={() => setOpen(false)} className="block px-4 py-3 hover:bg-slate-50 rounded-lg font-medium">👨‍🏫 Professeurs</Link>
+          <Link href="/faq" onClick={() => setOpen(false)} className="block px-4 py-3 hover:bg-slate-50 rounded-lg font-medium">❓ FAQ</Link>
+
+          {user && (
+            <>
+              <div className="border-t border-slate-100 my-2"></div>
+              <Link href="/mon-compte" onClick={() => setOpen(false)} className="block px-4 py-3 hover:bg-slate-50 rounded-lg font-medium">Mon compte</Link>
+              <Link href="/mon-compte/favoris" onClick={() => setOpen(false)} className="block px-4 py-3 hover:bg-slate-50 rounded-lg font-medium">Mes favoris</Link>
+              {(isTeacher || isAdmin) && (
+                <Link href="/enseignant" onClick={() => setOpen(false)} className="block px-4 py-3 hover:bg-amber-50 text-amber-700 rounded-lg font-medium">Espace enseignant</Link>
+              )}
+              {isAdmin && (
+                <Link href="/admin" onClick={() => setOpen(false)} className="block px-4 py-3 hover:bg-red-50 text-red-600 rounded-lg font-medium">Administration</Link>
+              )}
+              <form action="/api/auth/logout" method="POST">
+                <button type="submit" className="w-full text-left px-4 py-3 hover:bg-red-50 text-red-600 rounded-lg font-medium">Se déconnecter</button>
+              </form>
+            </>
+          )}
+        </nav>
+
+        <div className="p-4 border-t border-slate-100 text-xs text-slate-500 flex-shrink-0">
+          <Link href="/a-propos" onClick={() => setOpen(false)} className="hover:text-slate-700">À propos</Link>
+          <span className="mx-2">·</span>
+          <Link href="/contact" onClick={() => setOpen(false)} className="hover:text-slate-700">Contact</Link>
+        </div>
+      </div>
+    </div>
+  ) : null;
 
   return (
     <>
       <button
         onClick={() => setOpen(true)}
         className="lg:hidden p-2 text-slate-700 hover:bg-slate-100 rounded-lg"
+        aria-label="Ouvrir le menu"
       >
         <Menu className="w-6 h-6" />
       </button>
 
-      {open && (
-        <div className="fixed inset-0 z-[100] lg:hidden">
-          <div className="absolute inset-0 bg-slate-900/50" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-0 bottom-0 w-80 bg-white shadow-2xl overflow-y-auto">
-            <div className="flex items-center justify-between p-4 border-b border-slate-100">
-              <span className="font-extrabold text-lg">Menu</span>
-              <button onClick={() => setOpen(false)} className="p-2 hover:bg-slate-100 rounded-lg">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {user ? (
-              <div className="p-4 bg-gradient-to-br from-primary-50 to-white">
-                <div className="font-bold">{user.firstName} {user.lastName}</div>
-                <div className="text-xs text-slate-500">{user.email}</div>
-              </div>
-            ) : (
-              <div className="p-4 grid grid-cols-2 gap-2 border-b border-slate-100">
-                <Link href="/connexion" onClick={() => setOpen(false)} className="flex items-center justify-center gap-2 py-2.5 border border-slate-200 rounded-xl text-sm font-semibold">
-                  <LogIn className="w-4 h-4" /> Connexion
-                </Link>
-                <Link href="/inscription" onClick={() => setOpen(false)} className="flex items-center justify-center gap-2 py-2.5 bg-primary-500 text-white rounded-xl text-sm font-semibold">
-                  <UserPlus className="w-4 h-4" /> Inscription
-                </Link>
-              </div>
-            )}
-
-            <nav className="p-2">
-              <Link href="/ressources" onClick={() => setOpen(false)} className="block px-4 py-3 hover:bg-slate-50 rounded-lg font-medium">Ressources</Link>
-              <Link href="/college" onClick={() => setOpen(false)} className="block px-4 py-3 hover:bg-slate-50 rounded-lg font-medium">Collège</Link>
-              <Link href="/concours-9eme-tunisie" onClick={() => setOpen(false)} className="block px-4 py-3 hover:bg-amber-50 rounded-lg font-medium bg-amber-50/50">🎯 Concours 9ème</Link>
-              <Link href="/niveaux" onClick={() => setOpen(false)} className="block px-4 py-3 hover:bg-slate-50 rounded-lg font-medium">Niveaux</Link>
-              <Link href="/matieres" onClick={() => setOpen(false)} className="block px-4 py-3 hover:bg-slate-50 rounded-lg font-medium">Matières</Link>
-              <Link href="/professeurs" onClick={() => setOpen(false)} className="block px-4 py-3 hover:bg-slate-50 rounded-lg font-medium">Professeurs</Link>
-              <Link href="/faq" onClick={() => setOpen(false)} className="block px-4 py-3 hover:bg-slate-50 rounded-lg font-medium">FAQ</Link>
-
-              {user && (
-                <>
-                  <div className="border-t border-slate-100 my-2"></div>
-                  <Link href="/mon-compte" onClick={() => setOpen(false)} className="block px-4 py-3 hover:bg-slate-50 rounded-lg font-medium">Mon compte</Link>
-                  <Link href="/mon-compte/favoris" onClick={() => setOpen(false)} className="block px-4 py-3 hover:bg-slate-50 rounded-lg font-medium">Mes favoris</Link>
-                  {(isTeacher || isAdmin) && (
-                    <Link href="/enseignant" onClick={() => setOpen(false)} className="block px-4 py-3 hover:bg-amber-50 text-amber-700 rounded-lg font-medium">Espace enseignant</Link>
-                  )}
-                  {isAdmin && (
-                    <Link href="/admin" onClick={() => setOpen(false)} className="block px-4 py-3 hover:bg-red-50 text-red-600 rounded-lg font-medium">Administration</Link>
-                  )}
-                  <form action="/api/auth/logout" method="POST">
-                    <button type="submit" className="w-full text-left px-4 py-3 hover:bg-red-50 text-red-600 rounded-lg font-medium">Se déconnecter</button>
-                  </form>
-                </>
-              )}
-            </nav>
-          </div>
-        </div>
-      )}
+      {/* Render modal at document.body level via portal to escape any ancestor
+          containing block (e.g., parent's backdrop-filter, transform, etc.) */}
+      {mounted && menuContent && createPortal(menuContent, document.body)}
     </>
   );
 }
