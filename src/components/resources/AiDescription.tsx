@@ -234,7 +234,7 @@ export default function AiDescription({ text, source, language, className = '', 
     };
     tryAdd('\u0627\u0644\u0645\u062f\u0631\u0633\u0629', '\u00c9tablissement', h.school, Building2);
     tryAdd('\u0627\u0644\u0623\u0633\u062a\u0627\u0630', 'Enseignant', h.teacher, User);
-    tryAdd('\u0627\u0644\u0645\u0633\u062a\u0648\u0649', 'Niveau', h.cycle, GraduationCap);
+    tryAdd('\u0627\u0644\u0645\u0633\u062a\u0648\u0649', 'Niveau', isRtl ? (h.cycleAr || h.cycle) : h.cycle, GraduationCap);
     tryAdd('\u0627\u0644\u0633\u0646\u0629 \u0627\u0644\u062f\u0631\u0627\u0633\u064a\u0629', 'Ann\u00e9e scolaire', h.year, CalendarDays);
     tryAdd('\u0627\u0644\u0645\u0627\u062f\u0629', 'Mati\u00e8re', h.subject, BookOpen);
     tryAdd('\u0627\u0644\u0646\u0648\u0639', 'Type', h.type, FileText);
