@@ -129,7 +129,7 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
     subject: resource.subject?.nameFr || 'Éducation',
     type: resource.type,
     year: resource.year,
-    teacher: resource.teacher ? `${resource.teacher.firstName} ${resource.teacher.lastName}`.trim() : null,
+    teacher: resource.teacher ? `${resource.teacher.firstName || ''} ${resource.teacher.lastName || ''}`.replace(/\s+/g, ' ').trim() || null : null,
     url: resourceUrl,
     datePublished: resource.publishedAt?.toISOString() || resource.createdAt?.toISOString(),
     dateModified: resource.updatedAt?.toISOString() || resource.createdAt?.toISOString(),
