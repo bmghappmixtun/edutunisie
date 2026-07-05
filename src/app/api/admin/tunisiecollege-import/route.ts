@@ -110,6 +110,7 @@ export async function POST(req: NextRequest) {
 
     const formData = await req.formData();
     const file = formData.get('file') as File | null;
+    const originalFile = formData.get('originalFile') as File | null; // optional: original Word file
     const metadataStr = formData.get('metadata') as string | null;
 
     if (!file || !metadataStr) {
@@ -118,6 +119,7 @@ export async function POST(req: NextRequest) {
 
     const metadata = JSON.parse(metadataStr);
     const { fileId, parsed, teacherName, teacherId: providedTeacherId } = metadata;
+    const originalFormat = metadata.originalFormat || null; // 'docx' or 'doc' if uploaded
 
     // Check if already imported
     const existing = await prisma.resource.findFirst({
@@ -150,7 +152,7 @@ export async function POST(req: NextRequest) {
       }, { status: 400 });
     }
 
-    // Upload to Vercel Blob
+    // Upload PDF to Vercel Blob (public, on examanet)
     const filePath = `teacher-library/${teacher.id}/imported/${fileId}.pdf`;
     const pdfBuffer = Buffer.from(await file.arrayBuffer());
     const blob = await put(filePath, pdfBuffer, {
@@ -159,6 +161,19 @@ export async function POST(req: NextRequest) {
       // Don't pass token - let @vercel/blob SDK auto-detect from OIDC in production
       // Falls back to process.env.BLOB_READ_WRITE_TOKEN in dev
     });
+
+    // Optional: upload original Word file (kept in teacher library, not public)
+    let originalBlob = null;
+    let originalBuffer: Buffer | null = null;
+    if (originalFile && originalFormat) {
+      originalBuffer = Buffer.from(await originalFile.arrayBuffer());
+      const ext = originalFormat;
+      const originalPath = `teacher-library/${teacher.id}/originals/${fileId}.${ext}`;
+      originalBlob = await put(originalPath, originalBuffer, {
+        access: 'public',
+        addRandomSuffix: true,
+      });
+    }
 
     // Insert Resource
     const slug = slugify(parsed.title);
@@ -172,6 +187,11 @@ export async function POST(req: NextRequest) {
         fileUrl: blob.url,
         fileSize: pdfBuffer.length,
         pageCount: 10,
+        // Original Word file fields (if provided)
+        originalFileKey: originalBlob?.pathname || null,
+        originalFileName: originalFile?.name || null,
+        originalFormat: originalFormat || null,
+        originalFileSize: originalBuffer?.length || null,
         subjectId,
         classId,
         teacherId: teacher.id,
@@ -193,13 +213,15 @@ export async function POST(req: NextRequest) {
     });
 
     // Insert TeacherFile
+    // fileName/fileKey/fileUrl: the original (Word or PDF)
+    // pdfKey/pdfUrl/pdfSize: always the PDF version
     await prisma.teacherFile.create({
       data: {
-        fileName: parsed.title + '.pdf',
-        fileKey: blob.pathname,
-        fileUrl: blob.url,
-        fileSize: pdfBuffer.length,
-        originalFormat: 'pdf',
+        fileName: originalFile?.name || (parsed.title + '.pdf'),
+        fileKey: originalBlob?.pathname || blob.pathname,
+        fileUrl: originalBlob?.url || blob.url,
+        fileSize: originalBuffer?.length || pdfBuffer.length,
+        originalFormat: originalFormat || 'pdf',
         subjectId,
         classId,
         teacherId: teacher.id,
@@ -221,6 +243,8 @@ export async function POST(req: NextRequest) {
       fileUrl: blob.url,
       fileSize: pdfBuffer.length,
       teacherId: teacher.id,
+      originalFileUrl: originalBlob?.url || null,
+      originalFormat: originalFormat || null,
     });
 
   } catch (e: any) {
