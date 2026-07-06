@@ -119,6 +119,7 @@ export async function POST(req: NextRequest) {
 
     const metadata = JSON.parse(metadataStr);
     const { fileId, parsed, teacherName, teacherId: providedTeacherId } = metadata;
+    const source: string = metadata.source || 'tunisiecollege.net';
     const originalFormat = metadata.originalFormat || null; // 'docx' or 'doc' if uploaded
 
     // Check if already imported
@@ -136,7 +137,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Ensure teacher
-    const teacher = await ensureTeacher(teacherName, providedTeacherId);
+    const teacher = await ensureTeacher(teacherName, providedTeacherId, source);
 
     // Look up subject + class IDs
     const subjectId = parsed.subjectSlug
