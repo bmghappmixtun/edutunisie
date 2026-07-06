@@ -46,7 +46,7 @@ async function checkAdmin(req: NextRequest) {
   return user;
 }
 
-async function ensureTeacher(name: string, teacherId?: string) {
+async function ensureTeacher(name: string, teacherId?: string, source: string = 'tunisiecollege.net') {
   if (teacherId) {
     const existing = await prisma.user.findUnique({ where: { id: teacherId } });
     if (existing) return existing;
@@ -83,7 +83,7 @@ async function ensureTeacher(name: string, teacherId?: string) {
       schoolName: null,
       teachingSubjects: JSON.stringify(['mathematiques']),
       teachingLevels: JSON.stringify(['7eme', '8eme', '9eme']),
-      bio: 'Professeur importé depuis tunisiecollege.net',
+      bio: `Professeur importé depuis ${source}`,
       isVerifiedTeacher: true,
     },
   });
@@ -204,7 +204,7 @@ export async function POST(req: NextRequest) {
         hasCorrection: parsed.hasCorrection || false,
         importedByAdmin: true,
         importedAt: new Date(),
-        importedFrom: 'tunisiecollege.net',
+        importedFrom: source,
         originalSubmissionId: String(fileId),
         publishedAt: new Date(),
         approvedAt: new Date(),
@@ -231,7 +231,7 @@ export async function POST(req: NextRequest) {
         resourceId: resource.id,
         importedByAdmin: true,
         importedAt: new Date(),
-        importedFrom: 'tunisiecollege.net',
+        importedFrom: source,
         originalSubmissionId: String(fileId),
         readOnly: true,
       },
