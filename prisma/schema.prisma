@@ -62,6 +62,15 @@ model User {
   notifyEmail     Boolean    @default(true)
   notifyInApp     Boolean    @default(true)
 
+  // Invitation tracking
+  invitationStatus String?       // PENDING_INVITATION | INVITED | INVITATION_EXPIRED | ACTIVATED
+  invitationSentAt DateTime?
+  invitationActivatedAt DateTime?
+  lastInvitationId String?  @unique
+  lastInvitation   TeacherInvitation? @relation("UserInvitation", fields: [lastInvitationId], references: [id])
+  mustChangePassword Boolean   @default(false)
+  passwordSetAt    DateTime?
+
   // Relations
   uploadedFiles   Resource[]    @relation("UploadedBy")
   editsRequested  Resource[]   @relation("EditRequestedBy")
@@ -84,6 +93,8 @@ model User {
   convAsStudent   Conversation[] @relation("ConvStudent")
   convAsTeacher   Conversation[] @relation("ConvTeacher")
   sentMessages    Message[]      @relation("MessageSender")
+  invitations     TeacherInvitation[] @relation("UserAllInvitations")
+  invitationsSent TeacherInvitation[] @relation("InvitedBy")
 
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
@@ -466,6 +477,63 @@ model Newsletter {
   email       String   @unique
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
+}
+
+// ============ TEACHER INVITATIONS ============
+// Track each invitation sent to a teacher: who was invited, when, link clicks, activation
+model TeacherInvitation {
+  id              String   @id @default(cuid())
+
+  // Targeted teacher
+  teacherId       String
+  teacher         User     @relation("UserAllInvitations", fields: [teacherId], references: [id], onDelete: Cascade)
+
+  // Email snapshot at time of invitation (in case teacher email changes later)
+  email           String
+
+  // Secure token used in the invitation link
+  token           String   @unique
+
+  // Unique random password (8 chars) shown to teacher in the email
+  tempPassword    String   // Plain-text (only valid until activation or expiry)
+
+  // Status flow: PENDING → SENT → CLICKED → ACTIVATED (terminal)
+  //                                       ↘ EXPIRED (after 10 days)
+  //                                       ↘ CANCELLED (by admin)
+  status          String   @default("PENDING")
+
+  // Invitation lifecycle timestamps
+  createdAt       DateTime @default(now())      // When the invitation record was created
+  emailSentAt     DateTime?                     // When the email was actually sent (Resend call)
+  linkClickedAt   DateTime?                     // First time the teacher opened the accept page
+  activatedAt     DateTime?                     // When the teacher set their own password
+  cancelledAt     DateTime?                     // When an admin cancelled this invitation
+  expiresAt       DateTime                      // createdAt + 10 days
+
+  // Engagement metadata
+  clickIpAddress  String?
+  clickUserAgent  String?
+  clickCount      Int      @default(0)
+  activateIpAddress String?
+  activateUserAgent String?
+
+  // Who sent the invitation (admin user)
+  invitedById     String?
+  invitedBy       User?    @relation("InvitedBy", fields: [invitedById], references: [id])
+
+  // Inverse relation for User.lastInvitation
+  lastInvitationFor User? @relation("UserInvitation")
+
+  // Optional message from admin included in the email
+  customMessage   String?
+
+  updatedAt       DateTime @updatedAt
+
+  @@index([teacherId])
+  @@index([token])
+  @@index([status])
+  @@index([expiresAt])
+  @@index([email])
 }
 
 // ============ SETTINGS ============
