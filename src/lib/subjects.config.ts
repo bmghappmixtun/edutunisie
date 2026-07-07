@@ -200,10 +200,10 @@ export const SUBJECTS_CONFIG: Record<string, SubjectConfig> = {
       introAr: "لغة التعليم الرسمية في تونس — قواعد، صرف، تعبير، تحرير. تحضير شامل للباكالوريا.",
     },
     hero: {
-      prompt: hero('French literature and language', 'open book, quill pen, Eiffel tower silhouette, poetry pages', 'vintage book opening with floating letters, French flag hints, classical typography', 'illustration', 'rose + cream + Bordeaux pastels'),
+      prompt: hero('French literature and language', 'open book, quill pen, Eiffel tower silhouette, poetry pages', 'vintage book opening with floating letters, French flag hints, classical typography', 'flat', 'rose + cream + Bordeaux pastels'),
       altFr: 'Illustration de livre ouvert et plume, lettres flottantes',
       position: 'right',
-      style: 'illustration',
+      style: 'flat',
     },
   },
 
@@ -229,10 +229,10 @@ export const SUBJECTS_CONFIG: Record<string, SubjectConfig> = {
       introAr: "تدريس اللغة العربية في تونس يشمل النحو والصرف والتعبير والبلاغة وفق البرنامج الرسمي لوزارة التربية.",
     },
     hero: {
-      prompt: hero('Arabic language and calligraphy', 'Arabic calligraphy, geometric islamic patterns, traditional arabesque, calligraphy pen', 'flowing Arabic calligraphic strokes forming geometric arabesque, golden ink on parchment', 'illustration', 'amber + gold + cream warm pastels'),
+      prompt: hero('Arabic language and calligraphy', 'Arabic calligraphy, geometric islamic patterns, traditional arabesque, calligraphy pen', 'flowing Arabic calligraphic strokes forming geometric arabesque, golden ink on parchment', 'flat', 'amber + gold + cream warm pastels'),
       altFr: 'Illustration de calligraphie arabe et motifs géométriques islamiques',
       position: 'right',
-      style: 'illustration',
+      style: 'flat',
     },
   },
 
@@ -257,10 +257,10 @@ export const SUBJECTS_CONFIG: Record<string, SubjectConfig> = {
       introAr: "لغة عالمية — قواعد ومفردات وفهم وتعبير كتابي. جميع المستويات.",
     },
     hero: {
-      prompt: hero('English language learning', 'British flag hints, books, globe, retro typewriter', 'steam from teacup, vintage typewriter, stacked leather books, British flag motif', 'illustration', 'navy blue + cream + red pastels'),
+      prompt: hero('English language learning', 'British flag hints, books, globe, retro typewriter', 'steam from teacup, vintage typewriter, stacked leather books, British flag motif', 'flat', 'navy blue + cream + red pastels'),
       altFr: 'Illustration vintage d\'une machine à écrire, livres et drapeau britannique',
       position: 'right',
-      style: 'illustration',
+      style: 'flat',
     },
   },
 
@@ -698,10 +698,10 @@ export const SUBJECTS_CONFIG: Record<string, SubjectConfig> = {
       introAr: 'الفكر الإسلامي.',
     },
     hero: {
-      prompt: hero('Islamic thought and philosophy', 'ancient manuscripts, mosque lamp, geometric star patterns', 'floating antique Islamic manuscript, ornate mosque lamp, geometric star pattern', 'illustration', 'teal + gold + cream pastels'),
+      prompt: hero('Islamic thought and philosophy', 'ancient manuscripts, mosque lamp, geometric star patterns', 'floating antique Islamic manuscript, ornate mosque lamp, geometric star pattern', 'flat', 'teal + gold + cream pastels'),
       altFr: 'Illustration de manuscrit islamique ancien et lampe de mosquée',
       position: 'background',
-      style: 'illustration',
+      style: 'flat',
     },
   },
 
@@ -724,10 +724,10 @@ export const SUBJECTS_CONFIG: Record<string, SubjectConfig> = {
       introAr: 'ألماني أو إسباني أو إيطالي.',
     },
     hero: {
-      prompt: hero('third foreign language', 'speech bubbles in multiple languages, world flags pattern, open translation book', 'speech bubbles with German/Spanish/Italian letters, world flags collection, multilingual dictionary', 'illustration', 'amber + cream + multicolor pastels'),
+      prompt: hero('third foreign language', 'speech bubbles in multiple languages, world flags pattern, open translation book', 'speech bubbles with German/Spanish/Italian letters, world flags collection, multilingual dictionary', 'flat', 'amber + cream + multicolor pastels'),
       altFr: 'Illustration de bulles de dialogue multilingues et drapeaux',
       position: 'right',
-      style: 'illustration',
+      style: 'flat',
     },
   },
 
@@ -776,10 +776,10 @@ export const SUBJECTS_CONFIG: Record<string, SubjectConfig> = {
       introAr: 'تاريخ وجغرافيا مدموجين.',
     },
     hero: {
-      prompt: hero('history and geography combined', 'open atlas, scroll, compass, calendar', 'overlapping atlas and history book, vintage compass, calendar overlay, telescope', 'illustration', 'indigo + cream + earth tones'),
+      prompt: hero('history and geography combined', 'open atlas, scroll, compass, calendar', 'overlapping atlas and history book, vintage compass, calendar overlay, telescope', 'flat', 'indigo + cream + earth tones'),
       altFr: 'Illustration de livre d\'histoire ouvert et atlas de géographie',
       position: 'background',
-      style: 'illustration',
+      style: 'flat',
     },
   },
 
