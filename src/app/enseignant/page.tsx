@@ -8,9 +8,11 @@ import { isArabic } from '@/lib/text-utils';
 
 export const dynamic = 'force-dynamic';
 
-export default async function TeacherDashboard() {
+export default async function TeacherDashboard(props: { params: Promise<any>; searchParams: Promise<any> }) {
+  const sp = await props.searchParams;
   const user = await getCurrentUser();
   if (!user) redirect('/connexion');
+  const showWelcome = sp?.welcome === '1';
 
   const [totalResources, published, pending, rejected, recentResources] = await Promise.all([
     prisma.resource.count({ where: { teacherId: user.id } }),
@@ -41,6 +43,24 @@ export default async function TeacherDashboard() {
 
   return (
     <div>
+      {showWelcome && (
+        <div className="mb-6 bg-gradient-to-r from-sky-50 to-cyan-50 border-2 border-sky-200 rounded-2xl p-5 flex items-start gap-4">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-500 to-cyan-600 text-white flex items-center justify-center text-2xl flex-shrink-0">🎉</div>
+          <div className="flex-1">
+            <h2 className="font-extrabold text-lg text-slate-900 mb-1">
+              Bienvenue sur Examanet, {user.firstName} !
+            </h2>
+            <p className="text-sm text-slate-700 leading-relaxed">
+              Votre compte enseignant est activé. Vous retrouvez ci-dessous tous vos fichiers.
+              <strong className="text-sky-700"> {totalResources} {totalResources > 1 ? 'ressources sont déjà en ligne' : 'ressource est déjà en ligne'}</strong> sur la plateforme.
+              N'hésitez pas à explorer les statistiques et à modifier vos fichiers à tout moment.
+            </p>
+            <a href="/enseignant/bibliotheque" className="inline-flex items-center gap-1 mt-3 text-sm font-semibold text-sky-700 hover:text-sky-800">
+              Voir ma bibliothèque →
+            </a>
+          </div>
+        </div>
+      )}
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-extrabold">Tableau de bord 👨‍🏫</h1>
         <Link href="/enseignant/ajouter" className="btn-accent">
