@@ -73,7 +73,7 @@ export default function AcceptInvitationClient({ token }: { token: string }) {
       }
 
       // Success: server has set session cookie, just redirect
-      router.push('/espace-enseignant?welcome=1');
+      router.push('/enseignant?welcome=1');
     } catch (e: any) {
       setError(e?.message || 'Erreur réseau');
       setSubmitting(false);
