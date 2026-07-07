@@ -50,6 +50,12 @@ export default function Footer() {
               <li><Link href="/concours-9eme-tunisie" className="hover:text-primary-400 transition">🎯 Concours 9ème</Link></li>
               <li><Link href="/ressources?type=BAC_SUBJECT" className="hover:text-primary-400 transition">Sujets Bac</Link></li>
               <li><Link href="/ressources?type=CORRECTION" className="hover:text-primary-400 transition">Corrigés</Link></li>
+              <li>
+                <Link href="/referentiel-national" className="hover:text-primary-400 transition inline-flex items-center gap-1.5">
+                  <span className="text-base">🇹🇳</span>
+                  <span><T k="footer.referentiel" /></span>
+                </Link>
+              </li>
               <li><Link href="/faq" className="hover:text-primary-400 transition">FAQ</Link></li>
             </ul>
           </div>
