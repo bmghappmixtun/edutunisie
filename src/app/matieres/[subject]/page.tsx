@@ -149,7 +149,7 @@ export default async function SubjectPage({ params, searchParams }: PageProps) {
     if (sect) where.sectionId = sect.id;
   }
   if (sp.type) where.type = sp.type;
-  if (sp.trimestre) where.trimestre = sp.trimestre;
+  if (sp.trimestre) where.trimester = sp.trimestre;
   if (sp.prof) where.teacherId = sp.prof;
 
   // Sort
@@ -169,7 +169,7 @@ export default async function SubjectPage({ params, searchParams }: PageProps) {
       _count: true,
     }),
     prisma.resource.groupBy({
-      by: ['trimestre'],
+      by: ['trimester'],
       where: { ...facetBase, trimester: { not: null } },
       _count: true,
     }),
@@ -210,7 +210,7 @@ export default async function SubjectPage({ params, searchParams }: PageProps) {
     }),
     prisma.section.findMany({
       where: { resources: { some: { subjectId: subject.id, status: 'PUBLISHED' } } },
-      select: { id: true, name: true, slug: true, class: { select: { nameFr: true } } },
+      select: { id: true, nameFr: true, slug: true, class: { select: { nameFr: true } } },
       take: 100,
     }),
   ]);
@@ -243,7 +243,7 @@ export default async function SubjectPage({ params, searchParams }: PageProps) {
 
   // Unique teachers (dedupe)
   const uniqueTeachers = Array.from(
-    new Map(teachers.filter((t) => t.teacher).map((t) => [t.teacher!.id, t.teacher!])).values()
+    new Map(teachers.filter((t) => (t as any).teacher).map((t) => [(t as any).teacher!.id, (t as any).teacher!])).values()
   );
 
   // ===== JSON-LD =====
@@ -257,16 +257,20 @@ export default async function SubjectPage({ params, searchParams }: PageProps) {
   ]);
 
   const courseJsonLd = courseSchema({
-    name: subject.nameFr,
+    slug: subject.slug,
+    title: subject.nameFr,
     description:
       cfg?.seo?.descriptionFr ??
       `Cours complets en ${subject.nameFr} pour le système éducatif tunisien (7ème au Baccalauréat).`,
+    language: 'fr',
+    level: 'Enseignement Secondaire',
+    cycle: 'Tous niveaux',
+    subject: subject.nameFr,
+    type: 'COURSE',
     url,
-    provider: 'Examanet',
-    instructor: 'Professeurs tunisiens',
-    inLanguage: 'fr',
-    offers: { price: 0, priceCurrency: 'TND', availability: 'https://schema.org/InStock' },
-    aggregateRating: { ratingValue: 4.7, reviewCount: totalCount, bestRating: 5, worstRating: 1 },
+    datePublished: new Date().toISOString(),
+    dateModified: new Date().toISOString(),
+    aggregateRating: { ratingValue: 4.7, ratingCount: Math.min(totalCount, 500) },
   });
 
   const itemListJsonLd =
@@ -381,13 +385,13 @@ export default async function SubjectPage({ params, searchParams }: PageProps) {
               <SubjectFilters
                 subjectSlug={subject.slug}
                 classes={classes}
-                sections={sections}
+                sections={sections.map((s) => ({ id: s.id, name: s.nameFr, slug: s.slug, class: s.class }))}
                 teachers={uniqueTeachers}
                 resourceTypes={RESOURCE_TYPES}
                 trimesters={TRIMESTERS}
                 facets={{
                   byType: Object.fromEntries(byType.map((b) => [b.type, b._count])),
-                  byTrimestre: Object.fromEntries(byTrimestre.map((b) => [b.trimestre!, b._count])),
+                  byTrimestre: Object.fromEntries(byTrimestre.map((b) => [b.trimester!, b._count])),
                   byAnnee: byAnnee.filter((b) => b.class).reduce(
                     (acc: Record<string, number>, b) => {
                       if (b.class) acc[b.class.slug ?? b.class.nameFr] = (acc[b.class.slug ?? b.class.nameFr] ?? 0) + 1;
@@ -414,7 +418,7 @@ export default async function SubjectPage({ params, searchParams }: PageProps) {
                   </div>
                   <div className="text-xs text-slate-500 mt-0.5">
                     {sp.annee && `Classe: ${classes.find((c) => c.slug === sp.annee)?.nameFr ?? sp.annee}`}
-                    {sp.section && ` · Section: ${sections.find((s) => s.slug === sp.section)?.name ?? sp.section}`}
+                    {sp.section && ` · Section: ${sections.find((s) => s.slug === sp.section)?.nameFr ?? sp.section}`}
                     {sp.trimestre && ` · Trim. ${sp.trimestre}`}
                     {sp.type && ` · ${RESOURCE_TYPES.find((t) => t.slug === sp.type)?.label ?? sp.type}`}
                   </div>
