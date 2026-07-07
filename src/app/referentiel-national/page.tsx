@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import fs from 'fs';
 import path from 'path';
+import Header from '@/components/layout/Header';
+import Footer from '@/components/layout/Footer';
 import ReferentielContent from './ReferentielContent';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
@@ -48,11 +50,16 @@ export default function ReferentielNationalPage() {
 
   return (
     <>
+      <Header />
       {/* Inline the page-specific CSS so it scopes itself */}
       <style dangerouslySetInnerHTML={{ __html: css }} />
 
-      {/* Render the static HTML body */}
-      <ReferentielContent html={bodyHtml} />
+      {/* Main content pushed below the fixed Header */}
+      <main className="pt-[62px] lg:pt-[73px]">
+        <ReferentielContent html={bodyHtml} />
+      </main>
+
+      <Footer />
     </>
   );
 }
