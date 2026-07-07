@@ -41,6 +41,14 @@ const nextConfig = {
   },
   compress: true,
   poweredByHeader: false,
+  async rewrites() {
+    return [
+      {
+        source: '/referentiel-national',
+        destination: '/referentiel-national.html',
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;
