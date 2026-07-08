@@ -74,6 +74,18 @@ export default async function ResourcesPage(props: { searchParams: Promise<Searc
     : sort === 'oldest' ? { publishedAt: 'asc' }
     : { publishedAt: 'desc' };
 
+  // ============== Build base where for facets (excludes search OR) ==============
+  const facetBase: Prisma.ResourceWhereInput = { status: 'PUBLISHED' };
+  if (type.length > 0) facetBase.type = { in: type };
+  if (classSlug.length > 0) facetBase.class = { slug: { in: classSlug } };
+  if (section.length > 0) facetBase.section = { slug: { in: section } };
+  if (subject.length > 0) facetBase.subject = { slug: { in: subject } };
+  if (trimestre.length > 0) facetBase.trimester = { in: trimestre };
+  if (year.length > 0) facetBase.year = { in: year };
+  if (language.length > 0) facetBase.language = { in: language };
+  if (hasCorrection) facetBase.hasCorrection = true;
+  if (teacherId) facetBase.teacherId = teacherId;
+
   // ============== Run all queries in parallel ==============
   const PAGE_SIZE = 24;
   const [
@@ -85,9 +97,6 @@ export default async function ResourcesPage(props: { searchParams: Promise<Searc
     byLanguage,
     withCorrectionCount,
     currentUser,
-    classGroups,
-    sectionGroups,
-    subjectGroups,
   ] = await Promise.all([
     prisma.resource.findMany({
       where,
@@ -136,22 +145,45 @@ export default async function ResourcesPage(props: { searchParams: Promise<Searc
     }),
     prisma.resource.count({ where: { ...where, hasCorrection: true } }),
     getCurrentUser(),
-    prisma.resource.groupBy({
-      by: ['classId'],
-      where: { ...where, classId: { not: null } } as unknown as Prisma.ResourceWhereInput,
-      _count: { _all: true },
+  ]);
+
+  // Fetch class/section/subject IDs separately (groupBy on nullable strings has TS issues)
+  const [classRecords, sectionRecords, subjectRecords] = await Promise.all([
+    prisma.resource.findMany({
+      where: facetBase,
+      select: { classId: true },
     }),
-    prisma.resource.groupBy({
-      by: ['sectionId'],
-      where: { ...where, sectionId: { not: null } } as unknown as Prisma.ResourceWhereInput,
-      _count: { _all: true },
+    prisma.resource.findMany({
+      where: facetBase,
+      select: { sectionId: true },
     }),
-    prisma.resource.groupBy({
-      by: ['subjectId'],
-      where: { ...where, subjectId: { not: null } } as unknown as Prisma.ResourceWhereInput,
-      _count: { _all: true },
+    prisma.resource.findMany({
+      where: facetBase,
+      select: { subjectId: true },
     }),
   ]);
+
+  // Group manually
+  const classGroups = Object.entries(
+    classRecords.reduce((acc, r) => {
+      if (r.classId) acc[r.classId] = (acc[r.classId] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>)
+  ).map(([classId, count]) => ({ classId, _count: { _all: count } }));
+
+  const sectionGroups = Object.entries(
+    sectionRecords.reduce((acc, r) => {
+      if (r.sectionId) acc[r.sectionId] = (acc[r.sectionId] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>)
+  ).map(([sectionId, count]) => ({ sectionId, _count: { _all: count } }));
+
+  const subjectGroups = Object.entries(
+    subjectRecords.reduce((acc, r) => {
+      if (r.subjectId) acc[r.subjectId] = (acc[r.subjectId] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>)
+  ).map(([subjectId, count]) => ({ subjectId, _count: { _all: count } }));
 
   // Resolve class/section/subject names
   const classIds = classGroups.map((g) => g.classId).filter((id): id is string => !!id);
