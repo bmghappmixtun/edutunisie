@@ -20,3 +20,4 @@ export interface RessourcesResponse {
   currentPage: number;
   facets: Facets;
 }
+console.log('Build timestamp:', new Date().toISOString());
