@@ -88,6 +88,18 @@ export async function GET(req: NextRequest) {
 
   const where = buildWhere(filters);
 
+  // Build base where for facets (excludes search OR to avoid type conflicts)
+  const facetBase: Prisma.ResourceWhereInput = { status: 'PUBLISHED' };
+  if (filters.type.length > 0) facetBase.type = { in: filters.type };
+  if (filters.class.length > 0) facetBase.class = { slug: { in: filters.class } };
+  if (filters.section.length > 0) facetBase.section = { slug: { in: filters.section } };
+  if (filters.subject.length > 0) facetBase.subject = { slug: { in: filters.subject } };
+  if (filters.trimestre.length > 0) facetBase.trimester = { in: filters.trimestre };
+  if (filters.year.length > 0) facetBase.year = { in: filters.year };
+  if (filters.language.length > 0) facetBase.language = { in: filters.language };
+  if (filters.hasCorrection) facetBase.hasCorrection = true;
+  if (filters.teacherId) facetBase.teacherId = filters.teacherId;
+
   // Sort
   let orderBy: Prisma.ResourceOrderByWithRelationInput = { publishedAt: 'desc' };
   if (sort === 'popular') orderBy = { viewsCount: 'desc' };
@@ -153,6 +165,22 @@ export async function GET(req: NextRequest) {
     prisma.resource.count({ where: { ...where, hasCorrection: true } }),
   ]);
 
+  // Fetch class/section/subject IDs separately (groupBy on nullable strings has TS issues)
+  const [classRecords, sectionRecords, subjectRecords] = await Promise.all([
+    prisma.resource.findMany({
+      where: facetBase,
+      select: { classId: true },
+    }),
+    prisma.resource.findMany({
+      where: facetBase,
+      select: { sectionId: true },
+    }),
+    prisma.resource.findMany({
+      where: facetBase,
+      select: { subjectId: true },
+    }),
+  ]);
+
   // Format simple facets
   const byTypeMap: Record<string, number> = {};
   byType.forEach((b) => {
@@ -174,25 +202,28 @@ export async function GET(req: NextRequest) {
     if (b.language && b._count && typeof b._count === 'object') byLanguageMap[b.language] = b._count._all ?? 0;
   });
 
-  // For class/section/subject facets: use Prisma's $queryRaw or multiple parallel counts
-  // Get all unique slugs for each dimension via groupBy
-  const [classGroups, sectionGroups, subjectGroups] = await Promise.all([
-    prisma.resource.groupBy({
-      by: ['classId'],
-      where: { ...where, classId: { not: null } } as unknown as Prisma.ResourceWhereInput,
-      _count: { _all: true },
-    }),
-    prisma.resource.groupBy({
-      by: ['sectionId'],
-      where: { ...where, sectionId: { not: null } } as unknown as Prisma.ResourceWhereInput,
-      _count: { _all: true },
-    }),
-    prisma.resource.groupBy({
-      by: ['subjectId'],
-      where: { ...where, subjectId: { not: null } } as unknown as Prisma.ResourceWhereInput,
-      _count: { _all: true },
-    }),
-  ]);
+  // For class/section/subject facets: use findMany with select instead of groupBy
+  // (Prisma TS type for `not: null` on nullable strings is awkward; we filter in JS)
+  const classGroups = Object.entries(
+    classRecords.reduce((acc, r) => {
+      if (r.classId) acc[r.classId] = (acc[r.classId] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>)
+  ).map(([classId, count]) => ({ classId, _count: { _all: count } }));
+
+  const sectionGroups = Object.entries(
+    sectionRecords.reduce((acc, r) => {
+      if (r.sectionId) acc[r.sectionId] = (acc[r.sectionId] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>)
+  ).map(([sectionId, count]) => ({ sectionId, _count: { _all: count } }));
+
+  const subjectGroups = Object.entries(
+    subjectRecords.reduce((acc, r) => {
+      if (r.subjectId) acc[r.subjectId] = (acc[r.subjectId] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>)
+  ).map(([subjectId, count]) => ({ subjectId, _count: { _all: count } }));
 
   // Resolve class slugs
   const classIds = classGroups.map((g) => g.classId).filter((id): id is string => !!id);
