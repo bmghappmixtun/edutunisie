@@ -1,4 +1,3 @@
-import { Suspense } from 'react';
 import { Prisma } from '@prisma/client';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -8,7 +7,7 @@ import { itemListSchema } from '@/lib/structured-data';
 import FilterShell, { type Facets } from '@/components/ressources/FilterShell';
 import { getCurrentUser } from '@/lib/auth';
 
-export const revalidate = 60; // 1 min cache - new uploads
+export const dynamic = 'force-dynamic'; // dynamic because of searchParams
 
 interface SearchParams {
   q?: string;
@@ -278,19 +277,17 @@ export default async function ResourcesPage(props: { searchParams: Promise<Searc
           </div>
 
           {/* FilterShell (client) */}
-          <Suspense fallback={<FilterShellSkeleton />}>
-            <FilterShell
-              initialData={{
-                resources,
-                total,
-                totalPages: Math.ceil(total / PAGE_SIZE),
-                currentPage: page,
-                facets,
-              }}
-              userId={currentUser?.id ?? null}
-              initialFavorites={favoriteIds}
-            />
-          </Suspense>
+          <FilterShell
+            initialData={{
+              resources,
+              total,
+              totalPages: Math.ceil(total / PAGE_SIZE),
+              currentPage: page,
+              facets,
+            }}
+            userId={currentUser?.id ?? null}
+            initialFavorites={favoriteIds}
+          />
         </div>
       </main>
 
