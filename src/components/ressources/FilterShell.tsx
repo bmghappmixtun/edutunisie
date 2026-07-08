@@ -33,18 +33,12 @@ import ResourceCard from '@/components/resources/ResourceCard';
 import ResourceListItem from '@/components/resources/ResourceListItem';
 
 // ============== TYPES ==============
-import type { Facets as FacetsType } from '@/app/api/ressources/route';
+import type { Facets as FacetsType, RessourcesResponse } from '@/lib/facets';
 
-export type { Facets } from '@/app/api/ressources/route';
+export type { Facets } from '@/lib/facets';
 
 interface FilterShellProps {
-  initialData: {
-    resources: any[];
-    total: number;
-    totalPages: number;
-    currentPage: number;
-    facets: FacetsType;
-  };
+  initialData: RessourcesResponse;
   userId: string | null;
   initialFavorites: Set<string>;
 }

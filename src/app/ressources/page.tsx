@@ -4,7 +4,8 @@ import Footer from '@/components/layout/Footer';
 import { prisma } from '@/lib/prisma';
 import { getUserFavorites } from '@/lib/resource-helpers';
 import { itemListSchema } from '@/lib/structured-data';
-import FilterShell, { type Facets } from '@/components/ressources/FilterShell';
+import FilterShell from '@/components/ressources/FilterShell';
+import type { Facets } from '@/lib/facets';
 import { getCurrentUser } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic'; // dynamic because of searchParams
