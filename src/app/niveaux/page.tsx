@@ -119,12 +119,6 @@ export default async function NiveauxPage() {
 
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 lg:py-20">
             <div className="max-w-3xl">
-              {/* Eyebrow */}
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 rounded-full mb-5 text-xs font-semibold text-slate-700 shadow-sm">
-                <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                Système éducatif tunisien · JORT 2019-1085
-              </div>
-
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 mb-4 leading-tight">
                 Tous les{' '}
                 <span className="relative inline-block">
@@ -155,9 +149,10 @@ export default async function NiveauxPage() {
               </h1>
 
               <p className="text-lg text-slate-600 leading-relaxed mb-6">
-                Du Primaire au Baccalauréat, retrouvez les ressources conformes au programme
-                officiel du Ministère de l'Éducation tunisien. Cours, devoirs, exercices,
-                corrigés et sujets BAC — organisés par cycle et par classe.
+                Notre plateforme couvre les classes <strong className="font-semibold text-slate-900">à partir de la 7ème année de base jusqu&apos;au Baccalauréat</strong>.
+                Retrouvez les ressources conformes au programme officiel du Ministère de
+                l&apos;Éducation tunisien : cours, devoirs, exercices, corrigés et sujets
+                BAC — organisés par cycle et par classe.
               </p>
 
               {/* Stats pills */}
