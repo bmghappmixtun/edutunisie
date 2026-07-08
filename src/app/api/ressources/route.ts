@@ -1,29 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
+import type { Facets, RessourcesResponse } from '@/lib/facets';
+
+export { type Facets, type RessourcesResponse } from '@/lib/facets';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
-
-// ============== TYPES ==============
-export interface Facets {
-  byType: Record<string, number>;
-  byTrimestre: Record<string, number>;
-  byYear: Record<string, number>;
-  byLanguage: Record<string, number>;
-  byClass: Record<string, number>;
-  bySection: Record<string, number>;
-  bySubject: Record<string, number>;
-  withCorrection: number;
-}
-
-export interface RessourcesResponse {
-  resources: any[];
-  total: number;
-  totalPages: number;
-  currentPage: number;
-  facets: Facets;
-}
 
 // ============== HELPERS ==============
 function buildWhere(filters: ParsedFilters, exclude: (keyof ParsedFilters)[] = []): Prisma.ResourceWhereInput {
