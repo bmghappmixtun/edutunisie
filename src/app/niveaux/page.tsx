@@ -8,6 +8,7 @@ import {
   Baby, Library, Atom, Trophy, BookMarked, ChevronRight,
   type LucideIcon,
 } from 'lucide-react';
+import ClassAccordion from '@/components/niveaux/ClassAccordion';
 
 export const revalidate = 300; // 5 min cache
 
@@ -55,13 +56,73 @@ const CLASS_STYLES: Record<string, { roman: string; emoji: string; tint: string 
   '4eme-secondaire': { roman: 'IV', emoji: '🎯', tint: '#A855F7' },
 };
 
+/** Per-section design: emoji + color tint. Keyed by `${classSlug}:${sectionSlug}` */
+function sectionStyle(classSlug: string, sectionSlug: string): { emoji: string; tint: string } {
+  // 2AS sections
+  if (classSlug === '2eme-secondaire') {
+    if (sectionSlug === 'sciences')                  return { emoji: '🔬', tint: '#0EA5E9' };
+    if (sectionSlug === 'technologies-informatique') return { emoji: '💻', tint: '#2563EB' };
+    if (sectionSlug === 'eco-services')              return { emoji: '📊', tint: '#0891B2' };
+    if (sectionSlug === 'lettres')                   return { emoji: '📚', tint: '#A855F7' };
+    if (sectionSlug === 'sport')                     return { emoji: '⚽', tint: '#EA580C' };
+  }
+  // 3AS / 4AS sections
+  if (classSlug === '3eme-secondaire' || classSlug === '4eme-secondaire') {
+    if (sectionSlug === 'maths')                    return { emoji: '📐', tint: '#7C3AED' };
+    if (sectionSlug === 'sciences')                 return { emoji: '🧪', tint: '#059669' };
+    if (sectionSlug === 'technique')                return { emoji: '⚙️', tint: '#475569' };
+    if (sectionSlug === 'sciences-informatique')    return { emoji: '💾', tint: '#1E40AF' };
+    if (sectionSlug === 'eco-gestion')              return { emoji: '💼', tint: '#DC2626' };
+    if (sectionSlug === 'lettres')                  return { emoji: '📚', tint: '#A855F7' };
+    if (sectionSlug === 'sport')                    return { emoji: '⚽', tint: '#EA580C' };
+  }
+  return { emoji: '📖', tint: '#7C3AED' };
+}
+
+/** Classes that have sections (2AS, 3AS, 4AS) — the ones with drill-down */
+const CLASSES_WITH_SECTIONS = new Set([
+  '2eme-secondaire',
+  '3eme-secondaire',
+  '4eme-secondaire',
+]);
+
 export default async function NiveauxPage() {
   const levels = await prisma.level.findMany({
     orderBy: { order: 'asc' },
     include: {
       classes: {
         orderBy: { order: 'asc' },
-        include: { _count: { select: { resources: { where: { status: 'PUBLISHED' } } } } },
+        include: {
+          _count: { select: { resources: { where: { status: 'PUBLISHED' } } } },
+          // Only fetch sections for classes that have them (perf optimization)
+          sections: {
+            where: { class: { slug: { in: Array.from(CLASSES_WITH_SECTIONS) } } },
+            orderBy: { nameFr: 'asc' },
+            include: {
+              _count: { select: { resources: { where: { status: 'PUBLISHED' } } } },
+              // Pre-fetch top 8 resources per section for the inline drill-down
+              resources: {
+                where: { status: 'PUBLISHED' },
+                orderBy: { publishedAt: 'desc' },
+                take: 8,
+                select: {
+                  id: true,
+                  slug: true,
+                  title: true,
+                  type: true,
+                  trimester: true,
+                  year: true,
+                  pageCount: true,
+                  fileSize: true,
+                  viewsCount: true,
+                  downloadsCount: true,
+                  subject: { select: { slug: true, nameFr: true, color: true } },
+                  teacher: { select: { firstName: true, lastName: true } },
+                },
+              },
+            },
+          },
+        },
       },
     },
   });
@@ -276,84 +337,60 @@ export default async function NiveauxPage() {
                       emoji: '📚',
                       tint: design.color,
                     };
-                    const romanNum = classStyle.roman;
+                    const hasSections = CLASSES_WITH_SECTIONS.has(cls.slug) && cls.sections.length > 0;
+                    // Map sections with design tokens
+                    const sections = hasSections
+                      ? cls.sections.map((s) => {
+                          const sStyle = sectionStyle(cls.slug, s.slug);
+                          return {
+                            id: s.id,
+                            slug: s.slug,
+                            nameFr: s.nameFr,
+                            nameAr: s.nameAr,
+                            emoji: sStyle.emoji,
+                            tint: sStyle.tint,
+                            _count: s._count,
+                            resources: s.resources.map((r) => ({
+                              id: r.id,
+                              slug: r.slug,
+                              title: r.title,
+                              type: r.type,
+                              trimester: r.trimester,
+                              year: r.year,
+                              pageCount: r.pageCount,
+                              fileSize: r.fileSize,
+                              viewsCount: r.viewsCount,
+                              downloadsCount: r.downloadsCount,
+                              subject: {
+                                slug: r.subject.slug,
+                                nameFr: r.subject.nameFr,
+                                color: r.subject.color,
+                              },
+                              teacher: r.teacher
+                                ? {
+                                    firstName: r.teacher.firstName,
+                                    lastName: r.teacher.lastName,
+                                  }
+                                : null,
+                            })),
+                          };
+                        })
+                      : undefined;
                     return (
-                      <Link
+                      <ClassAccordion
                         key={cls.id}
-                        href={`/ressources?class=${cls.slug}`}
-                        className="group relative flex flex-col items-center text-center p-5 lg:p-6 bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-xl hover:-translate-y-1 hover:border-slate-300 transition-all duration-300 overflow-hidden"
-                      >
-                        {/* Top accent bar (animates on hover) */}
-                        <div
-                          className="absolute top-0 left-0 right-0 h-1 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"
-                          style={{ background: design.color }}
-                        />
-
-                        {/* Background tint (fades in on hover) */}
-                        <div
-                          className={`absolute inset-0 bg-gradient-to-br ${design.cardGradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none`}
-                        />
-
-                        {/* Roman numeral icon block */}
-                        <div
-                          className="relative w-16 h-16 lg:w-20 lg:h-20 rounded-2xl flex items-center justify-center mb-3 transition-all duration-300 group-hover:scale-110 group-hover:rotate-3"
-                          style={{
-                            background: `${classStyle.tint}1A`,
-                            boxShadow: `0 6px 16px -6px ${classStyle.tint}55`,
-                          }}
-                        >
-                          {/* Background roman numeral */}
-                          <span
-                            className="absolute text-2xl lg:text-3xl font-extrabold opacity-15"
-                            style={{ color: classStyle.tint }}
-                          >
-                            {romanNum}
-                          </span>
-                          {/* Foreground emoji */}
-                          <span className="relative text-3xl lg:text-4xl drop-shadow-sm">
-                            {classStyle.emoji}
-                          </span>
-                        </div>
-
-                        {/* Class name FR */}
-                        <h3 className="relative font-bold text-sm lg:text-base text-slate-900 leading-tight mb-1">
-                          {cls.nameFr}
-                        </h3>
-
-                        {/* Class name AR */}
-                        {cls.nameAr && (
-                          <p
-                            dir="rtl"
-                            className="relative text-xs text-slate-500 leading-tight mb-3"
-                            lang="ar"
-                          >
-                            {cls.nameAr}
-                          </p>
-                        )}
-                        {!cls.nameAr && <div className="mb-3" />}
-
-                        {/* Resource count badge */}
-                        <div className="relative mt-auto">
-                          <span
-                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold"
-                            style={{
-                              background: `${classStyle.tint}15`,
-                              color: classStyle.tint,
-                            }}
-                          >
-                            <span className="tabular-nums">
-                              {cls._count.resources.toLocaleString('fr-FR')}
-                            </span>
-                            <span className="font-normal opacity-80">ressources</span>
-                          </span>
-                        </div>
-
-                        {/* Hover arrow */}
-                        <ArrowRight
-                          className="absolute bottom-3 right-3 w-4 h-4 opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0 transition-all duration-300"
-                          style={{ color: classStyle.tint }}
-                        />
-                      </Link>
+                        classData={{
+                          id: cls.id,
+                          slug: cls.slug,
+                          nameFr: cls.nameFr,
+                          nameAr: cls.nameAr,
+                          _count: cls._count,
+                        }}
+                        classStyle={classStyle}
+                        design={{ color: design.color, cardGradient: design.cardGradient }}
+                        hasSections={hasSections}
+                        sections={sections}
+                      />
                     );
                   })}
                 </div>
