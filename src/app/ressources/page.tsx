@@ -1,373 +1,316 @@
-import Link from 'next/link';
-import { Search, Filter, X, User } from 'lucide-react';
+import { Suspense } from 'react';
+import { Prisma } from '@prisma/client';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
-import ResourceCard from '@/components/resources/ResourceCard';
-import ResourceListItem from '@/components/resources/ResourceListItem';
-import ResourcesViewClient from '@/components/resources/ResourcesViewClient';
 import { prisma } from '@/lib/prisma';
-import { getUserFavorites, decorateWithFavorites } from '@/lib/resource-helpers';
-import { RESOURCE_TYPE_LABELS } from '@/lib/utils';
+import { getUserFavorites } from '@/lib/resource-helpers';
 import { itemListSchema } from '@/lib/structured-data';
+import FilterShell, { type Facets } from '@/components/ressources/FilterShell';
+import { getCurrentUser } from '@/lib/auth';
 
 export const revalidate = 60; // 1 min cache - new uploads
 
-const TYPE_LABELS_FR: Record<string, string> = Object.fromEntries(
-  Object.entries(RESOURCE_TYPE_LABELS).map(([k, v]) => [k, (v as any).fr])
-);
-const TYPES = Object.keys(RESOURCE_TYPE_LABELS);
+interface SearchParams {
+  q?: string;
+  type?: string | string[];
+  class?: string | string[];
+  section?: string | string[];
+  subject?: string | string[];
+  trimestre?: string | string[];
+  year?: string | string[];
+  language?: string | string[];
+  hasCorrection?: string;
+  teacherId?: string;
+  sort?: string;
+  page?: string;
+  view?: string;
+}
 
-const SORTS = [
-  { value: 'recent', label: 'Plus récent' },
-  { value: 'popular', label: 'Plus consulté' },
-  { value: 'downloads', label: 'Plus téléchargé' },
-  { value: 'rating', label: 'Mieux noté' },
-];
+const toArr = (v: string | string[] | undefined): string[] => {
+  if (!v) return [];
+  return Array.isArray(v) ? v : [v];
+};
 
-export default async function ResourcesPage(props: { params: Promise<any>; searchParams: Promise<any> }) {
+export default async function ResourcesPage(props: { searchParams: Promise<SearchParams> }) {
   const sp = await props.searchParams;
-  const q = sp?.q || '';
-  const type = sp?.type || '';
-  const subject = sp?.subject || '';
-  const classSlug = sp?.class || '';
-  const teacherId = sp?.teacher || '';
-  const sort = sp?.sort || 'recent';
-  const view = sp?.view === 'list' ? 'list' : 'grid';
-  const page = parseInt(sp?.page || '1');
 
-  // Base filter: PUBLISHED + (optional) teacher
-  const baseWhere: any = { status: 'PUBLISHED' };
-  if (teacherId) baseWhere.teacherId = teacherId;
+  // ============== Parse URL state ==============
+  const q = sp.q || '';
+  const type = toArr(sp.type);
+  const classSlug = toArr(sp.class);
+  const section = toArr(sp.section);
+  const subject = toArr(sp.subject);
+  const trimestre = toArr(sp.trimestre);
+  const year = toArr(sp.year);
+  const language = toArr(sp.language);
+  const hasCorrection = sp.hasCorrection === '1';
+  const teacherId = sp.teacherId || '';
+  const sort = sp.sort || 'recent';
+  const page = Math.max(1, parseInt(sp.page || '1'));
 
-  // For dynamic filters: apply base filter (PUBLISHED + teacher) but NOT the
-  // user-applied filters (q/type/subject/class). This way the sidebar shows
-  // all options that exist for this teacher / the whole platform.
-  const whereForFilterOptions: any = { ...baseWhere };
+  // ============== Build where clause ==============
+  const where: Prisma.ResourceWhereInput = { status: 'PUBLISHED' };
+  if (q) {
+    where.OR = [
+      { title: { contains: q, mode: 'insensitive' } },
+      { description: { contains: q, mode: 'insensitive' } },
+      { summary: { contains: q, mode: 'insensitive' } },
+    ];
+  }
+  if (type.length > 0) where.type = { in: type };
+  if (classSlug.length > 0) where.class = { slug: { in: classSlug } };
+  if (section.length > 0) where.section = { slug: { in: section } };
+  if (subject.length > 0) where.subject = { slug: { in: subject } };
+  if (trimestre.length > 0) where.trimester = { in: trimestre };
+  if (year.length > 0) where.year = { in: year };
+  if (language.length > 0) where.language = { in: language };
+  if (hasCorrection) where.hasCorrection = true;
+  if (teacherId) where.teacherId = teacherId;
 
-  // For the actual query: apply all filters
-  const where: any = { ...baseWhere };
-  if (q) where.OR = [
-    { title: { contains: q } },
-    { description: { contains: q } },
-  ];
-  if (type) where.type = type;
-  if (subject) where.subject = { slug: subject };
-  if (classSlug) where.class = { slug: classSlug };
-
-  const orderBy: any = sort === 'popular' ? { viewsCount: 'desc' }
+  const orderBy: Prisma.ResourceOrderByWithRelationInput =
+    sort === 'popular' ? { viewsCount: 'desc' }
     : sort === 'downloads' ? { downloadsCount: 'desc' }
-    : sort === 'rating' ? [{ avgRating: 'desc' }, { ratingCount: 'desc' }]
+    : sort === 'rating' ? { ratingCount: 'desc' }
+    : sort === 'oldest' ? { publishedAt: 'asc' }
     : { publishedAt: 'desc' };
 
-  // Run 4 queries in parallel:
-  // 1. The page of resources (filtered)
-  // 2. Total count (filtered)
-  // 3. Distinct types/subjects/classes that exist (using base filter only)
-  // 4. Teacher info (if filtering by teacher)
-  const [resources, total, allAvailable, teacher] = await Promise.all([
+  // ============== Run all queries in parallel ==============
+  const PAGE_SIZE = 24;
+  const [
+    resources,
+    total,
+    byType,
+    byTrimestre,
+    byYear,
+    byLanguage,
+    withCorrectionCount,
+    currentUser,
+    classGroups,
+    sectionGroups,
+    subjectGroups,
+  ] = await Promise.all([
     prisma.resource.findMany({
       where,
-      take: 24,
-      skip: (page - 1) * 24,
+      take: PAGE_SIZE,
+      skip: (page - 1) * PAGE_SIZE,
       orderBy,
       include: {
-      subject: true,
-      class: true,
-      teacher: { select: { firstName: true, lastName: true, firstNameAr: true, lastNameAr: true } },_count: { select: { comments: true, ratings: true } },
-    },
+        subject: { select: { slug: true, nameFr: true, color: true } },
+        class: { select: { slug: true, nameFr: true } },
+        section: { select: { slug: true, nameFr: true } },
+        teacher: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            firstNameAr: true,
+            lastNameAr: true,
+            avatarUrl: true,
+            schoolName: true,
+          },
+        },
+        _count: { select: { comments: true, ratings: true, favorites: true } },
+      },
     }),
     prisma.resource.count({ where }),
-    // Fetch all resources matching the base filter (no type/subject/class/q)
-    // to compute the available filters dynamically. Use a small projection.
-    prisma.resource.findMany({
-      where: whereForFilterOptions,
-      select: {
-        type: true,
-        subject: { select: { slug: true, nameFr: true, color: true, icon: true } },
-        class: { select: { slug: true, nameFr: true } },
-      },
-      take: 1000, // cap for safety; if teacher has > 1000 we may miss rare filters
+    prisma.resource.groupBy({
+      by: ['type'],
+      where,
+      _count: { _all: true },
     }),
-    teacherId
-      ? prisma.user.findUnique({
-          where: { id: teacherId },
-          select: { firstName: true, lastName: true, email: true },
-        })
-      : Promise.resolve(null),
+    prisma.resource.groupBy({
+      by: ['trimester'],
+      where: { ...where, trimester: { not: null } },
+      _count: { _all: true },
+    }),
+    prisma.resource.groupBy({
+      by: ['year'],
+      where: { ...where, year: { not: null } },
+      _count: { _all: true },
+      orderBy: { year: 'desc' },
+    }),
+    prisma.resource.groupBy({
+      by: ['language'],
+      where,
+      _count: { _all: true },
+    }),
+    prisma.resource.count({ where: { ...where, hasCorrection: true } }),
+    getCurrentUser(),
+    prisma.resource.groupBy({
+      by: ['classId'],
+      where: { ...where, classId: { not: null } } as unknown as Prisma.ResourceWhereInput,
+      _count: { _all: true },
+    }),
+    prisma.resource.groupBy({
+      by: ['sectionId'],
+      where: { ...where, sectionId: { not: null } } as unknown as Prisma.ResourceWhereInput,
+      _count: { _all: true },
+    }),
+    prisma.resource.groupBy({
+      by: ['subjectId'],
+      where: { ...where, subjectId: { not: null } } as unknown as Prisma.ResourceWhereInput,
+      _count: { _all: true },
+    }),
   ]);
 
-  // Compute the actual available filter values from the results
-  const availableTypes = new Set<string>();
-  const availableSubjectsMap = new Map<string, { slug: string; nameFr: string; color: string | null; icon: string | null }>();
-  const availableClassesMap = new Map<string, { slug: string; nameFr: string }>();
-  for (const r of allAvailable) {
-    if (r.type) availableTypes.add(r.type);
-    if (r.subject) availableSubjectsMap.set(r.subject.slug, r.subject);
-    if (r.class) availableClassesMap.set(r.class.slug, r.class);
-  }
-  const availableSubjects = Array.from(availableSubjectsMap.values())
-    .sort((a, b) => a.nameFr.localeCompare(b.nameFr, 'fr'));
-  const availableClasses = Array.from(availableClassesMap.values())
-    .sort((a, b) => a.nameFr.localeCompare(b.nameFr, 'fr'));
+  // Resolve class/section/subject names
+  const classIds = classGroups.map((g) => g.classId).filter((id): id is string => !!id);
+  const sectionIds = sectionGroups.map((g) => g.sectionId).filter((id): id is string => !!id);
+  const subjectIds = subjectGroups.map((g) => g.subjectId).filter((id): id is string => !!id);
 
-  // Decorate resources with isFavorited for current user
-  const favoriteIds = await getUserFavorites(resources.map(r => r.id));
-  const decoratedResources = decorateWithFavorites(resources, favoriteIds);
+  const [classes, sections, subjects] = await Promise.all([
+    classIds.length > 0
+      ? prisma.class.findMany({
+          where: { id: { in: classIds } },
+          select: { id: true, slug: true, nameFr: true },
+        })
+      : Promise.resolve([] as Array<{ id: string; slug: string; nameFr: string }>),
+    sectionIds.length > 0
+      ? prisma.section.findMany({
+          where: { id: { in: sectionIds } },
+          select: { id: true, slug: true, nameFr: true },
+        })
+      : Promise.resolve([] as Array<{ id: string; slug: string; nameFr: string }>),
+    subjectIds.length > 0
+      ? prisma.subject.findMany({
+          where: { id: { in: subjectIds } },
+          select: { id: true, slug: true, nameFr: true, color: true },
+        })
+      : Promise.resolve([] as Array<{ id: string; slug: string; nameFr: string; color: string | null }>),
+  ]);
 
-  const totalPages = Math.ceil(total / 24);
-  const activeFilters = [type, subject, classSlug, q].filter(Boolean).length;
-  const teacherFullName = teacher
-    ? `${teacher.firstName || ''} ${teacher.lastName || ''}`.trim()
+  // ============== Build facets ==============
+  const byClassMap: Record<string, number> = {};
+  classGroups.forEach((g) => {
+    const c = classes.find((x) => x.id === g.classId);
+    if (c && g._count && typeof g._count === 'object') byClassMap[c.slug] = g._count._all;
+  });
+
+  const bySectionMap: Record<string, number> = {};
+  sectionGroups.forEach((g) => {
+    const s = sections.find((x) => x.id === g.sectionId);
+    if (s && g._count && typeof g._count === 'object') bySectionMap[s.slug] = g._count._all;
+  });
+
+  const bySubjectMap: Record<string, number> = {};
+  subjectGroups.forEach((g) => {
+    const s = subjects.find((x) => x.id === g.subjectId);
+    if (s && g._count && typeof g._count === 'object') bySubjectMap[s.slug] = g._count._all;
+  });
+
+  const facets: Facets = {
+    byType: Object.fromEntries(
+      byType
+        .filter((b) => b.type && b._count && typeof b._count === 'object')
+        .map((b) => [b.type, b._count!._all])
+    ),
+    byTrimestre: Object.fromEntries(
+      byTrimestre
+        .filter((b) => b.trimester && b._count && typeof b._count === 'object')
+        .map((b) => [b.trimester!, b._count!._all])
+    ),
+    byYear: Object.fromEntries(
+      byYear
+        .filter((b) => b.year && b._count && typeof b._count === 'object')
+        .map((b) => [b.year!, b._count!._all])
+    ),
+    byLanguage: Object.fromEntries(
+      byLanguage
+        .filter((b) => b.language && b._count && typeof b._count === 'object')
+        .map((b) => [b.language!, b._count!._all])
+    ),
+    byClass: byClassMap,
+    bySection: bySectionMap,
+    bySubject: bySubjectMap,
+    withCorrection: withCorrectionCount,
+  };
+
+  // ============== Favorites (if logged) ==============
+  const favoriteIds = currentUser
+    ? await getUserFavorites(resources.map((r) => r.id))
+    : new Set<string>();
+
+  // ============== JSON-LD ==============
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
+  const jsonLd = resources.length > 0
+    ? itemListSchema({
+        name: 'Toutes les ressources pédagogiques — Examanet',
+        description: `Catalogue de ${total.toLocaleString('fr-FR')} ressources pédagogiques gratuites du système éducatif tunisien.`,
+        url: `${baseUrl}/ressources`,
+        items: resources.slice(0, 50).map((r) => ({
+          name: r.title,
+          url: `${baseUrl}/ressources/${r.slug}`,
+          description: r.description?.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 200) || undefined,
+        })),
+      })
     : null;
 
-  // JSON-LD: ItemList of resources for rich SERP results
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
-  const resourcesListJsonLd = resources.length > 0 ? itemListSchema({
-    name: 'Toutes les ressources pédagogiques — Examanet',
-    description: `Catalogue de ${total.toLocaleString('fr-TN')} ressources pédagogiques gratuites du système éducatif tunisien.`,
-    url: `${baseUrl}/ressources`,
-    items: resources.slice(0, 50).map((r) => ({
-      name: r.title,
-      url: `${baseUrl}/ressources/${r.slug}`,
-      description: r.description?.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 200) || undefined,
-    })),
-  }) : null;
+  // ============== Page header text ==============
+  let pageTitle = 'Toutes les ressources';
+  let pageSubtitle = `${total.toLocaleString('fr-FR')} ressources gratuites pour le système éducatif tunisien.`;
+  if (q) {
+    pageTitle = `Résultats pour « ${q} »`;
+    pageSubtitle = `${total.toLocaleString('fr-FR')} résultats correspondants.`;
+  } else if (teacherId && currentUser) {
+    pageTitle = `Ressources de l'enseignant`;
+  }
 
   return (
-    <div className="min-h-screen flex flex-col overflow-x-hidden">
-      {resourcesListJsonLd && (
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(resourcesListJsonLd) }} />
+    <div className="min-h-screen flex flex-col bg-slate-50">
+      {jsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
       )}
       <Header />
 
-      <main className="flex-1 pt-24 lg:pt-28 bg-slate-50">
+      <main className="flex-1 pt-24 lg:pt-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Header */}
+          {/* Page header */}
           <div className="mb-6">
-            <h1 className="text-3xl lg:text-4xl font-extrabold mb-2 leading-tight">
-              {q
-                ? `Résultats pour "${q}"`
-                : teacherId
-                  ? <>
-                      <span className="text-slate-900">Ressources de l'enseignant</span>
-                      {teacherFullName && (
-                        <span className="ml-3 text-amber-600">· {teacherFullName}</span>
-                      )}
-                    </>
-                  : 'Toutes les ressources'}
+            <h1 className="text-3xl lg:text-4xl font-extrabold mb-2 leading-tight text-slate-900">
+              {pageTitle}
             </h1>
-            <p className="text-slate-600">
-              {total} ressource{total > 1 ? 's' : ''} disponible{total > 1 ? 's' : ''}
-              {teacherFullName && (
-                <span className="ml-2 inline-flex items-center gap-1 text-xs text-amber-700 font-semibold">
-                  <User className="w-3 h-3" /> {teacherFullName}
-                </span>
-              )}
+            <p className="text-slate-600 text-sm lg:text-base">
+              {pageSubtitle}
             </p>
           </div>
 
-          {/* Search bar */}
-          <form action="/ressources" method="GET" className="bg-white rounded-2xl p-2 shadow-sm border border-slate-100 flex gap-2 mb-4">
-            <input type="hidden" name="teacher" value={teacherId} />
-            {type && <input type="hidden" name="type" value={type} />}
-            {subject && <input type="hidden" name="subject" value={subject} />}
-            {classSlug && <input type="hidden" name="class" value={classSlug} />}
-            <div className="flex-1 flex items-center gap-2 px-4 py-2">
-              <Search className="w-5 h-5 text-slate-400" />
-              <input name="q" type="text" defaultValue={q} placeholder="Rechercher..." className="flex-1 bg-transparent outline-none text-slate-700 placeholder-slate-400 text-sm" />
-            </div>
-            <button type="submit" className="btn-primary whitespace-nowrap"><span className="hidden sm:inline">Rechercher</span><Search className="w-4 h-4 sm:hidden" /></button>
-          </form>
-
-          <div className="grid lg:grid-cols-[280px_1fr] gap-6">
-            {/* Sidebar filters - DYNAMIC: only show filters with data */}
-            <aside className="hidden lg:block bg-white rounded-2xl p-5 border border-slate-100 h-fit lg:sticky lg:top-24">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-bold text-lg flex items-center gap-2"><Filter className="w-4 h-4" /> Filtres</h3>
-                {activeFilters > 0 && <Link href={teacherId ? `/ressources?teacher=${teacherId}` : '/ressources'} className="text-xs text-primary-600 font-semibold">Réinitialiser</Link>}
-              </div>
-
-              {/* Type filter (only if > 1 type available) */}
-              {availableTypes.size > 1 && (
-                <div className="mb-5">
-                  <h4 className="font-semibold text-sm mb-2 text-slate-700">
-                    Type <span className="text-xs text-slate-400 font-normal">({availableTypes.size})</span>
-                  </h4>
-                  <div className="space-y-1">
-                    {TYPES.filter(t => availableTypes.has(t)).map(t => (
-                      <Link key={t} href={`/ressources?${new URLSearchParams({ ...sp, type: t === type ? '' : t, page: '1' }).toString()}`} className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm transition ${type === t ? 'bg-primary-100 text-primary-700 font-semibold' : 'hover:bg-slate-50 text-slate-600'}`}>
-                        <span>{TYPE_LABELS_FR[t] || t}</span>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Subject filter (only if > 1 subject available) */}
-              {availableSubjects.length > 1 && (
-                <div className="mb-5">
-                  <h4 className="font-semibold text-sm mb-2 text-slate-700">
-                    Matière <span className="text-xs text-slate-400 font-normal">({availableSubjects.length})</span>
-                  </h4>
-                  <div className="space-y-1 max-h-64 overflow-y-auto">
-                    {availableSubjects.map(s => (
-                      <Link key={s.slug} href={`/ressources?${new URLSearchParams({ ...sp, subject: s.slug === subject ? '' : s.slug, page: '1' }).toString()}`} className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition ${subject === s.slug ? 'bg-primary-100 text-primary-700 font-semibold' : 'hover:bg-slate-50 text-slate-600'}`}>
-                        <span className="w-2 h-2 rounded-full" style={{ background: s.color || '#0EA5E9' }} />
-                        <span className="flex-1">{s.nameFr}</span>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Class filter (only if > 1 class available) */}
-              {availableClasses.length > 1 && (
-                <div>
-                  <h4 className="font-semibold text-sm mb-2 text-slate-700">
-                    Classe <span className="text-xs text-slate-400 font-normal">({availableClasses.length})</span>
-                  </h4>
-                  <div className="space-y-1 max-h-64 overflow-y-auto">
-                    {availableClasses.map(c => (
-                      <Link key={c.slug} href={`/ressources?${new URLSearchParams({ ...sp, class: c.slug === classSlug ? '' : c.slug, page: '1' }).toString()}`} className={`block px-3 py-2 rounded-lg text-sm transition ${classSlug === c.slug ? 'bg-primary-100 text-primary-700 font-semibold' : 'hover:bg-slate-50 text-slate-600'}`}>
-                        {c.nameFr}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* No filters available */}
-              {availableTypes.size === 0 && availableSubjects.length === 0 && availableClasses.length === 0 && (
-                <p className="text-sm text-slate-500 italic">Aucun filtre disponible</p>
-              )}
-            </aside>
-
-            {/* Mobile filter trigger (only shows on mobile/tablet) */}
-            <details className="lg:hidden bg-white rounded-2xl border border-slate-100 mb-4 overflow-hidden">
-              <summary className="px-5 py-3 font-bold text-sm cursor-pointer flex items-center gap-2 hover:bg-slate-50">
-                <Filter className="w-4 h-4" /> Filtres {activeFilters > 0 && <span className="ml-auto text-xs bg-primary-100 text-primary-700 px-2 py-0.5 rounded-full">{activeFilters} actif{activeFilters > 1 ? 's' : ''}</span>}
-              </summary>
-              <div className="px-5 pb-5 border-t border-slate-100 pt-4 space-y-5">
-                {/* Type filter */}
-                {availableTypes.size > 1 && (
-                  <div>
-                    <h4 className="font-semibold text-sm mb-2 text-slate-700">Type ({availableTypes.size})</h4>
-                    <div className="flex flex-wrap gap-1.5">
-                      {Array.from(availableTypes).sort().map(t => (
-                        <Link key={t} href={`/ressources?${new URLSearchParams({ ...sp, type: t === type ? '' : t, page: '1' }).toString()}`} className={`px-2.5 py-1 rounded-full text-xs font-bold transition ${type === t ? 'bg-primary-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>
-                          {TYPE_LABELS_FR[t] || t}
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {/* Subject filter */}
-                {availableSubjects.length > 1 && (
-                  <div>
-                    <h4 className="font-semibold text-sm mb-2 text-slate-700">Matière ({availableSubjects.length})</h4>
-                    <div className="flex flex-wrap gap-1.5">
-                      {availableSubjects.map(s => (
-                        <Link key={s.slug} href={`/ressources?${new URLSearchParams({ ...sp, subject: s.slug === subject ? '' : s.slug, page: '1' }).toString()}`} className={`px-2.5 py-1 rounded-full text-xs font-bold transition ${subject === s.slug ? 'bg-primary-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>
-                          {s.icon && <span className="mr-1">{s.icon}</span>}{s.nameFr}
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {/* Class filter */}
-                {availableClasses.length > 1 && (
-                  <div>
-                    <h4 className="font-semibold text-sm mb-2 text-slate-700">Classe ({availableClasses.length})</h4>
-                    <div className="flex flex-wrap gap-1.5">
-                      {availableClasses.map(c => (
-                        <Link key={c.slug} href={`/ressources?${new URLSearchParams({ ...sp, class: c.slug === classSlug ? '' : c.slug, page: '1' }).toString()}`} className={`px-2.5 py-1 rounded-full text-xs font-bold transition ${classSlug === c.slug ? 'bg-primary-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>
-                          {c.nameFr}
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </details>
-
-
-            {/* Main */}
-            <div>
-              {/* Sort + View toggle */}
-              <div className="flex items-center justify-between mb-4 bg-white rounded-xl p-3 border border-slate-100 gap-2 flex-wrap">
-                <div className="text-sm text-slate-600">
-                  <span className="font-semibold text-slate-900">{decoratedResources.length}</span> sur {total} résultats
-                </div>
-                <div className="flex items-center gap-2 text-sm flex-wrap">
-                  <ResourcesViewClient
-                    currentView={view}
-                    sp={sp}
-                  />
-                  <span className="text-slate-500 hidden sm:inline">Trier par :</span>
-                  <select
-                    className="bg-slate-50 border-0 rounded-lg px-3 py-1.5 text-sm font-semibold focus:ring-2 focus:ring-primary-200 outline-none"
-                    defaultValue={sort}
-                    onChange={undefined}
-                  >
-                    {SORTS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
-                  </select>
-                </div>
-              </div>
-
-              {/* Active filters chips */}
-              {activeFilters > 0 && (
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {q && <span className="inline-flex items-center gap-1 px-3 py-1 bg-primary-100 text-primary-700 text-xs font-semibold rounded-full">"{q}" <Link href={teacherId ? `/ressources?teacher=${teacherId}` : '/ressources'}><X className="w-3 h-3" /></Link></span>}
-                  {type && <span className="inline-flex items-center gap-1 px-3 py-1 bg-amber-100 text-amber-700 text-xs font-semibold rounded-full">{TYPE_LABELS_FR[type] || type} <Link href={`/ressources?${new URLSearchParams({ ...sp, type: '', page: '1' }).toString()}`}><X className="w-3 h-3" /></Link></span>}
-                  {subject && <span className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-semibold rounded-full">{availableSubjects.find(s => s.slug === subject)?.nameFr} <Link href={`/ressources?${new URLSearchParams({ ...sp, subject: '', page: '1' }).toString()}`}><X className="w-3 h-3" /></Link></span>}
-                  {classSlug && <span className="inline-flex items-center gap-1 px-3 py-1 bg-purple-100 text-purple-700 text-xs font-semibold rounded-full">{availableClasses.find(c => c.slug === classSlug)?.nameFr} <Link href={`/ressources?${new URLSearchParams({ ...sp, class: '', page: '1' }).toString()}`}><X className="w-3 h-3" /></Link></span>}
-                </div>
-              )}
-
-              {/* Grid or List view */}
-              {decoratedResources.length === 0 ? (
-                <div className="bg-white rounded-2xl p-12 text-center border border-slate-100">
-                  <div className="text-5xl mb-3">🔍</div>
-                  <h3 className="font-bold text-xl mb-2">Aucun résultat</h3>
-                  <p className="text-slate-500 mb-4">Essayez d'élargir vos critères de recherche</p>
-                  <Link href={teacherId ? `/ressources?teacher=${teacherId}` : '/ressources'} className="btn-primary">Réinitialiser les filtres</Link>
-                </div>
-              ) : view === 'list' ? (
-                <div className="space-y-2">
-                  {decoratedResources.map(r => <ResourceListItem key={r.id} resource={r as any} />)}
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                  {decoratedResources.map(r => <ResourceCard key={r.id} resource={r as any} />)}
-                </div>
-              )}
-
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="flex items-center justify-center gap-2 mt-8">
-                  {page > 1 && (
-                    <Link href={`/ressources?${new URLSearchParams({ ...sp, page: String(page - 1) }).toString()}`} className="px-4 py-2 bg-white border border-slate-200 rounded-lg hover:border-primary-300 text-sm font-semibold">
-                      ← Précédent
-                    </Link>
-                  )}
-                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => i + 1).map(p => (
-                    <Link key={p} href={`/ressources?${new URLSearchParams({ ...sp, page: String(p) }).toString()}`} className={`w-10 h-10 flex items-center justify-center rounded-lg text-sm font-semibold ${p === page ? 'bg-primary-600 text-white' : 'bg-white border border-slate-200 hover:border-primary-300'}`}>
-                      {p}
-                    </Link>
-                  ))}
-                  {page < totalPages && (
-                    <Link href={`/ressources?${new URLSearchParams({ ...sp, page: String(page + 1) }).toString()}`} className="px-4 py-2 bg-white border border-slate-200 rounded-lg hover:border-primary-300 text-sm font-semibold">
-                      Suivant →
-                    </Link>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
+          {/* FilterShell (client) */}
+          <Suspense fallback={<FilterShellSkeleton />}>
+            <FilterShell
+              initialData={{
+                resources,
+                total,
+                totalPages: Math.ceil(total / PAGE_SIZE),
+                currentPage: page,
+                facets,
+              }}
+              userId={currentUser?.id ?? null}
+              initialFavorites={favoriteIds}
+            />
+          </Suspense>
         </div>
       </main>
 
       <Footer />
+    </div>
+  );
+}
+
+function FilterShellSkeleton() {
+  return (
+    <div className="grid lg:grid-cols-[340px_1fr] gap-6">
+      <div className="bg-white rounded-2xl border border-slate-200 h-[600px] animate-pulse" />
+      <div className="space-y-3">
+        <div className="h-14 bg-white rounded-xl border border-slate-200 animate-pulse" />
+        <div className="grid grid-cols-3 gap-5">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="h-72 bg-white rounded-2xl border border-slate-200 animate-pulse" />
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

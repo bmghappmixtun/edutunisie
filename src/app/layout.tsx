@@ -3,6 +3,7 @@ import './globals.css';
 import { Toaster } from 'react-hot-toast';
 import AnalyticsWithOptOut from '@/components/analytics/AnalyticsWithOptOut';
 import I18nProviderWrapper from '@/components/layout/I18nProviderWrapper';
+import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import { organizationSchema } from '@/lib/structured-data';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
@@ -103,7 +104,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="msvalidate.01" content="C04AC04227DB04DAC96552F4A27BCD73" />
       </head>
       <body>
-        <I18nProviderWrapper>{children}</I18nProviderWrapper>
+        <NuqsAdapter>
+          <I18nProviderWrapper>{children}</I18nProviderWrapper>
+        </NuqsAdapter>
         <Toaster position="top-right" toastOptions={{
           style: { borderRadius: '12px', background: '#0F172A', color: '#fff' }
         }} />
