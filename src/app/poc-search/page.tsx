@@ -63,7 +63,7 @@ export default function PocSearchPage() {
     })
       .then(r => r.json())
       .then(d => setStatus({ docs: d.numberOfDocuments || 0, ready: true }))
-      .catch(e => setError(`Meilisearch injoignable: ${e.message}. Le POC est local.`));
+      .catch((e: Error) => setError(`Meilisearch injoignable: ${e.message}. Le POC est local.`));
   }, []);
 
   const search = useCallback(async (q: string, fl: string[]) => {
@@ -87,7 +87,7 @@ export default function PocSearchPage() {
       setTotal(d.estimatedTotalHits || 0);
       setTime(Math.round(performance.now() - t0));
     } catch (e) {
-      setError(e.message);
+      setError((e as Error).message);
     } finally {
       setLoading(false);
     }
