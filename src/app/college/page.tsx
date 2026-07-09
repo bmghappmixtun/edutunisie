@@ -6,7 +6,7 @@ import ResourceCard from '@/components/resources/ResourceCard';
 import { prisma } from '@/lib/prisma';
 import { getUserFavorites, decorateWithFavorites } from '@/lib/resource-helpers';
 import { ChevronRight, BookOpen, GraduationCap, Sparkles, Award, Clock, Users, Target, CheckCircle, ArrowRight } from 'lucide-react';
-import { itemListSchema } from '@/lib/structured-data';
+import { itemListSchema, breadcrumbSchema } from '@/lib/structured-data';
 
 export const revalidate = 3600; // ISR: refresh every hour
 
@@ -124,11 +124,18 @@ export default async function CollegePillar() {
     })),
   }) : null;
 
+  // JSON-LD: Breadcrumb
+  const breadcrumbJsonLd = breadcrumbSchema([
+    { name: 'Accueil', url: SITE_URL },
+    { name: 'Collège', url: `${SITE_URL}/college` },
+  ]);
+
   return (
     <div className="min-h-screen flex flex-col">
       {resourcesListJsonLd && (
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(resourcesListJsonLd) }} />
       )}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <Header />
 
       <main className="flex-1 pt-20">

@@ -2,17 +2,31 @@ import { Mail, MessageSquare, Phone, MapPin, Clock } from 'lucide-react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import ContactForm from '@/components/contact/ContactForm';
+import { breadcrumbSchema, SITE_URL } from '@/lib/structured-data';
 
 export const revalidate = 3600; // 1 hour cache
 
 export const metadata = {
-  title: 'Contact',
-  description: 'Contactez l\'équipe Examanet. Une question, un bug, une suggestion ? Nous vous répondons sous 24-48h.'
+  title: 'Contact — Nous contacter',
+  description: 'Contactez l\'équipe Examanet. Une question, un bug, une suggestion ? Nous vous répondons sous 24-48h.',
+  alternates: { canonical: '/contact' },
+  openGraph: {
+    title: 'Contact Examanet',
+    description: 'Posez vos questions, signalez un bug ou suggérez une amélioration.',
+    url: '/contact',
+    type: 'website',
+  },
 };
+
+const breadcrumbJsonLd = breadcrumbSchema([
+  { name: 'Accueil', url: SITE_URL },
+  { name: 'Contact', url: `${SITE_URL}/contact` },
+]);
 
 export default function ContactPage() {
   return (
     <div className="min-h-screen flex flex-col">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <Header />
 
       <main className="flex-1 pt-16 lg:pt-20">

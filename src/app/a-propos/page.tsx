@@ -2,13 +2,26 @@ import Link from 'next/link';
 import { GraduationCap, Target, Heart, Users, BookOpen, Globe, Sparkles, Award, ArrowRight, Mail } from 'lucide-react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import { breadcrumbSchema, SITE_URL } from '@/lib/structured-data';
 
 export const revalidate = 3600; // 1 hour cache
 
 export const metadata = {
-  title: 'À propos',
-  description: 'Découvrez Examanet, la plateforme pédagogique #1 en Tunisie. Notre mission, notre équipe, nos valeurs.'
+  title: 'À propos — Notre mission, équipe et valeurs',
+  description: 'Découvrez Examanet, la plateforme pédagogique #1 en Tunisie. Notre mission : rendre l\'éducation gratuite et accessible à tous les élèves tunisiens.',
+  alternates: { canonical: '/a-propos' },
+  openGraph: {
+    title: 'À propos d\'Examanet',
+    description: 'Notre mission, notre équipe et nos valeurs pour l\'éducation en Tunisie.',
+    url: '/a-propos',
+    type: 'website',
+  },
 };
+
+const breadcrumbJsonLd = breadcrumbSchema([
+  { name: 'Accueil', url: SITE_URL },
+  { name: 'À propos', url: `${SITE_URL}/a-propos` },
+]);
 
 const team = [
   { name: 'Mehdi Boutiti', role: 'Fondateur & CEO', email: 'boutiti.mehdi@gmail.com' }
@@ -23,6 +36,7 @@ const milestones = [
 export default function AboutPage() {
   return (
     <div className="min-h-screen flex flex-col">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <Header />
 
       <main className="flex-1 pt-16 lg:pt-20">

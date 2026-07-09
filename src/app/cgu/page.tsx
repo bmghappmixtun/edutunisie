@@ -2,13 +2,21 @@ import Link from 'next/link';
 import { Scale, FileText, Mail, AlertCircle, CheckCircle, XCircle, Shield, BookOpen, Users, Globe, ArrowRight } from 'lucide-react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import { breadcrumbSchema, SITE_URL } from '@/lib/structured-data';
 
 export const revalidate = 3600; // 1 hour cache
 
 export const metadata = {
   title: 'CGU — Conditions Générales d\'Utilisation',
-  description: 'Conditions générales d\'utilisation de la plateforme Examanet'
+  description: 'Conditions générales d\'utilisation de la plateforme Examanet. Droits, obligations et responsabilités des utilisateurs.',
+  alternates: { canonical: '/cgu' },
+  robots: { index: true, follow: true },
 };
+
+const breadcrumbJsonLd = breadcrumbSchema([
+  { name: 'Accueil', url: SITE_URL },
+  { name: 'CGU', url: `${SITE_URL}/cgu` },
+]);
 
 const sections = [
   {
@@ -148,6 +156,7 @@ const sections = [
 export default function CGUPage() {
   return (
     <div className="min-h-screen flex flex-col">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <Header />
 
       <main className="flex-1 pt-16 lg:pt-20">

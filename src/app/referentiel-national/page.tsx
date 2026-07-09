@@ -4,8 +4,14 @@ import path from 'path';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import ReferentielContent from './ReferentielContent';
+import { breadcrumbSchema } from '@/lib/structured-data';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
+
+const breadcrumbJsonLd = breadcrumbSchema([
+  { name: 'Accueil', url: SITE_URL },
+  { name: 'Référentiel National', url: `${SITE_URL}/referentiel-national` },
+]);
 
 export const metadata: Metadata = {
   title: 'Référentiel National du Système Éducatif Tunisien — Examanet',
@@ -50,6 +56,7 @@ export default function ReferentielNationalPage() {
 
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <Header />
       {/* Inline the page-specific CSS so it scopes itself */}
       <style dangerouslySetInnerHTML={{ __html: css }} />
