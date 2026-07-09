@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Prisma } from '@prisma/client';
 import Header from '@/components/layout/Header';
+import { getLocale } from '@/lib/i18n-server';
 import Footer from '@/components/layout/Footer';
 import { prisma } from '@/lib/prisma';
 import { getUserFavorites } from '@/lib/resource-helpers';
@@ -9,19 +10,32 @@ import FilterShell from '@/components/ressources/FilterShell';
 import type { Facets } from '@/lib/facets';
 import { getCurrentUser } from '@/lib/auth';
 
-export const metadata: Metadata = {
-  title: 'Toutes les ressources pédagogiques',
-  description: 'Explorez plus de 15 000 ressources : cours, devoirs, exercices, séries, résumés, sujets de bac et corrigés. Filtres par matière, classe, section, année et trimestre.',
-  alternates: { canonical: '/ressources' },
-  openGraph: {
-    title: 'Toutes les ressources — Examanet',
-    description: '15 000+ cours, exercices, sujets de bac et corrigés pour le programme tunisien.',
-    url: '/ressources',
-    type: 'website',
-  },
-  // Filtered URLs (?class=X&type=Y) should not dilute the index
-  robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-snippet': -1 } },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = getLocale();
+  const isAr = locale === 'ar';
+  const totalResources = await prisma.resource.count({ where: { status: 'PUBLISHED' } });
+  return {
+    title: isAr
+      ? 'جميع الموارد التربوية'
+      : 'Toutes les ressources pédagogiques',
+    description: isAr
+      ? `اكتشف أكثر من ${totalResources.toLocaleString('ar-TN')} مورد: دروس، فروض، تمارين، سلاسل، ملخصات، مواضيع باك وإصلاحات. مرشحات حسب المادة، القسم، الشعبة، السنة، الثلاثي.`
+      : 'Explorez plus de 15 000 ressources : cours, devoirs, exercices, séries, résumés, sujets de bac et corrigés. Filtres par matière, classe, section, année et trimestre.',
+    alternates: { canonical: '/ressources' },
+    openGraph: {
+      title: isAr
+        ? 'جميع الموارد — إكسامانت'
+        : 'Toutes les ressources — Examanet',
+      description: isAr
+        ? `${totalResources.toLocaleString('ar-TN')} درس, تمرين, موضوع باك وإصلاح للبرنامج التونسي.`
+        : '15 000+ cours, exercices, sujets de bac et corrigés pour le programme tunisien.',
+      url: '/ressources',
+      type: 'website',
+      locale: isAr ? 'ar_TN' : 'fr_TN',
+    },
+    robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-snippet': -1 } },
+  };
+}
 
 export const dynamic = 'force-dynamic'; // dynamic because of searchParams
 

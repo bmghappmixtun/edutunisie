@@ -2,24 +2,27 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import { getLocale } from '@/lib/i18n-server';
 import { faqSchema, breadcrumbSchema } from '@/lib/structured-data';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
 
-export const metadata: Metadata = {
-  title: 'FAQ — Questions fréquentes',
-  description: 'Toutes les réponses à vos questions sur Examanet : cours gratuits, niveaux, matières, enseignants, téléchargement, et plus. La plateforme pédagogique #1 en Tunisie.',
-  keywords: ['FAQ Examanet', 'questions fréquentes', 'aide', 'cours gratuits Tunisie', 'support'],
-  alternates: { canonical: `${SITE_URL}/faq` },
-  openGraph: {
-    title: 'FAQ Examanet',
-    description: 'Toutes les réponses à vos questions sur la plateforme pédagogique #1 en Tunisie.',
-    url: `${SITE_URL}/faq`,
-    siteName: 'Examanet',
-    locale: 'fr_TN',
-    type: 'website',
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = getLocale();
+  const isAr = locale === "ar";
+  return {
+    title: isAr ? "الأسئلة الشائعة — إكسامانت" : "FAQ — Questions fréquentes",
+    description: isAr ? "جميع الإجابات على أسئلتك حول إكسامانت: دروس مجانية، مستويات، مواد، معلمون، تحميل." : "Toutes les réponses à vos questions sur Examanet : cours gratuits, niveaux, matières, enseignants, téléchargement.",
+    alternates: isAr ? {"canonical":"/faq"} : {"canonical":"/faq"},
+    openGraph: {
+      title: isAr ? "الأسئلة الشائعة إكسامانت" : "FAQ Examanet",
+      description: isAr ? "اعثر بسرعة على إجابات أسئلتك حول إكسامانت." : "Trouvez rapidement les réponses à vos questions sur Examanet.",
+      url: isAr ? "/faq" : "/faq",
+      type: isAr ? "website" : "website",
+      locale: isAr ? "ar_TN" : "fr_TN",
+    },
+  };
+}
 
 const FAQS = [
   {

@@ -17,7 +17,7 @@ import {
   itemListSchema,
   SITE_URL,
 } from '@/lib/structured-data';
-import { getT, getLocale } from '@/lib/i18n-server';
+import { getLocale, getT } from '@/lib/i18n-server';
 import {
   ChevronRight, BookOpen, Sparkles, Award, Clock, Target, CheckCircle,
   ArrowRight, Calendar, Trophy, FileText, Download, Star, Zap,

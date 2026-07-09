@@ -3,23 +3,29 @@ import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { prisma } from '@/lib/prisma';
+import { getLocale } from '@/lib/i18n-server';
 import { itemListSchema } from '@/lib/structured-data';
 import { BookOpen, Sparkles, ArrowRight, GraduationCap } from 'lucide-react';
 import { SUBJECTS_CONFIG, getSubjectConfig } from '@/lib/subjects.config';
 import { SUBJECT_ICONS } from '@/lib/subjects.icons';
 
-export const metadata: Metadata = {
-  title: 'Toutes les matières — Cours, exercices et corrigés',
-  description: 'Découvrez toutes les matières du programme scolaire tunisien : Mathématiques, Physique, SVT, Français, Arabe, Histoire, Philosophie et plus. Ressources gratuites par matière.',
-  alternates: { canonical: '/matieres' },
-  openGraph: {
-    title: 'Toutes les matières du programme tunisien',
-    description: 'Cours, exercices, sujets de bac et corrigés pour chaque matière du programme officiel tunisien.',
-    url: '/matieres',
-    type: 'website',
-    images: [{ url: '/api/og/page/matieres', width: 1200, height: 630, alt: 'Examanet — Toutes les matières' }],
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = getLocale();
+  const isAr = locale === "ar";
+  return {
+    title: isAr ? "جميع المواد — دروس، تمارين وإصلاحات" : "Toutes les matières — Cours, exercices et corrigés",
+    description: isAr ? "اكتشف جميع مواد البرنامج المدرسي التونسي: الرياضيات، الفيزياء، علوم الحياة والأرض، الفرنسية، العربية، التاريخ، الفلسفة والمزيد. موارد مجانية لكل مادة." : "Découvrez toutes les matières du programme scolaire tunisien : Mathématiques, Physique, SVT, Français, Arabe, Histoire, Philosophie et plus. Ressources gratuites par matière.",
+    alternates: isAr ? {"canonical":"/matieres"} : {"canonical":"/matieres"},
+    openGraph: {
+      title: isAr ? "جميع مواد البرنامج التونسي" : "Toutes les matières du programme tunisien",
+      description: isAr ? "دروس، تمارين، مواضيع باك وإصلاحات لكل مادة من البرنامج الرسمي التونسي." : "Cours, exercices, sujets de bac et corrigés pour chaque matière du programme officiel tunisien.",
+      url: isAr ? "/matieres" : "/matieres",
+      type: isAr ? "website" : "website",
+      locale: isAr ? "ar_TN" : "fr_TN",
+      images: isAr ? [{"url":"/api/og/page/matieres","width":1200,"height":630,"alt":"إكسامانت — جميع المواد"}] : [{"url":"/api/og/page/matieres","width":1200,"height":630,"alt":"Examanet — Toutes les matières"}],
+    },
+  };
+}
 
 export const revalidate = 300; // 5 min cache
 

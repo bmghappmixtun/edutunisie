@@ -11,7 +11,7 @@ import {
   breadcrumbSchema,
   SITE_URL,
 } from '@/lib/structured-data';
-import { getT, getLocale } from '@/lib/i18n-server';
+import { getLocale, getT } from '@/lib/i18n-server';
 import {
   ChevronRight, Download, ArrowLeft,
 } from 'lucide-react';
