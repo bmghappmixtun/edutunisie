@@ -3,7 +3,7 @@ import { Mail, MessageSquare, Phone, MapPin, Clock } from 'lucide-react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import ContactForm from '@/components/contact/ContactForm';
-import { getLocale } from '@/lib/i18n-server';
+import { getLocale, getT } from '@/lib/i18n-server';
 import { breadcrumbSchema, SITE_URL } from '@/lib/structured-data';
 
 export const revalidate = 3600; // 1 hour cache
@@ -31,6 +31,8 @@ const breadcrumbJsonLd = breadcrumbSchema([
 ]);
 
 export default function ContactPage() {
+  const t = getT();
+
   return (
     <div className="min-h-screen flex flex-col">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
@@ -42,13 +44,13 @@ export default function ContactPage() {
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <div className="inline-flex items-center gap-2 bg-white border border-primary-200 rounded-full px-4 py-2 mb-6 shadow-sm">
               <Mail className="w-4 h-4 text-primary-600" />
-              <span className="text-xs font-semibold text-slate-700">Nous sommes à votre écoute</span>
+              <span className="text-xs font-semibold text-slate-700">{t('contact.badge')}</span>
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-4">
-              Contactez-<span className="gradient-text">nous</span>
+              <span className="gradient-text">{t('contact.hero.title')}</span>
             </h1>
             <p className="text-lg lg:text-xl text-slate-600 max-w-2xl mx-auto">
-              Une question, une suggestion, un bug à signaler ? Notre équipe vous répond sous 24-48h.
+              {t('contact.hero.subtitle')}
             </p>
           </div>
         </section>
@@ -60,7 +62,7 @@ export default function ContactPage() {
 
               {/* Coordonnées */}
               <div className="space-y-4">
-                <h2 className="text-2xl font-extrabold mb-6">Nos coordonnées</h2>
+                <h2 className="text-2xl font-extrabold mb-6">{t('contact.info.title')}</h2>
 
                 <div className="bg-white rounded-2xl border border-slate-200 p-5 hover:border-primary-300 transition">
                   <div className="flex items-start gap-3">
@@ -68,11 +70,11 @@ export default function ContactPage() {
                       <Mail className="w-5 h-5" />
                     </div>
                     <div>
-                      <div className="text-sm font-semibold text-slate-500 mb-1">Email</div>
+                      <div className="text-sm font-semibold text-slate-500 mb-1">{t('contact.info.email')}</div>
                       <a href="mailto:contact@examanet.com" className="text-slate-900 font-semibold hover:text-primary-600">
                         contact@examanet.com
                       </a>
-                      <div className="text-xs text-slate-500 mt-1">Réponse sous 24-48h</div>
+                      <div className="text-xs text-slate-500 mt-1">{t('contact.info.emailResponse')}</div>
                     </div>
                   </div>
                 </div>
@@ -83,9 +85,9 @@ export default function ContactPage() {
                       <Phone className="w-5 h-5" />
                     </div>
                     <div>
-                      <div className="text-sm font-semibold text-slate-500 mb-1">Téléphone</div>
+                      <div className="text-sm font-semibold text-slate-500 mb-1">{t('contact.info.phone')}</div>
                       <div className="text-slate-900 font-semibold">+216 50 000 000</div>
-                      <div className="text-xs text-slate-500 mt-1">Lun-Ven 9h-17h</div>
+                      <div className="text-xs text-slate-500 mt-1">{t('contact.info.phoneHours')}</div>
                     </div>
                   </div>
                 </div>
@@ -96,9 +98,9 @@ export default function ContactPage() {
                       <MapPin className="w-5 h-5" />
                     </div>
                     <div>
-                      <div className="text-sm font-semibold text-slate-500 mb-1">Adresse</div>
+                      <div className="text-sm font-semibold text-slate-500 mb-1">{t('contact.info.address')}</div>
                       <div className="text-slate-900 font-semibold">Tunis, Tunisie</div>
-                      <div className="text-xs text-slate-500 mt-1">Siège social</div>
+                      <div className="text-xs text-slate-500 mt-1">{t('contact.info.addressHQ')}</div>
                     </div>
                   </div>
                 </div>
@@ -109,16 +111,16 @@ export default function ContactPage() {
                       <Clock className="w-5 h-5" />
                     </div>
                     <div>
-                      <div className="text-sm font-semibold text-slate-500 mb-1">Temps de réponse</div>
-                      <div className="text-slate-900 font-semibold">24-48 heures</div>
-                      <div className="text-xs text-slate-500 mt-1">Jours ouvrés</div>
+                      <div className="text-sm font-semibold text-slate-500 mb-1">{t('contact.info.responseTime')}</div>
+                      <div className="text-slate-900 font-semibold">{t('contact.info.responseValue')}</div>
+                      <div className="text-xs text-slate-500 mt-1">{t('contact.info.workDays')}</div>
                     </div>
                   </div>
                 </div>
 
                 {/* Réseaux sociaux */}
                 <div className="mt-6">
-                  <div className="text-sm font-semibold text-slate-500 mb-3">Suivez-nous</div>
+                  <div className="text-sm font-semibold text-slate-500 mb-3">{t('contact.info.followUs')}</div>
                   <div className="flex gap-2">
                     {[
                       { name: 'Facebook', icon: '📘', url: '#' },
@@ -144,7 +146,7 @@ export default function ContactPage() {
                 <div className="bg-white rounded-2xl border border-slate-200 p-6 lg:p-8 shadow-sm">
                   <div className="flex items-center gap-2 mb-6">
                     <MessageSquare className="w-5 h-5 text-primary-600" />
-                    <h2 className="text-2xl font-extrabold">Envoyez-nous un message</h2>
+                    <h2 className="text-2xl font-extrabold">{t('contact.form.title')}</h2>
                   </div>
 
                   <ContactForm />
@@ -153,10 +155,10 @@ export default function ContactPage() {
                 {/* FAQ rapide */}
                 <div className="mt-6 grid sm:grid-cols-2 gap-4">
                   {[
-                    { q: 'Comment signaler un contenu abusif ?', a: 'Utilisez le bouton "Signaler" sur chaque ressource ou le formulaire ci-dessus avec sujet "bug".' },
-                    { q: 'Puis-je devenir enseignant ?', a: 'Oui ! Créez un compte, sélectionnez "Enseignant" lors de l\'inscription. Notre équipe examine votre demande sous 24-48h.' },
-                    { q: 'Vos données sont-elles protégées ?', a: 'Absolument. Conformément à la loi tunisienne 2004-63. Voir nos CGU pour les détails.' },
-                    { q: 'Comment supprimer mon compte ?', a: 'Allez dans Paramètres → Compte → Zone dangereuse → Supprimer mon compte.' }
+                    { q: t('contact.faq.q1'), a: t('contact.faq.a1') },
+                    { q: t('contact.faq.q2'), a: t('contact.faq.a2') },
+                    { q: t('contact.faq.q3'), a: t('contact.faq.a3') },
+                    { q: t('contact.faq.q4'), a: t('contact.faq.a4') },
                   ].map((f, i) => (
                     <details key={i} className="bg-slate-50 rounded-xl p-4 cursor-pointer group">
                       <summary className="font-semibold text-slate-900 flex items-center justify-between">

@@ -278,19 +278,17 @@
     "passwordChanged": "Mot de passe modifié avec succès"
   },
   "levels": {
-    "title": "Tous les niveaux",
-    "subtitle": "Choisissez votre niveau pour explorer les ressources adaptées",
-    "primaire": "Primaire",
-    "college": "Collège",
-    "lycee": "Lycée",
-    "bac": "Baccalauréat",
-    "from1to6": "De la 1ère à la 6ème année",
-    "collegeDesc": "7ème, 8ème et 9ème année de base",
-    "lyceeDesc": "De la 1ère année au Baccalauréat",
-    "noResources": "Aucune ressource pour le moment",
-    "resourcesCount": "{count} ressources",
-    "exploreLevel": "Explorer ce niveau",
-    "allLevels": "Tous les niveaux"
+    "hero": {
+      "h1a": "Tous les ",
+      "h1b": "niveaux scolaires",
+      "h1c": "",
+      "subtitle": "Notre plateforme couvre les classes à partir de la 7ème année de base jusqu'au Baccalauréat. Retrouvez les ressources conformes au programme officiel du Ministère de l'Éducation tunisien : cours, devoirs, exercices, corrigés et sujets BAC — organisés par cycle et par classe.",
+      "cycles": "cycles",
+      "classes": "classes",
+      "ressources": "ressources",
+      "gratuit": "100% gratuit"
+    },
+    "richSnippet": "Explorez les ressources pédagogiques gratuites par niveau et classe (Enseignement de base et Enseignement Secondaire)."
   },
   "subjects": {
     "title": "Toutes les matières",
@@ -316,7 +314,20 @@
     "technique": "Sciences Techniques",
     "lettres": "Lettres",
     "math": "Mathématiques",
-    "sciences": "Sciences"
+    "sciences": "Sciences",
+    "page": {
+      "hero": {
+        "h1a": "Toutes les ",
+        "h1b": "matières",
+        "h1c": "",
+        "subtitle": "Explorez {count} matières du système éducatif tunisien — de la 7ème de base jusqu'au Baccalauréat. Cours, devoirs, séries, sujets BAC et corrigés gratuits, conformes au programme officiel.",
+        "matieres": "matières",
+        "ressources": "ressources",
+        "gratuit": "100% gratuit"
+      },
+      "richSnippet": "${count} matières disponibles : cours, devoirs, exercices et corrigés gratuits pour le système éducatif tunisien.",
+      "richSnippetItem": "${count} ressources en ${name}"
+    }
   },
   "teacher": {
     "title": "Tous nos professeurs",
@@ -374,7 +385,12 @@
     "noTeacherFound": "Aucun professeur trouvé",
     "noResultsFor": "Aucun résultat pour \"{q}\". Essayez d'élargir vos critères.",
     "noResultsForFilters": "Aucun résultat pour ces filtres. Essayez d'enlever certains filtres.",
-    "resetFilters": "Réinitialiser les filtres"
+    "resetFilters": "Réinitialiser les filtres",
+    "filteredResults": "Professeurs filtrés — Examanet",
+    "allResults": "Tous les enseignants — Examanet",
+    "richSnippet": "Découvrez {count} enseignants tunisiens sur Examanet",
+    "atSchool": "Enseignant à {school}",
+    "onExamanet": "Enseignant sur Examanet"
   },
   "admin": {
     "dashboard": "🛡️ Dashboard Administrateur",
@@ -777,6 +793,349 @@
         "voieGenerale": "Voie générale",
         "voieTechnique": "Voie technique",
         "yearHeader": "Concours 9ème {year}"
+      }
+    }
+  },
+  "contact": {
+    "badge": "Nous sommes à votre écoute",
+    "hero": {
+      "title": "Contactez-nous",
+      "subtitle": "Une question, une suggestion, un bug à signaler ? Notre équipe vous répond sous 24-48h."
+    },
+    "info": {
+      "title": "Nos coordonnées",
+      "email": "Email",
+      "phone": "Téléphone",
+      "address": "Adresse",
+      "responseTime": "Temps de réponse",
+      "emailResponse": "Réponse sous 24-48h",
+      "phoneHours": "Lun-Ven 9h-17h",
+      "addressHQ": "Siège social",
+      "workDays": "Jours ouvrés",
+      "responseValue": "24-48 heures",
+      "followUs": "Suivez-nous"
+    },
+    "form": {
+      "title": "Envoyez-nous un message"
+    },
+    "faq": {
+      "q1": "Comment signaler un contenu abusif ?",
+      "a1": "Utilisez le bouton \"Signaler\" sur chaque ressource ou le formulaire ci-dessus avec sujet \"bug\".",
+      "q2": "Puis-je devenir enseignant ?",
+      "a2": "Oui ! Créez un compte, sélectionnez \"Enseignant\" lors de l'inscription. Notre équipe examine votre demande sous 24-48h.",
+      "q3": "Vos données sont-elles protégées ?",
+      "a3": "Absolument. Conformément à la loi tunisienne 2004-63. Voir nos CGU pour les détails.",
+      "q4": "Comment supprimer mon compte ?",
+      "a4": "Allez dans Paramètres → Compte → Zone dangereuse → Supprimer mon compte."
+    }
+  },
+  "cgu": {
+    "badge": "Document juridique",
+    "hero": {
+      "title": "Conditions Générales d'Utilisation",
+      "lastUpdate": "Dernière mise à jour : ",
+      "lastUpdateDate": "18 juin 2026",
+      "intro": "Merci de lire attentivement ces conditions avant d'utiliser Examanet."
+    },
+    "sommaire": "Sommaire",
+    "acceptation": {
+      "title": "En utilisant Examanet, vous acceptez ces CGU",
+      "body": "Si vous avez des questions concernant ces conditions, contactez-nous à "
+    },
+    "sections": [
+      {
+        "id": "objet",
+        "title": "1. Objet",
+        "content": "Les présentes Conditions Générales d'Utilisation (ci-après « CGU ») ont pour objet de définir les modalités et conditions d'utilisation de la plateforme Examanet (ci-après « la Plateforme »), éditée par Examanet SARL, ainsi que les droits et obligations des utilisateurs.\n\nExamanet est une plateforme collaborative de partage de ressources pédagogiques destinée aux élèves, enseignants et parents d'élèves du système éducatif tunisien."
+      },
+      {
+        "id": "acceptation",
+        "title": "2. Acceptation des CGU",
+        "content": "L'utilisation de la Plateforme implique l'acceptation pleine et entière des présentes CGU. Tout utilisateur qui ne souhaite pas accepter les présentes CGU doit s'abstenir d'utiliser la Plateforme.\n\nExamanet se réserve le droit de modifier les présentes CGU à tout moment. Les utilisateurs seront informés de toute modification par email et/ou par notification sur la Plateforme."
+      },
+      {
+        "id": "inscription",
+        "title": "3. Inscription et compte utilisateur",
+        "content": "L'accès à certaines fonctionnalités (publication, commentaires, favoris) nécessite la création d'un compte. L'utilisateur s'engage à fournir des informations exactes lors de son inscription et à les mettre à jour.\n\nLe compte est personnel et non transférable. L'utilisateur est responsable de la confidentialité de ses identifiants et de toutes les actions effectuées depuis son compte.\n\nTrois rôles sont disponibles :\n• Élève : accès aux ressources, favoris, commentaires\n• Enseignant : publication de ressources après approbation\n• Administrateur : modération de la plateforme"
+      },
+      {
+        "id": "contenu",
+        "title": "4. Contenu utilisateur",
+        "content": "L'utilisateur est seul responsable du contenu qu'il publie sur la Plateforme (PDF, descriptions, commentaires, images).\n\nEn publiant du contenu, l'utilisateur garantit qu'il en est l'auteur ou qu'il dispose des droits nécessaires, et qu'il ne porte pas atteinte aux droits de tiers (propriété intellectuelle, droit à l'image, etc.).\n\nL'utilisateur cède à Examanet une licence non exclusive, mondiale et gratuite d'utilisation, de reproduction, de modification et de distribution du contenu publié, dans le cadre du fonctionnement de la Plateforme."
+      },
+      {
+        "id": "propriete",
+        "title": "5. Propriété intellectuelle",
+        "content": "L'ensemble du contenu de la Plateforme (textes, images, logos, icônes, ainsi que le code source) est protégé par le droit d'auteur et appartient à Examanet ou à ses partenaires.\n\nLes ressources pédagogiques (PDF) restent la propriété de leurs auteurs. Toute reproduction sans autorisation est interdite, sauf usage personnel et pédagogique.\n\nLes marques, logos et signes distinctifs présents sur la Plateforme sont protégés."
+      },
+      {
+        "id": "utilisation",
+        "title": "6. Utilisation acceptable",
+        "content": "L'utilisateur s'engage à ne pas :\n• Publier de contenu illégal, diffamatoire, injurieux, discriminatoire ou portant atteinte aux bonnes mœurs\n• Usurper l'identité d'un tiers\n• Publier de contenu protégé par des droits d'auteur sans autorisation\n• Tenter de pirater, décompiler ou contourner les mesures de sécurité de la Plateforme\n• Utiliser la Plateforme à des fins commerciales sans autorisation\n• Spam, hameçonnage, ou toute activité malveillante\n• Perturber le fonctionnement normal de la Plateforme"
+      },
+      {
+        "id": "moderation",
+        "title": "7. Modération et sanctions",
+        "content": "Examanet se réserve le droit de modérer, modifier ou supprimer tout contenu ne respectant pas les présentes CGU, sans préavis.\n\nEn cas de violation grave ou répétée, Examanet peut suspendre ou supprimer le compte de l'utilisateur, et le cas échéant engager des poursuites judiciaires.\n\nLes enseignants sont soumis à une approbation préalable par l'équipe d'Examanet avant de pouvoir publier des ressources."
+      },
+      {
+        "id": "donnees",
+        "title": "8. Données personnelles",
+        "content": "Les données personnelles collectées par la Plateforme sont traitées conformément à la loi organique n° 2004-63 du 27 juillet 2004 relative à la protection des données à caractère personnel et à notre Politique de confidentialité.\n\nL'utilisateur dispose d'un droit d'accès, de rectification, d'opposition et de suppression de ses données. Pour exercer ces droits : contact@examanet.com"
+      },
+      {
+        "id": "responsabilite",
+        "title": "9. Limitation de responsabilité",
+        "content": "Examanet s'efforce d'assurer la disponibilité et la qualité de la Plateforme, mais ne peut garantir une accessibilité 100% du temps.\n\nExamanet ne peut être tenu responsable :\n• Des dommages indirects liés à l'utilisation de la Plateforme\n• Du contenu publié par les utilisateurs\n• De l'exactitude pédagogique des ressources (chaque ressource reste sous la responsabilité de son auteur)\n• De l'utilisation détournée des ressources par des tiers"
+      },
+      {
+        "id": "cookies",
+        "title": "10. Cookies",
+        "content": "La Plateforme utilise des cookies et technologies similaires pour :\n• Assurer le bon fonctionnement (session, préférences)\n• Mémoriser la langue de l'utilisateur\n• Analyser l'audience (anonymisé)\n\nL'utilisateur peut gérer ses préférences cookies via les paramètres de son navigateur."
+      },
+      {
+        "id": "modifications",
+        "title": "11. Modification des CGU",
+        "content": "Examanet se réserve le droit de modifier les présentes CGU à tout moment. Les utilisateurs seront informés par email et/ou par notification au moins 30 jours avant l'entrée en vigueur des modifications.\n\nEn cas de refus des nouvelles CGU, l'utilisateur peut résilier son compte à tout moment."
+      },
+      {
+        "id": "droit",
+        "title": "12. Loi applicable et juridiction",
+        "content": "Les présentes CGU sont régies par le droit tunisien.\n\nEn cas de litige, les parties s'efforceront de trouver une solution amiable. À défaut, le litige sera porté devant les tribunaux compétents de Tunis."
+      }
+    ]
+  },
+  "about": {
+    "hero": {
+      "badge": "Fait avec ❤️ en Tunisie 🇹🇳",
+      "titleStart": "Notre mission : ",
+      "titleGradient": "démocratiser l'éducation",
+      "titleEnd": " en Tunisie",
+      "subtitle": "Examanet est née d'un constat simple : trop d'élèves tunisiens n'ont pas accès à des ressources pédagogiques de qualité. Nous avons décidé de changer ça."
+    },
+    "stats": {
+      "resources": {
+        "value": "+10 000",
+        "label": "Ressources"
+      },
+      "teachers": {
+        "value": "+200",
+        "label": "Enseignants"
+      },
+      "students": {
+        "value": "+30 000",
+        "label": "Élèves"
+      },
+      "free": {
+        "value": "100%",
+        "label": "Gratuit"
+      }
+    },
+    "story": {
+      "badge": "NOTRE HISTOIRE",
+      "title": "D'où venons-nous ?",
+      "p1": "Tout a commencé en 2024, lorsque notre fondateur, Mehdi Boutiti, a cherché des ressources de mathématiques pour aider un cousin en 9ème année. Les sites existants (devoirat.net, tunisiecollege.net) étaient vieillissants, pleins de publicités intrusives, et l'expérience utilisateur laissait à désirer.",
+      "p2": "L'idée est née : « Et si on créait une plateforme moderne, gratuite, sans pub, et faite par et pour les Tunisiens ? »",
+      "p3": "En 2025, la première version voyait le jour. Aujourd'hui, Examanet héberge des milliers de ressources partagées par des enseignants passionnés, et est devenue la référence pour des dizaines de milliers d'élèves à travers le pays."
+    },
+    "values": {
+      "badge": "NOS VALEURS",
+      "title": "Ce qui nous anime",
+      "v1": {
+        "title": "Gratuit pour tous",
+        "desc": "Aucune ressource payante, aucun paywall. L'éducation est un droit, pas un privilège."
+      },
+      "v2": {
+        "title": "Qualité avant tout",
+        "desc": "Chaque PDF est vérifié par notre équipe avant publication pour garantir l'excellence."
+      },
+      "v3": {
+        "title": "Communauté",
+        "desc": "Une plateforme collaborative où enseignants et élèves grandissent ensemble."
+      },
+      "v4": {
+        "title": "Accessibilité",
+        "desc": "Mobile-first, performant même avec une connexion lente, disponible partout en Tunisie."
+      },
+      "v5": {
+        "title": "Transparence",
+        "desc": "Pas d'algorithmes cachés, pas de manipulation. Le meilleur contenu remonte naturellement."
+      },
+      "v6": {
+        "title": "Excellence tunisienne",
+        "desc": "Nous mettons en valeur le savoir-faire des enseignants tunisiens et le programme national."
+      }
+    },
+    "milestones": {
+      "badge": "JALONS",
+      "title": "Notre parcours",
+      "m1": {
+        "title": "Lancement du projet",
+        "desc": "Idée de créer une alternative moderne à devoirat.net"
+      },
+      "m2": {
+        "title": "Première version bêta",
+        "desc": "Plateforme lancée avec 16 matières et 50 ressources"
+      },
+      "m3": {
+        "title": "+10 000 ressources",
+        "desc": "Import depuis tunisiecollege.net, communauté grandissante"
+      }
+    },
+    "team": {
+      "badge": "L'ÉQUIPE",
+      "title": "Qui sommes-nous ?",
+      "subtitle": "Une petite équipe passionnée qui croit en l'éducation.",
+      "founder": "Fondateur & CEO"
+    },
+    "cta": {
+      "title": "Rejoignez l'aventure",
+      "subtitle": "Vous êtes enseignant ? Partagez vos ressources avec la communauté.\nVous êtes élève ? Explorez des milliers de PDFs gratuits.",
+      "cta1": "Créer un compte gratuit",
+      "cta2": "Devenir enseignant"
+    }
+  },
+  "faq": {
+    "hero": {
+      "title": "Questions fréquentes",
+      "subtitle": "Toutes les réponses à vos questions sur Examanet"
+    },
+    "contact": {
+      "title": "Vous ne trouvez pas votre réponse ?",
+      "subtitle": "Notre équipe est là pour vous aider.",
+      "cta": "Nous contacter →"
+    },
+    "sections": [
+      {
+        "category": "Général",
+        "questions": [
+          {
+            "q": "Qu'est-ce qu'Examanet ?",
+            "a": "Examanet est la plateforme pédagogique gratuite #1 en Tunisie. Elle regroupe des cours, devoirs, séries d'exercices, sujets Bac et corrigés pour les élèves du collège (7ème, 8ème, 9ème année de base) et du lycée (1ère, 2ème, 3ème, 4ème année secondaire / Bac). Toutes les ressources sont 100% gratuites et accessibles sans inscription."
+          },
+          {
+            "q": "Examanet est-il vraiment gratuit ?",
+            "a": "Oui, 100% gratuit. Aucune inscription n'est requise pour consulter, télécharger ou imprimer les ressources. Le site est soutenu par la communauté enseignante tunisienne."
+          },
+          {
+            "q": "Quelles sont les matières disponibles ?",
+            "a": "Mathématiques, Physique, Sciences de la Vie et de la Terre (SVT), Français, Arabe, Anglais, Histoire-Géographie, Philosophie, Économie, Gestion, Informatique, Technologie, et plus encore."
+          },
+          {
+            "q": "Examanet couvre-t-il tout le programme officiel tunisien ?",
+            "a": "Oui, les ressources suivent le programme officiel du Ministère de l'Éducation tunisien pour chaque niveau et chaque matière."
+          }
+        ]
+      },
+      {
+        "category": "Navigation & Téléchargement",
+        "questions": [
+          {
+            "q": "Comment trouver une ressource précise ?",
+            "a": "Utilisez la barre de recherche en haut de la page, ou naviguez par niveau (Enseignement de base / Enseignement Secondaire), par classe (7ème, 8ème, 9ème, etc.) ou par matière. Vous pouvez aussi filtrer par type (Cours, Devoir, Série, Sujet Bac, Corrigé)."
+          },
+          {
+            "q": "Comment télécharger un PDF ?",
+            "a": "Sur la page d'une ressource, cliquez sur le bouton 'Télécharger' (icône en bas de page). Le PDF s'ouvre dans un nouvel onglet — vous pouvez ensuite l'enregistrer ou l'imprimer."
+          },
+          {
+            "q": "Puis-je imprimer les ressources ?",
+            "a": "Oui, toutes les ressources sont au format PDF et peuvent être imprimées librement pour un usage personnel ou scolaire."
+          }
+        ]
+      },
+      {
+        "category": "Niveaux & Classes",
+        "questions": [
+          {
+            "q": "Quelle est la différence entre 'Classe' et 'Niveau' ?",
+            "a": "La 'Classe' indique l'année précise (ex: 9ème année de base, 2ème année secondaire). Le 'Niveau' (ou cycle) indique le type d'enseignement : 'Enseignement de base' pour le collège (7-8-9ème) ou 'Enseignement Secondaire' pour le lycée (1-4ème année, Bac)."
+          },
+          {
+            "q": "Qu'est-ce que l'Enseignement de base ?",
+            "a": "L'Enseignement de base en Tunisie correspond au collège (7ème, 8ème, 9ème année). C'est le premier cycle du secondaire, après l'école primaire."
+          },
+          {
+            "q": "Qu'est-ce que l'Enseignement Secondaire ?",
+            "a": "L'Enseignement Secondaire en Tunisie correspond au lycée (1ère, 2ème, 3ème, 4ème année secondaire). La 4ème année est l'année du Baccalauréat."
+          }
+        ]
+      },
+      {
+        "category": "Enseignants",
+        "questions": [
+          {
+            "q": "Comment devenir contributeur sur Examanet ?",
+            "a": "Si vous êtes enseignant et souhaitez partager vos ressources, créez un compte enseignant gratuit sur examanet.com, puis ajoutez vos cours/devoirs depuis votre espace personnel."
+          },
+          {
+            "q": "Comment contacter un enseignant ?",
+            "a": "Sur la page profil d'un enseignant (cliquez sur son nom), vous pouvez le suivre ou lui envoyer un message privé via la plateforme."
+          }
+        ]
+      },
+      {
+        "category": "Technique",
+        "questions": [
+          {
+            "q": "Le site ne s'affiche pas correctement, que faire ?",
+            "a": "Essayez de vider le cache de votre navigateur (Ctrl+Shift+R ou Cmd+Shift+R). Si le problème persiste, contactez-nous via la page Contact."
+          },
+          {
+            "q": "Puis-je utiliser Examanet sur mobile ?",
+            "a": "Oui, le site est entièrement responsive et optimisé pour mobile et tablette. Vous pouvez aussi l'installer comme une application (PWA) depuis votre navigateur."
+          }
+        ]
+      }
+    ]
+  },
+  "college": {
+    "hero": {
+      "breadcrumb": "Collège (Enseignement de base)",
+      "badge": "Enseignement de base — Cycle 1",
+      "titleStart": "Toutes les ressources du ",
+      "titleGradient": "collège tunisien",
+      "titleEnd": "",
+      "subtitle": "+{count} ressources gratuites pour la 7ème, 8ème et 9ème année de base : cours, devoirs, séries d'exercices, sujets d'examen et corrigés, conformes au programme officiel tunisien.",
+      "cta1": "Voir par classe",
+      "cta2": "Voir par matière"
+    },
+    "stats": {
+      "ressources": "Ressources",
+      "classes": "Classes",
+      "matieres": "Matières",
+      "gratuit": "Gratuit"
+    },
+    "problem": {
+      "title": "Le problème qu'on résout",
+      "p1": "Trop d'élèves tunisiens accèdent à des ressources obsolètes, incomplètes ou payantes. Les photocopies des manuels scolaires, les fichiers PDF dispersés sur des forums, les vidéos YouTube non structurées : tout ça rend la révision inefficace.",
+      "p2": "Examanet centralise tout ce dont tu as besoin pour réussir ton année au collège : des cours bien structurés, des devoirs types, des séries d'exercices avec corrigés, et tout ça 100% gratuit.",
+      "p3": "Que tu sois en 7ème année de base (collège), en 8ème année ou en 9ème année (dernière année avant le lycée), tu trouveras des ressources alignées sur le programme officiel du Ministère de l'Éducation tunisien."
+    },
+    "features": {
+      "f1": {
+        "title": "Conforme au programme officiel",
+        "desc": "Toutes les ressources suivent le programme 2026-2027"
+      },
+      "f2": {
+        "title": "Mis à jour régulièrement",
+        "desc": "De nouvelles ressources ajoutées chaque semaine"
+      },
+      "f3": {
+        "title": "Vérifié par des enseignants",
+        "desc": "Tous les contenus sont validés par des profs tunisiens"
+      },
+      "f4": {
+        "title": "Couvre toutes les matières",
+        "desc": "Math, Physique, SVT, Français, Arabe, Anglais..."
+      },
+      "f5": {
+        "title": "Avec corrigés",
+        "desc": "Vérifie tes réponses avec les corrigés détaillés"
+      },
+      "f6": {
+        "title": "Accès 24/7",
+        "desc": "Révise quand tu veux, sans inscription"
       }
     }
   }

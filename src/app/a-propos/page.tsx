@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { GraduationCap, Target, Heart, Users, BookOpen, Globe, Sparkles, Award, ArrowRight, Mail } from 'lucide-react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
-import { getLocale } from '@/lib/i18n-server';
+import { getLocale, getT, getDict } from '@/lib/i18n-server';
 import { breadcrumbSchema, SITE_URL } from '@/lib/structured-data';
 
 export const revalidate = 3600; // 1 hour cache
@@ -31,16 +31,36 @@ const breadcrumbJsonLd = breadcrumbSchema([
 ]);
 
 const team = [
-  { name: 'Mehdi Boutiti', role: 'Fondateur & CEO', email: 'boutiti.mehdi@gmail.com' }
-];
-
-const milestones = [
-  { year: '2024', title: 'Lancement du projet', desc: 'Idée de créer une alternative moderne à devoirat.net' },
-  { year: '2025', title: 'Première version bêta', desc: 'Plateforme lancée avec 16 matières et 50 ressources' },
-  { year: '2026', title: '+10 000 ressources', desc: 'Import depuis tunisiecollege.net, communauté grandissante' }
+  { name: 'Mehdi Boutiti', roleKey: 'team.founder' as const, email: 'boutiti.mehdi@gmail.com' }
 ];
 
 export default function AboutPage() {
+  const t = getT();
+  const dict = getDict();
+  const isAr = dict === (require('@/messages/ar.json') as any);
+
+  const milestones = [
+    { year: '2024', title: t('about.milestones.m1.title'), desc: t('about.milestones.m1.desc') },
+    { year: '2025', title: t('about.milestones.m2.title'), desc: t('about.milestones.m2.desc') },
+    { year: '2026', title: t('about.milestones.m3.title'), desc: t('about.milestones.m3.desc') }
+  ];
+
+  const stats = [
+    { value: t('about.stats.resources.value'), label: t('about.stats.resources.label'), icon: BookOpen, color: 'bg-primary-100 text-primary-600' },
+    { value: t('about.stats.teachers.value'), label: t('about.stats.teachers.label'), icon: Users, color: 'bg-amber-100 text-amber-600' },
+    { value: t('about.stats.students.value'), label: t('about.stats.students.label'), icon: GraduationCap, color: 'bg-emerald-100 text-emerald-600' },
+    { value: t('about.stats.free.value'), label: t('about.stats.free.label'), icon: Award, color: 'bg-purple-100 text-purple-600' }
+  ];
+
+  const values = [
+    { icon: Heart, titleKey: 'about.values.v1', descKey: 'about.values.v1' },
+    { icon: Sparkles, titleKey: 'about.values.v2', descKey: 'about.values.v2' },
+    { icon: Users, titleKey: 'about.values.v3', descKey: 'about.values.v3' },
+    { icon: Globe, titleKey: 'about.values.v4', descKey: 'about.values.v4' },
+    { icon: Target, titleKey: 'about.values.v5', descKey: 'about.values.v5' },
+    { icon: Award, titleKey: 'about.values.v6', descKey: 'about.values.v6' },
+  ];
+
   return (
     <div className="min-h-screen flex flex-col">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
@@ -56,25 +76,19 @@ export default function AboutPage() {
             <div className="text-center mb-12">
               <div className="inline-flex items-center gap-2 bg-white border border-primary-200 rounded-full px-4 py-2 mb-6 shadow-sm">
                 <Heart className="w-4 h-4 text-red-500 fill-red-500" />
-                <span className="text-xs font-semibold text-slate-700">Fait avec ❤️ en Tunisie 🇹🇳</span>
+                <span className="text-xs font-semibold text-slate-700">{t('about.hero.badge')}</span>
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-6">
-                Notre mission : <span className="gradient-text">démocratiser l'éducation</span> en Tunisie
+                {t('about.hero.titleStart')}<span className="gradient-text">{t('about.hero.titleGradient')}</span>{t('about.hero.titleEnd')}
               </h1>
               <p className="text-lg lg:text-xl text-slate-600 max-w-3xl mx-auto">
-                Examanet est née d'un constat simple : trop d'élèves tunisiens n'ont pas accès à des ressources
-                pédagogiques de qualité. Nous avons décidé de changer ça.
+                {t('about.hero.subtitle')}
               </p>
             </div>
 
             {/* Stats */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-12">
-              {[
-                { value: '+10 000', label: 'Ressources', icon: BookOpen, color: 'bg-primary-100 text-primary-600' },
-                { value: '+200', label: 'Enseignants', icon: Users, color: 'bg-amber-100 text-amber-600' },
-                { value: '+30 000', label: 'Élèves', icon: GraduationCap, color: 'bg-emerald-100 text-emerald-600' },
-                { value: '100%', label: 'Gratuit', icon: Award, color: 'bg-purple-100 text-purple-600' }
-              ].map((s, i) => (
+              {stats.map((s, i) => (
                 <div key={i} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 text-center">
                   <div className={`w-12 h-12 mx-auto mb-3 rounded-xl ${s.color} flex items-center justify-center`}>
                     <s.icon className="w-6 h-6" />
@@ -91,25 +105,17 @@ export default function AboutPage() {
         <section className="py-20 bg-white">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
-              <div className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 rounded-full text-xs font-bold mb-3">NOTRE HISTOIRE</div>
-              <h2 className="text-3xl lg:text-5xl font-extrabold mb-3">D'où venons-nous ?</h2>
+              <div className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 rounded-full text-xs font-bold mb-3">{t('about.story.badge')}</div>
+              <h2 className="text-3xl lg:text-5xl font-extrabold mb-3">{t('about.story.title')}</h2>
             </div>
 
             <div className="prose prose-lg max-w-3xl mx-auto text-slate-600 space-y-4">
+              <p><strong className="text-slate-900">{t('about.story.p1').split(',')[0]}</strong>{t('about.story.p1').substring(t('about.story.p1').indexOf(','))}</p>
               <p>
-                <strong className="text-slate-900">Tout a commencé en 2024</strong>, lorsque notre fondateur,
-                Mehdi Boutiti, a cherché des ressources de mathématiques pour aider un cousin en 9ème année.
-                Les sites existants (devoirat.net, tunisiecollege.net) étaient vieillissants, pleins de
-                publicités intrusives, et l'expérience utilisateur laissait à désirer.
+                <em className="text-slate-900">{t('about.story.p2')}</em>
               </p>
               <p>
-                L'idée est née : <em className="text-slate-900">« Et si on créait une plateforme moderne,
-                gratuite, sans pub, et faite par et pour les Tunisiens ? »</em>
-              </p>
-              <p>
-                En 2025, la première version voyait le jour. Aujourd'hui, Examanet héberge des milliers
-                de ressources partagées par des enseignants passionnés, et est devenue la référence pour
-                des dizaines de milliers d'élèves à travers le pays.
+                {t('about.story.p3')}
               </p>
             </div>
           </div>
@@ -119,25 +125,18 @@ export default function AboutPage() {
         <section className="py-20 bg-gradient-to-br from-slate-50 to-primary-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
-              <div className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 rounded-full text-xs font-bold mb-3">NOS VALEURS</div>
-              <h2 className="text-3xl lg:text-5xl font-extrabold mb-3">Ce qui nous anime</h2>
+              <div className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 rounded-full text-xs font-bold mb-3">{t('about.values.badge')}</div>
+              <h2 className="text-3xl lg:text-5xl font-extrabold mb-3">{t('about.values.title')}</h2>
             </div>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[
-                { icon: Heart, title: 'Gratuit pour tous', desc: 'Aucune ressource payante, aucun paywall. L\'éducation est un droit, pas un privilège.' },
-                { icon: Sparkles, title: 'Qualité avant tout', desc: 'Chaque PDF est vérifié par notre équipe avant publication pour garantir l\'excellence.' },
-                { icon: Users, title: 'Communauté', desc: 'Une plateforme collaborative où enseignants et élèves grandissent ensemble.' },
-                { icon: Globe, title: 'Accessibilité', desc: 'Mobile-first, performant même avec une connexion lente, disponible partout en Tunisie.' },
-                { icon: Target, title: 'Transparence', desc: 'Pas d\'algorithmes cachés, pas de manipulation. Le meilleur contenu remonte naturellement.' },
-                { icon: Award, title: 'Excellence tunisienne', desc: 'Nous mettons en valeur le savoir-faire des enseignants tunisiens et le programme national.' }
-              ].map((v, i) => (
+              {values.map((v, i) => (
                 <div key={i} className="bg-white rounded-2xl p-6 border border-slate-100 card-hover">
                   <div className="w-12 h-12 rounded-xl bg-primary-100 text-primary-600 flex items-center justify-center mb-4">
                     <v.icon className="w-6 h-6" />
                   </div>
-                  <h3 className="text-lg font-bold mb-2">{v.title}</h3>
-                  <p className="text-slate-600 text-sm">{v.desc}</p>
+                  <h3 className="text-lg font-bold mb-2">{t(v.titleKey + '.title')}</h3>
+                  <p className="text-slate-600 text-sm">{t(v.descKey + '.desc')}</p>
                 </div>
               ))}
             </div>
@@ -148,8 +147,8 @@ export default function AboutPage() {
         <section className="py-20 bg-white">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
-              <div className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 rounded-full text-xs font-bold mb-3">JALONS</div>
-              <h2 className="text-3xl lg:text-5xl font-extrabold mb-3">Notre parcours</h2>
+              <div className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 rounded-full text-xs font-bold mb-3">{t('about.milestones.badge')}</div>
+              <h2 className="text-3xl lg:text-5xl font-extrabold mb-3">{t('about.milestones.title')}</h2>
             </div>
 
             <div className="space-y-6">
@@ -172,9 +171,9 @@ export default function AboutPage() {
         <section className="py-20 bg-gradient-to-br from-slate-50 to-primary-50">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
-              <div className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 rounded-full text-xs font-bold mb-3">L'ÉQUIPE</div>
-              <h2 className="text-3xl lg:text-5xl font-extrabold mb-3">Qui sommes-nous ?</h2>
-              <p className="text-lg text-slate-600">Une petite équipe passionnée qui croit en l'éducation.</p>
+              <div className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 rounded-full text-xs font-bold mb-3">{t('about.team.badge')}</div>
+              <h2 className="text-3xl lg:text-5xl font-extrabold mb-3">{t('about.team.title')}</h2>
+              <p className="text-lg text-slate-600">{t('about.team.subtitle')}</p>
             </div>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -184,7 +183,7 @@ export default function AboutPage() {
                     {m.name.split(' ').map(p => p[0]).join('').slice(0, 2)}
                   </div>
                   <h3 className="font-bold text-lg mb-1">{m.name}</h3>
-                  <div className="text-sm text-primary-600 font-semibold mb-2">{m.role}</div>
+                  <div className="text-sm text-primary-600 font-semibold mb-2">{t(m.roleKey)}</div>
                   <a href={`mailto:${m.email}`} className="text-xs text-slate-500 hover:text-primary-600 inline-flex items-center gap-1">
                     <Mail className="w-3 h-3" /> {m.email}
                   </a>
@@ -197,18 +196,17 @@ export default function AboutPage() {
         {/* CTA */}
         <section className="py-20 bg-white">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-3xl lg:text-4xl font-extrabold mb-4">Rejoignez l'aventure</h2>
-            <p className="text-lg text-slate-600 mb-8">
-              Vous êtes enseignant ? Partagez vos ressources avec la communauté.
-              <br />Vous êtes élève ? Explorez des milliers de PDFs gratuits.
+            <h2 className="text-3xl lg:text-4xl font-extrabold mb-4">{t('about.cta.title')}</h2>
+            <p className="text-lg text-slate-600 mb-8 whitespace-pre-line">
+              {t('about.cta.subtitle')}
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               <Link href="/inscription" className="btn-primary inline-flex items-center gap-2 px-7 py-3.5">
-                Créer un compte gratuit
+                {t('about.cta.cta1')}
                 <ArrowRight className="w-4 h-4 rtl:rotate-180" />
               </Link>
               <Link href="/professeurs" className="btn-accent inline-flex items-center gap-2 px-7 py-3.5">
-                Devenir enseignant
+                {t('about.cta.cta2')}
                 <ArrowRight className="w-4 h-4 rtl:rotate-180" />
               </Link>
             </div>

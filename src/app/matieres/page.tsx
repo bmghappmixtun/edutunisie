@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { prisma } from '@/lib/prisma';
-import { getLocale } from '@/lib/i18n-server';
+import { getLocale, getT } from '@/lib/i18n-server';
 import { itemListSchema } from '@/lib/structured-data';
 import { BookOpen, Sparkles, ArrowRight, GraduationCap } from 'lucide-react';
 import { SUBJECTS_CONFIG, getSubjectConfig } from '@/lib/subjects.config';
@@ -35,6 +35,7 @@ export const revalidate = 300; // 5 min cache
 const EXCLUDED_SLUGS = new Set(['sport', 'sciences-informatique-matiere']);
 
 export default async function SubjectsPage() {
+  const t = getT();
   const dbSubjects = await prisma.subject.findMany({
     where: { slug: { notIn: Array.from(EXCLUDED_SLUGS) } },
     orderBy: { order: 'asc' },
@@ -48,12 +49,12 @@ export default async function SubjectsPage() {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
   const subjectListJsonLd = itemListSchema({
     name: 'Toutes les matières — Examanet',
-    description: `${dbSubjects.length} matières disponibles : cours, devoirs, exercices et corrigés gratuits pour le système éducatif tunisien.`,
+    description: t('subjects.page.richSnippet').replace('{count}', String(dbSubjects.length)),
     url: `${baseUrl}/matieres`,
     items: dbSubjects.slice(0, 50).map((s) => ({
       name: s.nameFr,
       url: `${baseUrl}/matieres/${s.slug}`,
-      description: `${s._count.resources} ressources en ${s.nameFr}`,
+      description: t('subjects.page.richSnippetItem').replace('{count}', String(s._count.resources)).replace('{name}', s.nameFr),
     })),
   });
 
@@ -92,10 +93,10 @@ export default async function SubjectsPage() {
                 Programme officiel · JORT 2019-1085
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 mb-4 leading-tight">
-                Toutes les{' '}
+                {t('subjects.page.hero.h1a')}
                 <span className="relative inline-block">
                   <span className="relative z-10 bg-gradient-to-r from-primary-600 to-sky-500 bg-clip-text text-transparent">
-                    matières
+                    {t('subjects.page.hero.h1b')}
                   </span>
                   <svg
                     className="absolute -bottom-1 left-0 w-full"
@@ -119,9 +120,7 @@ export default async function SubjectsPage() {
                 </span>
               </h1>
               <p className="text-lg text-slate-600 leading-relaxed mb-6">
-                Explorez {dbSubjects.length} matières du système éducatif tunisien — de la 7ème
-                de base jusqu'au Baccalauréat. Cours, devoirs, séries, sujets BAC et corrigés
-                gratuits, conformes au programme officiel.
+                {t('subjects.page.hero.subtitle').replace('{count}', String(dbSubjects.length))}
               </p>
 
               {/* Hero stats */}
@@ -130,7 +129,7 @@ export default async function SubjectsPage() {
                   <BookOpen className="w-4 h-4 text-primary-600" />
                   <span className="text-sm">
                     <strong className="font-bold text-slate-900">{dbSubjects.length}</strong>
-                    <span className="text-slate-500"> matières</span>
+                    <span className="text-slate-500"> {t('subjects.page.hero.matieres')}</span>
                   </span>
                 </div>
                 <div className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl shadow-sm">
@@ -139,12 +138,12 @@ export default async function SubjectsPage() {
                     <strong className="font-bold text-slate-900">
                       {totalResources.toLocaleString('fr-FR')}
                     </strong>
-                    <span className="text-slate-500"> ressources</span>
+                    <span className="text-slate-500"> {t('subjects.page.hero.ressources')}</span>
                   </span>
                 </div>
                 <div className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl shadow-sm">
                   <span className="text-amber-500 text-base">⭐</span>
-                  <span className="text-sm text-slate-600">100% gratuit</span>
+                  <span className="text-sm text-slate-600">{t('subjects.page.hero.gratuit')}</span>
                 </div>
               </div>
             </div>

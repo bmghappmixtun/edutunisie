@@ -4,7 +4,7 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { prisma } from '@/lib/prisma';
 import { itemListSchema, breadcrumbSchema, SITE_URL } from '@/lib/structured-data';
-import { getLocale } from '@/lib/i18n-server';
+import { getLocale, getT } from '@/lib/i18n-server';
 import { GraduationCap, MapPin, Star, Search, ChevronLeft, ChevronRight, Award, Sparkles, Users, CheckCircle2, X, BookOpen } from 'lucide-react';
 import type { Prisma } from '@prisma/client';
 import TeachersSearchBar from './TeachersSearchBar';
@@ -57,6 +57,7 @@ const breadcrumbJsonLd = breadcrumbSchema([
 ]);
 
 export default async function TeachersPage(props: { searchParams: Promise<SearchParams> }) {
+  const tt = getT();
   const sp = await props.searchParams;
   const q = (sp.q || '').trim();
   const subjectSlugs = (sp.subject || '').split(',').filter(Boolean);
@@ -346,13 +347,13 @@ export default async function TeachersPage(props: { searchParams: Promise<Search
   // JSON-LD: ItemList of teachers for rich SERP results
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
   const teacherListJsonLd = teachers.length > 0 ? itemListSchema({
-    name: hasFilters ? `Professeurs filtrés — Examanet` : `Tous les enseignants — Examanet`,
-    description: `Découvrez ${totalMatching} enseignants tunisiens sur Examanet`,
+    name: hasFilters ? tt('teacher.filteredResults') : tt('teacher.allResults'),
+    description: tt('teacher.richSnippet').replace('{count}', String(totalMatching)),
     url: `${baseUrl}/professeurs`,
     items: teachers.slice(0, 50).map((t) => ({
       name: `${t.firstName || ''} ${t.lastName || ''}`.replace(/\s+/g, ' ').trim(),
       url: `${baseUrl}/professeurs/${t.id}`,
-      description: t.bio || (t.schoolName ? `Enseignant à ${t.schoolName}` : `Enseignant sur Examanet`),
+      description: t.bio || (t.schoolName ? tt('teacher.atSchool').replace('{school}', t.schoolName) : tt('teacher.onExamanet')),
     })),
   }) : null;
 
