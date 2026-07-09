@@ -62,9 +62,12 @@ export async function GET(req: NextRequest) {
       select: { term: true, synonyms: true, language: true, category: true },
     });
 
-    // Expand query with synonyms
+    // Expand query with synonyms (for trgm matching)
     const expandedQuery = expandQueryWithSynonyms(q, synonyms);
-    const ftsQuery = expandedQuery.expanded || q;
+    // FTS uses the original query (websearch_to_tsquery handles it natively)
+    // TRGM uses the expanded query to match synonyms
+    const ftsQuery = q;
+    const trgmQuery = expandedQuery.expanded || q;
 
     // Build additional WHERE clauses for filters
     const filterClauses: string[] = ['r.status = \'PUBLISHED\''];
@@ -134,13 +137,13 @@ export async function GET(req: NextRequest) {
         SELECT
           r.id,
           GREATEST(
-            word_similarity($1, r.title),
-            word_similarity($1, COALESCE(r.description, ''))
+            word_similarity($2, r.title),
+            word_similarity($2, COALESCE(r.description, ''))
           ) AS trgm_score
         FROM "Resource" r
         WHERE (
-            word_similarity($1, r.title) > 0.4
-            OR word_similarity($1, COALESCE(r.description, '')) > 0.4
+            word_similarity($2, r.title) > 0.4
+            OR word_similarity($2, COALESCE(r.description, '')) > 0.4
           )
           ${filterClauses.map(c => 'AND ' + c).join('\n          ')}
         ORDER BY trgm_score DESC
@@ -178,7 +181,7 @@ export async function GET(req: NextRequest) {
       LIMIT ${limit} OFFSET ${offset}
     `;
 
-    const allParams = [ftsQuery, ...filterParams];
+    const allParams = [ftsQuery, trgmQuery, ...filterParams];
     const results = await prisma.$queryRawUnsafe(sql, ...allParams) as any[];
 
     // Hydrate with relations
@@ -231,8 +234,8 @@ export async function GET(req: NextRequest) {
       trgm_hits AS (
         SELECT id FROM "Resource" r
         WHERE (
-            word_similarity($1, r.title) > 0.4
-            OR word_similarity($1, COALESCE(r.description, '')) > 0.4
+            word_similarity($2, r.title) > 0.4
+            OR word_similarity($2, COALESCE(r.description, '')) > 0.4
           )
           ${filterClauses.map(c => 'AND ' + c).join('\n          ')}
         LIMIT 1000
@@ -241,7 +244,7 @@ export async function GET(req: NextRequest) {
       FROM fts_hits f
       FULL OUTER JOIN trgm_hits t ON t.id = f.id
     `;
-    const countResult = await prisma.$queryRawUnsafe(countSql, ...allParams) as any[];
+    const countResult = await prisma.$queryRawUnsafe(countSql, ftsQuery, trgmQuery, ...filterParams) as any[];
     const total = parseInt(countResult[0]?.total || '0', 10);
 
     // Facets
@@ -259,8 +262,8 @@ export async function GET(req: NextRequest) {
           r."hasCorrection"
         FROM "Resource" r
         WHERE r.search_vector @@ websearch_to_tsquery('french', $1)
-           OR word_similarity($1, r.title) > 0.4
-           OR word_similarity($1, COALESCE(r.description, '')) > 0.4
+           OR word_similarity($2, r.title) > 0.4
+           OR word_similarity($2, COALESCE(r.description, '')) > 0.4
       )
       SELECT
         type::text AS type,
@@ -275,11 +278,11 @@ export async function GET(req: NextRequest) {
       WHERE id IN (
         SELECT id FROM "Resource" r
         WHERE r.search_vector @@ websearch_to_tsquery('french', $1)
-           OR word_similarity($1, r.title) > 0.4
+           OR word_similarity($2, r.title) > 0.4
         LIMIT 5000
       )
     `;
-    const facetRows = await prisma.$queryRawUnsafe(facetSql, ftsQuery) as any[];
+    const facetRows = await prisma.$queryRawUnsafe(facetSql, ftsQuery, trgmQuery) as any[];
 
     // Build facet counts
     const facets: any = {};
@@ -322,32 +325,31 @@ export async function GET(req: NextRequest) {
 }
 
 // ============================================================================
-// Helper: expand query with synonyms
+// Helper: expand query with synonyms (for trgm matching, not FTS)
 // ============================================================================
 function expandQueryWithSynonyms(q: string, synonyms: any[]): { expanded: string; applied: string[] } {
   if (!q) return { expanded: '', applied: [] };
-  const lower = q.toLowerCase();
+  const lower = q.toLowerCase().trim();
   const tokens = lower.split(/\s+/);
   const applied: string[] = [];
-  const expanded: string[] = [];
+  const expandedSet = new Set<string>();
 
   for (const token of tokens) {
-    let added = false;
+    let found = false;
     for (const syn of synonyms) {
-      const allTerms = [syn.term, ...(syn.synonyms || [])];
+      const allTerms = [syn.term.toLowerCase(), ...(syn.synonyms || []).map((s: string) => s.toLowerCase())];
       if (allTerms.includes(token)) {
-        // Add the canonical term + the others
-        expanded.push(syn.term);
-        for (const s of syn.synonyms || []) {
-          if (s !== token && !expanded.includes(s)) expanded.push(s);
-        }
-        applied.push(`${token} → ${allTerms.join(', ')}`);
-        added = true;
+        // Add all variants for trgm matching
+        for (const t of allTerms) expandedSet.add(t);
+        applied.push(`${token} → ${syn.term} (${allTerms.length} variants)`);
+        found = true;
         break;
       }
     }
-    if (!added) expanded.push(token);
+    if (!found) expandedSet.add(token);
   }
 
-  return { expanded: expanded.join(' | '), applied };
+  // For FTS: use original query (websearch_to_tsquery handles OR natively)
+  // For trgm: use all variants
+  return { expanded: Array.from(expandedSet).join(' '), applied };
 }
