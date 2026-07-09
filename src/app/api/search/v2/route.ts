@@ -70,9 +70,10 @@ export async function GET(req: NextRequest) {
     const trgmQuery = expandedQuery.expanded || q;
 
     // Build additional WHERE clauses for filters
+    // $1 = ftsQuery, $2 = trgmQuery, $3+ = filters
     const filterClauses: string[] = ['r.status = \'PUBLISHED\''];
     const filterParams: any[] = [];
-    let paramIdx = 1; // $1 = ftsQuery
+    let paramIdx = 2; // Start at 2 because $1 and $2 are already used
     if (filters.subject?.length) {
       filterClauses.push(`r."subjectId" IN (${filters.subject.map(() => `$${++paramIdx}`).join(',')})`);
       filterParams.push(...filters.subject);
