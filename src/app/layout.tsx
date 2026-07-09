@@ -69,15 +69,6 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: SITE_URL,
-    // Tunisian platform: primary French, with Arabic toggle available.
-    // We use x-default to indicate FR is the default canonical.
-    // (Full AR URL routing is on the roadmap; for now both languages
-    //  serve from the same URL based on the user's locale cookie.)
-    languages: {
-      'fr-TN': SITE_URL,
-      'ar-TN': SITE_URL,
-      'x-default': SITE_URL,
-    },
   },
   other: {
     'theme-color': '#0EA5E9',
@@ -111,6 +102,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="google-site-verification" content="GXE5A9gq9-K7q7IztCatkSHhYrgtWWBbPloJymofPUY" />
         {/* Bing Webmaster Tools verification meta tag (HTML tag verification) */}
         <meta name="msvalidate.01" content="C04AC04227DB04DAC96552F4A27BCD73" />
+        {/* Hreflang: Tunisian platform is bilingual FR/AR. Currently both
+            languages serve from the same URL (locale cookie); x-default
+            points to the canonical FR version. When AR URL routing ships,
+            update the ar-TN hreflang to point to the /ar/* path. */}
+        <link rel="alternate" hrefLang="fr-TN" href={SITE_URL} />
+        <link rel="alternate" hrefLang="ar-TN" href={SITE_URL} />
+        <link rel="alternate" hrefLang="x-default" href={SITE_URL} />
       </head>
       <body>
         <NuqsAdapter>
