@@ -1,8 +1,26 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { prisma } from '@/lib/prisma';
-import { itemListSchema } from '@/lib/structured-data';
+import { itemListSchema, breadcrumbSchema, SITE_URL } from '@/lib/structured-data';
+
+export const metadata: Metadata = {
+  title: 'Professeurs tunisiens — Découvrez nos enseignants',
+  description: 'Liste des enseignants tunisiens qui partagent leurs ressources pédagogiques sur Examanet. Trouvez des professeurs par matière, classe et niveau.',
+  alternates: { canonical: '/professeurs' },
+  openGraph: {
+    title: 'Professeurs tunisiens sur Examanet',
+    description: 'Découvrez nos enseignants certifiés et leurs ressources gratuites.',
+    url: '/professeurs',
+    type: 'website',
+  },
+};
+
+const breadcrumbJsonLd = breadcrumbSchema([
+  { name: 'Accueil', url: SITE_URL },
+  { name: 'Professeurs', url: `${SITE_URL}/professeurs` },
+]);
 import { GraduationCap, MapPin, Star, Search, ChevronLeft, ChevronRight, Award, Sparkles, Users, CheckCircle2, X, BookOpen } from 'lucide-react';
 import type { Prisma } from '@prisma/client';
 import TeachersSearchBar from './TeachersSearchBar';
@@ -337,6 +355,7 @@ export default async function TeachersPage(props: { searchParams: Promise<Search
       {teacherListJsonLd && (
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(teacherListJsonLd) }} />
       )}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <Header />
       <main className="flex-1 pt-20">
         {/* HERO */}

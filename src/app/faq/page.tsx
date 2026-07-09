@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
-import { faqSchema } from '@/lib/structured-data';
+import { faqSchema, breadcrumbSchema } from '@/lib/structured-data';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
 
@@ -109,10 +109,15 @@ export default function FAQPage() {
   // Flatten FAQs for schema
   const flatFaqs = FAQS.flatMap(c => c.questions).map(f => ({ question: f.q, answer: f.a }));
   const jsonLd = faqSchema(flatFaqs);
+  const breadcrumbJsonLd = breadcrumbSchema([
+    { name: 'Accueil', url: SITE_URL },
+    { name: 'FAQ', url: `${SITE_URL}/faq` },
+  ]);
 
   return (
     <div className="min-h-screen flex flex-col">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <Header />
 
       <main className="flex-1 pt-20">
