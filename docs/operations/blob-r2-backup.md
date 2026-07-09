@@ -171,15 +171,19 @@ node scripts/backup/blob-restore-r2.mjs --key=... --public-url
 
 ## Cost breakdown
 
-| Item | Estimate |
-|------|----------|
-| Storage (30GB × $0.015/GB) | **$0.45/month** |
-| Class A ops (PUT/LIST) | ~$0.20/month (30K PUTs) |
-| Class B ops (GET/HEAD) | ~$0.01/month |
-| Egress (downloads) | **$0 (R2 has free egress!)** |
-| **Total** | **~$0.66/month** |
+*Measured from `TeacherFile.fileSize` + `pdfSize` in DB on 2026-07-09:*
 
-Vs Vercel Blob: ~$5-10/month for same volume.
+| Item | Real data | Cost |
+|------|-----------|------|
+| Total files | 30,556 (15,278 source + 15,278 PDF) | — |
+| Total size | **13.64 GB** (avg 468 KB/file) | — |
+| Storage (10 GB free + 3.64 GB × $0.015) | — | **$0.055/month** |
+| Class A ops (15K PUTs × $4.50/M) | — | **$0.068/month** |
+| Class B ops (HEAD/GET × $0.36/M) | — | **$0.010/month** |
+| Egress (downloads) | — | **$0 (free!)** |
+| **TOTAL** | — | **~$0.13/month** |
+
+Vs Vercel Blob: $5-10/month for same volume (paid egress, single region).
 
 ---
 

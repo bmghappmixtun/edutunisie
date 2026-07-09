@@ -25,11 +25,12 @@
  *   R2_BUCKET            Bucket name (e.g. "examanet-blob-backup")
  *   R2_ENDPOINT          (optional) Custom endpoint, defaults to https://{ACCOUNT_ID}.r2.cloudflarestorage.com
  *
- * Cost estimate:
- *   Storage: 30GB × $0.015/GB = $0.45/month
+ * Cost estimate (measured 2026-07-09):
+ *   Storage: 13.64 GB total (10 GB free + 3.64 GB × $0.015/GB) = ~$0.06/month
  *   Egress:  $0 (R2 has free egress)
- *   Class A ops: $4.50/million (PUT/LIST) - negligible
- *   Class B ops: $0.36/million (GET/HEAD) - negligible
+ *   Class A ops: 15K PUTs × $4.50/M = $0.07/month
+ *   Class B ops: HEAD/GET × $0.36/M = $0.01/month
+ *   TOTAL:  ~$0.13/month
  */
 
 import { S3Client, HeadObjectCommand, PutObjectCommand, ListObjectsV2Command } from '@aws-sdk/client-s3';
