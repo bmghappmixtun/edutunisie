@@ -76,20 +76,29 @@ git push origin main
 
 ---
 
-## 🔴 Scenario 3 — Vercel Blob is gone (region outage / accidental delete)
+## 🟡 Scenario 3 — Vercel Blob is gone (region outage / accidental delete)
 
 **Symptom:** All PDFs / images return 404. Resource detail pages show missing files.
 
 **Cause:** Vercel storage incident or misconfigured cleanup script.
 
-**Status:** **This is NOT covered by backup today.** All 30,556 blob files (15,278 originals + 15,278 generated PDFs) would need to be re-uploaded.
+**Status:** **Covered by R2 backup if configured.** See [blob-r2-backup.md](./blob-r2-backup.md).
 
-**Mitigation (long-term):** Migrate to Cloudflare R2 with daily sync. See `docs/operations/blob-migration.md` (TBD).
+**Recovery from R2 (if configured):**
+1. Verify R2 backup is intact: `node scripts/backup/blob-restore-r2.mjs --report`
+2. Re-create Vercel Blob store: Vercel dashboard → Storage → Create new Blob
+3. Update `BLOB_READ_WRITE_TOKEN` in Vercel env vars with the new store's token
+4. Restore all files: `node scripts/backup/blob-restore-r2.mjs --restore-all` (~2-3h for 30K files)
+5. Verify: `curl -I https://kmy1h6us8l7bg7bg.public.blob.vercel-storage.com/teacher-library/foo/bar.pdf` → 200
+
+**Time:** 2-3 hours. Downtime depends on how fast you re-create the Vercel Blob store.
 
 **Manual recovery (if R2 not yet set up):**
 1. Check if any local copies exist: `find /workspace -name "*.pdf" | head`
 2. Re-upload from source: JotForm submissions, teacher emails, original import scripts
 3. Update `TeacherFile.fileUrl` in DB to new URLs
+
+**Time:** Hours to days (depending on volume)
 
 **Time:** Hours to days (depending on volume)
 
