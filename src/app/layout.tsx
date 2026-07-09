@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { headers } from 'next/headers';
 import './globals.css';
 import { Toaster } from 'react-hot-toast';
 import AnalyticsWithOptOut from '@/components/analytics/AnalyticsWithOptOut';
@@ -91,9 +92,15 @@ export const viewport = {
   themeColor: '#0EA5E9',
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // Read locale from middleware-set header (for /ar/* URLs)
+  const headerStore = await headers();
+  const xLocale = headerStore.get('x-locale');
+  const locale: 'fr' | 'ar' = xLocale === 'ar' ? 'ar' : 'fr';
+  const dir = locale === 'ar' ? 'rtl' : 'ltr';
+
   return (
-    <html lang="fr" suppressHydrationWarning>
+    <html lang={locale} dir={dir} suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -102,12 +109,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="google-site-verification" content="GXE5A9gq9-K7q7IztCatkSHhYrgtWWBbPloJymofPUY" />
         {/* Bing Webmaster Tools verification meta tag (HTML tag verification) */}
         <meta name="msvalidate.01" content="C04AC04227DB04DAC96552F4A27BCD73" />
-        {/* Hreflang: Tunisian platform is bilingual FR/AR. Currently both
-            languages serve from the same URL (locale cookie); x-default
-            points to the canonical FR version. When AR URL routing ships,
-            update the ar-TN hreflang to point to the /ar/* path. */}
+        {/* Hreflang: FR is canonical, AR is at /ar/* prefix, x-default points to FR. */}
         <link rel="alternate" hrefLang="fr-TN" href={SITE_URL} />
-        <link rel="alternate" hrefLang="ar-TN" href={SITE_URL} />
+        <link rel="alternate" hrefLang="ar-TN" href={`${SITE_URL}/ar`} />
         <link rel="alternate" hrefLang="x-default" href={SITE_URL} />
       </head>
       <body>
