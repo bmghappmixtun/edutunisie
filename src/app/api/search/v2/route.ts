@@ -6,32 +6,8 @@ export const runtime = 'nodejs';
 
 // ============================================================================
 // Search v2: FTS + pg_trgm + Synonyms + Highlighting + Facets
-// Strategy:
-//   1. Expand query with synonyms (FR/AR)
-//   2. FTS via websearch_to_tsquery (stemming, multi-lang)
-//   3. pg_trgm fallback for typos via word_similarity > 0.4
-//   4. Combine scores (FTS weight 1.0, trgm weight 0.5)
-//   5. ts_headline for highlighting
-//   6. GROUP BY for facets
+// Simplified & reliable version
 // ============================================================================
-
-interface SearchRequest {
-  q: string;
-  filters?: {
-    subject?: string[];
-    class?: string[];
-    section?: string[];
-    type?: string[];
-    year?: string[];
-    trimester?: string[];
-    language?: string[];
-    hasCorrection?: boolean;
-    teacherId?: string;
-  };
-  page?: number;
-  limit?: number;
-  sort?: 'relevance' | 'recent' | 'popular' | 'downloads';
-}
 
 export async function GET(req: NextRequest) {
   const t0 = Date.now();
@@ -41,120 +17,121 @@ export async function GET(req: NextRequest) {
   const page = Math.max(1, parseInt(params.get('page') || '1'));
   const limit = Math.min(50, Math.max(1, parseInt(params.get('limit') || '20')));
   const offset = (page - 1) * limit;
-  const sort = (params.get('sort') || 'relevance') as SearchRequest['sort'];
+  const sort = params.get('sort') || 'relevance';
 
   // Parse filters
-  const filters: SearchRequest['filters'] = {
-    subject: params.getAll('subject').filter(Boolean),
-    class: params.getAll('class').filter(Boolean),
-    section: params.getAll('section').filter(Boolean),
-    type: params.getAll('type').filter(Boolean),
-    year: params.getAll('year').filter(Boolean),
-    trimester: params.getAll('trimestre').filter(Boolean),
-    language: params.getAll('language').filter(Boolean),
-    hasCorrection: params.get('hasCorrection') === 'true' || undefined,
-    teacherId: params.get('teacherId') || undefined,
-  };
+  const subjects = params.getAll('subject').filter(Boolean);
+  const classes = params.getAll('class').filter(Boolean);
+  const sections = params.getAll('section').filter(Boolean);
+  const types = params.getAll('type').filter(Boolean);
+  const years = params.getAll('year').filter(Boolean);
+  const trimestres = params.getAll('trimestre').filter(Boolean);
+  const languages = params.getAll('language').filter(Boolean);
+  const hasCorrection = params.get('hasCorrection') === 'true' ? true : undefined;
+  const teacherId = params.get('teacherId') || undefined;
 
   try {
     // Pre-fetch all synonyms for query expansion
     const synonyms = await prisma.searchSynonym.findMany({
-      select: { term: true, synonyms: true, language: true, category: true },
+      select: { term: true, synonyms: true, category: true },
     });
 
     // Expand query with synonyms (for trgm matching)
     const expandedQuery = expandQueryWithSynonyms(q, synonyms);
-    // FTS uses the original query (websearch_to_tsquery handles it natively)
-    // TRGM uses the expanded query to match synonyms
     const ftsQuery = q;
     const trgmQuery = expandedQuery.expanded || q;
 
-    // Resolve slugs to IDs (filter inputs may be slugs)
-    const filterClauses: string[] = ['r.status = \'PUBLISHED\''];
-    const filterParams: any[] = [];
-    let paramIdx = 2; // Start at 2 because $1=ftsQuery, $2=trgmQuery
+    // Resolve slugs to IDs
+    let subjectIds: string[] = [];
+    let classIds: string[] = [];
+    let sectionIds: string[] = [];
 
-    if (filters.subject?.length) {
-      const subjects = await prisma.subject.findMany({
-        where: { slug: { in: filters.subject } },
+    if (subjects.length) {
+      const r = await prisma.subject.findMany({
+        where: { slug: { in: subjects } },
         select: { id: true },
       });
-      const subjectIds = subjects.map(s => s.id);
-      if (subjectIds.length) {
-        filterClauses.push(`r."subjectId" = ANY($${++paramIdx}::text[])`);
-        filterParams.push(subjectIds);
-      } else {
-        // No subjects matched - return empty
-        return NextResponse.json({
-          query: q, page, limit, total: 0, totalPages: 0, sort,
-          durationMs: Date.now() - t0, filters, results: [], facets: {},
-        });
+      subjectIds = r.map(s => s.id);
+      if (!subjectIds.length) {
+        return emptyResult({ q, page, limit, t0, subjects, classes, sections });
       }
     }
-    if (filters.class?.length) {
-      const classes = await prisma.class.findMany({
-        where: { slug: { in: filters.class } },
+    if (classes.length) {
+      const r = await prisma.class.findMany({
+        where: { slug: { in: classes } },
         select: { id: true },
       });
-      const classIds = classes.map(c => c.id);
-      if (classIds.length) {
-        filterClauses.push(`r."classId" = ANY($${++paramIdx}::text[])`);
-        filterParams.push(classIds);
-      } else {
-        return NextResponse.json({
-          query: q, page, limit, total: 0, totalPages: 0, sort,
-          durationMs: Date.now() - t0, filters, results: [], facets: {},
-        });
+      classIds = r.map(c => c.id);
+      if (!classIds.length) {
+        return emptyResult({ q, page, limit, t0, subjects, classes, sections });
       }
     }
-    if (filters.section?.length) {
-      const sections = await prisma.section.findMany({
-        where: { slug: { in: filters.section } },
+    if (sections.length) {
+      const r = await prisma.section.findMany({
+        where: { slug: { in: sections } },
         select: { id: true },
       });
-      const sectionIds = sections.map(s => s.id);
-      if (sectionIds.length) {
-        filterClauses.push(`r."sectionId" = ANY($${++paramIdx}::text[])`);
-        filterParams.push(sectionIds);
-      } else {
-        return NextResponse.json({
-          query: q, page, limit, total: 0, totalPages: 0, sort,
-          durationMs: Date.now() - t0, filters, results: [], facets: {},
-        });
+      sectionIds = r.map(s => s.id);
+      if (!sectionIds.length) {
+        return emptyResult({ q, page, limit, t0, subjects, classes, sections });
       }
     }
 
-    // Build additional WHERE clauses for filters
-    // (slug resolution to IDs is now done above)
-    if (filters.type?.length) {
-      filterClauses.push(`r.type::text = ANY($${++paramIdx}::text[])`);
-      filterParams.push(filters.type);
-    }
-    if (filters.year?.length) {
-      filterClauses.push(`r.year = ANY($${++paramIdx}::text[])`);
-      filterParams.push(filters.year);
-    }
-    if (filters.trimester?.length) {
-      filterClauses.push(`r."trimester" = ANY($${++paramIdx}::text[])`);
-      filterParams.push(filters.trimester);
-    }
-    if (filters.language?.length) {
-      filterClauses.push(`r.language = ANY($${++paramIdx}::text[])`);
-      filterParams.push(filters.language);
-    }
-    if (filters.hasCorrection !== undefined) {
-      filterClauses.push(`r."hasCorrection" = $${++paramIdx}`);
-      filterParams.push(filters.hasCorrection);
-    }
-    if (filters.teacherId) {
-      filterClauses.push(`r."teacherId" = $${++paramIdx}`);
-      filterParams.push(filters.teacherId);
-    }
-
-    // Set trigram threshold low for better recall
+    // Set trigram threshold
     await prisma.$executeRawUnsafe('SELECT set_limit(0.15)');
 
-    // Main search query: FTS + pg_trgm
+    // ============================================================
+    // Strategy: Single CTE with conditional WHERE
+    // $1 = ftsQuery, $2 = trgmQuery, $3+ = filter arrays
+    // ============================================================
+    const filterParams: any[] = [];
+    let pIdx = 2;
+    const filterConditions: string[] = [];
+
+    if (subjectIds.length) {
+      filterConditions.push(`r."subjectId" = ANY($${++pIdx}::text[])`);
+      filterParams.push(subjectIds);
+    }
+    if (classIds.length) {
+      filterConditions.push(`r."classId" = ANY($${++pIdx}::text[])`);
+      filterParams.push(classIds);
+    }
+    if (sectionIds.length) {
+      filterConditions.push(`r."sectionId" = ANY($${++pIdx}::text[])`);
+      filterParams.push(sectionIds);
+    }
+    if (types.length) {
+      filterConditions.push(`r.type::text = ANY($${++pIdx}::text[])`);
+      filterParams.push(types);
+    }
+    if (years.length) {
+      filterConditions.push(`r.year = ANY($${++pIdx}::text[])`);
+      filterParams.push(years);
+    }
+    if (trimestres.length) {
+      filterConditions.push(`r."trimester" = ANY($${++pIdx}::text[])`);
+      filterParams.push(trimestres);
+    }
+    if (languages.length) {
+      filterConditions.push(`r.language = ANY($${++pIdx}::text[])`);
+      filterParams.push(languages);
+    }
+    if (hasCorrection !== undefined) {
+      filterConditions.push(`r."hasCorrection" = $${++pIdx}`);
+      filterParams.push(hasCorrection);
+    }
+    if (teacherId) {
+      filterConditions.push(`r."teacherId" = $${++pIdx}`);
+      filterParams.push(teacherId);
+    }
+
+    const whereExtras = filterConditions.length
+      ? 'AND ' + filterConditions.join(' AND ')
+      : '';
+
+    // ============================================================
+    // Main search: UNION of FTS + pg_trgm
+    // ============================================================
     const orderBy = sort === 'recent'
       ? 'r."publishedAt" DESC NULLS LAST'
       : sort === 'popular'
@@ -163,47 +140,39 @@ export async function GET(req: NextRequest) {
       ? 'r."downloadsCount" DESC NULLS LAST'
       : 'combined_score DESC';
 
-    const sql = `
-      WITH fts_hits AS (
+    const searchSql = `
+      WITH matched AS (
         SELECT
           r.id,
-          ts_rank_cd(r.search_vector, websearch_to_tsquery('french', $1)) AS fts_score
+          COALESCE(fts.score, 0) + COALESCE(trgm.score * 0.5, 0) AS combined_score,
+          COALESCE(fts.score, 0) AS fts_score,
+          COALESCE(trgm.score, 0) AS trgm_score
         FROM "Resource" r
-        WHERE r.search_vector @@ websearch_to_tsquery('french', $1)
-          ${filterClauses.map(c => 'AND ' + c).join('\n          ')}
-        ORDER BY fts_score DESC
-        LIMIT 500
-      ),
-      trgm_hits AS (
-        SELECT
-          r.id,
-          GREATEST(
+        LEFT JOIN LATERAL (
+          SELECT ts_rank_cd(r.search_vector, websearch_to_tsquery('french', $1)) AS score
+          WHERE r.search_vector @@ websearch_to_tsquery('french', $1)
+          LIMIT 1
+        ) fts ON true
+        LEFT JOIN LATERAL (
+          SELECT GREATEST(
             word_similarity($2, r.title),
             word_similarity($2, COALESCE(r.description, ''))
-          ) AS trgm_score
-        FROM "Resource" r
-        WHERE (
+          ) AS score
+          WHERE (
             word_similarity($2, r.title) > 0.4
             OR word_similarity($2, COALESCE(r.description, '')) > 0.4
           )
-          ${filterClauses.map(c => 'AND ' + c).join('\n          ')}
-        ORDER BY trgm_score DESC
-        LIMIT 500
-      ),
-      combined AS (
-        SELECT
-          COALESCE(f.id, t.id) AS id,
-          COALESCE(f.fts_score, 0) + COALESCE(t.trgm_score * 0.5, 0) AS combined_score,
-          COALESCE(f.fts_score, 0) AS fts_score,
-          COALESCE(t.trgm_score, 0) AS trgm_score
-        FROM fts_hits f
-        FULL OUTER JOIN trgm_hits t ON t.id = f.id
+          LIMIT 1
+        ) trgm ON true
+        WHERE r.status = 'PUBLISHED'
+          AND (fts.score IS NOT NULL OR trgm.score IS NOT NULL)
+          ${whereExtras}
       )
       SELECT
-        c.id,
-        c.combined_score,
-        c.fts_score,
-        c.trgm_score,
+        m.id,
+        m.combined_score,
+        m.fts_score,
+        m.trgm_score,
         ts_headline(
           'french',
           r.title,
@@ -216,17 +185,17 @@ export async function GET(req: NextRequest) {
           websearch_to_tsquery('french', $1),
           'StartSel=<mark>,StopSel=</mark>,MaxFragments=2,MaxWords=15,MinWords=5'
         ) AS description_highlighted
-      FROM combined c
-      JOIN "Resource" r ON r.id = c.id
+      FROM matched m
+      JOIN "Resource" r ON r.id = m.id
       ORDER BY ${orderBy}
       LIMIT ${limit} OFFSET ${offset}
     `;
 
     const allParams = [ftsQuery, trgmQuery, ...filterParams];
-    const results = await prisma.$queryRawUnsafe(sql, ...allParams) as any[];
+    const rawResults = await prisma.$queryRawUnsafe(searchSql, ...allParams) as any[];
 
-    // Hydrate with relations
-    const ids = results.map(r => r.id);
+    // Hydrate
+    const ids = rawResults.map(r => r.id);
     const full = await prisma.resource.findMany({
       where: { id: { in: ids } },
       include: {
@@ -238,7 +207,7 @@ export async function GET(req: NextRequest) {
     });
     const byId = new Map(full.map(r => [r.id, r]));
 
-    const hydrated = results.map(r => {
+    const results = rawResults.map(r => {
       const f = byId.get(r.id);
       return {
         id: r.id,
@@ -264,64 +233,44 @@ export async function GET(req: NextRequest) {
       };
     });
 
-    // Total count
+    // ============================================================
+    // Total count (same WHERE, just count)
+    // ============================================================
     const countSql = `
-      WITH fts_hits AS (
-        SELECT id FROM "Resource" r
-        WHERE r.search_vector @@ websearch_to_tsquery('french', $1)
-          ${filterClauses.map(c => 'AND ' + c).join('\n          ')}
-        LIMIT 1000
-      ),
-      trgm_hits AS (
-        SELECT id FROM "Resource" r
-        WHERE (
-            word_similarity($2, r.title) > 0.4
-            OR word_similarity($2, COALESCE(r.description, '')) > 0.4
-          )
-          ${filterClauses.map(c => 'AND ' + c).join('\n          ')}
-        LIMIT 1000
-      )
-      SELECT COUNT(DISTINCT COALESCE(f.id, t.id)) AS total
-      FROM fts_hits f
-      FULL OUTER JOIN trgm_hits t ON t.id = f.id
+      SELECT count(*)::int AS total
+      FROM "Resource" r
+      WHERE r.status = 'PUBLISHED'
+        AND (
+          r.search_vector @@ websearch_to_tsquery('french', $1)
+          OR word_similarity($2, r.title) > 0.4
+          OR word_similarity($2, COALESCE(r.description, '')) > 0.4
+        )
+        ${whereExtras}
     `;
-    const countResult = await prisma.$queryRawUnsafe(countSql, ftsQuery, trgmQuery, ...filterParams) as any[];
-    const total = parseInt(countResult[0]?.total || '0', 10);
+    const countResult = await prisma.$queryRawUnsafe(countSql, ...allParams) as any[];
+    const total = countResult[0]?.total || 0;
 
-    // Facets
+    // ============================================================
+    // Facets (respect query but not the other filters for discovery)
+    // ============================================================
     const facetSql = `
-      WITH matched AS (
-        SELECT
-          r.id,
-          r.type,
-          r."subjectId",
-          r."classId",
-          r."sectionId",
-          r.year,
-          r."trimester",
-          r.language,
-          r."hasCorrection"
-        FROM "Resource" r
-        WHERE r.search_vector @@ websearch_to_tsquery('french', $1)
-           OR word_similarity($2, r.title) > 0.4
-           OR word_similarity($2, COALESCE(r.description, '')) > 0.4
-      )
       SELECT
-        type::text AS type,
-        "subjectId",
-        "classId",
-        "sectionId",
-        year,
-        "trimester",
-        language,
-        "hasCorrection"
-      FROM matched
-      WHERE id IN (
-        SELECT id FROM "Resource" r
-        WHERE r.search_vector @@ websearch_to_tsquery('french', $1)
-           OR word_similarity($2, r.title) > 0.4
-        LIMIT 5000
-      )
+        r.type::text AS type,
+        r."subjectId" AS "subjectId",
+        r."classId" AS "classId",
+        r."sectionId" AS "sectionId",
+        r.year AS year,
+        r."trimester" AS trimester,
+        r.language AS language,
+        r."hasCorrection" AS "hasCorrection"
+      FROM "Resource" r
+      WHERE r.status = 'PUBLISHED'
+        AND (
+          r.search_vector @@ websearch_to_tsquery('french', $1)
+          OR word_similarity($2, r.title) > 0.4
+          OR word_similarity($2, COALESCE(r.description, '')) > 0.4
+        )
+      LIMIT 5000
     `;
     const facetRows = await prisma.$queryRawUnsafe(facetSql, ftsQuery, trgmQuery) as any[];
 
@@ -345,29 +294,43 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       query: q,
       expandedQuery: expandedQuery.expanded !== q ? expandedQuery.expanded : undefined,
-      synonymsApplied: expandedQuery.applied,
+      synonymsApplied: expandedQuery.applied.length ? expandedQuery.applied : undefined,
       page,
       limit,
       total,
       totalPages: Math.ceil(total / limit),
       sort,
       durationMs,
-      filters,
-      results: hydrated,
+      filters: {
+        subject: subjects, class: classes, section: sections,
+        type: types, year: years, trimestre: trimestres, language: languages,
+        hasCorrection, teacherId,
+      },
+      results,
       facets,
     });
   } catch (e: any) {
-    console.error('Search v2 error:', e);
+    console.error('[search v2]', e);
     return NextResponse.json(
-      { error: 'Search failed', message: e.message, stack: e.stack?.split('\n').slice(0, 3) },
+      { error: 'Search failed', message: e.message?.slice(0, 500) },
       { status: 500 }
     );
   }
 }
 
-// ============================================================================
-// Helper: expand query with synonyms (for trgm matching, not FTS)
-// ============================================================================
+function emptyResult(opts: {
+  q: string; page: number; limit: number; t0: number;
+  subjects: string[]; classes: string[]; sections: string[];
+}) {
+  return NextResponse.json({
+    query: opts.q, page: opts.page, limit: opts.limit,
+    total: 0, totalPages: 0, sort: 'relevance',
+    durationMs: Date.now() - opts.t0,
+    filters: { subject: opts.subjects, class: opts.classes, section: opts.sections },
+    results: [], facets: {},
+  });
+}
+
 function expandQueryWithSynonyms(q: string, synonyms: any[]): { expanded: string; applied: string[] } {
   if (!q) return { expanded: '', applied: [] };
   const lower = q.toLowerCase().trim();
@@ -380,9 +343,8 @@ function expandQueryWithSynonyms(q: string, synonyms: any[]): { expanded: string
     for (const syn of synonyms) {
       const allTerms = [syn.term.toLowerCase(), ...(syn.synonyms || []).map((s: string) => s.toLowerCase())];
       if (allTerms.includes(token)) {
-        // Add all variants for trgm matching
         for (const t of allTerms) expandedSet.add(t);
-        applied.push(`${token} → ${syn.term} (${allTerms.length} variants)`);
+        applied.push(`${token} → ${syn.term}`);
         found = true;
         break;
       }
@@ -390,7 +352,5 @@ function expandQueryWithSynonyms(q: string, synonyms: any[]): { expanded: string
     if (!found) expandedSet.add(token);
   }
 
-  // For FTS: use original query (websearch_to_tsquery handles OR natively)
-  // For trgm: use all variants
   return { expanded: Array.from(expandedSet).join(' '), applied };
 }
