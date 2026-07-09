@@ -17,6 +17,7 @@ export const metadata: Metadata = {
     description: 'Cours, exercices, sujets de bac et corrigés pour chaque matière du programme officiel tunisien.',
     url: '/matieres',
     type: 'website',
+    images: [{ url: '/api/og/page/matieres', width: 1200, height: 630, alt: 'Examanet — Toutes les matières' }],
   },
 };
 

@@ -35,6 +35,7 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
       description: 'Découvrez nos enseignants certifiés et leurs ressources gratuites.',
       url: '/professeurs',
       type: 'website',
+      images: [{ url: '/api/og/page/professeurs', width: 1200, height: 630, alt: 'Examanet — Professeurs tunisiens' }],
     },
   };
 }

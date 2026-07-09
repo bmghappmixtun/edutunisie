@@ -14,6 +14,13 @@ export const metadata: Metadata = {
     description: '15 000+ ressources gratuites : cours, devoirs, séries, révisions, sujets bac et corrigés.',
     url: '/',
     type: 'website',
+    images: [{ url: '/api/og/page/home', width: 1200, height: 630, alt: 'Examanet — Plateforme pédagogique tunisienne' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Examanet — La plateforme pédagogique #1 en Tunisie',
+    description: '15 000+ ressources gratuites : cours, devoirs, séries, révisions, sujets bac et corrigés.',
+    images: ['/api/og/page/home'],
   },
 };
 

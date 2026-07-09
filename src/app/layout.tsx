@@ -43,7 +43,7 @@ export const metadata: Metadata = {
     description: 'Cours, devoirs, séries, révisions, sujets bac et corrigés — 100% gratuits pour les élèves tunisiens.',
     images: [
       {
-        url: '/og-image.png',
+        url: '/api/og/page/home',
         width: 1200,
         height: 630,
         alt: 'Examanet - Plateforme pédagogique tunisienne',
@@ -54,7 +54,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Examanet — La plateforme pédagogique #1 en Tunisie',
     description: 'Cours, devoirs, séries, révisions, sujets bac et corrigés — 100% gratuits.',
-    images: ['/og-image.png'],
+    images: ['/api/og/page/home'],
     creator: '@examanet',
   },
   robots: {
