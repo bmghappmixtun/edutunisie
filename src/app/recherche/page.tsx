@@ -39,9 +39,9 @@ async function getInitialData(searchParams: any): Promise<{
 
   // Load filter options (subjects, classes, etc.) for the UI
   const [subjects, classes, sections, teachers, types, years, trimestres, languages] = await Promise.all([
-    prisma.subject.findMany({ orderBy: { order: 'asc' }, select: { id: true, nameFr: true, slug: true, color: true, icon: true } }),
-    prisma.class.findMany({ orderBy: { order: 'asc' }, select: { id: true, nameFr: true, slug: true } }),
-    prisma.section.findMany({ orderBy: { order: 'asc' }, select: { id: true, nameFr: true, slug: true, classId: true } }),
+    prisma.subject.findMany({ select: { id: true, nameFr: true, slug: true, color: true, icon: true } }),
+    prisma.class.findMany({ select: { id: true, nameFr: true, slug: true } }),
+    prisma.section.findMany({ select: { id: true, nameFr: true, slug: true, classId: true } }),
     prisma.user.findMany({
       where: { role: 'TEACHER', status: 'ACTIVE' },
       select: { id: true, firstName: true, lastName: true },
