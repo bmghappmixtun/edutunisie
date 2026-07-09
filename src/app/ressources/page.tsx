@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { Prisma } from '@prisma/client';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -7,6 +8,20 @@ import { itemListSchema } from '@/lib/structured-data';
 import FilterShell from '@/components/ressources/FilterShell';
 import type { Facets } from '@/lib/facets';
 import { getCurrentUser } from '@/lib/auth';
+
+export const metadata: Metadata = {
+  title: 'Toutes les ressources pédagogiques',
+  description: 'Explorez plus de 15 000 ressources : cours, devoirs, exercices, séries, résumés, sujets de bac et corrigés. Filtres par matière, classe, section, année et trimestre.',
+  alternates: { canonical: '/ressources' },
+  openGraph: {
+    title: 'Toutes les ressources — Examanet',
+    description: '15 000+ cours, exercices, sujets de bac et corrigés pour le programme tunisien.',
+    url: '/ressources',
+    type: 'website',
+  },
+  // Filtered URLs (?class=X&type=Y) should not dilute the index
+  robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-snippet': -1 } },
+};
 
 export const dynamic = 'force-dynamic'; // dynamic because of searchParams
 

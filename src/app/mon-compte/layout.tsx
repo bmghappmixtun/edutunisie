@@ -1,10 +1,17 @@
 import { redirect } from 'next/navigation';
+import type { Metadata } from 'next';
 import { getInitials } from '@/lib/text-utils';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { getCurrentUser } from '@/lib/auth';
 import Link from 'next/link';
 import { LayoutDashboard, Heart, Settings, Bell, User } from 'lucide-react';
+
+// Student account pages should never be indexed
+export const metadata: Metadata = {
+  title: 'Mon compte',
+  robots: { index: false, follow: false, nocache: true, googleBot: { index: false, follow: false } },
+};
 
 export default async function AccountLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser();

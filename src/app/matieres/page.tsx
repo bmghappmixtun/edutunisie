@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -6,6 +7,18 @@ import { itemListSchema } from '@/lib/structured-data';
 import { BookOpen, Sparkles, ArrowRight, GraduationCap } from 'lucide-react';
 import { SUBJECTS_CONFIG, getSubjectConfig } from '@/lib/subjects.config';
 import { SUBJECT_ICONS } from '@/lib/subjects.icons';
+
+export const metadata: Metadata = {
+  title: 'Toutes les matières — Cours, exercices et corrigés',
+  description: 'Découvrez toutes les matières du programme scolaire tunisien : Mathématiques, Physique, SVT, Français, Arabe, Histoire, Philosophie et plus. Ressources gratuites par matière.',
+  alternates: { canonical: '/matieres' },
+  openGraph: {
+    title: 'Toutes les matières du programme tunisien',
+    description: 'Cours, exercices, sujets de bac et corrigés pour chaque matière du programme officiel tunisien.',
+    url: '/matieres',
+    type: 'website',
+  },
+};
 
 export const revalidate = 300; // 5 min cache
 

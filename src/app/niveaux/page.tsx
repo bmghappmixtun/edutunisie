@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -9,6 +10,18 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import ClassAccordion from '@/components/niveaux/ClassAccordion';
+
+export const metadata: Metadata = {
+  title: 'Tous les niveaux scolaires — Primaire, Collège, Lycée en Tunisie',
+  description: 'Ressources gratuites par niveau scolaire tunisien : 7ème à 9ème année (Collège), 1ère à 4ème année (Lycée/Bac). Cours, exercices et corrigés pour chaque classe.',
+  alternates: { canonical: '/niveaux' },
+  openGraph: {
+    title: 'Tous les niveaux scolaires en Tunisie',
+    description: 'Du Primaire au Bac : cours, exercices et corrigés par classe et section.',
+    url: '/niveaux',
+    type: 'website',
+  },
+};
 
 export const revalidate = 300; // 5 min cache
 

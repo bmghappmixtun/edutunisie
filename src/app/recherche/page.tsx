@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import type { Metadata } from 'next';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import HideOnScrollSearchBar from '@/components/search/HideOnScrollSearchBar';
@@ -8,10 +9,19 @@ import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
-export const metadata = {
-  title: 'Recherche | Examanet',
-  description: 'Recherchez parmi des milliers de ressources pédagogiques gratuites : cours, devoirs, exercices, sujets de bac et corrigés. Recherche tolérante aux fautes, synonymes FR/AR inclus.',
-};
+// Search results with query params should not be indexed (avoid duplicate
+// + thin content penalty). Base /recherche is indexable.
+export function generateMetadata({ searchParams }: { searchParams: any }): Metadata {
+  const hasQuery = !!(searchParams?.q || searchParams?.subject || searchParams?.class);
+  return {
+    title: 'Recherche | Examanet',
+    description: 'Recherchez parmi des milliers de ressources pédagogiques gratuites : cours, devoirs, exercices, sujets de bac et corrigés. Recherche tolérante aux fautes, synonymes FR/AR inclus.',
+    alternates: { canonical: '/recherche' },
+    robots: hasQuery
+      ? { index: false, follow: true }
+      : { index: true, follow: true },
+  };
+}
 
 async function getInitialData(searchParams: any): Promise<{
   initialData: SearchResponse;

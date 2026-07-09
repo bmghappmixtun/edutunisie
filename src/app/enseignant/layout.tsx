@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation';
+import type { Metadata } from 'next';
 import { getInitials } from '@/lib/text-utils';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -10,6 +11,12 @@ import {
   LayoutDashboard, Upload, FileText, BarChart3, User, Bell, Shield,
   ChevronRight, BookOpen, Settings, Heart, Plus, CheckCircle2
 } from 'lucide-react';
+
+// Teacher dashboard pages should never be indexed
+export const metadata: Metadata = {
+  title: 'Espace enseignant',
+  robots: { index: false, follow: false, nocache: true, googleBot: { index: false, follow: false } },
+};
 
 export default async function TeacherLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser();
