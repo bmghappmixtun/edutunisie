@@ -20,6 +20,7 @@ export const metadata: Metadata = {
     description: 'Du Primaire au Bac : cours, exercices et corrigés par classe et section.',
     url: '/niveaux',
     type: 'website',
+    images: [{ url: '/api/og/page/niveaux', width: 1200, height: 630, alt: 'Examanet — Tous les niveaux' }],
   },
 };
 

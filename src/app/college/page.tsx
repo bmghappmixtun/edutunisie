@@ -36,6 +36,7 @@ export const metadata: Metadata = {
     siteName: 'Examanet',
     locale: 'fr_TN',
     type: 'website',
+    images: [{ url: '/api/og/page/college', width: 1200, height: 630, alt: 'Examanet — Collège' }],
   },
 };
 
