@@ -109,6 +109,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <meta name="google-site-verification" content="GXE5A9gq9-K7q7IztCatkSHhYrgtWWBbPloJymofPUY" />
         {/* Bing Webmaster Tools verification meta tag (HTML tag verification) */}
         <meta name="msvalidate.01" content="C04AC04227DB04DAC96552F4A27BCD73" />
+        {/* OpenGraph locale: dynamic based on x-locale header (set by middleware for /ar/*) */}
+        <meta property="og:locale" content={locale === 'ar' ? 'ar_TN' : 'fr_TN'} />
+        {/* Twitter locale for AR */}
+        <meta name="twitter:card" content="summary_large_image" />
         {/* Hreflang: FR is canonical, AR is at /ar/* prefix, x-default points to FR. */}
         <link rel="alternate" hrefLang="fr-TN" href={SITE_URL} />
         <link rel="alternate" hrefLang="ar-TN" href={`${SITE_URL}/ar`} />

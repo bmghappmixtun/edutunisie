@@ -66,7 +66,12 @@ export async function generateMetadata(): Promise<Metadata> {
       siteName: 'Examanet',
       locale: locale === 'ar' ? 'ar_TN' : 'fr_TN',
       type: 'website',
-      images: [{ url: '/api/og/page/concours', width: 1200, height: 630, alt: 'Examanet — Concours 9ème Tunisie' }],
+      images: [{
+        url: `/api/og/page/concours${locale === 'ar' ? '?locale=ar' : ''}`,
+        width: 1200,
+        height: 630,
+        alt: locale === 'ar' ? 'Examanet — مناظرة التاسعة تونس' : 'Examanet — Concours 9ème Tunisie',
+      }],
     },
     twitter: {
       card: 'summary_large_image',
