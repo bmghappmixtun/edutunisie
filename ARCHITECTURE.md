@@ -1,10 +1,10 @@
 # Examanet — Architecture Snapshot
 
 > **Tag:** `stable-2026-07-09-pre-AR-routing`
-> **Generated:** 2026-07-09T14:03:33.090Z
-> **Current commit:** `a75d8f6` on `main`
-> **Total commits:** 335
-> **Last commit:** 2026-07-09T13:41:58+00:00
+> **Generated:** 2026-07-09T14:06:28.702Z
+> **Current commit:** `e03d1d1` on `main`
+> **Total commits:** 336
+> **Last commit:** 2026-07-09T14:06:18+00:00
 
 This document is the **single source of truth** for the current architecture.
 If something breaks, read this first, then check git history.
@@ -47,7 +47,7 @@ If something breaks, read this first, then check git history.
 | ├─ Source files (Word/etc) | 15,278 | ~6.8 GB |
 | └─ Generated PDFs | 15,278 | ~7.2 GB |
 | Search synonyms (FR/AR) | 35 | — |
-| Views (cumulative) | 45,824 | — |
+| Views (cumulative) | 45,970 | — |
 | Favorites | 6 | — |
 | Comments | 1 | — |
 
@@ -85,7 +85,7 @@ edutunisie/
 │   ├── blob-sync-r2.mjs              # Vercel Blob → R2
 │   ├── blob-restore-r2.mjs           # R2 → Vercel Blob
 │   ├── env-check.mjs                 # Pre-deploy health check
-│   └── ... (9 scripts total)
+│   └── ... (10 scripts total)
 ├── docs/operations/
 │   ├── disaster-recovery.md          # 6 DR scenarios
 │   ├── blob-r2-backup.md             # R2 setup guide
@@ -173,9 +173,9 @@ All public routes have:
 
 ### Recent commits
 ```
+e03d1d1 feat(backup): code mirror to R2 + auto-generated ARCHITECTURE.md
 a75d8f6 fix(backup): correct R2 cost estimate (13.64 GB measured, not 30GB guessed)
 c5472f8 feat(backup): Cloudflare R2 sync scripts + docs
-a076e57 chore: gitignore backups/ (live on backups/db branch only)
 ```
 
 ### Stable tags

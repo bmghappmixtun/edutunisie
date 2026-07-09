@@ -14,11 +14,17 @@ function getNested(obj: any, path: string): any {
 
 export function getServerLocale(): Locale {
   try {
+    // 1. x-locale header (set by middleware when /ar/* is requested)
+    const headerStore = headers();
+    const xLocale = headerStore.get('x-locale');
+    if (xLocale === 'fr' || xLocale === 'ar') return xLocale as Locale;
+
+    // 2. Cookie (set by LanguageSwitcher or middleware)
     const cookieStore = cookies();
     const cookieLocale = cookieStore.get('locale')?.value as Locale | undefined;
     if (cookieLocale === 'fr' || cookieLocale === 'ar') return cookieLocale;
 
-    const headerStore = headers();
+    // 3. Accept-Language header (first-time visitors)
     const accept = headerStore.get('accept-language') || '';
     if (accept.startsWith('ar')) return 'ar';
   } catch {
