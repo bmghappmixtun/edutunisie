@@ -62,6 +62,13 @@ export async function GET(req: NextRequest) {
       select: { term: true, synonyms: true, language: true, category: true },
     });
 
+    // Expand query with synonyms (for trgm matching)
+    const expandedQuery = expandQueryWithSynonyms(q, synonyms);
+    // FTS uses the original query (websearch_to_tsquery handles it natively)
+    // TRGM uses the expanded query to match synonyms
+    const ftsQuery = q;
+    const trgmQuery = expandedQuery.expanded || q;
+
     // Resolve slugs to IDs (filter inputs may be slugs)
     const filterClauses: string[] = ['r.status = \'PUBLISHED\''];
     const filterParams: any[] = [];
