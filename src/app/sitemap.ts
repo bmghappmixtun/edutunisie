@@ -7,20 +7,38 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
   
   // Static pages
+  // Helper: add AR alternates to sitemap entries
+  const arAlternates = (url: string) => ({
+    url,
+    alternates: {
+      languages: {
+        'fr-TN': url,
+        'ar-TN': url.replace(baseUrl, baseUrl + '/ar'),
+        'x-default': url,
+      },
+    },
+  });
+
   const staticPages: MetadataRoute.Sitemap = [
-    { url: baseUrl, lastModified: new Date(), changeFrequency: 'daily', priority: 1.0 },
-    { url: `${baseUrl}/a-propos`, changeFrequency: 'monthly', priority: 0.5 },
-    { url: `${baseUrl}/contact`, changeFrequency: 'monthly', priority: 0.5 },
-    { url: `${baseUrl}/cgu`, changeFrequency: 'yearly', priority: 0.3 },
-    { url: `${baseUrl}/matieres`, changeFrequency: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/niveaux`, changeFrequency: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/college`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
-    { url: `${baseUrl}/concours-9eme-tunisie`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
-    { url: `${baseUrl}/concours-9eme-tunisie/sujets-passes`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.8 },
-    { url: `${baseUrl}/professeurs`, changeFrequency: 'weekly', priority: 0.7 },
-    { url: `${baseUrl}/faq`, changeFrequency: 'monthly', priority: 0.6 },
-    { url: `${baseUrl}/recherche`, changeFrequency: 'monthly', priority: 0.5 },
-  ];
+    arAlternates(baseUrl),
+    arAlternates(`${baseUrl}/a-propos`),
+    arAlternates(`${baseUrl}/contact`),
+    arAlternates(`${baseUrl}/cgu`),
+    arAlternates(`${baseUrl}/matieres`),
+    arAlternates(`${baseUrl}/niveaux`),
+    arAlternates(`${baseUrl}/college`),
+    arAlternates(`${baseUrl}/concours-9eme-tunisie`),
+    arAlternates(`${baseUrl}/concours-9eme-tunisie/sujets-passes`),
+    arAlternates(`${baseUrl}/professeurs`),
+    arAlternates(`${baseUrl}/faq`),
+    arAlternates(`${baseUrl}/recherche`),
+    arAlternates(`${baseUrl}/referentiel-national`),
+  ].map((entry, i) => ({
+    ...entry,
+    lastModified: i === 0 ? new Date() : undefined,
+    changeFrequency: ['daily', 'monthly', 'monthly', 'yearly', 'weekly', 'weekly', 'daily', 'daily', 'daily', 'weekly', 'monthly', 'monthly', 'monthly'][i] as any,
+    priority: [1.0, 0.5, 0.5, 0.3, 0.8, 0.8, 0.9, 0.9, 0.8, 0.7, 0.6, 0.5, 0.5][i],
+  }));
   
   // Subjects (matieres)
   const subjects = await prisma.subject.findMany({
