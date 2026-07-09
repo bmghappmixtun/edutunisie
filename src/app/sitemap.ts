@@ -54,19 +54,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.5,
   }));
   
-  // Resources - top 1000 (sitemap.xml limits)
+  // Resources - ALL published (Google accepts up to 50k per file)
+  // We currently have ~15k so 1 file is enough
   const resources = await prisma.resource.findMany({
     where: { status: 'PUBLISHED' },
-    select: { slug: true, updatedAt: true, type: true },
+    select: { slug: true, updatedAt: true, type: true, viewsCount: true, downloadsCount: true },
     orderBy: { updatedAt: 'desc' },
-    take: 5000,
   });
-  const resourcePages: MetadataRoute.Sitemap = resources.map(r => ({
-    url: `${baseUrl}/ressources/${r.slug}`,
-    lastModified: r.updatedAt,
-    changeFrequency: 'weekly' as const,
-    priority: 0.6,
-  }));
+  const resourcePages: MetadataRoute.Sitemap = resources.map(r => {
+    // Quality-based priority: popular resources get higher priority
+    const popularity = (r.viewsCount || 0) + (r.downloadsCount || 0) * 3;
+    const priority = popularity > 1000 ? 0.8 : popularity > 100 ? 0.7 : 0.6;
+    const changeFrequency: 'daily' | 'weekly' | 'monthly' =
+      popularity > 500 ? 'daily' : popularity > 50 ? 'weekly' : 'monthly';
+    return {
+      url: `${baseUrl}/ressources/${r.slug}`,
+      lastModified: r.updatedAt,
+      changeFrequency,
+      priority,
+    };
+  });
   
   return [...staticPages, ...subjectPages, ...classPages, ...teacherPages, ...resourcePages];
 }
