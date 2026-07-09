@@ -34,3 +34,4 @@ node_modules/
 # One-off scripts with potentially sensitive operations
 extract-*.cjs
 *-extract.cjs
+backups/
