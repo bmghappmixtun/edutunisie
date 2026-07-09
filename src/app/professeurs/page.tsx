@@ -42,7 +42,7 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
       type: 'website',
       locale: isAr ? 'ar_TN' : 'fr_TN',
       images: [{
-        url: `/api/og/page/professeurs${isAr ? '?locale=ar' : ''}`,
+        url: `/api/og/page/professeurs`,
         width: 1200,
         height: 630,
         alt: isAr ? 'Examanet — المعلمون التونسيون' : 'Examanet — Professeurs tunisiens',
