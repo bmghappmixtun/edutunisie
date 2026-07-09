@@ -62,30 +62,63 @@ export async function GET(req: NextRequest) {
       select: { term: true, synonyms: true, language: true, category: true },
     });
 
-    // Expand query with synonyms (for trgm matching)
-    const expandedQuery = expandQueryWithSynonyms(q, synonyms);
-    // FTS uses the original query (websearch_to_tsquery handles it natively)
-    // TRGM uses the expanded query to match synonyms
-    const ftsQuery = q;
-    const trgmQuery = expandedQuery.expanded || q;
-
-    // Build additional WHERE clauses for filters
-    // $1 = ftsQuery, $2 = trgmQuery, $3+ = filters
+    // Resolve slugs to IDs (filter inputs may be slugs)
     const filterClauses: string[] = ['r.status = \'PUBLISHED\''];
     const filterParams: any[] = [];
-    let paramIdx = 2; // Start at 2 because $1 and $2 are already used
+    let paramIdx = 2; // Start at 2 because $1=ftsQuery, $2=trgmQuery
+
     if (filters.subject?.length) {
-      filterClauses.push(`r."subjectId" IN (${filters.subject.map(() => `$${++paramIdx}`).join(',')})`);
-      filterParams.push(...filters.subject);
+      const subjects = await prisma.subject.findMany({
+        where: { slug: { in: filters.subject } },
+        select: { id: true },
+      });
+      const subjectIds = subjects.map(s => s.id);
+      if (subjectIds.length) {
+        filterClauses.push(`r."subjectId" = ANY($${++paramIdx}::text[])`);
+        filterParams.push(subjectIds);
+      } else {
+        // No subjects matched - return empty
+        return NextResponse.json({
+          query: q, page, limit, total: 0, totalPages: 0, sort,
+          durationMs: Date.now() - t0, filters, results: [], facets: {},
+        });
+      }
     }
     if (filters.class?.length) {
-      filterClauses.push(`r."classId" IN (${filters.class.map(() => `$${++paramIdx}`).join(',')})`);
-      filterParams.push(...filters.class);
+      const classes = await prisma.class.findMany({
+        where: { slug: { in: filters.class } },
+        select: { id: true },
+      });
+      const classIds = classes.map(c => c.id);
+      if (classIds.length) {
+        filterClauses.push(`r."classId" = ANY($${++paramIdx}::text[])`);
+        filterParams.push(classIds);
+      } else {
+        return NextResponse.json({
+          query: q, page, limit, total: 0, totalPages: 0, sort,
+          durationMs: Date.now() - t0, filters, results: [], facets: {},
+        });
+      }
     }
     if (filters.section?.length) {
-      filterClauses.push(`r."sectionId" IN (${filters.section.map(() => `$${++paramIdx}`).join(',')})`);
-      filterParams.push(...filters.section);
+      const sections = await prisma.section.findMany({
+        where: { slug: { in: filters.section } },
+        select: { id: true },
+      });
+      const sectionIds = sections.map(s => s.id);
+      if (sectionIds.length) {
+        filterClauses.push(`r."sectionId" = ANY($${++paramIdx}::text[])`);
+        filterParams.push(sectionIds);
+      } else {
+        return NextResponse.json({
+          query: q, page, limit, total: 0, totalPages: 0, sort,
+          durationMs: Date.now() - t0, filters, results: [], facets: {},
+        });
+      }
     }
+
+    // Build additional WHERE clauses for filters
+    // (slug resolution to IDs is now done above)
     if (filters.type?.length) {
       filterClauses.push(`r.type::text = ANY($${++paramIdx}::text[])`);
       filterParams.push(filters.type);
