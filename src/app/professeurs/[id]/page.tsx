@@ -15,6 +15,7 @@ import ShareButton from '@/components/share/ShareButton';
 import FollowButton from '@/components/social/FollowButton';
 import MessageTeacherButton from '@/components/social/MessageTeacherButton';
 import { timeAgo } from '@/lib/utils';
+import { isArabic } from '@/lib/text-utils';
 import ResourceCard from '@/components/resources/ResourceCard';
 import { personSchema, breadcrumbSchema } from '@/lib/structured-data';
 
@@ -411,7 +412,11 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2">
-                            <h3 className="font-bold text-slate-900 group-hover:text-primary-600 transition line-clamp-1">
+                            <h3
+                              className={`font-bold text-slate-900 group-hover:text-primary-600 transition line-clamp-1 ${isArabic(r.title) ? 'text-right' : 'text-left'}`}
+                              dir={isArabic(r.title) ? 'rtl' : 'ltr'}
+                              lang={isArabic(r.title) ? 'ar' : 'fr'}
+                            >
                               {r.title}
                             </h3>
                             <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-semibold flex-shrink-0">
