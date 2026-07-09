@@ -1,8 +1,21 @@
+import type { Metadata } from 'next';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import HomeClient from '@/components/home/HomeClient';
 import { prisma } from '@/lib/prisma';
 import { getUserFavorites, decorateWithFavorites } from '@/lib/resource-helpers';
+
+export const metadata: Metadata = {
+  title: 'Examanet — Cours, devoirs, exercices et corrigés gratuits en Tunisie',
+  description: 'Plateforme pédagogique tunisienne #1 : cours, devoirs, exercices, sujets de bac et corrigés pour le Primaire, Collège et Lycée. 100% gratuit.',
+  alternates: { canonical: '/' },
+  openGraph: {
+    title: 'Examanet — La plateforme pédagogique #1 en Tunisie',
+    description: '15 000+ ressources gratuites : cours, devoirs, séries, révisions, sujets bac et corrigés.',
+    url: '/',
+    type: 'website',
+  },
+};
 
 export const revalidate = 300; // 5 min cache
 

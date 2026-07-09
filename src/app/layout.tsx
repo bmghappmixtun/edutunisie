@@ -69,6 +69,15 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: SITE_URL,
+    // Tunisian platform: primary French, with Arabic toggle available.
+    // We use x-default to indicate FR is the default canonical.
+    // (Full AR URL routing is on the roadmap; for now both languages
+    //  serve from the same URL based on the user's locale cookie.)
+    languages: {
+      'fr-TN': SITE_URL,
+      'ar-TN': SITE_URL,
+      'x-default': SITE_URL,
+    },
   },
   other: {
     'theme-color': '#0EA5E9',

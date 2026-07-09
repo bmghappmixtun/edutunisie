@@ -1,10 +1,17 @@
 import { redirect } from 'next/navigation';
+import type { Metadata } from 'next';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import { Shield, Users, FileText, BarChart3, CheckCircle, Flag, Edit3, BookOpen, Settings, MessageSquare, TrendingUp } from 'lucide-react';
+
+// Admin pages should never be indexed
+export const metadata: Metadata = {
+  title: 'Administration',
+  robots: { index: false, follow: false, nocache: true, googleBot: { index: false, follow: false } },
+};
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser();
