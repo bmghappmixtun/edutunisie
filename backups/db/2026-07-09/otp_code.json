@@ -1,0 +1,12 @@
+[
+  {
+    "id": "cmr3mh9x10002ovryeffamnl9",
+    "userId": "cmr3mh9wr0000ovryx7et9yug",
+    "code": "382135",
+    "purpose": "email_verification",
+    "expiresAt": "2026-07-02T15:21:29.268Z",
+    "consumedAt": "2026-07-02T14:52:14.404Z",
+    "attempts": 0,
+    "createdAt": "2026-07-02T14:51:29.269Z"
+  }
+]

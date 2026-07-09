@@ -1,0 +1,38 @@
+[
+  {
+    "id": "cmqk0kfb80000zll0ukl379nc",
+    "name": "Test User",
+    "email": "test@example.com",
+    "subject": "bug",
+    "message": "Test message after migration",
+    "ip": "47.253.4.207",
+    "userAgent": "curl/7.88.1",
+    "isRead": false,
+    "repliedAt": null,
+    "createdAt": "2026-06-18T21:30:27.330Z"
+  },
+  {
+    "id": "cmqqcuizw0000zstcqj9gq2oe",
+    "name": "Austin",
+    "email": "pranab.s.e.s1@gmail.com",
+    "subject": "question",
+    "message": "Bonjour ! Pour mieux expliquer les ressources gratuites d'EduTunisie, nous proposons des vidéos explicatives. Souhaitez-vous en discuter ?",
+    "ip": "38.154.205.216",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "isRead": false,
+    "repliedAt": null,
+    "createdAt": "2026-06-23T08:00:51.112Z"
+  },
+  {
+    "id": "cmrbxdb040000k905bsf73wgz",
+    "name": "tes test",
+    "email": "mozzi@yahoo.fr",
+    "subject": "teacher",
+    "message": "je veux devenir",
+    "ip": "196.235.131.147",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:152.0) Gecko/20100101 Firefox/152.0",
+    "isRead": false,
+    "repliedAt": null,
+    "createdAt": "2026-07-08T10:18:29.234Z"
+  }
+]

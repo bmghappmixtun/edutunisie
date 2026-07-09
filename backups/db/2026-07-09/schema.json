@@ -1,0 +1,108 @@
+{
+  "tables": [
+    {
+      "name": "user",
+      "rows": 2588
+    },
+    {
+      "name": "otp_code",
+      "rows": 1
+    },
+    {
+      "name": "session",
+      "rows": 648
+    },
+    {
+      "name": "level",
+      "rows": 2
+    },
+    {
+      "name": "class",
+      "rows": 7
+    },
+    {
+      "name": "section",
+      "rows": 25
+    },
+    {
+      "name": "subject",
+      "rows": 27
+    },
+    {
+      "name": "resource",
+      "rows": 15333
+    },
+    {
+      "name": "teacher_file",
+      "rows": 15278
+    },
+    {
+      "name": "comment",
+      "rows": 1
+    },
+    {
+      "name": "rating",
+      "rows": 1
+    },
+    {
+      "name": "favorite",
+      "rows": 6
+    },
+    {
+      "name": "view",
+      "rows": 44152
+    },
+    {
+      "name": "download",
+      "rows": 10
+    },
+    {
+      "name": "share",
+      "rows": 0
+    },
+    {
+      "name": "report",
+      "rows": 0
+    },
+    {
+      "name": "notification",
+      "rows": 484
+    },
+    {
+      "name": "newsletter",
+      "rows": 0
+    },
+    {
+      "name": "teacher_invitation",
+      "rows": 0
+    },
+    {
+      "name": "setting",
+      "rows": 0
+    },
+    {
+      "name": "follow",
+      "rows": 0
+    },
+    {
+      "name": "conversation",
+      "rows": 0
+    },
+    {
+      "name": "message",
+      "rows": 0
+    },
+    {
+      "name": "contact_message",
+      "rows": 3
+    },
+    {
+      "name": "search_synonym",
+      "rows": 35
+    },
+    {
+      "name": "search_log",
+      "rows": 0
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+[
+  {
+    "id": "cmqi8nqzs00062n4ajcgpq74g",
+    "levelId": "cmqi8nqzj00022n4ansnot863",
+    "slug": "2eme-secondaire",
+    "nameFr": "2ème année secondaire",
+    "nameAr": "الثاني ثانوي",
+    "order": 2
+  },
+  {
+    "id": "cmqi8nqzx00082n4a36xys4pl",
+    "levelId": "cmqi8nqzj00022n4ansnot863",
+    "slug": "3eme-secondaire",
+    "nameFr": "3ème année secondaire",
+    "nameAr": "الثالث ثانوي",
+    "order": 3
+  },
+  {
+    "id": "cmqi8nr08000a2n4ay1gyn0i2",
+    "levelId": "cmqi8nqzj00022n4ansnot863",
+    "slug": "4eme-secondaire",
+    "nameFr": "4ème année secondaire (Bac)",
+    "nameAr": "الباكالوريا",
+    "order": 4
+  },
+  {
+    "id": "cmqi8nr0g000e2n4afpu7ul6q",
+    "levelId": "cmqi8nqzg00012n4a7ymw26l1",
+    "slug": "9eme",
+    "nameFr": "9ème année de base",
+    "nameAr": "التاسعة أساسي",
+    "order": 3
+  },
+  {
+    "id": "cmqi8nr0r000k2n4abe7hvk7r",
+    "levelId": "cmqi8nqzj00022n4ansnot863",
+    "slug": "1ere-secondaire",
+    "nameFr": "1ère année secondaire",
+    "nameAr": "الأول ثانوي",
+    "order": 1
+  },
+  {
+    "id": "cmqi8nr0r000m2n4awg3uw6xa",
+    "levelId": "cmqi8nqzg00012n4a7ymw26l1",
+    "slug": "7eme",
+    "nameFr": "7ème année de base",
+    "nameAr": "السابعة أساسي",
+    "order": 1
+  },
+  {
+    "id": "cmqi8nr0v000o2n4a1gqgqus2",
+    "levelId": "cmqi8nqzg00012n4a7ymw26l1",
+    "slug": "8eme",
+    "nameFr": "8ème année de base",
+    "nameAr": "الثامنة أساسي",
+    "order": 2
+  }
+]

@@ -1,0 +1,16 @@
+[
+  {
+    "id": "cmqi8nqzg00012n4a7ymw26l1",
+    "slug": "college",
+    "nameFr": "Enseignement de base",
+    "nameAr": "التعليم الأساسي",
+    "order": 2
+  },
+  {
+    "id": "cmqi8nqzj00022n4ansnot863",
+    "slug": "lycee",
+    "nameFr": "Enseignement Secondaire",
+    "nameAr": "التعليم الثانوي",
+    "order": 3
+  }
+]

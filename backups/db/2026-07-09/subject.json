@@ -1,0 +1,245 @@
+[
+  {
+    "id": "cmqi8nr2z00252n4aoa8vuwmy",
+    "slug": "mathematiques",
+    "nameFr": "Mathématiques",
+    "nameAr": "الرياضيات",
+    "icon": null,
+    "color": "#0EA5E9",
+    "order": 1
+  },
+  {
+    "id": "cmqi8nr2z00262n4a7bxyc1ne",
+    "slug": "physique",
+    "nameFr": "Physique",
+    "nameAr": "الفيزياء",
+    "icon": null,
+    "color": "#8B5CF6",
+    "order": 2
+  },
+  {
+    "id": "cmqi8nr2z00272n4alxj2e9ny",
+    "slug": "economie",
+    "nameFr": "Économie",
+    "nameAr": "الاقتصاد",
+    "icon": null,
+    "color": "#DC2626",
+    "order": 10
+  },
+  {
+    "id": "cmqi8nr2z00282n4akb1nxctu",
+    "slug": "sport",
+    "nameFr": "Éducation Physique",
+    "nameAr": "الرياضة",
+    "icon": null,
+    "color": "#EA580C",
+    "order": 14
+  },
+  {
+    "id": "cmqi8nr35002a2n4adfreklxb",
+    "slug": "svt",
+    "nameFr": "Sciences de la Vie et de la Terre",
+    "nameAr": "علوم الحياة والأرض",
+    "icon": null,
+    "color": "#10B981",
+    "order": 3
+  },
+  {
+    "id": "cmqi8nr35002b2n4at9chdots",
+    "slug": "musique",
+    "nameFr": "Musique",
+    "nameAr": "الموسيقى",
+    "icon": null,
+    "color": "#9333EA",
+    "order": 16
+  },
+  {
+    "id": "cmqi8nr36002c2n4az2gqcsm7",
+    "slug": "francais",
+    "nameFr": "Français",
+    "nameAr": "الفرنسية",
+    "icon": null,
+    "color": "#EF4444",
+    "order": 4
+  },
+  {
+    "id": "cmqi8nr36002d2n4abka069kl",
+    "slug": "gestion",
+    "nameFr": "Gestion",
+    "nameAr": "التصرف",
+    "icon": null,
+    "color": "#0891B2",
+    "order": 11
+  },
+  {
+    "id": "cmqi8nr36002e2n4aae78qsph",
+    "slug": "arabe",
+    "nameFr": "Arabe",
+    "nameAr": "العربية",
+    "icon": null,
+    "color": "#F59E0B",
+    "order": 5
+  },
+  {
+    "id": "cmqi8nr37002f2n4amv7gw9pa",
+    "slug": "informatique",
+    "nameFr": "Informatique",
+    "nameAr": "الإعلامية",
+    "icon": null,
+    "color": "#1E40AF",
+    "order": 12
+  },
+  {
+    "id": "cmqi8nr37002g2n4a2c64ywwi",
+    "slug": "anglais",
+    "nameFr": "Anglais",
+    "nameAr": "الإنجليزية",
+    "icon": null,
+    "color": "#3B82F6",
+    "order": 6
+  },
+  {
+    "id": "cmqi8nr38002h2n4al99ham9h",
+    "slug": "technologie",
+    "nameFr": "Technologie",
+    "nameAr": "التكنولوجيا",
+    "icon": null,
+    "color": "#475569",
+    "order": 13
+  },
+  {
+    "id": "cmqi8nr38002i2n4ajkfetiot",
+    "slug": "histoire",
+    "nameFr": "Histoire",
+    "nameAr": "التاريخ",
+    "icon": null,
+    "color": "#A16207",
+    "order": 7
+  },
+  {
+    "id": "cmqi8nr39002j2n4al7r5w3ws",
+    "slug": "philosophie",
+    "nameFr": "Philosophie",
+    "nameAr": "الفلسفة",
+    "icon": null,
+    "color": "#7C3AED",
+    "order": 9
+  },
+  {
+    "id": "cmqi8nr39002k2n4adb975sp1",
+    "slug": "geographie",
+    "nameFr": "Géographie",
+    "nameAr": "الجغرافيا",
+    "icon": null,
+    "color": "#059669",
+    "order": 8
+  },
+  {
+    "id": "cmqo3rika0000yppq75sm1vk4",
+    "slug": "algo-prog",
+    "nameFr": "Algorithme et programmation",
+    "nameAr": "الخوارزميات والبرمجة",
+    "icon": "💻",
+    "color": "#8B5CF6",
+    "order": 17
+  },
+  {
+    "id": "cmqo3riuh0001yppq2lf19i6y",
+    "slug": "tic",
+    "nameFr": "TIC",
+    "nameAr": "تكنولوجيا المعلومات والاتصال",
+    "icon": "🌐",
+    "color": "#0EA5E9",
+    "order": 18
+  },
+  {
+    "id": "cmqo3rj240002yppqfcvqaevx",
+    "slug": "systeme-exploitation-reseaux",
+    "nameFr": "Système d'exploitation et réseaux informatiques",
+    "nameAr": "أنظمة التشغيل والشبكات",
+    "icon": "🖥️",
+    "color": "#1E40AF",
+    "order": 19
+  },
+  {
+    "id": "cmqo3rj9s0003yppqab2dao34",
+    "slug": "bases-donnees",
+    "nameFr": "Bases de données",
+    "nameAr": "قواعد البيانات",
+    "icon": "🗄️",
+    "color": "#7C3AED",
+    "order": 20
+  },
+  {
+    "id": "cmqo3rjhf0004yppq5k28car8",
+    "slug": "sciences-informatique-matiere",
+    "nameFr": "Sciences de l'informatique",
+    "nameAr": "علوم الإعلامية",
+    "icon": "🖥️",
+    "color": "#2563EB",
+    "order": 21
+  },
+  {
+    "id": "cmqo3rjp10005yppq591pw61b",
+    "slug": "education-civique",
+    "nameFr": "Éducation civique",
+    "nameAr": "التربية المدنية",
+    "icon": "🏛️",
+    "color": "#DC2626",
+    "order": 22
+  },
+  {
+    "id": "cmqo3rjwn0006yppqvdimrboe",
+    "slug": "education-islamique",
+    "nameFr": "Éducation islamique",
+    "nameAr": "التربية الإسلامية",
+    "icon": "🕌",
+    "color": "#059669",
+    "order": 23
+  },
+  {
+    "id": "cmqo3rk480007yppq31466i2o",
+    "slug": "pensee-islamique",
+    "nameFr": "Pensée islamique",
+    "nameAr": "التفكير الإسلامي",
+    "icon": "📿",
+    "color": "#10B981",
+    "order": 24
+  },
+  {
+    "id": "cmqo3rkc20008yppqz6jmaht7",
+    "slug": "3eme-langue",
+    "nameFr": "3ème langue",
+    "nameAr": "اللغة الثالثة",
+    "icon": "🗣️",
+    "color": "#F59E0B",
+    "order": 25
+  },
+  {
+    "id": "cmqo3rkjo0009yppqin4unmmj",
+    "slug": "education-artistique",
+    "nameFr": "Éducation artistique",
+    "nameAr": "التربية التشكيلية",
+    "icon": "🎨",
+    "color": "#EC4899",
+    "order": 26
+  },
+  {
+    "id": "cmqo3rkrb000ayppq9hdsb0zx",
+    "slug": "histoire-geographie",
+    "nameFr": "Histoire-Géographie",
+    "nameAr": "التاريخ والجغرافيا",
+    "icon": "🌍",
+    "color": "#6366F1",
+    "order": 27
+  },
+  {
+    "id": "cmqxjp1bm0000xkr0r4vgfbb3",
+    "slug": "theatre",
+    "nameFr": "Théâtre",
+    "nameAr": "المسرحية",
+    "icon": "🎭",
+    "color": "#F97316",
+    "order": 0
+  }
+]

@@ -1,0 +1,177 @@
+[
+  {
+    "id": "cmqi8nr10000u2n4agan6fvej",
+    "classId": "cmqi8nr0r000k2n4abe7hvk7r",
+    "slug": "sciences",
+    "nameFr": "Sciences",
+    "nameAr": "علوم"
+  },
+  {
+    "id": "cmqi8nr16000w2n4a6u6tue17",
+    "classId": "cmqi8nr0r000k2n4abe7hvk7r",
+    "slug": "maths",
+    "nameFr": "Mathématiques",
+    "nameAr": "رياضيات"
+  },
+  {
+    "id": "cmqi8nr19000y2n4a4pxa1n56",
+    "classId": "cmqi8nr0r000k2n4abe7hvk7r",
+    "slug": "lettres",
+    "nameFr": "Lettres",
+    "nameAr": "آداب"
+  },
+  {
+    "id": "cmqi8nr1c00102n4ael9u4d34",
+    "classId": "cmqi8nr0r000k2n4abe7hvk7r",
+    "slug": "eco-gestion",
+    "nameFr": "Économie-Gestion",
+    "nameAr": "اقتصاد وتصرف"
+  },
+  {
+    "id": "cmqi8nr1g00122n4ah04emgai",
+    "classId": "cmqi8nr0r000k2n4abe7hvk7r",
+    "slug": "technique",
+    "nameFr": "Technique",
+    "nameAr": "تقني"
+  },
+  {
+    "id": "cmqi8nr1i00142n4aut3t8oz2",
+    "classId": "cmqi8nr0r000k2n4abe7hvk7r",
+    "slug": "sciences-informatique",
+    "nameFr": "Sciences de l'informatique",
+    "nameAr": "علوم الإعلامية"
+  },
+  {
+    "id": "cmqi8nr1l00162n4aqu6syngo",
+    "classId": "cmqi8nqzs00062n4ajcgpq74g",
+    "slug": "sciences",
+    "nameFr": "Sciences",
+    "nameAr": "علوم"
+  },
+  {
+    "id": "cmqi8nr1r001a2n4aen0bcfrn",
+    "classId": "cmqi8nqzs00062n4ajcgpq74g",
+    "slug": "lettres",
+    "nameFr": "Lettres",
+    "nameAr": "آداب"
+  },
+  {
+    "id": "cmqi8nr1u001c2n4aily22wnm",
+    "classId": "cmqi8nqzs00062n4ajcgpq74g",
+    "slug": "eco-services",
+    "nameFr": "Économie et services",
+    "nameAr": "اقتصاد وتصرف"
+  },
+  {
+    "id": "cmqi8nr20001g2n4arw3kbj4l",
+    "classId": "cmqi8nqzs00062n4ajcgpq74g",
+    "slug": "technologies-informatique",
+    "nameFr": "Technologies de l'informatique (TI)",
+    "nameAr": "علوم الإعلامية"
+  },
+  {
+    "id": "cmqi8nr22001i2n4a9vf2nvnh",
+    "classId": "cmqi8nqzx00082n4a36xys4pl",
+    "slug": "sciences",
+    "nameFr": "Sciences",
+    "nameAr": "علوم"
+  },
+  {
+    "id": "cmqi8nr25001k2n4ao2yj4uf4",
+    "classId": "cmqi8nqzx00082n4a36xys4pl",
+    "slug": "maths",
+    "nameFr": "Mathématiques",
+    "nameAr": "رياضيات"
+  },
+  {
+    "id": "cmqi8nr28001m2n4axdomqz7s",
+    "classId": "cmqi8nqzx00082n4a36xys4pl",
+    "slug": "lettres",
+    "nameFr": "Lettres",
+    "nameAr": "آداب"
+  },
+  {
+    "id": "cmqi8nr2b001o2n4abrtukp76",
+    "classId": "cmqi8nqzx00082n4a36xys4pl",
+    "slug": "eco-gestion",
+    "nameFr": "Économie-Gestion",
+    "nameAr": "اقتصاد وتصرف"
+  },
+  {
+    "id": "cmqi8nr2d001q2n4a56765hj6",
+    "classId": "cmqi8nqzx00082n4a36xys4pl",
+    "slug": "technique",
+    "nameFr": "Technique",
+    "nameAr": "تقني"
+  },
+  {
+    "id": "cmqi8nr2g001s2n4az60wpuh4",
+    "classId": "cmqi8nqzx00082n4a36xys4pl",
+    "slug": "sciences-informatique",
+    "nameFr": "Sciences de l'informatique",
+    "nameAr": "علوم الإعلامية"
+  },
+  {
+    "id": "cmqi8nr2j001u2n4aum0hjyac",
+    "classId": "cmqi8nr08000a2n4ay1gyn0i2",
+    "slug": "sciences",
+    "nameFr": "Sciences",
+    "nameAr": "علوم"
+  },
+  {
+    "id": "cmqi8nr2m001w2n4ag78pyoxm",
+    "classId": "cmqi8nr08000a2n4ay1gyn0i2",
+    "slug": "maths",
+    "nameFr": "Mathématiques",
+    "nameAr": "رياضيات"
+  },
+  {
+    "id": "cmqi8nr2o001y2n4a3s8dd10k",
+    "classId": "cmqi8nr08000a2n4ay1gyn0i2",
+    "slug": "lettres",
+    "nameFr": "Lettres",
+    "nameAr": "آداب"
+  },
+  {
+    "id": "cmqi8nr2r00202n4apq7ur7ui",
+    "classId": "cmqi8nr08000a2n4ay1gyn0i2",
+    "slug": "eco-gestion",
+    "nameFr": "Économie-Gestion",
+    "nameAr": "اقتصاد وتصرف"
+  },
+  {
+    "id": "cmqi8nr2t00222n4a3mod8ute",
+    "classId": "cmqi8nr08000a2n4ay1gyn0i2",
+    "slug": "technique",
+    "nameFr": "Technique",
+    "nameAr": "تقني"
+  },
+  {
+    "id": "cmqi8nr2v00242n4af2y89mwh",
+    "classId": "cmqi8nr08000a2n4ay1gyn0i2",
+    "slug": "sciences-informatique",
+    "nameFr": "Sciences de l'informatique",
+    "nameAr": "علوم الإعلامية"
+  },
+  {
+    "id": "cmqobl30y0001b2uw72p8kixf",
+    "classId": "cmqi8nqzx00082n4a36xys4pl",
+    "slug": "sport",
+    "nameFr": "Sport",
+    "nameAr": "الرياضة"
+  },
+  {
+    "id": "cmqobl38e0003b2uwownqx2cg",
+    "classId": "cmqi8nr08000a2n4ay1gyn0i2",
+    "slug": "sport",
+    "nameFr": "Sport",
+    "nameAr": "الرياضة"
+  },
+  {
+    "id": "cmrabx6530001wh5k70fxwh1t",
+    "classId": "cmqi8nqzs00062n4ajcgpq74g",
+    "slug": "sport",
+    "nameFr": "Sport",
+    "nameAr": "رياضة"
+  }
+]

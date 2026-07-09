@@ -1,0 +1,496 @@
+[
+  {
+    "id": "cmrdef9lo0000ewbvgiiylzw0",
+    "term": "math",
+    "synonyms": [
+      "mathematiques",
+      "mathématique",
+      "maths",
+      "رياضيات"
+    ],
+    "language": "all",
+    "category": "subject",
+    "createdAt": "2026-07-09T11:03:40.377Z",
+    "updatedAt": "2026-07-09T11:03:40.377Z",
+    "createdBy": null
+  },
+  {
+    "id": "cmrdef9rc0001ewbvk9040vm4",
+    "term": "phys",
+    "synonyms": [
+      "physique",
+      "sciences physiques",
+      "فيزياء"
+    ],
+    "language": "all",
+    "category": "subject",
+    "createdAt": "2026-07-09T11:03:40.585Z",
+    "updatedAt": "2026-07-09T11:03:40.585Z",
+    "createdBy": null
+  },
+  {
+    "id": "cmrdef9tv0002ewbvvdv9sua4",
+    "term": "svt",
+    "synonyms": [
+      "sciences de la vie et de la terre",
+      "علوم الحياة والأرض",
+      "sciences naturelles"
+    ],
+    "language": "all",
+    "category": "subject",
+    "createdAt": "2026-07-09T11:03:40.676Z",
+    "updatedAt": "2026-07-09T11:03:40.676Z",
+    "createdBy": null
+  },
+  {
+    "id": "cmrdef9wi0003ewbvp5nlskj8",
+    "term": "fr",
+    "synonyms": [
+      "francais",
+      "français",
+      "الفرنسية"
+    ],
+    "language": "all",
+    "category": "subject",
+    "createdAt": "2026-07-09T11:03:40.771Z",
+    "updatedAt": "2026-07-09T11:03:40.771Z",
+    "createdBy": null
+  },
+  {
+    "id": "cmrdef9z20004ewbvwdcdiqez",
+    "term": "ar",
+    "synonyms": [
+      "arabe",
+      "العربية"
+    ],
+    "language": "all",
+    "category": "subject",
+    "createdAt": "2026-07-09T11:03:40.862Z",
+    "updatedAt": "2026-07-09T11:03:40.862Z",
+    "createdBy": null
+  },
+  {
+    "id": "cmrdefa1l0005ewbv20eihkrn",
+    "term": "en",
+    "synonyms": [
+      "anglais",
+      "الإنجليزية",
+      "english"
+    ],
+    "language": "all",
+    "category": "subject",
+    "createdAt": "2026-07-09T11:03:40.954Z",
+    "updatedAt": "2026-07-09T11:03:40.954Z",
+    "createdBy": null
+  },
+  {
+    "id": "cmrdefa450006ewbv5tdeb4je",
+    "term": "info",
+    "synonyms": [
+      "informatique",
+      "الاعلامية",
+      "computer science"
+    ],
+    "language": "all",
+    "category": "subject",
+    "createdAt": "2026-07-09T11:03:41.045Z",
+    "updatedAt": "2026-07-09T11:03:41.045Z",
+    "createdBy": null
+  },
+  {
+    "id": "cmrdefa6o0007ewbv4to00rsv",
+    "term": "philo",
+    "synonyms": [
+      "philosophie",
+      "فلسفة"
+    ],
+    "language": "all",
+    "category": "subject",
+    "createdAt": "2026-07-09T11:03:41.137Z",
+    "updatedAt": "2026-07-09T11:03:41.137Z",
+    "createdBy": null
+  },
+  {
+    "id": "cmrdefa980008ewbvxvo7yfyg",
+    "term": "histo",
+    "synonyms": [
+      "histoire",
+      "تاريخ"
+    ],
+    "language": "all",
+    "category": "subject",
+    "createdAt": "2026-07-09T11:03:41.228Z",
+    "updatedAt": "2026-07-09T11:03:41.228Z",
+    "createdBy": null
+  },
+  {
+    "id": "cmrdefabr0009ewbvv9h5vnn8",
+    "term": "geo",
+    "synonyms": [
+      "géographie",
+      "جغرافيا"
+    ],
+    "language": "all",
+    "category": "subject",
+    "createdAt": "2026-07-09T11:03:41.320Z",
+    "updatedAt": "2026-07-09T11:03:41.320Z",
+    "createdBy": null
+  },
+  {
+    "id": "cmrdefaea000aewbv8k4k2hrr",
+    "term": "devoir",
+    "synonyms": [
+      "devoirs",
+      "tâche",
+      "homework"
+    ],
+    "language": "all",
+    "category": "type",
+    "createdAt": "2026-07-09T11:03:41.411Z",
+    "updatedAt": "2026-07-09T11:03:41.411Z",
+    "createdBy": null
+  },
+  {
+    "id": "cmrdefagu000bewbvzihhfpch",
+    "term": "corrige",
+    "synonyms": [
+      "correction",
+      "corrigés",
+      "corrigée",
+      "solution",
+      "corriges"
+    ],
+    "language": "all",
+    "category": "type",
+    "createdAt": "2026-07-09T11:03:41.502Z",
+    "updatedAt": "2026-07-09T11:03:41.502Z",
+    "createdBy": null
+  },
+  {
+    "id": "cmrdefajd000cewbvigsi7yr4",
+    "term": "exercice",
+    "synonyms": [
+      "exercices",
+      "série",
+      "td",
+      "exos"
+    ],
+    "language": "all",
+    "category": "type",
+    "createdAt": "2026-07-09T11:03:41.593Z",
+    "updatedAt": "2026-07-09T11:03:41.593Z",
+    "createdBy": null
+  },
+  {
+    "id": "cmrdefalw000dewbv7uvm7rqf",
+    "term": "resume",
+    "synonyms": [
+      "résumé",
+      "résumés",
+      "synthèse",
+      "summaries"
+    ],
+    "language": "all",
+    "category": "type",
+    "createdAt": "2026-07-09T11:03:41.684Z",
+    "updatedAt": "2026-07-09T11:03:41.684Z",
+    "createdBy": null
+  },
+  {
+    "id": "cmrdefaoo000eewbvpqxwjzrw",
+    "term": "examen",
+    "synonyms": [
+      "examens",
+      "épreuve",
+      "bac blanc"
+    ],
+    "language": "all",
+    "category": "type",
+    "createdAt": "2026-07-09T11:03:41.785Z",
+    "updatedAt": "2026-07-09T11:03:41.785Z",
+    "createdBy": null
+  },
+  {
+    "id": "cmrdefar7000fewbvwqesn842",
+    "term": "controle",
+    "synonyms": [
+      "contrôle",
+      "controles",
+      "DS"
+    ],
+    "language": "all",
+    "category": "type",
+    "createdAt": "2026-07-09T11:03:41.876Z",
+    "updatedAt": "2026-07-09T11:03:41.876Z",
+    "createdBy": null
+  },
+  {
+    "id": "cmrdefatr000gewbvbvwdk2re",
+    "term": "synthese",
+    "synonyms": [
+      "synthèse",
+      "examen final",
+      "partiel"
+    ],
+    "language": "all",
+    "category": "type",
+    "createdAt": "2026-07-09T11:03:41.967Z",
+    "updatedAt": "2026-07-09T11:03:41.967Z",
+    "createdBy": null
+  },
+  {
+    "id": "cmrdefawa000hewbvnmenaw3s",
+    "term": "bac",
+    "synonyms": [
+      "baccalaureat",
+      "baccalauréat",
+      "الباكالوريا"
+    ],
+    "language": "all",
+    "category": "class",
+    "createdAt": "2026-07-09T11:03:42.059Z",
+    "updatedAt": "2026-07-09T11:03:42.059Z",
+    "createdBy": null
+  },
+  {
+    "id": "cmrdefayt000iewbvw5jo5mtt",
+    "term": "1as",
+    "synonyms": [
+      "1ere année secondaire",
+      "1ère année secondaire",
+      "première année",
+      "الأولى ثانوي"
+    ],
+    "language": "ar",
+    "category": "class",
+    "createdAt": "2026-07-09T11:03:42.150Z",
+    "updatedAt": "2026-07-09T11:03:42.150Z",
+    "createdBy": null
+  },
+  {
+    "id": "cmrdefb1d000jewbvj892gbes",
+    "term": "2as",
+    "synonyms": [
+      "2eme année secondaire",
+      "2ème année secondaire",
+      "deuxième année",
+      "الثانية ثانوي"
+    ],
+    "language": "ar",
+    "category": "class",
+    "createdAt": "2026-07-09T11:03:42.242Z",
+    "updatedAt": "2026-07-09T11:03:42.242Z",
+    "createdBy": null
+  },
+  {
+    "id": "cmrdefb3x000kewbv5clc3dlt",
+    "term": "3as",
+    "synonyms": [
+      "3eme année secondaire",
+      "3ème année secondaire",
+      "troisième année",
+      "الثالثة ثانوي"
+    ],
+    "language": "ar",
+    "category": "class",
+    "createdAt": "2026-07-09T11:03:42.333Z",
+    "updatedAt": "2026-07-09T11:03:42.333Z",
+    "createdBy": null
+  },
+  {
+    "id": "cmrdefb6g000lewbvju4kpsgx",
+    "term": "4as",
+    "synonyms": [
+      "4eme année secondaire",
+      "4ème année secondaire",
+      "quatrième année",
+      "الرابعة ثانوي"
+    ],
+    "language": "ar",
+    "category": "class",
+    "createdAt": "2026-07-09T11:03:42.424Z",
+    "updatedAt": "2026-07-09T11:03:42.424Z",
+    "createdBy": null
+  },
+  {
+    "id": "cmrdefb8z000mewbvr3u17reh",
+    "term": "7eme",
+    "synonyms": [
+      "7ème année",
+      "septième année de base",
+      "السابعة أساسي"
+    ],
+    "language": "ar",
+    "category": "class",
+    "createdAt": "2026-07-09T11:03:42.516Z",
+    "updatedAt": "2026-07-09T11:03:42.516Z",
+    "createdBy": null
+  },
+  {
+    "id": "cmrdefbbi000newbv7uka8yss",
+    "term": "8eme",
+    "synonyms": [
+      "8ème année",
+      "huitième année de base",
+      "الثامنة أساسي"
+    ],
+    "language": "ar",
+    "category": "class",
+    "createdAt": "2026-07-09T11:03:42.607Z",
+    "updatedAt": "2026-07-09T11:03:42.607Z",
+    "createdBy": null
+  },
+  {
+    "id": "cmrdefbe1000oewbvzz1x5gvl",
+    "term": "9eme",
+    "synonyms": [
+      "9ème année",
+      "neuvième année de base",
+      "التاسعة أساسي"
+    ],
+    "language": "ar",
+    "category": "class",
+    "createdAt": "2026-07-09T11:03:42.698Z",
+    "updatedAt": "2026-07-09T11:03:42.698Z",
+    "createdBy": null
+  },
+  {
+    "id": "cmrdefbgk000pewbvuyrl0eyc",
+    "term": "sciences",
+    "synonyms": [
+      "science",
+      "exp",
+      "sciences exp"
+    ],
+    "language": "fr",
+    "category": "section",
+    "createdAt": "2026-07-09T11:03:42.789Z",
+    "updatedAt": "2026-07-09T11:03:42.789Z",
+    "createdBy": null
+  },
+  {
+    "id": "cmrdefbj3000qewbvnkf4o1qz",
+    "term": "mathematiques",
+    "synonyms": [
+      "math",
+      "رياضيات",
+      "maths"
+    ],
+    "language": "fr",
+    "category": "section",
+    "createdAt": "2026-07-09T11:03:42.880Z",
+    "updatedAt": "2026-07-09T11:03:42.880Z",
+    "createdBy": null
+  },
+  {
+    "id": "cmrdefblm000rewbvr86f65f7",
+    "term": "technique",
+    "synonyms": [
+      "tech",
+      "sciences techniques"
+    ],
+    "language": "fr",
+    "category": "section",
+    "createdAt": "2026-07-09T11:03:42.971Z",
+    "updatedAt": "2026-07-09T11:03:42.971Z",
+    "createdBy": null
+  },
+  {
+    "id": "cmrdefbo5000sewbvlvjurlu8",
+    "term": "eco",
+    "synonyms": [
+      "économie",
+      "gestion",
+      "eco-gestion"
+    ],
+    "language": "fr",
+    "category": "section",
+    "createdAt": "2026-07-09T11:03:43.062Z",
+    "updatedAt": "2026-07-09T11:03:43.062Z",
+    "createdBy": null
+  },
+  {
+    "id": "cmrdefbqo000tewbvztmhvugl",
+    "term": "lettres",
+    "synonyms": [
+      "lettre",
+      "اداب"
+    ],
+    "language": "fr",
+    "category": "section",
+    "createdAt": "2026-07-09T11:03:43.153Z",
+    "updatedAt": "2026-07-09T11:03:43.153Z",
+    "createdBy": null
+  },
+  {
+    "id": "cmrdefbt8000uewbvjiuxnwtt",
+    "term": "sport",
+    "synonyms": [
+      "sport",
+      "eps",
+      "éducation physique"
+    ],
+    "language": "fr",
+    "category": "section",
+    "createdAt": "2026-07-09T11:03:43.244Z",
+    "updatedAt": "2026-07-09T11:03:43.244Z",
+    "createdBy": null
+  },
+  {
+    "id": "cmrdefbvr000vewbv0q7yo41t",
+    "term": "info-ti",
+    "synonyms": [
+      "informatique",
+      "TI",
+      "technologies informatique",
+      "sciences informatiques"
+    ],
+    "language": "fr",
+    "category": "section",
+    "createdAt": "2026-07-09T11:03:43.335Z",
+    "updatedAt": "2026-07-09T11:03:43.335Z",
+    "createdBy": null
+  },
+  {
+    "id": "cmrdefbya000wewbv5eqg564y",
+    "term": "mathematique",
+    "synonyms": [
+      "mathématique",
+      "mathématiques",
+      "math"
+    ],
+    "language": "fr",
+    "category": "free",
+    "createdAt": "2026-07-09T11:03:43.427Z",
+    "updatedAt": "2026-07-09T11:03:43.427Z",
+    "createdBy": null
+  },
+  {
+    "id": "cmrdefc0t000xewbvkzii0ozy",
+    "term": "physique",
+    "synonyms": [
+      "phys",
+      "physic",
+      "فيزياء"
+    ],
+    "language": "fr",
+    "category": "free",
+    "createdAt": "2026-07-09T11:03:43.518Z",
+    "updatedAt": "2026-07-09T11:03:43.518Z",
+    "createdBy": null
+  },
+  {
+    "id": "cmrdefc3c000yewbvi31uzu10",
+    "term": "svt",
+    "synonyms": [
+      "sciences de la vie et de la terre",
+      "biologie",
+      "علوم"
+    ],
+    "language": "fr",
+    "category": "free",
+    "createdAt": "2026-07-09T11:03:43.609Z",
+    "updatedAt": "2026-07-09T11:03:43.609Z",
+    "createdBy": null
+  }
+]

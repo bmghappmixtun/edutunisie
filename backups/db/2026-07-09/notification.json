@@ -1,0 +1,4842 @@
+[
+  {
+    "id": "cmqibmrf4000grcm74ej56yzb",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher-1781715879296@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T17:04:39.760Z"
+  },
+  {
+    "id": "cmqibmryc000lrcm74x4xo2xr",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher2-1781715880073@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T17:04:40.452Z"
+  },
+  {
+    "id": "cmqibmtas000srcm77t9nhdml",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher3-1781715881824@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T17:04:42.197Z"
+  },
+  {
+    "id": "cmqibmwne0003mmihrpe71la9",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Test Resource 1781715885877\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T17:04:46.538Z"
+  },
+  {
+    "id": "cmqibmytm0006nbrb9yw9300a",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Notify Test (notify-test-1781715888884@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T17:04:49.355Z"
+  },
+  {
+    "id": "cmqibmzab000bnbrbmv1knalv",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "OTP Test (otp-test-1781715889603@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T17:04:49.955Z"
+  },
+  {
+    "id": "cmqibnjai000inbrbapt8sikm",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "NotifTest Teacher (notif-test-1781715915509@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T17:05:15.882Z"
+  },
+  {
+    "id": "cmqibpp580004l0kvqlw00xed",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "E2E TestTeacher (e2e-teacher-1781716015743@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T17:06:56.780Z"
+  },
+  {
+    "id": "cmqibq1np0004n51ii67dp6ex",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "E2E TestTeacher (e2e-teacher-1781716032230@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T17:07:12.997Z"
+  },
+  {
+    "id": "cmqibqkpl0004gbrdm5s500iw",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "E2E TestTeacher (e2e-teacher-1781716056600@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T17:07:37.689Z"
+  },
+  {
+    "id": "cmqibrocv000gavk7wdagfefo",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher-1781716108206@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T17:08:29.072Z"
+  },
+  {
+    "id": "cmqibrovu000lavk7jv4zrtt6",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher2-1781716109366@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T17:08:29.755Z"
+  },
+  {
+    "id": "cmqibrqdt000qavk7uceeauq2",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher3-1781716111273@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T17:08:31.698Z"
+  },
+  {
+    "id": "cmqibrthr0003rqfn5yyv4g2d",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Test Resource 1781716114889\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T17:08:35.727Z"
+  },
+  {
+    "id": "cmqibs7ud0011avk7r32n2suf",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Notify Test (notify-test-1781716133843@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T17:08:54.325Z"
+  },
+  {
+    "id": "cmqibs8ff0016avk7gnro7ux8",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "OTP Test (otp-test-1781716134677@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T17:08:55.084Z"
+  },
+  {
+    "id": "cmqibs93q001bavk7dfon2us8",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "E2E TestTeacher (e2e-teacher-1781716135603@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T17:08:55.958Z"
+  },
+  {
+    "id": "cmqibtqbq001yavk7mojr225n",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher-1781716204439@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T17:10:04.934Z"
+  },
+  {
+    "id": "cmqibtqub0023avk7ti16pcm1",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher2-1781716205226@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T17:10:05.604Z"
+  },
+  {
+    "id": "cmqibts2p002aavk7dnlt6pp3",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher3-1781716206845@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T17:10:07.202Z"
+  },
+  {
+    "id": "cmqibtuji000359cx4yt8le5d",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Test Resource 1781716209896\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T17:10:10.398Z"
+  },
+  {
+    "id": "cmqibtwh3002pavk73ht7cgws",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Notify Test (notify-test-1781716212400@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T17:10:12.903Z"
+  },
+  {
+    "id": "cmqibtwz1002uavk74q9dxnm0",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "OTP Test (otp-test-1781716213172@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T17:10:13.550Z"
+  },
+  {
+    "id": "cmqibtxly002zavk7hsyx7ozf",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "E2E TestTeacher (e2e-teacher-1781716213959@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T17:10:14.375Z"
+  },
+  {
+    "id": "cmqibu04g0038avk7lctq4hzf",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "NotifTest Teacher (notif-test-1781716215860@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T17:10:17.632Z"
+  },
+  {
+    "id": "cmqif31bb0006ahnsqv6tel2u",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "ToDelete Test (to-delete-1781721677306@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T18:41:17.927Z"
+  },
+  {
+    "id": "cmqif3jca0006h5nlj4u6wc9r",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "ToDelete Test (to-delete-1781721700834@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T18:41:41.290Z"
+  },
+  {
+    "id": "cmqif4dcr000fh5nlgxuekkrl",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "ToDelete Test1781721739818 (to-delete-1781721739818@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T18:42:20.188Z"
+  },
+  {
+    "id": "cmqif4qk9000qh5nlqwrbun6c",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "ToDelete Test1781721756939 (to-delete-1781721756939@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T18:42:37.306Z"
+  },
+  {
+    "id": "cmqif4wq2000zh5nl74udqmdo",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher-1781721764661@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T18:42:45.291Z"
+  },
+  {
+    "id": "cmqif4x8x0014h5nl66392a3s",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher2-1781721765620@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T18:42:45.969Z"
+  },
+  {
+    "id": "cmqif4yin0019h5nl2plfraq0",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher3-1781721767223@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T18:42:47.615Z"
+  },
+  {
+    "id": "cmqif50gt00034ndmeh4sep6j",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Test Resource 1781721769397\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T18:42:50.142Z"
+  },
+  {
+    "id": "cmqif51oq001ih5nlndzsd5js",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Notify Test (notify-test-1781721771330@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T18:42:51.722Z"
+  },
+  {
+    "id": "cmqif527n001nh5nlcjgbr471",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "OTP Test (otp-test-1781721772066@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T18:42:52.404Z"
+  },
+  {
+    "id": "cmqif52vr001sh5nlywots45k",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "E2E TestTeacher (e2e-teacher-1781721772904@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T18:42:53.271Z"
+  },
+  {
+    "id": "cmqif54ex0021h5nl5tmi9qt8",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "NotifTest Teacher (notif-test-1781721774910@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T18:42:55.257Z"
+  },
+  {
+    "id": "cmqif5qj10028h5nl4rwrmz1o",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "ToDelete Test1781721803531 (to-delete-1781721803531@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T18:43:23.918Z"
+  },
+  {
+    "id": "cmqif5wkf002hh5nlal88n35i",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher-1781721811257@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T18:43:31.744Z"
+  },
+  {
+    "id": "cmqif5x2j002mh5nlpxvjji0h",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher2-1781721812062@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T18:43:32.395Z"
+  },
+  {
+    "id": "cmqif5yoe002rh5nl1evq5wte",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher3-1781721814035@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T18:43:34.479Z"
+  },
+  {
+    "id": "cmqif60id0003qrk16jbnhny4",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Test Resource 1781721816335\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T18:43:36.853Z"
+  },
+  {
+    "id": "cmqif61r60030h5nl6rd3pwj8",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Notify Test (notify-test-1781721817969@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T18:43:38.467Z"
+  },
+  {
+    "id": "cmqif62b90035h5nli596wpet",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "OTP Test (otp-test-1781721818840@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T18:43:39.189Z"
+  },
+  {
+    "id": "cmqif62wm003ah5nl3358km4u",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "E2E TestTeacher (e2e-teacher-1781721819624@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T18:43:39.959Z"
+  },
+  {
+    "id": "cmqif648v003jh5nlg900rozm",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "NotifTest Teacher (notif-test-1781721821340@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T18:43:41.695Z"
+  },
+  {
+    "id": "cmqif6yzj003qh5nlvhomdhin",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "ToDelete Test1781721861169 (to-delete-1781721861169@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T18:44:21.536Z"
+  },
+  {
+    "id": "cmqif755h003zh5nlf5n8lbt8",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher-1781721868989@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T18:44:29.526Z"
+  },
+  {
+    "id": "cmqif75o20044h5nleux1duo7",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher2-1781721869831@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T18:44:30.194Z"
+  },
+  {
+    "id": "cmqif772t0049h5nlg0lzdx9a",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher3-1781721871607@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T18:44:32.021Z"
+  },
+  {
+    "id": "cmqif78my0007qrk1nw08ks5a",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Test Resource 1781721873886\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T18:44:34.043Z"
+  },
+  {
+    "id": "cmqif7a7w004ih5nlzeo6mm4s",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Notify Test (notify-test-1781721875668@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T18:44:36.093Z"
+  },
+  {
+    "id": "cmqif7at4004nh5nluzv4svng",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "OTP Test (otp-test-1781721876473@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T18:44:36.856Z"
+  },
+  {
+    "id": "cmqif7bns004sh5nll8uv0epa",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "E2E TestTeacher (e2e-teacher-1781721877605@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T18:44:37.961Z"
+  },
+  {
+    "id": "cmqif7d0c0051h5nly4tdhiiw",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "NotifTest Teacher (notif-test-1781721879344@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T18:44:39.708Z"
+  },
+  {
+    "id": "cmqif8jtt0058h5nlig66pkm7",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "ToDelete Test1781721934821 (to-delete-1781721934821@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T18:45:35.201Z"
+  },
+  {
+    "id": "cmqif8yet005xh5nlfon1bjua",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher-1781721953751@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T18:45:54.102Z"
+  },
+  {
+    "id": "cmqif8yyb0062h5nlc1tympdf",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher2-1781721954384@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T18:45:54.804Z"
+  },
+  {
+    "id": "cmqif907y0069h5nlkirmkvhn",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher3-1781721956079@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T18:45:56.446Z"
+  },
+  {
+    "id": "cmqif92mv000bqrk1xzx25rnc",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Test Resource 1781721959471\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T18:45:59.575Z"
+  },
+  {
+    "id": "cmqif94qv006oh5nlni08kawd",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Notify Test (notify-test-1781721961941@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T18:46:02.311Z"
+  },
+  {
+    "id": "cmqif957d006th5nlqbib702d",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "OTP Test (otp-test-1781721962573@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T18:46:02.905Z"
+  },
+  {
+    "id": "cmqif95tj006yh5nlzvmhc5ol",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "E2E TestTeacher (e2e-teacher-1781721963334@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T18:46:03.703Z"
+  },
+  {
+    "id": "cmqif977n0077h5nlvryo2tj9",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "NotifTest Teacher (notif-test-1781721965130@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T18:46:05.507Z"
+  },
+  {
+    "id": "cmqikktx30006wnoxd3slabl3",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "DeleteFiles Test (del-files-1781730905563@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:15:06.231Z"
+  },
+  {
+    "id": "cmqikl6ph000611apfy6txg2q",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "ToDelete Test1781730922315 (to-delete-1781730922315@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:15:22.805Z"
+  },
+  {
+    "id": "cmqiklak2000h11apd3vqyx5g",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "DeleteFiles Test (del-files-1781730927404@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:15:27.794Z"
+  },
+  {
+    "id": "cmqiklekj000o11ap40jlggd4",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher-1781730932566@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:15:32.996Z"
+  },
+  {
+    "id": "cmqiklf5n000t11apmv4kg04r",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher2-1781730933379@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:15:33.756Z"
+  },
+  {
+    "id": "cmqiklgja000y11ap4ouhbyqx",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher3-1781730934989@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:15:35.543Z"
+  },
+  {
+    "id": "cmqikliic0003f38elmqqossm",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Test Resource 1781730937415\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:15:38.100Z"
+  },
+  {
+    "id": "cmqikljpi001711ap5ofwor5i",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Notify Test (notify-test-1781730939229@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:15:39.654Z"
+  },
+  {
+    "id": "cmqiklk94001c11apf4q9wyug",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "OTP Test (otp-test-1781730940005@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:15:40.360Z"
+  },
+  {
+    "id": "cmqiklky0001h11apnzzvyoex",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "E2E TestTeacher (e2e-teacher-1781730940870@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:15:41.256Z"
+  },
+  {
+    "id": "cmqiklmdo001q11apxtkeao4q",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "NotifTest Teacher (notif-test-1781730942722@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:15:43.116Z"
+  },
+  {
+    "id": "cmqikm9cl001x11ap23lwehn2",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "ToDelete Test1781730972470 (to-delete-1781730972470@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:16:12.886Z"
+  },
+  {
+    "id": "cmqikmcy3002811apfgggzbnb",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "DeleteFiles Test (del-files-1781730977160@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:16:17.548Z"
+  },
+  {
+    "id": "cmqikmgkr002f11apdqno671w",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher-1781730981811@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:16:22.252Z"
+  },
+  {
+    "id": "cmqikmh5c002k11apopjadmlm",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher2-1781730982626@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:16:22.992Z"
+  },
+  {
+    "id": "cmqikmigu002p11apfx81nt2b",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher3-1781730984272@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:16:24.702Z"
+  },
+  {
+    "id": "cmqikmjxj0003b80oqz7055ad",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Test Resource 1781730986442\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:16:26.600Z"
+  },
+  {
+    "id": "cmqikml4j002y11ap6nvc3w1l",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Notify Test (notify-test-1781730987723@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:16:28.148Z"
+  },
+  {
+    "id": "cmqikmloq003311aptzh1evwg",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "OTP Test (otp-test-1781730988497@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:16:28.875Z"
+  },
+  {
+    "id": "cmqikmmbu003811aps01j5pxa",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "E2E TestTeacher (e2e-teacher-1781730989293@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:16:29.707Z"
+  },
+  {
+    "id": "cmqikmnpu003h11aphs0626l5",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "NotifTest Teacher (notif-test-1781730991135@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:16:31.507Z"
+  },
+  {
+    "id": "cmqikn955003o11apg4q3vn42",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "ToDelete Test1781731018773 (to-delete-1781731018773@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:16:59.273Z"
+  },
+  {
+    "id": "cmqikncuf003z11apdh4b197y",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "DeleteFiles Test (del-files-1781731023711@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:17:04.071Z"
+  },
+  {
+    "id": "cmqiknghb004611apl0h54pd8",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher-1781731028333@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:17:08.783Z"
+  },
+  {
+    "id": "cmqiknh1h004b11ap8n3m77cx",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher2-1781731029146@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:17:09.509Z"
+  },
+  {
+    "id": "cmqiknied004g11ap913ayw02",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher3-1781731030744@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:17:11.269Z"
+  },
+  {
+    "id": "cmqiknjvt0007b80o4rif6s27",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Test Resource 1781731033058\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:17:13.193Z"
+  },
+  {
+    "id": "cmqiknl2m004p11apvt0h86u3",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Notify Test (notify-test-1781731034307@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:17:14.735Z"
+  },
+  {
+    "id": "cmqiknlpb004u11apglahkc6x",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "OTP Test (otp-test-1781731035144@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:17:15.551Z"
+  },
+  {
+    "id": "cmqiknmdb004z11apgfxs9u20",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "E2E TestTeacher (e2e-teacher-1781731036029@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:17:16.415Z"
+  },
+  {
+    "id": "cmqikno4c005811ap5t6zabd4",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "NotifTest Teacher (notif-test-1781731038326@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:17:18.684Z"
+  },
+  {
+    "id": "cmqikpnnr005f11apj0ipvkbp",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "ToDelete Test1781731131006 (to-delete-1781731131006@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:18:51.400Z"
+  },
+  {
+    "id": "cmqikpw9b005u11ap0da339p9",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "DeleteFiles Test (del-files-1781731142176@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:19:02.544Z"
+  },
+  {
+    "id": "cmqikq2zk006d11ap32njp7wz",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher-1781731150889@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:19:11.265Z"
+  },
+  {
+    "id": "cmqikq3h6006i11apbr3mun1e",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher2-1781731151535@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:19:11.898Z"
+  },
+  {
+    "id": "cmqikq4sd006p11ap46xgrzhk",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher3-1781731153223@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:19:13.598Z"
+  },
+  {
+    "id": "cmqikq7b2000bb80omkqm10ep",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Test Resource 1781731156749\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:19:16.862Z"
+  },
+  {
+    "id": "cmqikq9bq007411apd28j7x8g",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Notify Test (notify-test-1781731159126@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:19:19.478Z"
+  },
+  {
+    "id": "cmqikq9rw007911ape4wf7y8v",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "OTP Test (otp-test-1781731159717@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:19:20.061Z"
+  },
+  {
+    "id": "cmqikqace007e11ap0htxv138",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "E2E TestTeacher (e2e-teacher-1781731160440@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:19:20.798Z"
+  },
+  {
+    "id": "cmqikqbqe007n11ap06w9dfd1",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "NotifTest Teacher (notif-test-1781731162236@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:19:22.598Z"
+  },
+  {
+    "id": "cmqikvvq90003wcoutj658msg",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Test upload FormData\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:23:41.793Z"
+  },
+  {
+    "id": "cmqikvwaw0007wcou1m6g1uvb",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Test upload JSON\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:23:42.537Z"
+  },
+  {
+    "id": "cmqikvx3u000bwcouu0jg78e1",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Upload with PDF\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:23:43.578Z"
+  },
+  {
+    "id": "cmqikw7uj0006usld5ncc2bep",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "ToDelete Test1781731436973 (to-delete-1781731436973@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:23:57.499Z"
+  },
+  {
+    "id": "cmqikwg8f000lusldi1kswrd2",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "DeleteFiles Test (del-files-1781731448009@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:24:08.368Z"
+  },
+  {
+    "id": "cmqikwnv90014usldxffykf8m",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher-1781731457918@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:24:18.261Z"
+  },
+  {
+    "id": "cmqikwobs0019usld983pztc9",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher2-1781731458500@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:24:18.856Z"
+  },
+  {
+    "id": "cmqikwpij001guslduwa8qcnn",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher3-1781731460046@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:24:20.396Z"
+  },
+  {
+    "id": "cmqikws9m0003kdfwdpftq25y",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Test Resource 1781731463477\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:24:23.962Z"
+  },
+  {
+    "id": "cmqikwufk001vusldtn4y9dqf",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Notify Test (notify-test-1781731466404@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:24:26.769Z"
+  },
+  {
+    "id": "cmqikwuwh0020usldny8sg7za",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "OTP Test (otp-test-1781731467028@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:24:27.377Z"
+  },
+  {
+    "id": "cmqikwviw0025usldzgzfz6kj",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "E2E TestTeacher (e2e-teacher-1781731467827@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:24:28.184Z"
+  },
+  {
+    "id": "cmqikwwyn002eusldi4tp5xpy",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "NotifTest Teacher (notif-test-1781731469687@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:24:30.047Z"
+  },
+  {
+    "id": "cmqikxnpp0007kdfwmrh2nbim",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Test upload FormData\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:25:04.717Z"
+  },
+  {
+    "id": "cmqikxo71000bkdfwanwtftbs",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Test upload JSON\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:25:05.341Z"
+  },
+  {
+    "id": "cmqikxoth000fkdfwt2sq3p37",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Upload with PDF\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T21:25:06.149Z"
+  },
+  {
+    "id": "cmqiof1dy0006jn2pjh0skm5x",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "ToDelete Test1781737353755 (to-delete-1781737353755@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T23:02:34.439Z"
+  },
+  {
+    "id": "cmqiofbsa00069d4biiythxoa",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "DeleteFiles Test (del-files-1781737367392@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T23:02:47.914Z"
+  },
+  {
+    "id": "cmqiofl0q000p9d4bvvodohiq",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher-1781737379458@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T23:02:59.883Z"
+  },
+  {
+    "id": "cmqioflic000u9d4bcy4x5rj1",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher2-1781737380134@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T23:03:00.516Z"
+  },
+  {
+    "id": "cmqiofmxj00119d4bs1yfbgg9",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher3-1781737382001@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T23:03:02.359Z"
+  },
+  {
+    "id": "cmqiofqq1000363gezfxzmnt5",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Test Resource 1781737386539\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T23:03:07.274Z"
+  },
+  {
+    "id": "cmqioftpl001g9d4bp2hh2uzq",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Notify Test (notify-test-1781737390733@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T23:03:11.145Z"
+  },
+  {
+    "id": "cmqiofu90001l9d4bp8ss3p2e",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "OTP Test (otp-test-1781737391493@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T23:03:11.844Z"
+  },
+  {
+    "id": "cmqiofuyq001q9d4b443fvj7z",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "E2E TestTeacher (e2e-teacher-1781737392403@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T23:03:12.770Z"
+  },
+  {
+    "id": "cmqiofwcp001z9d4bx443h5x5",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "NotifTest Teacher (notif-test-1781737394208@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T23:03:14.570Z"
+  },
+  {
+    "id": "cmqioh04b0003a4qnd0bo4lkd",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Test upload FormData\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T23:04:06.108Z"
+  },
+  {
+    "id": "cmqioh0mj0007a4qnn64m2gzq",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Test upload JSON\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T23:04:06.764Z"
+  },
+  {
+    "id": "cmqioh1hc000ba4qndxz3x1pi",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Upload with PDF\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T23:04:07.872Z"
+  },
+  {
+    "id": "cmqiojxhw000fa4qn8jstmien",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"devoir\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T23:06:22.677Z"
+  },
+  {
+    "id": "cmqioq7s5000ja4qnb1zjqh6d",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"E2E Approve Test 1781737875771\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T23:11:15.942Z"
+  },
+  {
+    "id": "cmqioq9ef000na4qnfcfmij1m",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"E2E Reject Test 1781737877936\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T23:11:18.039Z"
+  },
+  {
+    "id": "cmqioqa5s000ra4qnwbj4s0l5",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"E2E Self-Approve Test 1781737878918\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T23:11:19.025Z"
+  },
+  {
+    "id": "cmqiowkj60006ukn2ieu13cmg",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "ToDelete Test1781738171857 (to-delete-1781738171857@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T23:16:12.403Z"
+  },
+  {
+    "id": "cmqiowmv50003vay9kgjxlng8",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"E2E Approve Test 1781738174723\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T23:16:15.425Z"
+  },
+  {
+    "id": "cmqiowooa0007vay9d220q5ir",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"E2E Reject Test 1781738177661\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T23:16:17.770Z"
+  },
+  {
+    "id": "cmqiowpg2000bvay9d047szsp",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"E2E Self-Approve Test 1781738178664\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T23:16:18.770Z"
+  },
+  {
+    "id": "cmqiox1nt0013ukn2x7w51nhn",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "DeleteFiles Test (del-files-1781738194249@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T23:16:34.601Z"
+  },
+  {
+    "id": "cmqioxa9t001mukn2vebysqs1",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher-1781738205380@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T23:16:45.761Z"
+  },
+  {
+    "id": "cmqioxars001rukn22hv9dxo9",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher2-1781738206037@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T23:16:46.408Z"
+  },
+  {
+    "id": "cmqioxc3z001yukn2kjibu36l",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher3-1781738207782@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T23:16:48.143Z"
+  },
+  {
+    "id": "cmqioxfm10003edtqdm6xhmxv",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Test Resource 1781738212184\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T23:16:52.681Z"
+  },
+  {
+    "id": "cmqioxicn002dukn2xwkha4y3",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Notify Test (notify-test-1781738215843@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T23:16:56.231Z"
+  },
+  {
+    "id": "cmqioxiuf002iukn2i7pmsnez",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "OTP Test (otp-test-1781738216484@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T23:16:56.871Z"
+  },
+  {
+    "id": "cmqioxjh3002nukn2grnrimcq",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "E2E TestTeacher (e2e-teacher-1781738217346@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T23:16:57.687Z"
+  },
+  {
+    "id": "cmqioxkty002wukn2488nk184",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "NotifTest Teacher (notif-test-1781738219100@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T23:16:59.446Z"
+  },
+  {
+    "id": "cmqioys0m0007edtqe7m4nac6",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Test upload FormData\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T23:17:55.414Z"
+  },
+  {
+    "id": "cmqioysho000bedtqp3wnva5e",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Test upload JSON\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T23:17:56.028Z"
+  },
+  {
+    "id": "cmqioyt5m000fedtqzib0eawc",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Upload with PDF\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-17T23:17:56.891Z"
+  },
+  {
+    "id": "cmqiqvbfg001ik69fw0hkx1tl",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "ToDelete Test1781741472402 (to-delete-1781741472402@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T00:11:13.181Z"
+  },
+  {
+    "id": "cmqiqvdp100031499ko13y76i",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"E2E Approve Test 1781741475481\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T00:11:16.117Z"
+  },
+  {
+    "id": "cmqiqvfdo000714993gjfsnxm",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"E2E Reject Test 1781741478198\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T00:11:18.300Z"
+  },
+  {
+    "id": "cmqiqvg4l000b14993qf6shhz",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"E2E Self-Approve Test 1781741479169\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T00:11:19.270Z"
+  },
+  {
+    "id": "cmqiqvqoh002fk69fw04wuf6h",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "DeleteFiles Test (del-files-1781741492565@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T00:11:32.946Z"
+  },
+  {
+    "id": "cmqiqvxpp002yk69f6wgozl9r",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher-1781741501691@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T00:11:42.062Z"
+  },
+  {
+    "id": "cmqiqvy7i0033k69fdz8ybnrh",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher2-1781741502338@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T00:11:42.703Z"
+  },
+  {
+    "id": "cmqiqvzdo003ak69fcsozwcf4",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher3-1781741503860@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T00:11:44.221Z"
+  },
+  {
+    "id": "cmqiqw2my00032451zjcmv828",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Test Resource 1781741507931\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T00:11:48.443Z"
+  },
+  {
+    "id": "cmqiqw4qv003pk69f8ojvba0t",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Notify Test (notify-test-1781741510805@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T00:11:51.175Z"
+  },
+  {
+    "id": "cmqiqw59h003uk69f8tidxmyx",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "OTP Test (otp-test-1781741511436@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T00:11:51.846Z"
+  },
+  {
+    "id": "cmqiqw5w3003zk69f2e1b6nfp",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "E2E TestTeacher (e2e-teacher-1781741512297@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T00:11:52.659Z"
+  },
+  {
+    "id": "cmqiqw79q0048k69fzquc3cpf",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "NotifTest Teacher (notif-test-1781741514090@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T00:11:54.446Z"
+  },
+  {
+    "id": "cmqiqxjo80003evyoseebzgzx",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Test upload FormData\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T00:12:57.177Z"
+  },
+  {
+    "id": "cmqiqxk6o0007evyonc1jvgj7",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Test upload JSON\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T00:12:57.840Z"
+  },
+  {
+    "id": "cmqiqxkuj000bevyosjopmlo0",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Upload with PDF\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T00:12:58.700Z"
+  },
+  {
+    "id": "cmqj4yrxl0017mgd1sw5lhild",
+    "userId": "cmqi8nr7a00332n4agsbylkth",
+    "type": "new_message",
+    "title": "Nouveau message 💬",
+    "message": "Ahmed: Bien reçu, merci pour votre message !",
+    "link": "/messages/cmqj4yqw8000vmgd1prubhqcg",
+    "isRead": false,
+    "createdAt": "2026-06-18T06:45:49.162Z"
+  },
+  {
+    "id": "cmqj4zo9w002dmgd16weaj63s",
+    "userId": "cmqi8nr7a00332n4agsbylkth",
+    "type": "new_message",
+    "title": "Nouveau message 💬",
+    "message": "Ahmed: Bien reçu, merci pour votre message !",
+    "link": "/messages/cmqj4yqw8000vmgd1prubhqcg",
+    "isRead": false,
+    "createdAt": "2026-06-18T06:46:31.077Z"
+  },
+  {
+    "id": "cmqj505ib002smgd1bwbey595",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "ToDelete Test1781765212866 (to-delete-1781765212866@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T06:46:53.412Z"
+  },
+  {
+    "id": "cmqj507um0003dx5lipgckhxr",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"E2E Approve Test 1781765215824\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T06:46:56.446Z"
+  },
+  {
+    "id": "cmqj509d20007dx5lp1uugu08",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"E2E Reject Test 1781765218288\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T06:46:58.406Z"
+  },
+  {
+    "id": "cmqj50a67000bdx5lhqic1d3d",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"E2E Self-Approve Test 1781765219354\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T06:46:59.456Z"
+  },
+  {
+    "id": "cmqj50ks4003pmgd1lp758eji",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "DeleteFiles Test (del-files-1781765232809@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T06:47:13.205Z"
+  },
+  {
+    "id": "cmqj50roe0048mgd1pbwarc9f",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher-1781765241762@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T06:47:22.142Z"
+  },
+  {
+    "id": "cmqj50s5n004dmgd1ce3vpq3m",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher2-1781765242409@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T06:47:22.763Z"
+  },
+  {
+    "id": "cmqj50tci004kmgd1fkyd89x4",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher3-1781765243929@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T06:47:24.306Z"
+  },
+  {
+    "id": "cmqj50wfe00033aq9u05gnmg9",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Test Resource 1781765247612\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T06:47:28.298Z"
+  },
+  {
+    "id": "cmqj50yi2004zmgd12z1ygj8t",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Notify Test (notify-test-1781765250594@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T06:47:30.987Z"
+  },
+  {
+    "id": "cmqj50z0g0054mgd1yr1efwgb",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "OTP Test (otp-test-1781765251256@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T06:47:31.648Z"
+  },
+  {
+    "id": "cmqj50zme0059mgd146ixttjj",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "E2E TestTeacher (e2e-teacher-1781765252079@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T06:47:32.438Z"
+  },
+  {
+    "id": "cmqj5111t005imgd1xq2opois",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "NotifTest Teacher (notif-test-1781765253904@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T06:47:34.289Z"
+  },
+  {
+    "id": "cmqj5294u000p14ledypves5j",
+    "userId": "cmqi8nr7a00332n4agsbylkth",
+    "type": "new_message",
+    "title": "Nouveau message 💬",
+    "message": "Ahmed: Bien reçu, merci pour votre message !",
+    "link": "/messages/cmqj4yqw8000vmgd1prubhqcg",
+    "isRead": false,
+    "createdAt": "2026-06-18T06:48:31.423Z"
+  },
+  {
+    "id": "cmqj52x000003b0zq8v5lty36",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Test upload FormData\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T06:49:02.352Z"
+  },
+  {
+    "id": "cmqj52xje0007b0zq4kxvlc9s",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Test upload JSON\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T06:49:03.050Z"
+  },
+  {
+    "id": "cmqj52y6u000bb0zqoep21mvi",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Upload with PDF\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T06:49:03.894Z"
+  },
+  {
+    "id": "cmqj7ie0f0003m8mk34p1t3bs",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°1 - Math - 7ème (2020-2021) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:57:03.472Z"
+  },
+  {
+    "id": "cmqj7ieek0007laymdnsomr5j",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°1 - Math - 7ème (2020-2021) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-1-math-7-me-2020-2021-gharbi-ridha-zf5pw",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:57:03.981Z"
+  },
+  {
+    "id": "cmqj7ig5l0007m8mkd7gc23a2",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°1 - Math DEVOIR - 7ème (2025-2026) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:57:06.249Z"
+  },
+  {
+    "id": "cmqj7igf80009laymxvsj4iku",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°1 - Math DEVOIR - 7ème (2025-2026) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-1-math-devoir-7-me-2025-2026-gharbi-rid-XFhHj",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:57:06.597Z"
+  },
+  {
+    "id": "cmqj7iixz000bm8mkns8d01ml",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°2 - Math - 7ème (2020-2021) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:57:09.863Z"
+  },
+  {
+    "id": "cmqj7ij6p000blaym3li3rdfo",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°2 - Math - 7ème (2020-2021) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-2-math-7-me-2020-2021-gharbi-ridha-9suPS",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:57:10.177Z"
+  },
+  {
+    "id": "cmqj7ile9000fm8mkn3gsb81j",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°2 - Math - 7ème (2024-2025) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:57:13.041Z"
+  },
+  {
+    "id": "cmqj7iln1000dlaymw8fvtx6y",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°2 - Math - 7ème (2024-2025) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-2-math-7-me-2024-2025-gharbi-ridha-Pn_Mn",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:57:13.358Z"
+  },
+  {
+    "id": "cmqj7in62000jm8mkb1wfj2xr",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°2 - Math DEVOIR - 7ème (2025-2026) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:57:15.338Z"
+  },
+  {
+    "id": "cmqj7infa000flaymw4vn00ln",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°2 - Math DEVOIR - 7ème (2025-2026) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-2-math-devoir-7-me-2025-2026-gharbi-rid-jTm4R",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:57:15.671Z"
+  },
+  {
+    "id": "cmqj7ippg000nm8mkmeog5hz8",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°2 - Math - 7ème (2023-2024) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:57:18.629Z"
+  },
+  {
+    "id": "cmqj7ipzq000hlaymi7w5ngld",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°2 - Math - 7ème (2023-2024) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-2-math-7-me-2023-2024-gharbi-ridha-DezUD",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:57:18.999Z"
+  },
+  {
+    "id": "cmqj7is7d000rm8mkzcb7a7of",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Synthèse N°1 - Math - 7ème (2020-2021) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:57:21.866Z"
+  },
+  {
+    "id": "cmqj7ish9000jlaym1mq7gy19",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Synthèse N°1 - Math - 7ème (2020-2021) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-synth-se-n-1-math-7-me-2020-2021-gharbi-ridha-qw1EJ",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:57:22.222Z"
+  },
+  {
+    "id": "cmqj7iup1000vm8mkakuyall3",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Synthèse N°1 - Math - 7ème (2023-2024) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:57:25.093Z"
+  },
+  {
+    "id": "cmqj7iuxv000llaymwgc2emyw",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Synthèse N°1 - Math - 7ème (2023-2024) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-synth-se-n-1-math-7-me-2023-2024-gharbi-ridha-qc46G",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:57:25.412Z"
+  },
+  {
+    "id": "cmqj7ix97000zm8mkrtkjm7lh",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Synthèse N°1 - Math - 7ème (2024-2025) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:57:28.411Z"
+  },
+  {
+    "id": "cmqj7ixhu000nlaymd6cnq3wo",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Synthèse N°1 - Math - 7ème (2024-2025) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-synth-se-n-1-math-7-me-2024-2025-gharbi-ridha-zqkIk",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:57:28.722Z"
+  },
+  {
+    "id": "cmqj7iz7c0013m8mkpjm2m8fo",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Synthèse N°1 - Math DEVOIR - 7ème (2025-2026) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:57:30.936Z"
+  },
+  {
+    "id": "cmqj7izhe000playm7qh4rxia",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Synthèse N°1 - Math DEVOIR - 7ème (2025-2026) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-synth-se-n-1-math-devoir-7-me-2025-2026-gharbi-rid-dsvk8",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:57:31.298Z"
+  },
+  {
+    "id": "cmqj7j1vo0017m8mkwdcsq0w8",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°3 - Math - 7ème (2021-2022) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:57:34.404Z"
+  },
+  {
+    "id": "cmqj7j254000rlaymaz6kug6v",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°3 - Math - 7ème (2021-2022) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-3-math-7-me-2021-2022-gharbi-ridha-qThrJ",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:57:34.744Z"
+  },
+  {
+    "id": "cmqj7j4n6001bm8mk5cmeucw6",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°3 - Math - 7ème (2023-2024) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:57:37.986Z"
+  },
+  {
+    "id": "cmqj7j4vi000tlaymaxgs9b0q",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°3 - Math - 7ème (2023-2024) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-3-math-7-me-2023-2024-gharbi-ridha-EPsOG",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:57:38.287Z"
+  },
+  {
+    "id": "cmqj7j7by001fm8mkm29936cd",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°3 - Math  - 7ème (2024-2025) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:57:41.470Z"
+  },
+  {
+    "id": "cmqj7j7kr000vlaymb0l33x1w",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°3 - Math  - 7ème (2024-2025) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-3-math-7-me-2024-2025-gharbi-ridha-KA8as",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:57:41.787Z"
+  },
+  {
+    "id": "cmqj7j9s6001jm8mkqa6wnt6x",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°3 - Math DEVOIR - 7ème (2025-2026) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:57:44.646Z"
+  },
+  {
+    "id": "cmqj7ja19000xlaymnjaak24i",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°3 - Math DEVOIR - 7ème (2025-2026) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-3-math-devoir-7-me-2025-2026-gharbi-rid-OloH2",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:57:44.973Z"
+  },
+  {
+    "id": "cmqj7jccl001nm8mk4fpv7465",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°4 - Math - 7ème (2021-2022) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:57:47.973Z"
+  },
+  {
+    "id": "cmqj7jcvl000zlaymilmbq268",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°4 - Math - 7ème (2021-2022) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-4-math-7-me-2021-2022-gharbi-ridha-ri3wU",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:57:48.657Z"
+  },
+  {
+    "id": "cmqj7jf42001rm8mkvbu5xt3a",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°4 - Math - 7ème (2023-2024) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:57:51.554Z"
+  },
+  {
+    "id": "cmqj7jfd20011laymg13mxw3l",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°4 - Math - 7ème (2023-2024) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-4-math-7-me-2023-2024-gharbi-ridha-NdDeF",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:57:51.879Z"
+  },
+  {
+    "id": "cmqj7jho6001vm8mkjorr7b5p",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Synthèse N°2 - Math - 7ème (2021-2022) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:57:54.870Z"
+  },
+  {
+    "id": "cmqj7jhwx0013laymr1xqva9s",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Synthèse N°2 - Math - 7ème (2021-2022) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-synth-se-n-2-math-7-me-2021-2022-gharbi-ridha-XuNGH",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:57:55.185Z"
+  },
+  {
+    "id": "cmqj7jk4f001zm8mkrip3nol1",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Synthèse N°2 - Math - 7ème (2023-2024) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:57:58.048Z"
+  },
+  {
+    "id": "cmqj7jkcs0015laymcucajoso",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Synthèse N°2 - Math - 7ème (2023-2024) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-synth-se-n-2-math-7-me-2023-2024-gharbi-ridha-IAub1",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:57:58.349Z"
+  },
+  {
+    "id": "cmqj7jmtl0023m8mkwhnpoltb",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Synthèse N°2 - Math DEVOIR SYNTHESE N2 - 7ème (2025-2026) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:58:01.545Z"
+  },
+  {
+    "id": "cmqj7jn250017laym0e0nr16l",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Synthèse N°2 - Math DEVOIR SYNTHESE N2 - 7ème (2025-2026) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-synth-se-n-2-math-devoir-synthese-n2-7-me-2025-202-KU_xL",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:58:01.853Z"
+  },
+  {
+    "id": "cmqj7jpfm0027m8mkqzg9gcr0",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°5 - Math - 7ème (2021-2022) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:58:04.930Z"
+  },
+  {
+    "id": "cmqj7jpoe0019laymeiobt8zw",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°5 - Math - 7ème (2021-2022) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-5-math-7-me-2021-2022-gharbi-ridha-m44PL",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:58:05.247Z"
+  },
+  {
+    "id": "cmqj7jrz6002bm8mkoe1b9s8v",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°5 - Math - 7ème (2023-2024) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:58:08.226Z"
+  },
+  {
+    "id": "cmqj7jsrn001blaymxb3opvcm",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°5 - Math - 7ème (2023-2024) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-5-math-7-me-2023-2024-gharbi-ridha-pQdzU",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:58:09.252Z"
+  },
+  {
+    "id": "cmqj7juxz002fm8mk8ddba0hk",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°5 - Math DEVOIR - 7ème (2024-2025) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:58:12.072Z"
+  },
+  {
+    "id": "cmqj7jv6r001dlaymfvjdk0nm",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°5 - Math DEVOIR - 7ème (2024-2025) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-5-math-devoir-7-me-2024-2025-gharbi-rid-saB2C",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:58:12.387Z"
+  },
+  {
+    "id": "cmqj7jxf6002jm8mk84ju3es6",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°5 - Math DEVOIR - 7ème (2025-2026) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:58:15.283Z"
+  },
+  {
+    "id": "cmqj7jxsb001flayme5mqrfc9",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°5 - Math DEVOIR - 7ème (2025-2026) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-5-math-devoir-7-me-2025-2026-gharbi-rid-To51e",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:58:15.755Z"
+  },
+  {
+    "id": "cmqj7k03w002nm8mk3argd4pj",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°6 - Math - 7ème (2021-2022) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:58:18.765Z"
+  },
+  {
+    "id": "cmqj7k0fe001hlaymfcoo9zt0",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°6 - Math - 7ème (2021-2022) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-6-math-7-me-2021-2022-gharbi-ridha-ydb2b",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:58:19.179Z"
+  },
+  {
+    "id": "cmqj7k2ol002rm8mkfvikoo5x",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°6 - Math - 7ème (2023-2024) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:58:22.101Z"
+  },
+  {
+    "id": "cmqj7k3cw001jlaym7h9o20t3",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°6 - Math - 7ème (2023-2024) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-6-math-7-me-2023-2024-gharbi-ridha-Es9VO",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:58:22.976Z"
+  },
+  {
+    "id": "cmqj7k5w3002vm8mk8qg3xku1",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°6 - Math DEVOIR - 7ème (2024-2025) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:58:26.259Z"
+  },
+  {
+    "id": "cmqj7k64z001llaymkvvv7nq1",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°6 - Math DEVOIR - 7ème (2024-2025) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-6-math-devoir-7-me-2024-2025-gharbi-rid-CDFCU",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:58:26.579Z"
+  },
+  {
+    "id": "cmqj7k8fv002zm8mkrtrcpmvp",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Synthèse N°3 - Math - 7ème (2021-2022) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:58:29.563Z"
+  },
+  {
+    "id": "cmqj7k8pi001nlaympj4eu8km",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Synthèse N°3 - Math - 7ème (2021-2022) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-synth-se-n-3-math-7-me-2021-2022-gharbi-ridha-7taJm",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:58:29.910Z"
+  },
+  {
+    "id": "cmqj7kb2m0033m8mkguv6y8e5",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Synthèse N°3 - Math - 7ème (2023-2024) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:58:32.975Z"
+  },
+  {
+    "id": "cmqj7kbbr001playma1flpdpb",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Synthèse N°3 - Math - 7ème (2023-2024) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-synth-se-n-3-math-7-me-2023-2024-gharbi-ridha-z2Nsi",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:58:33.303Z"
+  },
+  {
+    "id": "cmqj7kdj70037m8mk579w77yb",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Synthèse N°3 - Math DEVOIR SYNTHESE N3 - 7ème (2024-2025) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:58:36.164Z"
+  },
+  {
+    "id": "cmqj7kdsi001rlaymcndz1eh4",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Synthèse N°3 - Math DEVOIR SYNTHESE N3 - 7ème (2024-2025) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-synth-se-n-3-math-devoir-synthese-n3-7-me-2024-202-GoMP2",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:58:36.499Z"
+  },
+  {
+    "id": "cmqj7kg3d003bm8mkicc7lscr",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Synthèse N°3 - Math DEVOIR - 7ème (2025-2026) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:58:39.482Z"
+  },
+  {
+    "id": "cmqj7kgc8001tlaymimtbmy38",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Synthèse N°3 - Math DEVOIR - 7ème (2025-2026) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-synth-se-n-3-math-devoir-7-me-2025-2026-gharbi-rid-mAL6m",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:58:39.800Z"
+  },
+  {
+    "id": "cmqj7kijx003fm8mk8saqmsh5",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°1 - Math - 8ème (2020-2021) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:58:42.670Z"
+  },
+  {
+    "id": "cmqj7kis1001vlayms110z1f9",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°1 - Math - 8ème (2020-2021) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-1-math-8-me-2020-2021-gharbi-ridha-Cy1u7",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:58:42.961Z"
+  },
+  {
+    "id": "cmqj7klc8003jm8mkf4kotx2f",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°1 - Math - 8ème (2022-2023) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:58:46.281Z"
+  },
+  {
+    "id": "cmqj7kll5001xlaymerkqq8h1",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°1 - Math - 8ème (2022-2023) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-1-math-8-me-2022-2023-gharbi-ridha-9Az7t",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:58:46.601Z"
+  },
+  {
+    "id": "cmqj7knte003nm8mktcckcib9",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°2 - Math - 8ème (2020-2021) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:58:49.491Z"
+  },
+  {
+    "id": "cmqj7ko5c001zlaymev6d6xqh",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°2 - Math - 8ème (2020-2021) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-2-math-8-me-2020-2021-gharbi-ridha-WuGbB",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:58:49.921Z"
+  },
+  {
+    "id": "cmqj7kqhj003rm8mkuldnrwv1",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°2 - Math - 8ème (2021-2022) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:58:52.952Z"
+  },
+  {
+    "id": "cmqj7kqq30021laymwladfau3",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°2 - Math - 8ème (2021-2022) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-2-math-8-me-2021-2022-gharbi-ridha-fEPap",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:58:53.259Z"
+  },
+  {
+    "id": "cmqj7kt4f003vm8mksx1suufk",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Synthèse N°1 - Math - 8ème (2020-2021) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:58:56.367Z"
+  },
+  {
+    "id": "cmqj7ktcr0023laymkfif7qp2",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Synthèse N°1 - Math - 8ème (2020-2021) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-synth-se-n-1-math-8-me-2020-2021-gharbi-ridha-j34jT",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:58:56.668Z"
+  },
+  {
+    "id": "cmqj7kvoh003zm8mk6s7f4j9u",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Synthèse N°1 - Math - 8ème (2022-2023) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:58:59.681Z"
+  },
+  {
+    "id": "cmqj7kvwl0025laym9ykw8bdz",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Synthèse N°1 - Math - 8ème (2022-2023) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-synth-se-n-1-math-8-me-2022-2023-gharbi-ridha-fuxOZ",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:58:59.973Z"
+  },
+  {
+    "id": "cmqj7ky8o0043m8mkcubmctad",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°3 - Math - 8ème (2021-2022) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:59:03.001Z"
+  },
+  {
+    "id": "cmqj7kyh50027laymexpy4d2g",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°3 - Math - 8ème (2021-2022) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-3-math-8-me-2021-2022-gharbi-ridha-LrWNz",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:59:03.306Z"
+  },
+  {
+    "id": "cmqj7l0tv0047m8mkstdg82qk",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°3 - Math - 8ème (2022-2023) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:59:06.355Z"
+  },
+  {
+    "id": "cmqj7l15s0029laymt2v8q6sw",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°3 - Math - 8ème (2022-2023) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-3-math-8-me-2022-2023-gharbi-ridha-aI1lM",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:59:06.784Z"
+  },
+  {
+    "id": "cmqj7l3cv004bm8mkbvzc7lm4",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°4 - Math - 8ème (2021-2022) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:59:09.631Z"
+  },
+  {
+    "id": "cmqj7l3lc002blaymup789dqi",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°4 - Math - 8ème (2021-2022) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-4-math-8-me-2021-2022-gharbi-ridha-qtSbD",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:59:09.937Z"
+  },
+  {
+    "id": "cmqj7l609004fm8mkllbfldlt",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°4 - Math - 8ème (2022-2023) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:59:13.066Z"
+  },
+  {
+    "id": "cmqj7l693002dlaym2cutj0xs",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°4 - Math - 8ème (2022-2023) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-4-math-8-me-2022-2023-gharbi-ridha-6_5Vz",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:59:13.384Z"
+  },
+  {
+    "id": "cmqj7l8ol004jm8mkluv2e99r",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Synthèse N°2 - Math - 8ème (2021-2022) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:59:16.533Z"
+  },
+  {
+    "id": "cmqj7l8xh002flaymv6gx243o",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Synthèse N°2 - Math - 8ème (2021-2022) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-synth-se-n-2-math-8-me-2021-2022-gharbi-ridha-Njyyk",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:59:16.853Z"
+  },
+  {
+    "id": "cmqj7lb5x004nm8mkusubsldw",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Synthèse N°2 - Math - 8ème (2021-2022) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:59:19.750Z"
+  },
+  {
+    "id": "cmqj7lbkq002hlaymr5p7s4wd",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Synthèse N°2 - Math - 8ème (2021-2022) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-synth-se-n-2-math-8-me-2021-2022-gharbi-ridha-mzZhU",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:59:20.282Z"
+  },
+  {
+    "id": "cmqj7ldqp004rm8mkccf3agu3",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de synthese 2 - Math - 8ème (2022-2023) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:59:23.090Z"
+  },
+  {
+    "id": "cmqj7ldzs002jlayme6pqghc8",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de synthese 2 - Math - 8ème (2022-2023) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-synthese-2-math-8-me-2022-2023-gharbi-ridha-UHlzL",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:59:23.417Z"
+  },
+  {
+    "id": "cmqj7lgfk004vm8mktwozhxgu",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de synthese 2 - Math - 8ème (2022-2023) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:59:26.576Z"
+  },
+  {
+    "id": "cmqj7lgp3002llaymri208lrh",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de synthese 2 - Math - 8ème (2022-2023) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-synthese-2-math-8-me-2022-2023-gharbi-ridha-nfQJV",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:59:26.920Z"
+  },
+  {
+    "id": "cmqj7lixk004zm8mkurltbzvd",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°5 - Math - 8ème (2021-2022) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:59:29.816Z"
+  },
+  {
+    "id": "cmqj7lj6u002nlaymvkxqdb6y",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°5 - Math - 8ème (2021-2022) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-5-math-8-me-2021-2022-gharbi-ridha-XqK3e",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:59:30.150Z"
+  },
+  {
+    "id": "cmqj7lllu0053m8mk9htq6u6f",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°5 - Math - 8ème (2022-2023) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:59:33.282Z"
+  },
+  {
+    "id": "cmqj7lm0t002playmp7g8xb1i",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°5 - Math - 8ème (2022-2023) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-5-math-8-me-2022-2023-gharbi-ridha-q-96e",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:59:33.821Z"
+  },
+  {
+    "id": "cmqj7loc60057m8mkfe6gbrw5",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°6 - Math - 8ème (2021-2022) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:59:36.822Z"
+  },
+  {
+    "id": "cmqj7lol3002rlaymspajmjno",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°6 - Math - 8ème (2021-2022) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-6-math-8-me-2021-2022-gharbi-ridha-OkhHl",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:59:37.143Z"
+  },
+  {
+    "id": "cmqj7lqup005bm8mko6mqw8np",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°6 - Math - 8ème (2022-2023) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:59:40.081Z"
+  },
+  {
+    "id": "cmqj7lr3v002tlaym9l6nx3xb",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°6 - Math - 8ème (2022-2023) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-6-math-8-me-2022-2023-gharbi-ridha-nBpgc",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:59:40.411Z"
+  },
+  {
+    "id": "cmqj7lt83005fm8mk5m7dm50i",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Synthèse N°3 - Math - 8ème (2021-2022) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:59:43.156Z"
+  },
+  {
+    "id": "cmqj7lth9002vlaymksii4qqq",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Synthèse N°3 - Math - 8ème (2021-2022) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-synth-se-n-3-math-8-me-2021-2022-gharbi-ridha-fThRI",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:59:43.485Z"
+  },
+  {
+    "id": "cmqj7lvyj005jm8mkt047fur8",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Synthèse N°3 - Math - 8ème (2022-2023) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:59:46.699Z"
+  },
+  {
+    "id": "cmqj7lw7f002xlaym8763jrx1",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Synthèse N°3 - Math - 8ème (2022-2023) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-synth-se-n-3-math-8-me-2022-2023-gharbi-ridha-cOFin",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:59:47.019Z"
+  },
+  {
+    "id": "cmqj7lyhm005nm8mk1qr2lb2i",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°1 - Math - 9ème (2022-2023) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:59:49.978Z"
+  },
+  {
+    "id": "cmqj7lypn002zlaymf9oh0h4y",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°1 - Math - 9ème (2022-2023) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-1-math-9-me-2022-2023-gharbi-ridha-OlP7W",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:59:50.267Z"
+  },
+  {
+    "id": "cmqj7m0b2005rm8mkcgyyzc5q",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°1 - Math DEVOIR - 9ème (2025-2026) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:59:52.334Z"
+  },
+  {
+    "id": "cmqj7m0kb0031laymv0mn1dbw",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°1 - Math DEVOIR - 9ème (2025-2026) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-1-math-devoir-9-me-2025-2026-gharbi-rid-8zdM-",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:59:52.667Z"
+  },
+  {
+    "id": "cmqj7m2xn005vm8mkkb4wxwea",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°2 - Math - 9ème (2022-2023) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:59:55.739Z"
+  },
+  {
+    "id": "cmqj7m36e0033laymh4sab39r",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°2 - Math - 9ème (2022-2023) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-2-math-9-me-2022-2023-gharbi-ridha-f2G9g",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:59:56.054Z"
+  },
+  {
+    "id": "cmqj7m5nx005zm8mkdhajg61i",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°2 - Math - 9ème (2023-2024) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:59:59.277Z"
+  },
+  {
+    "id": "cmqj7m5wf0035laym1brm6smu",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°2 - Math - 9ème (2023-2024) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-2-math-9-me-2023-2024-gharbi-ridha-YzKoR",
+    "isRead": true,
+    "createdAt": "2026-06-18T07:59:59.584Z"
+  },
+  {
+    "id": "cmqj7m85s0063m8mk2tafmot9",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°2 - Math - 9ème (2024-2025) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:00:02.512Z"
+  },
+  {
+    "id": "cmqj7m9jt0037laym4hw2gck0",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°2 - Math - 9ème (2024-2025) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-2-math-9-me-2024-2025-gharbi-ridha-fqPje",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:00:04.314Z"
+  },
+  {
+    "id": "cmqj7mb8g0067m8mkb9ifglj1",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°2 - Math DEVOIR - 9ème (2025-2026) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:00:06.496Z"
+  },
+  {
+    "id": "cmqj7mc0q0039laymukskl73t",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°2 - Math DEVOIR - 9ème (2025-2026) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-2-math-devoir-9-me-2025-2026-gharbi-rid-kDknY",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:00:07.515Z"
+  },
+  {
+    "id": "cmqj7meiy006bm8mkej4v9mn1",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Synthèse N°1 - Math - 9ème (2022-2023) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:00:10.762Z"
+  },
+  {
+    "id": "cmqj7mgw1003blaymwzhduhv3",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Synthèse N°1 - Math - 9ème (2022-2023) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-synth-se-n-1-math-9-me-2022-2023-gharbi-ridha-nQJCU",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:00:13.825Z"
+  },
+  {
+    "id": "cmqj7mjah006fm8mkhqcux9jv",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Synthèse N°1 - Math - 9ème (2024-2025) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:00:16.937Z"
+  },
+  {
+    "id": "cmqj7mjlf003dlaymdlkffkhl",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Synthèse N°1 - Math - 9ème (2024-2025) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-synth-se-n-1-math-9-me-2024-2025-gharbi-ridha-z6eYw",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:00:17.331Z"
+  },
+  {
+    "id": "cmqj7ml7w006jm8mk8rehdgim",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Synthèse N°1 - Math DEVOIR - 9ème (2025-2026) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:00:19.436Z"
+  },
+  {
+    "id": "cmqj7mm2r003flaymetq1j27r",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Synthèse N°1 - Math DEVOIR - 9ème (2025-2026) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-synth-se-n-1-math-devoir-9-me-2025-2026-gharbi-rid-WJXMq",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:00:20.548Z"
+  },
+  {
+    "id": "cmqj7mrrt006nm8mkppdvhxu9",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°3 - Math - 9ème (2022-2023) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:00:27.929Z"
+  },
+  {
+    "id": "cmqj7ms1q003hlaym7rtyvhu5",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°3 - Math - 9ème (2022-2023) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-3-math-9-me-2022-2023-gharbi-ridha--j7wf",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:00:28.286Z"
+  },
+  {
+    "id": "cmqj7muex006rm8mk3chdavdw",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°3 - Math - 9ème (2022-2023) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:00:31.354Z"
+  },
+  {
+    "id": "cmqj7muo1003jlaym9efyeav0",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°3 - Math - 9ème (2022-2023) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-3-math-9-me-2022-2023-gharbi-ridha-TCTs_",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:00:31.681Z"
+  },
+  {
+    "id": "cmqj7mzhw006vm8mkgffcbi37",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°3 - Math  - 9ème (2024-2025) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:00:37.940Z"
+  },
+  {
+    "id": "cmqj7mzs7003llaym5ph73j4z",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°3 - Math  - 9ème (2024-2025) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-3-math-9-me-2024-2025-gharbi-ridha-nhk7f",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:00:38.311Z"
+  },
+  {
+    "id": "cmqj7n22u006zm8mku0obp4nj",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°3 - Math DEVOIR CONTROLE N 3 - 9ème (2025-2026) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:00:41.287Z"
+  },
+  {
+    "id": "cmqj7n2cj003nlaymg25bev0q",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°3 - Math DEVOIR CONTROLE N 3 - 9ème (2025-2026) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-3-math-devoir-controle-n-3-9-me-2025-20-3gPYb",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:00:41.635Z"
+  },
+  {
+    "id": "cmqj7n4o40073m8mkm9vlr8cf",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°4 - Math - 9ème (2022-2023) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:00:44.645Z"
+  },
+  {
+    "id": "cmqj7n4xz003playmhkhzdptc",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°4 - Math - 9ème (2022-2023) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-4-math-9-me-2022-2023-gharbi-ridha-6-CJw",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:00:45.000Z"
+  },
+  {
+    "id": "cmqj7n7ee0077m8mk16dqbbj7",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°4 - Math - 9ème (2023-2024) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:00:48.183Z"
+  },
+  {
+    "id": "cmqj7n7o6003rlaymae1c4luc",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°4 - Math - 9ème (2023-2024) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-4-math-9-me-2023-2024-gharbi-ridha-DOwpl",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:00:48.535Z"
+  },
+  {
+    "id": "cmqj7na3f007bm8mkbuazkjgb",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Synthèse N°2 - Math - 9ème (2022-2023) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:00:51.675Z"
+  },
+  {
+    "id": "cmqj7nacq003tlaymi43pbum8",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Synthèse N°2 - Math - 9ème (2022-2023) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-synth-se-n-2-math-9-me-2022-2023-gharbi-ridha-xljsO",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:00:52.010Z"
+  },
+  {
+    "id": "cmqj7ncma007fm8mkj1bucycl",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Synthèse N°2 - Math - 9ème (2022-2023) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:00:54.946Z"
+  },
+  {
+    "id": "cmqj7ncyr003vlaymv2rsfkar",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Synthèse N°2 - Math - 9ème (2022-2023) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-synth-se-n-2-math-9-me-2022-2023-gharbi-ridha-iiu17",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:00:55.396Z"
+  },
+  {
+    "id": "cmqj7nfa1007jm8mk2jilbu96",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°5 - Math - 9ème (2022-2023) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:00:58.393Z"
+  },
+  {
+    "id": "cmqj7nfig003xlaymj2gdedb6",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°5 - Math - 9ème (2022-2023) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-5-math-9-me-2022-2023-gharbi-ridha-HJ6ax",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:00:58.696Z"
+  },
+  {
+    "id": "cmqj7nhux007nm8mk64sgirb2",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°5 - Math - 9ème (2024-2025) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:01:01.737Z"
+  },
+  {
+    "id": "cmqj7ni3i003zlaymhlwdftku",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°5 - Math - 9ème (2024-2025) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-5-math-9-me-2024-2025-gharbi-ridha-IWePS",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:01:02.047Z"
+  },
+  {
+    "id": "cmqj7nka9007rm8mk861ant8a",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°6 - Math - 9ème (2022-2023) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:01:04.881Z"
+  },
+  {
+    "id": "cmqj7nkj30041laymgyyqlv3g",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°6 - Math - 9ème (2022-2023) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-6-math-9-me-2022-2023-gharbi-ridha-mAO3H",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:01:05.199Z"
+  },
+  {
+    "id": "cmqj7nnaj007vm8mkku2ksaen",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°6 - Math - 9ème (2023-2024) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:01:08.780Z"
+  },
+  {
+    "id": "cmqj7nnjh0043laymbucev4fq",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°6 - Math - 9ème (2023-2024) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-6-math-9-me-2023-2024-gharbi-ridha-WeSJu",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:01:09.102Z"
+  },
+  {
+    "id": "cmqj7npu1007zm8mkrh9siequ",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Contrôle N°6 - Math DEVOIR - 9ème (2024-2025) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:01:12.074Z"
+  },
+  {
+    "id": "cmqj7nqdf0045laymlimv9f62",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Contrôle N°6 - Math DEVOIR - 9ème (2024-2025) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-contr-le-n-6-math-devoir-9-me-2024-2025-gharbi-rid-pyixA",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:01:12.771Z"
+  },
+  {
+    "id": "cmqj7ntia0083m8mklp4enfh2",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Synthèse N°3 - Math - 9ème (2022-2023) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:01:16.834Z"
+  },
+  {
+    "id": "cmqj7nts10047laym6xwzzebw",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Synthèse N°3 - Math - 9ème (2022-2023) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-synth-se-n-3-math-9-me-2022-2023-gharbi-ridha-Kt3pb",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:01:17.186Z"
+  },
+  {
+    "id": "cmqj7nw780087m8mkxsgfb429",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Synthèse N°3 - Math - 9ème (2023-2024) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:01:20.324Z"
+  },
+  {
+    "id": "cmqj7nwht0049laym8y5ik4m9",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Synthèse N°3 - Math - 9ème (2023-2024) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-synth-se-n-3-math-9-me-2023-2024-gharbi-ridha-uya3O",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:01:20.705Z"
+  },
+  {
+    "id": "cmqj7nyst008bm8mko44883z0",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Admin a ajouté \"Devoir de Synthèse N°3 - Math DEVOIR SYNTHESE N3 - 9ème (2024-2025) - GHARBI RIDHA\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:01:23.693Z"
+  },
+  {
+    "id": "cmqj7nz29004blaymo93bv95c",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "resource_approved",
+    "title": "Ressource publiée ! ✅",
+    "message": "\"Devoir de Synthèse N°3 - Math DEVOIR SYNTHESE N3 - 9ème (2024-2025) - GHARBI RIDHA\" est maintenant en ligne.",
+    "link": "/ressources/devoir-de-synth-se-n-3-math-devoir-synthese-n3-9-me-2024-202-1mgR9",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:01:24.034Z"
+  },
+  {
+    "id": "cmqj8v8kk0006hqfu6c60l8qy",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Ridha Gharbi (gharbi.ridha@edutunisie.tn) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:35:02.565Z"
+  },
+  {
+    "id": "cmqj8wqka00078biu00jk66dh",
+    "userId": "cmqj8v8c90002hqfuq6knpy3k",
+    "type": "account_approved",
+    "title": "Compte approuvé ! 🎉",
+    "message": "Votre compte enseignant a été approuvé. Vous pouvez maintenant partager vos ressources.",
+    "link": "/enseignant",
+    "isRead": false,
+    "createdAt": "2026-06-18T08:36:12.539Z"
+  },
+  {
+    "id": "cmqj927me000wl2o4bqfuhvvb",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "ToDelete Test1781772027359 (to-delete-1781772027359@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:40:27.927Z"
+  },
+  {
+    "id": "cmqj929un00039rhjqh2sfb3d",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"E2E Approve Test 1781772030107\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:40:30.815Z"
+  },
+  {
+    "id": "cmqj92bag00079rhjztcfpp8f",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"E2E Reject Test 1781772032572\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:40:32.680Z"
+  },
+  {
+    "id": "cmqj92c2f000b9rhj81ylbq0d",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"E2E Self-Approve Test 1781772033581\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:40:33.687Z"
+  },
+  {
+    "id": "cmqj92ph9001tl2o4cn207dw0",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "DeleteFiles Test (del-files-1781772050689@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:40:51.070Z"
+  },
+  {
+    "id": "cmqj92w6v002cl2o4z07p024k",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher-1781772059399@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:40:59.767Z"
+  },
+  {
+    "id": "cmqj92wts002hl2o4gwpzjqhk",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher2-1781772060037@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:41:00.593Z"
+  },
+  {
+    "id": "cmqj92y08002ol2o4nmmk7bua",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher3-1781772061769@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:41:02.121Z"
+  },
+  {
+    "id": "cmqj931cd0003wwc9v3b9qnot",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Test Resource 1781772065929\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:41:06.445Z"
+  },
+  {
+    "id": "cmqj933fe0033l2o4zniasc7x",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Notify Test (notify-test-1781772068755@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:41:09.147Z"
+  },
+  {
+    "id": "cmqj933xo0038l2o40rbdn7e4",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "OTP Test (otp-test-1781772069428@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:41:09.804Z"
+  },
+  {
+    "id": "cmqj934jn003dl2o4t8hirwyb",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "E2E TestTeacher (e2e-teacher-1781772070262@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:41:10.596Z"
+  },
+  {
+    "id": "cmqj93d7n000kzou0rrc1dtmn",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "NotifTest Teacher (notif-test-1781772081205@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:41:21.827Z"
+  },
+  {
+    "id": "cmqj94ljg000xfs600kfr56fz",
+    "userId": "cmqi8nr7a00332n4agsbylkth",
+    "type": "new_message",
+    "title": "Nouveau message 💬",
+    "message": "Ahmed: Bien reçu, merci pour votre message !",
+    "link": "/messages/cmqj4yqw8000vmgd1prubhqcg",
+    "isRead": false,
+    "createdAt": "2026-06-18T08:42:19.276Z"
+  },
+  {
+    "id": "cmqj9590g00036imvmfunsvyt",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Test upload FormData\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:42:49.697Z"
+  },
+  {
+    "id": "cmqj959g000076imvv5si9pds",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Test upload JSON\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:42:50.256Z"
+  },
+  {
+    "id": "cmqj95a3a000b6imvq9f8npvl",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Upload with PDF\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T08:42:51.094Z"
+  },
+  {
+    "id": "cmqja15lk000615aq5022u5c9",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "ToDelete Test1781773657794 (to-delete-1781773657794@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T09:07:38.265Z"
+  },
+  {
+    "id": "cmqja182d0003rr36xipek5ag",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"E2E Approve Test 1781773660400\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T09:07:41.461Z"
+  },
+  {
+    "id": "cmqja19gg0007rr36nb9wcj3b",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"E2E Reject Test 1781773663153\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T09:07:43.264Z"
+  },
+  {
+    "id": "cmqja1a7o000brr36yxfh5vrd",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"E2E Self-Approve Test 1781773664148\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T09:07:44.244Z"
+  },
+  {
+    "id": "cmqja1nlf001315aqm2ogakou",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "DeleteFiles Test (del-files-1781773681230@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T09:08:01.587Z"
+  },
+  {
+    "id": "cmqja1u0d001m15aqtr6fp6iv",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher-1781773689601@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T09:08:09.901Z"
+  },
+  {
+    "id": "cmqja1uj4001r15aqudveio4s",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher2-1781773690145@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T09:08:10.576Z"
+  },
+  {
+    "id": "cmqja1vly001y15aqifi97h65",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher3-1781773691688@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T09:08:11.974Z"
+  },
+  {
+    "id": "cmqja1y7c000frr36j2pnftsi",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Test Resource 1781773695201\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T09:08:15.336Z"
+  },
+  {
+    "id": "cmqja207k002d15aqaesxfift",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Notify Test (notify-test-1781773697604@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T09:08:17.937Z"
+  },
+  {
+    "id": "cmqja20lh002i15aqq1d73qy3",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "OTP Test (otp-test-1781773698130@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T09:08:18.437Z"
+  },
+  {
+    "id": "cmqja2186002n15aqpy6vjrfw",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "E2E TestTeacher (e2e-teacher-1781773698959@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T09:08:19.255Z"
+  },
+  {
+    "id": "cmqja2ahu000k10gdnkc5vocx",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "NotifTest Teacher (notif-test-1781773710786@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T09:08:31.267Z"
+  },
+  {
+    "id": "cmqja3ijt000tie352aukiwzf",
+    "userId": "cmqi8nr7a00332n4agsbylkth",
+    "type": "new_message",
+    "title": "Nouveau message 💬",
+    "message": "Ahmed: Bien reçu, merci pour votre message !",
+    "link": "/messages/cmqj4yqw8000vmgd1prubhqcg",
+    "isRead": false,
+    "createdAt": "2026-06-18T09:09:28.361Z"
+  },
+  {
+    "id": "cmqja46wc0003oz4r6fqluq9f",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Test upload FormData\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T09:09:59.917Z"
+  },
+  {
+    "id": "cmqja47e70007oz4rs8umqueb",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Test upload JSON\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T09:10:00.560Z"
+  },
+  {
+    "id": "cmqja484k000boz4r20cqlg2u",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Upload with PDF\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T09:10:01.509Z"
+  },
+  {
+    "id": "cmqjbcbl30006rm997g30jm0w",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "ToDelete Test1781775858361 (to-delete-1781775858361@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T09:44:18.856Z"
+  },
+  {
+    "id": "cmqjbce8n00035vwua8sagdgd",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"E2E Approve Test 1781775861107\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T09:44:22.296Z"
+  },
+  {
+    "id": "cmqjbcfr300075vwutyr802wl",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"E2E Reject Test 1781775864148\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T09:44:24.255Z"
+  },
+  {
+    "id": "cmqjbcggh000b5vwu9gwvhw0g",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"E2E Self-Approve Test 1781775865075\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T09:44:25.169Z"
+  },
+  {
+    "id": "cmqjbcurl000a503b04gxyc9v",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "DeleteFiles Test (del-files-1781775883317@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T09:44:43.714Z"
+  },
+  {
+    "id": "cmqjbd1hf000t503bxrn1dxdv",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher-1781775892127@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T09:44:52.419Z"
+  },
+  {
+    "id": "cmqjbd1z6000y503bj7cpbq7z",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher2-1781775892603@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T09:44:53.059Z"
+  },
+  {
+    "id": "cmqjbd34j0015503bqso9w24i",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher3-1781775894250@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T09:44:54.548Z"
+  },
+  {
+    "id": "cmqjbd64o0003neh3ipkqma3p",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Test Resource 1781775897923\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T09:44:58.440Z"
+  },
+  {
+    "id": "cmqjbd88t001k503bpbr4wxy1",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Notify Test (notify-test-1781775900786@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T09:45:01.181Z"
+  },
+  {
+    "id": "cmqjbd8o3001p503bwu5kyjfj",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "OTP Test (otp-test-1781775901389@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T09:45:01.732Z"
+  },
+  {
+    "id": "cmqjbd97u001u503b7nc925g0",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "E2E TestTeacher (e2e-teacher-1781775902146@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T09:45:02.442Z"
+  },
+  {
+    "id": "cmqjbdh6d0006ymd974cdrsx4",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "NotifTest Teacher (notif-test-1781775912351@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T09:45:12.757Z"
+  },
+  {
+    "id": "cmqjbfn6m000xfmaqeyd1wpcg",
+    "userId": "cmqi8nr7a00332n4agsbylkth",
+    "type": "new_message",
+    "title": "Nouveau message 💬",
+    "message": "Ahmed: Bien reçu, merci pour votre message !",
+    "link": "/messages/cmqj4yqw8000vmgd1prubhqcg",
+    "isRead": false,
+    "createdAt": "2026-06-18T09:46:53.854Z"
+  },
+  {
+    "id": "cmqjbgbom0003e9l7vj5o4rmn",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Test upload FormData\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T09:47:25.607Z"
+  },
+  {
+    "id": "cmqjbgc4f0007e9l7uwmn4bvd",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Test upload JSON\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T09:47:26.175Z"
+  },
+  {
+    "id": "cmqjbgcr8000be9l7qnsay4vm",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Upload with PDF\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T09:47:26.997Z"
+  },
+  {
+    "id": "cmqjbxmf8000i4zujfjlt5tht",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "ToDelete Test1781776851739 (to-delete-1781776851739@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T10:00:52.677Z"
+  },
+  {
+    "id": "cmqjbxos40003hs6i1k8m473r",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"E2E Approve Test 1781776854945\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T10:00:55.732Z"
+  },
+  {
+    "id": "cmqjbxqgj0007hs6i1649hrgp",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"E2E Reject Test 1781776857803\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T10:00:57.908Z"
+  },
+  {
+    "id": "cmqjbxr66000bhs6iq6krfued",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"E2E Self-Approve Test 1781776858733\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T10:00:58.830Z"
+  },
+  {
+    "id": "cmqjby59u001f4zujlsug4uzx",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "DeleteFiles Test (del-files-1781776876771@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T10:01:17.107Z"
+  },
+  {
+    "id": "cmqjbyd69000g8c7faimj0mwu",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher-1781776887023@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T10:01:27.345Z"
+  },
+  {
+    "id": "cmqjbydkl000l8c7fnmtvkn8l",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher2-1781776887540@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T10:01:27.862Z"
+  },
+  {
+    "id": "cmqjbyerk000s8c7fqw18rxv1",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher3-1781776889093@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T10:01:29.408Z"
+  },
+  {
+    "id": "cmqjbyjjc00031336ectpigpr",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Test Resource 1781776894914\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T10:01:35.592Z"
+  },
+  {
+    "id": "cmqjbyls100082oyygef9rcbg",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Notify Test (notify-test-1781776898110@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T10:01:38.497Z"
+  },
+  {
+    "id": "cmqjbym7o000d2oyyoobtcrub",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "OTP Test (otp-test-1781776898698@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T10:01:39.060Z"
+  },
+  {
+    "id": "cmqjbymsr000i2oyybqlnanyk",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "E2E TestTeacher (e2e-teacher-1781776899496@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T10:01:39.819Z"
+  },
+  {
+    "id": "cmqjbyuz800152oyyspwho3cb",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "NotifTest Teacher (notif-test-1781776910097@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T10:01:50.421Z"
+  },
+  {
+    "id": "cmqjc1d9m002j2oyyjmbg1lvs",
+    "userId": "cmqi8nr7a00332n4agsbylkth",
+    "type": "new_message",
+    "title": "Nouveau message 💬",
+    "message": "Ahmed: Bien reçu, merci pour votre message !",
+    "link": "/messages/cmqj4yqw8000vmgd1prubhqcg",
+    "isRead": false,
+    "createdAt": "2026-06-18T10:03:47.434Z"
+  },
+  {
+    "id": "cmqjc20zp0003sbtrd3he6uft",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Test upload FormData\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T10:04:18.181Z"
+  },
+  {
+    "id": "cmqjc21g80007sbtrq1m098zy",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Test upload JSON\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T10:04:18.776Z"
+  },
+  {
+    "id": "cmqjc22ab000bsbtrx66hdz74",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Upload with PDF\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T10:04:19.859Z"
+  },
+  {
+    "id": "cmqjfolrs000abnfkfyeqonjv",
+    "userId": "cmqj8v8c90002hqfuq6knpy3k",
+    "type": "new_comment",
+    "title": "Nouveau commentaire",
+    "message": "colle zj a commenté votre ressource \"Devoir de Synthèse N°3 - Math DEVOIR SYNTHESE N3 - 9ème (2024-2025)\"",
+    "link": "/ressources/devoir-de-synth-se-n-3-math-devoir-synthese-n3-9-me-2024-202-1mgR9",
+    "isRead": false,
+    "createdAt": "2026-06-18T11:45:50.393Z"
+  },
+  {
+    "id": "cmqjfowq3000ebnfkhz1hg3es",
+    "userId": "cmqj8v8c90002hqfuq6knpy3k",
+    "type": "new_follower",
+    "title": "Nouveau follower 👋",
+    "message": "colle zj vous suit maintenant.",
+    "link": "/profil/cmqjflrwy0000bnfkadr330dx",
+    "isRead": false,
+    "createdAt": "2026-06-18T11:46:04.588Z"
+  },
+  {
+    "id": "cmqjhgqnq001lkgayvxt37hww",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "ToDelete Test1781786140281 (to-delete-1781786140281@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T12:35:42.710Z"
+  },
+  {
+    "id": "cmqjhguge001xkgayw910f5ah",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"E2E Approve Test 1781786145491\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T12:35:47.630Z"
+  },
+  {
+    "id": "cmqjhguli001zkgayd2txn7rk",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"E2E Reject Test 1781786146105\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T12:35:47.814Z"
+  },
+  {
+    "id": "cmqjhgy41002dkgay9lcjssj2",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"E2E Self-Approve Test 1781786150590\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T12:35:52.370Z"
+  },
+  {
+    "id": "cmqjhkldf003dkgayrophyzej",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "DeleteFiles Test (del-files-1781786316966@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T12:38:42.483Z"
+  },
+  {
+    "id": "cmqjhl8va003rkgayr4by6mio",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher2-1781786351175@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T12:39:12.934Z"
+  },
+  {
+    "id": "cmqjhl8vk003tkgaygpvw4imo",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher-1781786349136@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T12:39:12.944Z"
+  },
+  {
+    "id": "cmqjhlab10040kgayz7mkocm2",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher3-1781786353814@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T12:39:14.797Z"
+  },
+  {
+    "id": "cmqjhlfxs004ckgayik2h32zy",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Test Resource 1781786357826\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T12:39:22.096Z"
+  },
+  {
+    "id": "cmqjhmaf2004kkgay7r37qfg0",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "OTP Test (otp-test-1781786399677@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T12:40:01.598Z"
+  },
+  {
+    "id": "cmqjhmaj5004mkgayomlx6n34",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Notify Test (notify-test-1781786399108@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T12:40:01.745Z"
+  },
+  {
+    "id": "cmqjhmcxk004rkgayezl8ukfk",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "E2E TestTeacher (e2e-teacher-1781786402605@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T12:40:04.856Z"
+  },
+  {
+    "id": "cmqjhn6re0054kgay4hmi0wki",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "ToDelete Test1781786442546 (to-delete-1781786442546@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T12:40:43.514Z"
+  },
+  {
+    "id": "cmqjhn9kl005gkgay5psrr47z",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"E2E Reject Test 1781786445820\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T12:40:47.157Z"
+  },
+  {
+    "id": "cmqjhn9ph005ikgaystigkyfr",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"E2E Approve Test 1781786445602\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T12:40:47.334Z"
+  },
+  {
+    "id": "cmqjhngm6005ykgay4yy91zey",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"E2E Self-Approve Test 1781786450954\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T12:40:56.286Z"
+  },
+  {
+    "id": "cmqjhqk5y006wkgay0yyc498f",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "DeleteFiles Test (del-files-1781786598336@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T12:43:20.854Z"
+  },
+  {
+    "id": "cmqjhr3ij0077kgaymye6dg8b",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher-1781786624658@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T12:43:45.932Z"
+  },
+  {
+    "id": "cmqjhr4hs007ekgayuhnet0of",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher2-1781786626354@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T12:43:47.200Z"
+  },
+  {
+    "id": "cmqjhr60z007lkgayiz6bsj7c",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher3-1781786628228@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T12:43:49.187Z"
+  },
+  {
+    "id": "cmqjhrqem007vkgayvy0e09r2",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Test Resource 1781786636851\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T12:44:15.599Z"
+  },
+  {
+    "id": "cmqjhrxuf0082kgayo9aqrn4y",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Notify Test (notify-test-1781786662424@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T12:44:25.240Z"
+  },
+  {
+    "id": "cmqjhs13b0087kgayrif6pahl",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "OTP Test (otp-test-1781786665543@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T12:44:29.447Z"
+  },
+  {
+    "id": "cmqjhs88m008ckgaygbm5u9nb",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "E2E TestTeacher (e2e-teacher-1781786677472@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T12:44:38.710Z"
+  },
+  {
+    "id": "cmqjhsroq008vkgay8i14y0z0",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "NotifTest Teacher (notif-test-1781786702820@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T12:45:03.914Z"
+  },
+  {
+    "id": "cmqjhuff4009xkgay4zr59xq0",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "ToDelete Test1781786776851 (to-delete-1781786776851@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T12:46:21.329Z"
+  },
+  {
+    "id": "cmqjhvfzb00abkgaypzrsvveo",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"E2E Approve Test 1781786814723\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T12:47:08.712Z"
+  },
+  {
+    "id": "cmqjhvly400afkgayphje67n9",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"E2E Reject Test 1781786826250\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T12:47:16.444Z"
+  },
+  {
+    "id": "cmqjhxhpc00atkgaynfrjsq6z",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"E2E Self-Approve Test 1781786851646\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T12:48:44.256Z"
+  },
+  {
+    "id": "cmqji2tc800bpkgayp2zoapcv",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "DeleteFiles Test (del-files-1781787165756@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T12:52:52.616Z"
+  },
+  {
+    "id": "cmqji3gr400c3kgayolpx7dgr",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher2-1781787201883@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T12:53:22.960Z"
+  },
+  {
+    "id": "cmqji3grk00c5kgay1y8fdz9m",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher-1781787202027@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T12:53:22.976Z"
+  },
+  {
+    "id": "cmqji3i5h00cckgayq9n9zb82",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Teacher (teacher3-1781787203847@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T12:53:24.773Z"
+  },
+  {
+    "id": "cmqji3o8400cokgay0493ytcp",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Test Resource 1781787208382\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T12:53:32.644Z"
+  },
+  {
+    "id": "cmqji4jjl00cykgay4rf7aqtm",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Notify Test (notify-test-1781787250589@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T12:54:13.233Z"
+  },
+  {
+    "id": "cmqji4jp800d0kgayrcyvqond",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "OTP Test (otp-test-1781787250721@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T12:54:13.437Z"
+  },
+  {
+    "id": "cmqji4kmn00d5kgaymhbdnxx7",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "E2E TestTeacher (e2e-teacher-1781787253503@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T12:54:14.639Z"
+  },
+  {
+    "id": "cmqji5a6900dokgay33s9arpd",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "NotifTest Teacher (notif-test-1781787286353@test.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-18T12:54:47.746Z"
+  },
+  {
+    "id": "cmqkex9ks0004dfgl7pdrthfr",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "prof yandex (boutiti.mehdi@yandex.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-19T04:12:21.052Z"
+  },
+  {
+    "id": "cmqkpz9un000ivg0tbrtvvey4",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Teacher E2E (teacher.e2e.1781860909898@example.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-19T09:21:50.495Z"
+  },
+  {
+    "id": "cmqkq09aa000svg0tvelrpdbf",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Teacher UI (ui.teacher.1781860953853@example.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-19T09:22:36.418Z"
+  },
+  {
+    "id": "cmqkqbs1g000jtrok0k0g14u2",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Test Yandex (yandextest1781861493@yandex.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-19T09:31:33.941Z"
+  },
+  {
+    "id": "cmqkqkz6m0006wy86jn0emb76",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "Teacher UI (ui.teacher.1781861920360@example.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-19T09:38:43.102Z"
+  },
+  {
+    "id": "cmqme0i0o0008si0l21jkhymn",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_teacher_pending",
+    "title": "👨‍🏫 Nouveau professeur en attente",
+    "message": "prof proton (boutiti.mehdi@yandex.com) a postulé comme enseignant.",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-20T13:22:24.696Z"
+  },
+  {
+    "id": "cmqme5rrh0003vix3bx7a7h9w",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "prof a ajouté \"Devoir de Contrôle N°1 - Math - 2ème Sciences exp (2025-2026) Mr OUERGHI CHOKRI\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-20T13:26:30.606Z"
+  },
+  {
+    "id": "cmqmfa8jb00084c7y5b3ht3nm",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "edit_pending",
+    "title": "Modification en attente ✏️",
+    "message": "Ahmed Ben Ali a modifié \"E2E Approve Test 1781772030107\" — en attente d'approbation.",
+    "link": "/admin/ressources/editions",
+    "isRead": true,
+    "createdAt": "2026-06-20T13:57:58.584Z"
+  },
+  {
+    "id": "cmqmfc73s000f4c7yb46ddxfx",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "edit_pending",
+    "title": "Modification en attente ✏️",
+    "message": "Ahmed Ben Ali a modifié \"E2E Approve Test 1781786145491\" — en attente d'approbation.",
+    "link": "/admin/ressources/editions",
+    "isRead": true,
+    "createdAt": "2026-06-20T13:59:30.040Z"
+  },
+  {
+    "id": "cmqmfcgx8000i4c7y5zyr8uwj",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "edit_pending",
+    "title": "Modification en attente ✏️",
+    "message": "Ahmed Ben Ali a modifié \"E2E Approve Test 1781775861107\" — en attente d'approbation.",
+    "link": "/admin/ressources/editions",
+    "isRead": true,
+    "createdAt": "2026-06-20T13:59:42.765Z"
+  },
+  {
+    "id": "cmqmfdcb9000l4c7y6zvzzevw",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "edit_pending",
+    "title": "Modification en attente ✏️",
+    "message": "Ahmed Ben Ali a modifié \"E2E Approve Test 1781773660400\" — en attente d'approbation.",
+    "link": "/admin/ressources/editions",
+    "isRead": true,
+    "createdAt": "2026-06-20T14:00:23.445Z"
+  },
+  {
+    "id": "cmqmff9or000s4c7yejsk6e2j",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "edit_pending",
+    "title": "Modification en attente ✏️",
+    "message": "Ahmed Ben Ali a modifié \"E2E Self-Approve Test 1781776858733\" — en attente d'approbation.",
+    "link": "/admin/ressources/editions",
+    "isRead": true,
+    "createdAt": "2026-06-20T14:01:53.356Z"
+  },
+  {
+    "id": "cmqmfufbe0000355cyu5eigdo",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "edit_pending",
+    "title": "Modification en attente ✏️",
+    "message": "prof proton a modifié \"Devoir de Contrôle N°1 - Math - 2ème Sciences exp (2025-2026) Mr OUERGHI CHOKRI\" — en attente d'approbation.",
+    "link": "/admin/ressources/editions",
+    "isRead": true,
+    "createdAt": "2026-06-20T14:13:40.491Z"
+  },
+  {
+    "id": "cmqmgkiz30000phn27g0kn5j1",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "edit_pending",
+    "title": "Modification en attente ✏️",
+    "message": "prof proton a modifié \"Devoir de Contrôle N°1 - Math - 2ème Sciences exp (2025-2026) Mr OUERGHI CHOKRI\" — en attente d'approbation.",
+    "link": "/admin/ressources/editions",
+    "isRead": true,
+    "createdAt": "2026-06-20T14:33:58.287Z"
+  },
+  {
+    "id": "cmqmoi3cp00074hxmkgir2ms4",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Ahmed a ajouté \"Test publish after db fix\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-20T18:16:01.657Z"
+  },
+  {
+    "id": "cmqmomlqp000f4hxmxtaaezxo",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "prof a ajouté \"Doc1.docx\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-20T18:19:32.113Z"
+  },
+  {
+    "id": "cmqqlk1c300034boivu5trec1",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Fatma a ajouté \"Test PDF Upload Fix\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-23T12:04:38.212Z"
+  },
+  {
+    "id": "cmqqlnbxs000b4boipre8a1ag",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "Fatma a ajouté \"E2E PDF Test 1782216431692\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-23T12:07:11.920Z"
+  },
+  {
+    "id": "cmqqlraqx0003vswbllj42oid",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "mehdi Prof a ajouté \"Devoir de Contrôle N°2 - Math - 3ème Technique (2025-2026) Mr chaabane mounir\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-23T12:10:17.002Z"
+  },
+  {
+    "id": "cmqqmyah00003xd3hq77f90so",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "mehdi Prof a ajouté \"Devoir de Synthèse N°2 - Sciences physiques - 3ème Technique (2025-2026) Mr Mesrati Ali\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-23T12:43:42.853Z"
+  },
+  {
+    "id": "cmqqn95v800015t9n52nmw3d0",
+    "userId": "cmqj8v8c90002hqfuq6knpy3k",
+    "type": "resource_rejected",
+    "title": "Ressource non validée",
+    "message": "\"Test Pending\" n'a pas été validée par l'administrateur.",
+    "link": null,
+    "isRead": false,
+    "createdAt": "2026-06-23T12:52:10.101Z"
+  },
+  {
+    "id": "cmqqnjfzf00041jec7tfx0njh",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "edit_pending",
+    "title": "Modification en attente ✏️",
+    "message": "mehdi Prof yandex a modifié \"Devoir de Synthèse N°2 - Sciences physiques - 3ème Technique (2025-2026) Mr Mesrati Ali\" — en attente d'approbation.",
+    "link": "/admin/ressources/editions",
+    "isRead": true,
+    "createdAt": "2026-06-23T13:00:09.771Z"
+  },
+  {
+    "id": "cmqqnlnlf0003g1kov81sc2u4",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "mehdi Prof a ajouté \"Devoir de Contrôle N°3 - SVT devoir de controle 3 - Bac Sciences exp (2023-2024) Mme SNOUSSI LIMEM Hanen-stamped.pdf\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-23T13:01:52.947Z"
+  },
+  {
+    "id": "cmqqo758g000011j9krni57zy",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "edit_pending",
+    "title": "Modification en attente ✏️",
+    "message": "mehdi Prof yandex a modifié \"Devoir de Synthèse N°2 - Sciences physiques - 3ème Technique (2025-2026) Mr Mesrati Ali\" — en attente d'approbation.",
+    "link": "/admin/ressources/editions",
+    "isRead": true,
+    "createdAt": "2026-06-23T13:18:35.584Z"
+  },
+  {
+    "id": "cmqqoi5n300024f4yzc8w0xdr",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "edit_pending",
+    "title": "Modification re-soumise 🔄",
+    "message": "Mohamed Gharbi a re-soumis une modification sur \"TEST RESUBMIT\" — en attente d'approbation.",
+    "link": "/admin/ressources/editions",
+    "isRead": true,
+    "createdAt": "2026-06-23T13:27:09.328Z"
+  },
+  {
+    "id": "cmqqondvz00001340hhyakqru",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "edit_pending",
+    "title": "Modification en attente ✏️",
+    "message": "mehdi Prof yandex a modifié \"Devoir de Synthèse N°2 - Sciences physiques - 3ème Technique (2025-2026) Mr Mesrati Ali\" — en attente d'approbation.",
+    "link": "/admin/ressources/editions",
+    "isRead": true,
+    "createdAt": "2026-06-23T13:31:13.296Z"
+  },
+  {
+    "id": "cmqqopf740004fovmpvnepasv",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "edit_pending",
+    "title": "Modification re-soumise 🔄",
+    "message": "mehdi Prof yandex a re-soumis une modification sur \"Devoir de Synthèse N°2 - Sciences physiques - 3ème Technique (2025-2026) Mr Mesrati Ali\" — en attente d'approbation.",
+    "link": "/admin/ressources/editions",
+    "isRead": true,
+    "createdAt": "2026-06-23T13:32:48.304Z"
+  },
+  {
+    "id": "cmqqor3n70005fovm5q1chcgj",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "edit_pending",
+    "title": "Modification en attente ✏️",
+    "message": "mehdi Prof yandex a modifié \"Devoir de Contrôle N°3 - SVT devoir de controle 3 - Bac Sciences exp (2023-2024) Mme SNOUSSI LIMEM Hanen-stamped.pdf\" — en attente d'approbation.",
+    "link": "/admin/ressources/editions",
+    "isRead": true,
+    "createdAt": "2026-06-23T13:34:06.643Z"
+  },
+  {
+    "id": "cmqqosolv000afovm4xopaqwj",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "edit_pending",
+    "title": "Modification en attente ✏️",
+    "message": "mehdi Prof yandex a modifié \"Devoir de Contrôle N°3 - SVT devoir de controle 3 - Bac Sciences exp (2023-2024) Mme SNOUSSI LIMEM Hanen-stamped.pdf\" — en attente d'approbation.",
+    "link": "/admin/ressources/editions",
+    "isRead": true,
+    "createdAt": "2026-06-23T13:35:20.468Z"
+  },
+  {
+    "id": "cmqqosthh000bfovmgw3jhj3c",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "edit_pending",
+    "title": "Modification en attente ✏️",
+    "message": "mehdi Prof yandex a modifié \"Devoir de Synthèse N°2 - Sciences physiques - 3ème Technique (2025-2026) Mr Mesrati Ali\" — en attente d'approbation.",
+    "link": "/admin/ressources/editions",
+    "isRead": true,
+    "createdAt": "2026-06-23T13:35:26.789Z"
+  },
+  {
+    "id": "cmqqp2lwu00034unv428xxjz1",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "mehdi Prof a ajouté \"Devoir de Contrôle N°2 - Math Devoir de contrôle 2 - 3ème Sciences exp (2025-2026) Mr Baccar Achraf\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-23T13:43:03.535Z"
+  },
+  {
+    "id": "cmqqp9moz00094unvo441l7y7",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "new_resource_pending",
+    "title": "📄 Ressource à valider",
+    "message": "mehdi Prof a ajouté \"Série d'exercices N°3 Avec correction - Math Vecteurs Colinéaires - 1ère AS (2025-2026) Mr Arayssi Mohamed A\"",
+    "link": "/admin/approbations",
+    "isRead": true,
+    "createdAt": "2026-06-23T13:48:31.140Z"
+  },
+  {
+    "id": "cmqqpan82000g85gtkmedyu4s",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "edit_pending",
+    "title": "Modification en attente ✏️",
+    "message": "mehdi Prof yandex a modifié \"Série d'exercices N°3 Avec correction - Math Vecteurs Colinéaires - 1ère AS (2025-2026) Mr Arayssi Mohamed A\" — en attente d'approbation.",
+    "link": "/admin/ressources/editions",
+    "isRead": true,
+    "createdAt": "2026-06-23T13:49:18.482Z"
+  },
+  {
+    "id": "cmqqpewhf0000v4nyc9yxjn31",
+    "userId": "cmqi8nr6k002l2n4a2ddetnwy",
+    "type": "edit_pending",
+    "title": "Modification en attente ✏️",
+    "message": "mehdi Prof yandex a modifié \"Série d'exercices N°3 Avec correction - Math Vecteurs Colinéaires - 1ère AS (2025-2026) Mr Arayssi Mohamed\" — en attente d'approbation.",
+    "link": "/admin/ressources/editions",
+    "isRead": true,
+    "createdAt": "2026-06-23T13:52:37.107Z"
+  },
+  {
+    "id": "cmr3mmmj1000kovryja0wy7ux",
+    "userId": "cmqy1x1or001m3ajz92di3oqy",
+    "type": "new_comment",
+    "title": "Nouveau commentaire",
+    "message": "élève Test élève Test a commenté votre ressource \"فرض تأليفي عدد 1 - التربية المسرحيّة - 7 أساسي (2015-2016) الاستاذة سميرة المحمودي 1\"",
+    "link": "/ressources/-1-7-2015-2016-1--b3d0F",
+    "isRead": false,
+    "createdAt": "2026-07-02T14:55:38.893Z"
+  }
+]
