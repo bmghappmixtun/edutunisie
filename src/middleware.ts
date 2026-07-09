@@ -48,18 +48,22 @@ export function middleware(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.pathname = newPathname;
 
-    // Rewrite (no redirect — URL stays /ar/matieres in browser)
-    const response = NextResponse.rewrite(url);
+    // IMPORTANT: pass x-locale header via request headers (not response)
+    // This makes `headers()` in server components see the locale.
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set('x-locale', 'ar');
 
-    // Set locale cookie for 1 year
+    // Rewrite with the modified request headers
+    const response = NextResponse.rewrite(url, {
+      request: { headers: requestHeaders },
+    });
+
+    // Set locale cookie for 1 year (for subsequent requests without /ar prefix)
     response.cookies.set('locale', 'ar', {
       path: '/',
       maxAge: 60 * 60 * 24 * 365,
       sameSite: 'lax',
     });
-
-    // Add request header so server components know the locale
-    response.headers.set('x-locale', 'ar');
 
     return response;
   }
