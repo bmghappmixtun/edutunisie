@@ -231,7 +231,9 @@ export async function searchV2(options: SearchOptions): Promise<SearchResponse> 
   // For FTS score: use MAX across all variants (compute via subquery)
   // For TRGM score: use MAX across all variants
   // To avoid 2N+1 subqueries per row, use LATERAL with unnest
-  const variantsArrayParam = `$${match.params.length === 1 ? '1' : `ARRAY[${match.params.map((_, i) => `$${i + 1}`).join(',')}]::text[]`}::text[]`;
+  const variantsArrayParam = match.params.length === 1
+    ? `ARRAY[$1]::text[]`
+    : `ARRAY[${match.params.map((_, i) => `$${i + 1}`).join(',')}]::text[]`;
 
   const orderBy = sort === 'recent' ? 'r."publishedAt" DESC NULLS LAST' :
     sort === 'popular' ? 'r."viewsCount" DESC NULLS LAST' :
