@@ -4,7 +4,7 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { prisma } from '@/lib/prisma';
 import { itemListSchema } from '@/lib/structured-data';
-import { getLocale } from '@/lib/i18n-server';
+import { getLocale, getT } from '@/lib/i18n-server';
 import {
   BookOpen, ArrowRight, Sparkles, GraduationCap, School,
   Baby, Library, Atom, Trophy, BookMarked, ChevronRight,
@@ -115,6 +115,7 @@ const CLASSES_WITH_SECTIONS = new Set([
 ]);
 
 export default async function NiveauxPage() {
+  const t = getT();
   const levels = await prisma.level.findMany({
     orderBy: { order: 'asc' },
     include: {
@@ -172,8 +173,7 @@ export default async function NiveauxPage() {
   );
   const niveauxListJsonLd = itemListSchema({
     name: 'Tous les niveaux scolaires — Examanet',
-    description:
-      'Explorez les ressources pédagogiques gratuites par niveau et classe (Enseignement de base et Enseignement Secondaire).',
+    description: t('levels.richSnippet'),
     url: `${baseUrl}/niveaux`,
     items: allClasses.slice(0, 50),
   });
@@ -209,10 +209,10 @@ export default async function NiveauxPage() {
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 lg:py-20">
             <div className="max-w-3xl">
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 mb-4 leading-tight">
-                Tous les{' '}
+                {t('levels.hero.h1a')}
                 <span className="relative inline-block">
                   <span className="relative z-10 bg-gradient-to-r from-emerald-600 via-primary-600 to-violet-600 bg-clip-text text-transparent">
-                    niveaux scolaires
+                    {t('levels.hero.h1b')}
                   </span>
                   <svg
                     className="absolute -bottom-1 left-0 w-full"
@@ -238,10 +238,7 @@ export default async function NiveauxPage() {
               </h1>
 
               <p className="text-lg text-slate-600 leading-relaxed mb-6">
-                Notre plateforme couvre les classes <strong className="font-semibold text-slate-900">à partir de la 7ème année de base jusqu&apos;au Baccalauréat</strong>.
-                Retrouvez les ressources conformes au programme officiel du Ministère de
-                l&apos;Éducation tunisien : cours, devoirs, exercices, corrigés et sujets
-                BAC — organisés par cycle et par classe.
+                {t('levels.hero.subtitle')}
               </p>
 
               {/* Stats pills */}
@@ -250,14 +247,14 @@ export default async function NiveauxPage() {
                   <Library className="w-4 h-4 text-primary-600" />
                   <span className="text-sm">
                     <strong className="font-bold text-slate-900">{levels.length}</strong>
-                    <span className="text-slate-500"> cycles</span>
+                    <span className="text-slate-500"> {t('levels.hero.cycles')}</span>
                   </span>
                 </div>
                 <div className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl shadow-sm">
                   <School className="w-4 h-4 text-emerald-600" />
                   <span className="text-sm">
                     <strong className="font-bold text-slate-900">{totalClasses}</strong>
-                    <span className="text-slate-500"> classes</span>
+                    <span className="text-slate-500"> {t('levels.hero.classes')}</span>
                   </span>
                 </div>
                 <div className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl shadow-sm">
@@ -266,12 +263,12 @@ export default async function NiveauxPage() {
                     <strong className="font-bold text-slate-900">
                       {totalResources.toLocaleString('fr-FR')}
                     </strong>
-                    <span className="text-slate-500"> ressources</span>
+                    <span className="text-slate-500"> {t('levels.hero.ressources')}</span>
                   </span>
                 </div>
                 <div className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl shadow-sm">
                   <span className="text-amber-500 text-base">⭐</span>
-                  <span className="text-sm text-slate-600">100% gratuit</span>
+                  <span className="text-sm text-slate-600">{t('levels.hero.gratuit')}</span>
                 </div>
               </div>
             </div>

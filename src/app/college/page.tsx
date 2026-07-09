@@ -6,7 +6,7 @@ import ResourceCard from '@/components/resources/ResourceCard';
 import { prisma } from '@/lib/prisma';
 import { getUserFavorites, decorateWithFavorites } from '@/lib/resource-helpers';
 import { ChevronRight, BookOpen, GraduationCap, Sparkles, Award, Clock, Users, Target, CheckCircle, ArrowRight } from 'lucide-react';
-import { getLocale } from '@/lib/i18n-server';
+import { getLocale, getT } from '@/lib/i18n-server';
 import { itemListSchema, breadcrumbSchema } from '@/lib/structured-data';
 
 export const revalidate = 3600; // ISR: refresh every hour
@@ -47,6 +47,7 @@ const SUBJECT_INFO: Record<string, { color: string; icon: string; desc: string }
 };
 
 export default async function CollegePillar() {
+  const t = getT();
   // Top resources (by views) for carousel
   const topResources = await prisma.resource.findMany({
     where: {
@@ -141,24 +142,23 @@ export default async function CollegePillar() {
             <nav aria-label="Fil d'Ariane" className="flex items-center gap-1 text-xs text-slate-500 mb-6 flex-wrap">
               <Link href="/" className="hover:text-primary-600 transition">Accueil</Link>
               <ChevronRight className="w-3 h-3 text-slate-300" />
-              <span className="text-slate-900 font-semibold">Collège (Enseignement de base)</span>
+              <span className="text-slate-900 font-semibold">{t('college.hero.breadcrumb')}</span>
             </nav>
 
             <div className="text-center mb-12">
               <div className="inline-flex items-center gap-2 bg-white border border-primary-200 rounded-full px-4 py-2 mb-6 shadow-sm">
                 <GraduationCap className="w-4 h-4 text-primary-600" />
-                <span className="text-xs font-semibold text-slate-700">Enseignement de base — Cycle 1</span>
+                <span className="text-xs font-semibold text-slate-700">{t('college.hero.badge')}</span>
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-6">
-                Toutes les ressources du <span className="gradient-text">collège tunisien</span>
+                {t('college.hero.titleStart')}<span className="gradient-text">{t('college.hero.titleGradient')}</span>{t('college.hero.titleEnd')}
               </h1>
               <p className="text-lg lg:text-xl text-slate-600 max-w-3xl mx-auto mb-8">
-                +{totalResources.toLocaleString('fr-TN')} ressources gratuites pour la <strong>7ème, 8ème et 9ème année de base</strong> :
-                cours, devoirs, séries d'exercices, sujets d'examen et corrigés, conformes au programme officiel tunisien.
+                {t('college.hero.subtitle').replace('{count}', totalResources.toLocaleString('fr-TN'))}
               </p>
               <div className="flex flex-wrap items-center justify-center gap-4">
-                <Link href="#classes" className="btn-primary text-base">Voir par classe</Link>
-                <Link href="#matieres" className="btn-secondary text-base">Voir par matière</Link>
+                <Link href="#classes" className="btn-primary text-base">{t('college.hero.cta1')}</Link>
+                <Link href="#matieres" className="btn-secondary text-base">{t('college.hero.cta2')}</Link>
               </div>
             </div>
 
@@ -166,19 +166,19 @@ export default async function CollegePillar() {
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl mx-auto">
               <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 text-center">
                 <div className="text-3xl lg:text-4xl font-extrabold text-primary-600 mb-1">+{(totalResources / 1000).toFixed(1)}K</div>
-                <div className="text-xs text-slate-500 font-semibold uppercase">Ressources</div>
+                <div className="text-xs text-slate-500 font-semibold uppercase">{t('college.stats.ressources')}</div>
               </div>
               <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 text-center">
                 <div className="text-3xl lg:text-4xl font-extrabold text-amber-600 mb-1">{classStats.length}</div>
-                <div className="text-xs text-slate-500 font-semibold uppercase">Classes</div>
+                <div className="text-xs text-slate-500 font-semibold uppercase">{t('college.stats.classes')}</div>
               </div>
               <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 text-center">
                 <div className="text-3xl lg:text-4xl font-extrabold text-emerald-600 mb-1">{subjectStats.length}</div>
-                <div className="text-xs text-slate-500 font-semibold uppercase">Matières</div>
+                <div className="text-xs text-slate-500 font-semibold uppercase">{t('college.stats.matieres')}</div>
               </div>
               <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 text-center">
                 <div className="text-3xl lg:text-4xl font-extrabold text-purple-600 mb-1">100%</div>
-                <div className="text-xs text-slate-500 font-semibold uppercase">Gratuit</div>
+                <div className="text-xs text-slate-500 font-semibold uppercase">{t('college.stats.gratuit')}</div>
               </div>
             </div>
           </div>
@@ -190,40 +190,34 @@ export default async function CollegePillar() {
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <div>
                 <h2 className="text-3xl font-extrabold mb-6 text-slate-900">
-                  Le problème qu'on résout
+                  {t('college.problem.title')}
                 </h2>
                 <p className="text-slate-700 leading-relaxed mb-4">
-                  Trop d'élèves tunisiens accèdent à des ressources <strong>obsolètes, incomplètes ou payantes</strong>.
-                  Les photocopies des manuels scolaires, les fichiers PDF dispersés sur des forums,
-                  les vidéos YouTube non structurées : tout ça rend la révision <strong>inefficace</strong>.
+                  {t('college.problem.p1')}
                 </p>
                 <p className="text-slate-700 leading-relaxed mb-4">
-                  Examanet centralise <strong>tout ce dont tu as besoin pour réussir ton année</strong> au collège :
-                  des cours bien structurés, des devoirs types, des séries d'exercices avec corrigés,
-                  et tout ça <strong>100% gratuit</strong>.
+                  {t('college.problem.p2')}
                 </p>
                 <p className="text-slate-700 leading-relaxed">
-                  Que tu sois en <strong>7ème année de base</strong> (collège), en <strong>8ème année</strong> ou en
-                  <strong> 9ème année</strong> (dernière année avant le lycée), tu trouveras des ressources
-                  alignées sur le programme officiel du Ministère de l'Éducation tunisien.
+                  {t('college.problem.p3')}
                 </p>
               </div>
               <div className="space-y-3">
                 {[
-                  { icon: CheckCircle, title: 'Conforme au programme officiel', desc: 'Toutes les ressources suivent le programme 2026-2027' },
-                  { icon: Sparkles, title: 'Mis à jour régulièrement', desc: 'De nouvelles ressources ajoutées chaque semaine' },
-                  { icon: Users, title: 'Vérifié par des enseignants', desc: 'Tous les contenus sont validés par des profs tunisiens' },
-                  { icon: Target, title: 'Couvre toutes les matières', desc: 'Math, Physique, SVT, Français, Arabe, Anglais...' },
-                  { icon: Award, title: 'Avec corrigés', desc: 'Vérifie tes réponses avec les corrigés détaillés' },
-                  { icon: Clock, title: 'Accès 24/7', desc: 'Révise quand tu veux, sans inscription' },
+                  { icon: CheckCircle, titleKey: 'college.features.f1' },
+                  { icon: Sparkles, titleKey: 'college.features.f2' },
+                  { icon: Users, titleKey: 'college.features.f3' },
+                  { icon: Target, titleKey: 'college.features.f4' },
+                  { icon: Award, titleKey: 'college.features.f5' },
+                  { icon: Clock, titleKey: 'college.features.f6' },
                 ].map((f, i) => (
                   <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-slate-50">
                     <div className="w-10 h-10 rounded-lg bg-primary-100 text-primary-600 flex items-center justify-center flex-shrink-0">
                       <f.icon className="w-5 h-5" />
                     </div>
                     <div>
-                      <div className="font-bold text-slate-900 text-sm">{f.title}</div>
-                      <div className="text-xs text-slate-600">{f.desc}</div>
+                      <div className="font-bold text-slate-900 text-sm">{t(f.titleKey + '.title')}</div>
+                      <div className="text-xs text-slate-600">{t(f.titleKey + '.desc')}</div>
                     </div>
                   </div>
                 ))}
