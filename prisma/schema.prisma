@@ -604,3 +604,34 @@ model ContactMessage {
   @@index([createdAt])
   @@index([isRead])
 }
+
+model SearchSynonym {
+  id        String   @id @default(cuid())
+  term      String   // 'math'
+  synonyms  String[] // ['mathematiques', 'رياضيات']
+  language  String   @default("all")  // 'fr' | 'ar' | 'all'
+  category  String   @default("free") // 'subject' | 'type' | 'class' | 'free'
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String?  // userId
+
+  @@unique([term, language, category])
+  @@index([term])
+  @@index([category])
+}
+
+model SearchLog {
+  id           String   @id @default(cuid())
+  query        String
+  resultCount  Int
+  clickedId    String?
+  durationMs   Int?
+  userId       String?
+  sessionId    String?
+  userAgent    String?
+  createdAt    DateTime @default(now())
+
+  @@index([query])
+  @@index([createdAt])
+}
+
