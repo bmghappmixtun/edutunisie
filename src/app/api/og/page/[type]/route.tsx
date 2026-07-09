@@ -72,6 +72,25 @@ export async function GET(
   if (titleOverride) config.title = titleOverride;
   if (subtitleOverride) config.subtitle = subtitleOverride;
 
+  // For AR locale (?locale=ar), overlay Arabic versions
+  if (url.searchParams.get('locale') === 'ar') {
+    const AR_OVERLAY: Record<string, { title?: string; subtitle?: string; badge?: string; bgGradient?: string }> = {
+      home: { title: 'إكسامانت', subtitle: 'دروس, فروض, تمارين و إصلاحات مجانية في تونس', badge: 'المنصة التربوية #1' },
+      matieres: { title: 'جميع المواد', subtitle: 'الرياضيات, الفيزياء, علوم الحياة والأرض, الفرنسية, العربية, الإنجليزية و المزيد', badge: 'البرنامج الرسمي' },
+      niveaux: { title: 'جميع المستويات الدراسية', subtitle: 'الابتدائي, الإعدادي, الثانوي — من السنة الأولى إلى الباكالوريا', badge: 'البرنامج الوطني' },
+      professeurs: { title: 'المعلمون التونسيون', subtitle: 'أكثر من 2500 معلم معتمد يشاركون مواردهم التعليمية', badge: 'مجتمع المعلمين' },
+      concours: { title: 'مناظرة التاسعة تونس', subtitle: '257 موضوع و إصلاح PDF للتحضير للمناظرة الوطنية', badge: 'دخول الثانوي' },
+      college: { title: 'الإعدادي — السنة 7, 8, 9', subtitle: 'أكثر من 4700 مورد لدورة التعليم الأساسي', badge: 'التعليم الأساسي' },
+      recherche: { title: 'البحث المتقدم', subtitle: 'ابحث عن موارد حسب المادة, المستوى, النوع أو المعلم', badge: 'محرك بحث كامل' },
+      default: { title: 'إكسامانت', subtitle: 'دروس, فروض, تمارين و إصلاحات مجانية في تونس', badge: 'المنصة التربوية' },
+    };
+    const overlay = AR_OVERLAY[type] || AR_OVERLAY.default;
+    if (overlay.title) config.title = overlay.title;
+    if (overlay.subtitle) config.subtitle = overlay.subtitle;
+    if (overlay.badge) config.badge = overlay.badge;
+    if (overlay.bgGradient) config.bgGradient = overlay.bgGradient;
+  }
+
   return new ImageResponse(
     (
       <div

@@ -298,7 +298,25 @@
     "noResources": "Aucune matière disponible",
     "resourcesCount": "{count} ressources",
     "exploreSubject": "Explorer cette matière",
-    "allSubjects": "Toutes les matières"
+    "allSubjects": "Toutes les matières",
+    "mathematiques": "Mathématiques",
+    "physique": "Physique",
+    "svt": "Sciences de la Vie et de la Terre",
+    "francais": "Français",
+    "arabe": "Arabe",
+    "anglais": "Anglais",
+    "histoire": "Histoire",
+    "geographie": "Géographie",
+    "philosophie": "Philosophie",
+    "informatique": "Informatique",
+    "islamique": "Éducation Islamique",
+    "economique": "Sciences Économiques",
+    "gestion": "Gestion",
+    "sport": "Éducation Physique",
+    "technique": "Sciences Techniques",
+    "lettres": "Lettres",
+    "math": "Mathématiques",
+    "sciences": "Sciences"
   },
   "teacher": {
     "title": "Tous nos professeurs",
@@ -350,7 +368,13 @@
     "weekly": "Cette semaine",
     "today": "Aujourd'hui",
     "avgRating": "Note moyenne",
-    "noResources": "Vous n'avez pas encore de ressources"
+    "noResources": "Vous n'avez pas encore de ressources",
+    "certifiedTeachers": "Enseignants certifiés",
+    "topContributors": "Top contributeurs",
+    "noTeacherFound": "Aucun professeur trouvé",
+    "noResultsFor": "Aucun résultat pour \"{q}\". Essayez d'élargir vos critères.",
+    "noResultsForFilters": "Aucun résultat pour ces filtres. Essayez d'enlever certains filtres.",
+    "resetFilters": "Réinitialiser les filtres"
   },
   "admin": {
     "dashboard": "🛡️ Dashboard Administrateur",

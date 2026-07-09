@@ -298,7 +298,25 @@
     "noResources": "لا توجد مواد متاحة",
     "resourcesCount": "{count} مورد(ات)",
     "exploreSubject": "استكشف هذه المادة",
-    "allSubjects": "جميع المواد"
+    "allSubjects": "جميع المواد",
+    "mathematiques": "الرياضيات",
+    "physique": "الفيزياء",
+    "svt": "علوم الحياة والأرض",
+    "francais": "الفرنسية",
+    "arabe": "العربية",
+    "anglais": "الإنجليزية",
+    "histoire": "التاريخ",
+    "geographie": "الجغرافيا",
+    "philosophie": "الفلسفة",
+    "informatique": "المعلوماتية",
+    "islamique": "التربية الإسلامية",
+    "economique": "الاقتصاد",
+    "gestion": "التسيير",
+    "sport": "التربية البدنية",
+    "technique": "العلوم التقنية",
+    "lettres": "الآداب",
+    "math": "الرياضيات",
+    "sciences": "العلوم"
   },
   "teacher": {
     "title": "جميع أساتذتنا",
@@ -350,7 +368,13 @@
     "weekly": "هذا الأسبوع",
     "today": "اليوم",
     "avgRating": "متوسط التقييم",
-    "noResources": "ليس لديك موارد بعد"
+    "noResources": "ليس لديك موارد بعد",
+    "certifiedTeachers": "معلمون معتمدون",
+    "topContributors": "أفضل المساهمين",
+    "noTeacherFound": "لم يتم العثور على معلم",
+    "noResultsFor": "لا توجد نتائج لـ \"{q}\". حاول توسيع معاييرك.",
+    "noResultsForFilters": "لا توجد نتائج لهذه المرشحات. حاول إزالة بعضها.",
+    "resetFilters": "إعادة تعيين المرشحات"
   },
   "admin": {
     "dashboard": "🛡️ لوحة الإدارة",

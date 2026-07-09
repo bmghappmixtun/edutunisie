@@ -4,6 +4,7 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { prisma } from '@/lib/prisma';
 import { itemListSchema, breadcrumbSchema, SITE_URL } from '@/lib/structured-data';
+import { getLocale } from '@/lib/i18n-server';
 import { GraduationCap, MapPin, Star, Search, ChevronLeft, ChevronRight, Award, Sparkles, Users, CheckCircle2, X, BookOpen } from 'lucide-react';
 import type { Prisma } from '@prisma/client';
 import TeachersSearchBar from './TeachersSearchBar';
@@ -26,16 +27,26 @@ type SearchParams = {
 export async function generateMetadata({ searchParams }: { searchParams: Promise<SearchParams> }) {
   const sp = await searchParams;
   const total = await prisma.user.count({ where: { role: 'TEACHER', status: 'ACTIVE' } });
+  const locale = getLocale();
+  const isAr = locale === 'ar';
   return {
-    title: `Professeurs — ${total} enseignants certifiés`,
-    description: `Découvrez nos ${total} professeurs certifiés et leurs ressources pédagogiques gratuites : cours, devoirs, exercices pour tous les niveaux en Tunisie.`,
+    title: isAr ? `المعلمون — ${total} معلم معتمد` : `Professeurs — ${total} enseignants certifiés`,
+    description: isAr
+      ? `اكتشف ${total} معلماً معتمداً ومواردهم التعليمية المجانية: دروس، فروض، تمارين لجميع المستويات في تونس.`
+      : `Découvrez nos ${total} professeurs certifiés et leurs ressources pédagogiques gratuites : cours, devoirs, exercices pour tous les niveaux en Tunisie.`,
     alternates: { canonical: 'https://examanet.com/professeurs' },
     openGraph: {
-      title: 'Professeurs tunisiens sur Examanet',
-      description: 'Découvrez nos enseignants certifiés et leurs ressources gratuites.',
+      title: isAr ? 'المعلمون التونسيون على إكسامانت' : 'Professeurs tunisiens sur Examanet',
+      description: isAr ? 'اكتشف معلمينا المعتمدين ومواردهم المجانية.' : 'Découvrez nos enseignants certifiés et leurs ressources gratuites.',
       url: '/professeurs',
       type: 'website',
-      images: [{ url: '/api/og/page/professeurs', width: 1200, height: 630, alt: 'Examanet — Professeurs tunisiens' }],
+      locale: isAr ? 'ar_TN' : 'fr_TN',
+      images: [{
+        url: `/api/og/page/professeurs${isAr ? '?locale=ar' : ''}`,
+        width: 1200,
+        height: 630,
+        alt: isAr ? 'Examanet — المعلمون التونسيون' : 'Examanet — Professeurs tunisiens',
+      }],
     },
   };
 }
