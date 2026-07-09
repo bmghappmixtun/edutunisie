@@ -108,27 +108,37 @@ function expandQueryWithSynonyms(q: string, synonyms: { term: string; synonyms: 
 // Build OR'd SQL conditions for variants
 // Params: $1..$N = variants (same set used for FTS and TRGM)
 // ============================================================================
-function buildMatchConditions(variants: string[]): {
+function buildMatchConditions(variants: string[], originalQ: string): {
   ftsSql: string;
   trgmSql: string;
   params: any[];
+  ftsCombined: string;
 } {
   if (variants.length === 0) {
-    return { ftsSql: 'FALSE', trgmSql: 'FALSE', params: [] };
+    return { ftsSql: 'FALSE', trgmSql: 'FALSE', params: [], ftsCombined: '' };
   }
+
+  // FTS: build OR'd tsqueries using `||` operator (PostgreSQL tsquery OR)
+  // Each variant becomes its own tsquery, OR'd together
   const ftsParts: string[] = [];
-  const trgmParts: string[] = [];
-  const params: any[] = [];
+  const ftsParams: any[] = [];
   variants.forEach((v, i) => {
-    const idx = i + 1;
-    ftsParts.push(`search_vector @@ websearch_to_tsquery('french', $${idx})`);
-    trgmParts.push(`(word_similarity($${idx}, title) > 0.4 OR word_similarity($${idx}, COALESCE(description, '')) > 0.4)`);
-    params.push(v);
+    ftsParts.push(`websearch_to_tsquery('french', $${i + 1})`);
+    ftsParams.push(v);
   });
+  const ftsSql = `search_vector @@ (${ftsParts.join(' || ')})`;
+
+  // TRGM: only check the original query (fast, single similarity)
+  // Synonyms don't need TRGM because they should match via FTS
+  // The TRGM param will be at index variants.length + 1
+  const trgmIdx = variants.length + 1;
+  const trgmSql = `(word_similarity($${trgmIdx}, title) > 0.4 OR word_similarity($${trgmIdx}, COALESCE(description, '')) > 0.4)`;
+
   return {
-    ftsSql: '(' + ftsParts.join(' OR ') + ')',
-    trgmSql: '(' + trgmParts.join(' OR ') + ')',
-    params,
+    ftsSql,
+    trgmSql,
+    params: [...ftsParams, originalQ || variants[0]], // variants + trgm query
+    ftsCombined: variants.join(' · '),
   };
 }
 
@@ -175,7 +185,9 @@ export async function searchV2(options: SearchOptions): Promise<SearchResponse> 
   }
 
   // 4. Build SQL conditions
-  const match = buildMatchConditions(variants);
+  const match = buildMatchConditions(variants, q);
+  // match.params = [variant1, variant2, ..., originalQ]
+  // In SQL: $1..$N = variants (FTS), $N+1 = original q (TRGM)
   let pIdx = match.params.length + 1;
   const filterParams: any[] = [];
   const filterConditions: string[] = [];
@@ -220,38 +232,39 @@ export async function searchV2(options: SearchOptions): Promise<SearchResponse> 
   const whereExtras = filterConditions.length ? 'AND ' + filterConditions.join(' AND ') : '';
 
   // 5. Highlight uses the original q (best single match)
+  // For highlighting, we need a single tsquery. Use the original q.
   const highlightParam = q || variants[0] || '';
   const highlightIdx = pIdx;
   pIdx++;
 
   // 6. Build final params
+  // Order: $1..$N = variants, $N+1 = trgm q, $N+2+ = filters, $last = highlight
   const allParams = [...match.params, ...filterParams, highlightParam];
 
   // 7. Main search query
-  // For FTS score: use MAX across all variants (compute via subquery)
-  // For TRGM score: use MAX across all variants
-  // To avoid 2N+1 subqueries per row, use LATERAL with unnest
-  const variantsArrayParam = match.params.length === 1
-    ? `ARRAY[$1]::text[]`
-    : `ARRAY[${match.params.map((_, i) => `$${i + 1}`).join(',')}]::text[]`;
-
   const orderBy = sort === 'recent' ? 'r."publishedAt" DESC NULLS LAST' :
     sort === 'popular' ? 'r."viewsCount" DESC NULLS LAST' :
     sort === 'downloads' ? 'r."downloadsCount" DESC NULLS LAST' :
-    'm.combined_score DESC';
+    'combined_score DESC';
 
+  // $1..$N = variants, $N+1 = trgm q, $N+2+ = filters, $last = highlight
+  // The match.ftsSql uses $1..$N internally for variants
+  // The match.trgmSql uses $N+1 for the original q
+  // For highlighting, we need a single tsquery. Use the original q.
   const searchSql = `
     WITH matched AS (
       SELECT
         r.id,
-        COALESCE((SELECT MAX(ts_rank_cd(r.search_vector, websearch_to_tsquery('french', v.q)))
-                  FROM unnest(${variantsArrayParam}) AS v(q)
-                  WHERE r.search_vector @@ websearch_to_tsquery('french', v.q)), 0) AS fts_score,
-        COALESCE((SELECT MAX(LEAST(
-            word_similarity(v.q, r.title),
-            word_similarity(v.q, COALESCE(r.description, ''))
-          ))
-          FROM unnest(${variantsArrayParam}) AS v(q)), 0) AS trgm_score
+        -- FTS score: use the OR'd variants tsquery
+        CASE WHEN r.search_vector @@ (${match.ftsSql.replace(/^search_vector @@ /, '')})
+             THEN ts_rank_cd(r.search_vector, (${match.ftsSql.replace(/^search_vector @@ /, '')}))
+             ELSE 0
+        END AS fts_score,
+        -- TRGM score (original q)
+        GREATEST(
+          word_similarity($${variants.length + 1}, r.title),
+          word_similarity($${variants.length + 1}, COALESCE(r.description, ''))
+        ) AS trgm_score
       FROM "Resource" r
       WHERE r.status = 'PUBLISHED'
         AND (${match.ftsSql} OR ${match.trgmSql})
@@ -273,7 +286,7 @@ export async function searchV2(options: SearchOptions): Promise<SearchResponse> 
     LIMIT ${limit} OFFSET ${offset}
   `;
 
-  // 8. Count query
+  // 8. Count query (uses $1=ftsCombined + $2=trgm q, same as search)
   const countSql = `
     SELECT count(*)::int AS total
     FROM "Resource" r
@@ -282,13 +295,13 @@ export async function searchV2(options: SearchOptions): Promise<SearchResponse> 
       ${whereExtras}
   `;
 
-  // 9. Facets query (parallel aggregation)
+  // 9. Facets query (parallel aggregation, $1=ftsCombined, $2=trgm)
   const facetsSql = `
     WITH matched AS (
       SELECT r.type::text AS type, r."subjectId", r."classId", r."sectionId",
              r.year, r."trimester", r.language, r."hasCorrection"
       FROM "Resource" r
-      WHERE r.status = 'PUBLISHED'
+      WHERE r.status = 'PUBLIFIED'
         AND (${match.ftsSql} OR ${match.trgmSql})
       LIMIT 5000
     ),
@@ -312,6 +325,7 @@ export async function searchV2(options: SearchOptions): Promise<SearchResponse> 
   `;
 
   // 10. Execute all in parallel
+  // Params: [variant1..N, trgm q, ...filters, highlight]
   const [rawResults, countResult, facetRows] = await Promise.all([
     prisma.$queryRawUnsafe(searchSql, ...allParams) as Promise<any[]>,
     prisma.$queryRawUnsafe(countSql, ...match.params, ...filterParams) as Promise<any[]>,
