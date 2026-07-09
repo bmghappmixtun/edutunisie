@@ -6,39 +6,31 @@ import ResourceCard from '@/components/resources/ResourceCard';
 import { prisma } from '@/lib/prisma';
 import { getUserFavorites, decorateWithFavorites } from '@/lib/resource-helpers';
 import { ChevronRight, BookOpen, GraduationCap, Sparkles, Award, Clock, Users, Target, CheckCircle, ArrowRight } from 'lucide-react';
+import { getLocale } from '@/lib/i18n-server';
 import { itemListSchema, breadcrumbSchema } from '@/lib/structured-data';
 
 export const revalidate = 3600; // ISR: refresh every hour
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
 
-export const metadata: Metadata = {
-  title: 'Cours Collège Tunisie — 7ème, 8ème, 9ème année de base | Examanet',
-  description:
-    "📚 +3 700 ressources gratuites pour le collège en Tunisie : cours, devoirs, séries, exercices et corrigés pour la 7ème, 8ème et 9ème année de base. Mathématiques, Physique, SVT, Français, Arabe, Anglais et plus.",
-  keywords: [
-    'cours collège tunisie',
-    'devoirs 7ème année',
-    'exercices 8ème année',
-    '9ème année de base',
-    'enseignement de base',
-    'mathématiques collège',
-    'physique collège',
-    'SVT collège',
-    'examanet collège',
-    'ressources collège tunisie',
-  ],
-  alternates: { canonical: `${SITE_URL}/college` },
-  openGraph: {
-    title: 'Cours Collège Tunisie — 7ème, 8ème, 9ème année de base',
-    description: '+3 700 ressources gratuites pour le collège en Tunisie : cours, devoirs, séries, exercices et corrigés.',
-    url: `${SITE_URL}/college`,
-    siteName: 'Examanet',
-    locale: 'fr_TN',
-    type: 'website',
-    images: [{ url: '/api/og/page/college', width: 1200, height: 630, alt: 'Examanet — Collège' }],
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = getLocale();
+  const isAr = locale === "ar";
+  return {
+    title: isAr ? "دروس الإعدادي تونس — السنة 7، 8، 9 أساسي | إكسامانت" : "Cours Collège Tunisie — 7ème, 8ème, 9ème année de base | Examanet",
+    description: isAr ? "📚 +3700 مورد مجاني للإعدادي في تونس: دروس، فروض، سلاسل، تمارين وإصلاحات للسنة السابعة والثامنة والتاسعة أساسي." : "📚 +3 700 ressources gratuites pour le collège en Tunisie : cours, devoirs, séries, exercices et corrigés pour la 7ème, 8ème et 9ème année de base. Mathématiques, Physique, SVT, Français, Arabe, Anglais et plus.",
+    alternates: isAr ? {"canonical":"/college"} : {"canonical":"/college"},
+    openGraph: {
+      title: isAr ? "دروس الإعدادي تونس — السنة 7، 8، 9" : "Cours Collège Tunisie — 7ème, 8ème, 9ème année de base",
+      description: isAr ? "+3700 مورد مجاني للإعدادي في تونس." : "+3 700 ressources gratuites pour le collège en Tunisie : cours, devoirs, séries, exercices et corrigés.",
+      url: isAr ? "/college" : "/college",
+      siteName: isAr ? "إكسامانت" : "Examanet",
+      locale: isAr ? "ar_TN" : "fr_TN",
+      type: isAr ? "website" : "website",
+      images: isAr ? [{"url":"/api/og/page/college","width":1200,"height":630,"alt":"إكسامانت — الإعدادي"}] : [{"url":"/api/og/page/college","width":1200,"height":630,"alt":"Examanet — Collège"}],
+    },
+  };
+}
 
 const SUBJECT_INFO: Record<string, { color: string; icon: string; desc: string }> = {
   Mathématiques: { color: '#3B82F6', icon: '📐', desc: 'Algèbre, géométrie, fonctions, statistiques' },

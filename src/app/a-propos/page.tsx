@@ -1,22 +1,29 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { GraduationCap, Target, Heart, Users, BookOpen, Globe, Sparkles, Award, ArrowRight, Mail } from 'lucide-react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import { getLocale } from '@/lib/i18n-server';
 import { breadcrumbSchema, SITE_URL } from '@/lib/structured-data';
 
 export const revalidate = 3600; // 1 hour cache
 
-export const metadata = {
-  title: 'À propos — Notre mission, équipe et valeurs',
-  description: 'Découvrez Examanet, la plateforme pédagogique #1 en Tunisie. Notre mission : rendre l\'éducation gratuite et accessible à tous les élèves tunisiens.',
-  alternates: { canonical: '/a-propos' },
-  openGraph: {
-    title: 'À propos d\'Examanet',
-    description: 'Notre mission, notre équipe et nos valeurs pour l\'éducation en Tunisie.',
-    url: '/a-propos',
-    type: 'website',
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = getLocale();
+  const isAr = locale === "ar";
+  return {
+    title: isAr ? "حول إكسامانت — مهمتنا وفريقنا وقيمنا" : "À propos — Notre mission, équipe et valeurs",
+    description: isAr ? "اكتشف إكسامانت، المنصة التربوية #1 في تونس. مهمتنا: جعل التعليم مجانياً ومتاحاً لجميع التلاميذ التونسيين." : "Découvrez Examanet, la plateforme pédagogique #1 en Tunisie. Notre mission : rendre l'éducation gratuite et accessible à tous les élèves tunisiens.",
+    alternates: isAr ? {"canonical":"/a-propos"} : {"canonical":"/a-propos"},
+    openGraph: {
+      title: isAr ? "حول إكسامانت" : "À propos d'Examanet",
+      description: isAr ? "مهمتنا، فريقنا وقيمنا من أجل التعليم في تونس." : "Notre mission, notre équipe et nos valeurs pour l'éducation en Tunisie.",
+      url: isAr ? "/a-propos" : "/a-propos",
+      type: isAr ? "website" : "website",
+      locale: isAr ? "ar_TN" : "fr_TN",
+    },
+  };
+}
 
 const breadcrumbJsonLd = breadcrumbSchema([
   { name: 'Accueil', url: SITE_URL },

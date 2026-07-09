@@ -6,20 +6,34 @@ import HideOnScrollSearchBar from '@/components/search/HideOnScrollSearchBar';
 import SearchResultsV2 from '@/components/search/SearchResultsV2';
 import { searchV2, SearchResponse } from '@/lib/search-v2';
 import { prisma } from '@/lib/prisma';
+import { getLocale } from '@/lib/i18n-server';
 
 export const dynamic = 'force-dynamic';
 
 // Search results with query params should not be indexed (avoid duplicate
 // + thin content penalty). Base /recherche is indexable.
 export function generateMetadata({ searchParams }: { searchParams: any }): Metadata {
+  const locale = getLocale();
+  const isAr = locale === 'ar';
   const hasQuery = !!(searchParams?.q || searchParams?.subject || searchParams?.class);
   return {
-    title: 'Recherche | Examanet',
-    description: 'Recherchez parmi des milliers de ressources pédagogiques gratuites : cours, devoirs, exercices, sujets de bac et corrigés. Recherche tolérante aux fautes, synonymes FR/AR inclus.',
+    title: isAr ? 'بحث | إكسامانت' : 'Recherche | Examanet',
+    description: isAr
+      ? 'ابحث في آلاف الموارد التربوية المجانية: دروس، فروض، تمارين، مواضيع باك وإصلاحات. بحث متسامح مع الأخطاء، مرادفات فرنسية/عربية مشمولة.'
+      : 'Recherchez parmi des milliers de ressources pédagogiques gratuites : cours, devoirs, exercices, sujets de bac et corrigés. Recherche tolérante aux fautes, synonymes FR/AR inclus.',
     alternates: { canonical: '/recherche' },
     robots: hasQuery
       ? { index: false, follow: true }
       : { index: true, follow: true },
+    openGraph: {
+      title: isAr ? 'بحث في إكسامانت' : 'Recherche Examanet',
+      description: isAr
+        ? 'ابحث في آلاف الموارد التربوية المجانية.'
+        : 'Recherchez parmi des milliers de ressources pédagogiques gratuites.',
+      url: '/recherche',
+      type: 'website',
+      locale: isAr ? 'ar_TN' : 'fr_TN',
+    },
   };
 }
 

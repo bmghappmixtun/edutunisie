@@ -4,6 +4,7 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { prisma } from '@/lib/prisma';
 import { itemListSchema } from '@/lib/structured-data';
+import { getLocale } from '@/lib/i18n-server';
 import {
   BookOpen, ArrowRight, Sparkles, GraduationCap, School,
   Baby, Library, Atom, Trophy, BookMarked, ChevronRight,
@@ -11,18 +12,31 @@ import {
 } from 'lucide-react';
 import ClassAccordion from '@/components/niveaux/ClassAccordion';
 
-export const metadata: Metadata = {
-  title: 'Tous les niveaux scolaires — Primaire, Collège, Lycée en Tunisie',
-  description: 'Ressources gratuites par niveau scolaire tunisien : 7ème à 9ème année (Collège), 1ère à 4ème année (Lycée/Bac). Cours, exercices et corrigés pour chaque classe.',
-  alternates: { canonical: '/niveaux' },
-  openGraph: {
-    title: 'Tous les niveaux scolaires en Tunisie',
-    description: 'Du Primaire au Bac : cours, exercices et corrigés par classe et section.',
-    url: '/niveaux',
-    type: 'website',
-    images: [{ url: '/api/og/page/niveaux', width: 1200, height: 630, alt: 'Examanet — Tous les niveaux' }],
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = getLocale();
+  const isAr = locale === 'ar';
+  return {
+    title: isAr
+      ? 'جميع المستويات الدراسية — الابتدائي، الإعدادي، الثانوي في تونس'
+      : 'Tous les niveaux scolaires — Primaire, Collège, Lycée en Tunisie',
+    description: isAr
+      ? 'موارد مجانية حسب المستوى الدراسي التونسي: من السنة السابعة إلى التاسعة أساسي (الإعدادي)، ومن الأولى إلى الرابعة ثانوي (الباك). دروس، تمارين وإصلاحات لكل قسم.'
+      : 'Ressources gratuites par niveau scolaire tunisien : 7ème à 9ème année (Collège), 1ère à 4ème année (Lycée/Bac). Cours, exercices et corrigés pour chaque classe.',
+    alternates: { canonical: '/niveaux' },
+    openGraph: {
+      title: isAr
+        ? 'جميع المستويات الدراسية في تونس'
+        : 'Tous les niveaux scolaires en Tunisie',
+      description: isAr
+        ? 'من الابتدائي إلى الباك: دروس، تمارين وإصلاحات حسب القسم والشعبة.'
+        : 'Du Primaire au Bac : cours, exercices et corrigés par classe et section.',
+      url: '/niveaux',
+      type: 'website',
+      locale: isAr ? 'ar_TN' : 'fr_TN',
+      images: [{ url: '/api/og/page/niveaux', width: 1200, height: 630, alt: isAr ? 'إكسامانت — جميع المستويات' : 'Examanet — Tous les niveaux' }],
+    },
+  };
+}
 
 export const revalidate = 300; // 5 min cache
 
@@ -422,7 +436,7 @@ export default async function NiveauxPage() {
                 Votre parcours de la 7ème au Bac
               </h3>
               <p className="text-sm text-slate-500">
-                Sept années d'apprentissage — chaque étape ouvre de nouvelles matières
+                Sept années d\'apprentissage — chaque étape ouvre de nouvelles matières
               </p>
             </div>
 

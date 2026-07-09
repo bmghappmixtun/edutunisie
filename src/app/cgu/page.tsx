@@ -1,17 +1,22 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Scale, FileText, Mail, AlertCircle, CheckCircle, XCircle, Shield, BookOpen, Users, Globe, ArrowRight } from 'lucide-react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import { getLocale } from '@/lib/i18n-server';
 import { breadcrumbSchema, SITE_URL } from '@/lib/structured-data';
 
 export const revalidate = 3600; // 1 hour cache
 
-export const metadata = {
-  title: 'CGU — Conditions Générales d\'Utilisation',
-  description: 'Conditions générales d\'utilisation de la plateforme Examanet. Droits, obligations et responsabilités des utilisateurs.',
-  alternates: { canonical: '/cgu' },
-  robots: { index: true, follow: true },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = getLocale();
+  const isAr = locale === "ar";
+  return {
+    title: isAr ? "شروط الاستخدام — إكسامانت" : "CGU — Conditions Générales d'Utilisation",
+    description: isAr ? "شروط استخدام منصة إكسامانت. الحقوق والالتزامات والمسؤوليات." : "Conditions générales d'utilisation de la plateforme Examanet. Droits, obligations et responsabilités des utilisateurs.",
+    alternates: isAr ? {"canonical":"/cgu"} : {"canonical":"/cgu"},
+  };
+}
 
 const breadcrumbJsonLd = breadcrumbSchema([
   { name: 'Accueil', url: SITE_URL },
