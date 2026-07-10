@@ -270,10 +270,10 @@ export default function SearchBar({ className = '', size = 'md', initialQuery = 
                   <div className="px-3 py-1.5 flex items-center justify-between">
                     <span className="text-xs font-bold text-slate-400 uppercase tracking-wide flex items-center gap-1.5">
                       <Clock className="w-3 h-3" />
-                      Recherches récentes
+                      {t('search.recentSearches')}
                     </span>
                     <button onClick={clearRecent} className="text-xs text-slate-400 hover:text-slate-600">
-                      Effacer
+                      {t('search.clear')}
                     </button>
                   </div>
                   {recent.map((q, idx) => (

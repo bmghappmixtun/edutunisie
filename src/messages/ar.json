@@ -605,7 +605,9 @@
     "noResultsDesc": "لا توجد نتائج لـ \"{query}\". جرب كلمات أخرى.",
     "searchInResources": "الموارد",
     "searchInTeachers": "الأساتذة",
-    "searchInSubjects": "المواد"
+    "searchInSubjects": "المواد",
+    "recentSearches": "عمليات البحث الأخيرة",
+    "clear": "مسح"
   },
   "concours": {
     "meta": {

@@ -120,7 +120,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body>
         <NuqsAdapter>
-          <I18nProviderWrapper>{children}</I18nProviderWrapper>
+          <I18nProviderWrapper initialLocale={(() => { try { const h = headers(); const l = h.get('x-locale'); return l === 'ar' || l === 'fr' ? l : 'fr'; } catch { return 'fr'; } })()}>{children}</I18nProviderWrapper>
         </NuqsAdapter>
         <Toaster position="top-right" toastOptions={{
           style: { borderRadius: '12px', background: '#0F172A', color: '#fff' }

@@ -605,7 +605,9 @@
     "noResultsDesc": "Aucun résultat pour \"{query}\". Essayez d'autres mots-clés.",
     "searchInResources": "Ressources",
     "searchInTeachers": "Professeurs",
-    "searchInSubjects": "Matières"
+    "searchInSubjects": "Matières",
+    "recentSearches": "Recherches récentes",
+    "clear": "Effacer"
   },
   "concours": {
     "meta": {
