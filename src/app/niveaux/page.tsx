@@ -488,13 +488,13 @@ export default async function NiveauxPage() {
                   className="inline-flex items-center gap-2 px-6 py-3 bg-white text-slate-900 font-bold rounded-xl hover:bg-primary-50 transition shadow-lg"
                 >
                   <BookMarked className="w-4 h-4" />
-                  Toutes les ressources
+                  {t('levels.cta.cta1')}
                 </Link>
                 <Link
                   href="/referentiel-national"
                   className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 text-white font-bold rounded-xl hover:bg-white/20 transition border border-white/20"
                 >
-                  🇹🇳 Référentiel national
+                  {t('levels.cta.cta2')}
                   <ChevronRight className="w-4 h-4" />
                 </Link>
               </div>

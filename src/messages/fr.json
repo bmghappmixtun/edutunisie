@@ -294,7 +294,17 @@
       "ressources": "ressources",
       "gratuit": "100% gratuit"
     },
-    "richSnippet": "Explorez les ressources pédagogiques gratuites par niveau et classe (Enseignement de base et Enseignement Secondaire)."
+    "richSnippet": "Explorez les ressources pédagogiques gratuites par niveau et classe (Enseignement de base et Enseignement Secondaire).",
+    "parcours": {
+      "title": "Votre parcours de la 7ème au Bac",
+      "subtitle": "Sept années d'apprentissage — chaque étape ouvre de nouvelles matières"
+    },
+    "cta": {
+      "title": "Préparez votre réussite scolaire",
+      "subtitle": "Toutes les ressources sont conformes au programme officiel tunisien et sélectionnées par nos professeurs partenaires.",
+      "cta1": "Toutes les ressources",
+      "cta2": "🇹🇳 Référentiel national"
+    }
   },
   "subjects": {
     "title": "Toutes les matières",
@@ -534,7 +544,9 @@
     "contact": "Contact",
     "referentiel": "Référentiel national",
     "copyright": "© {year} Examanet. Tous droits réservés.",
-    "madeWith": "Conçu avec ❤️ en Tunisie 🇹🇳 pour les élèves tunisiens"
+    "madeWith": "Conçu avec ❤️ en Tunisie 🇹🇳 pour les élèves tunisiens",
+    "sujetsBac": "Sujets Bac",
+    "corriges": "Corrigés"
   },
   "errors": {
     "notFound": "Page introuvable",
@@ -827,7 +839,33 @@
       "followUs": "Suivez-nous"
     },
     "form": {
-      "title": "Envoyez-nous un message"
+      "title": "Envoyez-nous un message",
+      "errorRequired": "Veuillez remplir tous les champs requis",
+      "errorSend": "Erreur lors de l'envoi",
+      "errorNetwork": "Erreur réseau",
+      "success": "Message envoyé ! Nous vous répondrons rapidement.",
+      "sentTitle": "Message envoyé !",
+      "sentDesc": "Nous vous répondrons sous 24-48h ouvrés.",
+      "name": "Nom complet",
+      "namePlaceholder": "Votre nom",
+      "email": "Email",
+      "emailPlaceholder": "vous@exemple.com",
+      "subject": "Sujet",
+      "chooseSubject": "-- Choisir un sujet --",
+      "subjects": {
+        "question": "Question générale",
+        "bug": "Signaler un bug",
+        "teacher": "Devenir enseignant",
+        "partnership": "Partenariat",
+        "copyright": "Droit d'auteur (DMCA)",
+        "other": "Autre"
+      },
+      "message": "Message",
+      "messagePlaceholder": "Décrivez votre demande en détail...",
+      "rgpd": "RGPD",
+      "rgpdText": "Vos données ne sont utilisées que pour vous répondre. Voir nos {cgu}.",
+      "sending": "Envoi en cours...",
+      "send": "Envoyer le message"
     },
     "faq": {
       "q1": "Comment signaler un contenu abusif ?",
