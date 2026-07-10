@@ -116,6 +116,8 @@ const CLASSES_WITH_SECTIONS = new Set([
 
 export default async function NiveauxPage() {
   const t = getT();
+  const locale = getLocale();
+  const isAr = locale === 'ar';
   const levels = await prisma.level.findMany({
     orderBy: { order: 'asc' },
     include: {
@@ -326,7 +328,7 @@ export default async function NiveauxPage() {
                           className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${design.badge}`}
                         >
                           <LevelIcon className="w-3 h-3" />
-                          {level.nameAr || 'Cycle'}
+                          {isAr ? (level.nameAr || 'حلقة') : 'Cycle'}
                         </span>
                         <span className="text-xs text-slate-500">{design.tagline}</span>
                       </div>

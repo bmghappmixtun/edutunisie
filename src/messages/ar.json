@@ -103,7 +103,12 @@
     "openMenu": "فتح القائمة",
     "closeMenu": "إغلاق القائمة",
     "language": "اللغة",
-    "theme": "المظهر"
+    "theme": "المظهر",
+    "college": "الإعدادي",
+    "concours": "مناظرة التاسعة",
+    "myAccount": "حسابي",
+    "about": "حول",
+    "contact": "اتصال"
   },
   "home": {
     "heroTitle": "المنصة التربوية",
