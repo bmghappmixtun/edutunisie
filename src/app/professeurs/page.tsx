@@ -373,11 +373,10 @@ export default async function TeachersPage(props: { searchParams: Promise<Search
               <span>Enseignants certifiés</span>
             </div>
             <h1 className="text-4xl lg:text-5xl font-extrabold mb-3 tracking-tight">
-              Nos <span className="gradient-text">professeurs</span>
+              {tt('teacher.hero.h1A')} <span className="gradient-text">{tt('teacher.hero.h1B')}</span>
             </h1>
             <p className="text-lg text-slate-600 max-w-2xl mb-6">
-              Découvrez {totalActive} enseignants certifiés et accédez à des milliers de ressources
-              pédagogiques gratuites pour tous les niveaux.
+              {tt('teacher.hero.subtitle').replace('{count}', String(totalActive))}
             </p>
 
             {/* Mini stats */}
