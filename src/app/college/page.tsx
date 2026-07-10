@@ -140,7 +140,7 @@ export default async function CollegePillar() {
 
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative">
             <nav aria-label="Fil d'Ariane" className="flex items-center gap-1 text-xs text-slate-500 mb-6 flex-wrap">
-              <Link href="/" className="hover:text-primary-600 transition">Accueil</Link>
+              <Link href="/" className="hover:text-primary-600 transition">{t('common.home')}</Link>
               <ChevronRight className="w-3 h-3 text-slate-300" />
               <span className="text-slate-900 font-semibold">{t('college.hero.breadcrumb')}</span>
             </nav>
@@ -231,10 +231,10 @@ export default async function CollegePillar() {
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <h2 className="text-3xl lg:text-4xl font-extrabold mb-3 text-slate-900">
-                Choisis ta classe
+                {t('college.classes.title')}
               </h2>
               <p className="text-lg text-slate-600">
-                Chaque classe a son programme spécifique — clique sur la tienne pour accéder aux ressources.
+                {t('college.classes.subtitle')}
               </p>
             </div>
 
@@ -249,12 +249,12 @@ export default async function CollegePillar() {
                     <div className="text-xs font-bold uppercase tracking-wider text-primary-600 mb-2">{cls.nameAr}</div>
                     <h3 className="text-2xl font-extrabold text-slate-900 mb-3">{cls.nameFr}</h3>
                     <p className="text-slate-600 mb-4 text-sm">
-                      {cls.slug === '7eme' && "Première année du collège. Adaptation, nouvelles matières, méthodes de travail."}
-                      {cls.slug === '8eme' && "Approfondissement. Préparation progressive aux évaluations nationales."}
-                      {cls.slug === '9eme' && "Année charnière. Préparation intensive au passage vers le lycée."}
+                      {cls.slug === '7eme' && t('college.classes.desc7')}
+                      {cls.slug === '8eme' && t('college.classes.desc8')}
+                      {cls.slug === '9eme' && t('college.classes.desc9')}
                     </p>
                     <div className="flex items-center justify-between pt-4 border-t border-slate-100">
-                      <div className="font-bold text-primary-600">+{cls._count.resources.toLocaleString('fr-TN')} ressources</div>
+                      <div className="font-bold text-primary-600">+{cls._count.resources.toLocaleString('fr-TN')} {t('college.classes.ressources')}</div>
                       <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-primary-600 group-hover:translate-x-1 transition-all" />
                     </div>
                   </Link>
@@ -264,8 +264,8 @@ export default async function CollegePillar() {
                       className="mt-4 flex items-center justify-between gap-2 bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-xl px-4 py-3 hover:from-amber-100 hover:to-yellow-100 transition"
                     >
                       <div>
-                        <div className="text-xs font-bold text-amber-700 uppercase">🎯 Préparation concours</div>
-                        <div className="text-sm font-bold text-amber-900">Concours 9ème 2027</div>
+                        <div className="text-xs font-bold text-amber-700 uppercase">{t('college.classes.prepConcours')}</div>
+                        <div className="text-sm font-bold text-amber-900">{t('college.classes.concoursTitle')}</div>
                       </div>
                       <ChevronRight className="w-5 h-5 text-amber-600" />
                     </Link>
@@ -281,10 +281,10 @@ export default async function CollegePillar() {
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <h2 className="text-3xl lg:text-4xl font-extrabold mb-3 text-slate-900">
-                Toutes les matières
+                {t('college.subjects.title')}
               </h2>
               <p className="text-lg text-slate-600">
-                Du tronc commun aux options, retrouve toutes les matières du collège.
+                {t('college.subjects.subtitle')}
               </p>
             </div>
 
@@ -317,10 +317,10 @@ export default async function CollegePillar() {
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <h2 className="text-3xl lg:text-4xl font-extrabold mb-3 text-slate-900">
-                Top ressources du collège
+                {t('college.top.title')}
               </h2>
               <p className="text-lg text-slate-600">
-                Les ressources les plus consultées par les élèves et les enseignants tunisiens.
+                {t('college.top.subtitle')}
               </p>
             </div>
 
@@ -440,17 +440,17 @@ export default async function CollegePillar() {
         <section className="py-16 bg-gradient-to-br from-primary-600 to-sky-700 text-white">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-3xl lg:text-4xl font-extrabold mb-4">
-              Prêt à réussir ton année ?
+              {t('college.cta.title')}
             </h2>
             <p className="text-lg lg:text-xl text-primary-100 mb-8">
-              Rejoins les milliers d'élèves tunisiens qui utilisent Examanet pour réviser efficacement.
+              {t('college.cta.subtitle')}
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4">
               <Link href="/ressources?class=7eme&class=8eme&class=9eme" className="bg-white text-primary-700 font-bold px-7 py-3 rounded-xl hover:bg-primary-50 transition shadow-lg">
-                Explorer les ressources
+                {t('college.cta.cta1')}
               </Link>
               <Link href="/matieres" className="bg-primary-500 text-white font-bold px-7 py-3 rounded-xl hover:bg-primary-400 transition border-2 border-primary-300">
-                Toutes les matières
+                {t('college.cta.cta2')}
               </Link>
             </div>
           </div>
