@@ -15,8 +15,40 @@ import {
   Sparkles, BookOpen, Award, Clock, Target, CheckCircle,
   ArrowRight, Calendar, Trophy, FileText, Download, Star,
   GraduationCap, ChevronRight, ChevronDown, BarChart3,
-  TrendingUp, Calculator, Archive,
+  TrendingUp, Calculator, Archive, Calculator as CalculatorIcon,
+  Atom, Leaf, BookText, Globe, Brain, Landmark, Monitor,
+  BookHeart, Dumbbell, Languages, Cog, Code2, Database,
+  Briefcase, Palette, Music, Drama,
 } from 'lucide-react';
+
+const SUBJECT_ICONS: Record<string, any> = {
+  'mathematiques': CalculatorIcon,
+  'physique': Atom,
+  'svt': Leaf,
+  'francais': BookText,
+  'anglais': Globe,
+  'arabe': BookOpen,
+  'philosophie': Brain,
+  'histoire-geo': Landmark,
+  'informatique': Monitor,
+  'pensee-islamique': BookHeart,
+  'eps': Dumbbell,
+  'allemand': Languages,
+  'espagnol': Languages,
+  'italien': Languages,
+  'chinois': Languages,
+  'russe': Languages,
+  'portugais': Languages,
+  'turc': Languages,
+  'technique': Cog,
+  'algorithme': Code2,
+  'bases-donnees': Database,
+  'economie': TrendingUp,
+  'gestion': Briefcase,
+  'art': Palette,
+  'musique': Music,
+  'theatre': Drama,
+};
 
 export const revalidate = 3600; // ISR: refresh hourly
 
@@ -371,13 +403,13 @@ export default function BacPillar() {
         </section>
 
         {/* =================================================================
-            MATIÈRES
+            MATIÈRES — All 26 subjects in 4 categories
             ================================================================= */}
-        <section className="py-20 bg-gradient-to-br from-slate-50 to-primary-50">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="py-20 bg-gradient-to-br from-slate-50 via-white to-primary-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
-              <div className="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 rounded-full text-xs font-bold mb-3">
-                {isAr ? 'المواد' : 'MATIÈRES'}
+              <div className="inline-block px-4 py-1.5 bg-slate-900 text-slate-100 rounded-full text-xs font-bold mb-3 uppercase tracking-wider">
+                {isAr ? '26 مادة' : '26 MATIÈRES'}
               </div>
               <h2 className="text-3xl lg:text-5xl font-extrabold mb-3 text-slate-900">
                 {t('bac.matieres.title')}
@@ -387,18 +419,97 @@ export default function BacPillar() {
               </p>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-              {Object.entries((dict.bac?.matieres?.items as Record<string, string>) || {}).map(([key, name], i) => (
-                <Link
-                  key={i}
-                  href={`/ressources?class=4eme-secondaire&subject=${key}`}
-                  className="group bg-white rounded-2xl p-5 border border-slate-200 hover:border-primary-400 hover:shadow-lg transition-all text-center"
-                >
-                  <div className="font-bold text-slate-900 group-hover:text-primary-600 transition">
-                    {name}
-                  </div>
-                </Link>
-              ))}
+            {(() => {
+              const subjects = (dict.bac?.matieres?.list as Array<any>) || [];
+              const categories = (dict.bac?.matieres?.categories as Record<string, { fr: string; ar: string }>) || {};
+              const catOrder = ['common', 'sciences', 'langues', 'arts'];
+              const catGradient: Record<string, string> = {
+                common: 'from-slate-100/50 to-white',
+                sciences: 'from-violet-100/40 to-white',
+                langues: 'from-emerald-100/40 to-white',
+                arts: 'from-amber-100/40 to-white',
+              };
+
+              return (
+                <div className="space-y-10">
+                  {catOrder.map((catKey) => {
+                    const catSubjects = subjects.filter((s) => s.cat === catKey);
+                    if (catSubjects.length === 0) return null;
+                    const catMeta = categories[catKey] || { fr: catKey, ar: catKey };
+
+                    return (
+                      <div key={catKey} className={`rounded-3xl bg-gradient-to-br ${catGradient[catKey]} border border-slate-200/60 p-6 lg:p-8`}>
+                        {/* Category header */}
+                        <div className="flex items-center gap-3 mb-5">
+                          <div className="h-px flex-1 bg-slate-200" />
+                          <h3 className="text-sm font-extrabold text-slate-700 uppercase tracking-wider">
+                            {isAr ? catMeta.ar : catMeta.fr}
+                            <span className="text-slate-400 font-normal normal-case ml-2">
+                              ({catSubjects.length})
+                            </span>
+                          </h3>
+                          <div className="h-px flex-1 bg-slate-200" />
+                        </div>
+
+                        {/* Cards grid */}
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+                          {catSubjects.map((subj) => {
+                            const Icon = SUBJECT_ICONS[subj.slug] || BookOpen;
+                            const name = isAr ? subj.ar : subj.fr;
+                            return (
+                              <Link
+                                key={subj.slug}
+                                href={`/ressources?class=4eme-secondaire&subject=${subj.slug}`}
+                                className="group relative bg-white rounded-2xl p-4 border border-slate-200 hover:border-slate-400 hover:shadow-md transition-all overflow-hidden"
+                              >
+                                {/* Coef badge (top right) */}
+                                {subj.coef > 1 && (
+                                  <span className="absolute top-2 right-2 text-[10px] font-extrabold px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-600">
+                                    ×{subj.coef}
+                                  </span>
+                                )}
+
+                                {/* Icon */}
+                                <div className="mb-3">
+                                  <div className="w-11 h-11 rounded-xl bg-slate-100 group-hover:bg-slate-900 transition-colors flex items-center justify-center">
+                                    <Icon className="w-5 h-5 text-slate-500 group-hover:text-white transition-colors" />
+                                  </div>
+                                </div>
+
+                                {/* Name */}
+                                <div className="font-bold text-sm text-slate-900 leading-tight mb-1 line-clamp-2">
+                                  {name}
+                                </div>
+
+                                {/* Subject slug (for SEO) */}
+                                <div className="text-[10px] text-slate-400 font-mono truncate">
+                                  {subj.slug}
+                                </div>
+
+                                {/* Hover arrow */}
+                                <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <ArrowRight className="w-3.5 h-3.5 text-slate-400 rtl:rotate-180" />
+                                </div>
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })()}
+
+            {/* Bottom CTA */}
+            <div className="mt-10 text-center">
+              <Link
+                href="/matieres"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl transition shadow-md"
+              >
+                {isAr ? 'استكشف كل المواد' : 'Explorer toutes les matières'}
+                <ArrowRight className="w-4 h-4 rtl:rotate-180" />
+              </Link>
             </div>
           </div>
         </section>
