@@ -390,7 +390,12 @@
     "allResults": "Tous les enseignants — Examanet",
     "richSnippet": "Découvrez {count} enseignants tunisiens sur Examanet",
     "atSchool": "Enseignant à {school}",
-    "onExamanet": "Enseignant sur Examanet"
+    "onExamanet": "Enseignant sur Examanet",
+    "hero": {
+      "h1A": "Nos",
+      "h1B": "professeurs",
+      "subtitle": "Découvrez {count} enseignants certifiés et accédez à des milliers de ressources pédagogiques gratuites pour tous les niveaux."
+    }
   },
   "admin": {
     "dashboard": "🛡️ Dashboard Administrateur",
