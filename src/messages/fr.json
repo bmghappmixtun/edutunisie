@@ -103,7 +103,12 @@
     "openMenu": "Ouvrir le menu",
     "closeMenu": "Fermer le menu",
     "language": "Langue",
-    "theme": "Thème"
+    "theme": "Thème",
+    "college": "Collège",
+    "concours": "Concours 9ème",
+    "myAccount": "Mon compte",
+    "about": "À propos",
+    "contact": "Contact"
   },
   "home": {
     "heroTitle": "La plateforme pédagogique",

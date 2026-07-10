@@ -7,7 +7,6 @@ import MobileMenu from './MobileMenu';
 import LanguageSwitcher from './LanguageSwitcher';
 import HoverSearchBar from '@/components/search/HoverSearchBar';
 import MobileSearchTrigger from '@/components/search/MobileSearchTrigger';
-import T from '@/components/i18n/T';
 import { getT } from '@/lib/i18n-server';
 
 export const dynamic = 'force-dynamic';
@@ -49,10 +48,10 @@ export default async function Header() {
 
           {/* CENTER: Main nav (centered between logo and search) */}
           <nav className="hidden lg:flex items-center gap-7 shrink-0">
-            <Link href="/ressources" className="text-sm font-medium text-slate-700 hover:text-primary-600 transition"><T k="nav.resources" /></Link>
-            <Link href="/niveaux" className="text-sm font-medium text-slate-700 hover:text-primary-600 transition"><T k="nav.levels" /></Link>
-            <Link href="/matieres" className="text-sm font-medium text-slate-700 hover:text-primary-600 transition"><T k="nav.subjects" /></Link>
-            <Link href="/professeurs" className="text-sm font-medium text-slate-700 hover:text-primary-600 transition"><T k="nav.teachers" /></Link>
+            <Link href="/ressources" className="text-sm font-medium text-slate-700 hover:text-primary-600 transition">{t('nav.resources')}</Link>
+            <Link href="/niveaux" className="text-sm font-medium text-slate-700 hover:text-primary-600 transition">{t('nav.levels')}</Link>
+            <Link href="/matieres" className="text-sm font-medium text-slate-700 hover:text-primary-600 transition">{t('nav.subjects')}</Link>
+            <Link href="/professeurs" className="text-sm font-medium text-slate-700 hover:text-primary-600 transition">{t('nav.teachers')}</Link>
           </nav>
 
           {/* RIGHT: Search + actions */}
@@ -65,10 +64,10 @@ export default async function Header() {
             ) : (
               <>
                 <Link href="/connexion" className="hidden sm:block text-sm font-semibold text-slate-700 hover:text-primary-600 px-3 py-2 transition">
-                  <T k="nav.login" />
+                  {t('nav.login')}
                 </Link>
                 <Link href="/inscription" className="btn-primary text-sm">
-                  <T k="nav.signup" />
+                  {t('nav.signup')}
                 </Link>
               </>
             )}
