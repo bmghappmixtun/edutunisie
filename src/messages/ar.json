@@ -1295,21 +1295,262 @@
     },
     "matieres": {
       "title": "جميع مواد الباكالوريا",
-      "subtitle": "تحضير كامل حسب المادة: دروس، سلاسل تمارين، فروض نموذجية وإصلاحات مفصلة.",
+      "subtitle": "تحضير كامل حسب المادة: دروس، تمارين، فروض نموذجية وإصلاحات مفصلة.",
       "items": {
-        "math": "الرياضيات",
-        "physique": "العلوم الفيزيائية",
-        "svt": "علوم الحياة والأرض",
         "arabe": "العربية",
         "francais": "الفرنسية",
         "anglais": "الإنجليزية",
-        "philo": "الفلسفة",
-        "hg": "التاريخ والجغرافيا",
-        "eco": "الاقتصاد",
+        "philosophie": "الفلسفة",
+        "mathematiques": "الرياضيات",
+        "eps": "التربية البدنية",
+        "histoire-geo": "التاريخ والجغرافيا",
+        "informatique": "الإعلامية",
+        "pensee-islamique": "الفكر الإسلامي",
+        "physique": "العلوم الفيزيائية",
+        "svt": "علوم الحياة والأرض",
+        "technique": "التكنولوجيا",
+        "algorithme": "الخوارزميات والبرمجة",
+        "bases-donnees": "قواعد البيانات",
+        "economie": "الاقتصاد",
         "gestion": "التصرف",
-        "info": "الإعلامية",
-        "tech": "التكنولوجيا",
-        "eps": "التربية البدنية"
+        "allemand": "الألمانية",
+        "espagnol": "الإسبانية",
+        "italien": "الإيطالية",
+        "chinois": "الصينية",
+        "russe": "الروسية",
+        "portugais": "البرتغالية",
+        "turc": "التركية",
+        "art": "الفن",
+        "musique": "الموسيقى",
+        "theatre": "المسرح"
+      },
+      "list": [
+        {
+          "slug": "arabe",
+          "cat": "common",
+          "icon": "BookOpen",
+          "coef": 2,
+          "fr": "Arabe",
+          "ar": "العربية"
+        },
+        {
+          "slug": "francais",
+          "cat": "common",
+          "icon": "BookText",
+          "coef": 2,
+          "fr": "Français",
+          "ar": "الفرنسية"
+        },
+        {
+          "slug": "anglais",
+          "cat": "common",
+          "icon": "Globe",
+          "coef": 2,
+          "fr": "Anglais",
+          "ar": "الإنجليزية"
+        },
+        {
+          "slug": "philosophie",
+          "cat": "common",
+          "icon": "Brain",
+          "coef": 2,
+          "fr": "Philosophie",
+          "ar": "الفلسفة"
+        },
+        {
+          "slug": "mathematiques",
+          "cat": "common",
+          "icon": "Calculator",
+          "coef": 1,
+          "fr": "Mathématiques",
+          "ar": "الرياضيات"
+        },
+        {
+          "slug": "eps",
+          "cat": "common",
+          "icon": "Dumbbell",
+          "coef": 1,
+          "fr": "EPS",
+          "ar": "التربية البدنية"
+        },
+        {
+          "slug": "histoire-geo",
+          "cat": "common",
+          "icon": "Landmark",
+          "coef": 1,
+          "fr": "Histoire-Géographie",
+          "ar": "التاريخ والجغرافيا"
+        },
+        {
+          "slug": "informatique",
+          "cat": "common",
+          "icon": "Monitor",
+          "coef": 1,
+          "fr": "Informatique",
+          "ar": "الإعلامية"
+        },
+        {
+          "slug": "pensee-islamique",
+          "cat": "common",
+          "icon": "BookHeart",
+          "coef": 1,
+          "fr": "Pensée Islamique",
+          "ar": "الفكر الإسلامي"
+        },
+        {
+          "slug": "physique",
+          "cat": "sciences",
+          "icon": "Atom",
+          "coef": 3,
+          "fr": "Sciences Physiques",
+          "ar": "العلوم الفيزيائية"
+        },
+        {
+          "slug": "svt",
+          "cat": "sciences",
+          "icon": "Leaf",
+          "coef": 2,
+          "fr": "Sciences de la Vie et de la Terre",
+          "ar": "علوم الحياة والأرض"
+        },
+        {
+          "slug": "technique",
+          "cat": "sciences",
+          "icon": "Cog",
+          "coef": 3,
+          "fr": "Technologie",
+          "ar": "التكنولوجيا"
+        },
+        {
+          "slug": "algorithme",
+          "cat": "sciences",
+          "icon": "Code2",
+          "coef": 3,
+          "fr": "Algorithmique & Programmation",
+          "ar": "الخوارزميات والبرمجة"
+        },
+        {
+          "slug": "bases-donnees",
+          "cat": "sciences",
+          "icon": "Database",
+          "coef": 2,
+          "fr": "Bases de Données",
+          "ar": "قواعد البيانات"
+        },
+        {
+          "slug": "economie",
+          "cat": "sciences",
+          "icon": "TrendingUp",
+          "coef": 3,
+          "fr": "Économie",
+          "ar": "الاقتصاد"
+        },
+        {
+          "slug": "gestion",
+          "cat": "sciences",
+          "icon": "Briefcase",
+          "coef": 3,
+          "fr": "Gestion",
+          "ar": "التصرف"
+        },
+        {
+          "slug": "allemand",
+          "cat": "langues",
+          "icon": "Languages",
+          "coef": 1,
+          "fr": "Allemand",
+          "ar": "الألمانية"
+        },
+        {
+          "slug": "espagnol",
+          "cat": "langues",
+          "icon": "Languages",
+          "coef": 1,
+          "fr": "Espagnol",
+          "ar": "الإسبانية"
+        },
+        {
+          "slug": "italien",
+          "cat": "langues",
+          "icon": "Languages",
+          "coef": 1,
+          "fr": "Italien",
+          "ar": "الإيطالية"
+        },
+        {
+          "slug": "chinois",
+          "cat": "langues",
+          "icon": "Languages",
+          "coef": 1,
+          "fr": "Chinois",
+          "ar": "الصينية"
+        },
+        {
+          "slug": "russe",
+          "cat": "langues",
+          "icon": "Languages",
+          "coef": 1,
+          "fr": "Russe",
+          "ar": "الروسية"
+        },
+        {
+          "slug": "portugais",
+          "cat": "langues",
+          "icon": "Languages",
+          "coef": 1,
+          "fr": "Portugais",
+          "ar": "البرتغالية"
+        },
+        {
+          "slug": "turc",
+          "cat": "langues",
+          "icon": "Languages",
+          "coef": 1,
+          "fr": "Turc",
+          "ar": "التركية"
+        },
+        {
+          "slug": "art",
+          "cat": "arts",
+          "icon": "Palette",
+          "coef": 1,
+          "fr": "Art",
+          "ar": "الفن"
+        },
+        {
+          "slug": "musique",
+          "cat": "arts",
+          "icon": "Music",
+          "coef": 1,
+          "fr": "Musique",
+          "ar": "الموسيقى"
+        },
+        {
+          "slug": "theatre",
+          "cat": "arts",
+          "icon": "Drama",
+          "coef": 1,
+          "fr": "Théâtre",
+          "ar": "المسرح"
+        }
+      ],
+      "categories": {
+        "common": {
+          "fr": "Matières communes",
+          "ar": "المواد المشتركة"
+        },
+        "sciences": {
+          "fr": "Sciences de spécialité",
+          "ar": "علوم الاختصاص"
+        },
+        "langues": {
+          "fr": "Langues vivantes 2",
+          "ar": "اللغات الحية الثانية"
+        },
+        "arts": {
+          "fr": "Options artistiques",
+          "ar": "الخيارات الفنية"
+        }
       }
     },
     "methodo": {
