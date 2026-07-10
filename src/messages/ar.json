@@ -1446,7 +1446,27 @@
       "subject": "المادة",
       "year": "السنة",
       "session": "الدورة",
-      "type": "النوع"
+      "type": "النوع",
+      "heroTitle": "أرشيف الباكالوريا {highlight} التونسية",
+      "backToPillar": "العودة إلى الباكالوريا",
+      "allYears": "كل السنوات",
+      "allSections": "كل الشعب",
+      "allSubjects": "كل المواد",
+      "allSessions": "كل الدورات",
+      "allTypes": "كل الأنواع",
+      "sujetsOnly": "المواضيع فقط",
+      "corrigesOnly": "الإصلاحات فقط",
+      "searchPlaceholder": "بحث في الأرشيف (مادة، شعبة، سنة...)",
+      "countMatches": "{count} ملف يطابق البحث",
+      "countTotal": "{total} ملف في {years} سنة",
+      "reset": "إعادة التعيين",
+      "expandAll": "توسيع الكل",
+      "collapseAll": "طي الكل",
+      "noResultsTitle": "لا توجد نتائج",
+      "noResultsDesc": "حاول تعديل المرشحات للعثور على ما تبحث عنه.",
+      "noResultsBtn": "إعادة تعيين المرشحات",
+      "sujet": "موضوع",
+      "corrige": "إصلاح"
     }
   }
 }

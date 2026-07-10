@@ -1446,7 +1446,27 @@
       "subject": "Matière",
       "year": "Année",
       "session": "Session",
-      "type": "Type"
+      "type": "Type",
+      "heroTitle": "Archives du Baccalauréat {highlight} Tunisie",
+      "backToPillar": "Retour à la page Bac",
+      "allYears": "Toutes les années",
+      "allSections": "Toutes les sections",
+      "allSubjects": "Toutes les matières",
+      "allSessions": "Toutes les sessions",
+      "allTypes": "Tous les types",
+      "sujetsOnly": "Sujets seulement",
+      "corrigesOnly": "Corrigés seulement",
+      "searchPlaceholder": "Rechercher (matière, section, année...)",
+      "countMatches": "{count} fichiers trouvés",
+      "countTotal": "{total} fichiers sur {years} ans",
+      "reset": "Réinitialiser",
+      "expandAll": "Tout étendre",
+      "collapseAll": "Tout replier",
+      "noResultsTitle": "Aucun résultat",
+      "noResultsDesc": "Essayez de modifier les filtres pour trouver ce que vous cherchez.",
+      "noResultsBtn": "Réinitialiser les filtres",
+      "sujet": "Sujet",
+      "corrige": "Corrigé"
     }
   }
 }

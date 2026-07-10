@@ -260,6 +260,44 @@ export function groupBySection(): SectionGroup[] {
   });
 }
 
+// =============================================================================
+// ARCHIVE-SPECIFIC GROUPING (used by /bac/archives)
+// Structure: year → section → session → BacFile[]
+// =============================================================================
+export type ArchiveYearGroup = {
+  year: number;
+  total: number;
+  sujets: number;
+  corriges: number;
+  sections: {
+    [sectionSlug: string]: {
+      [sessionCode: string]: BacFile[]; // sessionCode: 'principale' | 'controle'
+    };
+  };
+};
+
+export function groupByYearForArchive(): ArchiveYearGroup[] {
+  const files = getBacFiles();
+  const grouped: Record<number, ArchiveYearGroup> = {};
+
+  for (const f of files) {
+    if (typeof f.year !== 'number' || !f.section || !f.session) continue;
+    if (!grouped[f.year]) {
+      grouped[f.year] = { year: f.year, total: 0, sujets: 0, corriges: 0, sections: {} };
+    }
+    const yg = grouped[f.year];
+    if (!yg.sections[f.section]) yg.sections[f.section] = {};
+    if (!yg.sections[f.section][f.session]) yg.sections[f.section][f.session] = [];
+    yg.sections[f.section][f.session].push(f);
+    yg.total++;
+    if (f.type === 'sujets') yg.sujets++;
+    if (f.type === 'corriges') yg.corriges++;
+  }
+
+  return Object.values(grouped).sort((a, b) => b.year - a.year);
+}
+
+
 export function getSectionMeta(slug: string): BacSection | null {
   return BAC_SECTIONS.find((s) => s.slug === slug) || null;
 }
