@@ -145,11 +145,11 @@ export default function HomeClient({
           </div>
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { slug: 'college', name: t('levels.college'), desc: t('levels.collegeDesc'), icon: '📖', bg: 'from-emerald-50 to-green-50', border: 'border-emerald-200' },
-              { slug: 'lycee', name: t('levels.lycee'), desc: t('levels.lyceeDesc'), icon: '📚', bg: 'from-primary-50 to-sky-50', border: 'border-primary-200' },
-              { slug: 'bac', name: t('levels.bac'), desc: t('levels.bacDesc'), icon: '🎓', bg: 'from-amber-50 to-orange-50', border: 'border-amber-200' },
+              { slug: 'college', name: t('levels.college'), desc: t('levels.collegeDesc'), icon: '📖', bg: 'from-emerald-50 to-green-50', border: 'border-emerald-200', href: '/niveaux/college' },
+              { slug: 'lycee', name: t('levels.lycee'), desc: t('levels.lyceeDesc'), icon: '📚', bg: 'from-primary-50 to-sky-50', border: 'border-primary-200', href: '/niveaux/lycee' },
+              { slug: 'bac', name: t('levels.bac'), desc: t('levels.bacDesc'), icon: '🎓', bg: 'from-amber-50 to-orange-50', border: 'border-amber-200', href: '/bac' },
             ].map(n => (
-              <Link key={n.slug} href={`/niveaux/${n.slug}`} className={`group relative bg-gradient-to-br ${n.bg} rounded-3xl p-8 border-2 ${n.border} hover:border-primary-400 transition-all card-hover overflow-hidden`}>
+              <Link key={n.slug} href={n.href} className={`group relative bg-gradient-to-br ${n.bg} rounded-3xl p-8 border-2 ${n.border} hover:border-primary-400 transition-all card-hover overflow-hidden`}>
                 <div className="absolute -top-10 -right-10 w-40 h-40 bg-primary-200 rounded-full opacity-30 group-hover:scale-150 transition-transform duration-500" />
                 <div className="relative z-10">
                   <div className="text-6xl mb-4">{n.icon}</div>
