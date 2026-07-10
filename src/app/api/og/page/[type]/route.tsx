@@ -39,6 +39,12 @@ const PAGE_CONFIG: Record<string, {
     badge: 'Entrée au Lycée',
     bgGradient: 'linear-gradient(135deg, #7C2D12 0%, #9A3412 50%, #C2410C 100%)',
   },
+  bac: {
+    title: 'Bac Tunisie 2025',
+    subtitle: 'Sujets, corrigés & méthodologie pour les 7 sections',
+    badge: '🎓 Baccalauréat',
+    bgGradient: 'linear-gradient(135deg, #4C1D95 0%, #7E22CE 50%, #F59E0B 100%)',
+  },
   college: {
     title: 'Collège — 7ème, 8ème, 9ème année',
     subtitle: '4 700+ ressources pour le cycle de base',
