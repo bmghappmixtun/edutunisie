@@ -29,6 +29,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     arAlternates(`${baseUrl}/college`),
     arAlternates(`${baseUrl}/concours-9eme-tunisie`),
     arAlternates(`${baseUrl}/concours-9eme-tunisie/sujets-passes`),
+    arAlternates(`${baseUrl}/bac`),
     arAlternates(`${baseUrl}/professeurs`),
     arAlternates(`${baseUrl}/faq`),
     arAlternates(`${baseUrl}/recherche`),
@@ -36,7 +37,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ].map((entry, i) => ({
     ...entry,
     lastModified: i === 0 ? new Date() : undefined,
-    changeFrequency: ['daily', 'monthly', 'monthly', 'yearly', 'weekly', 'weekly', 'daily', 'daily', 'daily', 'weekly', 'monthly', 'monthly', 'monthly'][i] as any,
+    changeFrequency: ['daily', 'monthly', 'monthly', 'yearly', 'weekly', 'weekly', 'daily', 'daily', 'daily', 'weekly', 'monthly', 'monthly', 'monthly', 'daily'][i] as any,
     priority: [1.0, 0.5, 0.5, 0.3, 0.8, 0.8, 0.9, 0.9, 0.8, 0.7, 0.6, 0.5, 0.5][i],
   }));
   
