@@ -47,7 +47,7 @@ export default function FAQPage() {
         <div className="bg-gradient-to-br from-primary-50 to-sky-50 py-12">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <nav aria-label="Fil d'Ariane" className="flex items-center gap-2 text-sm text-slate-500 mb-4">
-              <Link href="/" className="hover:text-primary-600">Accueil</Link>
+              <Link href="/" className="hover:text-primary-600">{t('common.home')}</Link>
               <span className="text-slate-300">›</span>
               <span className="text-slate-900 font-semibold">FAQ</span>
             </nav>

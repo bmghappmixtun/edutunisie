@@ -79,7 +79,8 @@
     "minutes": "minutes",
     "hours": "heures",
     "days": "jours",
-    "ago": "il y a"
+    "ago": "il y a",
+    "home": "Accueil"
   },
   "nav": {
     "home": "Accueil",
@@ -1147,6 +1148,30 @@
         "title": "Accès 24/7",
         "desc": "Révise quand tu veux, sans inscription"
       }
+    },
+    "classes": {
+      "title": "Choisis ta classe",
+      "subtitle": "Chaque classe a son programme spécifique — clique sur la tienne pour accéder aux ressources.",
+      "desc7": "Première année du collège. Adaptation, nouvelles matières, méthodes de travail.",
+      "desc8": "Approfondissement. Préparation progressive aux évaluations nationales.",
+      "desc9": "Année charnière. Préparation intensive au passage vers le lycée.",
+      "ressources": "ressources",
+      "prepConcours": "🎯 Préparation concours",
+      "concoursTitle": "Concours 9ème 2027"
+    },
+    "subjects": {
+      "title": "Toutes les matières",
+      "subtitle": "Du tronc commun aux options, retrouve toutes les matières du collège."
+    },
+    "top": {
+      "title": "Top ressources du collège",
+      "subtitle": "Les ressources les plus consultées par les élèves et les enseignants tunisiens."
+    },
+    "cta": {
+      "title": "Prêt à réussir ton année ?",
+      "subtitle": "Rejoins les milliers d'élèves tunisiens qui utilisent Examanet pour réviser efficacement.",
+      "cta1": "Explorer les ressources",
+      "cta2": "Toutes les matières"
     }
   }
 }
