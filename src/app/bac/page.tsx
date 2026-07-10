@@ -388,7 +388,7 @@ export default function BacPillar() {
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-              {Object.entries(t('bac.matieres.items') as unknown as Record<string, string>).map(([key, name], i) => (
+              {Object.entries((dict.bac?.matieres?.items as Record<string, string>) || {}).map(([key, name], i) => (
                 <Link
                   key={i}
                   href={`/ressources?class=4eme-secondaire&subject=${key}`}
