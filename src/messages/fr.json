@@ -865,7 +865,7 @@
       "message": "Message",
       "messagePlaceholder": "Décrivez votre demande en détail...",
       "rgpd": "RGPD",
-      "rgpdText": "Vos données ne sont utilisées que pour vous répondre. Voir nos {cgu}.",
+      "rgpdText": "Vos données ne sont utilisées que pour vous répondre. Voir nos",
       "sending": "Envoi en cours...",
       "send": "Envoyer le message"
     },
