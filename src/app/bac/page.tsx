@@ -10,11 +10,12 @@ import {
   SITE_URL,
 } from '@/lib/structured-data';
 import { getLocale, getT, getDict } from '@/lib/i18n-server';
+import { getBacFiles, getBacStats, getSectionMeta, getSubjectMeta } from '@/lib/bac-data';
 import {
   Sparkles, BookOpen, Award, Clock, Target, CheckCircle,
   ArrowRight, Calendar, Trophy, FileText, Download, Star,
   GraduationCap, ChevronRight, ChevronDown, BarChart3,
-  TrendingUp, Calculator,
+  TrendingUp, Calculator, Archive,
 } from 'lucide-react';
 
 export const revalidate = 3600; // ISR: refresh hourly
@@ -32,8 +33,8 @@ export async function generateMetadata(): Promise<Metadata> {
     ? 'باكالوريا تونس 2025 — مواضيع، إصلاحات ومراجعة كاملة | إكسامانت'
     : 'Bac Tunisie 2025 — Sujets, Corrigés et Révision complète | Examanet';
   const description = isAr
-    ? '🎓 كل ما تحتاجه للنجاح في الباكالوريا التونسية 2025: مواضيع الدورة الرئيسية والمراقبة منذ 1994، إصلاحات رسمية، منهجية مراجعة + 7 شعب (رياضيات، علوم تجريبية، تقنية، إعلامية، اقتصاد وتصرف، آداب، رياضة). 100٪ مجاني.'
-    : '🎓 Tout pour réussir le Baccalauréat tunisien 2025 : sujets des sessions principale et de contrôle depuis 1994, corrigés officiels, méthodologie de révision + 7 sections (Math, Sciences Exp, Technique, Informatique, Éco-Gestion, Lettres, Sport). 100% gratuit.';
+    ? '🎓 كل ما تحتاجه للنجاح في الباكالوريا التونسية 2025: مواضيع الدورة الرئيسية والمراقبة منذ 2010، إصلاحات رسمية، منهجية مراجعة + 7 شعب (رياضيات، علوم تجريبية، تقنية، إعلامية، اقتصاد وتصرف، آداب، رياضة). 100٪ مجاني.'
+    : '🎓 Tout pour réussir le Baccalauréat tunisien 2025 : sujets des sessions principale et de contrôle depuis 2010, corrigés officiels, méthodologie de révision + 7 sections (Math, Sciences Exp, Technique, Informatique, Éco-Gestion, Lettres, Sport). 100% gratuit.';
 
   return {
     title,
@@ -163,6 +164,13 @@ export default function BacPillar() {
     dateModified: new Date().toISOString(),
   });
 
+  // Archives preview - get latest year files for preview
+  const allFiles = getBacFiles();
+  const latestYear = Math.max(...allFiles.map(f => f.year || 0));
+  const previewFiles = allFiles
+    .filter(f => f.year === latestYear && f.session === 'principale' && f.type === 'sujets')
+    .slice(0, 8);
+
   // FAQ schema
   const dict = getDict();
   const faqItems = (dict.bac?.faq?.items as Array<{ q: string; a: string }>) || [];
@@ -261,6 +269,10 @@ export default function BacPillar() {
                   <FileText className="w-4 h-4" />
                   {t('bac.hero.ctaPrimary')}
                 </Link>
+                <Link href="/bac/archives" className="inline-flex items-center gap-2 px-7 py-3.5 bg-gradient-to-r from-violet-600 to-purple-700 text-white font-bold rounded-xl hover:from-violet-700 hover:to-purple-800 transition shadow-md">
+                  <Archive className="w-4 h-4" />
+                  {t('bac.hero.ctaArchives') || 'Archives 2010-2025'}
+                </Link>
                 <Link href="/outils/moyenne-bac" className="inline-flex items-center gap-2 px-7 py-3.5 bg-white border-2 border-violet-300 text-violet-700 font-bold rounded-xl hover:bg-violet-50 transition shadow-sm">
                   <Calculator className="w-4 h-4" />
                   {t('bac.hero.ctaSecondary')}
@@ -275,8 +287,8 @@ export default function BacPillar() {
             {/* Stats */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl mx-auto">
               {[
-                { value: '1994', label: t('bac.stats.subjects'), icon: FileText, color: 'bg-violet-100 text-violet-600' },
-                { value: '700+', label: t('bac.stats.corriges'), icon: CheckCircle, color: 'bg-emerald-100 text-emerald-600' },
+                { value: '2010', label: t('bac.stats.subjects'), icon: FileText, color: 'bg-violet-100 text-violet-600' },
+                { value: '15+', label: t('bac.stats.years'), icon: CheckCircle, color: 'bg-emerald-100 text-emerald-600' },
                 { value: '7', label: t('bac.stats.sections'), icon: Trophy, color: 'bg-amber-100 text-amber-600' },
                 { value: '13', label: t('bac.stats.matieres'), icon: BookOpen, color: 'bg-rose-100 text-rose-600' },
               ].map((s, i) => (
@@ -553,6 +565,73 @@ export default function BacPillar() {
             </div>
           </div>
         </section>
+
+        {/* =================================================================
+            ARCHIVES PREVIEW - Latest year files
+            ================================================================= */}
+        {previewFiles.length > 0 && (
+        <section className="py-16 bg-gradient-to-br from-slate-50 via-white to-violet-50">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-10">
+              <div className="inline-flex items-center gap-2 bg-white border-2 border-violet-200 rounded-full px-4 py-1.5 mb-3 shadow-sm">
+                <Archive className="w-4 h-4 text-violet-600" />
+                <span className="text-xs font-bold text-violet-700 uppercase">
+                  {isAr ? `الأرشيف ${latestYear}` : `ARCHIVES BAC ${latestYear}`}
+                </span>
+              </div>
+              <h2 className="text-3xl lg:text-4xl font-extrabold mb-3 text-slate-900">
+                {isAr ? `أحدث مواضيع الباكالوريا ${latestYear}` : `Derniers sujets du Bac ${latestYear}`}
+              </h2>
+              <p className="text-slate-600 max-w-2xl mx-auto">
+                {isAr
+                  ? `تحميل مباشر لمواضيع الدورة الرئيسية ${latestYear} - 7 شعب كاملة`
+                  : `Téléchargement direct des sujets de la session principale ${latestYear} - 7 sections complètes`}
+              </p>
+            </div>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 max-w-5xl mx-auto mb-8">
+              {previewFiles.map((f, i) => {
+                const sectionMeta = getSectionMeta(f.section || '');
+                const subjectMeta = getSubjectMeta(f.subject || '');
+                return (
+                  <a
+                    key={i}
+                    href={f.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group bg-white rounded-2xl p-4 border-2 border-slate-100 hover:border-violet-300 hover:shadow-lg transition-all"
+                  >
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="text-2xl">{sectionMeta?.icon || '📄'}</div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-xs font-bold text-slate-900 truncate">
+                          {subjectMeta?.nameFr || f.subject}
+                        </div>
+                        <div className="text-xs text-slate-500">
+                          {sectionMeta?.nameFr || f.section}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-slate-400">{latestYear}</span>
+                      <Download className="w-4 h-4 text-violet-500 group-hover:text-violet-700" />
+                    </div>
+                  </a>
+                );
+              })}
+            </div>
+            <div className="text-center">
+              <Link
+                href="/bac/archives"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-violet-600 to-purple-700 text-white font-bold px-6 py-3 rounded-xl hover:from-violet-700 hover:to-purple-800 transition shadow-md"
+              >
+                <Archive className="w-4 h-4" />
+                {isAr ? 'استكشف كل الأرشيف (2634 ملف)' : 'Explorer toutes les archives (2634 fichiers)'}
+                <ArrowRight className="w-4 h-4 rtl:rotate-180" />
+              </Link>
+            </div>
+          </div>
+        </section>
+        )}
 
         {/* =================================================================
             CTA FINAL

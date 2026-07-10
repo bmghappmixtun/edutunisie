@@ -30,6 +30,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     arAlternates(`${baseUrl}/concours-9eme-tunisie`),
     arAlternates(`${baseUrl}/concours-9eme-tunisie/sujets-passes`),
     arAlternates(`${baseUrl}/bac`),
+    arAlternates(`${baseUrl}/bac/archives`),
     arAlternates(`${baseUrl}/professeurs`),
     arAlternates(`${baseUrl}/faq`),
     arAlternates(`${baseUrl}/recherche`),
