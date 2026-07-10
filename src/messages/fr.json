@@ -304,7 +304,14 @@
       "subtitle": "Toutes les ressources sont conformes au programme officiel tunisien et sélectionnées par nos professeurs partenaires.",
       "cta1": "Toutes les ressources",
       "cta2": "🇹🇳 Référentiel national"
-    }
+    },
+    "college": "Collège",
+    "collegeDesc": "7ème → 9ème année de base",
+    "lycee": "Lycée",
+    "lyceeDesc": "1ère → 2ème année secondaire",
+    "bac": "Bac",
+    "bacDesc": "3ème → 4ème année (Bac) — 7 sections",
+    "exploreLevel": "Explorer ce niveau"
   },
   "subjects": {
     "title": "Toutes les matières",
