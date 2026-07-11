@@ -14,6 +14,13 @@ export default async function TeacherDashboard(props: { params: Promise<any>; se
   if (!user) redirect('/connexion');
   const showWelcome = sp?.welcome === '1';
 
+  // Check if teacher needs to submit verification files
+  const fullUser = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: { status: true, verificationFilesRequestedAt: true, verificationFilesCount: true, verificationFilesNote: true }
+  });
+  const needsVerification = fullUser?.status === 'PENDING_FILE_VERIFICATION';
+
   const [totalResources, published, pending, rejected, recentResources] = await Promise.all([
     prisma.resource.count({ where: { teacherId: user.id } }),
     prisma.resource.count({ where: { teacherId: user.id, status: 'PUBLISHED' } }),
@@ -43,6 +50,53 @@ export default async function TeacherDashboard(props: { params: Promise<any>; se
 
   return (
     <div>
+      {/* PENDING_FILE_VERIFICATION banner */}
+      {needsVerification && (
+        <div className="mb-6 bg-gradient-to-br from-violet-50 via-white to-amber-50 border-2 border-violet-300 rounded-2xl p-5 lg:p-6">
+          <div className="flex items-start gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 text-white flex items-center justify-center text-2xl flex-shrink-0 shadow-md">
+              📁
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1 flex-wrap">
+                <h2 className="font-extrabold text-lg text-slate-900">
+                  Action requise : envoyez 5 fichiers de vérification
+                </h2>
+                <span className="inline-flex items-center text-[10px] font-bold px-2 py-0.5 rounded-full bg-violet-100 text-violet-700 border border-violet-200">
+                  En attente
+                </span>
+              </div>
+              <p className="text-sm text-slate-700 leading-relaxed mb-3">
+                Pour finaliser la vérification de votre compte enseignant et activer votre profil, merci de nous envoyer <strong>5 fichiers Word (.docx) ou PDF</strong> parmi vos productions (cours, séries, devoirs, corrigés...). Chaque fichier doit contenir <strong>votre nom et prénom</strong> ({user.firstName} {user.lastName}) en pied de page.
+              </p>
+              {fullUser?.verificationFilesNote && (
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-3 text-sm text-amber-900">
+                  <strong>📝 Message de l'équipe :</strong>
+                  <p className="whitespace-pre-line mt-1">{fullUser.verificationFilesNote}</p>
+                </div>
+              )}
+              <div className="flex flex-wrap gap-2">
+                <a
+                  href="mailto:contact@examanet.com?subject=Envoi%20de%20mes%20fichiers%20de%20v%C3%A9rification%20%E2%80%94%20Examanet"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-violet-500 to-purple-600 text-white text-sm font-bold rounded-xl hover:from-violet-600 hover:to-purple-700 transition shadow-md"
+                >
+                  📤 Soumettre mes fichiers par email
+                </a>
+                <Link
+                  href="/contact"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-white border-2 border-violet-200 text-violet-700 text-sm font-bold rounded-xl hover:bg-violet-50 transition"
+                >
+                  💬 Contacter l'équipe
+                </Link>
+              </div>
+              <p className="text-xs text-slate-500 mt-3">
+                ⏱️ Vous avez 7 jours pour envoyer vos fichiers. Passé ce délai, votre demande sera classée sans suite.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showWelcome && (
         <div className="mb-6 bg-gradient-to-r from-sky-50 to-cyan-50 border-2 border-sky-200 rounded-2xl p-5 flex items-start gap-4">
           <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-500 to-cyan-600 text-white flex items-center justify-center text-2xl flex-shrink-0">🎉</div>
