@@ -15,6 +15,19 @@ export async function POST(req: NextRequest) {
   if (user.role !== 'TEACHER' && user.role !== 'ADMIN') {
     return NextResponse.json({ error: 'Réservé aux enseignants' }, { status: 403 });
   }
+  // Block teachers who haven't completed file verification
+  if (user.role === 'TEACHER' && user.status === 'PENDING_FILE_VERIFICATION') {
+    return NextResponse.json({
+      error: 'Vous devez d\'abord soumettre vos 5 fichiers de vérification avant de pouvoir publier des ressources. Rendez-vous sur votre tableau de bord.',
+      code: 'PENDING_FILE_VERIFICATION',
+    }, { status: 403 });
+  }
+  if (user.role === 'TEACHER' && user.status === 'PENDING_APPROVAL') {
+    return NextResponse.json({
+      error: 'Votre compte est en attente d\'approbation par l\'administrateur.',
+      code: 'PENDING_APPROVAL',
+    }, { status: 403 });
+  }
 
   try {
     // Parse form data (multipart/form-data) OR JSON body
