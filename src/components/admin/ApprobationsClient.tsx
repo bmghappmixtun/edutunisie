@@ -1,6 +1,7 @@
 'use client';
 import { useState, useMemo } from 'react';
 import { CheckCircle, XCircle, Loader2, CheckSquare, Square, Users, FileText, Filter, FolderOpen, Mail, Shield } from 'lucide-react';
+import TeacherVerificationFilesViewer from '@/components/admin/TeacherVerificationFilesViewer';
 import toast from 'react-hot-toast';
 
 type Teacher = {
@@ -383,13 +384,18 @@ export default function ApprobationsClient({
                             {t.teachingSubjects && <div className="bg-slate-50 px-2 py-1 rounded col-span-2 sm:col-span-3">📚 {t.teachingSubjects}</div>}
                             <div className="text-slate-400 px-2">⏱️ {formatDate(t.createdAt)}</div>
                             {t.verificationFilesRequestedAt && (
-                              <div className="text-violet-600 px-2 col-span-2 sm:col-span-3">
-                                📁 Demande envoyée {formatDate(t.verificationFilesRequestedAt)}
-                                {t.verificationFilesCount ? ` • ${t.verificationFilesCount} fichier(s) reçu(s)` : ' • en attente'}
+                              <div className="text-violet-600 px-2 col-span-2 sm:col-span-3 flex items-center gap-2 flex-wrap">
+                                <span>
+                                  📁 Demande envoyée {formatDate(t.verificationFilesRequestedAt)}
+                                  {t.verificationFilesCount ? ` • ${t.verificationFilesCount} fichier(s) reçu(s)` : ' • en attente'}
+                                </span>
                                 {t.verificationFilesReceivedAt && (
-                                  <span className="ml-2 inline-flex items-center text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200">
+                                  <span className="inline-flex items-center text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200">
                                     ✓ Complet
                                   </span>
+                                )}
+                                {t.verificationFilesCount && t.verificationFilesCount > 0 && (
+                                  <TeacherVerificationFilesViewer teacherId={t.id} />
                                 )}
                               </div>
                             )}
