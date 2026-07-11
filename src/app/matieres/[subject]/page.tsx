@@ -253,7 +253,7 @@ export default async function SubjectPage({ params, searchParams }: PageProps) {
   const breadcrumbJsonLd = breadcrumbSchema([
     { name: 'Accueil', url: `${baseUrl}/` },
     { name: 'Matières', url: `${baseUrl}/matieres` },
-    { name: subject.nameFr, url },
+    { name: subject.nameFr || subject.slug, url },
   ]);
 
   const courseJsonLd = courseSchema({

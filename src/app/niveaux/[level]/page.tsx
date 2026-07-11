@@ -61,7 +61,7 @@ export default async function LevelPage({ params }: { params: Promise<{ level: s
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema([
         { name: 'Accueil', url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com'}/` },
         { name: 'Niveaux', url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com'}/niveaux` },
-        { name: level.nameFr, url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com'}/niveaux/${level.slug}` },
+        { name: level.nameFr || level.slug, url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com'}/niveaux/${level.slug}` },
       ])) }} />
       <main className="flex-1 pt-20">
         <div className="bg-gradient-to-br from-primary-50 to-sky-50 py-12">

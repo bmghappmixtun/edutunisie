@@ -70,17 +70,36 @@ export function organizationSchema() {
 /**
  * BreadcrumbList — for the visual breadcrumb in SERPs.
  * Pass items in order from root to current page.
+ *
+ * Defensive: ensures `name` is always present (required by Google).
+ * Falls back to URL slug if name is missing/empty.
  */
 export function breadcrumbSchema(items: BreadcrumbItem[]) {
   return {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
-    itemListElement: items.map((item, index) => ({
-      '@type': 'ListItem',
-      position: index + 1,
-      name: item.name,
-      item: item.url,
-    })),
+    itemListElement: items.map((item, index) => {
+      // Ensure name is never empty/null (Google Search Console requires it)
+      let name = (item.name || '').toString().trim();
+      if (!name) {
+        // Fallback: derive from URL path
+        try {
+          const u = new URL(item.url);
+          const path = u.pathname.replace(/^\/+|\/+$/g, '');
+          name = path ? path.split('/').pop() || path : u.hostname;
+          // Capitalize for display
+          name = name.charAt(0).toUpperCase() + name.slice(1).replace(/-/g, ' ');
+        } catch {
+          name = `Page ${index + 1}`;
+        }
+      }
+      return {
+        '@type': 'ListItem',
+        position: index + 1,
+        name,
+        item: item.url,
+      };
+    }),
   };
 }
 
