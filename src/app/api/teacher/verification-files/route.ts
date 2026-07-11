@@ -3,6 +3,7 @@ import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { uploadFile } from '@/lib/storage';
 import { detectFormat } from '@/lib/document-converter';
+import { sendAdminVerificationFilesEmail } from '@/lib/email';
 import { nanoid } from 'nanoid';
 
 export const runtime = 'nodejs';
@@ -147,14 +148,56 @@ export async function POST(req: NextRequest) {
 
   // Update user's count + status
   const newCount = existingCount + 1;
+  const allReceived = newCount >= MAX_FILES;
   await prisma.user.update({
     where: { id: user.id },
     data: {
       verificationFilesCount: newCount,
       // If all 5 files received, mark receivedAt
-      ...(newCount >= MAX_FILES ? { verificationFilesReceivedAt: new Date() } : {}),
+      ...(allReceived ? { verificationFilesReceivedAt: new Date() } : {}),
     },
   });
+
+  // Notify admin (email) — fetch all files + admin user
+  try {
+    const [allFiles, admins] = await Promise.all([
+      prisma.teacherVerificationFile.findMany({
+        where: { teacherId: user.id },
+        orderBy: { uploadedAt: 'desc' },
+        take: 10,
+      }),
+      prisma.user.findMany({
+        where: { role: 'ADMIN' },
+        select: { email: true },
+      }),
+    ]);
+    const adminBaseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
+    for (const admin of admins) {
+      if (!admin.email) continue;
+      // Send email on each new file (digest) — but especially when 5/5 complete
+      await sendAdminVerificationFilesEmail({
+        to: admin.email,
+        teacher: {
+          firstName: user.firstName || '',
+          lastName: user.lastName || '',
+          email: user.email || '',
+        },
+        files: allFiles.map(f => ({
+          fileName: f.fileName,
+          fileSize: f.fileSize,
+          fileUrl: f.fileUrl,
+          type: f.type,
+          uploadedAt: f.uploadedAt.toISOString(),
+        })),
+        count: newCount,
+        total: MAX_FILES,
+        adminUrl: `${adminBaseUrl}/admin/approbations`,
+      });
+    }
+  } catch (emailErr) {
+    console.error('Failed to send admin verification email:', emailErr);
+    // Don't fail the request — file was uploaded successfully
+  }
 
   return NextResponse.json({
     success: true,

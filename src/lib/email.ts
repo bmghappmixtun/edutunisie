@@ -191,8 +191,49 @@ export async function sendTeacherFileRequestEmail(opts: {
   }
 }
 
-export async function sendResourceApprovedEmail(to: string, firstName: string, resourceTitle: string, approved: boolean): Promise<EmailResult> {
+/**
+ * Notify admin when a teacher uploads verification files.
+ * Triggers:
+ * - When each new file is uploaded (digest)
+ * - When all 5 files are received (priority notification)
+ */
+export async function sendAdminVerificationFilesEmail(opts: {
+  to: string;
+  teacher: { firstName: string; lastName: string; email: string };
+  files: Array<{ fileName: string; fileSize: number; fileUrl: string; type: string | null; uploadedAt: string }>;
+  count: number;
+  total: number;
+  adminUrl: string;
+}): Promise<EmailResult> {
   if (process.env.DISABLE_EMAILS === 'true' || process.env.NODE_ENV === 'test') {
+    return new EmailResult(true, 'test-mode');
+  }
+  const html = renderAdminVerificationFilesEmail(opts);
+  if (!resend) {
+    console.log(`\n📧 [EMAIL - DEV] To admin: ${opts.to} | ${opts.teacher.firstName} ${opts.teacher.lastName} - ${opts.count}/${opts.total} files`);
+    return new EmailResult(true, 'dev-mode');
+  }
+  const isComplete = opts.count >= opts.total;
+  try {
+    const result: any = await resend.emails.send({
+      from: FROM,
+      to: [opts.to],
+      subject: isComplete
+        ? `✅ ${opts.teacher.firstName} ${opts.teacher.lastName} a envoyé ses 5 fichiers — à examiner`
+        : `📁 ${opts.teacher.firstName} ${opts.teacher.lastName} — ${opts.count}/${opts.total} fichier(s) reçu(s)`,
+      html,
+    });
+    if (result.error) {
+      console.error('📧 [ADMIN VERIFICATION EMAIL ERROR]', opts.to, '→', result.error.message);
+      return new EmailResult(false, 'failed', result.error.message);
+    }
+    return new EmailResult(true, result.data?.id || 'sent');
+  } catch (e: any) {
+    return new EmailResult(false, 'threw', e?.message);
+  }
+}
+
+export async function sendResourceApprovedEmail(to: string, firstName: string, resourceTitle: string, approved: boolean): Promise<EmailResult> {  if (process.env.DISABLE_EMAILS === 'true' || process.env.NODE_ENV === 'test') {
     return new EmailResult(true, 'test-mode');
   }
   const html = renderResourceApprovedEmail(firstName, resourceTitle, approved);
@@ -235,6 +276,78 @@ function renderContactEmail(p: { name: string; email: string; subject: string; m
 
 function renderTeacherApprovalEmail(firstName: string, approved: boolean): string {
   return `<!DOCTYPE html><html><body><h2>${approved ? 'Compte approuvé !' : 'Mise à jour'}</h2><p>Bonjour ${firstName},</p></body></html>`;
+}
+
+function renderAdminVerificationFilesEmail(opts: {
+  teacher: { firstName: string; lastName: string; email: string };
+  files: Array<{ fileName: string; fileSize: number; fileUrl: string; type: string | null; uploadedAt: string }>;
+  count: number;
+  total: number;
+  adminUrl: string;
+}): string {
+  const { teacher, files, count, total, adminUrl } = opts;
+  const safeFirst = teacher.firstName.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const safeLast = teacher.lastName.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const complete = count >= total;
+  const filesList = files.slice(0, 10).map(f => {
+    const sizeKb = (f.fileSize / 1024).toFixed(0);
+    const typeIcon = f.type === 'COURSE' ? '📚' : f.type === 'HOMEWORK' ? '📝' : f.type === 'EXERCISE' ? '✏️' : f.type === 'REVISION' ? '🔄' : f.type === 'EXAM' ? '📋' : f.type === 'BAC_SUBJECT' ? '🎓' : f.type === 'CORRECTION' ? '✅' : '📁';
+    return `<tr>
+      <td style="padding:10px 8px;border-bottom:1px solid #e2e8f0;font-size:13px">${typeIcon} ${f.fileName.replace(/</g, '&lt;')}</td>
+      <td style="padding:10px 8px;border-bottom:1px solid #e2e8f0;font-size:12px;color:#64748b">${sizeKb} KB</td>
+      <td style="padding:10px 8px;border-bottom:1px solid #e2e8f0;text-align:right">
+        <a href="${f.fileUrl}" style="display:inline-block;background:#7c3aed;color:#fff;font-size:11px;font-weight:600;padding:5px 10px;border-radius:6px;text-decoration:none">Voir</a>
+      </td>
+    </tr>`;
+  }).join('');
+  return `<!DOCTYPE html>
+<html><head><meta charset="UTF-8"></head>
+<body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f8fafc;margin:0;padding:20px;color:#0f172a">
+  <div style="max-width:600px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;border:1px solid #e2e8f0">
+    <!-- Header -->
+    <div style="background:linear-gradient(135deg,#7c3aed 0%,#a855f7 100%);padding:24px;text-align:center">
+      <div style="font-size:36px;margin-bottom:6px">${complete ? '🎉' : '📁'}</div>
+      <h1 style="color:#fff;margin:0;font-size:20px;font-weight:800">
+        ${complete ? 'Tous les fichiers de vérification reçus' : 'Nouveaux fichiers reçus'}
+      </h1>
+      <p style="color:#ede9fe;margin:4px 0 0;font-size:13px">${safeFirst} ${safeLast}</p>
+    </div>
+
+    <div style="padding:24px">
+      <div style="background:${complete ? '#d1fae5' : '#fef3c7'};border-left:4px solid ${complete ? '#10b981' : '#f59e0b'};padding:12px 16px;border-radius:8px;margin-bottom:20px">
+        <strong style="color:${complete ? '#065f46' : '#92400e'};font-size:14px">
+          ${complete ? '✅ Vérification complète' : '⏳ En cours de vérification'}
+        </strong>
+        <p style="margin:4px 0 0;font-size:13px;color:${complete ? '#047857' : '#78350f'};line-height:1.5">
+          ${count}/${total} fichier(s) reçu(s).
+          ${complete ? 'Vous pouvez maintenant examiner le profil et approuver ou rejeter la demande.' : 'Le prof vous enverra probablement d\'autres fichiers.'}
+        </p>
+      </div>
+
+      <h2 style="font-size:14px;color:#475569;margin:20px 0 8px;font-weight:700">📂 Fichiers envoyés</h2>
+      <table style="width:100%;border-collapse:collapse;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden">
+        <thead>
+          <tr style="background:#f1f5f9">
+            <th style="padding:10px 8px;text-align:left;font-size:11px;color:#475569;font-weight:700;text-transform:uppercase">Fichier</th>
+            <th style="padding:10px 8px;text-align:left;font-size:11px;color:#475569;font-weight:700;text-transform:uppercase">Taille</th>
+            <th style="padding:10px 8px"></th>
+          </tr>
+        </thead>
+        <tbody>${filesList}</tbody>
+      </table>
+
+      <div style="text-align:center;margin:24px 0 0">
+        <a href="${adminUrl}" style="display:inline-block;background:linear-gradient(135deg,#7c3aed 0%,#a855f7 100%);color:#fff;font-size:14px;font-weight:700;padding:12px 28px;border-radius:10px;text-decoration:none;box-shadow:0 4px 14px rgba(124,58,237,0.3)">
+          Examiner sur Examanet →
+        </a>
+      </div>
+
+      <p style="margin:24px 0 0;font-size:12px;color:#94a3b8;text-align:center">
+        Email automatique · Examanet Admin
+      </p>
+    </div>
+  </div>
+</body></html>`;
 }
 
 function renderTeacherFileRequestEmail(opts: {
