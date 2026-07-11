@@ -138,9 +138,9 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
   const breadcrumbJsonLd = breadcrumbSchema([
     { name: 'Accueil', url: baseUrl },
     { name: 'Ressources', url: `${baseUrl}/ressources` },
-    ...(resource.subject ? [{ name: resource.subject.nameFr, url: `${baseUrl}/matieres/${resource.subject.slug}` }] : []),
-    ...(resource.class ? [{ name: resource.class.nameFr, url: `${baseUrl}/niveaux/${resource.class.level?.slug}?class=${resource.class.slug}` }] : []),
-    { name: resource.title, url: resourceUrl },
+    ...(resource.subject ? [{ name: resource.subject.nameFr || resource.subject.slug, url: `${baseUrl}/matieres/${resource.subject.slug}` }] : []),
+    ...(resource.class ? [{ name: resource.class.nameFr || resource.class.slug, url: `${baseUrl}/niveaux/${resource.class.level?.slug}?class=${resource.class.slug}` }] : []),
+    { name: resource.title || 'Ressource', url: resourceUrl },
   ]);
 
   return (

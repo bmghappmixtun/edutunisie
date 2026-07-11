@@ -166,7 +166,7 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
   const breadcrumbJsonLd = breadcrumbSchema([
     { name: 'Accueil', url: SITE_URL },
     { name: 'Professeurs', url: `${SITE_URL}/professeurs` },
-    { name: fullName, url: profileUrl },
+    { name: fullName || 'Profil enseignant', url: profileUrl },
   ]);
 
   return (
