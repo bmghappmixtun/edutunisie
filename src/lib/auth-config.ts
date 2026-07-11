@@ -34,7 +34,7 @@ export const authOptions: AuthOptions = {
         const bcrypt = await import('bcryptjs');
         const valid = await bcrypt.compare(credentials.password, user.passwordHash);
         if (!valid) return null;
-        if (user.status !== 'ACTIVE') return null;
+        if (user.status !== 'ACTIVE' && user.status !== 'PENDING_FILE_VERIFICATION') return null;
         return {
           id: user.id,
           email: user.email,

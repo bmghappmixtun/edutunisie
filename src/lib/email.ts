@@ -154,6 +154,43 @@ export async function sendTeacherApprovalEmail(to: string, firstName: string, ap
   }
 }
 
+/**
+ * Send a request to a NEW (non-invited) teacher asking for 5 sample files.
+ * This is the verification step for teachers who registered themselves
+ * and weren't invited by the admin.
+ */
+export async function sendTeacherFileRequestEmail(opts: {
+  to: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  note?: string | null;
+}): Promise<EmailResult> {
+  if (process.env.DISABLE_EMAILS === 'true' || process.env.NODE_ENV === 'test') {
+    return new EmailResult(true, 'test-mode');
+  }
+  const html = renderTeacherFileRequestEmail(opts);
+  if (!resend) {
+    console.log(`\n📧 [EMAIL - DEV] To: ${opts.to} | FILE REQUEST for ${opts.firstName} ${opts.lastName}\n   Note: ${opts.note || '(no note)'}\n`);
+    return new EmailResult(true, 'dev-mode');
+  }
+  try {
+    const result: any = await resend.emails.send({
+      from: FROM,
+      to: [opts.to],
+      subject: `📁 Action requise : envoyez-nous 5 fichiers pour vérifier votre profil — Examanet`,
+      html,
+    });
+    if (result.error) {
+      console.error('📧 [TEACHER FILE REQUEST ERROR]', opts.to, '→', result.error.message);
+      return new EmailResult(false, 'failed', result.error.message);
+    }
+    return new EmailResult(true, result.data?.id || 'sent');
+  } catch (e: any) {
+    return new EmailResult(false, 'threw', e?.message);
+  }
+}
+
 export async function sendResourceApprovedEmail(to: string, firstName: string, resourceTitle: string, approved: boolean): Promise<EmailResult> {
   if (process.env.DISABLE_EMAILS === 'true' || process.env.NODE_ENV === 'test') {
     return new EmailResult(true, 'test-mode');
@@ -198,6 +235,89 @@ function renderContactEmail(p: { name: string; email: string; subject: string; m
 
 function renderTeacherApprovalEmail(firstName: string, approved: boolean): string {
   return `<!DOCTYPE html><html><body><h2>${approved ? 'Compte approuvé !' : 'Mise à jour'}</h2><p>Bonjour ${firstName},</p></body></html>`;
+}
+
+function renderTeacherFileRequestEmail(opts: {
+  firstName: string;
+  lastName: string;
+  email: string;
+  note?: string | null;
+}): string {
+  const { firstName, lastName, email, note } = opts;
+  const safeFirst = firstName.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const safeLast = lastName.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const safeEmail = email.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const noteHtml = note
+    ? `<div style="background:#fef3c7;border-left:4px solid #f59e0b;padding:12px 16px;border-radius:8px;margin:20px 0;color:#78350f"><strong>📝 Message de l'équipe :</strong><br><span style="white-space:pre-line">${note.replace(/</g, '&lt;')}</span></div>`
+    : '';
+  return `<!DOCTYPE html>
+<html><head><meta charset="UTF-8"></head>
+<body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background:#f8fafc;margin:0;padding:20px;color:#0f172a">
+  <div style="max-width:600px;margin:0 auto;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #e2e8f0">
+    <!-- Header -->
+    <div style="background:linear-gradient(135deg,#7c3aed 0%,#a855f7 50%,#d97706 100%);padding:32px 24px;text-align:center">
+      <div style="font-size:48px;margin-bottom:8px">📁</div>
+      <h1 style="color:#ffffff;margin:0;font-size:24px;font-weight:800">Examanet</h1>
+      <p style="color:#ede9fe;margin:6px 0 0;font-size:13px">Plateforme pédagogique #1 en Tunisie</p>
+    </div>
+
+    <!-- Content -->
+    <div style="padding:32px 24px">
+      <p style="margin:0 0 16px;font-size:16px">Bonjour <strong>${safeFirst} ${safeLast}</strong>,</p>
+
+      <p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#334155">
+        Nous vous remercions pour votre demande de compte enseignant sur <strong>Examanet</strong>.
+        Votre profil a bien été reçu et nous l'examinons avec attention.
+      </p>
+
+      <p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#334155">
+        Afin de vérifier votre expertise pédagogique et de garantir la qualité des ressources
+        partagées sur notre plateforme, nous vous invitons à nous envoyer
+        <strong>5 fichiers Word (.docx) d'exemple</strong> parmi vos productions :
+      </p>
+
+      <!-- Requirements card -->
+      <div style="background:linear-gradient(135deg,#faf5ff 0%,#fef3c7 100%);border:2px solid #c084fc;border-radius:12px;padding:20px;margin:24px 0">
+        <h3 style="margin:0 0 12px;font-size:15px;color:#6b21a8">📋 Ce que nous attendons :</h3>
+        <ul style="margin:0;padding-left:20px;color:#334155;line-height:1.8;font-size:14px">
+          <li><strong>5 fichiers au total</strong> (minimum)</li>
+          <li>Formats acceptés : <strong>Word (.docx)</strong> ou <strong>PDF</strong></li>
+          <li>Types de fichiers recommandés : <em>cours, séries d'exercices, devoirs, corrigés</em>…</li>
+          <li>Chaque fichier doit contenir <strong>votre nom et prénom</strong> (${safeFirst} ${safeLast}) en pied de page ou en en-tête</li>
+          <li>Les fichiers doivent refléter votre <strong>niveau d'enseignement réel</strong></li>
+        </ul>
+      </div>
+
+      ${noteHtml}
+
+      <!-- How to send -->
+      <h3 style="margin:24px 0 12px;font-size:15px;color:#0f172a">📤 Comment nous les envoyer ?</h3>
+      <ol style="margin:0;padding-left:20px;color:#334155;line-height:1.8;font-size:14px">
+        <li>Connectez-vous à votre compte Examanet</li>
+        <li>Rendez-vous sur votre tableau de bord enseignant</li>
+        <li>Cliquez sur <strong>« Soumettre mes fichiers de vérification »</strong></li>
+        <li>Joignez vos 5 fichiers et validez</li>
+      </ol>
+
+      <p style="margin:20px 0 8px;font-size:14px;color:#64748b">
+        Vous avez 7 jours pour nous envoyer ces fichiers. Passé ce délai,
+        votre demande sera classée sans suite.
+      </p>
+
+      <p style="margin:24px 0 0;font-size:14px;color:#64748b">
+        Une question ? Répondez simplement à cet email ou contactez-nous à
+        <a href="mailto:contact@examanet.com" style="color:#7c3aed">contact@examanet.com</a>.
+      </p>
+    </div>
+
+    <!-- Footer -->
+    <div style="background:#f8fafc;padding:20px 24px;text-align:center;border-top:1px solid #e2e8f0">
+      <p style="margin:0 0 4px;font-size:12px;color:#64748b">Cordialement,</p>
+      <p style="margin:0;font-size:13px;font-weight:700;color:#0f172a">L'équipe Examanet</p>
+      <p style="margin:8px 0 0;font-size:11px;color:#94a3b8">🇹🇳 Made with love in Tunisia</p>
+    </div>
+  </div>
+</body></html>`;
 }
 
 function renderResourceApprovedEmail(firstName: string, resourceTitle: string, approved: boolean): string {
