@@ -121,9 +121,16 @@ export async function sendInvitationEmail(invitationId: string, tempPassword: st
     expiresAt: inv.expiresAt,
   });
 
+  // Smart subject line
+  const greeting = computeFirstName(teacherName, inv.email);
+  const subject = fileCount > 0
+    ? `${greeting}, vos ${fileCount} ressources sont prêtes sur Examanet 🎓`
+    : `${greeting}, rejoignez Examanet — la plateforme #1 en Tunisie 🎓`;
+
   if (!resend) {
     console.log(`\n📧 [INVITATION - DEV] To: ${inv.email}`);
     console.log(`   Name: ${teacherName}`);
+    console.log(`   Greeting: ${greeting}`);
     console.log(`   Temp password: ${tempPassword}`);
     console.log(`   Accept URL: ${acceptUrl}`);
     console.log(`   Files: ${fileCount}`);
@@ -134,7 +141,7 @@ export async function sendInvitationEmail(invitationId: string, tempPassword: st
     const result: any = await resend.emails.send({
       from: FROM,
       to: [inv.email],
-      subject: `${teacherName}, vos ${fileCount} fichiers vous attendent sur Examanet 🎓`,
+      subject,
       html,
     });
 
@@ -307,6 +314,54 @@ export async function expireStaleInvitations() {
   return { expired: stale.length };
 }
 
+// ======================== HELPER FUNCTIONS ========================
+
+const GENERIC_FIRST_NAMES = new Set([
+  'enseignant', 'teacher', 'prof', 'professeur',
+  'm.', 'mr', 'mme', 'mme.', 'monsieur', 'madame',
+  'utilisateur', 'user', 'admin', 'test', 'élève', 'eleve',
+  'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+  'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+]);
+
+/**
+ * Compute a sensible first name to use in greeting.
+ * Falls back to email prefix or "Cher enseignant" if the first name is missing or generic.
+ */
+function computeFirstName(fullName: string, email: string): string {
+  const first = (fullName.split(' ')[0] || '').trim();
+  if (first && !GENERIC_FIRST_NAMES.has(first.toLowerCase()) && first.length >= 2) {
+    return first;
+  }
+  // Fallback: derive from email local-part (before @)
+  const local = (email.split('@')[0] || '').trim();
+  if (local) {
+    // Strip dots/underscores/digits and title-case
+    const cleaned = local
+      .replace(/[._\-]+/g, ' ')
+      .replace(/\d+/g, '')
+      .trim();
+    if (cleaned.length >= 2) {
+      return cleaned
+        .split(' ')
+        .filter(Boolean)
+        .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+        .join(' ')
+        .slice(0, 30);
+    }
+  }
+  return 'Cher enseignant';
+}
+
+function htmlEscape(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 // ======================== EMAIL TEMPLATE ========================
 
 function renderInvitationEmail(args: {
@@ -319,139 +374,228 @@ function renderInvitationEmail(args: {
   customMessage?: string | null;
   expiresAt: Date;
 }): string {
-  const { teacherName, acceptUrl, landingUrl, tempPassword, fileCount, customMessage } = args;
-  const daysLeft = 10;
-  const firstName = teacherName.split(' ')[0] || 'Cher enseignant';
+  const { teacherName, teacherEmail, acceptUrl, landingUrl, tempPassword, fileCount, customMessage } = args;
+  const firstName = computeFirstName(teacherName, teacherEmail);
+  const safeName = htmlEscape(teacherName);
+  const safeFirst = htmlEscape(firstName);
+  const safeEmail = htmlEscape(teacherEmail);
+  const safePassword = htmlEscape(tempPassword);
+  const safeCustomMessage = customMessage ? htmlEscape(customMessage) : '';
+  const hasFiles = fileCount > 0;
 
   return `<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Vos fichiers vous attendent sur Examanet</title>
+<title>Rejoignez Examanet — votre espace enseignant</title>
 </head>
-<body style="margin:0;padding:0;background:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#0f172a">
+<body style="margin:0;padding:0;background:#f8fafc;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#0f172a">
 <!-- Preheader (hidden) -->
-<div style="display:none;max-height:0;overflow:hidden">${fileCount} fichiers vous attendent — activez votre compte enseignant gratuit sur Examanet</div>
+<div style="display:none;max-height:0;overflow:hidden">${hasFiles ? `${fileCount} ressources vous attendent sur Examanet` : 'Activez votre compte enseignant gratuit sur Examanet'}</div>
 
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f1f5f9;padding:32px 16px">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f8fafc;padding:32px 16px">
 <tr><td align="center">
 <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%">
 
-  <!-- HEADER -->
+  <!-- HERO HEADER -->
   <tr><td>
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:linear-gradient(135deg,#0EA5E9 0%,#0369A1 100%);border-radius:16px 16px 0 0;padding:32px 40px">
-      <tr>
-        <td>
-          <div style="display:inline-block;background:rgba(255,255,255,0.15);padding:6px 14px;border-radius:999px;color:white;font-size:12px;font-weight:600;letter-spacing:0.5px">EXAMANET • PLATEFORME ÉDUCATIVE TUNISIENNE</div>
-        </td>
-      </tr>
-      <tr><td style="padding-top:24px">
-        <h1 style="margin:0;color:white;font-size:30px;line-height:1.2;font-weight:800">Vos fichiers vous attendent 🎓</h1>
-        <p style="margin:12px 0 0 0;color:rgba(255,255,255,0.92);font-size:16px;line-height:1.5">${firstName}, on a préparé ${fileCount} de vos ressources pour les rendre visibles à des milliers d'élèves tunisiens.</p>
-      </td></tr>
-    </table>
+    <div style="background:linear-gradient(135deg,#7c3aed 0%,#a855f7 50%,#ec4899 100%);border-radius:20px 20px 0 0;padding:48px 40px;text-align:center;position:relative;overflow:hidden">
+      <div style="position:absolute;top:20px;left:20px;font-size:32px;opacity:0.4">✨</div>
+      <div style="position:absolute;top:32px;right:24px;font-size:28px;opacity:0.4">🎓</div>
+      <div style="position:absolute;bottom:24px;left:32px;font-size:24px;opacity:0.4">📚</div>
+      <div style="position:absolute;bottom:32px;right:20px;font-size:28px;opacity:0.4">⭐</div>
+
+      <div style="display:inline-block;background:rgba(255,255,255,0.18);padding:6px 14px;border-radius:999px;color:white;font-size:12px;font-weight:700;letter-spacing:1px;backdrop-filter:blur(8px)">EXAMANET</div>
+
+      <h1 style="margin:20px 0 0;color:white;font-size:34px;line-height:1.15;font-weight:800;letter-spacing:-0.5px">
+        ${hasFiles ? `Vos ressources vous attendent` : `Rejoignez l'aventure`} 🎓
+      </h1>
+      <p style="margin:14px auto 0;color:rgba(255,255,255,0.95);font-size:16px;line-height:1.5;max-width:480px">
+        ${hasFiles
+          ? `${safeFirst}, on a préparé <strong style="background:rgba(255,255,255,0.2);padding:2px 10px;border-radius:8px">${fileCount} de vos ressources</strong> pour les rendre visibles à des milliers d'élèves tunisiens.`
+          : `${safeFirst}, on vous a réservé une place dans la communauté <strong>Examanet</strong> — la plateforme pédagogique #1 en Tunisie.`}
+      </p>
+    </div>
   </td></tr>
 
   <!-- BODY -->
-  <tr><td style="background:white;padding:40px">
+  <tr><td style="background:white;padding:40px 40px 32px">
 
-    ${customMessage ? `<div style="background:#fef3c7;border-left:4px solid #f59e0b;padding:16px 20px;border-radius:8px;margin-bottom:24px"><p style="margin:0;color:#78350f;font-size:14px;line-height:1.6;font-style:italic">${customMessage.replace(/\n/g, '<br>')}</p></div>` : ''}
+    ${customMessage ? `<div style="background:linear-gradient(135deg,#fef3c7 0%,#fde68a 100%);border-left:4px solid #f59e0b;padding:16px 20px;border-radius:8px;margin-bottom:28px"><p style="margin:0;color:#78350f;font-size:14px;line-height:1.6;font-style:italic">${safeCustomMessage.replace(/\n/g, '<br>')}</p></div>` : ''}
 
-    <p style="margin:0 0 16px 0;font-size:16px;line-height:1.6;color:#334155">Bonjour <strong>${teacherName}</strong>,</p>
+    <p style="margin:0 0 16px 0;font-size:17px;line-height:1.6;color:#0f172a">Bonjour <strong style="color:#7c3aed">${safeFirst}</strong> 👋</p>
 
-    <p style="margin:0 0 24px 0;font-size:16px;line-height:1.6;color:#334155">Vous avez partagé <strong>${fileCount} ressources</strong> via JotForm ces dernières années. Nous les avons <strong>conservées, indexées et publiées</strong> sur Examanet — la plateforme éducative tunisienne qui rassemble désormais des milliers de devoirs, cours et exercices.</p>
+    ${hasFiles ? `
+      <p style="margin:0 0 24px 0;font-size:16px;line-height:1.6;color:#334155">
+        Vous avez partagé <strong>${fileCount} ressource${fileCount > 1 ? 's' : ''}</strong> via JotForm / devoirat.net ces dernières années.
+        Nous les avons <strong>conservées, indexées et publiées</strong> sur Examanet — la plateforme qui rassemble désormais des milliers de profs et d'élèves tunisiens.
+      </p>
+    ` : `
+      <p style="margin:0 0 24px 0;font-size:16px;line-height:1.6;color:#334155">
+        <strong>Examanet</strong> est la plateforme pédagogique de référence en Tunisie :
+        des milliers de ressources (devoirs, cours, exercices, corrigés) partagées par des profs comme vous,
+        consultées chaque mois par des dizaines de milliers d'élèves.
+      </p>
+    `}
 
-    <!-- Files summary box -->
-    <div style="background:linear-gradient(135deg,#f0f9ff,#e0f2fe);border:1px solid #bae6fd;border-radius:12px;padding:20px;margin:24px 0">
-      <div style="display:flex;align-items:center;gap:12px">
-        <div style="background:#0EA5E9;color:white;width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px">📚</div>
-        <div>
-          <div style="font-size:14px;color:#0369a1;font-weight:600">VOS RESSOURCES SONT EN LIGNE</div>
-          <div style="font-size:24px;color:#0c4a6e;font-weight:800;margin-top:2px">${fileCount} fichiers publiés</div>
+    <!-- ${hasFiles ? 'Files summary' : 'Why join'} box -->
+    ${hasFiles ? `
+      <div style="background:linear-gradient(135deg,#faf5ff 0%,#fef3c7 100%);border:2px solid #e9d5ff;border-radius:16px;padding:24px;margin:24px 0">
+        <div style="display:flex;align-items:center;gap:14px">
+          <div style="background:linear-gradient(135deg,#7c3aed 0%,#a855f7 100%);color:white;width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;box-shadow:0 4px 12px rgba(124,58,237,0.25)">📚</div>
+          <div>
+            <div style="font-size:13px;color:#7c3aed;font-weight:700;letter-spacing:0.3px;text-transform:uppercase">VOS RESSOURCES SONT EN LIGNE</div>
+            <div style="font-size:26px;color:#0f172a;font-weight:800;margin-top:2px;line-height:1.1">${fileCount} fichier${fileCount > 1 ? 's' : ''} publié${fileCount > 1 ? 's' : ''}</div>
+          </div>
         </div>
       </div>
-    </div>
+    ` : `
+      <div style="background:linear-gradient(135deg,#faf5ff 0%,#fef3c7 100%);border:2px solid #e9d5ff;border-radius:16px;padding:24px;margin:24px 0">
+        <div style="display:flex;align-items:center;gap:14px">
+          <div style="background:linear-gradient(135deg,#7c3aed 0%,#a855f7 100%);color:white;width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;box-shadow:0 4px 12px rgba(124,58,237,0.25)">🚀</div>
+          <div>
+            <div style="font-size:13px;color:#7c3aed;font-weight:700;letter-spacing:0.3px;text-transform:uppercase">VOTRE PLACE EST RÉSERVÉE</div>
+            <div style="font-size:20px;color:#0f172a;font-weight:800;margin-top:2px;line-height:1.2">Accédez à +2 600 sujets Bac et 11 000+ ressources</div>
+          </div>
+        </div>
+      </div>
+    `}
 
-    <p style="margin:24px 0 16px 0;font-size:16px;line-height:1.6;color:#334155">En activant votre compte enseignant <strong>gratuit</strong>, vous pouvez :</p>
+    <p style="margin:24px 0 16px 0;font-size:16px;line-height:1.6;color:#334155">
+      ${hasFiles
+        ? `En activant votre compte enseignant gratuit, vous pouvez :`
+        : `Voici ce que vous obtenez en activant votre compte gratuit :`}
+    </p>
 
     <!-- Benefits list -->
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:16px 0">
-      <tr><td style="padding:10px 0"><table role="presentation"><tr>
-        <td style="vertical-align:top;padding-right:12px"><div style="background:#dcfce7;color:#16a34a;width:28px;height:28px;border-radius:50%;text-align:center;line-height:28px;font-weight:700">✓</div></td>
-        <td style="font-size:15px;line-height:1.5;color:#334155"><strong>Récupérer vos ${fileCount} fichiers</strong> — versions Word d'origine et PDF propres (sans watermark)</td>
-      </tr></table></td></tr>
-      <tr><td style="padding:10px 0"><table role="presentation"><tr>
-        <td style="vertical-align:top;padding-right:12px"><div style="background:#dcfce7;color:#16a34a;width:28px;height:28px;border-radius:50%;text-align:center;line-height:28px;font-weight:700">📊</div></td>
-        <td style="font-size:15px;line-height:1.5;color:#334155"><strong>Voir les statistiques</strong> de vos ressources — téléchargements, vues, notes, commentaires</td>
-      </tr></table></td></tr>
-      <tr><td style="padding:10px 0"><table role="presentation"><tr>
-        <td style="vertical-align:top;padding-right:12px"><div style="background:#dcfce7;color:#16a34a;width:28px;height:28px;border-radius:50%;text-align:center;line-height:28px;font-weight:700">✏️</div></td>
-        <td style="font-size:15px;line-height:1.5;color:#334155"><strong>Modifier vos fichiers</strong> après publication (correction, mise à jour, ajout)</td>
-      </tr></table></td></tr>
-      <tr><td style="padding:10px 0"><table role="presentation"><tr>
-        <td style="vertical-align:top;padding-right:12px"><div style="background:#dcfce7;color:#16a34a;width:28px;height:28px;border-radius:50%;text-align:center;line-height:28px;font-weight:700">👥</div></td>
-        <td style="font-size:15px;line-height:1.5;color:#334155"><strong>Gagner en visibilité</strong> auprès de <strong>25 000+ élèves et enseignants</strong> tunisiens qui utilisent Examanet chaque mois</td>
-      </tr></table></td></tr>
-      <tr><td style="padding:10px 0"><table role="presentation"><tr>
-        <td style="vertical-align:top;padding-right:12px"><div style="background:#dcfce7;color:#16a34a;width:28px;height:28px;border-radius:50%;text-align:center;line-height:28px;font-weight:700">💬</div></td>
-        <td style="font-size:15px;line-height:1.5;color:#334155"><strong>Recevoir des messages</strong> d'élèves qui ont des questions sur vos devoirs</td>
-      </tr></table></td></tr>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:16px 0 8px">
+      ${hasFiles ? `
+      <tr><td style="padding:12px 0">
+        <table role="presentation"><tr>
+          <td style="vertical-align:top;padding-right:14px">
+            <div style="background:linear-gradient(135deg,#dcfce7 0%,#bbf7d0 100%);color:#15803d;width:36px;height:36px;border-radius:10px;text-align:center;line-height:36px;font-size:18px;flex-shrink:0">✓</div>
+          </td>
+          <td style="font-size:15px;line-height:1.5;color:#334155;padding-top:6px">
+            <strong>Récupérer vos ${fileCount} fichier${fileCount > 1 ? 's' : ''}</strong> — versions Word d'origine et PDF propres (sans watermark)
+          </td>
+        </tr></table>
+      </td></tr>
+      ` : `
+      <tr><td style="padding:12px 0">
+        <table role="presentation"><tr>
+          <td style="vertical-align:top;padding-right:14px">
+            <div style="background:linear-gradient(135deg,#dbeafe 0%,#bfdbfe 100%);color:#1e40af;width:36px;height:36px;border-radius:10px;text-align:center;line-height:36px;font-size:18px;flex-shrink:0">📚</div>
+          </td>
+          <td style="font-size:15px;line-height:1.5;color:#334155;padding-top:6px">
+            <strong>Publier vos propres ressources</strong> — cours, séries d'exercices, devoirs, corrigés
+          </td>
+        </tr></table>
+      </td></tr>
+      `}
+      <tr><td style="padding:12px 0">
+        <table role="presentation"><tr>
+          <td style="vertical-align:top;padding-right:14px">
+            <div style="background:linear-gradient(135deg,#fef3c7 0%,#fde68a 100%);color:#a16207;width:36px;height:36px;border-radius:10px;text-align:center;line-height:36px;font-size:18px;flex-shrink:0">📊</div>
+          </td>
+          <td style="font-size:15px;line-height:1.5;color:#334155;padding-top:6px">
+            <strong>Voir les statistiques</strong> de vos ressources — téléchargements, vues, notes, commentaires
+          </td>
+        </tr></table>
+      </td></tr>
+      <tr><td style="padding:12px 0">
+        <table role="presentation"><tr>
+          <td style="vertical-align:top;padding-right:14px">
+            <div style="background:linear-gradient(135deg,#fce7f3 0%,#fbcfe8 100%);color:#be185d;width:36px;height:36px;border-radius:10px;text-align:center;line-height:36px;font-size:18px;flex-shrink:0">✏️</div>
+          </td>
+          <td style="font-size:15px;line-height:1.5;color:#334155;padding-top:6px">
+            <strong>Modifier vos fichiers</strong> après publication (correction, mise à jour, ajout)
+          </td>
+        </tr></table>
+      </td></tr>
+      <tr><td style="padding:12px 0">
+        <table role="presentation"><tr>
+          <td style="vertical-align:top;padding-right:14px">
+            <div style="background:linear-gradient(135deg,#dbeafe 0%,#bfdbfe 100%);color:#1e40af;width:36px;height:36px;border-radius:10px;text-align:center;line-height:36px;font-size:18px;flex-shrink:0">👥</div>
+          </td>
+          <td style="font-size:15px;line-height:1.5;color:#334155;padding-top:6px">
+            <strong>Gagner en visibilité</strong> auprès de <strong>25 000+ élèves et enseignants</strong> tunisiens qui utilisent Examanet chaque mois
+          </td>
+        </tr></table>
+      </td></tr>
+      <tr><td style="padding:12px 0">
+        <table role="presentation"><tr>
+          <td style="vertical-align:top;padding-right:14px">
+            <div style="background:linear-gradient(135deg,#dcfce7 0%,#bbf7d0 100%);color:#15803d;width:36px;height:36px;border-radius:10px;text-align:center;line-height:36px;font-size:18px;flex-shrink:0">💬</div>
+          </td>
+          <td style="font-size:15px;line-height:1.5;color:#334155;padding-top:6px">
+            <strong>Recevoir des messages</strong> d'élèves qui ont des questions sur vos devoirs
+          </td>
+        </tr></table>
+      </td></tr>
     </table>
 
     <!-- Login credentials card -->
-    <div style="background:#f8fafc;border:2px solid #e2e8f0;border-radius:12px;padding:24px;margin:32px 0">
-      <div style="font-size:13px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:16px">🔐 VOS IDENTIFIANTS DE CONNEXION</div>
+    <div style="background:linear-gradient(135deg,#f8fafc 0%,#f1f5f9 100%);border:2px solid #e2e8f0;border-radius:16px;padding:24px;margin:32px 0">
+      <div style="font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px">🔐 VOS IDENTIFIANTS DE CONNEXION</div>
 
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td style="padding:8px 0;font-size:14px;color:#64748b;width:140px">Email</td>
-          <td style="padding:8px 0;font-size:15px;color:#0f172a;font-weight:600;font-family:monospace">${args.teacherEmail}</td>
+          <td style="padding:8px 0;font-size:13px;color:#64748b;width:140px;vertical-align:middle">📧 Email</td>
+          <td style="padding:8px 0;font-size:14px;color:#0f172a;font-weight:600;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;word-break:break-all">${safeEmail}</td>
         </tr>
         <tr>
-          <td style="padding:8px 0;font-size:14px;color:#64748b">Mot de passe temporaire</td>
-          <td style="padding:8px 0">
-            <span style="display:inline-block;background:#0f172a;color:white;padding:8px 16px;border-radius:8px;font-family:monospace;font-size:18px;font-weight:700;letter-spacing:2px">${tempPassword}</span>
+          <td style="padding:8px 0;font-size:13px;color:#64748b;vertical-align:middle">🔑 Mot de passe</td>
+          <td style="padding:8px 0;vertical-align:middle">
+            <span style="display:inline-block;background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);color:white;padding:10px 18px;border-radius:10px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:18px;font-weight:700;letter-spacing:3px;box-shadow:0 4px 12px rgba(15,23,42,0.15)">${safePassword}</span>
           </td>
         </tr>
       </table>
 
-      <div style="background:#fef3c7;border-radius:8px;padding:12px 16px;margin-top:16px;font-size:13px;color:#78350f;line-height:1.5">
-        ⚠️ <strong>Important</strong> — Ce mot de passe est à usage unique. Vous devrez le changer lors de l'activation de votre compte. Vous avez <strong>${daysLeft} jours</strong> pour activer votre compte.
+      <div style="background:linear-gradient(135deg,#fef3c7 0%,#fde68a 100%);border-radius:10px;padding:12px 16px;margin-top:18px;font-size:13px;color:#78350f;line-height:1.5">
+        ⚠️ <strong>Important</strong> — Ce mot de passe est à usage unique. Vous devrez le changer lors de l'activation. Vous avez <strong>${INVITATION_TTL_DAYS} jours</strong> pour activer votre compte.
       </div>
     </div>
 
     <!-- CTA Button -->
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:32px 0">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:32px 0 12px">
       <tr><td align="center">
-        <a href="${acceptUrl}" style="display:inline-block;background:linear-gradient(135deg,#0EA5E9,#0369A1);color:white;text-decoration:none;padding:18px 48px;border-radius:12px;font-size:17px;font-weight:700;letter-spacing:0.3px;box-shadow:0 4px 12px rgba(14,165,233,0.35)">Activer mon compte gratuit →</a>
+        <a href="${acceptUrl}" style="display:inline-block;background:linear-gradient(135deg,#7c3aed 0%,#a855f7 100%);color:white;text-decoration:none;padding:18px 48px;border-radius:14px;font-size:17px;font-weight:800;letter-spacing:0.3px;box-shadow:0 8px 24px rgba(124,58,237,0.3);text-transform:uppercase">Activer mon compte gratuit →</a>
       </td></tr>
     </table>
 
-    <p style="text-align:center;font-size:13px;color:#94a3b8;margin:8px 0 32px 0">ou copier ce lien : <a href="${acceptUrl}" style="color:#0EA5E9;text-decoration:underline;word-break:break-all">${acceptUrl}</a></p>
+    <p style="text-align:center;font-size:12px;color:#94a3b8;margin:8px 0 32px 0">Ou copier ce lien : <a href="${acceptUrl}" style="color:#7c3aed;text-decoration:underline;word-break:break-all">${acceptUrl}</a></p>
 
     <!-- Landing page link -->
-    <div style="background:#fafafa;border-radius:12px;padding:20px;text-align:center;margin:24px 0">
+    <div style="background:#fafafa;border-radius:12px;padding:20px;text-align:center;margin:24px 0 8px">
       <p style="margin:0 0 8px 0;font-size:14px;color:#64748b">Envie d'en savoir plus sur les avantages pour les enseignants ?</p>
-      <a href="${landingUrl}" style="color:#0EA5E9;font-weight:600;text-decoration:none;font-size:15px">Découvrir tous les avantages →</a>
+      <a href="${landingUrl}" style="color:#7c3aed;font-weight:700;text-decoration:none;font-size:15px">Découvrir tous les avantages →</a>
     </div>
 
-    <p style="margin:32px 0 0 0;font-size:15px;line-height:1.6;color:#334155">À très vite sur Examanet,<br><strong style="color:#0EA5E9">L'équipe Examanet</strong></p>
+    <p style="margin:32px 0 0 0;font-size:15px;line-height:1.6;color:#334155">À très vite sur Examanet,<br><strong style="color:#7c3aed">L'équipe Examanet</strong></p>
 
   </td></tr>
 
   <!-- FOOTER -->
-  <tr><td style="background:#f8fafc;padding:24px 40px;border-radius:0 0 16px 16px;border-top:1px solid #e2e8f0">
+  <tr><td style="background:#0f172a;padding:24px 40px;border-radius:0 0 20px 20px">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
       <tr>
-        <td style="font-size:12px;color:#94a3b8;line-height:1.5">
-          Cet email a été envoyé à <strong>${args.teacherEmail}</strong> car vous avez partagé des ressources via JotForm / devoirat.net.<br>
-          Vous ne souhaitez pas rejoindre Examanet ? <a href="${SITE_URL}/api/invitation/unsubscribe?token=${args.teacherEmail}" style="color:#94a3b8;text-decoration:underline">Se désinscrire</a>
+        <td align="center">
+          <div style="margin-bottom:12px">
+            <span style="display:inline-block;background:linear-gradient(135deg,#7c3aed 0%,#ec4899 100%);-webkit-background-clip:text;background-clip:text;color:transparent;font-size:22px;font-weight:800;letter-spacing:-0.5px">Examanet</span>
+          </div>
+          <p style="margin:0 0 4px 0;font-size:12px;color:#94a3b8">La plateforme pédagogique #1 en Tunisie</p>
+          <p style="margin:0 0 12px 0;font-size:12px;color:#64748b">
+            Cet email a été envoyé à <strong style="color:#cbd5e1">${safeEmail}</strong>.
+          </p>
+          <p style="margin:0;font-size:11px;color:#64748b">
+            Vous ne souhaitez pas rejoindre Examanet ? <a href="${SITE_URL}/api/invitation/unsubscribe?token=${encodeURIComponent(teacherEmail)}" style="color:#a78bfa;text-decoration:underline">Se désinscrire</a>
+          </p>
+          <p style="margin:8px 0 0;font-size:11px;color:#475569">
+            © ${new Date().getFullYear()} Examanet · Made with ❤️ in Tunisia 🇹🇳
+          </p>
         </td>
       </tr>
-      <tr><td style="padding-top:12px;font-size:12px;color:#cbd5e1">
-        © ${new Date().getFullYear()} Examanet • Plateforme pédagogique tunisienne • Made with ❤️ in Tunisia
-      </td></tr>
     </table>
   </td></tr>
 
