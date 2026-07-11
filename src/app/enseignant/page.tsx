@@ -5,6 +5,7 @@ import { getCurrentUser } from '@/lib/auth';
 import { FileText, Eye, Download, Star, Clock, TrendingUp, Upload, AlertCircle, CheckCircle } from 'lucide-react';
 import { formatNumber, timeAgo } from '@/lib/utils';
 import { isArabic } from '@/lib/text-utils';
+import VerificationFilesUploader from '@/components/teacher/VerificationFilesUploader';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,9 +18,24 @@ export default async function TeacherDashboard(props: { params: Promise<any>; se
   // Check if teacher needs to submit verification files
   const fullUser = await prisma.user.findUnique({
     where: { id: user.id },
-    select: { status: true, verificationFilesRequestedAt: true, verificationFilesCount: true, verificationFilesNote: true }
+    select: {
+      status: true,
+      verificationFilesRequestedAt: true,
+      verificationFilesCount: true,
+      verificationFilesNote: true,
+      verificationFilesReceivedAt: true,
+    }
   });
   const needsVerification = fullUser?.status === 'PENDING_FILE_VERIFICATION';
+
+  // Fetch verification files if needed
+  const verificationFiles = needsVerification
+    ? await prisma.teacherVerificationFile.findMany({
+        where: { teacherId: user.id },
+        orderBy: { uploadedAt: 'desc' },
+      })
+    : [];
+  const verificationRemaining = Math.max(0, 5 - verificationFiles.length);
 
   const [totalResources, published, pending, rejected, recentResources] = await Promise.all([
     prisma.resource.count({ where: { teacherId: user.id } }),
@@ -50,50 +66,49 @@ export default async function TeacherDashboard(props: { params: Promise<any>; se
 
   return (
     <div>
-      {/* PENDING_FILE_VERIFICATION banner */}
+      {/* PENDING_FILE_VERIFICATION banner + uploader */}
       {needsVerification && (
         <div className="mb-6 bg-gradient-to-br from-violet-50 via-white to-amber-50 border-2 border-violet-300 rounded-2xl p-5 lg:p-6">
-          <div className="flex items-start gap-4">
+          <div className="flex items-start gap-4 mb-5">
             <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 text-white flex items-center justify-center text-2xl flex-shrink-0 shadow-md">
               📁
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1 flex-wrap">
-                <h2 className="font-extrabold text-lg text-slate-900">
+                <h2 className="font-extrabold text-xl text-slate-900">
                   Action requise : envoyez 5 fichiers de vérification
                 </h2>
                 <span className="inline-flex items-center text-[10px] font-bold px-2 py-0.5 rounded-full bg-violet-100 text-violet-700 border border-violet-200">
                   En attente
                 </span>
               </div>
-              <p className="text-sm text-slate-700 leading-relaxed mb-3">
-                Pour finaliser la vérification de votre compte enseignant et activer votre profil, merci de nous envoyer <strong>5 fichiers Word (.docx) ou PDF</strong> parmi vos productions (cours, séries, devoirs, corrigés...). Chaque fichier doit contenir <strong>votre nom et prénom</strong> ({user.firstName} {user.lastName}) en pied de page.
-              </p>
-              {fullUser?.verificationFilesNote && (
-                <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-3 text-sm text-amber-900">
-                  <strong>📝 Message de l'équipe :</strong>
-                  <p className="whitespace-pre-line mt-1">{fullUser.verificationFilesNote}</p>
-                </div>
-              )}
-              <div className="flex flex-wrap gap-2">
-                <a
-                  href="mailto:contact@examanet.com?subject=Envoi%20de%20mes%20fichiers%20de%20v%C3%A9rification%20%E2%80%94%20Examanet"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-violet-500 to-purple-600 text-white text-sm font-bold rounded-xl hover:from-violet-600 hover:to-purple-700 transition shadow-md"
-                >
-                  📤 Soumettre mes fichiers par email
-                </a>
-                <Link
-                  href="/contact"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-white border-2 border-violet-200 text-violet-700 text-sm font-bold rounded-xl hover:bg-violet-50 transition"
-                >
-                  💬 Contacter l'équipe
-                </Link>
-              </div>
-              <p className="text-xs text-slate-500 mt-3">
-                ⏱️ Vous avez 7 jours pour envoyer vos fichiers. Passé ce délai, votre demande sera classée sans suite.
+              <p className="text-sm text-slate-700 leading-relaxed">
+                Pour finaliser la vérification de votre compte enseignant, merci de nous envoyer
+                <strong> 5 fichiers Word/PDF</strong> parmi vos productions (cours, séries, devoirs, corrigés).
+                Chaque fichier doit contenir <strong>votre nom et prénom</strong> ({user.firstName} {user.lastName}).
               </p>
             </div>
           </div>
+
+          <VerificationFilesUploader
+            initialFiles={verificationFiles.map(f => ({
+              id: f.id,
+              fileName: f.fileName,
+              originalFormat: f.originalFormat,
+              fileUrl: f.fileUrl,
+              fileSize: f.fileSize,
+              type: f.type,
+              description: f.description,
+              year: f.year,
+              uploadedAt: f.uploadedAt.toISOString(),
+              reviewedByAdmin: f.reviewedByAdmin,
+            }))}
+            initialRemaining={verificationRemaining}
+            initialRequestedAt={fullUser?.verificationFilesRequestedAt?.toISOString() || null}
+            initialReceivedAt={fullUser?.verificationFilesReceivedAt?.toISOString() || null}
+            initialStatus={fullUser?.status || ''}
+            note={fullUser?.verificationFilesNote || null}
+          />
         </div>
       )}
 
@@ -117,9 +132,19 @@ export default async function TeacherDashboard(props: { params: Promise<any>; se
       )}
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-extrabold">Tableau de bord 👨‍🏫</h1>
-        <Link href="/enseignant/ajouter" className="btn-accent">
-          <Upload className="w-4 h-4" /> Ajouter une ressource
-        </Link>
+        {fullUser?.status === 'ACTIVE' ? (
+          <Link href="/enseignant/ajouter" className="btn-accent">
+            <Upload className="w-4 h-4" /> Ajouter une ressource
+          </Link>
+        ) : (
+          <span
+            className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-500 font-semibold rounded-xl cursor-not-allowed"
+            title="Soumettez vos fichiers de vérification pour activer cette fonctionnalité"
+          >
+            <Upload className="w-4 h-4" /> Ajouter une ressource
+            <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">Vérification requise</span>
+          </span>
+        )}
       </div>
 
       {/* Quick links to new features */}

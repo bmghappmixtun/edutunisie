@@ -386,6 +386,11 @@ export default function ApprobationsClient({
                               <div className="text-violet-600 px-2 col-span-2 sm:col-span-3">
                                 📁 Demande envoyée {formatDate(t.verificationFilesRequestedAt)}
                                 {t.verificationFilesCount ? ` • ${t.verificationFilesCount} fichier(s) reçu(s)` : ' • en attente'}
+                                {t.verificationFilesReceivedAt && (
+                                  <span className="ml-2 inline-flex items-center text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200">
+                                    ✓ Complet
+                                  </span>
+                                )}
                               </div>
                             )}
                           </div>

@@ -84,6 +84,7 @@ model User {
   editsRequested  Resource[]   @relation("EditRequestedBy")
   editsReviewed   Resource[]   @relation("EditReviewedBy")
   library         TeacherFile[] @relation("TeacherLibrary")
+  verificationFiles TeacherVerificationFile[] @relation("TeacherVerificationFiles")
   approvedFiles   Resource[]    @relation("ApprovedBy")
   approvedBy      User?         @relation("ApprovedUsers", fields: [approvedById], references: [id])
   approvedUsers   User[]        @relation("ApprovedUsers")
@@ -310,6 +311,38 @@ model Resource {
 // =============================================================================
 // TEACHER LIBRARY - personal file archive (Word, PDF, etc.)
 // =============================================================================
+model TeacherVerificationFile {
+  id                String   @id @default(cuid())
+
+  // File
+  fileName          String
+  originalFormat    String   // docx, doc, pdf, etc.
+  fileKey           String   // storage key
+  fileUrl           String   // public URL
+  fileSize          Int
+  pageCount         Int?     // optional, for PDFs
+
+  // Metadata
+  type              String?  // COURSE, HOMEWORK, EXERCISE, REVISION, EXAM, OTHER
+  description       String?  // teacher's description of this sample
+  year              String?  // 2024, 2023, etc.
+  trimester         String?
+
+  // Teacher
+  teacherId         String
+  teacher           User     @relation("TeacherVerificationFiles", fields: [teacherId], references: [id], onDelete: Cascade)
+
+  // Linked to verification request
+  requestId         String?  // optional reference to track which request this satisfies
+  reviewedByAdmin   Boolean  @default(false)
+  reviewedAt        DateTime?
+  reviewNote        String?  // admin's note about this file
+
+  uploadedAt        DateTime @default(now())
+
+  @@index([teacherId])
+}
+
 model TeacherFile {
   id                String   @id @default(cuid())
 
