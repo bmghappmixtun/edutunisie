@@ -22,6 +22,13 @@ export default async function TeacherResourcesPage(props: { params: Promise<any>
   const page = parseInt(sp?.page || '1');
   const limit = 20;
 
+  // Check if teacher can upload (status === ACTIVE)
+  const teacher = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: { status: true }
+  });
+  const canUpload = teacher?.status === 'ACTIVE';
+
   const where: any = { teacherId: user.id };
   if (status !== 'ALL') where.status = status;
   if (editStatus !== 'ALL') where.editStatus = editStatus;
@@ -57,9 +64,19 @@ export default async function TeacherResourcesPage(props: { params: Promise<any>
           <h1 className="text-3xl font-extrabold text-slate-900">Mes ressources 📚</h1>
           <p className="text-slate-500 text-sm mt-1">{total} ressource{total > 1 ? 's' : ''} au total</p>
         </div>
-        <Link href="/enseignant/ajouter" className="btn-primary inline-flex items-center gap-2">
-          <Plus className="w-4 h-4" /> Nouvelle ressource
-        </Link>
+        {canUpload ? (
+          <Link href="/enseignant/ajouter" className="btn-primary inline-flex items-center gap-2">
+            <Plus className="w-4 h-4" /> Nouvelle ressource
+          </Link>
+        ) : (
+          <span
+            className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-500 font-semibold rounded-xl cursor-not-allowed"
+            title="Soumettez vos fichiers de vérification pour publier"
+          >
+            <Plus className="w-4 h-4" /> Nouvelle ressource
+            <span className="text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-bold">🔒</span>
+          </span>
+        )}
       </div>
 
       {/* Stats cards */}
@@ -97,9 +114,15 @@ export default async function TeacherResourcesPage(props: { params: Promise<any>
           <FileText className="w-16 h-16 mx-auto mb-4 text-slate-300" />
           <h3 className="font-bold text-xl mb-2">Aucune ressource</h3>
           <p className="text-slate-500 mb-4">Commencez par ajouter votre première ressource</p>
-          <Link href="/enseignant/ajouter" className="btn-primary inline-flex items-center gap-2">
-            <Plus className="w-4 h-4" /> Ajouter une ressource
-          </Link>
+          {canUpload ? (
+            <Link href="/enseignant/ajouter" className="btn-primary inline-flex items-center gap-2">
+              <Plus className="w-4 h-4" /> Ajouter une ressource
+            </Link>
+          ) : (
+            <Link href="/enseignant" className="btn-primary inline-flex items-center gap-2">
+              <Plus className="w-4 h-4" /> Soumettre mes fichiers
+            </Link>
+          )}
         </div>
       ) : (
         <div className="space-y-3">

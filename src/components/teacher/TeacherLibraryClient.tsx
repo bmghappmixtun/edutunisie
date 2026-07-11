@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
+import { Lock } from 'lucide-react';
 
 type TeacherFile = {
   id: string;
@@ -78,6 +79,7 @@ export default function TeacherLibraryClient({
 }) {
   const [files, setFiles] = useState<TeacherFile[]>([]);
   const [loading, setLoading] = useState(true);
+  const [canUpload, setCanUpload] = useState<boolean>(true);
   const [filter, setFilter] = useState<Filter>({
     search: '',
     classId: '',
@@ -86,6 +88,16 @@ export default function TeacherLibraryClient({
     format: '',
   });
   const [view, setView] = useState<'grid' | 'list'>('grid');
+
+  // Check if teacher is allowed to upload (status === ACTIVE)
+  useEffect(() => {
+    fetch('/api/teacher/status')
+      .then(r => r.json())
+      .then(data => {
+        if (data?.canUpload !== undefined) setCanUpload(data.canUpload);
+      })
+      .catch(() => setCanUpload(true));
+  }, []);
 
   const loadFiles = useCallback(async () => {
     setLoading(true);
@@ -227,7 +239,7 @@ export default function TeacherLibraryClient({
           <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent" />
         </div>
       ) : files.length === 0 ? (
-        <EmptyState />
+        <EmptyState canUpload={canUpload} />
       ) : view === 'grid' ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {files.map((file) => (
@@ -322,7 +334,7 @@ function StatCard({ icon, label, value, color }: { icon: string; label: string; 
   );
 }
 
-function EmptyState() {
+function EmptyState({ canUpload = true }: { canUpload?: boolean }) {
   return (
     <div className="bg-white dark:bg-slate-900 rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700 p-12 text-center">
       <div className="text-6xl mb-4">📚</div>
@@ -334,10 +346,15 @@ function EmptyState() {
         Vous pourrez le télécharger à tout moment et le réutiliser pour publier de nouvelles ressources.
       </p>
       <Link
-        href="/enseignant/ajouter"
-        className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary to-cyan-500 text-white rounded-lg font-medium shadow-md hover:shadow-lg transition"
+        href={canUpload ? "/enseignant/ajouter" : "/enseignant"}
+        className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium shadow-md hover:shadow-lg transition ${
+          canUpload
+            ? 'bg-gradient-to-r from-primary to-cyan-500 text-white'
+            : 'bg-slate-200 text-slate-500'
+        }`}
       >
-        <span>📤</span> Ajouter une ressource
+        {canUpload ? <span>📤</span> : <Lock className="w-4 h-4" />}
+        {canUpload ? 'Ajouter une ressource' : 'Soumettre mes fichiers d\'abord'}
       </Link>
     </div>
   );

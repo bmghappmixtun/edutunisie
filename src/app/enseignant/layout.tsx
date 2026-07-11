@@ -23,6 +23,13 @@ export default async function TeacherLayout({ children }: { children: React.Reac
   if (!user) redirect('/connexion');
   if (user.role !== 'TEACHER' && user.role !== 'ADMIN') redirect('/');
 
+  // Check if teacher is blocked from uploading (pending file verification or approval)
+  const teacherStatus = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: { status: true, verificationFilesCount: true, verificationFilesReceivedAt: true }
+  });
+  const canUpload = teacherStatus?.status === 'ACTIVE';
+
   // Get counts for the sidebar (in parallel)
   const [
     myResources,
@@ -111,6 +118,8 @@ export default async function TeacherLayout({ children }: { children: React.Reac
                   icon={Plus}
                   label="Ajouter"
                   highlight
+                  disabled={!canUpload}
+                  disabledReason={!canUpload ? 'Terminez la vérification de vos fichiers pour publier' : undefined}
                 />
               </SidebarGroup>
 
@@ -186,7 +195,7 @@ function SidebarGroup({ title, icon: Icon, children }: { title: string; icon: an
 }
 
 function SidebarLink({
-  href, icon: Icon, label, exact, badge, badgeColor, highlight
+  href, icon: Icon, label, exact, badge, badgeColor, highlight, disabled, disabledReason
 }: {
   href: string;
   icon: any;
@@ -195,7 +204,33 @@ function SidebarLink({
   badge?: number;
   badgeColor?: string;
   highlight?: boolean;
+  disabled?: boolean;
+  disabledReason?: string;
 }) {
+  if (disabled) {
+    return (
+      <div
+        title={disabledReason || 'Action désactivée'}
+        aria-disabled="true"
+        className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium cursor-not-allowed ${
+          highlight
+            ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white opacity-50 font-bold'
+            : 'text-slate-400 bg-slate-100/50'
+        }`}
+      >
+        <Icon className="w-4 h-4 flex-shrink-0" strokeWidth={highlight ? 2.5 : 2} />
+        <span className="flex-1 truncate">{label}</span>
+        <span className="px-1.5 py-0.5 bg-amber-200 text-amber-800 text-[9px] font-bold rounded-full">
+          🔒
+        </span>
+        {badge !== undefined && badge > 0 && (
+          <span className={`px-1.5 py-0.5 text-white text-[10px] font-bold rounded-full ${badgeColor || 'bg-slate-500'}`}>
+            {badge}
+          </span>
+        )}
+      </div>
+    );
+  }
   return (
     <Link
       href={href}
