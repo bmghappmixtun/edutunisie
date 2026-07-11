@@ -12,12 +12,15 @@ export default async function AdminApprovationsPage() {
 
   const [pendingTeachers, pendingResources] = await Promise.all([
     prisma.user.findMany({
-      where: { role: 'TEACHER', status: 'PENDING_APPROVAL' },
+      where: { role: 'TEACHER', status: { in: ['PENDING_APPROVAL', 'PENDING_FILE_VERIFICATION'] } },
       orderBy: { createdAt: 'desc' },
       select: {
         id: true, email: true, firstName: true, lastName: true,
         schoolName: true, governorate: true, diploma: true,
-        teachingSubjects: true, teachingLevels: true, createdAt: true
+        teachingSubjects: true, teachingLevels: true, createdAt: true,
+        status: true, invitationStatus: true, lastInvitationId: true,
+        verificationFilesRequestedAt: true, verificationFilesCount: true,
+        verificationFilesReceivedAt: true,
       }
     }),
     prisma.resource.findMany({
@@ -46,7 +49,12 @@ export default async function AdminApprovationsPage() {
         </div>
       ) : (
         <ApprobationsClient
-          initialTeachers={pendingTeachers.map(t => ({ ...t, createdAt: t.createdAt.toISOString() }))}
+          initialTeachers={pendingTeachers.map(t => ({
+            ...t,
+            createdAt: t.createdAt.toISOString(),
+            verificationFilesRequestedAt: t.verificationFilesRequestedAt?.toISOString() || null,
+            verificationFilesReceivedAt: t.verificationFilesReceivedAt?.toISOString() || null,
+          }))}
           initialResources={pendingResources.map(r => ({
             ...r,
             createdAt: r.createdAt.toISOString()

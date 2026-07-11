@@ -1,6 +1,6 @@
 'use client';
 import { useState, useMemo } from 'react';
-import { CheckCircle, XCircle, Loader2, CheckSquare, Square, Users, FileText, Filter } from 'lucide-react';
+import { CheckCircle, XCircle, Loader2, CheckSquare, Square, Users, FileText, Filter, FolderOpen, Mail, Shield } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 type Teacher = {
@@ -14,6 +14,12 @@ type Teacher = {
   teachingSubjects: string | null;
   teachingLevels: string | null;
   createdAt: string;
+  status: string;
+  invitationStatus?: string | null;
+  lastInvitationId?: string | null;
+  verificationFilesRequestedAt?: string | null;
+  verificationFilesCount?: number;
+  verificationFilesReceivedAt?: string | null;
 };
 
 type Resource = {
@@ -45,6 +51,8 @@ export default function ApprobationsClient({
   const [rejectModal, setRejectModal] = useState<{ ids: string[]; isBulk: boolean; itemTitle?: string } | null>(null);
   const [rejectReason, setRejectReason] = useState('');
   const [search, setSearch] = useState('');
+  const [fileRequestModal, setFileRequestModal] = useState<{ teacher: Teacher } | null>(null);
+  const [fileRequestNote, setFileRequestNote] = useState('');
 
   const currentList = tab === 'teachers' ? teachers : resources;
   const filteredList = useMemo(() => {
@@ -168,6 +176,34 @@ export default function ApprobationsClient({
       toast.success(`✅ ${successIds.length} élément(s) ${action === 'approve' ? 'approuvé(s)' : 'rejeté(s)'} !`);
     } else {
       toast.error(`${successIds.length} réussi, ${failCount} échoué(s)`);
+    }
+  }
+
+  async function handleRequestFiles(teacher: Teacher, note: string | null) {
+    setLoading(`${teacher.id}-request-files`);
+    try {
+      const res = await fetch(`/api/admin/teacher/${teacher.id}/request-files`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ note }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.error || 'Erreur');
+        return;
+      }
+      toast.success(`📁 Demande envoyée à ${teacher.firstName} ${teacher.lastName}`);
+      // Update teacher in list
+      setTeachers(ts => ts.map(t => t.id === teacher.id
+        ? { ...t, status: 'PENDING_FILE_VERIFICATION', verificationFilesRequestedAt: new Date().toISOString() }
+        : t
+      ));
+      setFileRequestModal(null);
+      setFileRequestNote('');
+    } catch (e) {
+      toast.error('Erreur réseau');
+    } finally {
+      setLoading(null);
     }
   }
 
@@ -321,10 +357,24 @@ export default function ApprobationsClient({
                             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 text-white font-bold flex items-center justify-center flex-shrink-0">
                               {t.firstName?.[0]}{t.lastName?.[0]}
                             </div>
-                            <div className="min-w-0">
+                            <div className="min-w-0 flex-1">
                               <div className="font-bold truncate">{t.firstName} {t.lastName}</div>
                               <div className="text-xs text-slate-500 truncate">{t.email}</div>
                             </div>
+                            {/* Status badge */}
+                            {t.lastInvitationId || t.invitationStatus ? (
+                              <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 border border-indigo-200 flex-shrink-0">
+                                <Mail className="w-3 h-3" /> Invité
+                              </span>
+                            ) : t.status === 'PENDING_FILE_VERIFICATION' ? (
+                              <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-violet-100 text-violet-700 border border-violet-200 flex-shrink-0">
+                                <FolderOpen className="w-3 h-3" /> Fichiers demandés
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 border border-amber-200 flex-shrink-0">
+                                Nouveau
+                              </span>
+                            )}
                           </div>
                           <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 text-xs">
                             {t.schoolName && <div className="bg-slate-50 px-2 py-1 rounded">🏫 {t.schoolName}</div>}
@@ -332,6 +382,12 @@ export default function ApprobationsClient({
                             {t.diploma && <div className="bg-slate-50 px-2 py-1 rounded">🎓 {t.diploma}</div>}
                             {t.teachingSubjects && <div className="bg-slate-50 px-2 py-1 rounded col-span-2 sm:col-span-3">📚 {t.teachingSubjects}</div>}
                             <div className="text-slate-400 px-2">⏱️ {formatDate(t.createdAt)}</div>
+                            {t.verificationFilesRequestedAt && (
+                              <div className="text-violet-600 px-2 col-span-2 sm:col-span-3">
+                                📁 Demande envoyée {formatDate(t.verificationFilesRequestedAt)}
+                                {t.verificationFilesCount ? ` • ${t.verificationFilesCount} fichier(s) reçu(s)` : ' • en attente'}
+                              </div>
+                            )}
                           </div>
                         </>
                       ) : (
@@ -383,6 +439,18 @@ export default function ApprobationsClient({
                         {loading === `${item.id}-reject` ? <Loader2 className="w-4 h-4 animate-spin" /> : <XCircle className="w-4 h-4" />}
                         <span className="hidden sm:inline">Rejeter</span>
                       </button>
+                      {/* Request files button — only for non-invited teachers */}
+                      {isTeacher && !t.lastInvitationId && !t.invitationStatus && (
+                        <button
+                          onClick={() => { setFileRequestModal({ teacher: t }); setFileRequestNote(''); }}
+                          disabled={loading !== null}
+                          className="p-2 sm:px-3 sm:py-2 bg-violet-500 hover:bg-violet-600 text-white text-xs sm:text-sm font-semibold rounded-lg sm:rounded-xl transition disabled:opacity-50 flex items-center gap-1.5"
+                          title="Demander 5 fichiers de vérification"
+                        >
+                          {loading === `${item.id}-request-files` ? <Loader2 className="w-4 h-4 animate-spin" /> : <FolderOpen className="w-4 h-4" />}
+                          <span className="hidden sm:inline">Fichiers</span>
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -444,6 +512,72 @@ export default function ApprobationsClient({
                   <><Loader2 className="w-4 h-4 animate-spin" /> Envoi...</>
                 ) : (
                   <><XCircle className="w-4 h-4" /> Confirmer le refus</>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* FILE REQUEST modal — for new non-invited teachers */}
+      {fileRequestModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" onClick={() => setFileRequestModal(null)}>
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden" onClick={e => e.stopPropagation()}>
+            <div className="bg-gradient-to-br from-violet-500 via-purple-600 to-amber-500 p-6 text-white">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-2xl">
+                  📁
+                </div>
+                <div>
+                  <h2 className="text-xl font-extrabold leading-tight">Demander 5 fichiers de vérification</h2>
+                  <p className="text-sm text-violet-100 mt-1">
+                    {fileRequestModal.teacher.firstName} {fileRequestModal.teacher.lastName}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="p-6">
+              <div className="bg-violet-50 border border-violet-200 rounded-xl p-3 mb-4 text-sm text-violet-800">
+                <Shield className="w-4 h-4 inline mr-1" />
+                Cette action enverra un email au prof lui demandant de nous envoyer
+                <strong> 5 fichiers Word/PDF d'exemple</strong> avec son nom et prénom.
+                <br />
+                <span className="text-xs text-violet-600 mt-1 block">
+                  Le prof aura 7 jours pour répondre. Son statut passera à
+                  <code className="mx-1 px-1 bg-white rounded">PENDING_FILE_VERIFICATION</code>.
+                </span>
+              </div>
+
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Message personnalisé <span className="text-slate-400 font-normal">(optionnel)</span>
+              </label>
+              <textarea
+                value={fileRequestNote}
+                onChange={e => setFileRequestNote(e.target.value)}
+                placeholder="Ex: Bienvenue ! Merci de nous envoyer 5 exemples de vos meilleurs cours/séries en français et en arabe. Mettez votre nom en pied de page de chaque fichier."
+                className="w-full border-2 border-slate-200 rounded-xl p-3 text-sm focus:border-violet-400 focus:ring-4 focus:ring-violet-100 outline-none resize-none"
+                rows={5}
+                maxLength={500}
+              />
+              <div className="text-xs text-slate-400 mt-1 text-right">{fileRequestNote.length}/500</div>
+            </div>
+            <div className="bg-slate-50 px-6 py-4 flex gap-2 justify-end border-t border-slate-100">
+              <button
+                onClick={() => { setFileRequestModal(null); setFileRequestNote(''); }}
+                className="px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-200 rounded-lg"
+                disabled={loading?.endsWith('-request-files')}
+              >
+                Annuler
+              </button>
+              <button
+                onClick={() => handleRequestFiles(fileRequestModal.teacher, fileRequestNote.trim() || null)}
+                disabled={loading?.endsWith('-request-files')}
+                className="px-4 py-2 text-sm font-bold text-white bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 rounded-lg disabled:opacity-50 shadow-md flex items-center gap-2"
+              >
+                {loading?.endsWith('-request-files') ? (
+                  <><Loader2 className="w-4 h-4 animate-spin" /> Envoi...</>
+                ) : (
+                  <><Mail className="w-4 h-4" /> Envoyer la demande</>
                 )}
               </button>
             </div>

@@ -71,6 +71,14 @@ model User {
   mustChangePassword Boolean   @default(false)
   passwordSetAt    DateTime?
 
+  // File verification (for new non-invited teachers, admin requests 5 sample docs)
+  verificationFilesRequestedAt DateTime?
+  verificationFilesRequestedById String?
+  verificationFilesRequestedBy   User? @relation("VerificationFilesRequestedBy", fields: [verificationFilesRequestedById], references: [id])
+  verificationFilesNote String?  // Admin's note when requesting files
+  verificationFilesCount Int     @default(0)  // Number of sample files received
+  verificationFilesReceivedAt DateTime?
+
   // Relations
   uploadedFiles   Resource[]    @relation("UploadedBy")
   editsRequested  Resource[]   @relation("EditRequestedBy")
@@ -79,6 +87,7 @@ model User {
   approvedFiles   Resource[]    @relation("ApprovedBy")
   approvedBy      User?         @relation("ApprovedUsers", fields: [approvedById], references: [id])
   approvedUsers   User[]        @relation("ApprovedUsers")
+  verificationFilesRequested  User[] @relation("VerificationFilesRequestedBy")
   comments        Comment[]
   ratings         Rating[]
   favorites       Favorite[]
