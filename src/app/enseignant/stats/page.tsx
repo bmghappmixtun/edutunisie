@@ -11,6 +11,12 @@ export default async function TeacherStatsPage() {
   const user = await getCurrentUser();
   if (!user) redirect('/connexion');
 
+  const teacher = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: { status: true }
+  });
+  const canUpload = teacher?.status === 'ACTIVE';
+
   // Top performing resources
   const topResources = await prisma.resource.findMany({
     where: { teacherId: user.id, status: 'PUBLISHED' },
@@ -119,8 +125,8 @@ export default async function TeacherStatsPage() {
           <div className="py-12 text-center text-slate-400">
             <FileText className="w-10 h-10 mx-auto mb-2 opacity-30" />
             <p>Aucune ressource publiée pour l'instant.</p>
-            <Link href="/enseignant/ajouter" className="btn-accent mt-4">
-              <Upload className="w-4 h-4" /> Publier ma première ressource
+            <Link href={canUpload ? "/enseignant/ajouter" : "/enseignant"} className="btn-accent mt-4">
+              <Upload className="w-4 h-4" /> {canUpload ? 'Publier ma première ressource' : 'Soumettre mes fichiers d\'abord'}
             </Link>
           </div>
         ) : (
