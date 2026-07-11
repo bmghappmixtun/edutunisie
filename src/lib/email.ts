@@ -128,11 +128,11 @@ export async function sendContactEmail(payload: { name: string; email: string; s
   }
 }
 
-export async function sendTeacherApprovalEmail(to: string, firstName: string, approved: boolean): Promise<EmailResult> {
+export async function sendTeacherApprovalEmail(to: string, firstName: string, approved: boolean, opts?: { lastName?: string; dashboardUrl?: string; subjects?: string[]; level?: string; }): Promise<EmailResult> {
   if (process.env.DISABLE_EMAILS === 'true' || process.env.NODE_ENV === 'test') {
     return new EmailResult(true, 'test-mode');
   }
-  const html = renderTeacherApprovalEmail(firstName, approved);
+  const html = renderTeacherApprovalEmail(firstName, approved, opts);
   if (!resend) {
     console.log(`\n📧 [EMAIL - DEV] To: ${to} | Teacher ${approved ? 'approved' : 'rejected'}\n`);
     return new EmailResult(true, 'dev-mode');
@@ -141,7 +141,7 @@ export async function sendTeacherApprovalEmail(to: string, firstName: string, ap
     const result: any = await resend.emails.send({
       from: FROM,
       to: [to],
-      subject: approved ? '🎉 Votre compte enseignant est approuvé !' : 'Mise à jour de votre compte',
+      subject: approved ? `🎉 Bienvenue dans l'équipe Examanet, ${firstName} !` : 'Mise à jour de votre compte enseignant — Examanet',
       html,
     });
     if (result.error) {
@@ -274,8 +274,151 @@ function renderContactEmail(p: { name: string; email: string; subject: string; m
   return `<!DOCTYPE html><html><body><h2>Contact: ${p.subject}</h2><p><strong>De:</strong> ${p.name} (${p.email})</p><p>${p.message}</p></body></html>`;
 }
 
-function renderTeacherApprovalEmail(firstName: string, approved: boolean): string {
-  return `<!DOCTYPE html><html><body><h2>${approved ? 'Compte approuvé !' : 'Mise à jour'}</h2><p>Bonjour ${firstName},</p></body></html>`;
+function renderTeacherApprovalEmail(firstName: string, approved: boolean, opts?: {
+  lastName?: string;
+  dashboardUrl?: string;
+  subjects?: string[];
+  level?: string;
+}): string {
+  const { lastName = '', dashboardUrl = 'https://examanet.com/enseignant', subjects = [], level = '' } = opts || {};
+  const safeFirst = firstName.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const safeLast = lastName.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const fullName = `${safeFirst} ${safeLast}`.trim();
+
+  if (approved) {
+    return `<!DOCTYPE html>
+<html><head><meta charset="UTF-8"></head>
+<body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background:#f8fafc;margin:0;padding:20px;color:#0f172a">
+  <div style="max-width:600px;margin:0 auto;background:#ffffff;border-radius:20px;overflow:hidden;border:1px solid #e2e8f0;box-shadow:0 4px 24px rgba(0,0,0,0.04)">
+    <!-- Hero header with confetti gradient -->
+    <div style="background:linear-gradient(135deg,#7c3aed 0%,#a855f7 50%,#ec4899 100%);padding:48px 32px;text-align:center;position:relative">
+      <div style="position:absolute;top:20px;left:20px;font-size:32px;opacity:0.4">✨</div>
+      <div style="position:absolute;top:32px;right:24px;font-size:28px;opacity:0.4">🎉</div>
+      <div style="position:absolute;bottom:24px;left:32px;font-size:24px;opacity:0.4">⭐</div>
+      <div style="position:absolute;bottom:32px;right:20px;font-size:28px;opacity:0.4">✨</div>
+
+      <div style="display:inline-block;width:96px;height:96px;border-radius:50%;background:#ffffff;box-shadow:0 8px 32px rgba(0,0,0,0.12);margin-bottom:20px;line-height:96px;font-size:56px">
+        🎓
+      </div>
+
+      <h1 style="color:#ffffff;margin:0 0 8px;font-size:32px;font-weight:800;line-height:1.2;letter-spacing:-0.5px">
+        Bienvenue dans l'équipe !
+      </h1>
+      <p style="color:#fce7f3;margin:0;font-size:15px;font-weight:500">
+        Votre compte enseignant est approuvé ✨
+      </p>
+    </div>
+
+    <!-- Welcome message -->
+    <div style="padding:40px 32px">
+      <p style="margin:0 0 6px;font-size:18px;color:#0f172a;font-weight:700">Bonjour <span style="color:#7c3aed">${safeFirst}</span> 👋</p>
+      <p style="margin:0 0 24px;font-size:15px;color:#475569;line-height:1.6">
+        C'est officiel ! Votre profil enseignant sur <strong>Examanet</strong> a été validé par notre équipe.
+        Vous pouvez maintenant partager vos cours, séries d'exercices, devoirs et corrigés avec <strong>des milliers d'élèves tunisiens</strong>.
+      </p>
+
+      <!-- Account summary card -->
+      <div style="background:linear-gradient(135deg,#faf5ff 0%,#fef3c7 100%);border:2px solid #e9d5ff;border-radius:16px;padding:24px;margin:24px 0">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+          <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#7c3aed 0%,#a855f7 100%);color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;flex-shrink:0">
+            ${(safeFirst[0] || 'E').toUpperCase()}${(safeLast[0] || '').toUpperCase()}
+          </div>
+          <div>
+            <div style="font-size:16px;font-weight:800;color:#0f172a;line-height:1.2">${fullName}</div>
+            <div style="font-size:13px;color:#7c3aed;font-weight:600">Compte enseignant vérifié ✓</div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-wrap:wrap;gap:8px;padding-top:16px;border-top:1px solid rgba(124,58,237,0.15)">
+          <div style="background:#ffffff;border:1px solid #e9d5ff;border-radius:10px;padding:8px 12px;font-size:12px;color:#6b21a8;font-weight:600">
+            ✓ Identité vérifiée
+          </div>
+          <div style="background:#ffffff;border:1px solid #e9d5ff;border-radius:10px;padding:8px 12px;font-size:12px;color:#6b21a8;font-weight:600">
+            ✓ Fichiers contrôlés
+          </div>
+          <div style="background:#ffffff;border:1px solid #e9d5ff;border-radius:10px;padding:8px 12px;font-size:12px;color:#6b21a8;font-weight:600">
+            ${level ? `✓ ${level}` : '✓ Prêt à publier'}
+          </div>
+        </div>
+      </div>
+
+      <!-- Next steps -->
+      <h2 style="margin:32px 0 16px;font-size:18px;color:#0f172a;font-weight:800;display:flex;align-items:center;gap:8px">
+        <span style="display:inline-block;width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#7c3aed 0%,#a855f7 100%);color:#fff;text-align:center;line-height:32px;font-size:16px">1</span>
+        Vos prochaines étapes
+      </h2>
+
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:6px;margin-bottom:24px">
+        <a href="${dashboardUrl}" style="display:flex;align-items:center;gap:14px;padding:14px;border-radius:10px;text-decoration:none;transition:background 0.2s" onMouseOver="this.style.background='#f1f5f9'" onMouseOut="this.style.background='transparent'">
+          <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#dbeafe 0%,#bfdbfe 100%);color:#1e40af;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🚀</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:700;color:#0f172a">Publier votre première ressource</div>
+            <div style="font-size:12px;color:#64748b">Cours, séries, devoirs, corrigés...</div>
+          </div>
+          <span style="color:#7c3aed;font-size:18px">→</span>
+        </a>
+        <a href="${dashboardUrl}/stats" style="display:flex;align-items:center;gap:14px;padding:14px;border-radius:10px;text-decoration:none" onMouseOver="this.style.background='#f1f5f9'" onMouseOut="this.style.background='transparent'">
+          <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#dcfce7 0%,#bbf7d0 100%);color:#15803d;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">📊</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:700;color:#0f172a">Suivre vos statistiques</div>
+            <div style="font-size:12px;color:#64748b">Vues, téléchargements, étoiles reçues</div>
+          </div>
+          <span style="color:#7c3aed;font-size:18px">→</span>
+        </a>
+        <a href="${dashboardUrl}/profil" style="display:flex;align-items:center;gap:14px;padding:14px;border-radius:10px;text-decoration:none" onMouseOver="this.style.background='#f1f5f9'" onMouseOut="this.style.background='transparent'">
+          <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#fef3c7 0%,#fde68a 100%);color:#a16207;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">👤</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:700;color:#0f172a">Compléter votre profil</div>
+            <div style="font-size:12px;color:#64748b">Photo, bio, matières enseignées</div>
+          </div>
+          <span style="color:#7c3aed;font-size:18px">→</span>
+        </a>
+      </div>
+
+      <!-- Tips / pro tips -->
+      <div style="background:linear-gradient(135deg,#fef3c7 0%,#fde68a 100%);border-radius:14px;padding:18px;margin-bottom:8px">
+        <div style="display:flex;gap:12px">
+          <div style="font-size:24px;flex-shrink:0">💡</div>
+          <div>
+            <div style="font-size:13px;font-weight:800;color:#78350f;margin-bottom:4px">Conseil de l'équipe</div>
+            <p style="margin:0;font-size:13px;color:#78350f;line-height:1.5">
+              Les ressources <strong>avec corrigé détaillé</strong> reçoivent 3× plus de téléchargements.
+              Pensez à publier vos corrigés en parallèle de vos séries d'exercices.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <div style="text-align:center;margin:32px 0 8px">
+        <a href="${dashboardUrl}" style="display:inline-block;background:linear-gradient(135deg,#7c3aed 0%,#a855f7 100%);color:#ffffff;font-size:16px;font-weight:800;padding:16px 40px;border-radius:12px;text-decoration:none;box-shadow:0 8px 24px rgba(124,58,237,0.25);letter-spacing:0.2px">
+          Accéder à mon espace enseignant →
+        </a>
+      </div>
+
+      <p style="text-align:center;margin:24px 0 0;font-size:13px;color:#94a3b8">
+        Une question ? Répondez à cet email, on est là pour vous aider 💜
+      </p>
+    </div>
+
+    <!-- Footer -->
+    <div style="background:#0f172a;padding:24px 32px;text-align:center">
+      <div style="margin-bottom:12px">
+        <span style="display:inline-block;background:linear-gradient(135deg,#7c3aed 0%,#ec4899 100%);-webkit-background-clip:text;background-clip:text;color:transparent;font-size:20px;font-weight:800;letter-spacing:-0.5px">Examanet</span>
+      </div>
+      <p style="margin:0 0 4px;font-size:12px;color:#94a3b8">
+        La plateforme pédagogique #1 en Tunisie
+      </p>
+      <p style="margin:0;font-size:11px;color:#64748b">
+        Made with love in Tunisia 🇹🇳 · <a href="https://examanet.com" style="color:#a78bfa;text-decoration:none">examanet.com</a>
+      </p>
+    </div>
+  </div>
+</body></html>`;
+  }
+
+  // Rejection email (kept simple)
+  return `<!DOCTYPE html><html><body style="font-family:sans-serif;padding:20px"><div style="max-width:600px;margin:0 auto;background:#fff;border-radius:12px;padding:32px;border:1px solid #e2e8f0"><h2 style="color:#0f172a">Mise à jour de votre compte</h2><p>Bonjour ${safeFirst},</p><p>Nous vous remercions pour l'intérêt que vous portez à Examanet. Après examen de votre dossier, nous ne sommes malheureusement pas en mesure de valider votre compte enseignant pour le moment.</p><p>Si vous pensez qu'il s'agit d'une erreur, n'hésitez pas à nous contacter.</p><p style="margin-top:24px">Cordialement,<br><strong>L'équipe Examanet</strong></p></div></body></html>`;
 }
 
 function renderAdminVerificationFilesEmail(opts: {
