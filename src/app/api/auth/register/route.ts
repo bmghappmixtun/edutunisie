@@ -1,10 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { isValidOrigin, isProduction } from '@/lib/security';
+import { rateLimit, getClientIp } from '@/lib/security';
 import { prisma } from '@/lib/prisma';
 import { hashPassword, generateOTP } from '@/lib/auth';
 import { sendOTPEmail, sendWelcomeEmail } from '@/lib/email';
 import { notifyAdminsNewTeacher } from '@/lib/admin-notify';
 
 export async function POST(req: NextRequest) {
+  // SECURITY: CSRF origin check (production only)
+  if (isProduction() && !isValidOrigin(req)) {
+    return NextResponse.json({ error: 'Origine non autorisée' }, { status: 403 });
+  }
+
   try {
     const { email, password, firstName, lastName, role = 'STUDENT' } = await req.json();
 

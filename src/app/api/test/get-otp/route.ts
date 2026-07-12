@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { notInProductionResponse } from '@/lib/security';
 import { prisma } from '@/lib/prisma';
 
 // Test-only endpoint to retrieve latest OTP for an email
 // Protected by SEED_TOKEN. Used by E2E tests only.
 export async function GET(req: NextRequest) {
+  // SECURITY: Block in production
+  const blocked = notInProductionResponse();
+  if (blocked) return blocked;
+
   const token = req.nextUrl.searchParams.get('token');
   const email = req.nextUrl.searchParams.get('email');
 

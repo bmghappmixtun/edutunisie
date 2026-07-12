@@ -1,9 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { isValidOrigin, isProduction } from '@/lib/security';
+import { rateLimit, getClientIp } from '@/lib/security';
 import { prisma } from '@/lib/prisma';
 import { verifyPassword, createSession, setSessionCookie } from '@/lib/auth';
 
 export async function POST(req: NextRequest) {
+  // SECURITY: CSRF origin check (production only)
+  if (isProduction() && !isValidOrigin(req)) {
+    return NextResponse.json({ error: 'Origine non autorisée' }, { status: 403 });
+  }
+
   try {
+    // SECURITY: rate limit per IP
+    const ip = getClientIp(req);
+    const endpoint = 'login';
+    const limit = endpoint === 'login' ? { max: 10, windowMs: 15 * 60 * 1000 } : { max: 5, windowMs: 60 * 60 * 1000 };
+    const rl = rateLimit(ip, endpoint, limit.max, limit.windowMs);
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: `Trop de tentatives. Réessayez dans ${Math.ceil(rl.resetIn / 60000)} minutes.` },
+        { status: 429, headers: { 'Retry-After': String(Math.ceil(rl.resetIn / 1000)) } }
+      );
+    }
+
     const { email, password } = await req.json();
 
     const user = await prisma.user.findUnique({ where: { email } });

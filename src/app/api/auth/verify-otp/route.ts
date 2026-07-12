@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { isValidOrigin, isProduction } from '@/lib/security';
 import { prisma } from '@/lib/prisma';
 import { createSession, setSessionCookie } from '@/lib/auth';
 import { sendWelcomeConfirmedEmail } from '@/lib/email';
 
 export async function POST(req: NextRequest) {
+  // SECURITY: CSRF origin check (production only)
+  if (isProduction() && !isValidOrigin(req)) {
+    return NextResponse.json({ error: 'Origine non autorisée' }, { status: 403 });
+  }
+
   try {
     const { email, code } = await req.json();
     if (!email || !code) {
