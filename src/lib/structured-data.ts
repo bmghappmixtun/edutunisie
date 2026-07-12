@@ -154,6 +154,7 @@ export function courseSchema(opts: {
   datePublished: string;
   dateModified: string;
   aggregateRating?: { ratingCount: number; ratingValue: number } | null;
+  tags?: string | null; // comma-separated tags
 }) {
   const data: Record<string, unknown> = {
     '@context': 'https://schema.org',
@@ -181,9 +182,12 @@ export function courseSchema(opts: {
       },
     },
     about: opts.subject,
-    keywords: [opts.subject, opts.level, opts.cycle, opts.type, 'Tunisie', 'examanet']
-      .filter(Boolean)
-      .join(', '),
+    keywords: (() => {
+      const tagList = opts.tags ? opts.tags.split(',').map((t: string) => t.trim()).filter(Boolean) : [];
+      const auto = [opts.subject, opts.level, opts.cycle, opts.type, 'Tunisie', 'examanet'].filter(Boolean) as string[];
+      // Tags first (most relevant), then auto keywords, dedupe
+      return Array.from(new Set([...tagList, ...auto])).slice(0, 15).join(', ');
+    })(),
     datePublished: opts.datePublished,
     dateModified: opts.dateModified,
     isPartOf: { '@id': `${SITE_URL}#website` },

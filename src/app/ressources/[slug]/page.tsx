@@ -32,7 +32,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: resource.title,
     description: description.slice(0, 160),
-    keywords: [resource.subject?.nameFr, resource.class?.nameFr, resource.type, 'Tunisie', 'examanet'].filter(Boolean),
+    keywords: (() => {
+      const tagList = resource.tags ? resource.tags.split(',').map((t: string) => t.trim()).filter(Boolean) : [];
+      const auto = [resource.subject?.nameFr, resource.class?.nameFr, resource.type, 'Tunisie', 'examanet'].filter(Boolean) as string[];
+      // Combine tags + auto keywords, dedupe, max 15
+      return Array.from(new Set([...tagList, ...auto])).slice(0, 15);
+    })(),
     alternates: {
       canonical: `${baseUrl}/ressources/${resource.slug}`,
     },
@@ -43,6 +48,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       siteName: 'Examanet',
       locale: 'fr_TN',
       type: 'article',
+      // article:tag = Facebook/LinkedIn tags (helps distribution)
+      ...(resource.tags ? { tags: resource.tags.split(',').map((t: string) => t.trim()).filter(Boolean) } : {}),
       images: [
         {
           url: `${baseUrl}/api/og/resource/${resource.slug}`,
@@ -134,6 +141,7 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
     datePublished: resource.publishedAt?.toISOString() || resource.createdAt?.toISOString(),
     dateModified: resource.updatedAt?.toISOString() || resource.createdAt?.toISOString(),
     aggregateRating,
+    tags: resource.tags, // SEO: auto-generated tags boost discoverability
   });
   const breadcrumbJsonLd = breadcrumbSchema([
     { name: 'Accueil', url: baseUrl },
