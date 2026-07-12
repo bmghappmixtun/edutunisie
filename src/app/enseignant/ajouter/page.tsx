@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ModernUploader from '@/components/teacher/ModernUploader';
-import { autoGenerateTags } from '@/lib/auto-tagger';
+import { autoGenerateTags, autoGenerateTagsEnriched } from '@/lib/auto-tagger';
 import {
   SCHOOL_YEARS,
   CLASSES,
@@ -137,6 +137,23 @@ export default function AddResourcePage() {
   // Auto-suggested SEO tags based on current form state
   const suggestedTags = useMemo(() => {
     if (!fileType || !subjectSlug || !classSlug) return [];
+    // Use enriched version if user has filled in custom title/description (will include topic words)
+    if (description && description.length > 20) {
+      return autoGenerateTagsEnriched({
+        title: customTitle || otherTypeLabel || 'Ressource',
+        subjectSlug,
+        classSlug,
+        sectionSlug: sectionSlug || null,
+        type: fileType,
+        year: schoolYear,
+        trimester: trimester || null,
+        homeworkSubtype: fileType === 'HOMEWORK' ? (homeworkSubtype || null) : null,
+        homeworkNumber: fileType === 'HOMEWORK' ? (homeworkNumber || null) : null,
+        hasCorrection,
+        description,
+        summary: description,  // Use description as summary
+      });
+    }
     return autoGenerateTags({
       title: customTitle || otherTypeLabel || 'Ressource',
       subjectSlug,
