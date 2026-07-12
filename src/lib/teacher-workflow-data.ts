@@ -145,13 +145,14 @@ const LYCEE_1AS: SubjectOption[] = [
   { slug: 'economie',             name: 'Économie (intro)' },
 ];
 
-// 2AS Sciences — Math/Phy/SVT renforcés
+// 2AS Sciences — Math/Phy/SVT renforcés + Informatique (2h/sem)
 const LYCEE_2AS_SCIENCES: SubjectOption[] = [
   ...LYCEE_COMMON,
   { slug: 'mathematiques',        name: 'Mathématiques' },
   { slug: 'physique',             name: 'Sciences Physiques' },
   { slug: 'svt',                  name: 'Sciences de la Vie et de la Terre (SVT)' },
   { slug: 'technologie',          name: 'Technologie' },
+  { slug: 'informatique',         name: 'Informatique' },
 ];
 
 // 2AS Technologies de l'Informatique (TI)
@@ -163,29 +164,32 @@ const LYCEE_2AS_TI: SubjectOption[] = [
   { slug: 'informatique',         name: 'Informatique (TI)' },
 ];
 
-// 2AS Économie et Services
+// 2AS Économie et Services — + Informatique (tableurs, BD, e-commerce)
 const LYCEE_2AS_ECO: SubjectOption[] = [
   ...LYCEE_COMMON,
   { slug: 'mathematiques',        name: 'Mathématiques (Éco)' },
   { slug: 'economie',             name: 'Économie' },
   { slug: 'gestion',              name: 'Gestion' },
+  { slug: 'informatique',         name: 'Informatique' },
 ];
 
-// 2AS Lettres
+// 2AS Lettres — + Informatique (bureautique, traitement de textes)
 const LYCEE_2AS_LETTRES: SubjectOption[] = [
   ...LYCEE_COMMON,
   { slug: 'mathematiques',        name: 'Mathématiques (Lettres)' },
   { slug: 'svt',                  name: 'Sciences de la Vie et de la Terre (Lettres)' },
+  { slug: 'informatique',         name: 'Informatique' },
 ];
 
-// 2AS Sport
+// 2AS Sport — + Informatique (collecte/analyse données, médias)
 const LYCEE_2AS_SPORT: SubjectOption[] = [
   ...LYCEE_COMMON,
   { slug: 'mathematiques',        name: 'Mathématiques' },
   { slug: 'svt',                  name: 'Sciences biologiques' },
+  { slug: 'informatique',         name: 'Informatique' },
 ];
 
-// 3AS/4AS — Mathématiques
+// 3AS/4AS — Mathématiques — + Informatique (algo, programmation 2h/sem)
 const LYCEE_MATHS: SubjectOption[] = [
   ...LYCEE_COMMON,
   { slug: 'mathematiques',        name: 'Mathématiques' },
@@ -194,20 +198,22 @@ const LYCEE_MATHS: SubjectOption[] = [
   { slug: 'informatique',         name: 'Informatique' },
 ];
 
-// 3AS/4AS — Sciences Expérimentales
+// 3AS/4AS — Sciences Expérimentales — + Informatique (algo, programmation 2h/sem)
 const LYCEE_SC_EXP: SubjectOption[] = [
   ...LYCEE_COMMON,
   { slug: 'mathematiques',        name: 'Mathématiques' },
   { slug: 'physique',             name: 'Sciences Physiques' },
   { slug: 'svt',                  name: 'Sciences de la Vie et de la Terre (SVT)' },
+  { slug: 'informatique',         name: 'Informatique' },
 ];
 
-// 3AS/4AS — Sciences Techniques
+// 3AS/4AS — Sciences Techniques — + Informatique (algo, programmation 2h/sem)
 const LYCEE_TECHNIQUE: SubjectOption[] = [
   ...LYCEE_COMMON,
   { slug: 'mathematiques',        name: 'Mathématiques' },
   { slug: 'physique',             name: 'Sciences Physiques' },
   { slug: 'technologie',          name: 'Technologie (Génie méca/élec)' },
+  { slug: 'informatique',         name: 'Informatique' },
 ];
 
 // 3AS/4AS — Sciences de l'Informatique
@@ -215,31 +221,34 @@ const LYCEE_SI: SubjectOption[] = [
   ...LYCEE_COMMON,
   { slug: 'mathematiques',        name: 'Mathématiques' },
   { slug: 'physique',             name: 'Sciences Physiques' },
+  { slug: 'informatique',         name: 'Informatique' },
   { slug: 'algo-prog',            name: 'Algorithme et Programmation' },
   { slug: 'tic',                  name: 'Technologies de l\'Information et de la Communication' },
   { slug: 'bases-donnees',        name: 'Bases de Données (4AS surtout)' },
   { slug: 'systeme-exploitation-reseaux', name: 'Système d\'Exploitation et Réseaux' },
 ];
 
-// 3AS/4AS — Économie et Gestion
+// 3AS/4AS — Économie et Gestion — + Informatique (gestion info, tableurs, BD 2h/sem)
 const LYCEE_ECO: SubjectOption[] = [
   ...LYCEE_COMMON,
   { slug: 'mathematiques',        name: 'Mathématiques' },
   { slug: 'economie',             name: 'Économie' },
   { slug: 'gestion',              name: 'Gestion' },
+  { slug: 'informatique',         name: 'Informatique' },
 ];
 
-// 3AS/4AS — Lettres
+// 3AS/4AS — Lettres — + Informatique (bureautique, traitement textes 2h/sem)
 const LYCEE_LETTRES: SubjectOption[] = [
   ...LYCEE_COMMON,
-  // Philo + Arabe + Français + Anglais + HG déjà dans LYCEE_COMMON
+  { slug: 'informatique',         name: 'Informatique' },
 ];
 
-// 3AS/4AS — Sport
+// 3AS/4AS — Sport — + Informatique (collecte données, médias 1h/sem)
 const LYCEE_SPORT: SubjectOption[] = [
   ...LYCEE_COMMON,
   { slug: 'mathematiques',        name: 'Mathématiques' },
   { slug: 'svt',                  name: 'Sciences biologiques' },
+  { slug: 'informatique',         name: 'Informatique' },
 ];
 
 // Index des matières par (classe, section)
