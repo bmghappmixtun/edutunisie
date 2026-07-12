@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
         if (Number.isFinite(n) && n >= 1 && n <= 20) homeworkNumber = n;
       }
       if (rawSchoolType && typeof rawSchoolType === 'string' && rawSchoolType.trim()) {
-        const allowed = ['PUBLIC', 'PILOTE'];
+        const allowed = ['PUBLIC', 'PRIVATE', 'PILOTE'];
         if (allowed.includes(rawSchoolType)) schoolType = rawSchoolType;
       }
       if (rawProduct && typeof rawProduct === 'string' && rawProduct.trim()) {
@@ -119,7 +119,7 @@ export async function POST(req: NextRequest) {
         const n = parseInt(String(body.homeworkNumber), 10);
         if (Number.isFinite(n) && n >= 1 && n <= 20) homeworkNumber = n;
       }
-      const allowedSchool = ['PUBLIC', 'PILOTE'];
+      const allowedSchool = ['PUBLIC', 'PRIVATE', 'PILOTE'];
       if (allowedSchool.includes(body.schoolType)) schoolType = body.schoolType;
       if (body.product && typeof body.product === 'string') product = body.product.trim().substring(0, 200);
       hasCorrection = body.hasCorrection === true || body.hasCorrection === 'true';

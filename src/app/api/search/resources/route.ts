@@ -41,7 +41,7 @@ export async function GET(req: NextRequest) {
   if (homeworkSubtype && ['CONTROL', 'SYNTHESIS', 'HOUSEWORK'].includes(homeworkSubtype)) {
     where.homeworkSubtype = homeworkSubtype;
   }
-  if (schoolType && ['PUBLIC', 'PILOTE'].includes(schoolType)) {
+  if (schoolType && ['PUBLIC', 'PRIVATE', 'PILOTE'].includes(schoolType)) {
     where.schoolType = schoolType;
   }
   if (fromDate || toDate) {
