@@ -5,6 +5,7 @@ import { uploadFile } from '@/lib/storage';
 import { nanoid } from 'nanoid';
 import { notifyAdminsNewResource } from '@/lib/admin-notify';
 import { detectFormat } from '@/lib/document-converter';
+import { autoGenerateTags } from '@/lib/auto-tagger';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -268,6 +269,25 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Aucun fichier fourni' }, { status: 400 });
     }
 
+    // Auto-generate smart SEO tags (overrides empty user tags)
+    const autoTags = autoGenerateTags({
+      title,
+      subjectSlug: subjectRec.slug,
+      classSlug: classRec.slug,
+      sectionSlug: sectionRec?.slug,
+      type,
+      year,
+      trimester,
+      homeworkSubtype: type === 'HOMEWORK' ? homeworkSubtype : null,
+      homeworkNumber,
+      hasCorrection,
+    });
+    // Merge: user-provided tags + auto-generated (deduped, max 15)
+    const finalTags = Array.from(new Set([
+      ...(tags ? tags.split(',').map((t: string) => t.trim()).filter(Boolean) : []),
+      ...autoTags,
+    ])).slice(0, 15).join(',');
+
     const resource = await prisma.resource.create({
       data: {
         slug,
@@ -284,7 +304,7 @@ export async function POST(req: NextRequest) {
         teacherId: user.id,
         trimester,
         year,
-        tags,
+        tags: finalTags,
         pageCount: 10,
         // Homework & school metadata (NEW)
         homeworkSubtype: type === 'HOMEWORK' ? homeworkSubtype : null,

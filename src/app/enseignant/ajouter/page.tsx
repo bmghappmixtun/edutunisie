@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ModernUploader from '@/components/teacher/ModernUploader';
+import { autoGenerateTags } from '@/lib/auto-tagger';
 import {
   SCHOOL_YEARS,
   CLASSES,
@@ -88,6 +89,7 @@ export default function AddResourcePage() {
   const [description, setDescription] = useState<string>('');
   const [tags, setTags] = useState<string>('');
   const [trimester, setTrimester] = useState<string>('');
+  const [tagsManuallyEdited, setTagsManuallyEdited] = useState<boolean>(false);
 
   // Fetch teacher info on mount
   useEffect(() => {
@@ -131,6 +133,33 @@ export default function AddResourcePage() {
     else if (homeworkNumber === 2) setTrimester('T2');
     else if (typeof homeworkNumber === 'number' && homeworkNumber >= 3) setTrimester('T3');
   }, [homeworkNumber]);
+
+  // Auto-suggested SEO tags based on current form state
+  const suggestedTags = useMemo(() => {
+    if (!fileType || !subjectSlug || !classSlug) return [];
+    return autoGenerateTags({
+      title: customTitle || otherTypeLabel || 'Ressource',
+      subjectSlug,
+      classSlug,
+      sectionSlug: sectionSlug || null,
+      type: fileType,
+      year: schoolYear,
+      trimester: trimester || null,
+      homeworkSubtype: fileType === 'HOMEWORK' ? (homeworkSubtype || null) : null,
+      homeworkNumber: fileType === 'HOMEWORK' ? (homeworkNumber || null) : null,
+      hasCorrection,
+    });
+  }, [fileType, subjectSlug, classSlug, sectionSlug, customTitle, otherTypeLabel, schoolYear, trimester, homeworkSubtype, homeworkNumber, hasCorrection]);
+
+  // Auto-apply suggested tags if user hasn't manually edited them yet
+  useEffect(() => {
+    if (!tagsManuallyEdited && suggestedTags.length > 0) {
+      // Add new suggestions to existing user tags
+      const currentTags = tags ? tags.split(',').map((t: string) => t.trim()).filter(Boolean) : [];
+      const merged = Array.from(new Set([...currentTags, ...suggestedTags])).slice(0, 15);
+      setTags(merged.join(', '));
+    }
+  }, [suggestedTags, tagsManuallyEdited]);
 
   // Build title automatically based on selections (or use custom title)
   // Format: [Type] [N°X] - [Objet/Sujet] - [Classe] - [Section] - [Année] - [Nom Prof]
@@ -604,14 +633,42 @@ export default function AddResourcePage() {
           />
         </div>
         <div>
-          <Label>Tags <span className="text-xs text-slate-400 font-normal">(séparés par des virgules)</span></Label>
+          <Label>
+            Tags <span className="text-xs text-slate-400 font-normal">(séparés par des virgules — suggestions automatiques)</span>
+          </Label>
           <input
             type="text"
             value={tags}
-            onChange={e => setTags(e.target.value)}
+            onChange={e => { setTags(e.target.value); setTagsManuallyEdited(true); }}
             className="input"
             placeholder="math, bac, 2024, fonction"
           />
+          {suggestedTags.length > 0 && (
+            <div className="mt-2">
+              <div className="text-xs text-slate-500 mb-1.5 flex items-center gap-1">
+                <Sparkles className="w-3 h-3 text-violet-500" />
+                <span>{tagsManuallyEdited ? 'Suggestions (cliquez pour ajouter)' : 'Auto-générés depuis le formulaire'}</span>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {suggestedTags.map(t => (
+                  <button
+                    key={t}
+                    type="button"
+                    onClick={() => {
+                      const current = tags ? tags.split(',').map((s: string) => s.trim()).filter(Boolean) : [];
+                      if (!current.includes(t)) {
+                        setTags([...current, t].join(', '));
+                        setTagsManuallyEdited(true);
+                      }
+                    }}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-violet-50 text-violet-700 border border-violet-200 hover:bg-violet-100 transition"
+                  >
+                    + {t}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Correction checkbox */}

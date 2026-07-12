@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import { sendNewEditPendingEmail } from '@/lib/email';
 import { prisma } from '@/lib/prisma';
+import { autoGenerateTags } from '@/lib/auto-tagger';
 
 export const runtime = 'nodejs';
 
@@ -77,6 +78,33 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     for (const [k, v] of Object.entries(allowed)) {
       if (v !== undefined) pendingEdit[k] = v;
     }
+
+    // Re-generate smart SEO tags if any tag-relevant field changed
+    const tagRelevantFields = ['title', 'type', 'subjectId', 'classId', 'sectionId', 'year', 'trimester', 'homeworkSubtype', 'homeworkNumber', 'hasCorrection'];
+    const needsRetag = tagRelevantFields.some(f => f in pendingEdit && (pendingEdit as any)[f] !== (resource as any)[f]);
+    if (needsRetag && resource.subjectId && resource.classId) {
+      const [subjectRec, classRec] = await Promise.all([
+        pendingEdit.subjectId ? prisma.subject.findUnique({ where: { id: pendingEdit.subjectId } }) : prisma.subject.findUnique({ where: { id: resource.subjectId! } }),
+        pendingEdit.classId ? prisma.class.findUnique({ where: { id: pendingEdit.classId } }) : prisma.class.findUnique({ where: { id: resource.classId! } }),
+      ]);
+      if (subjectRec && classRec) {
+        const autoTags = autoGenerateTags({
+          title: pendingEdit.title || resource.title,
+          subjectSlug: subjectRec.slug,
+          classSlug: classRec.slug,
+          sectionSlug: pendingEdit.sectionId === undefined ? (resource.sectionId || null) : (pendingEdit.sectionId || null),
+          type: pendingEdit.type || resource.type,
+          year: pendingEdit.year !== undefined ? pendingEdit.year : resource.year,
+          trimester: pendingEdit.trimester !== undefined ? pendingEdit.trimester : resource.trimester,
+          homeworkSubtype: pendingEdit.homeworkSubtype !== undefined ? pendingEdit.homeworkSubtype : resource.homeworkSubtype,
+          homeworkNumber: pendingEdit.homeworkNumber !== undefined ? pendingEdit.homeworkNumber : resource.homeworkNumber,
+          hasCorrection: pendingEdit.hasCorrection !== undefined ? pendingEdit.hasCorrection : resource.hasCorrection,
+        });
+        const userTags = pendingEdit.tags ? String(pendingEdit.tags).split(',').map((t: string) => t.trim()).filter(Boolean) : [];
+        pendingEdit.tags = Array.from(new Set([...userTags, ...autoTags])).slice(0, 15).join(',');
+      }
+    }
+
     if (Object.keys(pendingEdit).length === 0) {
       return NextResponse.json({ error: 'Aucune modification fournie' }, { status: 400 });
     }
