@@ -1,155 +1,211 @@
 'use client';
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { Info, Loader2, BookOpen, GraduationCap, ChevronRight, Library, CheckCircle2, Wrench, School } from 'lucide-react';
+import {
+  Info, Loader2, ChevronRight, Library, CheckCircle2, Wrench, School,
+  Upload, FileCheck, Sparkles, ArrowRight, Hash, Calendar, BookOpen,
+  GraduationCap, Layers, AlertCircle, CheckCircle, ChevronLeft,
+} from 'lucide-react';
 import toast from 'react-hot-toast';
 import ModernUploader from '@/components/teacher/ModernUploader';
-
-const RESOURCE_TYPES = ['COURSE', 'HOMEWORK', 'EXERCISE', 'REVISION', 'EXAM', 'BAC_SUBJECT', 'CORRECTION', 'SUMMARY', 'OTHER'];
-const TYPE_LABELS: Record<string, string> = {
-  COURSE: 'Cours', HOMEWORK: 'Devoir', EXERCISE: "Série d'exercices",
-  REVISION: 'Révision', EXAM: 'Contrôle/Examen', BAC_SUBJECT: 'Sujet Bac',
-  CORRECTION: 'Corrigé', SUMMARY: 'Résumé', OTHER: 'Autre'
-};
-
-type Subject = { slug: string; name: string; icon?: string; color?: string };
-type ClassItem = { slug: string; name: string; levelSlug: string };
-type Section = { slug: string; name: string; classSlug: string };
+import {
+  SCHOOL_YEARS,
+  CLASSES,
+  getSectionsForClass,
+  isTroncCommun,
+  getSubjectsForClassSection,
+  FILE_TYPES,
+  HOMEWORK_SUBTYPES,
+  HOMEWORK_NUMBERS,
+  EXERCISE_NUMBERS,
+  SCHOOL_TYPES,
+  type FileTypeKey,
+  type SubjectOption,
+} from '@/lib/teacher-workflow-data';
 
 type UploadedFile = {
   libraryFileId: string;
-  fileKey: string;          // PDF key (for the resource)
-  fileUrl: string;          // PDF URL
+  fileKey: string;
+  fileUrl: string;
   fileSize: number;
   fileName: string;
   originalFormat: string;
   conversionStatus: string;
 };
 
+const COLOR_BG: Record<string, string> = {
+  amber:    'bg-amber-100 text-amber-700',
+  emerald:  'bg-emerald-100 text-emerald-700',
+  violet:   'bg-violet-100 text-violet-700',
+  sky:      'bg-sky-100 text-sky-700',
+  slate:    'bg-slate-100 text-slate-700',
+  red:      'bg-red-100 text-red-700',
+  orange:   'bg-orange-100 text-orange-700',
+  blue:     'bg-blue-100 text-blue-700',
+};
+const COLOR_RING: Record<string, string> = {
+  amber:    'ring-amber-400 border-amber-400 bg-amber-50',
+  emerald:  'ring-emerald-400 border-emerald-400 bg-emerald-50',
+  violet:   'ring-violet-400 border-violet-400 bg-violet-50',
+  sky:      'ring-sky-400 border-sky-400 bg-sky-50',
+  slate:    'ring-slate-400 border-slate-400 bg-slate-50',
+  red:      'bg-red-100 border-red-400 text-red-800',
+  orange:   'bg-orange-100 border-orange-400 text-orange-800',
+  blue:     'bg-blue-100 border-blue-400 text-blue-800',
+};
+
 export default function AddResourcePage() {
   const router = useRouter();
-  const [loadingOptions, setLoadingOptions] = useState(true);
-  const [subjects, setSubjects] = useState<Subject[]>([]);
-  const [classes, setClasses] = useState<ClassItem[]>([]);
-  const [sections, setSections] = useState<Section[]>([]);
-  const [form, setForm] = useState({
-    title: '', description: '', type: 'COURSE', subject: '', class: '',
-    section: '', trimester: '', year: '2023-2024', tags: ''
-  });
-  // Homework & school metadata
-  const [homeworkSubtype, setHomeworkSubtype] = useState<string>(''); // CONTROL | SYNTHESIS | HOUSEWORK
-  const [homeworkNumber, setHomeworkNumber] = useState<number | ''>('');
-  const [schoolType, setSchoolType] = useState<string>('PUBLIC');
-  const [product, setProduct] = useState<string>('');
-  const [hasCorrection, setHasCorrection] = useState<boolean>(false);
-  const [correctionSummary, setCorrectionSummary] = useState<string>('');
-
+  const [resetKey, setResetKey] = useState(0);
   const [uploadedFile, setUploadedFile] = useState<UploadedFile | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [resetKey, setResetKey] = useState(0);
 
-  // Show product field only for technologie + 7-8-9ème (collège)
-  const showProductField = useMemo(() => {
-    return form.subject === 'technologie' && ['7eme', '8eme', '9eme'].includes(form.class);
-  }, [form.subject, form.class]);
+  // Workflow state
+  const [fileType, setFileType] = useState<FileTypeKey | ''>('');
+  const [otherTypeLabel, setOtherTypeLabel] = useState<string>(''); // quand fileType=OTHER
 
-  // Auto-inference: when title changes, detect homework subtype + number + trimester
+  // Devoir-specific
+  const [homeworkSubtype, setHomeworkSubtype] = useState<string>('');
+  const [homeworkNumber, setHomeworkNumber] = useState<number | ''>('');
+
+  // Série d'exercices specific
+  const [exerciseNumber, setExerciseNumber] = useState<number | ''>('');
+
+  // Course / Revision / Other title
+  const [customTitle, setCustomTitle] = useState<string>('');
+
+  // Common
+  const [classSlug, setClassSlug] = useState<string>('');
+  const [sectionSlug, setSectionSlug] = useState<string>('');
+  const [subjectSlug, setSubjectSlug] = useState<string>('');
+  const [schoolYear, setSchoolYear] = useState<string>('2025-2026');
+  const [schoolType, setSchoolType] = useState<string>('PUBLIC');
+  const [hasCorrection, setHasCorrection] = useState<boolean>(false);
+  const [correctionSummary, setCorrectionSummary] = useState<string>('');
+  const [description, setDescription] = useState<string>('');
+  const [tags, setTags] = useState<string>('');
+  const [trimester, setTrimester] = useState<string>('');
+
+  // Computed
+  const sections = useMemo(() => getSectionsForClass(classSlug), [classSlug]);
+  const subjects: SubjectOption[] = useMemo(
+    () => getSubjectsForClassSection(classSlug, sectionSlug || null),
+    [classSlug, sectionSlug]
+  );
+  const isTronc = isTroncCommun(classSlug);
+
+  // Reset section when class changes
   useEffect(() => {
-    const title = form.title;
-    if (!title) return;
-    let detectedSubtype = '';
-    let detectedNumber: number | '' = '';
-    let detectedTrimester = '';
-    const lower = title.toLowerCase();
-
-    // Subtype detection
-    if (/contr[oô]le|controle/i.test(title)) detectedSubtype = 'CONTROL';
-    else if (/synth[eè]se|synthese|synt[eè]se/i.test(title)) detectedSubtype = 'SYNTHESIS';
-    else if (/\bmaison\b/i.test(title)) detectedSubtype = 'HOUSEWORK';
-
-    // Number detection: "N°1", "N 1", "n°2", "numéro 3", etc.
-    const numMatch = title.match(/N[°o\u00ba]\s*(\d+)|num[eé]ro\s*(\d+)|n[\.\s]+(\d+)/i);
-    if (numMatch) {
-      const n = parseInt(numMatch[1] || numMatch[2] || numMatch[3], 10);
-      if (Number.isFinite(n) && n >= 1 && n <= 20) detectedNumber = n;
-    }
-    // Trimester auto-fill from number (only when not set by user)
-    if (detectedNumber && !form.trimester) {
-      if (detectedNumber === 1) detectedTrimester = 'T1';
-      else if (detectedNumber === 2) detectedTrimester = 'T2';
-      else if (detectedNumber >= 3) detectedTrimester = 'T3';
-    }
-
-    if (detectedSubtype && !homeworkSubtype) setHomeworkSubtype(detectedSubtype);
-    if (detectedNumber && !homeworkNumber) setHomeworkNumber(detectedNumber);
-    if (detectedTrimester) {
-      setForm(p => p.trimester ? p : { ...p, trimester: detectedTrimester });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [form.title]);
-
-  // Load dropdown options
+    setSectionSlug('');
+  }, [classSlug]);
+  // Reset subject when class or section changes
   useEffect(() => {
-    (async () => {
-      try {
-        const res = await fetch('/api/teacher/options');
-        if (!res.ok) throw new Error('Failed to load options');
-        const data = await res.json();
-        setSubjects(data.subjects || []);
-        setClasses(data.classes || []);
-        setSections(data.sections || []);
-      } catch (e) {
-        toast.error('Erreur de chargement des options');
-      } finally {
-        setLoadingOptions(false);
+    setSubjectSlug('');
+  }, [classSlug, sectionSlug]);
+
+  // Auto-set trimester based on homework number (1=T1, 2=T2, 3+=T3)
+  useEffect(() => {
+    if (homeworkNumber === 1) setTrimester('T1');
+    else if (homeworkNumber === 2) setTrimester('T2');
+    else if (typeof homeworkNumber === 'number' && homeworkNumber >= 3) setTrimester('T3');
+  }, [homeworkNumber]);
+
+  // Build title automatically based on selections (or use custom title)
+  const generatedTitle = useMemo(() => {
+    if (!fileType) return '';
+    const parts: string[] = [];
+
+    if (fileType === 'HOMEWORK') {
+      const sub = HOMEWORK_SUBTYPES.find(s => s.key === homeworkSubtype);
+      if (sub) parts.push(sub.label.replace(/^[\u{1F4CD}\u{1F4DD}\u{1F3E0}]\s*/u, ''));
+      if (homeworkNumber) parts.push(`N°${homeworkNumber}`);
+      if (subjectSlug) {
+        const subName = subjects.find(s => s.slug === subjectSlug)?.name;
+        if (subName) parts.push(`- ${subName}`);
       }
-    })();
-  }, []);
+    } else if (fileType === 'EXERCISE') {
+      parts.push("Série d'exercices");
+      if (exerciseNumber) parts.push(`N°${exerciseNumber}`);
+      if (subjectSlug) {
+        const subName = subjects.find(s => s.slug === subjectSlug)?.name;
+        if (subName) parts.push(`- ${subName}`);
+      }
+      if (customTitle) parts.push(`- ${customTitle}`);
+    } else if (fileType === 'COURSE' || fileType === 'REVISION') {
+      const typeLabel = fileType === 'COURSE' ? 'Cours' : 'Révision';
+      parts.push(typeLabel);
+      if (subjectSlug) {
+        const subName = subjects.find(s => s.slug === subjectSlug)?.name;
+        if (subName) parts.push(`- ${subName}`);
+      }
+      if (customTitle) parts.push(`- ${customTitle}`);
+    } else if (fileType === 'OTHER') {
+      if (otherTypeLabel) parts.push(otherTypeLabel);
+      if (subjectSlug) {
+        const subName = subjects.find(s => s.slug === subjectSlug)?.name;
+        if (subName) parts.push(`- ${subName}`);
+      }
+    }
+    return parts.filter(Boolean).join(' ').trim();
+  }, [fileType, homeworkSubtype, homeworkNumber, exerciseNumber, customTitle, otherTypeLabel, subjectSlug, subjects]);
 
-  function update(k: string, v: string) { setForm(p => ({ ...p, [k]: v })); }
+  // Validation per type
+  const validation = useMemo(() => {
+    const errors: string[] = [];
+    if (!uploadedFile) errors.push('Uploadez un fichier');
+    if (!fileType) errors.push('Choisissez le type de fichier');
+    if (fileType === 'HOMEWORK' && !homeworkSubtype) errors.push('Choisissez le type de devoir');
+    if (fileType === 'EXERCISE' && !customTitle.trim()) errors.push("Saisissez l'objet de la série");
+    if ((fileType === 'COURSE' || fileType === 'REVISION') && !customTitle.trim()) errors.push("Saisissez l'objet du cours/révision");
+    if (fileType === 'OTHER' && !otherTypeLabel.trim()) errors.push('Précisez le type de fichier');
+    if (!classSlug) errors.push('Choisissez la classe');
+    if (!isTronc && sections.length > 0 && !sectionSlug) errors.push('Choisissez la section');
+    if (!subjectSlug) errors.push('Choisissez la matière');
+    return errors;
+  }, [uploadedFile, fileType, homeworkSubtype, customTitle, otherTypeLabel, classSlug, sectionSlug, subjectSlug, isTronc, sections.length]);
 
-  // Filter sections by selected class
-  const filteredSections = sections.filter(s => !form.class || s.classSlug === form.class);
+  const canSubmit = validation.length === 0 && uploadedFile && uploadedFile.conversionStatus !== 'FAILED';
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!form.title || !form.subject || !form.class) {
-      toast.error('Titre, matière et classe sont requis');
-      return;
-    }
-    if (!uploadedFile) {
-      toast.error("Veuillez d'abord uploader un fichier");
-      return;
-    }
-    if (uploadedFile.conversionStatus === 'FAILED') {
-      toast.error('Conversion PDF échouée pour ce fichier. Ré-uploadez en PDF.');
+    if (!canSubmit) {
+      toast.error(validation[0] || 'Formulaire incomplet');
       return;
     }
     setSubmitting(true);
     try {
+      const finalTitle = generatedTitle || customTitle || otherTypeLabel || 'Sans titre';
       const res = await fetch('/api/teacher/resources', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ...form,
-          // We pass libraryFileId so the server uses the stored PDF
-          // AND links the library file to the resource
-          libraryFileId: uploadedFile.libraryFileId,
-          fileKey: uploadedFile.fileKey,
-          fileUrl: uploadedFile.fileUrl,
-          fileSize: uploadedFile.fileSize,
-          // Homework & school metadata (NEW)
-          homeworkSubtype: form.type === 'HOMEWORK' && homeworkSubtype ? homeworkSubtype : null,
-          homeworkNumber: form.type === 'HOMEWORK' && homeworkNumber ? Number(homeworkNumber) : null,
-          schoolType: schoolType || 'PUBLIC',
-          product: showProductField && product ? product : null,
+          title: finalTitle,
+          description: description || null,
+          type: fileType,
+          subject: subjectSlug,
+          class: classSlug,
+          section: sectionSlug || '',
+          trimester: trimester || null,
+          year: schoolYear,
+          tags: tags || null,
+          // Library file
+          libraryFileId: uploadedFile!.libraryFileId,
+          fileKey: uploadedFile!.fileKey,
+          fileUrl: uploadedFile!.fileUrl,
+          fileSize: uploadedFile!.fileSize,
+          // Homework
+          homeworkSubtype: fileType === 'HOMEWORK' ? (homeworkSubtype || null) : null,
+          homeworkNumber: fileType === 'HOMEWORK' && homeworkNumber ? Number(homeworkNumber) : null,
+          // School
+          schoolType,
+          // Correction
           hasCorrection,
           correctionSummary: hasCorrection && correctionSummary ? correctionSummary : null,
         })
       });
       const result = await res.json();
       if (!res.ok) { toast.error(result.error || 'Erreur'); return; }
-      toast.success('Ressource ajoutée et en attente d\'approbation ! ✅');
+      toast.success('Ressource ajoutée et en attente d\'approbation ! 🎉');
       setTimeout(() => router.push('/enseignant/ressources'), 1500);
     } catch (e) {
       toast.error('Erreur réseau');
@@ -160,20 +216,188 @@ export default function AddResourcePage() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
+      {/* Header */}
       <div>
-        <h1 className="text-3xl font-extrabold flex items-center gap-2">➕ Ajouter une ressource</h1>
+        <h1 className="text-3xl font-extrabold flex items-center gap-2">
+          <Sparkles className="w-7 h-7 text-violet-600" />
+          Ajouter une ressource
+        </h1>
         <p className="text-slate-500 mt-1">
-          Uploadez votre fichier (PDF ou Word). Le fichier original est automatiquement
-          sauvegardé dans <a href="/enseignant/bibliotheque" className="text-primary-600 font-semibold underline">votre bibliothèque</a> pour réutilisation future.
+          Suivez le workflow — votre fichier sera automatiquement sauvegardé dans{' '}
+          <a href="/enseignant/bibliotheque" className="text-violet-600 font-semibold underline">
+            votre bibliothèque
+          </a>
+          .
         </p>
       </div>
 
-      {/* Step 1: Upload */}
-      <div>
-        <div className="flex items-center gap-2 mb-3">
-          <span className="w-7 h-7 rounded-full bg-primary-600 text-white font-bold text-sm flex items-center justify-center">1</span>
-          <h2 className="font-bold text-lg">Uploader le fichier</h2>
+      {/* ============================ STEP 0: FILE TYPE ============================ */}
+      <Section step={1} title="Type de fichier" icon={<Layers className="w-4 h-4" />}>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          {FILE_TYPES.map(ft => {
+            const active = fileType === ft.key;
+            return (
+              <button
+                key={ft.key}
+                type="button"
+                onClick={() => {
+                  setFileType(ft.key);
+                  setOtherTypeLabel('');
+                  setHomeworkSubtype('');
+                  setHomeworkNumber('');
+                  setExerciseNumber('');
+                  setCustomTitle('');
+                }}
+                className={`p-4 rounded-2xl border-2 text-left transition ${
+                  active
+                    ? `${COLOR_RING[ft.color]} border-current ring-2`
+                    : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
+                }`}
+              >
+                <div className={`w-10 h-10 rounded-xl ${COLOR_BG[ft.color]} flex items-center justify-center text-xl mb-2`}>
+                  {ft.icon}
+                </div>
+                <div className="font-bold text-slate-900 text-sm">{ft.label}</div>
+                <div className="text-xs text-slate-500 mt-1 line-clamp-2">{ft.description}</div>
+              </button>
+            );
+          })}
         </div>
+
+        {/* Sub-flow: Devoir */}
+        {fileType === 'HOMEWORK' && (
+          <SubSection title="📝 Détails du devoir" tone="amber">
+            <div>
+              <Label>Type de devoir <Required /></Label>
+              <div className="flex flex-wrap gap-2">
+                {HOMEWORK_SUBTYPES.map(opt => (
+                  <button
+                    key={opt.key}
+                    type="button"
+                    onClick={() => setHomeworkSubtype(opt.key)}
+                    className={`px-4 py-2.5 rounded-lg text-sm font-bold border-2 transition ${
+                      homeworkSubtype === opt.key
+                        ? COLOR_RING[opt.color]
+                        : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {homeworkSubtype && (
+              <div>
+                <Label>Numéro du devoir <span className="text-xs text-slate-400 font-normal">(optionnel)</span></Label>
+                <div className="flex flex-wrap gap-2">
+                  {HOMEWORK_NUMBERS.map(n => (
+                    <button
+                      key={n}
+                      type="button"
+                      onClick={() => setHomeworkNumber(n)}
+                      className={`w-12 h-12 rounded-lg text-sm font-bold border-2 transition ${
+                        homeworkNumber === n
+                          ? 'ring-2 ring-violet-400 border-violet-400 bg-violet-50 text-violet-800'
+                          : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                      }`}
+                    >
+                      N°{n}
+                    </button>
+                  ))}
+                </div>
+                <p className="text-xs text-slate-500 mt-2">💡 Le numéro indique le trimestre (N°1 = T1, N°2 = T2, N°3+ = T3)</p>
+              </div>
+            )}
+          </SubSection>
+        )}
+
+        {/* Sub-flow: Série d'exercices */}
+        {fileType === 'EXERCISE' && (
+          <SubSection title="✏️ Détails de la série" tone="emerald">
+            <div>
+              <Label>Numéro de série</Label>
+              <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
+                {EXERCISE_NUMBERS.map(n => (
+                  <button
+                    key={n}
+                    type="button"
+                    onClick={() => setExerciseNumber(n)}
+                    className={`w-12 h-12 rounded-lg text-sm font-bold border-2 transition ${
+                      exerciseNumber === n
+                        ? 'ring-2 ring-emerald-400 border-emerald-400 bg-emerald-50 text-emerald-800'
+                        : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                    }`}
+                  >
+                    N°{n}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <Label>Objet / Titre de la série <Required /></Label>
+              <input
+                type="text"
+                value={customTitle}
+                onChange={e => setCustomTitle(e.target.value)}
+                className="input"
+                placeholder="Ex: Trigonométrie, Suites numériques, Les probabilités..."
+              />
+            </div>
+          </SubSection>
+        )}
+
+        {/* Sub-flow: Cours */}
+        {fileType === 'COURSE' && (
+          <SubSection title="📚 Détails du cours" tone="violet">
+            <div>
+              <Label>Objet / Titre du cours <Required /></Label>
+              <input
+                type="text"
+                value={customTitle}
+                onChange={e => setCustomTitle(e.target.value)}
+                className="input"
+                placeholder="Ex: Chapitre 3 — Les fonctions exponentielles, Leçon n°5..."
+              />
+            </div>
+          </SubSection>
+        )}
+
+        {/* Sub-flow: Révision */}
+        {fileType === 'REVISION' && (
+          <SubSection title="🔄 Détails de la révision" tone="sky">
+            <div>
+              <Label>Objet / Titre de la révision <Required /></Label>
+              <input
+                type="text"
+                value={customTitle}
+                onChange={e => setCustomTitle(e.target.value)}
+                className="input"
+                placeholder="Ex: Bac Blanc — Math, Fiche de révision Physique, Sujets types..."
+              />
+            </div>
+          </SubSection>
+        )}
+
+        {/* Sub-flow: Autres */}
+        {fileType === 'OTHER' && (
+          <SubSection title="📦 Précisez le type" tone="slate">
+            <div>
+              <Label>Type de fichier <Required /></Label>
+              <input
+                type="text"
+                value={otherTypeLabel}
+                onChange={e => setOtherTypeLabel(e.target.value)}
+                className="input"
+                placeholder="Ex: Résumé de cours, Fiche méthode, Projet, Activité, Évaluation..."
+              />
+              <p className="text-xs text-slate-500 mt-2">💡 Décrivez en quelques mots ce que contient votre fichier</p>
+            </div>
+          </SubSection>
+        )}
+      </Section>
+
+      {/* ============================ STEP 1: UPLOAD FILE ============================ */}
+      <Section step={2} title="Uploader le fichier" icon={<Upload className="w-4 h-4" />}>
         <ModernUploader
           endpoint="/api/teacher/files/upload"
           fieldName="file"
@@ -192,13 +416,12 @@ export default function AddResourcePage() {
                 originalFormat: data.originalFormat,
                 conversionStatus: data.conversionStatus,
               });
-
               if (data.conversionStatus === 'FAILED') {
-                toast.error('⚠️ Conversion PDF échouée. Vous pouvez ré-uploader le fichier en PDF manuellement.');
+                toast.error('⚠️ Conversion PDF échouée. Ré-uploadez en PDF.');
               } else if (data.originalFormat !== 'pdf' && data.conversionStatus === 'SUCCESS') {
-                toast.success('📄 Fichier Word converti en PDF ! Sauvegardé dans votre bibliothèque.');
+                toast.success('📄 Fichier Word converti en PDF !');
               } else {
-                toast.success('📄 Fichier uploadé ! Sauvegardé dans votre bibliothèque.');
+                toast.success('📄 Fichier uploadé !');
               }
             }
           }}
@@ -206,328 +429,332 @@ export default function AddResourcePage() {
             toast.error('Erreur upload: ' + (typeof err === 'string' ? err : 'inconnue'));
           }}
         />
-
-        {/* Show library hint when file is uploaded */}
         {uploadedFile && uploadedFile.conversionStatus !== 'FAILED' && (
-          <div className="mt-3 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 flex items-start gap-2">
+          <div className="mt-3 p-3 rounded-lg bg-blue-50 border border-blue-200 flex items-start gap-2">
             <Library className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-            <div className="text-sm text-blue-800 dark:text-blue-200">
+            <div className="text-sm text-blue-800">
               <strong>Original sauvegardé.</strong> Vous retrouverez{' '}
               <span className="font-mono text-xs">{uploadedFile.fileName}</span> dans votre{' '}
-              <a href="/enseignant/bibliotheque" className="font-bold underline">bibliothèque</a>
-              {' '}pour le télécharger ou le réutiliser plus tard.
+              <a href="/enseignant/bibliotheque" className="font-bold underline">bibliothèque</a>.
             </div>
           </div>
         )}
-      </div>
+      </Section>
 
-      {/* Step 2: Metadata */}
-      <div>
-        <div className="flex items-center gap-2 mb-3">
-          <span className="w-7 h-7 rounded-full bg-primary-600 text-white font-bold text-sm flex items-center justify-center">2</span>
-          <h2 className="font-bold text-lg">Informations</h2>
-        </div>
-
-        {loadingOptions ? (
-          <div className="flex items-center justify-center py-8 gap-2 text-slate-500 bg-white rounded-2xl border border-slate-200">
-            <Loader2 className="w-5 h-5 animate-spin" />
-            <span>Chargement des matières et classes...</span>
+      {/* ============================ STEP 2: CLASSE / SECTION / MATIÈRE ============================ */}
+      <Section step={3} title="Classe, section & matière" icon={<GraduationCap className="w-4 h-4" />}>
+        <div className="space-y-4">
+          <div>
+            <Label>Classe <Required /></Label>
+            <select value={classSlug} onChange={e => setClassSlug(e.target.value)} className="input">
+              <option value="">— Choisir une classe —</option>
+              <optgroup label="Collège">
+                {CLASSES.filter(c => c.level === 'college').map(c => (
+                  <option key={c.slug} value={c.slug}>{c.name}</option>
+                ))}
+              </optgroup>
+              <optgroup label="Lycée">
+                {CLASSES.filter(c => c.level === 'lycee').map(c => (
+                  <option key={c.slug} value={c.slug}>{c.name}</option>
+                ))}
+              </optgroup>
+            </select>
           </div>
-        ) : (
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4">
-            <div>
-              <label className="label">Titre *</label>
-              <input type="text" value={form.title} onChange={e => update('title', e.target.value)} required className="input" placeholder="Ex: Devoir de synthèse n°2 — Mathématiques" />
-            </div>
 
-            <div>
-              <label className="label">Description</label>
-              <textarea value={form.description} onChange={e => update('description', e.target.value)} className="input min-h-[100px] resize-none" placeholder="Décrivez votre ressource..." />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="label flex items-center gap-1.5">
-                  <BookOpen className="w-3.5 h-3.5" /> Type *
-                </label>
-                <select value={form.type} onChange={e => update('type', e.target.value)} className="input">
-                  {RESOURCE_TYPES.map(t => <option key={t} value={t}>{TYPE_LABELS[t]}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className="label flex items-center gap-1.5">
-                  <BookOpen className="w-3.5 h-3.5" /> Matière *
-                </label>
-                <select value={form.subject} onChange={e => update('subject', e.target.value)} required className="input">
-                  <option value="">— Choisir une matière —</option>
-                  {subjects.map(s => (
-                    <option key={s.slug} value={s.slug}>{s.icon ? `${s.icon} ` : ''}{s.name}</option>
-                  ))}
-                </select>
-                {subjects.length === 0 && (
-                  <p className="text-xs text-amber-600 mt-1">⚠️ Aucune matière disponible</p>
-                )}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="label flex items-center gap-1.5">
-                  <GraduationCap className="w-3.5 h-3.5" /> Classe *
-                </label>
-                <select value={form.class} onChange={e => update('class', e.target.value)} required className="input">
-                  <option value="">— Choisir une classe —</option>
-                  {classes.map(c => (
-                    <option key={c.slug} value={c.slug}>{c.name}</option>
-                  ))}
-                </select>
-                {classes.length === 0 && (
-                  <p className="text-xs text-amber-600 mt-1">⚠️ Aucune classe disponible</p>
-                )}
-              </div>
-              <div>
-                <label className="label">Section</label>
-                <select
-                  key={`sections-${form.class}`}
-                  value={form.section}
-                  onChange={e => update('section', e.target.value)}
-                  className="input"
-                  disabled={!form.class}
-                >
-                  <option value="">— Aucune —</option>
-                  {filteredSections.map(s => (
-                    <option key={`${s.classSlug}-${s.slug}`} value={s.slug} data-class-slug={s.classSlug}>{s.name}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <label className="label">Trimestre</label>
-                <select value={form.trimester} onChange={e => update('trimester', e.target.value)} className="input">
-                  <option value="">—</option>
-                  <option value="T1">1er trimestre</option>
-                  <option value="T2">2ème trimestre</option>
-                  <option value="T3">3ème trimestre</option>
-                </select>
-              </div>
-              <div>
-                <label className="label">Année</label>
-                <input type="text" value={form.year} onChange={e => update('year', e.target.value)} className="input" />
-              </div>
-              <div>
-                <label className="label">Tags</label>
-                <input type="text" value={form.tags} onChange={e => update('tags', e.target.value)} className="input" placeholder="math, bac, 2024" />
-              </div>
-            </div>
-
-            {/* ===== HOMEWORK & SCHOOL METADATA (NEW) ===== */}
-
-            {/* Homework subtype + number — only when type=HOMEWORK */}
-            {form.type === 'HOMEWORK' && (
-              <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 space-y-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-lg">📝</span>
-                  <span className="font-bold text-amber-900 dark:text-amber-200">Détails du devoir</span>
-                  <span className="text-xs text-amber-700 ml-auto">
-                    Auto-détecté depuis le titre — modifiable
-                  </span>
-                </div>
-                <div>
-                  <label className="label">Type de devoir</label>
-                  <div className="flex flex-wrap gap-2">
-                    {[
-                      { value: 'CONTROL', label: '📋 Devoir de Contrôle', color: 'red' },
-                      { value: 'SYNTHESIS', label: '📝 Devoir de Synthèse', color: 'violet' },
-                      { value: 'HOUSEWORK', label: '🏠 Devoir de Maison', color: 'orange' },
-                    ].map(opt => (
-                      <button
-                        key={opt.value}
-                        type="button"
-                        onClick={() => setHomeworkSubtype(opt.value)}
-                        className={`px-3 py-2 rounded-lg text-sm font-bold border transition ${
-                          homeworkSubtype === opt.value
-                            ? opt.color === 'red' ? 'bg-red-100 border-red-400 text-red-800'
-                            : opt.color === 'violet' ? 'bg-violet-100 border-violet-400 text-violet-800'
-                            : 'bg-orange-100 border-orange-400 text-orange-800'
-                            : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
-                        }`}
-                      >
-                        {opt.label}
-                      </button>
-                    ))}
+          {classSlug && (
+            <>
+              {isTronc ? (
+                <div className="p-3 rounded-lg bg-violet-50 border border-violet-200 flex items-start gap-2">
+                  <Info className="w-4 h-4 text-violet-600 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-violet-800">
+                    <strong>{CLASSES.find(c => c.slug === classSlug)?.name}</strong> est un tronc commun — toutes les matières sont enseignées à tous les élèves, sans distinction de section.
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="label">Numéro du devoir (optionnel)</label>
-                    <select
-                      value={homeworkNumber}
-                      onChange={e => setHomeworkNumber(e.target.value ? parseInt(e.target.value, 10) : '')}
-                      className="input"
-                    >
-                      <option value="">— Non spécifié —</option>
-                      {[1,2,3,4,5,6,7,8,9,10].map(n => (
-                        <option key={n} value={n}>N°{n}</option>
-                      ))}
-                    </select>
-                    <p className="text-xs text-amber-700 mt-1">
-                      💡 Le numéro indique le trimestre (N°1 = T1, N°2 = T2, N°3+ = T3)
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* School type */}
-            <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/20 border border-slate-200 dark:border-slate-800 space-y-3">
-              <div className="flex items-center gap-2">
-                <School className="w-5 h-5 text-slate-700" />
-                <span className="font-bold text-slate-900 dark:text-slate-200">Type d'école</span>
-              </div>
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => setSchoolType('PUBLIC')}
-                  className={`flex-1 px-3 py-2 rounded-lg text-sm font-bold border transition ${
-                    schoolType === 'PUBLIC' || !schoolType
-                      ? 'bg-slate-200 border-slate-400 text-slate-900'
-                      : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
-                  }`}
-                >
-                  🏫 École publique
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setSchoolType('PILOTE')}
-                  className={`flex-1 px-3 py-2 rounded-lg text-sm font-bold border transition ${
-                    schoolType === 'PILOTE'
-                      ? 'bg-amber-200 border-amber-500 text-amber-900'
-                      : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
-                  }`}
-                >
-                  🎓 Lycée/Collège Pilote
-                </button>
-              </div>
-              {schoolType === 'PILOTE' && (
-                <p className="text-xs text-amber-700">
-                  ⓘ Le badge “🏫 Pilote” sera affiché sur la fiche de la ressource.
-                </p>
-              )}
-            </div>
-
-            {/* Product (المنتج) — only for technologie + 7-8-9ème */}
-            {showProductField && (
-              <div className="p-4 rounded-xl bg-orange-50 dark:bg-orange-900/10 border border-orange-200 dark:border-orange-800 space-y-3">
-                <div className="flex items-center gap-2">
-                  <Wrench className="w-5 h-5 text-orange-700" />
-                  <span className="font-bold text-orange-900 dark:text-orange-200">المنتج / Produit réalisé</span>
-                  <span className="text-xs text-orange-700">(Technologie collège — optionnel)</span>
-                </div>
-                <input
-                  type="text"
-                  value={product}
-                  onChange={e => setProduct(e.target.value)}
-                  className="input text-right"
-                  dir="rtl"
-                  placeholder="مثال: مطوية، برنامج سكراتش، موقع إلكتروني..."
-                  maxLength={200}
-                />
-                <p className="text-xs text-orange-700">
-                  💡 Décrit le produit/livrable du projet de technologie (en arabe).
-                </p>
-              </div>
-            )}
-
-            {/* Correction (optionnel) */}
-            <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-200 dark:border-emerald-800 space-y-3">
-              <label className="flex items-start gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={hasCorrection}
-                  onChange={e => setHasCorrection(e.target.checked)}
-                  className="mt-1 w-5 h-5 rounded text-emerald-600 focus:ring-emerald-500"
-                />
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-700" />
-                    <span className="font-bold text-emerald-900 dark:text-emerald-200">
-                      Ce document contient un corrigé
-                    </span>
-                    <span className="text-xs bg-emerald-200 text-emerald-800 px-2 py-0.5 rounded-full font-bold">
-                      Très recherché par les élèves 🔥
-                    </span>
-                  </div>
-                  <p className="text-xs text-emerald-700 mt-1">
-                    Cochez si votre PDF inclut le corrigé détaillé à la fin du document. Un badge vert proéminent
-                    sera affiché pour aider les élèves à le trouver.
-                  </p>
-                </div>
-              </label>
-              {hasCorrection && (
-                <div>
-                  <label className="label">Description du corrigé (optionnel)</label>
-                  <textarea
-                    value={correctionSummary}
-                    onChange={e => setCorrectionSummary(e.target.value)}
-                    className="input min-h-[60px] resize-none text-sm"
-                    placeholder="Ex: Corrigé détaillé des exercices 1 à 4 avec barème et explications..."
-                    maxLength={500}
-                  />
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Step 3: Submit */}
-      <form onSubmit={handleSubmit}>
-        <div className="flex items-center gap-2 mb-3">
-          <span className="w-7 h-7 rounded-full bg-primary-600 text-white font-bold text-sm flex items-center justify-center">3</span>
-          <h2 className="font-bold text-lg">Publier</h2>
-        </div>
-        <div className="bg-white rounded-2xl border border-slate-200 p-6 flex items-center justify-between gap-4">
-          <div className="text-sm text-slate-500">
-            {uploadedFile ? (
-              uploadedFile.conversionStatus === 'FAILED' ? (
-                <span className="text-amber-700">⚠️ Conversion échouée. Ré-uploadez en PDF.</span>
               ) : (
-                <span>
-                  ✅ Fichier <span className="font-bold text-slate-900">{uploadedFile.fileName}</span> prêt à publier.
-                  {uploadedFile.originalFormat !== 'pdf' && (
-                    <span className="ml-1 text-blue-600">
-                      (original {uploadedFile.originalFormat.toUpperCase()} sauvegardé)
-                    </span>
-                  )}
-                </span>
-              )
-            ) : (
-              <span>⚠️ Uploadez d'abord un fichier à l'étape 1</span>
-            )}
+                <div>
+                  <Label>Section <Required /></Label>
+                  <select value={sectionSlug} onChange={e => setSectionSlug(e.target.value)} className="input">
+                    <option value="">— Choisir une section —</option>
+                    {sections.map(s => (
+                      <option key={s.slug} value={s.slug}>{s.name}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </>
+          )}
+
+          {classSlug && (isTronc || sectionSlug) && (
+            <div>
+              <Label>Matière <Required /></Label>
+              <select value={subjectSlug} onChange={e => setSubjectSlug(e.target.value)} className="input">
+                <option value="">— Choisir une matière —</option>
+                {subjects.map(s => (
+                  <option key={s.slug} value={s.slug}>{s.name}</option>
+                ))}
+              </select>
+              {subjects.length === 0 && (
+                <p className="text-xs text-amber-600 mt-1">⚠️ Aucune matière disponible pour cette combinaison</p>
+              )}
+            </div>
+          )}
+        </div>
+      </Section>
+
+      {/* ============================ STEP 3: ANNÉE + ÉCOLE ============================ */}
+      <Section step={4} title="Année scolaire & école" icon={<Calendar className="w-4 h-4" />}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <Label>Année scolaire <Required /></Label>
+            <select value={schoolYear} onChange={e => setSchoolYear(e.target.value)} className="input">
+              {SCHOOL_YEARS.map(y => (
+                <option key={y} value={y}>{y}</option>
+              ))}
+            </select>
           </div>
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => {
-                setUploadedFile(null);
-                setResetKey(k => k + 1);
-              }}
-              className="px-4 py-2.5 rounded-lg border border-slate-200 font-semibold text-slate-700 hover:bg-slate-50"
-            >
-              Réinitialiser
-            </button>
-            <button
-              type="submit"
-              disabled={submitting || !uploadedFile || uploadedFile.conversionStatus === 'FAILED'}
-              className="btn-primary inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {submitting ? <><Loader2 className="w-4 h-4 animate-spin" /> Publication...</> : <>Publier la ressource <ChevronRight className="w-4 h-4" /></>}
-            </button>
+          <div>
+            <Label>Trimestre <span className="text-xs text-slate-400 font-normal">(optionnel)</span></Label>
+            <select value={trimester} onChange={e => setTrimester(e.target.value)} className="input">
+              <option value="">— Non spécifié —</option>
+              <option value="T1">1er trimestre</option>
+              <option value="T2">2ème trimestre</option>
+              <option value="T3">3ème trimestre</option>
+            </select>
           </div>
         </div>
+        <div className="mt-4">
+          <Label>Type d'école</Label>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {SCHOOL_TYPES.map(st => {
+              const active = schoolType === st.key;
+              return (
+                <button
+                  key={st.key}
+                  type="button"
+                  onClick={() => setSchoolType(st.key)}
+                  className={`p-4 rounded-xl border-2 text-left transition ${
+                    active
+                      ? `${COLOR_RING[st.color]} border-current ring-2`
+                      : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">{st.icon}</span>
+                    <span className="font-bold text-slate-900 text-sm">{st.label}</span>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-1.5">{st.description}</p>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </Section>
+
+      {/* ============================ STEP 4: OPTIONNEL ============================ */}
+      <Section step={5} title="Détails optionnels" icon={<Info className="w-4 h-4" />}>
+        <div>
+          <Label>Description <span className="text-xs text-slate-400 font-normal">(optionnel)</span></Label>
+          <textarea
+            value={description}
+            onChange={e => setDescription(e.target.value)}
+            className="input min-h-[80px] resize-none"
+            placeholder="Décrivez votre ressource..."
+            maxLength={500}
+          />
+        </div>
+        <div>
+          <Label>Tags <span className="text-xs text-slate-400 font-normal">(séparés par des virgules)</span></Label>
+          <input
+            type="text"
+            value={tags}
+            onChange={e => setTags(e.target.value)}
+            className="input"
+            placeholder="math, bac, 2024, fonction"
+          />
+        </div>
+
+        {/* Correction checkbox */}
+        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 space-y-3">
+          <label className="flex items-start gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={hasCorrection}
+              onChange={e => setHasCorrection(e.target.checked)}
+              className="mt-1 w-5 h-5 rounded text-emerald-600 focus:ring-emerald-500"
+            />
+            <div className="flex-1">
+              <div className="flex items-center gap-2 flex-wrap">
+                <CheckCircle2 className="w-5 h-5 text-emerald-700" />
+                <span className="font-bold text-emerald-900">Ce document contient un corrigé</span>
+                <span className="text-xs bg-emerald-200 text-emerald-800 px-2 py-0.5 rounded-full font-bold">
+                  Très recherché 🔥
+                </span>
+              </div>
+              <p className="text-xs text-emerald-700 mt-1">
+                Cochez si votre PDF inclut le corrigé détaillé. Un badge vert proéminent sera affiché.
+              </p>
+            </div>
+          </label>
+          {hasCorrection && (
+            <div>
+              <Label>Description du corrigé</Label>
+              <textarea
+                value={correctionSummary}
+                onChange={e => setCorrectionSummary(e.target.value)}
+                className="input min-h-[60px] resize-none text-sm"
+                placeholder="Ex: Corrigé détaillé des exercices 1 à 4 avec barème..."
+                maxLength={500}
+              />
+            </div>
+          )}
+        </div>
+      </Section>
+
+      {/* ============================ STEP 5: TITRE GÉNÉRÉ + PREVIEW + PUBLIER ============================ */}
+      <form onSubmit={handleSubmit}>
+        <Section step={6} title="Aperçu & publication" icon={<FileCheck className="w-4 h-4" />}>
+          {/* Title preview */}
+          {generatedTitle && (
+            <div className="p-4 rounded-xl bg-gradient-to-br from-violet-50 to-amber-50 border-2 border-violet-200">
+              <div className="text-xs font-bold text-violet-600 uppercase tracking-wide mb-1">📋 Titre généré</div>
+              <div className="text-lg font-bold text-slate-900">{generatedTitle}</div>
+              <div className="mt-2 flex flex-wrap gap-2 text-xs">
+                {subjectSlug && (
+                  <span className="inline-flex items-center gap-1 bg-white border border-violet-200 rounded-full px-2.5 py-1 text-violet-700">
+                    <BookOpen className="w-3 h-3" />{subjects.find(s => s.slug === subjectSlug)?.name}
+                  </span>
+                )}
+                {classSlug && (
+                  <span className="inline-flex items-center gap-1 bg-white border border-violet-200 rounded-full px-2.5 py-1 text-violet-700">
+                    <GraduationCap className="w-3 h-3" />{CLASSES.find(c => c.slug === classSlug)?.name}
+                  </span>
+                )}
+                {sectionSlug && (
+                  <span className="inline-flex items-center gap-1 bg-white border border-violet-200 rounded-full px-2.5 py-1 text-violet-700">
+                    <Layers className="w-3 h-3" />{sections.find(s => s.slug === sectionSlug)?.name}
+                  </span>
+                )}
+                <span className="inline-flex items-center gap-1 bg-white border border-violet-200 rounded-full px-2.5 py-1 text-violet-700">
+                  <Calendar className="w-3 h-3" />{schoolYear}
+                </span>
+                {trimester && (
+                  <span className="inline-flex items-center gap-1 bg-white border border-violet-200 rounded-full px-2.5 py-1 text-violet-700">
+                    {trimester}
+                  </span>
+                )}
+                {hasCorrection && (
+                  <span className="inline-flex items-center gap-1 bg-emerald-100 border border-emerald-300 rounded-full px-2.5 py-1 text-emerald-700">
+                    <CheckCircle2 className="w-3 h-3" />Avec corrigé
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Validation errors */}
+          {validation.length > 0 && (
+            <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 space-y-1.5">
+              <div className="flex items-center gap-2 text-amber-900 font-bold text-sm">
+                <AlertCircle className="w-4 h-4" />
+                Pour finaliser, complétez :
+              </div>
+              <ul className="text-sm text-amber-800 space-y-0.5 pl-6 list-disc">
+                {validation.slice(0, 5).map((err, i) => (
+                  <li key={i}>{err}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Submit row */}
+          <div className="bg-white rounded-2xl border border-slate-200 p-4 flex items-center justify-between gap-4 flex-wrap">
+            <div className="text-sm text-slate-500">
+              {uploadedFile ? (
+                uploadedFile.conversionStatus === 'FAILED' ? (
+                  <span className="text-amber-700">⚠️ Conversion échouée. Ré-uploadez en PDF.</span>
+                ) : (
+                  <span>
+                    ✅ Fichier <span className="font-bold text-slate-900">{uploadedFile.fileName}</span> prêt
+                    {uploadedFile.originalFormat !== 'pdf' && (
+                      <span className="ml-1 text-blue-600">(original {uploadedFile.originalFormat.toUpperCase()})</span>
+                    )}
+                  </span>
+                )
+              ) : (
+                <span>⚠️ Uploadez d'abord un fichier à l'étape 2</span>
+              )}
+            </div>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setUploadedFile(null);
+                  setResetKey(k => k + 1);
+                }}
+                className="px-4 py-2.5 rounded-lg border border-slate-200 font-semibold text-slate-700 hover:bg-slate-50"
+              >
+                Réinitialiser fichier
+              </button>
+              <button
+                type="submit"
+                disabled={submitting || !canSubmit}
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-violet-600 to-purple-600 text-white font-bold shadow-lg hover:shadow-xl hover:scale-[1.02] transition disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              >
+                {submitting ? (
+                  <><Loader2 className="w-4 h-4 animate-spin" /> Publication...</>
+                ) : (
+                  <><CheckCircle className="w-4 h-4" /> Publier la ressource</>
+                )}
+              </button>
+            </div>
+          </div>
+        </Section>
       </form>
     </div>
   );
+}
+
+// ============================================================================
+// UI HELPERS
+// ============================================================================
+function Section({ step, title, icon, children }: { step: number; title: string; icon: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <div>
+      <div className="flex items-center gap-2 mb-3">
+        <span className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-600 to-purple-600 text-white font-extrabold text-sm flex items-center justify-center shadow-md">
+          {step}
+        </span>
+        <h2 className="font-bold text-lg flex items-center gap-1.5">{icon}{title}</h2>
+      </div>
+      <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-4">
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function SubSection({ title, tone, children }: { title: string; tone: string; children: React.ReactNode }) {
+  const toneClass: Record<string, string> = {
+    amber:   'bg-amber-50 border-amber-200',
+    emerald: 'bg-emerald-50 border-emerald-200',
+    violet:  'bg-violet-50 border-violet-200',
+    sky:     'bg-sky-50 border-sky-200',
+    slate:   'bg-slate-50 border-slate-200',
+  };
+  return (
+    <div className={`p-4 rounded-xl border ${toneClass[tone] || toneClass.slate} space-y-3`}>
+      <div className="font-bold text-sm text-slate-900">{title}</div>
+      {children}
+    </div>
+  );
+}
+
+function Label({ children }: { children: React.ReactNode }) {
+  return (
+    <label className="block text-sm font-semibold text-slate-700 mb-1.5">{children}</label>
+  );
+}
+
+function Required() {
+  return <span className="text-red-500">*</span>;
 }
