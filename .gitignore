@@ -37,3 +37,4 @@ extract-*.cjs
 backups/
 build-cache/
 .build-cache/
+.github/
