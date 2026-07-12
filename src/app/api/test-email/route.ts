@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { notInProductionResponse } from '@/lib/security';
 import { sendOTPEmail, sendTeacherApprovalEmail, sendResourceApprovedEmail } from '@/lib/email';
 
 export const runtime = 'nodejs';
 
 export async function POST(req: NextRequest) {
+  // SECURITY: Block in production
+  const blocked = notInProductionResponse();
+  if (blocked) return blocked;
+
   // Safety check: require a test token
   const { searchParams } = new URL(req.url);
   const token = searchParams.get('token');

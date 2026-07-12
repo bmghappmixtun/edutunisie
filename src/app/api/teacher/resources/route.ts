@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { isValidOrigin, isProduction } from '@/lib/security';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { uploadFile } from '@/lib/storage';
@@ -11,6 +12,11 @@ export const runtime = 'nodejs';
 export const maxDuration = 60;
 
 export async function POST(req: NextRequest) {
+  // SECURITY: CSRF origin check (production only)
+  if (isProduction() && !isValidOrigin(req)) {
+    return NextResponse.json({ error: 'Origine non autorisée' }, { status: 403 });
+  }
+
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
   if (user.role !== 'TEACHER' && user.role !== 'ADMIN') {

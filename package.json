@@ -43,9 +43,9 @@
     "lucide-react": "^0.408.0",
     "mammoth": "^1.12.0",
     "nanoid": "^5.0.7",
-    "next": "14.2.5",
-    "next-auth": "^4.24.7",
-    "next-intl": "^3.17.2",
+    "next": "14.2.35",
+    "next-auth": "4.24.14",
+    "next-intl": "3.26.5",
     "nuqs": "^2.9.0",
     "pdf-lib": "^1.17.1",
     "pdf-parse": "^2.4.5",
@@ -58,6 +58,7 @@
     "recharts": "^2.12.7",
     "resend": "^4.0.0",
     "tailwind-merge": "^2.4.0",
+    "uuid": "14.0.1",
     "zod": "^3.23.8"
   },
   "devDependencies": {

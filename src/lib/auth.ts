@@ -6,7 +6,7 @@ const SESSION_COOKIE = 'examanet_session';
 const SESSION_DURATION = 30 * 24 * 60 * 60 * 1000; // 30 days
 
 export async function hashPassword(password: string): Promise<string> {
-  return bcrypt.hash(password, 10);
+  return bcrypt.hash(password, 12);
 }
 
 export async function verifyPassword(password: string, hash: string): Promise<boolean> {

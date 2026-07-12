@@ -60,7 +60,7 @@ export async function createInvitation(teacherId: string, invitedById?: string, 
 
   const token = generateInvitationToken();
   const tempPassword = generateTempPassword();
-  const tempPasswordHash = await bcrypt.hash(tempPassword, 10);
+  const tempPasswordHash = await bcrypt.hash(tempPassword, 12);
   const expiresAt = new Date(Date.now() + INVITATION_TTL_DAYS * 24 * 60 * 60 * 1000);
 
   const invitation = await prisma.teacherInvitation.create({
@@ -229,7 +229,7 @@ export async function activateInvitation(token: string, newPassword: string, ipA
     return { ok: false, error: 'Le mot de passe doit contenir au moins 6 caractères' };
   }
 
-  const newHash = await bcrypt.hash(newPassword, 10);
+  const newHash = await bcrypt.hash(newPassword, 12);
 
   await prisma.$transaction([
     prisma.user.update({

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { sanitizeHighlightHtml } from '@/lib/security';
 import { prisma } from '@/lib/prisma';
 
 export const runtime = 'nodejs';

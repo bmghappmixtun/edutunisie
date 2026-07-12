@@ -1,0 +1,110 @@
+name: Blob Sync to R2 (Daily)
+
+# Runs every day at 04:00 UTC (05:00 Paris winter / 06:00 Paris summer).
+# Mirrors new Vercel Blob files to Cloudflare R2 for off-site backup.
+# Only uploads delta (files not already in R2), so daily runs are fast.
+#
+# Required GitHub secrets (Settings → Secrets and variables → Actions):
+#   DATABASE_URL              Neon connection string
+#   R2_ACCOUNT_ID             Cloudflare account ID
+#   R2_ACCESS_KEY_ID          R2 access key (from API token)
+#   R2_SECRET_ACCESS_KEY      R2 secret key
+#   R2_BUCKET                 Bucket name (e.g. "examanet-blob-backup")
+#
+# Manual trigger: Actions tab → "Blob Sync to R2" → "Run workflow"
+#
+# Outputs:
+#   - GitHub Actions summary with stats (uploaded, skipped, errors)
+#   - Manifest committed to backups/blob/ branch
+
+on:
+  schedule:
+    - cron: '0 4 * * *'
+  workflow_dispatch:
+    inputs:
+      dryRun:
+        description: 'Dry run only (no uploads)'
+        required: false
+        default: 'false'
+      prefix:
+        description: 'Only sync files with this prefix (optional)'
+        required: false
+        default: ''
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180  # 3 hours max for first full sync
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run R2 sync
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+        run: |
+          ARGS=""
+          if [ "${{ github.event.inputs.dryRun }}" = "true" ]; then
+            ARGS="--dry-run"
+          fi
+          if [ -n "${{ github.event.inputs.prefix }}" ]; then
+            ARGS="$ARGS --prefix=${{ github.event.inputs.prefix }}"
+          fi
+          node scripts/backup/blob-sync-r2.mjs $ARGS 2>&1 | tee sync-output.log
+
+      - name: Upload sync log as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r2-sync-${{ github.run_id }}-$(date -u +%Y-%m-%d)
+          path: |
+            sync-output.log
+            backups/blob/sync-*.json
+          retention-days: 30
+          if-no-files-found: ignore
+
+      - name: Commit manifest to backups branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Create or checkout backups/blob branch
+          git checkout -B backups/blob backups/blob 2>/dev/null || git checkout -b backups/blob
+          git add backups/blob/ || true
+          git commit -m "r2-sync: $(date -u +%Y-%m-%d)" || echo "No changes to commit"
+          git push origin backups/blob --force
+
+      - name: Summary
+        if: always()
+        run: |
+          # Extract stats from log
+          UPLOADED=$(grep -oP 'Uploaded: \K[0-9]+' sync-output.log | head -1 || echo "0")
+          BYTES=$(grep -oP 'Uploaded: \K[0-9]+ \([0-9.]+ MB' sync-output.log | head -1 || echo "0 MB")
+          ERRORS=$(grep -oP 'Errors:   \K[0-9]+' sync-output.log | head -1 || echo "0")
+          DURATION=$(grep -oP 'DONE in \K[0-9.]+s' sync-output.log | head -1 || echo "unknown")
+
+          echo "## ☁️ Blob → R2 Sync Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- Date: $(date -u +%Y-%m-%d)" >> $GITHUB_STEP_SUMMARY
+          echo "- Duration: $DURATION" >> $GITHUB_STEP_SUMMARY
+          echo "- Uploaded: $UPLOADED files ($BYTES)" >> $GITHUB_STEP_SUMMARY
+          echo "- Errors: $ERRORS" >> $GITHUB_STEP_SUMMARY
+          echo "- Trigger: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Verify" >> $GITHUB_STEP_SUMMARY
+          echo '```bash' >> $GITHUB_STEP_SUMMARY
+          echo "node scripts/backup/blob-restore-r2.mjs --report" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY

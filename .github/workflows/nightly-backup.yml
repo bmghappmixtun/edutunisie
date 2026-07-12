@@ -1,0 +1,120 @@
+name: Nightly Backup
+
+# Runs every day at 03:00 UTC (04:00 Paris winter / 05:00 Paris summer)
+# Dumps the Examanet database to JSON, uploads as GitHub Actions artifact
+# (90-day retention), and commits a manifest to the `backups/` branch.
+#
+# Required secrets (set in GitHub repo Settings → Secrets):
+#   DATABASE_URL         — Neon connection string
+#
+# Outputs:
+#   - GitHub Actions artifact: backup-YYYY-MM-DD (90 days)
+#   - Commit on `backups/db/` branch: manifest.json (history)
+#
+# Manual trigger: Actions tab → "Nightly Backup" → "Run workflow"
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Optional reason for manual run'
+        required: false
+        default: 'manual'
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run DB dump
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          mkdir -p backups/db/$(date -u +%Y-%m-%d)
+          node scripts/backup/db-dump.mjs --out=./backups/db/$(date -u +%Y-%m-%d)
+          echo "Backup output:"
+          find backups/db/$(date -u +%Y-%m-%d) -type f | head -30
+
+      - name: Get total size
+        id: size
+        run: |
+          SIZE=$(du -sh backups/db/$(date -u +%Y-%m-%d) | cut -f1)
+          echo "size=$SIZE" >> $GITHUB_OUTPUT
+          echo "Total backup size: $SIZE"
+
+      - name: Upload artifact (90 days)
+        uses: actions/upload-artifact@v4
+        with:
+          name: backup-${{ github.run_id }}-$(date -u +%Y-%m-%d)
+          path: backups/db/$(date -u +%Y-%m-%d)/
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Commit manifest to backups branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Create manifest
+          MANIFEST=backups/db/MANIFEST.json
+          DATE=$(date -u +%Y-%m-%d)
+          SIZE="${{ steps.size.outputs.size }}"
+
+          if [ ! -f "$MANIFEST" ]; then
+            echo '{"backups":[]}' > "$MANIFEST"
+          fi
+
+          # Add new entry (use Node to safely merge JSON)
+          node -e "
+            const fs = require('fs');
+            const m = JSON.parse(fs.readFileSync('$MANIFEST', 'utf8'));
+            m.backups.push({
+              date: '$DATE',
+              size: '$SIZE',
+              runId: '${{ github.run_id }}',
+              workflow: '${{ github.workflow }}',
+              actor: '${{ github.actor }}',
+              timestamp: new Date().toISOString(),
+            });
+            m.backups = m.backups.slice(-90);  // keep last 90 entries
+            fs.writeFileSync('$MANIFEST', JSON.stringify(m, null, 2));
+          "
+
+          # Push to backups branch (create if missing)
+          git checkout -B backups/db backups/db 2>/dev/null || git checkout -b backups/db
+          git add "$MANIFEST"
+          git commit -m "backup: $DATE ($SIZE)" || echo "No changes"
+          git push origin backups/db --force
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## 🗄️ Database Backup Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- Date: $(date -u +%Y-%m-%d)" >> $GITHUB_STEP_SUMMARY
+          echo "- Size: ${{ steps.size.outputs.size }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Run: ${{ github.run_id }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Trigger: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Reason: ${{ github.event.inputs.reason || 'scheduled' }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Restore" >> $GITHUB_STEP_SUMMARY
+          echo '```bash' >> $GITHUB_STEP_SUMMARY
+          echo "# 1. Download artifact from Actions tab" >> $GITHUB_STEP_SUMMARY
+          echo "# 2. Extract to backups/db/YYYY-MM-DD/" >> $GITHUB_STEP_SUMMARY
+          echo "# 3. Inspect with: cat backups/db/YYYY-MM-DD/schema.json" >> $GITHUB_STEP_SUMMARY
+          echo "# 4. Restore with: node scripts/backup/db-restore.mjs --dir=backups/db/YYYY-MM-DD" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY

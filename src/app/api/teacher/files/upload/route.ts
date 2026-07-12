@@ -24,6 +24,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { isValidOrigin, isProduction } from '@/lib/security';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { uploadFile } from '@/lib/storage';
@@ -36,6 +37,11 @@ export const runtime = 'nodejs'; // need full Node for puppeteer/chromium
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB
 
 export async function POST(req: NextRequest) {
+  // SECURITY: CSRF origin check (production only)
+  if (isProduction() && !isValidOrigin(req)) {
+    return NextResponse.json({ error: 'Origine non autorisée' }, { status: 403 });
+  }
+
   try {
     const user = await getCurrentUser();
     if (!user) {
@@ -92,7 +98,31 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // SECURITY: Read first bytes to verify actual file content (magic number)
     const fileBuffer = Buffer.from(await file.arrayBuffer());
+    const firstBytes = fileBuffer.slice(0, 8);
+    let magicNumberValid = true;
+    if (format.isPdf) {
+      // PDF files start with %PDF-
+      magicNumberValid = firstBytes.toString('ascii', 0, 5) === '%PDF-';
+    } else if (format.format === 'docx' || format.format === 'doc') {
+      // DOCX/DOC are ZIP-based (start with PK) or OLE (D0 CF 11 E0)
+      const isPK = firstBytes[0] === 0x50 && firstBytes[1] === 0x4B; // ZIP (DOCX)
+      const isOLE = firstBytes[0] === 0xD0 && firstBytes[1] === 0xCF && firstBytes[2] === 0x11 && firstBytes[3] === 0xE0; // OLE (DOC)
+      magicNumberValid = isPK || isOLE;
+    } else if (format.format === 'odt') {
+      // ODT is ZIP-based
+      magicNumberValid = firstBytes[0] === 0x50 && firstBytes[1] === 0x4B;
+    }
+    if (!magicNumberValid) {
+      console.warn(`[security] Rejected ${file.name} (${format.format}) — magic number mismatch: ${firstBytes.toString('hex')}`);
+      return NextResponse.json(
+        { error: 'Type de fichier invalide. Le contenu ne correspond pas à l\'extension.' },
+        { status: 400 }
+      );
+    }
+
+    // fileBuffer already read above for magic number check
     const teacherId = user.id;
 
     // 1. Save original file to Blob

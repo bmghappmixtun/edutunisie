@@ -10,6 +10,7 @@
  *   5. GROUP BY for facets (single query, parallel aggregation)
  */
 import { prisma } from './prisma';
+import { sanitizeHighlightHtml } from './security';
 
 export interface SearchFilters {
   subject?: string[];
@@ -353,8 +354,8 @@ export async function searchV2(options: SearchOptions): Promise<SearchResponse> 
       id: r.id,
       slug: f?.slug ?? null,
       title: f?.title ?? null,
-      titleHighlighted: r.title_highlighted,
-      descriptionHighlighted: r.description_highlighted,
+      titleHighlighted: sanitizeHighlightHtml(r.title_highlighted),
+      descriptionHighlighted: sanitizeHighlightHtml(r.description_highlighted),
       type: f?.type ?? null,
       subject: f?.subject ? { nameFr: f.subject.nameFr, slug: f.subject.slug, color: f.subject.color } : null,
       class: f?.class ? { nameFr: f.class.nameFr, slug: f.class.slug } : null,

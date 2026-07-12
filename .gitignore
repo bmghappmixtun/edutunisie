@@ -35,3 +35,5 @@ node_modules/
 extract-*.cjs
 *-extract.cjs
 backups/
+build-cache/
+.build-cache/
