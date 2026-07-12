@@ -60,6 +60,9 @@ export default function AddResourcePage() {
   const [uploadedFile, setUploadedFile] = useState<UploadedFile | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
+  // Teacher info (for title generation)
+  const [teacherName, setTeacherName] = useState<string>('');
+
   // Workflow state
   const [fileType, setFileType] = useState<FileTypeKey | ''>('');
   const [otherTypeLabel, setOtherTypeLabel] = useState<string>(''); // quand fileType=OTHER
@@ -86,6 +89,25 @@ export default function AddResourcePage() {
   const [tags, setTags] = useState<string>('');
   const [trimester, setTrimester] = useState<string>('');
 
+  // Fetch teacher info on mount
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch('/api/auth/me');
+        if (res.ok) {
+          const data = await res.json();
+          const u = data.user;
+          if (u) {
+            const fullName = `${u.firstName || ''} ${u.lastName || ''}`.trim();
+            setTeacherName(fullName);
+          }
+        }
+      } catch {
+        // Silently fail — title will just not include teacher name
+      }
+    })();
+  }, []);
+
   // Computed
   const sections = useMemo(() => getSectionsForClass(classSlug), [classSlug]);
   const subjects: SubjectOption[] = useMemo(
@@ -111,43 +133,62 @@ export default function AddResourcePage() {
   }, [homeworkNumber]);
 
   // Build title automatically based on selections (or use custom title)
+  // Format: [Type] [N°X] - [Objet/Sujet] - [Classe] - [Section] - [Année] - [Nom Prof]
   const generatedTitle = useMemo(() => {
     if (!fileType) return '';
     const parts: string[] = [];
 
+    // 1) Type + sous-type / N°
     if (fileType === 'HOMEWORK') {
       const sub = HOMEWORK_SUBTYPES.find(s => s.key === homeworkSubtype);
-      if (sub) parts.push(sub.label.replace(/^[\u{1F4CD}\u{1F4DD}\u{1F3E0}]\s*/u, ''));
-      if (homeworkNumber) parts.push(`N°${homeworkNumber}`);
-      if (subjectSlug) {
-        const subName = subjects.find(s => s.slug === subjectSlug)?.name;
-        if (subName) parts.push(`- ${subName}`);
+      if (sub) {
+        // Strip leading emoji: 📋📝🏠
+        const cleanLabel = sub.label.replace(/^[\u{1F4CD}\u{1F4DD}\u{1F3E0}]\s*/u, '');
+        parts.push(cleanLabel);
       }
+      if (homeworkNumber) parts.push(`N°${homeworkNumber}`);
     } else if (fileType === 'EXERCISE') {
       parts.push("Série d'exercices");
       if (exerciseNumber) parts.push(`N°${exerciseNumber}`);
-      if (subjectSlug) {
-        const subName = subjects.find(s => s.slug === subjectSlug)?.name;
-        if (subName) parts.push(`- ${subName}`);
-      }
-      if (customTitle) parts.push(`- ${customTitle}`);
-    } else if (fileType === 'COURSE' || fileType === 'REVISION') {
-      const typeLabel = fileType === 'COURSE' ? 'Cours' : 'Révision';
-      parts.push(typeLabel);
-      if (subjectSlug) {
-        const subName = subjects.find(s => s.slug === subjectSlug)?.name;
-        if (subName) parts.push(`- ${subName}`);
-      }
-      if (customTitle) parts.push(`- ${customTitle}`);
+    } else if (fileType === 'COURSE') {
+      parts.push('Cours');
+    } else if (fileType === 'REVISION') {
+      parts.push('Révision');
     } else if (fileType === 'OTHER') {
       if (otherTypeLabel) parts.push(otherTypeLabel);
-      if (subjectSlug) {
-        const subName = subjects.find(s => s.slug === subjectSlug)?.name;
-        if (subName) parts.push(`- ${subName}`);
-      }
     }
+
+    // 2) Objet / Sujet (custom title) - pour série, cours, révision
+    if ((fileType === 'EXERCISE' || fileType === 'COURSE' || fileType === 'REVISION' || fileType === 'OTHER') && customTitle) {
+      parts.push(`- ${customTitle}`);
+    }
+
+    // 3) Matière
+    if (subjectSlug) {
+      const subName = subjects.find(s => s.slug === subjectSlug)?.name;
+      if (subName) parts.push(`- ${subName}`);
+    }
+
+    // 4) Classe
+    if (classSlug) {
+      const className = CLASSES.find(c => c.slug === classSlug)?.name;
+      if (className) parts.push(`- ${className}`);
+    }
+
+    // 5) Section (si pas tronc commun)
+    if (sectionSlug && !isTronc) {
+      const sectionName = sections.find(s => s.slug === sectionSlug)?.name;
+      if (sectionName) parts.push(`- ${sectionName}`);
+    }
+
+    // 6) Année scolaire
+    if (schoolYear) parts.push(`- ${schoolYear}`);
+
+    // 7) Nom du prof
+    if (teacherName) parts.push(`- ${teacherName}`);
+
     return parts.filter(Boolean).join(' ').trim();
-  }, [fileType, homeworkSubtype, homeworkNumber, exerciseNumber, customTitle, otherTypeLabel, subjectSlug, subjects]);
+  }, [fileType, homeworkSubtype, homeworkNumber, exerciseNumber, customTitle, otherTypeLabel, subjectSlug, classSlug, sectionSlug, schoolYear, teacherName, subjects, sections, isTronc]);
 
   // Validation per type
   const validation = useMemo(() => {
