@@ -10,7 +10,14 @@ import { ChevronLeft, Download } from 'lucide-react';
 export const dynamic = 'force-dynamic';
 
 export default async function ResourceViewerPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
+  const rawSlug = (await params).slug;
+  // Same URL-decode fix as the page (Next.js doesn't auto-decode non-ASCII slugs)
+  let slug: string;
+  try {
+    slug = decodeURIComponent(rawSlug);
+  } catch {
+    slug = rawSlug;
+  }
   const resource = await prisma.resource.findUnique({ where: { slug } });
   if (!resource || resource.status !== 'PUBLISHED') notFound();
 
