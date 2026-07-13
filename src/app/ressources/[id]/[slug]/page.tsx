@@ -358,7 +358,7 @@ export default async function ResourcePage({ params }: { params: Promise<{ id: s
                 </div>
                 <div className="p-0">
                   <PDFViewer
-                    url={resource.fileUrl}
+                    url={`/api/resources/${resource.id}/download`}
                     fileName={`${resource.title}.pdf`}
                   />
                 </div>
