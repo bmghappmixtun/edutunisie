@@ -128,6 +128,10 @@ export default async function ResourcePage({ params }: { params: Promise<{ id: s
     }
   }
 
+  // Replace the blob URL with our proxy URL so the file is always served from examanet.com
+  // (the user never sees the Vercel Blob URL).
+  resource.fileUrl = `/api/resources/${resource.id}/download`;
+
   // Track view
   await prisma.view.create({ data: { resourceId: resource.id, ipAddress: 'visitor' } });
   await prisma.resource.update({ where: { id: resource.id }, data: { viewsCount: { increment: 1 } } });
@@ -339,7 +343,7 @@ export default async function ResourcePage({ params }: { params: Promise<{ id: s
                   numericId={resource.numericId}
                   slug={resource.slug}
                   title={resource.title}
-                  fileUrl={resource.fileUrl}
+                  fileUrl={`/api/resources/${resource.id}/download`}
                   originalFileKey={resource.originalFileKey}
                   originalFileName={resource.originalFileName}
                   originalFormat={resource.originalFormat}
