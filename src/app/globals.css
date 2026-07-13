@@ -263,4 +263,18 @@
 .pdf-viewer-container {
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
+  /* Allow vertical pan (swipe up/down to scroll) + horizontal pan (swipe to next page) */
+  touch-action: pan-x pan-y;
+  /* Prevent text selection from blocking scroll */
+  -webkit-user-select: none;
+  user-select: none;
+  /* Better mobile scroll */
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* But re-enable text selection on the PDF text layer (so user can still copy text) */
+.pdf-viewer-container .react-pdf__Page__textContent {
+  -webkit-user-select: text;
+  user-select: text;
 }
