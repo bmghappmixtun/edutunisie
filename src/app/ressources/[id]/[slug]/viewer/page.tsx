@@ -55,8 +55,7 @@ export default async function ResourceViewerPage({ params }: { params: Promise<{
             </div>
           </div>
           <a
-            href={resource.fileUrl}
-            download={`${resource.title}.pdf`}
+            href={`/api/resources/${resource.id}/download`}
             className="btn-primary text-sm"
           >
             <Download className="w-4 h-4" /> Télécharger
@@ -66,7 +65,7 @@ export default async function ResourceViewerPage({ params }: { params: Promise<{
       <div className="flex-1 p-4">
         <div className="max-w-7xl mx-auto">
           <PDFViewer
-            url={resource.fileUrl}
+            url={`/api/resources/${resource.id}/download`}
             fileName={`${resource.title}.pdf`}
           />
           <div className="mt-3 text-center text-xs text-slate-500">
