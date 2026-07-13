@@ -30,8 +30,11 @@ const breadcrumbJsonLd = breadcrumbSchema([
   { name: 'À propos', url: `${SITE_URL}/a-propos` },
 ]);
 
+// SECURITY: founder name is intentionally anonymized (initials only)
+// to protect personal data. No personal email exposed on public pages.
+// Contact: /contact page (generic, monitored)
 const team = [
-  { name: 'Mehdi Boutiti', roleKey: 'team.founder' as const, email: 'boutiti.mehdi@gmail.com' }
+  { name: 'B.Mehdi', roleKey: 'team.founder' as const }
 ];
 
 export default function AboutPage() {
@@ -180,13 +183,13 @@ export default function AboutPage() {
               {team.map((m, i) => (
                 <div key={i} className="bg-white rounded-2xl p-6 text-center border border-slate-100">
                   <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 text-white font-extrabold text-2xl flex items-center justify-center shadow-lg shadow-primary-500/30">
-                    {m.name.split(' ').map(p => p[0]).join('').slice(0, 2)}
+                    {m.name.split(/[.\s]+/).filter(Boolean).map(p => p[0]).join('').slice(0, 2).toUpperCase()}
                   </div>
                   <h3 className="font-bold text-lg mb-1">{m.name}</h3>
                   <div className="text-sm text-primary-600 font-semibold mb-2">{t(m.roleKey)}</div>
-                  <a href={`mailto:${m.email}`} className="text-xs text-slate-500 hover:text-primary-600 inline-flex items-center gap-1">
-                    <Mail className="w-3 h-3" /> {m.email}
-                  </a>
+                  <Link href="/contact" className="text-xs text-slate-500 hover:text-primary-600 inline-flex items-center gap-1">
+                    <Mail className="w-3 h-3" /> {t('about.team.contactCta')}
+                  </Link>
                 </div>
               ))}
             </div>
