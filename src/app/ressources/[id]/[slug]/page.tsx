@@ -137,7 +137,17 @@ export default async function ResourcePage({ params }: { params: Promise<{ id: s
     where: { status: 'PUBLISHED', subjectId: resource.subjectId, NOT: { id: resource.id } },
     take: 4,
     orderBy: { viewsCount: 'desc' },
-    include: { subject: true, class: true, teacher: { select: { firstName: true, lastName: true, firstNameAr: true, lastNameAr: true, schoolName: true, schoolNameAr: true } } }
+    select: {
+      id: true,
+      numericId: true,
+      slug: true,
+      title: true,
+      viewsCount: true,
+      avgRating: true,
+      subject: { select: { nameFr: true, color: true } },
+      class: { select: { nameFr: true, slug: true } },
+      teacher: { select: { firstName: true, lastName: true, firstNameAr: true, lastNameAr: true, schoolName: true, schoolNameAr: true } },
+    },
   });
 
   // Star distribution
@@ -326,6 +336,7 @@ export default async function ResourcePage({ params }: { params: Promise<{ id: s
 
                 <ResourceActions
                   resourceId={resource.id}
+                  numericId={resource.numericId}
                   slug={resource.slug}
                   title={resource.title}
                   fileUrl={resource.fileUrl}
@@ -341,7 +352,7 @@ export default async function ResourcePage({ params }: { params: Promise<{ id: s
               <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden mb-4">
                 <div className="px-6 lg:px-8 py-4 border-b border-slate-100 flex items-center justify-between">
                   <h2 className="font-bold text-lg flex items-center gap-2"><FileText className="w-5 h-5 text-primary-600" /> Aperçu du document</h2>
-                  <Link href={`/ressources/${resource.slug}/viewer`} className="text-sm text-primary-600 font-semibold hover:underline">
+                  <Link href={`/ressources/${resource.numericId}/${resource.slug}/viewer`} className="text-sm text-primary-600 font-semibold hover:underline">
                     Ouvrir en plein écran →
                   </Link>
                 </div>
@@ -379,7 +390,7 @@ export default async function ResourcePage({ params }: { params: Promise<{ id: s
                   <h2 className="font-bold text-xl mb-4">📚 Ressources similaires</h2>
                   <div className="grid sm:grid-cols-2 gap-4">
                     {similar.map(s => (
-                      <Link key={s.id} href={`/ressources/${s.slug}`} className="card card-hover p-4 flex gap-3">
+                      <Link key={s.id} href={`/ressources/${s.numericId}/${s.slug}`} className="card card-hover p-4 flex gap-3">
                         <div className="w-16 h-20 bg-slate-100 rounded flex items-center justify-center flex-shrink-0">
                           <FileText className="w-8 h-8 text-slate-300" />
                         </div>

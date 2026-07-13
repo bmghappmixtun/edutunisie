@@ -36,7 +36,7 @@ async function searchResources(q: string, limit: number): Promise<SuggestResult[
   // Fall back to plainto_tsquery if websearch not available
   const results = await prisma.$queryRaw<any[]>`
     SELECT 
-      r.id, r.title, r.slug, r.type,
+      r.id, r."numericId", r.title, r.slug, r.type,
       s."nameFr" as "subjectName",
       c."nameFr" as "className",
       ts_rank(r.search_vector, websearch_to_tsquery('french', ${trimmed})) as rank,
