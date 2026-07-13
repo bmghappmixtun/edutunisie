@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 
 type Props = {
   resourceId: string;
+  numericId?: number | null;
   slug: string;
   title: string;
   fileUrl?: string;
@@ -15,7 +16,7 @@ type Props = {
   isOwner?: boolean;
 };
 
-export default function ResourceActions({ resourceId, slug, title, fileUrl, originalFileKey, originalFileName, originalFormat, isTeacher, isOwner }: Props) {
+export default function ResourceActions({ resourceId, numericId, slug, title, fileUrl, originalFileKey, originalFileName, originalFormat, isTeacher, isOwner }: Props) {
   const [favorited, setFavorited] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -149,7 +150,7 @@ export default function ResourceActions({ resourceId, slug, title, fileUrl, orig
             {isOwner ? `Original (${originalFormat?.toUpperCase()})` : `Original ${originalFormat?.toUpperCase()} 👨‍🏫`}
           </button>
         )}
-        <button onClick={() => window.location.href = `/ressources/${slug}/viewer`} className="btn-secondary justify-center text-sm">
+        <button onClick={() => window.location.href = numericId ? `/ressources/${numericId}/${slug}/viewer` : `/ressources/${slug}/viewer`} className="btn-secondary justify-center text-sm">
           <Eye className="w-4 h-4" /> Lire en ligne
         </button>
         <button onClick={handlePrint} disabled={printing} className="btn-secondary justify-center text-sm disabled:opacity-50">
