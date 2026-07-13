@@ -3,10 +3,10 @@ import { isValidOrigin, isProduction } from '@/lib/security';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { uploadFile } from '@/lib/storage';
-import { nanoid } from 'nanoid';
 import { notifyAdminsNewResource } from '@/lib/admin-notify';
 import { detectFormat } from '@/lib/document-converter';
 import { autoGenerateTags } from '@/lib/auto-tagger';
+import { properSlugify } from '@/lib/slugify';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -148,14 +148,9 @@ export async function POST(req: NextRequest) {
     const sectionRec = sectionSlug
       ? await prisma.section.findFirst({ where: { classId: classRec.id, slug: sectionSlug } })
       : null;
-    const slug =
-      title
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-|-$/g, '')
-        .substring(0, 60) +
-      '-' +
-      nanoid(5);
+    // Use proper slugify: transliterate accents, keep Arabic letters, no cuid/nanoid suffix
+    // (The URL is /ressources/{numericId}/{slug} — numericId is the stable identifier)
+    const slug = properSlugify(title);
 
     // Original file metadata (will be copied from library file if used)
     let originalFileKey: string | null = null;

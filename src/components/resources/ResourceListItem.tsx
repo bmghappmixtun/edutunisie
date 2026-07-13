@@ -5,6 +5,7 @@ import { isArabic } from '@/lib/text-utils';
 
 type Resource = {
   id: string;
+  numericId?: number | null;
   slug: string;
   title: string;
   type: string;
@@ -48,7 +49,7 @@ export default function ResourceListItem({ resource }: { resource: Resource }) {
     : null;
   return (
     <Link
-      href={`/ressources/${resource.slug}`}
+      href={`/ressources/${resource.numericId}/${resource.slug}`}
       className="flex items-center gap-4 bg-white border border-slate-100 rounded-xl p-4 hover:border-primary-300 hover:shadow-md transition group"
     >
       {/* Thumbnail / Icon */}

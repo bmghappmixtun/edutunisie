@@ -22,6 +22,7 @@ export interface ClassSectionData {
 
 export interface ResourceMini {
   id: string;
+  numericId?: number | null;
   slug: string;
   title: string;
   type: string;
@@ -406,7 +407,7 @@ function SectionResourceView({
             return (
               <Link
                 key={r.id}
-                href={`/ressources/${r.slug}`}
+                href={`/ressources/${r.numericId}/${r.slug}`}
                 className="group/res flex items-center gap-3 p-3 rounded-xl border border-slate-100 hover:border-slate-300 hover:bg-slate-50 hover:shadow-sm transition"
               >
                 {/* Subject color accent */}

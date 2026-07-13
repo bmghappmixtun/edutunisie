@@ -17,8 +17,13 @@ import { Eye, Download, MessageCircle, Star, FileText, ChevronLeft, ChevronRight
 
 export const dynamic = 'force-dynamic';
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
-  const rawSlug = (await params).slug;
+export async function generateMetadata({ params }: { params: Promise<{ id: string; slug: string }> }) {
+  const { id: rawId, slug: rawSlug } = await params;
+  // The numericId is the stable identifier; the slug is purely cosmetic / SEO
+  const numericId = parseInt(rawId, 10);
+  if (isNaN(numericId)) {
+    return { title: 'Ressource non trouvée' };
+  }
   // Same URL-decode fix as the page (Next.js doesn't auto-decode non-ASCII slugs)
   let slug: string;
   try {
@@ -27,7 +32,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     slug = rawSlug;
   }
   const resource = await prisma.resource.findUnique({
-    where: { slug },
+    where: { numericId },
     include: { subject: true, class: true, teacher: true },
   });
   if (!resource) return { title: 'Ressource non trouvée' };
@@ -46,12 +51,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       return Array.from(new Set([...tagList, ...auto])).slice(0, 15);
     })(),
     alternates: {
-      canonical: `${baseUrl}/ressources/${resource.slug}`,
+      canonical: `${baseUrl}/ressources/${resource.numericId}/${resource.slug}`,
     },
     openGraph: {
       title: resource.title,
       description: description.slice(0, 160),
-      url: `${baseUrl}/ressources/${resource.slug}`,
+      url: `${baseUrl}/ressources/${resource.numericId}/${resource.slug}`,
       siteName: 'Examanet',
       locale: 'fr_TN',
       type: 'article',
@@ -59,7 +64,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       ...(resource.tags ? { tags: resource.tags.split(',').map((t: string) => t.trim()).filter(Boolean) } : {}),
       images: [
         {
-          url: `${baseUrl}/api/og/resource/${resource.slug}`,
+          url: `${baseUrl}/api/og/resource/${resource.numericId}`,
           width: 1200,
           height: 630,
           alt: resource.title,
@@ -70,16 +75,19 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       card: 'summary_large_image',
       title: resource.title,
       description: description.slice(0, 160),
-      images: [`${baseUrl}/api/og/resource/${resource.slug}`],
+      images: [`${baseUrl}/api/og/resource/${resource.numericId}`],
     },
   };
 }
 
-export default async function ResourcePage({ params }: { params: Promise<{ slug: string }> }) {
-  const rawSlug = (await params).slug;
+export default async function ResourcePage({ params }: { params: Promise<{ id: string; slug: string }> }) {
+  const { id: rawId, slug: rawSlug } = await params;
   // SECURITY/UX: Next.js does NOT auto-decode non-ASCII chars in [slug] params
   // (e.g. Arabic slugs arrive as '%D9%81...' percent-encoded). Decode manually
   // so Prisma can find the resource by its real slug.
+  // The numericId is the stable identifier; the slug is purely cosmetic / SEO.
+  const numericId = parseInt(rawId, 10);
+  if (isNaN(numericId)) notFound();
   let slug: string;
   try {
     slug = decodeURIComponent(rawSlug);
@@ -88,7 +96,7 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
   }
   const userSession = await getCurrentUser();
   const resource = await prisma.resource.findUnique({
-    where: { slug },
+    where: { numericId },
     include: {
       subject: true,
       class: { include: { level: true } },
@@ -141,7 +149,7 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
 
   // JSON-LD structured data for SEO (LearningResource schema)
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
-  const resourceUrl = `${baseUrl}/ressources/${resource.slug}`;
+  const resourceUrl = `${baseUrl}/ressources/${resource.numericId}/${resource.slug}`;
   const courseJsonLd = courseSchema({
     slug: resource.slug,
     title: resource.title,

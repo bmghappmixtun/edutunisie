@@ -225,7 +225,7 @@ export default async function TeacherDashboard(props: { params: Promise<any>; se
         ) : (
           <div className="space-y-3">
             {recentResources.map(r => (
-              <Link key={r.id} href={`/ressources/${r.slug}`} className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 transition">
+              <Link key={r.id} href={`/ressources/${r.numericId}/${r.slug}`} className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 transition">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-12 bg-slate-100 rounded flex items-center justify-center">
                     <FileText className="w-5 h-5 text-slate-400" />

@@ -44,7 +44,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   
   // Subjects (matieres)
   const subjects = await prisma.subject.findMany({
-    select: { slug: true },
+    select: { slug: true, },
   });
   const subjectPages: MetadataRoute.Sitemap = subjects.map(s => ({
     url: `${baseUrl}/matieres/${s.slug}`,
@@ -54,7 +54,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Classes (niveaux)
   const classes = await prisma.class.findMany({
-    select: { slug: true },
+    select: { slug: true, },
   });
   const classPages: MetadataRoute.Sitemap = classes.map(c => ({
     url: `${baseUrl}/niveaux/${c.slug}`,
@@ -78,7 +78,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // We currently have ~15k so 1 file is enough
   const resources = await prisma.resource.findMany({
     where: { status: 'PUBLISHED' },
-    select: { slug: true, updatedAt: true, type: true, viewsCount: true, downloadsCount: true },
+    select: { slug: true, numericId: true, updatedAt: true, type: true, viewsCount: true, downloadsCount: true },
     orderBy: { updatedAt: 'desc' },
   });
   const resourcePages: MetadataRoute.Sitemap = resources.map(r => {
@@ -88,7 +88,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const changeFrequency: 'daily' | 'weekly' | 'monthly' =
       popularity > 500 ? 'daily' : popularity > 50 ? 'weekly' : 'monthly';
     return {
-      url: `${baseUrl}/ressources/${r.slug}`,
+      url: `${baseUrl}/ressources/${r.numericId}/${r.slug}`,
       lastModified: r.updatedAt,
       changeFrequency,
       priority,

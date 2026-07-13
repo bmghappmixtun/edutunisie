@@ -137,8 +137,8 @@ export default async function AdminAnalyticsPage({
     orderBy: { viewsCount: 'desc' },
     select: {
       id: true,
-      slug: true,
-      title: true,
+      slug: true, title: true,
+      numericId: true,
       viewsCount: true,
       downloadsCount: true,
       avgRating: true,
@@ -177,7 +177,7 @@ export default async function AdminAnalyticsPage({
     _sum: { viewsCount: true, downloadsCount: true },
   });
   const subjects = await prisma.subject.findMany({
-    select: { id: true, nameFr: true, color: true, slug: true },
+    select: { id: true, nameFr: true, color: true, slug: true, },
   });
   const subjectMap = new Map(subjects.map((s) => [s.id, s]));
   const subjectBreakdown = subjectStats
@@ -335,7 +335,7 @@ export default async function AdminAnalyticsPage({
                 </div>
                 <div className="flex-1 min-w-0">
                   <Link
-                    href={`/ressources/${r.slug}`}
+                    href={`/ressources/${r.numericId}/${r.slug}`}
                     target="_blank"
                     className="font-semibold text-sm text-slate-800 hover:text-primary-600 line-clamp-1 group flex items-center gap-1"
                   >

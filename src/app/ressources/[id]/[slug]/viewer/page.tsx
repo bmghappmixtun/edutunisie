@@ -9,8 +9,10 @@ import { ChevronLeft, Download } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
-export default async function ResourceViewerPage({ params }: { params: Promise<{ slug: string }> }) {
-  const rawSlug = (await params).slug;
+export default async function ResourceViewerPage({ params }: { params: Promise<{ id: string; slug: string }> }) {
+  const { id: rawId, slug: rawSlug } = await params;
+  const numericId = parseInt(rawId, 10);
+  if (isNaN(numericId)) notFound();
   // Same URL-decode fix as the page (Next.js doesn't auto-decode non-ASCII slugs)
   let slug: string;
   try {
@@ -18,7 +20,7 @@ export default async function ResourceViewerPage({ params }: { params: Promise<{
   } catch {
     slug = rawSlug;
   }
-  const resource = await prisma.resource.findUnique({ where: { slug } });
+  const resource = await prisma.resource.findUnique({ where: { numericId } });
   if (!resource || resource.status !== 'PUBLISHED') notFound();
 
   // Increment view (use real IP, skip bots)
@@ -44,7 +46,7 @@ export default async function ResourceViewerPage({ params }: { params: Promise<{
       <div className="pt-16 lg:pt-20 px-4 py-3 bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
-            <Link href={`/ressources/${slug}`} className="p-2 hover:bg-slate-100 rounded-lg">
+            <Link href={`/ressources/${numericId}/${slug}`} className="p-2 hover:bg-slate-100 rounded-lg">
               <ChevronLeft className="w-5 h-5" />
             </Link>
             <div className="min-w-0">

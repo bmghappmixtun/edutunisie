@@ -403,7 +403,7 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
                   {latestResources.map(r => (
                     <Link
                       key={r.id}
-                      href={`/ressources/${r.slug}`}
+                      href={`/ressources/${r.numericId}/${r.slug}`}
                       className="block bg-white rounded-2xl border border-slate-200 hover:border-primary-300 hover:shadow-md transition p-4 group"
                     >
                       <div className="flex items-start gap-3">

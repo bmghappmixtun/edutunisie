@@ -300,7 +300,7 @@ export default async function ResourcesPage(props: { searchParams: Promise<Searc
         url: `${baseUrl}/ressources`,
         items: resources.slice(0, 50).map((r) => ({
           name: r.title,
-          url: `${baseUrl}/ressources/${r.slug}`,
+          url: `${baseUrl}/ressources/${r.numericId}/${r.slug}`,
           description: r.description?.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 200) || undefined,
         })),
       })

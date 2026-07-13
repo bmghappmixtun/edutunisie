@@ -27,7 +27,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     });
     // Force revalidation of all relevant pages (public list + detail + filters)
     revalidatePath('/ressources');
-    revalidatePath(`/ressources/${resource.slug}`);
+    revalidatePath(`/ressources/${resource.numericId}/${resource.slug}`);
     revalidatePath('/');
     revalidatePath('/enseignant/ressources');
     revalidatePath('/admin/approbations');
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
           type: 'resource_approved',
           title: 'Ressource publiée ! ✅',
           message: `"${resource.title}" est maintenant en ligne.`,
-          link: `/ressources/${resource.slug}`
+          link: `/ressources/${resource.numericId}/${resource.slug}`
         }
       });
       const teacher = await prisma.user.findUnique({ where: { id: resource.teacherId } });
@@ -68,13 +68,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
           type: 'resource_rejected',
           title: 'Ressource non validée ❌',
           message: reason.length > 100 ? reason.slice(0, 100) + '...' : reason,
-          link: `/ressources/${resource.slug}`
+          link: `/ressources/${resource.numericId}/${resource.slug}`
         }
       });
       const teacher = await prisma.user.findUnique({ where: { id: resource.teacherId } });
       if (teacher?.email && teacher.firstName) {
         const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
-        const resourceUrl = `${siteUrl}/ressources/${resource.slug}`;
+        const resourceUrl = `${siteUrl}/ressources/${resource.numericId}/${resource.slug}`;
         await sendResourceRejectedEmail(
           teacher.email,
           teacher.firstName,
