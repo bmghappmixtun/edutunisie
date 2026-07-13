@@ -46,7 +46,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Column 2: Pilliers (3 main content pillars) */}
+          {/* Column 2: Parcours (3 main education pathways) */}
           <div>
             <h4 className="font-bold text-white mb-4 text-sm uppercase tracking-wide">{t('footer.pillars')}</h4>
             <ul className="space-y-2 text-sm">
@@ -56,7 +56,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Column 3: Outils (resource tools) */}
+          {/* Column 3: Ressources (archives + référence) */}
           <div>
             <h4 className="font-bold text-white mb-4 text-sm uppercase tracking-wide">{t('footer.tools')}</h4>
             <ul className="space-y-2 text-sm">
