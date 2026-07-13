@@ -992,7 +992,7 @@
     "story": {
       "badge": "NOTRE HISTOIRE",
       "title": "D'où venons-nous ?",
-      "p1": "Tout a commencé en 2024, lorsque notre fondateur, Mehdi Boutiti, a cherché des ressources de mathématiques pour aider un cousin en 9ème année. Les sites existants (devoirat.net, tunisiecollege.net) étaient vieillissants, pleins de publicités intrusives, et l'expérience utilisateur laissait à désirer.",
+      "p1": "Tout a commencé en 2024, lorsque notre fondateur, B.Mehdi, a cherché des ressources de mathématiques pour aider un cousin en 9ème année. Les sites existants (devoirat.net, tunisiecollege.net) étaient vieillissants, pleins de publicités intrusives, et l'expérience utilisateur laissait à désirer.",
       "p2": "L'idée est née : « Et si on créait une plateforme moderne, gratuite, sans pub, et faite par et pour les Tunisiens ? »",
       "p3": "En 2025, la première version voyait le jour. Aujourd'hui, Examanet héberge des milliers de ressources partagées par des enseignants passionnés, et est devenue la référence pour des dizaines de milliers d'élèves à travers le pays."
     },
@@ -1044,7 +1044,8 @@
       "badge": "L'ÉQUIPE",
       "title": "Qui sommes-nous ?",
       "subtitle": "Une petite équipe passionnée qui croit en l'éducation.",
-      "founder": "Fondateur & CEO"
+      "founder": "Fondateur & CEO",
+      "contactCta": "Nous contacter"
     },
     "cta": {
       "title": "Rejoignez l'aventure",
