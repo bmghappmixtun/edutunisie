@@ -41,7 +41,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       pending.title && pending.title !== resource.title
         ? `${pending.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}-${Date.now().toString(36)}`
         : resource.slug;
-    const resourceUrl = `${siteUrl}/ressources/${resource.slug}`;
+    const resourceUrl = `${siteUrl}/ressources/${resource.numericId}/${resource.slug}`;
 
     if (action === 'approve') {
       const pending = (resource.pendingEdit as any) || {};
@@ -76,14 +76,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       await prisma.resource.update({ where: { id }, data: updateData });
       // Force revalidation of all relevant pages
       revalidatePath('/ressources');
-      revalidatePath(`/ressources/${resource.slug}`);
+      revalidatePath(`/ressources/${resource.numericId}/${resource.slug}`);
       revalidatePath('/');
       revalidatePath('/enseignant/ressources');
       revalidatePath('/admin/ressources/editions');
       revalidatePath('/admin/ressources');
       if (resource.teacherId) revalidatePath(`/professeurs/${resource.teacherId}`);
 
-      const finalUrl = `${siteUrl}/ressources/${newSlug(pending)}`;
+      const finalUrl = `${siteUrl}/ressources/${pending.numericId}/${newSlug(pending)}`;
 
       // Notify teacher
       if (resource.editRequestedById) {
@@ -93,7 +93,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
             type: 'edit_approved',
             title: 'Modification approuvée ✅',
             message: `Votre modification sur "${pending.title || resource.title}" a été approuvée et publiée.`,
-            link: `/ressources/${newSlug(pending)}`
+            link: `/ressources/${pending.numericId}/${newSlug(pending)}`
           }
         });
 

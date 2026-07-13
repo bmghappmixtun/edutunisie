@@ -59,7 +59,7 @@ async function searchResources(q: string, limit: number): Promise<SuggestResult[
     id: r.id,
     title: r.title,
     subtitle: [r.subjectName, r.className, typeLabel(r.type)].filter(Boolean).join(' · '),
-    href: `/ressources/${r.slug}`,
+    href: `/ressources/${r.numericId}/${r.slug}`,
     icon: typeIcon(r.type)
   }));
 }

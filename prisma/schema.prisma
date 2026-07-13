@@ -197,7 +197,11 @@ model Subject {
 // ============ RESOURCES ============
 model Resource {
   id              String         @id @default(cuid())
-  slug            String         @unique
+  /// Sequential numeric ID (1, 2, 3, ...) used in URLs as the stable identifier.
+  /// The slug is purely cosmetic; this numericId never changes.
+  numericId       Int?           @unique @default(autoincrement())
+  /// URL slug — purely cosmetic / SEO. NOT unique. Lookup is by numericId.
+  slug            String
 
   title           String
   description     String?
@@ -220,6 +224,8 @@ model Resource {
   subject         Subject        @relation(fields: [subjectId], references: [id])
   teacherId       String?
   teacher         User?          @relation("UploadedBy", fields: [teacherId], references: [id])
+
+  @@index([slug])
   trimester       String?
   year            String?
   tags            String?        // comma-separated

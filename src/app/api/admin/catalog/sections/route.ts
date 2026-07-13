@@ -13,7 +13,7 @@ export async function GET() {
   const sections = await prisma.section.findMany({
     orderBy: [{ class: { order: 'asc' } }, { nameFr: 'asc' }],
     include: {
-      class: { select: { nameFr: true, slug: true } },
+      class: { select: { nameFr: true, slug: true, } },
       _count: { select: { resources: true } }
     }
   });

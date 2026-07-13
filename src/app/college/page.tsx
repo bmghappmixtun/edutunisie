@@ -113,7 +113,7 @@ export default async function CollegePillar() {
     url: `${SITE_URL}/college`,
     items: topResources.slice(0, 50).map((r) => ({
       name: r.title,
-      url: `${SITE_URL}/ressources/${r.slug}`,
+      url: `${SITE_URL}/ressources/${r.numericId}/${r.slug}`,
       description: r.description?.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 200) || undefined,
     })),
   }) : null;

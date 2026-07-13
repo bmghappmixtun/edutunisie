@@ -28,12 +28,15 @@ function getColor(subjectSlug?: string | null): string {
 
 export async function GET(
   req: Request,
-  { params }: { params: Promise<{ slug: string }> }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { slug } = await params;
-  
+  const { id: rawId } = await params;
+  const numericId = parseInt(rawId, 10);
+  if (isNaN(numericId)) {
+    return new Response('Invalid ID', { status: 400 });
+  }
   const resource = await prisma.resource.findUnique({
-    where: { slug },
+    where: { numericId },
     include: {
       subject: true,
       class: true,

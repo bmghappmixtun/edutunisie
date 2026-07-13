@@ -38,12 +38,8 @@ export function timeAgo(date: Date | string): string {
   return 'à l\'instant';
 }
 
-export function slugify(text: string): string {
-  return text.toLowerCase()
-    .replace(/[àáâãäå]/g, 'a').replace(/[èéêë]/g, 'e').replace(/[ìíîï]/g, 'i')
-    .replace(/[òóôõö]/g, 'o').replace(/[ùúûü]/g, 'u').replace(/[ç]/g, 'c')
-    .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-}
+// Re-export the proper slugify from @/lib/slugify for backwards compatibility
+export { properSlugify as slugify, properSlugify, decodeHtmlEntities } from './slugify';
 
 export function fileSize(bytes: number): string {
   if (bytes < 1024) return bytes + ' B';

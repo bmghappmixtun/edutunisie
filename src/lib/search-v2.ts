@@ -34,6 +34,7 @@ export interface SearchOptions {
 
 export interface SearchResult {
   id: string;
+  numericId?: number | null;
   slug: string | null;
   title: string | null;
   titleHighlighted: string | null;
@@ -339,7 +340,19 @@ export async function searchV2(options: SearchOptions): Promise<SearchResponse> 
   const ids = rawResults.map(r => r.id);
   const full = await prisma.resource.findMany({
     where: { id: { in: ids } },
-    include: {
+    select: {
+      id: true,
+      numericId: true,
+      slug: true,
+      title: true,
+      type: true,
+      year: true,
+      trimester: true,
+      language: true,
+      hasCorrection: true,
+      viewsCount: true,
+      downloadsCount: true,
+      publishedAt: true,
       subject: { select: { nameFr: true, slug: true, color: true } },
       class: { select: { nameFr: true, slug: true } },
       section: { select: { nameFr: true, slug: true } },

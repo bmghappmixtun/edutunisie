@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: { params: Promise<{ level: st
   const { level: levelSlug } = await params;
   const level = await prisma.level.findUnique({
     where: { slug: levelSlug },
-    select: { nameFr: true, nameAr: true, slug: true },
+    select: { nameFr: true, nameAr: true, slug: true, },
   });
   if (!level) return { title: 'Niveau non trouvé' };
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';

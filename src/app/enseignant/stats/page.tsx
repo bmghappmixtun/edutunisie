@@ -132,7 +132,7 @@ export default async function TeacherStatsPage() {
         ) : (
           <div className="space-y-2">
             {topResources.map((r, i) => (
-              <Link key={r.id} href={`/ressources/${r.slug}`} className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition">
+              <Link key={r.id} href={`/ressources/${r.numericId}/${r.slug}`} className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition">
                 <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-extrabold flex-shrink-0 ${i === 0 ? 'bg-amber-100 text-amber-700' : i === 1 ? 'bg-slate-200 text-slate-700' : i === 2 ? 'bg-orange-100 text-orange-700' : 'bg-slate-100 text-slate-500'}`}>
                   #{i + 1}
                 </div>

@@ -503,7 +503,7 @@ function ActiveChip({ label, onRemove }: { label: string; onRemove: () => void }
 
 function ResultCard({ r, viewMode }: { r: SearchResult; viewMode: 'grid' | 'list' }) {
   const typeColor = TYPE_COLORS[r.type || 'OTHER'] || 'bg-slate-100 text-slate-600';
-  const href = r.slug ? `/ressources/${r.slug}` : '#';
+  const href = r.slug ? `/ressources/${r.numericId}/${r.slug}` : '#';
 
   if (viewMode === 'list') {
     return (

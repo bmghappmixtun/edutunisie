@@ -46,7 +46,7 @@ export const revalidate = 600; // 10 min cache — pages publiques très SEO
 
 // Pre-generate all subject slugs for static rendering
 export async function generateStaticParams() {
-  const subjects = await prisma.subject.findMany({ select: { slug: true } });
+  const subjects = await prisma.subject.findMany({ select: { slug: true, } });
   return subjects.map((s) => ({ subject: s.slug }));
 }
 
@@ -281,7 +281,7 @@ export default async function SubjectPage({ params, searchParams }: PageProps) {
           url,
           items: resources.slice(0, 10).map((r) => ({
             name: r.title,
-            url: `${baseUrl}/ressources/${r.slug}`,
+            url: `${baseUrl}/ressources/${r.numericId}/${r.slug}`,
             description: r.summary ?? r.description?.slice(0, 120) ?? '',
             image: r.thumbnailUrl ?? `${baseUrl}/icon-transparent.png`,
           })),

@@ -22,7 +22,7 @@ export default async function TeacherLibraryPage() {
   const [classes, subjects] = await Promise.all([
     prisma.class.findMany({
       orderBy: { order: 'asc' },
-      select: { id: true, nameFr: true, nameAr: true, slug: true },
+      select: { id: true, nameFr: true, nameAr: true, slug: true, },
     }),
     prisma.subject.findMany({
       orderBy: { order: 'asc' },

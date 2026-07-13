@@ -23,14 +23,14 @@ export default async function AdminCatalogPage() {
     prisma.class.findMany({
       orderBy: [{ level: { order: 'asc' } }, { order: 'asc' }],
       include: {
-        level: { select: { nameFr: true, slug: true } },
+        level: { select: { nameFr: true, slug: true, } },
         _count: { select: { resources: true, sections: true } }
       }
     }),
     prisma.section.findMany({
       orderBy: [{ class: { order: 'asc' } }, { nameFr: 'asc' }],
       include: {
-        class: { select: { nameFr: true, slug: true } },
+        class: { select: { nameFr: true, slug: true, } },
         _count: { select: { resources: true } }
       }
     })
