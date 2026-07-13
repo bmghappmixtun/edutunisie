@@ -240,3 +240,27 @@
 .animate-fade-in {
   animation: fade-in 0.4s ease-out;
 }
+
+/* ==========================================================================
+   PDF Viewer — mobile UX
+   ========================================================================== */
+/* Prevent double-tap zoom on iOS / Chrome mobile when tapping toolbar buttons */
+.pdf-viewer-container button,
+.pdf-viewer-toolbar button {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* On mobile, ensure tap targets are at least 44x44px (Apple HIG / WCAG) */
+@media (max-width: 640px) {
+  .pdf-viewer-toolbar button {
+    min-width: 40px;
+    min-height: 40px;
+  }
+}
+
+/* Smooth scrolling on iOS for the PDF container */
+.pdf-viewer-container {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}

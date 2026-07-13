@@ -412,7 +412,7 @@ export default function PDFViewer({
   return (
     <div className={`bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm ${className}`}>
       {/* Toolbar */}
-      <div className="bg-slate-900 text-white px-2 sm:px-3 py-2 flex items-center justify-between gap-1 sm:gap-2 flex-wrap">
+      <div className="pdf-viewer-toolbar bg-slate-900 text-white px-2 sm:px-3 py-2 flex items-center justify-between gap-1 sm:gap-2 flex-wrap">
         {/* Page navigation */}
         <div className="flex items-center gap-1">
           <button
@@ -586,10 +586,14 @@ export default function PDFViewer({
         // UX: container is tall enough to show the full first page in height
         // when 'width' fit is active (page fills width, container is tall).
         // A4 portrait page at fit-to-width 800px → ~1130px tall.
-        // - 95vh on normal view (was 80vh)
-        // - 100vh in fullscreen
-        // - min 800px so on short screens the page is still readable
-        style={{ height: isFullscreen ? '100vh' : '95vh', minHeight: '800px' }}
+        // - Mobile: 70vh + 500px min (so it's tall but not overwhelming)
+        // - Desktop: 95vh + 800px min (taller, more room for the page)
+        // - Fullscreen: 100vh
+        style={{
+          height: isFullscreen ? '100vh' : '95vh',
+          minHeight: '800px'
+        }}
+        // Mobile-friendly scroll (no rubber-band, no double-tap zoom)
       >
         {error ? (
           <div className="flex items-center justify-center h-full p-8">
