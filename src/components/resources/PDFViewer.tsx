@@ -116,10 +116,10 @@ export default function PDFViewer({
   const [numPages, setNumPages] = useState<number | null>(null);
   const [pageNumber, setPageNumber] = useState<number>(initialPage);
   const [scale, setScale] = useState<number>(1);
-  // UX FIX: default to 'page' (fit to page) so the entire first page is visible
-  // without scrolling. User can switch to 'width' if they want to zoom in and
-  // read at a larger size (then they'll need to scroll vertically).
-  const [fitMode, setFitMode] = useState<FitMode>('page');
+  // UX FIX: default to 'width' (page fills container width, good for reading)
+  // The container is now tall enough (95vh + 800px min) to fit most pages
+  // entirely in height too — so the user sees the full first page without scrolling.
+  const [fitMode, setFitMode] = useState<FitMode>('width');
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -583,11 +583,13 @@ export default function PDFViewer({
       <div
         ref={containerRef}
         className="bg-slate-200 overflow-auto pdf-viewer-container"
-        // UX: give the page more vertical room so it fits without scrolling
-        // - 80vh on normal view (was 70vh) = ~140px more space
+        // UX: container is tall enough to show the full first page in height
+        // when 'width' fit is active (page fills width, container is tall).
+        // A4 portrait page at fit-to-width 800px → ~1130px tall.
+        // - 95vh on normal view (was 80vh)
         // - 100vh in fullscreen
-        // - min 600px so on short screens the page is still readable
-        style={{ height: isFullscreen ? '100vh' : '80vh', minHeight: '600px' }}
+        // - min 800px so on short screens the page is still readable
+        style={{ height: isFullscreen ? '100vh' : '95vh', minHeight: '800px' }}
       >
         {error ? (
           <div className="flex items-center justify-center h-full p-8">
