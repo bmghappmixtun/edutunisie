@@ -116,7 +116,10 @@ export default function PDFViewer({
   const [numPages, setNumPages] = useState<number | null>(null);
   const [pageNumber, setPageNumber] = useState<number>(initialPage);
   const [scale, setScale] = useState<number>(1);
-  const [fitMode, setFitMode] = useState<FitMode>('width');
+  // UX FIX: default to 'page' (fit to page) so the entire first page is visible
+  // without scrolling. User can switch to 'width' if they want to zoom in and
+  // read at a larger size (then they'll need to scroll vertically).
+  const [fitMode, setFitMode] = useState<FitMode>('page');
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -580,7 +583,11 @@ export default function PDFViewer({
       <div
         ref={containerRef}
         className="bg-slate-200 overflow-auto pdf-viewer-container"
-        style={{ height: isFullscreen ? '100vh' : '70vh', minHeight: '500px' }}
+        // UX: give the page more vertical room so it fits without scrolling
+        // - 80vh on normal view (was 70vh) = ~140px more space
+        // - 100vh in fullscreen
+        // - min 600px so on short screens the page is still readable
+        style={{ height: isFullscreen ? '100vh' : '80vh', minHeight: '600px' }}
       >
         {error ? (
           <div className="flex items-center justify-center h-full p-8">
