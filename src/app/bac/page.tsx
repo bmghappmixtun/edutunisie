@@ -227,7 +227,7 @@ export default function BacPillar() {
     coef: t(`bac.sections.items.${key}.coef`),
     icon: t(`bac.sections.items.${key}.icon`),
     color: t(`bac.sections.items.${key}.color`),
-    href: `/ressources?class=4eme-secondaire&section=${key === 'scExp' ? 'sciences' : key === 'math' ? 'maths' : key === 'scTech' ? 'technique' : key === 'scInfo' ? 'sciences-informatique' : key === 'eco' ? 'eco-gestion' : key}`,
+    href: `/ressources?class=4eme-secondaire&section=${key === 'scExp' ? 'sciences-experimentales' : key === 'math' ? 'maths' : key === 'scTech' ? 'technique' : key === 'scInfo' ? 'sciences-informatique' : key === 'eco' ? 'eco-gestion' : key}`,
   }));
 
   // ==========================================================================

@@ -97,7 +97,7 @@ function sectionStyle(classSlug: string, sectionSlug: string): { emoji: string; 
   // 3AS / 4AS sections
   if (classSlug === '3eme-secondaire' || classSlug === '4eme-secondaire') {
     if (sectionSlug === 'maths')                    return { emoji: '📐', tint: '#7C3AED' };
-    if (sectionSlug === 'sciences')                 return { emoji: '🧪', tint: '#059669' };
+    if (sectionSlug === 'sciences-experimentales')  return { emoji: '🧪', tint: '#059669' };
     if (sectionSlug === 'technique')                return { emoji: '⚙️', tint: '#475569' };
     if (sectionSlug === 'sciences-informatique')    return { emoji: '💾', tint: '#1E40AF' };
     if (sectionSlug === 'eco-gestion')              return { emoji: '💼', tint: '#DC2626' };

@@ -55,14 +55,39 @@ export async function POST(req: NextRequest) {
       prisma.class.create({ data: { levelId: lycee.id, slug: '4eme-secondaire', nameFr: '4ème année secondaire (Bac)', nameAr: 'الباكالوريا', order: 4 } }),
     ]);
 
-    // Sections for lycée
+    // Sections for lycée (per official Tunisian curriculum)
+    // 2AS = 5 sections, 3AS/4AS = 7 sections
     const lyceeClasses = classes.filter(c => c.levelId === lycee.id);
     for (const cls of lyceeClasses) {
-      await prisma.section.create({ data: { classId: cls.id, slug: 'sciences', nameFr: 'Sciences', nameAr: 'علوم' } });
-      await prisma.section.create({ data: { classId: cls.id, slug: 'maths', nameFr: 'Mathématiques', nameAr: 'رياضيات' } });
+      const is4AS = cls.slug === '4eme-secondaire';
+      const is3AS = cls.slug === '3eme-secondaire';
+      // Sciences has different name per class (2AS = Sciences, 3AS/4AS = Sciences Expérimentales)
+      const sciencesSection = is4AS
+        ? { slug: 'sciences-experimentales', nameFr: 'Bac Sciences Expérimentales', nameAr: 'باك علوم تجريبية' }
+        : is3AS
+        ? { slug: 'sciences-experimentales', nameFr: 'Sciences Expérimentales', nameAr: 'علوم تجريبية' }
+        : { slug: 'sciences', nameFr: 'Sciences', nameAr: 'علوم' };
+      await prisma.section.create({ data: { classId: cls.id, ...sciencesSection } });
+      // Maths (4AS has 'Bac Mathématiques' prefix per teacher-workflow-data.ts)
+      const mathsSection = is4AS
+        ? { slug: 'maths', nameFr: 'Bac Mathématiques', nameAr: 'باك رياضيات' }
+        : is3AS
+        ? { slug: 'maths', nameFr: 'Mathématiques', nameAr: 'رياضيات' }
+        : { slug: 'maths', nameFr: 'Mathématiques', nameAr: 'رياضيات' };
+      await prisma.section.create({ data: { classId: cls.id, ...mathsSection } });
       await prisma.section.create({ data: { classId: cls.id, slug: 'lettres', nameFr: 'Lettres', nameAr: 'آداب' } });
-      await prisma.section.create({ data: { classId: cls.id, slug: 'eco-gestion', nameFr: 'Économie-Gestion', nameAr: 'اقتصاد وتصرف' } });
-      await prisma.section.create({ data: { classId: cls.id, slug: 'technique', nameFr: 'Technique', nameAr: 'تقني' } });
+      // Eco-Gestion: 2AS = "Économie et services" (different), 3AS/4AS = "Économie-Gestion"
+      const ecoSection = cls.slug === '2eme-secondaire'
+        ? { slug: 'eco-services', nameFr: 'Économie et services', nameAr: 'اقتصاد وتصرف' }
+        : { slug: 'eco-gestion', nameFr: 'Économie-Gestion', nameAr: 'اقتصاد وتصرف' };
+      await prisma.section.create({ data: { classId: cls.id, ...ecoSection } });
+      // Technique: 4AS = "Bac Sciences Techniques" (3AS uses just "Technique")
+      const techniqueSection = is4AS
+        ? { slug: 'technique', nameFr: 'Bac Sciences Techniques', nameAr: 'باك تقني' }
+        : is3AS
+        ? { slug: 'technique', nameFr: 'Sciences Techniques', nameAr: 'تقني' }
+        : { slug: 'technique', nameFr: 'Technique', nameAr: 'تقني' };
+      await prisma.section.create({ data: { classId: cls.id, ...techniqueSection } });
       await prisma.section.create({ data: { classId: cls.id, slug: 'info', nameFr: 'Informatique', nameAr: 'إعلامية' } });
     }
 
