@@ -90,11 +90,18 @@ async function ensureTeacher(name: string, teacherId?: string, source: string = 
 }
 
 function slugify(text: string): string {
+  // SECURITY/QUALITY FIX: transliterate accents BEFORE filtering non-ASCII
+  // (was: directly removing non-ASCII chars, which made "série" → "srie"
+  //  instead of "serie" — silent data loss for French/Arabic titles)
   return text
     .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // strip diacritics
+    .replace(/[àáâãäå]/g, 'a').replace(/[èéêë]/g, 'e').replace(/[ìíîï]/g, 'i')
+    .replace(/[òóôõö]/g, 'o').replace(/[ùúûü]/g, 'u').replace(/[ç]/g, 'c')
     .replace(/[^a-z0-9\s-]/g, '')
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '')
     .substring(0, 60)
     + '-' + nanoid(6);
 }
