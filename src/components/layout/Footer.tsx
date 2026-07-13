@@ -60,7 +60,7 @@ export default function Footer() {
           <div>
             <h4 className="font-bold text-white mb-4 text-sm uppercase tracking-wide">{t('footer.tools')}</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/ressources?type=BAC_SUBJECT" className="hover:text-primary-400 transition">{t('footer.bacSubjects')}</Link></li>
+              <li><Link href="/bac/archives" className="hover:text-primary-400 transition">{t('footer.bacSubjects')}</Link></li>
               <li><Link href="/ressources?type=CORRECTION" className="hover:text-primary-400 transition">{t('footer.corrections')}</Link></li>
               <li><Link href="/referentiel-national" className="hover:text-primary-400 transition">{t('footer.referentiel')}</Link></li>
               <li><Link href="/faq" className="hover:text-primary-400 transition">FAQ</Link></li>
