@@ -84,7 +84,7 @@
   },
   "nav": {
     "home": "Accueil",
-    "resources": "Ressources",
+    "resources": "Explorer",
     "levels": "Niveaux",
     "subjects": "Matières",
     "teachers": "Professeurs",
@@ -555,8 +555,8 @@
     "madeWith": "Conçu avec ❤️ en Tunisie 🇹🇳 pour les élèves tunisiens",
     "sujetsBac": "Sujets Bac",
     "corriges": "Corrigés",
-    "pillars": "Pilliers",
-    "tools": "Outils",
+    "pillars": "Parcours",
+    "tools": "Ressources",
     "concoursSubjects": "Sujets 9ème"
   },
   "errors": {

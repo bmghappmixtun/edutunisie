@@ -84,7 +84,7 @@
   },
   "nav": {
     "home": "الرئيسية",
-    "resources": "الموارد",
+    "resources": "استكشف",
     "levels": "المستويات",
     "subjects": "المواد",
     "teachers": "الأساتذة",
@@ -555,8 +555,8 @@
     "madeWith": "صنع بحب في تونس 🇹🇳 للتلاميذ التونسيين",
     "sujetsBac": "مواضيع الباكالوريا",
     "corriges": "الإصلاحات",
-    "pillars": "الأعمدة",
-    "tools": "الأدوات",
+    "pillars": "المسارات",
+    "tools": "المصادر",
     "concoursSubjects": "مواضيع 9ème"
   },
   "errors": {
