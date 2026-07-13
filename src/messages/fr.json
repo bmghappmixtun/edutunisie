@@ -109,7 +109,8 @@
     "concours": "Concours 9ème",
     "myAccount": "Mon compte",
     "about": "À propos",
-    "contact": "Contact"
+    "contact": "Contact",
+    "bac": "Bac"
   },
   "home": {
     "heroTitle": "La plateforme pédagogique",
@@ -553,7 +554,9 @@
     "copyright": "© {year} Examanet. Tous droits réservés.",
     "madeWith": "Conçu avec ❤️ en Tunisie 🇹🇳 pour les élèves tunisiens",
     "sujetsBac": "Sujets Bac",
-    "corriges": "Corrigés"
+    "corriges": "Corrigés",
+    "pillars": "Pilliers",
+    "tools": "Outils"
   },
   "errors": {
     "notFound": "Page introuvable",
