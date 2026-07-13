@@ -18,7 +18,14 @@ import { Eye, Download, MessageCircle, Star, FileText, ChevronLeft, ChevronRight
 export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
+  const rawSlug = (await params).slug;
+  // Same URL-decode fix as the page (Next.js doesn't auto-decode non-ASCII slugs)
+  let slug: string;
+  try {
+    slug = decodeURIComponent(rawSlug);
+  } catch {
+    slug = rawSlug;
+  }
   const resource = await prisma.resource.findUnique({
     where: { slug },
     include: { subject: true, class: true, teacher: true },
@@ -69,7 +76,16 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 }
 
 export default async function ResourcePage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
+  const rawSlug = (await params).slug;
+  // SECURITY/UX: Next.js does NOT auto-decode non-ASCII chars in [slug] params
+  // (e.g. Arabic slugs arrive as '%D9%81...' percent-encoded). Decode manually
+  // so Prisma can find the resource by its real slug.
+  let slug: string;
+  try {
+    slug = decodeURIComponent(rawSlug);
+  } catch {
+    slug = rawSlug;
+  }
   const userSession = await getCurrentUser();
   const resource = await prisma.resource.findUnique({
     where: { slug },
