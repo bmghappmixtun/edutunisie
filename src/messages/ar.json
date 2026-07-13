@@ -556,7 +556,8 @@
     "sujetsBac": "مواضيع الباكالوريا",
     "corriges": "الإصلاحات",
     "pillars": "الأعمدة",
-    "tools": "الأدوات"
+    "tools": "الأدوات",
+    "concoursSubjects": "مواضيع 9ème"
   },
   "errors": {
     "notFound": "الصفحة غير موجودة",
