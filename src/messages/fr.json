@@ -556,7 +556,8 @@
     "sujetsBac": "Sujets Bac",
     "corriges": "Corrigés",
     "pillars": "Pilliers",
-    "tools": "Outils"
+    "tools": "Outils",
+    "concoursSubjects": "Sujets 9ème"
   },
   "errors": {
     "notFound": "Page introuvable",
