@@ -71,6 +71,11 @@ model User {
   mustChangePassword Boolean   @default(false)
   passwordSetAt    DateTime?
 
+  // SECURITY: account lockout after N failed login attempts
+  failedLoginCount Int       @default(0)
+  lockedUntil      DateTime?
+  lastFailedLoginAt DateTime?
+
   // File verification (for new non-invited teachers, admin requests 5 sample docs)
   verificationFilesRequestedAt DateTime?
   verificationFilesRequestedById String?
