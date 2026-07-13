@@ -34,7 +34,7 @@ const breadcrumbJsonLd = breadcrumbSchema([
 // to protect personal data. No personal email exposed on public pages.
 // Contact: /contact page (generic, monitored)
 const team = [
-  { name: 'B.Mehdi', roleKey: 'team.founder' as const }
+  { name: 'B.Mehdi', roleKey: 'about.team.founder' as const }
 ];
 
 export default function AboutPage() {
