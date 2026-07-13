@@ -144,6 +144,9 @@ export default function PDFViewer({
   // Refs
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  // Touch state for swipe detection (next/previous page on horizontal swipe)
+  const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
+  const touchEndRef = useRef<{ x: number; y: number; time: number } | null>(null);
 
   // ==========================================================================
   // Document options — self-hosted assets, no unpkg dependency
@@ -593,7 +596,40 @@ export default function PDFViewer({
           height: isFullscreen ? '100vh' : '95vh',
           minHeight: '800px'
         }}
-        // Mobile-friendly scroll (no rubber-band, no double-tap zoom)
+        // Mobile-friendly touch + swipe handlers (see useEffect below for the gesture)
+        onTouchStart={(e) => {
+          const t = e.touches[0];
+          touchStartRef.current = { x: t.clientX, y: t.clientY, time: Date.now() };
+          touchEndRef.current = null;
+        }}
+        onTouchMove={(e) => {
+          if (!touchStartRef.current) return;
+          const t = e.touches[0];
+          touchEndRef.current = { x: t.clientX, y: t.clientY, time: Date.now() };
+        }}
+        onTouchEnd={() => {
+          if (!touchStartRef.current || !touchEndRef.current || !numPages) {
+            touchStartRef.current = null;
+            return;
+          }
+          const dx = touchEndRef.current.x - touchStartRef.current.x;
+          const dy = touchEndRef.current.y - touchStartRef.current.y;
+          const dt = touchEndRef.current.time - touchStartRef.current.time;
+          // Swipe threshold: 50px horizontal, 200ms max duration, horizontal-dominant
+          const isHorizontalSwipe = Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5;
+          const isFastEnough = dt < 500;
+          if (isHorizontalSwipe && isFastEnough) {
+            if (dx < 0) {
+              // Swipe left → next page
+              setPageNumber(p => Math.min(numPages, p + 1));
+            } else {
+              // Swipe right → previous page
+              setPageNumber(p => Math.max(1, p - 1));
+            }
+          }
+          touchStartRef.current = null;
+          touchEndRef.current = null;
+        }}
       >
         {error ? (
           <div className="flex items-center justify-center h-full p-8">
