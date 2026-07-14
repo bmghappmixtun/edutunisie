@@ -219,7 +219,7 @@ export default async function ResourcesPage(props: { searchParams: Promise<Searc
   const sectionIds = sectionGroups.map((g) => g.sectionId).filter((id): id is string => !!id);
   const subjectIds = subjectGroups.map((g) => g.subjectId).filter((id): id is string => !!id);
 
-  const [classes, sections, subjects] = await Promise.all([
+  const [classes, sections, subjects, allClasses, allSections, allSubjects] = await Promise.all([
     classIds.length > 0
       ? prisma.class.findMany({
           where: { id: { in: classIds } },
@@ -238,6 +238,11 @@ export default async function ResourcesPage(props: { searchParams: Promise<Searc
           select: { id: true, slug: true, nameFr: true, color: true },
         })
       : Promise.resolve([] as Array<{ id: string; slug: string; nameFr: string; color: string | null }>),
+    // Always load ALL classes/sections/subjects for the display name maps
+    // (used to display 'Sciences' instead of 'sciences' in the filter)
+    prisma.class.findMany({ select: { slug: true, nameFr: true } }),
+    prisma.section.findMany({ select: { slug: true, nameFr: true } }),
+    prisma.subject.findMany({ select: { slug: true, nameFr: true } }),
   ]);
 
   // ============== Build facets ==============
@@ -346,6 +351,11 @@ export default async function ResourcesPage(props: { searchParams: Promise<Searc
               totalPages: Math.ceil(total / PAGE_SIZE),
               currentPage: page,
               facets,
+              nameMaps: {
+                class: Object.fromEntries(allClasses.map(c => [c.slug, c.nameFr])),
+                section: Object.fromEntries(allSections.map(s => [s.slug, s.nameFr])),
+                subject: Object.fromEntries(allSubjects.map(s => [s.slug, s.nameFr])),
+              },
             }}
             userId={currentUser?.id ?? null}
             initialFavorites={favoriteIds}
