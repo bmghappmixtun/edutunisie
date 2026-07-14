@@ -13,7 +13,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getConcours9emeFiles } from '@/lib/concours-9eme-data';
+import { getOriginalConcoursFiles } from '@/lib/concours-9eme-data';
+import { getOriginalBacFiles } from '@/lib/bac-data';
 
 const BLOB_BASE_URL = 'https://kmy1h6us8l7bg7bg.public.blob.vercel-storage.com';
 
@@ -37,9 +38,11 @@ export async function GET(
   const { key: keyParts } = await params;
   const key = keyParts.map(decodeURIComponent).join('/');
 
-  // Look up the file in the manifest — only allow curated files
-  const files = getConcours9emeFiles();
-  const file = files.find((f) => f.key === key);
+  // Look up the file in either the concours or bac manifest
+  // We use the ORIGINAL URLs (not proxied) because this is the proxy route itself
+  const concoursFiles = getOriginalConcoursFiles();
+  const bacFiles = getOriginalBacFiles();
+  const file = concoursFiles.find((f) => f.key === key) || bacFiles.find((f) => f.key === key);
 
   if (!file) {
     return new NextResponse('Fichier non trouvé', { status: 404 });

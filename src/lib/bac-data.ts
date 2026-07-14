@@ -139,6 +139,25 @@ export function proxiedBacFileUrl(key: string): string {
   return `/api/concours-file/${encoded}`;
 }
 
+/**
+ * Returns files with ORIGINAL upstream URLs (used by the proxy route itself,
+ * since it needs the real blob URL, not its own proxy URL).
+ */
+export function getOriginalBacFiles(): BacFile[] {
+  const manifest = loadManifest();
+  return (manifest.uploaded || []).map((f: any) => {
+    const parsed = parseKey(f.key);
+    return {
+      ...f,
+      year: parsed?.year,
+      section: parsed?.section,
+      session: parsed?.session,
+      type: parsed?.type,
+      subject: parsed?.subject,
+    };
+  });
+}
+
 export function getBacFiles(): BacFile[] {
   const manifest = loadManifest();
   return (manifest.uploaded || []).map((f: any) => {
