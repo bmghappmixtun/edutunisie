@@ -104,6 +104,22 @@ export function proxiedFileUrl(key: string): string {
   return `/api/concours-file/${encoded}`;
 }
 
+/**
+ * Returns files with the ORIGINAL upstream URLs (used by the proxy route itself,
+ * since it needs to fetch the real blob URL, not its own proxy URL).
+ */
+export function getOriginalConcoursFiles(): ConcoursFile[] {
+  const m = loadManifest();
+  return (m.uploaded || []).map((u: any) => ({
+    key: u.key,
+    url: u.url,
+    size: u.size,
+    source: u.source,
+    namespace: u.namespace,
+    note: u.note,
+  }));
+}
+
 export function getConcours9emeFiles(): ConcoursFile[] {
   const m = loadManifest();
   return (m.uploaded || []).map((u: any) => ({
