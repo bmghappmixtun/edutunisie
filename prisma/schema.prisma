@@ -688,3 +688,53 @@ model SearchLog {
   @@index([createdAt])
 }
 
+
+// ============================================================================
+// CONVERSION PROVIDER CONFIG (admin-managed API keys for iLoveAPI, APIConvert)
+// ============================================================================
+
+model ApiProvider {
+  id              String   @id @default(cuid())
+  // 'iloveapi' | 'apiconvert'
+  provider        String   @unique
+  // Display name override (e.g. "iLoveAPI (production)")
+  displayName     String?
+  // For iLoveAPI: the public key
+  publicKey       String?
+  // The secret key/token (stored encrypted in DB)
+  secretKey       String
+  // Whether this provider is currently active
+  enabled         Boolean  @default(true)
+  // Optional monthly quota set by the admin (e.g. 250 for iLoveAPI free tier)
+  monthlyQuota    Int?
+  // Optional custom API URL (for self-hosted or alternative endpoints)
+  apiUrl          String?
+  // Free-form notes
+  notes           String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  usages          ApiProviderUsage[]
+
+  @@index([enabled])
+}
+
+model ApiProviderUsage {
+  id              String   @id @default(cuid())
+  providerId      String
+  provider        ApiProvider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  // true if the conversion succeeded
+  success         Boolean
+  // File metadata
+  fileName        String
+  fileSize        Int      // bytes
+  // Step where it failed (only set when success=false)
+  failedStep      String?
+  // For month bucketing (denormalized for fast queries)
+  year            Int
+  month           Int      // 1-12
+  createdAt       DateTime @default(now())
+
+  @@index([providerId, year, month])
+  @@index([createdAt])
+}
