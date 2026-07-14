@@ -323,7 +323,7 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
               icon={BookOpen}
               options={subjectOptions.map(([slug, count]) => ({
                 value: slug,
-                label: slug,
+                label: initialData.nameMaps?.subject?.[slug] || slug,
                 count,
               }))}
               selected={filters.subject}
@@ -338,7 +338,7 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
               icon={GraduationCap}
               options={classOptions.map(([slug, count]) => ({
                 value: slug,
-                label: slug,
+                label: initialData.nameMaps?.class?.[slug] || slug,
                 count,
               }))}
               selected={filters.class}
@@ -353,7 +353,7 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
               icon={FilterIcon}
               options={availableSections.map(([slug, count]) => ({
                 value: slug,
-                label: slug,
+                label: initialData.nameMaps?.section?.[slug] || slug,
                 count,
               }))}
               selected={filters.section}
@@ -541,6 +541,7 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
             filters={filters}
             onRemove={(patch) => update(patch)}
             onReset={reset}
+            nameMaps={initialData.nameMaps}
           />
         )}
 
@@ -709,10 +710,12 @@ function ActiveFilterChips({
   filters,
   onRemove,
   onReset,
+  nameMaps,
 }: {
   filters: any;
   onRemove: (patch: any) => void;
   onReset: () => void;
+  nameMaps?: { class?: Record<string, string>; section?: Record<string, string>; subject?: Record<string, string> };
 }) {
   const chips: { key: string; label: string; onRemove: () => void; color: string }[] = [];
 
@@ -735,7 +738,7 @@ function ActiveFilterChips({
   filters.subject.forEach((v: string) => {
     chips.push({
       key: `subject-${v}`,
-      label: v,
+      label: nameMaps?.subject?.[v] || v,
       onRemove: () => onRemove({ subject: filters.subject.filter((x: string) => x !== v) }),
       color: 'bg-violet-100 text-violet-700',
     });
@@ -743,7 +746,7 @@ function ActiveFilterChips({
   filters.class.forEach((v: string) => {
     chips.push({
       key: `class-${v}`,
-      label: v,
+      label: nameMaps?.class?.[v] || v,
       onRemove: () => onRemove({ class: filters.class.filter((x: string) => x !== v) }),
       color: 'bg-indigo-100 text-indigo-700',
     });
@@ -751,7 +754,7 @@ function ActiveFilterChips({
   filters.section.forEach((v: string) => {
     chips.push({
       key: `section-${v}`,
-      label: v,
+      label: nameMaps?.section?.[v] || v,
       onRemove: () => onRemove({ section: filters.section.filter((x: string) => x !== v) }),
       color: 'bg-cyan-100 text-cyan-700',
     });

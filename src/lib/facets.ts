@@ -19,5 +19,12 @@ export interface RessourcesResponse {
   totalPages: number;
   currentPage: number;
   facets: Facets;
+  // Display name maps: slug → human-readable name (per locale)
+  // Used by the filter sidebar to show 'Sciences' instead of 'sciences'
+  nameMaps?: {
+    class?: Record<string, string>;
+    section?: Record<string, string>;
+    subject?: Record<string, string>;
+  };
 }
 console.log('Build timestamp:', new Date().toISOString());
