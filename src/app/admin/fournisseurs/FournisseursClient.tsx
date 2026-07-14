@@ -392,12 +392,12 @@ function ProviderCard({
         <div className="mb-3 p-3 bg-gradient-to-br from-slate-50 to-white rounded-lg border border-slate-200">
           <div className="flex items-center justify-between mb-1.5">
             <span className="text-xs font-bold text-slate-500 uppercase">
-              {liveQ ? 'Quota en direct' : new Date(usage!.year, usage!.month - 1, 1).toLocaleString('fr-FR', { month: 'long', year: 'numeric' })}
+              {liveQ ? 'Used credits this month' : new Date(usage!.year, usage!.month - 1, 1).toLocaleString('fr-FR', { month: 'long', year: 'numeric' })}
             </span>
-            <span className="text-xs text-slate-500">
+            <span className="text-xs text-slate-500 font-mono">
               {liveQ
-                ? `${liveUsed ?? '?'} / ${totalQuota || '∞'} conversions`
-                : `${usage!.used} / ${info!.monthlyQuota || '∞'} conversions`}
+                ? `${formatNumber(liveUsed ?? 0)} / ${formatNumber(totalQuota || 0)} used`
+                : `${formatNumber(usage!.used)} / ${formatNumber(info!.monthlyQuota || 0)} used`}
             </span>
           </div>
           {totalQuota > 0 && (
@@ -417,17 +417,17 @@ function ProviderCard({
           <div className="flex items-center justify-between mt-2 text-xs">
             {liveQ ? (
               <>
-                <span className="text-emerald-600 font-bold">✓ {liveRemaining ?? 0} restantes</span>
+                <span className="text-emerald-600 font-bold">✓ {formatNumber(liveRemaining ?? 0)} restantes</span>
                 {liveQ.source && <span className="text-slate-400">via {liveQ.source}</span>}
               </>
             ) : (
               <>
-                <span className="text-emerald-600 font-bold">✓ {usage!.success} OK</span>
+                <span className="text-emerald-600 font-bold">✓ {formatNumber(usage!.success)} OK</span>
                 {usage!.failed > 0 && (
-                  <span className="text-red-600 font-bold">✗ {usage!.failed}</span>
+                  <span className="text-red-600 font-bold">✗ {formatNumber(usage!.failed)}</span>
                 )}
-                {info!.monthlyQuota && (
-                  <span className="text-slate-500">{usage!.remaining} restantes</span>
+                {info!.monthlyQuota && usage!.remaining != null && (
+                  <span className="text-slate-500">{formatNumber(usage!.remaining)} restantes</span>
                 )}
               </>
             )}
@@ -944,6 +944,14 @@ function NeonCard({ info, refreshing, onRefresh, onChanged }: {
       )}
     </div>
   );
+}
+
+// ============================================================================
+// Helpers
+// ============================================================================
+
+function formatNumber(n: number): string {
+  return n.toLocaleString('fr-FR');
 }
 
 // ============================================================================
