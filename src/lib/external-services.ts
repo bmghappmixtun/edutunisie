@@ -72,9 +72,10 @@ export async function checkVercelUsage(token: string): Promise<VercelUsage> {
   // Vercel billing period: 1st of current month to 1st of next month
   const periodStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-  // Vercel API expects Unix timestamps in SECONDS (not ms)
-  const fromSec = Math.floor(periodStart.getTime() / 1000);
-  const toSec = Math.floor(periodEnd.getTime() / 1000);
+  // Vercel API expects YYYY-MM-DD format
+  const fmt = (d: Date) => d.toISOString().slice(0, 10);
+  const fromDate = fmt(periodStart);
+  const toDate = fmt(periodEnd);
 
   try {
     // Get user info (optional, non-fatal)
@@ -101,11 +102,11 @@ export async function checkVercelUsage(token: string): Promise<VercelUsage> {
     // Try personal account first, then team
     const usageEndpoints = teamId
       ? [
-          { url: `${VERCEL_API}/v1/teams/${teamId}/usage?from=${fromSec}&to=${toSec}`, label: 'team' },
-          { url: `${VERCEL_API}/v1/usage?from=${fromSec}&to=${toSec}`, label: 'personal' },
+          { url: `${VERCEL_API}/v1/teams/${teamId}/usage?from=${fromDate}&to=${toDate}`, label: 'team' },
+          { url: `${VERCEL_API}/v1/usage?from=${fromDate}&to=${toDate}`, label: 'personal' },
         ]
       : [
-          { url: `${VERCEL_API}/v1/usage?from=${fromSec}&to=${toSec}`, label: 'personal' },
+          { url: `${VERCEL_API}/v1/usage?from=${fromDate}&to=${toDate}`, label: 'personal' },
         ];
 
     let usageData: any = null;
