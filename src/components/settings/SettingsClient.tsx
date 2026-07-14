@@ -592,7 +592,7 @@ function ChangePassword() {
         toast.error(data.error);
         return;
       }
-      toast.success('Mot de passe changé ✅');
+      toast.success('Mot de passe changé ✅ — Un email de confirmation vous a été envoyé', { duration: 6000 });
       setCurrent(''); setNext(''); setConfirm('');
     } catch {
       toast.error('Erreur réseau');
@@ -636,6 +636,14 @@ function ChangePassword() {
           className="input"
         />
       </Field>
+      <div className="bg-sky-50 border border-sky-200 rounded-xl p-3 text-sm text-sky-800 flex items-start gap-2">
+        <Shield className="w-4 h-4 flex-shrink-0 mt-0.5" />
+        <div>
+          <strong>Notification de sécurité :</strong> un email de confirmation vous sera envoyé après chaque modification,
+          avec l'adresse IP, l'heure et l'appareil utilisé. Si vous n'êtes pas à l'origine de ce changement, contactez-nous
+          immédiatement via <a href="/contact?subject=compromised&motif=password" className="underline font-semibold">notre page de contact</a>.
+        </div>
+      </div>
       <button
         onClick={submit}
         disabled={loading || !current || !next || !confirm}
