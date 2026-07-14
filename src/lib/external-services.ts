@@ -1,214 +1,284 @@
 /**
  * External service usage checkers (Vercel, Neon)
  *
- * Both have REST APIs that return quota / usage information.
- * The admin enters their API token via the admin panel; we store it encrypted
- * and use it to query the current usage.
- *
  * Vercel API: https://vercel.com/docs/rest-api
- *   - GET /v1/teams/{id}/usage — current billing period usage
- *   - GET /v9/projects — project list with limits
+ *   - GET /v1/billing/charges — NEW billing/charges endpoint (FOCUS v1.3)
+ *     Returns JSONL, from/to as ISO 8601 date-time UTC
+ *     https://vercel.com/docs/rest-api/billing/list-focus-billing-charges
+ *   - GET /v1/usage — legacy endpoint, returns aggregate usage
  *
  * Neon API: https://neon.tech/docs/manage/api
- *   - GET /api/v2/projects/{id}/consumption/projects — project consumption
- *   - GET /api/v2/consumption/transfer — transfer usage
  */
 
 const VERCEL_API = 'https://api.vercel.com';
 const NEON_API = 'https://console.neon.tech/api/v2';
 
 export type VercelUsage = {
-  // Period (current billing cycle)
   periodStart: string;
   periodEnd: string;
-  // Aggregated usage
   bandwidth: { used: number; unit: string; limit?: number };
   functions: { used: number; unit: string; limit?: number };
   builds: { used: number; unit: string; limit?: number };
-  // Errors
   error?: string;
-  // Account info
   username?: string;
   plan?: string;
+  source?: 'billing-charges' | 'usage-v1' | 'none';
 };
 
 export type NeonUsage = {
-  // Current period
   periodStart: string;
   periodEnd: string;
-  // Storage
   storage: { usedMb: number; limitMb?: number; percent?: number };
-  // Compute time
   compute: { usedHours: number; limitHours?: number; percent?: number };
-  // Data transfer
   transfer: { usedGb: number; limitGb?: number; percent?: number };
-  // Projects
   projects: { active: number; limit?: number };
-  // Branch / compute endpoints
   branches?: { active: number; limit?: number };
-  // Errors
   error?: string;
-  // Account info
   email?: string;
   plan?: string;
 };
 
 /**
- * Fetch Vercel usage for the current billing period
+ * Fetch Vercel usage for the current billing period.
+ *
+ * Tries in order:
+ *   1. /v1/billing/charges (newer, FOCUS format, JSONL)
+ *   2. /v1/usage (legacy, JSON object)
+ *   3. Falls back to "no data" if both fail
  */
 export async function checkVercelUsage(token: string): Promise<VercelUsage> {
-  if (!token) {
-    return {
-      periodStart: '',
-      periodEnd: '',
-      bandwidth: { used: 0, unit: 'GB' },
-      functions: { used: 0, unit: 'GB-Hours' },
-      builds: { used: 0, unit: 'builds' },
-      error: 'No Vercel token',
-    };
-  }
+  const empty = (overrides: Partial<VercelUsage> = {}): VercelUsage => ({
+    periodStart: '',
+    periodEnd: '',
+    bandwidth: { used: 0, unit: 'GB' },
+    functions: { used: 0, unit: 'hours' },
+    builds: { used: 0, unit: 'builds' },
+    source: 'none',
+    ...overrides,
+  });
+
+  if (!token) return empty({ error: 'No Vercel token' });
 
   const now = new Date();
-  // Vercel billing period: 1st of current month to 1st of next month
   const periodStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-  // Vercel API expects YYYY-MM-DD format
-  const fmt = (d: Date) => d.toISOString().slice(0, 10);
-  const fromDate = fmt(periodStart);
-  const toDate = fmt(periodEnd);
+  // Vercel API expects ISO 8601 date-time in UTC
+  const fromISO = periodStart.toISOString(); // e.g. "2026-07-01T00:00:00.000Z"
+  const toISO = periodEnd.toISOString();
 
+  // Get user info (non-fatal)
+  let username: string | undefined;
+  let plan: string | undefined;
+  let teamId: string | undefined;
   try {
-    // Get user info (optional, non-fatal)
-    let username: string | undefined;
-    let plan: string | undefined;
-    let teamId: string | undefined;
-    try {
-      const userRes = await fetch(`${VERCEL_API}/v1/user`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (userRes.ok) {
-        const userData: any = await userRes.json();
-        username = userData.user?.username;
-        plan = userData.user?.billing?.plan;
-        // Get the default team (if any)
-        if (userData.user?.defaultTeamId) {
-          teamId = userData.user.defaultTeamId;
+    const userRes = await fetch(`${VERCEL_API}/v2/user`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (userRes.ok) {
+      const userData: any = await userRes.json();
+      username = userData.user?.username;
+      plan = userData.user?.plan;
+      teamId = userData.user?.defaultTeamId;
+    }
+  } catch {
+    // ignore
+  }
+
+  // ============================================================
+  // STRATEGY 1: /v1/billing/charges (new, FOCUS v1.3 JSONL)
+  // ============================================================
+  const teamParam = teamId ? `&teamId=${teamId}` : '';
+  const billingUrl = `${VERCEL_API}/v1/billing/charges?from=${encodeURIComponent(fromISO)}&to=${encodeURIComponent(toISO)}${teamParam}`;
+  try {
+    const res = await fetch(billingUrl, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (res.ok) {
+      const text = await res.text();
+      const lines = text.split('\n').filter(Boolean);
+      let bandwidth = 0;
+      let bandwidthUnit = 'GB';
+      let functionsGbSec = 0;
+      let builds = 0;
+      let foundAny = false;
+
+      for (const line of lines) {
+        try {
+          const charge = JSON.parse(line);
+          if (charge.ChargeCategory !== 'Usage') continue;
+          foundAny = true;
+          const service = (charge.ServiceName || '').toLowerCase();
+          const qty = charge.ConsumedQuantity || 0;
+          const unit = charge.ConsumedUnit || '';
+
+          if (
+            service.includes('bandwidth') ||
+            service.includes('fast data transfer') ||
+            service.includes('data transfer')
+          ) {
+            bandwidth += qty;
+            bandwidthUnit = unit;
+          } else if (
+            service.includes('function') ||
+            service.includes('compute') ||
+            service.includes('execution') ||
+            service.includes('invocation')
+          ) {
+            functionsGbSec += qty;
+          } else if (service.includes('build')) {
+            builds += qty;
+          }
+        } catch {
+          // ignore parse errors
         }
       }
-    } catch {
-      // ignore
-    }
 
-    // Try personal account first, then team
-    const usageEndpoints = teamId
-      ? [
-          { url: `${VERCEL_API}/v1/teams/${teamId}/usage?from=${fromDate}&to=${toDate}`, label: 'team' },
-          { url: `${VERCEL_API}/v1/usage?from=${fromDate}&to=${toDate}`, label: 'personal' },
-        ]
-      : [
-          { url: `${VERCEL_API}/v1/usage?from=${fromDate}&to=${toDate}`, label: 'personal' },
-        ];
-
-    let usageData: any = null;
-    let lastError: string | undefined;
-    for (const ep of usageEndpoints) {
-      try {
-        const usageRes = await fetch(ep.url, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (usageRes.ok) {
-          usageData = await usageRes.json();
-          break;
-        }
-        const errText = await usageRes.text().catch(() => '');
-        lastError = `Vercel ${ep.label}: ${usageRes.status} ${errText.slice(0, 150)}`;
-      } catch (e: any) {
-        lastError = `Vercel ${ep.label} network: ${e?.message || 'erreur'}`;
+      if (foundAny) {
+        return {
+          periodStart: periodStart.toISOString().slice(0, 10),
+          periodEnd: periodEnd.toISOString().slice(0, 10),
+          bandwidth: normalizeBandwidth(bandwidth, bandwidthUnit),
+          functions: normalizeFunctions(functionsGbSec),
+          builds: { used: Math.round(builds), unit: 'builds' },
+          username,
+          plan,
+          source: 'billing-charges',
+        };
       }
+    } else if (res.status !== 404 && res.status !== 403) {
+      // 404/403 means user doesn't have access to this endpoint (e.g., Hobby plan)
+      // Other errors are real failures
+      const errText = await res.text().catch(() => '');
+      console.warn('[vercel-usage] billing/charges error:', res.status, errText.slice(0, 200));
     }
+  } catch (e: any) {
+    console.warn('[vercel-usage] billing/charges network error:', e?.message);
+  }
 
-    if (!usageData) {
-      return {
-        periodStart: periodStart.toISOString().slice(0, 10),
-        periodEnd: periodEnd.toISOString().slice(0, 10),
-        bandwidth: { used: 0, unit: 'GB' },
-        functions: { used: 0, unit: 'hours' },
-        builds: { used: 0, unit: 'builds' },
+  // ============================================================
+  // STRATEGY 2: /v1/usage (legacy, JSON object)
+  // ============================================================
+  const usageUrl = teamId
+    ? `${VERCEL_API}/v1/teams/${teamId}/usage?from=${encodeURIComponent(fromISO)}&to=${encodeURIComponent(toISO)}`
+    : `${VERCEL_API}/v1/usage?from=${encodeURIComponent(fromISO)}&to=${encodeURIComponent(toISO)}`;
+  try {
+    const res = await fetch(usageUrl, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (res.ok) {
+      const data: any = await res.json();
+      const usage = parseLegacyUsage(data);
+      if (usage) {
+        return {
+          periodStart: periodStart.toISOString().slice(0, 10),
+          periodEnd: periodEnd.toISOString().slice(0, 10),
+          ...usage,
+          username,
+          plan,
+          source: 'usage-v1',
+        };
+      }
+    } else {
+      const errText = await res.text().catch(() => '');
+      return empty({
+        error: `Vercel ${res.status}: ${errText.slice(0, 250)}`,
         username,
         plan,
-        error: lastError || 'Vercel API indisponible',
-      };
+      });
     }
-
-    // Vercel returns a flat array of usage objects
-    // e.g. [{ resource: "bandwidth", usageValue: 123, usageUnit: "GB" }, ...]
-    // OR a nested object: { bandwidth: { usageValue, usageUnit }, ... }
-    let bandwidthValue = 0;
-    let bandwidthUnit = 'GB';
-    let functionsValue = 0;
-    let functionsUnit = 'hours';
-    let buildsValue = 0;
-
-    if (Array.isArray(usageData)) {
-      for (const item of usageData) {
-        if (item.resource === 'bandwidth' || item.resource === 'fastDataTransfer') {
-          bandwidthValue = parseFloat(item.usageValue) || 0;
-          bandwidthUnit = item.usageUnit || 'GB';
-        } else if (item.resource === 'functions') {
-          functionsValue = parseFloat(item.usageValue) || 0;
-          functionsUnit = item.usageUnit || 'GB-Hours';
-        } else if (item.resource === 'builds') {
-          buildsValue = parseFloat(item.usageValue) || 0;
-        }
-      }
-    } else if (typeof usageData === 'object' && usageData !== null) {
-      // Nested format
-      if (usageData.bandwidth) {
-        bandwidthValue = parseFloat(usageData.bandwidth.usageValue) || 0;
-        bandwidthUnit = usageData.bandwidth.usageUnit || 'GB';
-      }
-      if (usageData.functions) {
-        functionsValue = parseFloat(usageData.functions.usageValue) || 0;
-        functionsUnit = usageData.functions.usageUnit || 'GB-Hours';
-      }
-      if (usageData.builds) {
-        buildsValue = parseFloat(usageData.builds.usageValue) || 0;
-      }
-    }
-
-    // Normalize units
-    let bandwidthGB = bandwidthValue;
-    if (bandwidthUnit === 'MB' || bandwidthUnit === 'MBs') {
-      bandwidthGB = bandwidthValue / 1024;
-    } else if (bandwidthUnit === 'Bytes' || bandwidthUnit === 'B') {
-      bandwidthGB = bandwidthValue / (1024 * 1024 * 1024);
-    }
-    let functionsHours = functionsValue;
-    if (functionsUnit === 'GB-Hours' || functionsUnit === 'GB-Hrs') {
-      functionsHours = functionsValue * 1000;
-    } else if (functionsUnit === 'ms' || functionsUnit === 'milliseconds') {
-      functionsHours = functionsValue / 1000 / 3600 / 1000;
-    }
-
-    return {
-      periodStart: periodStart.toISOString().slice(0, 10),
-      periodEnd: periodEnd.toISOString().slice(0, 10),
-      bandwidth: { used: parseFloat(bandwidthGB.toFixed(2)), unit: 'GB' },
-      functions: { used: parseFloat(functionsHours.toFixed(2)), unit: 'hours' },
-      builds: { used: buildsValue, unit: 'builds' },
-      username,
-      plan,
-    };
   } catch (e: any) {
+    return empty({ error: `Network: ${e?.message || 'erreur'}`, username, plan });
+  }
+
+  return empty({ username, plan });
+}
+
+/**
+ * Parse the legacy /v1/usage response (different shapes possible)
+ */
+function parseLegacyUsage(data: any): { bandwidth: any; functions: any; builds: any } | null {
+  // Shape 1: flat array [{resource, usageValue, usageUnit}]
+  if (Array.isArray(data)) {
+    let bw = 0, bwUnit = 'GB', fn = 0, fnUnit = 'hours', builds = 0;
+    let found = false;
+    for (const item of data) {
+      found = true;
+      const v = parseFloat(item.usageValue) || 0;
+      const u = item.usageUnit || '';
+      if (item.resource === 'bandwidth' || item.resource === 'fastDataTransfer') {
+        bw += v; bwUnit = u;
+      } else if (item.resource === 'serverlessFunctionExecution' || item.resource === 'functions') {
+        fn += v; fnUnit = u;
+      } else if (item.resource === 'builds') {
+        builds += v;
+      }
+    }
+    if (!found) return null;
     return {
-      periodStart: periodStart.toISOString().slice(0, 10),
-      periodEnd: periodEnd.toISOString().slice(0, 10),
-      bandwidth: { used: 0, unit: 'GB' },
-      functions: { used: 0, unit: 'hours' },
-      builds: { used: 0, unit: 'builds' },
-      error: e?.message || 'Network error',
+      bandwidth: normalizeBandwidth(bw, bwUnit),
+      functions: normalizeFunctions(fn, fnUnit),
+      builds: { used: Math.round(builds), unit: 'builds' },
     };
   }
+
+  // Shape 2: nested object {bandwidth: {usageValue, usageUnit}, ...}
+  if (typeof data === 'object' && data !== null) {
+    return {
+      bandwidth: normalizeBandwidth(
+        parseFloat(data.bandwidth?.usageValue) || 0,
+        data.bandwidth?.usageUnit || 'GB'
+      ),
+      functions: normalizeFunctions(
+        parseFloat(data.serverlessFunctionExecution?.usageValue || data.functions?.usageValue) || 0,
+        data.serverlessFunctionExecution?.usageUnit || data.functions?.usageUnit || 'hours'
+      ),
+      builds: {
+        used: Math.round(parseFloat(data.builds?.usageValue) || 0),
+        unit: 'builds',
+      },
+    };
+  }
+
+  return null;
+}
+
+function normalizeBandwidth(value: number, unit: string): { used: number; unit: string } {
+  const u = (unit || '').toUpperCase();
+  let gb = value;
+  let normalizedUnit = 'GB';
+  if (u === 'MB' || u === 'MBS') {
+    gb = value / 1024;
+  } else if (u === 'BYTES' || u === 'B') {
+    gb = value / (1024 * 1024 * 1024);
+  } else if (u === 'GB' || u === 'GBS') {
+    gb = value;
+    normalizedUnit = 'GB';
+  } else if (u === 'TB' || u === 'TBS') {
+    gb = value * 1024;
+    normalizedUnit = 'GB';
+  } else {
+    normalizedUnit = unit || 'GB';
+  }
+  return { used: parseFloat(gb.toFixed(3)), unit: normalizedUnit };
+}
+
+function normalizeFunctions(value: number, unit?: string): { used: number; unit: string } {
+  const u = (unit || '').toLowerCase();
+  // Functions can be in GB-seconds, GB-hours, ms, etc.
+  let hours = value;
+  let finalUnit = 'hours';
+  if (u === 'gb-seconds' || u === 'gb-s' || u === 'gb-secs') {
+    hours = value / 3600;
+  } else if (u === 'gb-hours' || u === 'gb-h' || u === 'gb-hrs') {
+    hours = value;
+  } else if (u === 'ms' || u === 'milliseconds') {
+    hours = value / 1000 / 3600;
+  } else if (u === 'seconds' || u === 's') {
+    hours = value / 3600;
+  } else {
+    finalUnit = unit || 'GB-hours';
+  }
+  return { used: parseFloat(hours.toFixed(2)), unit: finalUnit };
 }
 
 /**
@@ -271,14 +341,12 @@ export async function checkNeonUsage(apiKey: string, projectId?: string): Promis
     }
 
     // 2. Get consumption (storage, compute, transfer)
-    // Use the specific project if provided, otherwise the first project
     const targetProjectId = projectId || projects[0]?.id;
     let storageMb = 0;
     let computeSeconds = 0;
     let transferGb = 0;
 
     if (targetProjectId) {
-      // Storage: query the latest consumption
       try {
         const consumptionRes = await fetch(
           `${NEON_API}/projects/${targetProjectId}/consumption/projects?from=${from}&to=${to}&granularity=daily`,
@@ -286,26 +354,11 @@ export async function checkNeonUsage(apiKey: string, projectId?: string): Promis
         );
         if (consumptionRes.ok) {
           const cData: any = await consumptionRes.json();
-          // Sum up active_time_seconds for the period
           if (cData.consumption && Array.isArray(cData.consumption)) {
             for (const day of cData.consumption) {
               computeSeconds += day.active_time_seconds || 0;
             }
           }
-        }
-      } catch {
-        // ignore
-      }
-
-      // Get current storage from a sample endpoint
-      try {
-        const statsRes = await fetch(
-          `${NEON_API}/projects/${targetProjectId}/branches`,
-          { headers: { Authorization: `Bearer ${apiKey}` } }
-        );
-        if (statsRes.ok) {
-          // We don't get direct storage; approximate from branch count
-          // (real implementation would query metrics)
         }
       } catch {
         // ignore
