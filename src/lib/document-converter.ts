@@ -1,34 +1,37 @@
 /**
  * Document conversion utilities
  *
- * Converts various formats (.docx, .doc, .odt, .ppt, .xls) to PDF using
- * iLoveAPI (iLovePDF) - a high-quality, hosted conversion service.
+ * Converts .docx (and other Office formats) to PDF for the teacher library
+ * and the "ajouter une ressource" flow.
  *
- *   .docx → iLoveAPI officepdf → PDF
- *   .pdf  → passthrough (no conversion)
+ * Conversion chain (tries each in order, falls back automatically):
+ *   1. iLoveAPI         — high quality, hosted LibreOffice, requires API keys (paid)
+ *   2. Gotenberg        — totally free, open-source, self-hosted, requires URL
+ *   3. Puppeteer+Chromium — totally free, no config, slower (cold start ~3s)
+ *   4. ConvertAPI       — free tier (1500/mo), requires API token
+ *   5. original only    — last resort, just store the .docx + warn the user
  *
- * Quality: very good for complex math, Arabic, RTL, mixed content.
- * Uses LibreOffice under the hood (hosted by iLoveAPI).
- *
- * Free tier: 250 documents/month (with public API key).
- *
- * If the API key is missing or the service fails, the original file
- * is still saved to the teacher's library - the teacher can re-upload
- * a PDF version manually.
+ * Recommended free setup:
+ *   - Deploy Gotenberg on Render.com (free Docker tier) or Fly.io
+ *   - Set GOTENBERG_URL=https://your-gotenberg.onrender.com
+ *   - Done. Free forever, no quota, high quality (LibreOffice).
  */
 
 import { convertOfficeToPdfViaIloveapi, IloveapiError } from './iloveapi';
+import { convertOfficeToPdfViaGotenberg, GotenbergError } from './gotenberg';
+import { convertDocxToPdfViaPuppeteer, PuppeteerConvertError } from './puppeteer-converter';
+import { convertOfficeToPdfViaConvertApi, ConvertApiError } from './convertapi';
 
 export type ConversionResult = {
   pdfBuffer?: Buffer;
   pdfSize?: number;
   warnings: string[];
-  provider: 'iloveapi' | 'none' | 'failed';
+  provider: 'iloveapi' | 'gotenberg' | 'puppeteer' | 'convertapi' | 'none' | 'failed';
 };
 
 /**
- * Convert an Office document (.docx, .doc, .odt) to PDF
- * Uses iLoveAPI (high quality, hosted LibreOffice)
+ * Convert a .docx buffer to a PDF
+ * Tries providers in order until one succeeds
  */
 export async function convertDocxToPdf(
   fileBuffer: Buffer,
@@ -44,42 +47,122 @@ export async function convertDocxToPdf(
   if (options.fileName) {
     const fmt = detectFormat(options.fileName);
     if (fmt.isPdf) {
-      // Already a PDF - never send to iLoveAPI
       return { warnings, provider: 'none' };
     }
   }
 
-  const publicKey = process.env.I_LOVE_API_PUBLIC_KEY;
-  // Backwards-compat: I_LOVE_API_KEY is the secret key (older var name)
-  const secretKey = process.env.I_LOVE_API_SECRET_KEY || process.env.I_LOVE_API_KEY;
+  // ============== PROVIDER 1: iLoveAPI (high quality, paid) ==============
+  const ilovePublicKey = process.env.I_LOVE_API_PUBLIC_KEY;
+  const iloveSecretKey = process.env.I_LOVE_API_SECRET_KEY || process.env.I_LOVE_API_KEY;
 
-  if (!publicKey || !secretKey) {
-    warnings.push(
-      'I_LOVE_API_PUBLIC_KEY et I_LOVE_API_SECRET_KEY (ou I_LOVE_API_KEY) non configurées. Le fichier original est sauvegardé, mais la conversion PDF est désactivée. Ré-uploadez le fichier en PDF manuellement.'
-    );
-    return { warnings, provider: 'none' };
+  if (ilovePublicKey && iloveSecretKey) {
+    try {
+      const fileName = options.fileName || 'document.docx';
+      const result = await convertOfficeToPdfViaIloveapi(
+        fileBuffer,
+        fileName,
+        ilovePublicKey,
+        iloveSecretKey
+      );
+      return {
+        pdfBuffer: result.pdfBuffer,
+        pdfSize: result.pdfSize,
+        warnings: [...warnings, ...result.warnings],
+        provider: 'iloveapi',
+      };
+    } catch (err) {
+      let msg = 'Erreur inconnue';
+      if (err instanceof IloveapiError) msg = `iLoveAPI (${err.step}): ${err.message}`;
+      else if (err instanceof Error) msg = err.message;
+      console.warn('[document-converter] iLoveAPI failed, falling back to Gotenberg:', msg);
+      warnings.push(`iLoveAPI indisponible (${msg}).`);
+    }
+  } else {
+    warnings.push('iLoveAPI non configuré.');
   }
 
+  // ============== PROVIDER 2: Gotenberg (self-hosted, totally free) ==============
+  // Recommended free plan: deploy Gotenberg on Render.com / Fly.io / your VPS.
+  // Quality: LibreOffice based, identical to paid services.
+  const gotenbergUrl = process.env.GOTENBERG_URL;
+  if (gotenbergUrl) {
+    try {
+      const fileName = options.fileName || 'document.docx';
+      const result = await convertOfficeToPdfViaGotenberg(fileBuffer, fileName, {
+        url: gotenbergUrl,
+        apiKey: process.env.GOTENBERG_API_KEY,
+      });
+      return {
+        pdfBuffer: result.pdfBuffer,
+        pdfSize: result.pdfSize,
+        warnings: [...warnings, ...result.warnings],
+        provider: 'gotenberg',
+      };
+    } catch (err) {
+      let msg = 'Erreur inconnue';
+      if (err instanceof GotenbergError) msg = `Gotenberg (${err.step}): ${err.message}`;
+      else if (err instanceof Error) msg = err.message;
+      console.warn('[document-converter] Gotenberg failed, falling back to Puppeteer:', msg);
+      warnings.push(`Gotenberg indisponible (${msg}).`);
+    }
+  } else {
+    warnings.push('Gotenberg non configuré (GOTENBERG_URL manquant).');
+  }
+
+  // ============== PROVIDER 3: Puppeteer + Chromium (totally free, no config) ==============
+  // Always-available fallback. Slower cold start (~3s for chromium download on
+  // first use per cold server). Quality: very good (full HTML rendering).
   try {
     const fileName = options.fileName || 'document.docx';
-    const result = await convertOfficeToPdfViaIloveapi(fileBuffer, fileName, publicKey, secretKey);
+    const result = await convertDocxToPdfViaPuppeteer(fileBuffer, {
+      fileName,
+      title: options.title,
+      author: options.author,
+    });
     return {
       pdfBuffer: result.pdfBuffer,
       pdfSize: result.pdfSize,
       warnings: [...warnings, ...result.warnings],
-      provider: 'iloveapi',
+      provider: 'puppeteer',
     };
   } catch (err) {
     let msg = 'Erreur inconnue';
-    if (err instanceof IloveapiError) {
-      msg = `iLoveAPI (${err.step}): ${err.message}`;
-    } else if (err instanceof Error) {
-      msg = err.message;
-    }
-    console.error('[document-converter] iLoveAPI failed:', err);
-    warnings.push(`Conversion échouée: ${msg}. L'original a été sauvegardé. Vous pouvez ré-uploader en PDF manuellement.`);
-    return { warnings, provider: 'failed' };
+    if (err instanceof PuppeteerConvertError) msg = `Puppeteer (${err.step}): ${err.message}`;
+    else if (err instanceof Error) msg = err.message;
+    console.error('[document-converter] Puppeteer failed:', err);
+    warnings.push(`Puppeteer/Chromium indisponible (${msg}).`);
   }
+
+  // ============== PROVIDER 4: ConvertAPI (optional, requires API token) ==============
+  const convertApiSecret = process.env.CONVERTAPI_SECRET;
+  if (convertApiSecret) {
+    try {
+      const fileName = options.fileName || 'document.docx';
+      const result = await convertOfficeToPdfViaConvertApi(
+        fileBuffer,
+        fileName,
+        convertApiSecret
+      );
+      return {
+        pdfBuffer: result.pdfBuffer,
+        pdfSize: result.pdfSize,
+        warnings: [...warnings, ...result.warnings],
+        provider: 'convertapi',
+      };
+    } catch (err) {
+      let msg = 'Erreur inconnue';
+      if (err instanceof ConvertApiError) msg = `ConvertAPI (${err.step}): ${err.message}`;
+      else if (err instanceof Error) msg = err.message;
+      console.error('[document-converter] ConvertAPI failed:', err);
+      warnings.push(`ConvertAPI indisponible (${msg}).`);
+    }
+  }
+
+  // ============== PROVIDER 5: nothing left, return failure ==============
+  warnings.push(
+    'Aucun service de conversion PDF disponible. Le fichier original (.docx) est sauvegardé dans votre bibliothèque. Vous pouvez le re-uploader en PDF manuellement depuis /enseignant/bibliotheque.'
+  );
+  return { warnings, provider: 'failed' };
 }
 
 /**
@@ -110,7 +193,6 @@ export function detectFormat(filename: string, mimeType?: string): {
   if (ext === 'rtf' || mimeType === 'application/rtf') {
     return { format: 'rtf', isConvertible: true, isPdf: false };
   }
-  // iLoveAPI also supports:
   if (
     ext === 'pptx' ||
     mimeType === 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
