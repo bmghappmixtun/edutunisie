@@ -5,7 +5,7 @@ import Footer from '@/components/layout/Footer';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
-import { Shield, Users, FileText, BarChart3, CheckCircle, Flag, Edit3, BookOpen, Settings, MessageSquare, TrendingUp } from 'lucide-react';
+import { Shield, Users, FileText, BarChart3, CheckCircle, Flag, Edit3, BookOpen, Settings, MessageSquare, TrendingUp, Key } from 'lucide-react';
 
 // Admin pages should never be indexed
 export const metadata: Metadata = {
@@ -44,6 +44,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
     { group: 'Configuration' },
     { href: '/admin/parametres', icon: Settings, label: 'Paramètres' },
+    { href: '/admin/fournisseurs', icon: Key, label: 'Fournisseurs & API' },
   ];
 
   return (

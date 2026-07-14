@@ -5,22 +5,24 @@
  * and the "ajouter une ressource" flow.
  *
  * Conversion chain (only 2 providers):
- *   1. iLoveAPI   — high quality, hosted LibreOffice, requires API keys (plan A)
- *   2. APIConvert — free tier fallback, requires APICONVERT_API_KEY (plan B)
+ *   1. iLoveAPI   — high quality, hosted LibreOffice (plan A)
+ *   2. APIConvert — free tier fallback (plan B)
  *
- * If both fail, the original .docx is still saved and the user can
- * re-upload a PDF manually.
+ * API keys are read from the ApiProvider table (encrypted) first, then
+ * fall back to env vars. Each conversion is logged to ApiProviderUsage
+ * so the admin can see usage stats.
  *
- * To configure:
- *   - I_LOVE_API_PUBLIC_KEY + I_LOVE_API_SECRET_KEY  → enables plan A
- *   - APICONVERT_API_KEY                              → enables plan B
+ * To configure via env vars (legacy):
+ *   - I_LOVE_API_PUBLIC_KEY + I_LOVE_API_SECRET_KEY
+ *   - APICONVERT_API_KEY
  *
- * If neither is configured, the converter returns `provider: 'failed'`
- * and the original .docx is preserved.
+ * To configure via admin UI: see /admin/fournisseurs
  */
 
 import { convertOfficeToPdfViaIloveapi, IloveapiError } from './iloveapi';
 import { convertOfficeToPdfViaConvertApi, ApiconvertError } from './apiconvert';
+import { prisma } from './prisma';
+import { decryptSecret } from './provider-keys';
 
 export type ConversionResult = {
   pdfBuffer?: Buffer;
@@ -28,6 +30,75 @@ export type ConversionResult = {
   warnings: string[];
   provider: 'iloveapi' | 'apiconvert' | 'none' | 'failed';
 };
+
+async function getProviderConfig(providerName: string): Promise<{
+  publicKey?: string;
+  secretKey?: string;
+  apiUrl?: string;
+} | null> {
+  // 1. Try DB first
+  try {
+    const dbProvider = await prisma.apiProvider.findUnique({
+      where: { provider: providerName },
+    });
+    if (dbProvider && dbProvider.enabled && dbProvider.secretKey) {
+      return {
+        publicKey: dbProvider.publicKey || undefined,
+        secretKey: decryptSecret(dbProvider.secretKey),
+        apiUrl: dbProvider.apiUrl || undefined,
+      };
+    }
+  } catch (e) {
+    console.warn(`[document-converter] Could not read provider ${providerName} from DB:`, e);
+  }
+
+  // 2. Fall back to env vars
+  if (providerName === 'iloveapi') {
+    const publicKey = process.env.I_LOVE_API_PUBLIC_KEY;
+    const secretKey = process.env.I_LOVE_API_SECRET_KEY || process.env.I_LOVE_API_KEY;
+    if (publicKey && secretKey) {
+      return { publicKey, secretKey };
+    }
+  } else if (providerName === 'apiconvert') {
+    const secretKey = process.env.APICONVERT_API_KEY;
+    if (secretKey) {
+      return { secretKey, apiUrl: process.env.APICONVERT_API_URL };
+    }
+  }
+
+  return null;
+}
+
+async function logUsage(
+  providerName: string,
+  fileName: string,
+  fileSize: number,
+  success: boolean,
+  failedStep?: string
+) {
+  try {
+    const provider = await prisma.apiProvider.findUnique({
+      where: { provider: providerName },
+    });
+    // Only log if the provider is configured in the DB
+    if (!provider) return;
+    const now = new Date();
+    await prisma.apiProviderUsage.create({
+      data: {
+        providerId: provider.id,
+        success,
+        fileName,
+        fileSize,
+        failedStep: failedStep || null,
+        year: now.getFullYear(),
+        month: now.getMonth() + 1,
+      },
+    });
+  } catch (e) {
+    // Non-fatal: don't break the conversion flow if logging fails
+    console.warn('[document-converter] Could not log usage:', e);
+  }
+}
 
 /**
  * Convert a .docx buffer to a PDF
@@ -42,28 +113,28 @@ export async function convertDocxToPdf(
   } = {}
 ): Promise<ConversionResult> {
   const warnings: string[] = [];
+  const fileName = options.fileName || 'document.docx';
+  const fileSize = fileBuffer.length;
 
   // Defensive check: skip PDF files (no conversion needed)
-  if (options.fileName) {
-    const fmt = detectFormat(options.fileName);
+  if (fileName) {
+    const fmt = detectFormat(fileName);
     if (fmt.isPdf) {
       return { warnings, provider: 'none' };
     }
   }
 
   // ============== PLAN A: iLoveAPI ==============
-  const ilovePublicKey = process.env.I_LOVE_API_PUBLIC_KEY;
-  const iloveSecretKey = process.env.I_LOVE_API_SECRET_KEY || process.env.I_LOVE_API_KEY;
-
-  if (ilovePublicKey && iloveSecretKey) {
+  const iloveConfig = await getProviderConfig('iloveapi');
+  if (iloveConfig?.publicKey && iloveConfig?.secretKey) {
     try {
-      const fileName = options.fileName || 'document.docx';
       const result = await convertOfficeToPdfViaIloveapi(
         fileBuffer,
         fileName,
-        ilovePublicKey,
-        iloveSecretKey
+        iloveConfig.publicKey,
+        iloveConfig.secretKey
       );
+      await logUsage('iloveapi', fileName, fileSize, true);
       return {
         pdfBuffer: result.pdfBuffer,
         pdfSize: result.pdfSize,
@@ -72,25 +143,31 @@ export async function convertDocxToPdf(
       };
     } catch (err) {
       let msg = 'Erreur inconnue';
-      if (err instanceof IloveapiError) msg = `iLoveAPI (${err.step}): ${err.message}`;
-      else if (err instanceof Error) msg = err.message;
+      let step = 'unknown';
+      if (err instanceof IloveapiError) {
+        msg = `iLoveAPI (${err.step}): ${err.message}`;
+        step = err.step;
+      } else if (err instanceof Error) {
+        msg = err.message;
+      }
       console.warn('[document-converter] iLoveAPI failed, falling back to APIConvert:', msg);
       warnings.push(`iLoveAPI indisponible (${msg}). Plan B (APIConvert) activé.`);
+      await logUsage('iloveapi', fileName, fileSize, false, step);
     }
   } else {
     warnings.push('iLoveAPI non configuré.');
   }
 
   // ============== PLAN B: APIConvert ==============
-  const apiconvertKey = process.env.APICONVERT_API_KEY;
-  if (apiconvertKey) {
+  const apiconvertConfig = await getProviderConfig('apiconvert');
+  if (apiconvertConfig?.secretKey) {
     try {
-      const fileName = options.fileName || 'document.docx';
       const result = await convertOfficeToPdfViaConvertApi(
         fileBuffer,
         fileName,
-        apiconvertKey
+        apiconvertConfig.secretKey
       );
+      await logUsage('apiconvert', fileName, fileSize, true);
       return {
         pdfBuffer: result.pdfBuffer,
         pdfSize: result.pdfSize,
@@ -99,13 +176,19 @@ export async function convertDocxToPdf(
       };
     } catch (err) {
       let msg = 'Erreur inconnue';
-      if (err instanceof ApiconvertError) msg = `APIConvert (${err.step}): ${err.message}`;
-      else if (err instanceof Error) msg = err.message;
+      let step = 'unknown';
+      if (err instanceof ApiconvertError) {
+        msg = `APIConvert (${err.step}): ${err.message}`;
+        step = err.step;
+      } else if (err instanceof Error) {
+        msg = err.message;
+      }
       console.error('[document-converter] APIConvert failed:', err);
       warnings.push(`APIConvert indisponible (${msg}).`);
+      await logUsage('apiconvert', fileName, fileSize, false, step);
     }
   } else {
-    warnings.push('APIConvert non configuré (APICONVERT_API_KEY manquant).');
+    warnings.push('APIConvert non configuré.');
   }
 
   // ============== Aucun provider n'a fonctionné ==============
