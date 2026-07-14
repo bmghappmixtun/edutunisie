@@ -10,7 +10,7 @@
  *
  * iLovePDF: https://www.iloveapi.com/docs/api-reference
  *   - JWT self-signed (1h expiry) using public_key + secret_key
- *   - GET /v1/start/{tool}/eu-1 → returns task with remainingFiles
+ *   - GET /v1/info → returns { remaining_credits: N }
  *   - Use 'merge' (cheapest tool) to check quota
  *
  * Neon: https://neon.tech/docs/manage/api-keys
@@ -100,17 +100,23 @@ export async function checkConvertApiUsage(token: string): Promise<ProviderUsage
 // Auth: JWT (HS256) self-signed with public_key + secret_key
 //   payload: { public_key, iat, exp, nbf } where iat/exp/nbf are UTC seconds
 //   expire = iat + 3600 (1h)
-// To check quota: GET /v1/start/{tool}/eu-1 with the signed JWT
+// To check quota: GET /v1/info with the signed JWT
 //   response contains remainingFiles
 
 function signIlovepdfJwt(publicKey: string, secretKey: string): string {
+  // Per the official @ilovepdf/ilovepdf-js-core SDK (auth/JWT.js):
+  //   payload = {
+  //     jti: publicKey,
+  //     iss: API_URL (e.g. "api.ilovepdf.com"),
+  //     iat: now - 5  (5s delay to avoid clock skew issues)
+  //   }
+  // No exp, no nbf — iLoveAPI expects these 3 fields.
   const header = { alg: 'HS256', typ: 'JWT' };
-  const now = Math.floor(Date.now() / 1000);
+  const now = Math.floor(Date.now() / 1000) - 5;
   const payload = {
-    public_key: publicKey,
+    jti: publicKey,
+    iss: 'api.ilovepdf.com',
     iat: now,
-    nbf: now,
-    exp: now + 3600,
   };
   const base64Url = (obj: object) =>
     Buffer.from(JSON.stringify(obj))
@@ -133,43 +139,44 @@ export async function checkIlovepdfUsage(
   secretKey: string
 ): Promise<ProviderUsage> {
   if (!publicKey || !secretKey) {
-    return { source: 'ilovepdf/start', error: 'iLoveAPI public ou secret key manquant' };
+    return { source: 'ilovepdf/info', error: 'iLoveAPI public ou secret key manquant' };
   }
 
   let token: string;
   try {
     token = signIlovepdfJwt(publicKey, secretKey);
   } catch (e: any) {
-    return { source: 'ilovepdf/start', error: `JWT sign failed: ${e?.message}` };
+    return { source: 'ilovepdf/info', error: `JWT sign failed: ${e?.message}` };
   }
 
   try {
-    // Use 'merge' (cheapest tool) to start a task and get remainingFiles
-    const res = await fetch('https://api.ilovepdf.com/v1/start/merge/eu-1', {
+    // GET /v1/info returns { remaining_credits: N } for the current month.
+    // This is the OFFICIAL quota endpoint, not /v1/start/{tool}/{region}
+    // which was 404ing on the current iLoveAPI deployment.
+    const res = await fetch('https://api.ilovepdf.com/v1/info', {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (!res.ok) {
       const errText = await res.text().catch(() => '');
       return {
-        source: 'ilovepdf/start',
+        source: 'ilovepdf/info',
         error: `iLoveAPI ${res.status}: ${errText.slice(0, 200)}`,
       };
     }
     const data: any = await res.json();
-    const remaining = data.remainingFiles ?? data.remaining_files ?? 0;
+    const remaining = data.remaining_credits ?? data.remainingFiles ?? 0;
     return {
-      source: 'ilovepdf/start',
-      // iLoveAPI doesn't return quota total directly, but we know the free
-      // tier is 250/month. If admin set a custom quota in DB, use that.
+      source: 'ilovepdf/info',
+      // iLoveAPI doesn't return quota total via /v1/info; admin sets monthlyQuota in DB
       quota: {
-        used: 0, // not directly returned
+        used: 0, // filled by caller from DB: total - remaining
         total: 0, // filled by caller from DB
         remaining,
         percent: 0,
       },
     };
   } catch (e: any) {
-    return { source: 'ilovepdf/start', error: `Network: ${e?.message || 'erreur'}` };
+    return { source: 'ilovepdf/info', error: `Network: ${e?.message || 'erreur'}` };
   }
 }
 
