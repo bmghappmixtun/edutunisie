@@ -75,21 +75,29 @@ export default function FournisseursClient() {
   const [providers, setProviders] = useState<ProviderInfo[]>([]);
   const [vercel, setVercel] = useState<ExternalInfo | null>(null);
   const [neon, setNeon] = useState<ExternalInfo | null>(null);
+  const [liveQuota, setLiveQuota] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [provRes, vercelRes, neonRes] = await Promise.all([
+      const [provRes, vercelRes, neonRes, apiconvertRes, iloveapiRes] = await Promise.all([
         fetch('/api/admin/providers'),
         fetch('/api/admin/external-services?type=vercel'),
         fetch('/api/admin/external-services?type=neon'),
+        fetch('/api/admin/external-services?type=apiconvert'),
+        fetch('/api/admin/external-services?type=iloveapi'),
       ]);
       const provData = await provRes.json();
       setProviders(provData.providers || []);
       if (vercelRes.ok) setVercel(await vercelRes.json());
       if (neonRes.ok) setNeon(await neonRes.json());
+      // Live quota for conversion providers (overrides the monthlyQuota in DB if available)
+      const newLiveQuota: Record<string, any> = {};
+      if (apiconvertRes.ok) newLiveQuota.apiconvert = await apiconvertRes.json();
+      if (iloveapiRes.ok) newLiveQuota.iloveapi = await iloveapiRes.json();
+      setLiveQuota(newLiveQuota);
     } catch (e) {
       toast.error('Erreur de chargement');
     } finally {
@@ -101,7 +109,7 @@ export default function FournisseursClient() {
     load();
   }, [load]);
 
-  const refresh = async (type: 'providers' | 'vercel' | 'neon') => {
+  const refresh = async (type: 'providers' | 'vercel' | 'neon' | 'apiconvert' | 'iloveapi') => {
     setRefreshing(type);
     try {
       if (type === 'providers') {
@@ -113,7 +121,8 @@ export default function FournisseursClient() {
         if (r.ok) {
           const d = await r.json();
           if (type === 'vercel') setVercel(d);
-          else setNeon(d);
+          else if (type === 'neon') setNeon(d);
+          else setLiveQuota((prev) => ({ ...prev, [type]: d }));
         }
       }
     } finally {
@@ -161,11 +170,12 @@ export default function FournisseursClient() {
           <ProviderCard
             provider="iloveapi"
             info={providers.find((p) => p.provider === 'iloveapi')}
+            liveQuota={liveQuota.iloveapi}
             title="iLoveAPI"
-            description="Plan A. Service payant, 250 docs/mois gratuit. Qualité haute (LibreOffice)."
-            docsUrl="https://developer.ilovepdf.com/"
-            onChanged={() => refresh('providers')}
-            refreshing={refreshing === 'providers'}
+            description="Plan A. Service payant, 250 docs/mois gratuit. Qualité haute (LibreOffice). Quota vérifié via /v1/start/merge/eu-1."
+            docsUrl="https://www.iloveapi.com/docs/api-reference"
+            onChanged={() => { refresh('providers'); refresh('iloveapi'); }}
+            refreshing={refreshing === 'providers' || refreshing === 'iloveapi'}
             extraFields={[
               { name: 'publicKey', label: 'Public Key', required: true, placeholder: 'project_public_xxxx' },
               { name: 'secretKey', label: 'Secret Key', required: true, placeholder: 'secret_key_xxxx', secret: true },
@@ -174,11 +184,12 @@ export default function FournisseursClient() {
           <ProviderCard
             provider="apiconvert"
             info={providers.find((p) => p.provider === 'apiconvert')}
+            liveQuota={liveQuota.apiconvert}
             title="APIConvert"
-            description="Plan B. Free tier 1500/mois. URL API configurable (ex: api.convertapi.com)."
-            docsUrl="https://www.convertapi.com/"
-            onChanged={() => refresh('providers')}
-            refreshing={refreshing === 'providers'}
+            description="Plan B. Free tier 1500/mois. Quota vérifié via GET /v2/user."
+            docsUrl="https://docs.convertapi.com/"
+            onChanged={() => { refresh('providers'); refresh('apiconvert'); }}
+            refreshing={refreshing === 'providers' || refreshing === 'apiconvert'}
             extraFields={[
               { name: 'apiUrl', label: 'API URL (optionnel)', required: false, placeholder: 'https://v2.convertapi.com' },
               { name: 'secretKey', label: 'API Token', required: true, placeholder: 'token_xxxx', secret: true },
@@ -252,11 +263,12 @@ export default function FournisseursClient() {
 // ============================================================================
 
 function ProviderCard({
-  provider, info, title, description, docsUrl, onChanged, refreshing,
+  provider, info, liveQuota, title, description, docsUrl, onChanged, refreshing,
   extraFields,
 }: {
   provider: string;
   info?: ProviderInfo;
+  liveQuota?: any;
   title: string;
   description: string;
   docsUrl: string;
@@ -345,6 +357,11 @@ function ProviderCard({
 
   const configured = !!info;
   const usage = info?.usage;
+  // Use live quota from the external service if available, otherwise fall back to DB
+  const liveQ = liveQuota?.quota;
+  const totalQuota = liveQ?.total || info?.monthlyQuota || 0;
+  const liveRemaining = liveQ?.remaining;
+  const liveUsed = liveQ?.used;
 
   return (
     <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
@@ -371,39 +388,55 @@ function ProviderCard({
       </div>
 
       {/* Status / Quota display */}
-      {configured && usage && (
+      {configured && (usage || liveQ) && (
         <div className="mb-3 p-3 bg-gradient-to-br from-slate-50 to-white rounded-lg border border-slate-200">
           <div className="flex items-center justify-between mb-1.5">
             <span className="text-xs font-bold text-slate-500 uppercase">
-              {new Date(usage.year, usage.month - 1, 1).toLocaleString('fr-FR', { month: 'long', year: 'numeric' })}
+              {liveQ ? 'Quota en direct' : new Date(usage!.year, usage!.month - 1, 1).toLocaleString('fr-FR', { month: 'long', year: 'numeric' })}
             </span>
             <span className="text-xs text-slate-500">
-              {usage.used} / {info.monthlyQuota || '∞'} conversions
+              {liveQ
+                ? `${liveUsed ?? '?'} / ${totalQuota || '∞'} conversions`
+                : `${usage!.used} / ${info!.monthlyQuota || '∞'} conversions`}
             </span>
           </div>
-          {info.monthlyQuota && (
+          {totalQuota > 0 && (
             <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
               <div
                 className={`h-full transition-all ${
-                  (usage.percentUsed || 0) > 80
+                  (liveQ?.percent ?? usage?.percentUsed ?? 0) > 80
                     ? 'bg-red-500'
-                    : (usage.percentUsed || 0) > 50
+                    : (liveQ?.percent ?? usage?.percentUsed ?? 0) > 50
                     ? 'bg-amber-500'
                     : 'bg-emerald-500'
                 }`}
-                style={{ width: `${Math.min(100, usage.percentUsed || 0)}%` }}
+                style={{ width: `${Math.min(100, liveQ?.percent ?? usage?.percentUsed ?? 0)}%` }}
               />
             </div>
           )}
           <div className="flex items-center justify-between mt-2 text-xs">
-            <span className="text-emerald-600 font-bold">✓ {usage.success} OK</span>
-            {usage.failed > 0 && (
-              <span className="text-red-600 font-bold">✗ {usage.failed}</span>
-            )}
-            {info.monthlyQuota && (
-              <span className="text-slate-500">{usage.remaining} restantes</span>
+            {liveQ ? (
+              <>
+                <span className="text-emerald-600 font-bold">✓ {liveRemaining ?? 0} restantes</span>
+                {liveQ.source && <span className="text-slate-400">via {liveQ.source}</span>}
+              </>
+            ) : (
+              <>
+                <span className="text-emerald-600 font-bold">✓ {usage!.success} OK</span>
+                {usage!.failed > 0 && (
+                  <span className="text-red-600 font-bold">✗ {usage!.failed}</span>
+                )}
+                {info!.monthlyQuota && (
+                  <span className="text-slate-500">{usage!.remaining} restantes</span>
+                )}
+              </>
             )}
           </div>
+          {liveQ?.error && (
+            <div className="mt-2 text-xs text-amber-700 bg-amber-50 rounded p-2">
+              ⚠ {liveQ.error}
+            </div>
+          )}
         </div>
       )}
 

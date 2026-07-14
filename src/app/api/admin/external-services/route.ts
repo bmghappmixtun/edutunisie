@@ -15,7 +15,12 @@ import { isValidOrigin, isProduction } from '@/lib/security';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { encryptSecret, decryptSecret, redactSecret } from '@/lib/provider-keys';
-import { checkVercelUsage, checkNeonUsage } from '@/lib/external-services';
+import { checkVercelUsage } from '@/lib/external-services.vercel';
+import {
+  checkConvertApiUsage,
+  checkIlovepdfUsage,
+  checkNeonUsage,
+} from '@/lib/external-services';
 
 export const runtime = 'nodejs';
 
@@ -31,9 +36,9 @@ export async function GET(req: NextRequest) {
   if ('error' in auth) return NextResponse.json({ error: auth.error }, { status: auth.status });
 
   const type = req.nextUrl.searchParams.get('type')?.toLowerCase();
-  if (!type || !['vercel', 'neon'].includes(type)) {
+  if (!type || !['vercel', 'neon', 'apiconvert', 'iloveapi'].includes(type)) {
     return NextResponse.json(
-      { error: 'type doit être "vercel" ou "neon"' },
+      { error: 'type doit être "vercel", "neon", "apiconvert" ou "iloveapi"' },
       { status: 400 }
     );
   }
@@ -54,9 +59,23 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ configured: true, tokenInvalid: true });
   }
 
-  let usage;
+  let usage: any;
   if (type === 'vercel') {
     usage = await checkVercelUsage(token);
+  } else if (type === 'apiconvert') {
+    usage = await checkConvertApiUsage(token);
+  } else if (type === 'iloveapi') {
+    usage = await checkIlovepdfUsage(provider.publicKey || '', token);
+    // iLoveAPI doesn't return total quota in the response.
+    // Use the configured monthlyQuota from DB if set.
+    if (usage.quota && provider.monthlyQuota) {
+      const remaining = usage.quota.remaining;
+      const total = provider.monthlyQuota;
+      const used = Math.max(0, total - remaining);
+      usage.quota.total = total;
+      usage.quota.used = used;
+      usage.quota.percent = total > 0 ? Math.round((used / total) * 100) : 0;
+    }
   } else {
     usage = await checkNeonUsage(token, provider.publicKey || undefined);
   }
@@ -96,9 +115,9 @@ export async function POST(req: NextRequest) {
   }
 
   const type = (body.type || '').toLowerCase();
-  if (!['vercel', 'neon'].includes(type)) {
+  if (!['vercel', 'neon', 'apiconvert', 'iloveapi'].includes(type)) {
     return NextResponse.json(
-      { error: 'type doit être "vercel" ou "neon"' },
+      { error: 'type doit être "vercel", "neon", "apiconvert" ou "iloveapi"' },
       { status: 400 }
     );
   }
@@ -138,9 +157,9 @@ export async function DELETE(req: NextRequest) {
   if ('error' in auth) return NextResponse.json({ error: auth.error }, { status: auth.status });
 
   const type = req.nextUrl.searchParams.get('type')?.toLowerCase();
-  if (!type || !['vercel', 'neon'].includes(type)) {
+  if (!type || !['vercel', 'neon', 'apiconvert', 'iloveapi'].includes(type)) {
     return NextResponse.json(
-      { error: 'type doit être "vercel" ou "neon"' },
+      { error: 'type doit être "vercel", "neon", "apiconvert" ou "iloveapi"' },
       { status: 400 }
     );
   }

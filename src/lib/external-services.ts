@@ -1,391 +1,335 @@
 /**
- * External service usage checkers (Vercel, Neon)
+ * External service usage checkers (ConvertAPI, iLovePDF, Neon)
  *
- * Vercel API: https://vercel.com/docs/rest-api
- *   - GET /v1/billing/charges — NEW billing/charges endpoint (FOCUS v1.3)
- *     Returns JSONL, from/to as ISO 8601 date-time UTC
- *     https://vercel.com/docs/rest-api/billing/list-focus-billing-charges
- *   - GET /v1/usage — legacy endpoint, returns aggregate usage
+ * Each function returns the current period usage (count, unit, limit where
+ * available) so the admin panel can show real-time quota.
  *
- * Neon API: https://neon.tech/docs/manage/api
+ * ConvertAPI: https://docs.convertapi.com/
+ *   - GET /v2/user → {ConversionsTotal, ConversionsConsumed, Active, Email, ...}
+ *   - GET /v2/user/statistic?startDate&endDate → daily breakdown
+ *
+ * iLovePDF: https://www.iloveapi.com/docs/api-reference
+ *   - JWT self-signed (1h expiry) using public_key + secret_key
+ *   - GET /v1/start/{tool}/eu-1 → returns task with remainingFiles
+ *   - Use 'merge' (cheapest tool) to check quota
+ *
+ * Neon: https://neon.tech/docs/manage/api-keys
+ *   - GET /api/v2/projects → list all projects
+ *   - GET /api/v2/consumption_history/v2/projects?from&to&granularity&metrics&org_id
+ *     Returns storage (root_branch_bytes_month, child_branch_bytes_month)
+ *     and compute (compute_unit_seconds)
  */
 
-const VERCEL_API = 'https://api.vercel.com';
-const NEON_API = 'https://console.neon.tech/api/v2';
+import { createHmac } from 'crypto';
 
-export type VercelUsage = {
-  periodStart: string;
-  periodEnd: string;
-  bandwidth: { used: number; unit: string; limit?: number };
-  functions: { used: number; unit: string; limit?: number };
-  builds: { used: number; unit: string; limit?: number };
-  error?: string;
+// ============================================================================
+// SHARED TYPES
+// ============================================================================
+
+export type ProviderUsage = {
+  // Identifies which endpoint gave us the data (for the UI)
+  source: string;
+  // Account / plan info
   username?: string;
-  plan?: string;
-  source?: 'billing-charges' | 'usage-v1' | 'none';
-};
-
-export type NeonUsage = {
-  periodStart: string;
-  periodEnd: string;
-  storage: { usedMb: number; limitMb?: number; percent?: number };
-  compute: { usedHours: number; limitHours?: number; percent?: number };
-  transfer: { usedGb: number; limitGb?: number; percent?: number };
-  projects: { active: number; limit?: number };
-  branches?: { active: number; limit?: number };
-  error?: string;
   email?: string;
   plan?: string;
+  active?: boolean;
+  // Quota (for conversion providers)
+  quota?: { used: number; total: number; remaining: number; percent: number };
+  // Vercel-style flat usage
+  bandwidth?: { used: number; unit: string };
+  functions?: { used: number; unit: string };
+  builds?: { used: number; unit: string };
+  // Neon-style consumption
+  storage?: { usedMb: number; unit: string };
+  compute?: { usedHours: number; unit: string };
+  transfer?: { usedGb: number; unit: string };
+  projects?: { active: number };
+  branches?: { active: number };
+  // Period (for display)
+  periodStart?: string;
+  periodEnd?: string;
+  // Error
+  error?: string;
 };
 
-/**
- * Fetch Vercel usage for the current billing period.
- *
- * Tries in order:
- *   1. /v1/billing/charges (newer, FOCUS format, JSONL)
- *   2. /v1/usage (legacy, JSON object)
- *   3. Falls back to "no data" if both fail
- */
-export async function checkVercelUsage(token: string): Promise<VercelUsage> {
-  const empty = (overrides: Partial<VercelUsage> = {}): VercelUsage => ({
-    periodStart: '',
-    periodEnd: '',
-    bandwidth: { used: 0, unit: 'GB' },
-    functions: { used: 0, unit: 'hours' },
-    builds: { used: 0, unit: 'builds' },
-    source: 'none',
-    ...overrides,
-  });
+// ============================================================================
+// CONVERTAPI
+// ============================================================================
+// Docs: https://docs.convertapi.com/docs/user-information
+// Endpoint: GET https://v2.convertapi.com/user
+// Auth: Authorization: Bearer <token>
 
-  if (!token) return empty({ error: 'No Vercel token' });
+export async function checkConvertApiUsage(token: string): Promise<ProviderUsage> {
+  if (!token) {
+    return { source: 'convertapi/user', error: 'No APIConvert token configured' };
+  }
+
+  try {
+    const res = await fetch('https://v2.convertapi.com/user', {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) {
+      const errText = await res.text().catch(() => '');
+      return {
+        source: 'convertapi/user',
+        error: `APIConvert ${res.status}: ${errText.slice(0, 200)}`,
+      };
+    }
+    const data: any = await res.json();
+    const total = data.ConversionsTotal || 0;
+    const consumed = data.ConversionsConsumed || 0;
+    const remaining = Math.max(0, total - consumed);
+    const percent = total > 0 ? Math.round((consumed / total) * 100) : 0;
+    return {
+      source: 'convertapi/user',
+      active: data.Active,
+      email: data.Email,
+      username: data.FullName,
+      quota: { used: consumed, total, remaining, percent },
+    };
+  } catch (e: any) {
+    return { source: 'convertapi/user', error: `Network: ${e?.message || 'erreur'}` };
+  }
+}
+
+// ============================================================================
+// iLOVEPDF
+// ============================================================================
+// Docs: https://www.iloveapi.com/docs/api-reference
+// Auth: JWT (HS256) self-signed with public_key + secret_key
+//   payload: { public_key, iat, exp, nbf } where iat/exp/nbf are UTC seconds
+//   expire = iat + 3600 (1h)
+// To check quota: GET /v1/start/{tool}/eu-1 with the signed JWT
+//   response contains remainingFiles
+
+function signIlovepdfJwt(publicKey: string, secretKey: string): string {
+  const header = { alg: 'HS256', typ: 'JWT' };
+  const now = Math.floor(Date.now() / 1000);
+  const payload = {
+    public_key: publicKey,
+    iat: now,
+    nbf: now,
+    exp: now + 3600,
+  };
+  const base64Url = (obj: object) =>
+    Buffer.from(JSON.stringify(obj))
+      .toString('base64')
+      .replace(/=/g, '')
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_');
+  const signingInput = `${base64Url(header)}.${base64Url(payload)}`;
+  const signature = createHmac('sha256', secretKey)
+    .update(signingInput)
+    .digest('base64')
+    .replace(/=/g, '')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_');
+  return `${signingInput}.${signature}`;
+}
+
+export async function checkIlovepdfUsage(
+  publicKey: string,
+  secretKey: string
+): Promise<ProviderUsage> {
+  if (!publicKey || !secretKey) {
+    return { source: 'ilovepdf/start', error: 'iLoveAPI public ou secret key manquant' };
+  }
+
+  let token: string;
+  try {
+    token = signIlovepdfJwt(publicKey, secretKey);
+  } catch (e: any) {
+    return { source: 'ilovepdf/start', error: `JWT sign failed: ${e?.message}` };
+  }
+
+  try {
+    // Use 'merge' (cheapest tool) to start a task and get remainingFiles
+    const res = await fetch('https://api.ilovepdf.com/v1/start/merge/eu-1', {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) {
+      const errText = await res.text().catch(() => '');
+      return {
+        source: 'ilovepdf/start',
+        error: `iLoveAPI ${res.status}: ${errText.slice(0, 200)}`,
+      };
+    }
+    const data: any = await res.json();
+    const remaining = data.remainingFiles ?? data.remaining_files ?? 0;
+    return {
+      source: 'ilovepdf/start',
+      // iLoveAPI doesn't return quota total directly, but we know the free
+      // tier is 250/month. If admin set a custom quota in DB, use that.
+      quota: {
+        used: 0, // not directly returned
+        total: 0, // filled by caller from DB
+        remaining,
+        percent: 0,
+      },
+    };
+  } catch (e: any) {
+    return { source: 'ilovepdf/start', error: `Network: ${e?.message || 'erreur'}` };
+  }
+}
+
+// ============================================================================
+// NEON
+// ============================================================================
+// Docs: https://neon.tech/docs/manage/api-keys
+//       https://neon.tech/docs/guides/partner-consumption-metrics
+// Auth: Authorization: Bearer <api_key>
+//
+// Endpoints used:
+//   - GET /api/v2/projects                          → list projects
+//   - GET /api/v2/projects/{id}/branches            → branches per project
+//   - GET /api/v2/orgs                              → list orgs (for org_id)
+//   - GET /api/v2/consumption_history/v2/projects?from&to&granularity&metrics&org_id
+//                                                  → consumption metrics
+
+const NEON_API = 'https://console.neon.tech/api/v2';
+
+export async function checkNeonUsage(
+  apiKey: string,
+  projectId?: string
+): Promise<ProviderUsage> {
+  if (!apiKey) {
+    return { source: 'neon/projects', error: 'No Neon API key configured' };
+  }
 
   const now = new Date();
   const periodStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-  // Vercel API expects ISO 8601 date-time in UTC
-  const fromISO = periodStart.toISOString(); // e.g. "2026-07-01T00:00:00.000Z"
-  const toISO = periodEnd.toISOString();
+  // Neon expects RFC 3339 date-time
+  const from = periodStart.toISOString();
+  const to = periodEnd.toISOString();
 
-  // Get user info (non-fatal)
-  let username: string | undefined;
+  // 1. List orgs (need org_id for the consumption query)
+  let orgId: string | undefined;
+  let email: string | undefined;
   let plan: string | undefined;
-  let teamId: string | undefined;
   try {
-    const userRes = await fetch(`${VERCEL_API}/v2/user`, {
-      headers: { Authorization: `Bearer ${token}` },
+    const orgsRes = await fetch(`${NEON_API}/orgs`, {
+      headers: { Authorization: `Bearer ${apiKey}` },
     });
-    if (userRes.ok) {
-      const userData: any = await userRes.json();
-      username = userData.user?.username;
-      plan = userData.user?.plan;
-      teamId = userData.user?.defaultTeamId;
+    if (orgsRes.ok) {
+      const orgsData: any = await orgsRes.json();
+      if (orgsData.orgs && orgsData.orgs.length > 0) {
+        orgId = orgsData.orgs[0].id;
+        plan = orgsData.orgs[0].plan;
+      }
     }
   } catch {
     // ignore
   }
 
-  // ============================================================
-  // STRATEGY 1: /v1/billing/charges (new, FOCUS v1.3 JSONL)
-  // ============================================================
-  const teamParam = teamId ? `&teamId=${teamId}` : '';
-  const billingUrl = `${VERCEL_API}/v1/billing/charges?from=${encodeURIComponent(fromISO)}&to=${encodeURIComponent(toISO)}${teamParam}`;
+  // 2. Get user info
   try {
-    const res = await fetch(billingUrl, {
-      headers: { Authorization: `Bearer ${token}` },
+    const userRes = await fetch(`${NEON_API}/users/me`, {
+      headers: { Authorization: `Bearer ${apiKey}` },
     });
-    if (res.ok) {
-      const text = await res.text();
-      const lines = text.split('\n').filter(Boolean);
-      let bandwidth = 0;
-      let bandwidthUnit = 'GB';
-      let functionsGbSec = 0;
-      let builds = 0;
-      let foundAny = false;
-
-      for (const line of lines) {
-        try {
-          const charge = JSON.parse(line);
-          if (charge.ChargeCategory !== 'Usage') continue;
-          foundAny = true;
-          const service = (charge.ServiceName || '').toLowerCase();
-          const qty = charge.ConsumedQuantity || 0;
-          const unit = charge.ConsumedUnit || '';
-
-          if (
-            service.includes('bandwidth') ||
-            service.includes('fast data transfer') ||
-            service.includes('data transfer')
-          ) {
-            bandwidth += qty;
-            bandwidthUnit = unit;
-          } else if (
-            service.includes('function') ||
-            service.includes('compute') ||
-            service.includes('execution') ||
-            service.includes('invocation')
-          ) {
-            functionsGbSec += qty;
-          } else if (service.includes('build')) {
-            builds += qty;
-          }
-        } catch {
-          // ignore parse errors
-        }
-      }
-
-      if (foundAny) {
-        return {
-          periodStart: periodStart.toISOString().slice(0, 10),
-          periodEnd: periodEnd.toISOString().slice(0, 10),
-          bandwidth: normalizeBandwidth(bandwidth, bandwidthUnit),
-          functions: normalizeFunctions(functionsGbSec),
-          builds: { used: Math.round(builds), unit: 'builds' },
-          username,
-          plan,
-          source: 'billing-charges',
-        };
-      }
-    } else if (res.status !== 404 && res.status !== 403) {
-      // 404/403 means user doesn't have access to this endpoint (e.g., Hobby plan)
-      // Other errors are real failures
-      const errText = await res.text().catch(() => '');
-      console.warn('[vercel-usage] billing/charges error:', res.status, errText.slice(0, 200));
+    if (userRes.ok) {
+      const u: any = await userRes.json();
+      email = u.user?.email || u.email;
     }
-  } catch (e: any) {
-    console.warn('[vercel-usage] billing/charges network error:', e?.message);
+  } catch {
+    // ignore
   }
 
-  // ============================================================
-  // STRATEGY 2: /v1/usage (legacy, JSON object)
-  // ============================================================
-  const usageUrl = teamId
-    ? `${VERCEL_API}/v1/teams/${teamId}/usage?from=${encodeURIComponent(fromISO)}&to=${encodeURIComponent(toISO)}`
-    : `${VERCEL_API}/v1/usage?from=${encodeURIComponent(fromISO)}&to=${encodeURIComponent(toISO)}`;
+  // 3. List projects
+  let projects: any[] = [];
   try {
-    const res = await fetch(usageUrl, {
-      headers: { Authorization: `Bearer ${token}` },
+    const projectsRes = await fetch(`${NEON_API}/projects`, {
+      headers: { Authorization: `Bearer ${apiKey}` },
     });
-    if (res.ok) {
-      const data: any = await res.json();
-      const usage = parseLegacyUsage(data);
-      if (usage) {
-        return {
-          periodStart: periodStart.toISOString().slice(0, 10),
-          periodEnd: periodEnd.toISOString().slice(0, 10),
-          ...usage,
-          username,
-          plan,
-          source: 'usage-v1',
-        };
-      }
-    } else {
-      const errText = await res.text().catch(() => '');
-      return empty({
-        error: `Vercel ${res.status}: ${errText.slice(0, 250)}`,
-        username,
-        plan,
-      });
+    if (projectsRes.ok) {
+      const data: any = await projectsRes.json();
+      projects = data.projects || [];
     }
-  } catch (e: any) {
-    return empty({ error: `Network: ${e?.message || 'erreur'}`, username, plan });
+  } catch {
+    // ignore
   }
 
-  return empty({ username, plan });
-}
-
-/**
- * Parse the legacy /v1/usage response (different shapes possible)
- */
-function parseLegacyUsage(data: any): { bandwidth: any; functions: any; builds: any } | null {
-  // Shape 1: flat array [{resource, usageValue, usageUnit}]
-  if (Array.isArray(data)) {
-    let bw = 0, bwUnit = 'GB', fn = 0, fnUnit = 'hours', builds = 0;
-    let found = false;
-    for (const item of data) {
-      found = true;
-      const v = parseFloat(item.usageValue) || 0;
-      const u = item.usageUnit || '';
-      if (item.resource === 'bandwidth' || item.resource === 'fastDataTransfer') {
-        bw += v; bwUnit = u;
-      } else if (item.resource === 'serverlessFunctionExecution' || item.resource === 'functions') {
-        fn += v; fnUnit = u;
-      } else if (item.resource === 'builds') {
-        builds += v;
-      }
-    }
-    if (!found) return null;
-    return {
-      bandwidth: normalizeBandwidth(bw, bwUnit),
-      functions: normalizeFunctions(fn, fnUnit),
-      builds: { used: Math.round(builds), unit: 'builds' },
-    };
-  }
-
-  // Shape 2: nested object {bandwidth: {usageValue, usageUnit}, ...}
-  if (typeof data === 'object' && data !== null) {
-    return {
-      bandwidth: normalizeBandwidth(
-        parseFloat(data.bandwidth?.usageValue) || 0,
-        data.bandwidth?.usageUnit || 'GB'
-      ),
-      functions: normalizeFunctions(
-        parseFloat(data.serverlessFunctionExecution?.usageValue || data.functions?.usageValue) || 0,
-        data.serverlessFunctionExecution?.usageUnit || data.functions?.usageUnit || 'hours'
-      ),
-      builds: {
-        used: Math.round(parseFloat(data.builds?.usageValue) || 0),
-        unit: 'builds',
-      },
-    };
-  }
-
-  return null;
-}
-
-function normalizeBandwidth(value: number, unit: string): { used: number; unit: string } {
-  const u = (unit || '').toUpperCase();
-  let gb = value;
-  let normalizedUnit = 'GB';
-  if (u === 'MB' || u === 'MBS') {
-    gb = value / 1024;
-  } else if (u === 'BYTES' || u === 'B') {
-    gb = value / (1024 * 1024 * 1024);
-  } else if (u === 'GB' || u === 'GBS') {
-    gb = value;
-    normalizedUnit = 'GB';
-  } else if (u === 'TB' || u === 'TBS') {
-    gb = value * 1024;
-    normalizedUnit = 'GB';
-  } else {
-    normalizedUnit = unit || 'GB';
-  }
-  return { used: parseFloat(gb.toFixed(3)), unit: normalizedUnit };
-}
-
-function normalizeFunctions(value: number, unit?: string): { used: number; unit: string } {
-  const u = (unit || '').toLowerCase();
-  // Functions can be in GB-seconds, GB-hours, ms, etc.
-  let hours = value;
-  let finalUnit = 'hours';
-  if (u === 'gb-seconds' || u === 'gb-s' || u === 'gb-secs') {
-    hours = value / 3600;
-  } else if (u === 'gb-hours' || u === 'gb-h' || u === 'gb-hrs') {
-    hours = value;
-  } else if (u === 'ms' || u === 'milliseconds') {
-    hours = value / 1000 / 3600;
-  } else if (u === 'seconds' || u === 's') {
-    hours = value / 3600;
-  } else {
-    finalUnit = unit || 'GB-hours';
-  }
-  return { used: parseFloat(hours.toFixed(2)), unit: finalUnit };
-}
-
-/**
- * Fetch Neon usage for the current billing period
- */
-export async function checkNeonUsage(apiKey: string, projectId?: string): Promise<NeonUsage> {
-  if (!apiKey) {
-    return {
-      periodStart: '',
-      periodEnd: '',
-      storage: { usedMb: 0 },
-      compute: { usedHours: 0 },
-      transfer: { usedGb: 0 },
-      projects: { active: 0 },
-      error: 'No Neon API key',
-    };
-  }
-
-  const now = new Date();
-  const periodStart = new Date(now.getFullYear(), now.getMonth(), 1);
-  const periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-  const from = periodStart.toISOString();
-  const to = periodEnd.toISOString();
-
-  try {
-    // 1. Get account info / projects
-    let email: string | undefined;
-    let plan: string | undefined;
-    let projects: any[] = [];
-    let activeProjectCount = 0;
-    let activeBranchCount = 0;
-
+  // 4. List branches per project
+  let activeBranchCount = 0;
+  for (const proj of projects) {
     try {
-      const projectsRes = await fetch(`${NEON_API}/projects`, {
+      const branchesRes = await fetch(
+        `${NEON_API}/projects/${proj.id}/branches`,
+        { headers: { Authorization: `Bearer ${apiKey}` } }
+      );
+      if (branchesRes.ok) {
+        const data: any = await branchesRes.json();
+        activeBranchCount += (data.branches || []).length;
+      }
+    } catch {
+      // ignore
+    }
+  }
+
+  // 5. Get consumption metrics (storage, compute, transfer)
+  let storageBytes = 0;
+  let computeSeconds = 0;
+  let transferBytes = 0;
+  if (orgId) {
+    try {
+      const metrics = ['compute_unit_seconds', 'root_branch_bytes_month', 'child_branch_bytes_month', 'public_network_transfer_bytes', 'private_network_transfer_bytes'];
+      const url = `${NEON_API}/consumption_history/v2/projects?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&granularity=monthly&metrics=${metrics.join(',')}&org_id=${orgId}`;
+      const res = await fetch(url, {
         headers: { Authorization: `Bearer ${apiKey}` },
       });
-      if (projectsRes.ok) {
-        const data: any = await projectsRes.json();
-        projects = data.projects || [];
-        activeProjectCount = projects.length;
-        for (const proj of projects) {
-          try {
-            const branchesRes = await fetch(
-              `${NEON_API}/projects/${proj.id}/branches`,
-              { headers: { Authorization: `Bearer ${apiKey}` } }
-            );
-            if (branchesRes.ok) {
-              const branchesData: any = await branchesRes.json();
-              activeBranchCount += (branchesData.branches || []).filter(
-                (b: any) => b.primary === false
-              ).length;
+      if (res.ok) {
+        const data: any = await res.json();
+        // Sum across all projects
+        if (Array.isArray(data.projects)) {
+          for (const proj of data.projects) {
+            for (const period of proj.periods || []) {
+              for (const consumption of period.consumption || []) {
+                for (const m of consumption.metrics || []) {
+                  if (m.metric_name === 'compute_unit_seconds') computeSeconds += m.value || 0;
+                  else if (m.metric_name === 'root_branch_bytes_month') storageBytes += m.value || 0;
+                  else if (m.metric_name === 'child_branch_bytes_month') storageBytes += m.value || 0;
+                  else if (m.metric_name === 'public_network_transfer_bytes') transferBytes += m.value || 0;
+                  else if (m.metric_name === 'private_network_transfer_bytes') transferBytes += m.value || 0;
+                }
+              }
             }
-          } catch {
-            // ignore
           }
         }
       }
     } catch {
       // ignore
     }
-
-    // 2. Get consumption (storage, compute, transfer)
-    const targetProjectId = projectId || projects[0]?.id;
-    let storageMb = 0;
-    let computeSeconds = 0;
-    let transferGb = 0;
-
-    if (targetProjectId) {
-      try {
-        const consumptionRes = await fetch(
-          `${NEON_API}/projects/${targetProjectId}/consumption/projects?from=${from}&to=${to}&granularity=daily`,
-          { headers: { Authorization: `Bearer ${apiKey}` } }
-        );
-        if (consumptionRes.ok) {
-          const cData: any = await consumptionRes.json();
-          if (cData.consumption && Array.isArray(cData.consumption)) {
-            for (const day of cData.consumption) {
-              computeSeconds += day.active_time_seconds || 0;
-            }
-          }
-        }
-      } catch {
-        // ignore
-      }
-    }
-
-    return {
-      periodStart: periodStart.toISOString().slice(0, 10),
-      periodEnd: periodEnd.toISOString().slice(0, 10),
-      storage: { usedMb: parseFloat(storageMb.toFixed(0)) },
-      compute: { usedHours: parseFloat((computeSeconds / 3600).toFixed(1)) },
-      transfer: { usedGb: parseFloat(transferGb.toFixed(2)) },
-      projects: { active: activeProjectCount },
-      branches: { active: activeBranchCount },
-      email,
-      plan,
-      error: activeProjectCount === 0 ? 'Aucun projet trouvé ou clé API invalide' : undefined,
-    };
-  } catch (e: any) {
-    return {
-      periodStart: periodStart.toISOString().slice(0, 10),
-      periodEnd: periodEnd.toISOString().slice(0, 10),
-      storage: { usedMb: 0 },
-      compute: { usedHours: 0 },
-      transfer: { usedGb: 0 },
-      projects: { active: 0 },
-      error: e?.message || 'Network error',
-    };
   }
+
+  return {
+    source: 'neon/projects+consumption',
+    email,
+    plan,
+    storage: {
+      usedMb: parseFloat((storageBytes / (1024 * 1024)).toFixed(1)),
+      unit: 'MB',
+    },
+    compute: {
+      usedHours: parseFloat((computeSeconds / 3600).toFixed(2)),
+      unit: 'hours',
+    },
+    transfer: {
+      usedGb: parseFloat((transferBytes / (1024 * 1024 * 1024)).toFixed(3)),
+      unit: 'GB',
+    },
+    projects: { active: projects.length },
+    branches: { active: activeBranchCount },
+    periodStart: periodStart.toISOString().slice(0, 10),
+    periodEnd: periodEnd.toISOString().slice(0, 10),
+  };
 }
+
+// ============================================================================
+// VERCEL (kept for compatibility)
+// ============================================================================
+// Uses /v1/billing/charges (FOCUS v1.3) and /v1/usage as fallback
+// See external-services.vercel.ts for the full implementation
+import { checkVercelUsage as _checkVercelUsage } from './external-services.vercel';
+export { _checkVercelUsage as checkVercelUsage };
+export type { VercelUsage } from './external-services.vercel';
