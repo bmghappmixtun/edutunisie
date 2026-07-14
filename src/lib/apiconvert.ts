@@ -1,51 +1,45 @@
 /**
- * ConvertAPI integration for Office → PDF conversion
+ * APIConvert integration for Office → PDF conversion (plan B)
  *
- * https://www.convertapi.com/
- *
- * ConvertAPI is a hosted file conversion service backed by LibreOffice.
- * Free tier: 1500 conversions/month (no credit card required).
- *
- * The REST API is simple:
- *   POST https://v2.convertapi.com/convert/docx/to/pdf
- *   Authorization: Bearer <CONVERTAPI_SECRET>
- *   Body: multipart/form-data with file + optional params
- *
- * Quality: very good for math, Arabic, RTL, mixed content.
- *   Better than mammoth+pdf-lib (text-only), a bit lower than iLoveAPI.
+ * Used as the fallback converter when iLoveAPI (plan A) is not configured
+ * or fails. APIConvert is a hosted file conversion service backed by
+ * LibreOffice — same quality as iLoveAPI.
  *
  * Required env var:
- *   CONVERTAPI_SECRET  (get one at https://www.convertapi.com/a/signup)
+ *   APICONVERT_API_KEY  (the API token from your provider)
+ *
+ * The base URL is configurable via APICONVERT_API_URL
+ * (defaults to https://v2.convertapi.com if not set).
  */
 
-export class ConvertApiError extends Error {
+export class ApiconvertError extends Error {
   constructor(
     message: string,
     public step: 'start' | 'upload' | 'convert' = 'start',
     public status?: number
   ) {
     super(message);
-    this.name = 'ConvertApiError';
+    this.name = 'ApiconvertError';
   }
 }
 
-export type ConvertApiResult = {
+export type ApiconvertResult = {
   pdfBuffer: Buffer;
   pdfSize: number;
   warnings: string[];
 };
 
 /**
- * Convert an Office document to PDF via ConvertAPI REST.
+ * Convert an Office document to PDF via the APIConvert REST endpoint.
  * Supports: .docx, .doc, .odt, .pptx, .xlsx, .rtf, etc.
  */
 export async function convertOfficeToPdfViaConvertApi(
   fileBuffer: Buffer,
   fileName: string,
   secret: string
-): Promise<ConvertApiResult> {
+): Promise<ApiconvertResult> {
   if (!secret) {
-    throw new ConvertApiError('CONVERTAPI_SECRET non configuré');
+    throw new ApiconvertError('APICONVERT_API_KEY non configuré');
   }
 
   // Detect the source format from the extension
@@ -62,7 +56,7 @@ export async function convertOfficeToPdfViaConvertApi(
   };
   const sourceFormat = formatMap[ext];
   if (!sourceFormat) {
-    throw new ConvertApiError(`Format non supporté: .${ext}`);
+    throw new ApiconvertError(`Format non supporté: .${ext}`);
   }
 
   // Build multipart form
@@ -72,7 +66,8 @@ export async function convertOfficeToPdfViaConvertApi(
   });
   form.append('File', blob, fileName);
 
-  const url = `https://v2.convertapi.com/convert/${sourceFormat}/to/pdf`;
+  const baseUrl = (process.env.APICONVERT_API_URL || 'https://v2.convertapi.com').replace(/\/+$/, '');
+  const url = `${baseUrl}/convert/${sourceFormat}/to/pdf`;
 
   let res: Response;
   try {
@@ -84,8 +79,8 @@ export async function convertOfficeToPdfViaConvertApi(
       body: form as any,
     });
   } catch (e: any) {
-    throw new ConvertApiError(
-      `ConvertAPI requête échouée: ${e?.message || 'erreur réseau'}`,
+    throw new ApiconvertError(
+      `APIConvert requête échouée: ${e?.message || 'erreur réseau'}`,
       'start'
     );
   }
@@ -98,8 +93,8 @@ export async function convertOfficeToPdfViaConvertApi(
     } catch {
       // ignore body parsing
     }
-    throw new ConvertApiError(
-      `ConvertAPI error: ${errMsg}`,
+    throw new ApiconvertError(
+      `APIConvert error: ${errMsg}`,
       res.status === 401 || res.status === 403 ? 'start' : 'convert',
       res.status
     );
@@ -110,11 +105,11 @@ export async function convertOfficeToPdfViaConvertApi(
   const pdfBuffer = Buffer.from(arrayBuffer);
 
   if (pdfBuffer.length < 100) {
-    throw new ConvertApiError('ConvertAPI a renvoyé un fichier vide', 'convert');
+    throw new ApiconvertError('APIConvert a renvoyé un fichier vide', 'convert');
   }
   if (!pdfBuffer.subarray(0, 4).toString().startsWith('%PDF')) {
-    throw new ConvertApiError(
-      'ConvertAPI a renvoyé du contenu non-PDF (rate limit? erreur?)',
+    throw new ApiconvertError(
+      'APIConvert a renvoyé du contenu non-PDF (rate limit? erreur?)',
       'convert'
     );
   }
@@ -127,25 +122,25 @@ export async function convertOfficeToPdfViaConvertApi(
 }
 
 /**
- * Quick health check — uses the small "any to pdf" endpoint
+ * Quick health check
  */
-export async function checkConvertApiHealth(secret: string): Promise<{
+export async function checkApiconvertHealth(secret: string): Promise<{
   ok: boolean;
   error?: string;
 }> {
-  if (!secret) return { ok: false, error: 'Missing CONVERTAPI_SECRET' };
+  if (!secret) return { ok: false, error: 'Missing APICONVERT_API_KEY' };
   try {
-    // Use a tiny .txt as a smoke test
     const form = new FormData();
     form.append(
       'File',
       new Blob(['Hello Examanet'], { type: 'text/plain' }),
       'test.txt'
     );
-    const res = await fetch('https://v2.convertapi.com/convert/txt/to/pdf', {
+    const baseUrl = (process.env.APICONVERT_API_URL || 'https://v2.convertapi.com').replace(/\/+$/, '');
+    const res = await fetch(`${baseUrl}/convert/txt/to/pdf`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${secret}` },
-      body: form,
+      body: form as any,
     });
     if (!res.ok) {
       return {
