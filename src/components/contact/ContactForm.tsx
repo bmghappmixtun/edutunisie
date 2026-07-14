@@ -1,5 +1,6 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Send, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import T from '@/components/i18n/T';
@@ -7,9 +8,25 @@ import { useI18n } from '@/lib/i18n';
 
 export default function ContactForm() {
   const { t } = useI18n();
+  const searchParams = useSearchParams();
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
+
+  // Prefill subject and message from URL query params (e.g. /contact?subject=security&motif=password)
+  useEffect(() => {
+    const subjectParam = searchParams.get('subject');
+    const motifParam = searchParams.get('motif');
+    if (subjectParam || motifParam) {
+      setForm((prev) => ({
+        ...prev,
+        subject: subjectParam || prev.subject,
+        message: motifParam
+          ? `⚠️ Motif : ${motifParam}\n\nBonjour,\n\nJe souhaite signaler un problème concernant mon compte...\n\n[Décrivez ici les détails de l'incident]`
+          : prev.message,
+      }));
+    }
+  }, [searchParams]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -95,6 +112,8 @@ export default function ContactForm() {
             <option value="teacher">{t('contact.form.subjects.teacher')}</option>
             <option value="partnership">{t('contact.form.subjects.partnership')}</option>
             <option value="copyright">{t('contact.form.subjects.copyright')}</option>
+            <option value="security">{t('contact.form.subjects.security')}</option>
+            <option value="compromised">{t('contact.form.subjects.compromised')}</option>
             <option value="other">{t('contact.form.subjects.other')}</option>
           </select>
         </div>

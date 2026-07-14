@@ -885,6 +885,8 @@
         "teacher": "أن أصبح معلماً",
         "partnership": "شراكة",
         "copyright": "حقوق النشر (DMCA)",
+        "security": "مشكلة أمنية",
+        "compromised": "🚨 حساب مخترق / نشاط مشبوه",
         "other": "أخرى"
       },
       "message": "الرسالة",

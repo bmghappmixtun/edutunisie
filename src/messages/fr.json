@@ -885,6 +885,8 @@
         "teacher": "Devenir enseignant",
         "partnership": "Partenariat",
         "copyright": "Droit d'auteur (DMCA)",
+        "security": "Problème de sécurité",
+        "compromised": "🚨 Compte compromis / activité suspecte",
         "other": "Autre"
       },
       "message": "Message",
