@@ -72,69 +72,129 @@ export async function checkVercelUsage(token: string): Promise<VercelUsage> {
   // Vercel billing period: 1st of current month to 1st of next month
   const periodStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+  // Vercel API expects Unix timestamps in SECONDS (not ms)
+  const fromSec = Math.floor(periodStart.getTime() / 1000);
+  const toSec = Math.floor(periodEnd.getTime() / 1000);
 
   try {
-    // Get user info (optional)
+    // Get user info (optional, non-fatal)
     let username: string | undefined;
     let plan: string | undefined;
+    let teamId: string | undefined;
     try {
-      const userRes = await fetch(`${VERCEL_API}/www/user`, {
+      const userRes = await fetch(`${VERCEL_API}/v1/user`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (userRes.ok) {
         const userData: any = await userRes.json();
         username = userData.user?.username;
         plan = userData.user?.billing?.plan;
+        // Get the default team (if any)
+        if (userData.user?.defaultTeamId) {
+          teamId = userData.user.defaultTeamId;
+        }
       }
     } catch {
       // ignore
     }
 
-    // Fetch usage
-    const usageRes = await fetch(
-      `${VERCEL_API}/usage?team_id=&start=${periodStart.getTime()}&end=${periodEnd.getTime()}`,
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
+    // Try personal account first, then team
+    const usageEndpoints = teamId
+      ? [
+          { url: `${VERCEL_API}/v1/teams/${teamId}/usage?from=${fromSec}&to=${toSec}`, label: 'team' },
+          { url: `${VERCEL_API}/v1/usage?from=${fromSec}&to=${toSec}`, label: 'personal' },
+        ]
+      : [
+          { url: `${VERCEL_API}/v1/usage?from=${fromSec}&to=${toSec}`, label: 'personal' },
+        ];
 
-    if (!usageRes.ok) {
-      const errText = await usageRes.text().catch(() => '');
+    let usageData: any = null;
+    let lastError: string | undefined;
+    for (const ep of usageEndpoints) {
+      try {
+        const usageRes = await fetch(ep.url, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (usageRes.ok) {
+          usageData = await usageRes.json();
+          break;
+        }
+        const errText = await usageRes.text().catch(() => '');
+        lastError = `Vercel ${ep.label}: ${usageRes.status} ${errText.slice(0, 150)}`;
+      } catch (e: any) {
+        lastError = `Vercel ${ep.label} network: ${e?.message || 'erreur'}`;
+      }
+    }
+
+    if (!usageData) {
       return {
         periodStart: periodStart.toISOString().slice(0, 10),
         periodEnd: periodEnd.toISOString().slice(0, 10),
         bandwidth: { used: 0, unit: 'GB' },
-        functions: { used: 0, unit: 'GB-Hours' },
+        functions: { used: 0, unit: 'hours' },
         builds: { used: 0, unit: 'builds' },
         username,
         plan,
-        error: `Vercel API ${usageRes.status}: ${errText.slice(0, 200)}`,
+        error: lastError || 'Vercel API indisponible',
       };
     }
 
-    const data: any = await usageRes.json();
+    // Vercel returns a flat array of usage objects
+    // e.g. [{ resource: "bandwidth", usageValue: 123, usageUnit: "GB" }, ...]
+    // OR a nested object: { bandwidth: { usageValue, usageUnit }, ... }
+    let bandwidthValue = 0;
+    let bandwidthUnit = 'GB';
+    let functionsValue = 0;
+    let functionsUnit = 'hours';
+    let buildsValue = 0;
 
-    // Vercel returns values in bytes for bandwidth, etc.
-    const bandwidthBytes = (data.bandwidth?.usageValue || 0) * 1024 * 1024; // they report in MB?
-    const bandwidthGB = bandwidthBytes / 1024 / 1024 / 1024;
-    const functionGBHours = data.functions?.usageValue || 0;
-    const builds = data.builds?.usageValue || 0;
+    if (Array.isArray(usageData)) {
+      for (const item of usageData) {
+        if (item.resource === 'bandwidth' || item.resource === 'fastDataTransfer') {
+          bandwidthValue = parseFloat(item.usageValue) || 0;
+          bandwidthUnit = item.usageUnit || 'GB';
+        } else if (item.resource === 'functions') {
+          functionsValue = parseFloat(item.usageValue) || 0;
+          functionsUnit = item.usageUnit || 'GB-Hours';
+        } else if (item.resource === 'builds') {
+          buildsValue = parseFloat(item.usageValue) || 0;
+        }
+      }
+    } else if (typeof usageData === 'object' && usageData !== null) {
+      // Nested format
+      if (usageData.bandwidth) {
+        bandwidthValue = parseFloat(usageData.bandwidth.usageValue) || 0;
+        bandwidthUnit = usageData.bandwidth.usageUnit || 'GB';
+      }
+      if (usageData.functions) {
+        functionsValue = parseFloat(usageData.functions.usageValue) || 0;
+        functionsUnit = usageData.functions.usageUnit || 'GB-Hours';
+      }
+      if (usageData.builds) {
+        buildsValue = parseFloat(usageData.builds.usageValue) || 0;
+      }
+    }
+
+    // Normalize units
+    let bandwidthGB = bandwidthValue;
+    if (bandwidthUnit === 'MB' || bandwidthUnit === 'MBs') {
+      bandwidthGB = bandwidthValue / 1024;
+    } else if (bandwidthUnit === 'Bytes' || bandwidthUnit === 'B') {
+      bandwidthGB = bandwidthValue / (1024 * 1024 * 1024);
+    }
+    let functionsHours = functionsValue;
+    if (functionsUnit === 'GB-Hours' || functionsUnit === 'GB-Hrs') {
+      functionsHours = functionsValue * 1000;
+    } else if (functionsUnit === 'ms' || functionsUnit === 'milliseconds') {
+      functionsHours = functionsValue / 1000 / 3600 / 1000;
+    }
 
     return {
       periodStart: periodStart.toISOString().slice(0, 10),
       periodEnd: periodEnd.toISOString().slice(0, 10),
-      bandwidth: {
-        used: parseFloat(bandwidthGB.toFixed(2)),
-        unit: 'GB',
-      },
-      functions: {
-        used: parseFloat((functionGBHours / 1000).toFixed(2)),
-        unit: 'hours',
-      },
-      builds: {
-        used: builds,
-        unit: 'builds',
-      },
+      bandwidth: { used: parseFloat(bandwidthGB.toFixed(2)), unit: 'GB' },
+      functions: { used: parseFloat(functionsHours.toFixed(2)), unit: 'hours' },
+      builds: { used: buildsValue, unit: 'builds' },
       username,
       plan,
     };
