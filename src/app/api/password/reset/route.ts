@@ -70,6 +70,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Email ou code invalide' }, { status: 400 });
   }
 
+  // SECURITY: re-check status in case user was banned/suspended after
+  // the code was issued. Blocked users must not be able to complete reset.
+  if (user.status === 'SUSPENDED' || user.status === 'BANNED') {
+    console.log(`[password-reset] blocked ${user.status} user email=${email}`);
+    return NextResponse.json({ error: 'Email ou code invalide' }, { status: 400 });
+  }
+
   // Find the latest unused OTP for password reset
   const otp = await prisma.otpCode.findFirst({
     where: { userId: user.id, purpose: 'password_reset', consumedAt: null },
