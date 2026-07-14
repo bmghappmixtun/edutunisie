@@ -108,11 +108,24 @@ export async function POST(req: NextRequest) {
   }
 
   // ============================================================
-  // CHECK 2: Account status — only ACTIVE accounts can reset password
-  // Silent return for non-ACTIVE accounts (no email sent, same response)
+  // CHECK 2: Account status — only blocked users cannot reset
+  // Silent return for blocked accounts (no email sent, same response)
+  //
+  // Status flow for STUDENTS:
+  //   PENDING_OTP  → after signup, before email verification
+  //   ACTIVE       → after email verification
+  //
+  // Status flow for TEACHERS:
+  //   PENDING_APPROVAL       → after signup, before admin approval
+  //   PENDING_FILE_VERIFICATION → during file verification
+  //   ACTIVE                 → fully approved
+  //
+  // Blocked statuses (cannot reset):
+  //   SUSPENDED  → admin-suspended
+  //   BANNED     → permanently banned
   // ============================================================
-  if (user.status !== 'ACTIVE') {
-    console.log(`[forgot-password] blocked non-active user status=${user.status} email=${email}`);
+  if (user.status === 'SUSPENDED' || user.status === 'BANNED') {
+    console.log(`[forgot-password] blocked ${user.status} user email=${email}`);
     return NextResponse.json(genericResponse);
   }
 
