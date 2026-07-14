@@ -92,11 +92,24 @@ function loadManifest(): any {
   return { uploaded: [], failed: [], namespaces: {} };
 }
 
+/**
+ * Build a proxied URL for the given key, so the browser only ever sees
+ * examanet.com URLs (never the Vercel Blob storage URL).
+ *
+ * The key is the same as in the manifest (e.g. "concours-9eme/9raya/2020/.../math.pdf").
+ */
+export function proxiedFileUrl(key: string): string {
+  // Encode each path segment, keeping the slashes
+  const encoded = key.split('/').map(encodeURIComponent).join('/');
+  return `/api/concours-file/${encoded}`;
+}
+
 export function getConcours9emeFiles(): ConcoursFile[] {
   const m = loadManifest();
   return (m.uploaded || []).map((u: any) => ({
     key: u.key,
-    url: u.url,
+    // Replace the upstream blob URL with our proxy URL (browser sees examanet.com)
+    url: proxiedFileUrl(u.key),
     size: u.size,
     source: u.source,
     namespace: u.namespace,

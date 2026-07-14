@@ -129,12 +129,24 @@ function parseKey(key: string): { year: number; section: string; session: string
 // =============================================================================
 // PUBLIC API
 // =============================================================================
+
+/**
+ * Build a proxied URL for the given key, so the browser only ever sees
+ * examanet.com URLs (never the Vercel Blob storage URL).
+ */
+export function proxiedBacFileUrl(key: string): string {
+  const encoded = key.split('/').map(encodeURIComponent).join('/');
+  return `/api/concours-file/${encoded}`;
+}
+
 export function getBacFiles(): BacFile[] {
   const manifest = loadManifest();
   return (manifest.uploaded || []).map((f: any) => {
     const parsed = parseKey(f.key);
     return {
       ...f,
+      // Replace the upstream blob URL with our proxy URL (browser sees examanet.com)
+      url: proxiedBacFileUrl(f.key),
       year: parsed?.year,
       section: parsed?.section,
       session: parsed?.session,
