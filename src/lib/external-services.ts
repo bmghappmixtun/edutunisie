@@ -149,31 +149,57 @@ export async function checkIlovepdfUsage(
     return { source: 'ilovepdf/info', error: `JWT sign failed: ${e?.message}` };
   }
 
+  // Per the official @ilovepdf/ilovepdf-js-core SDK source (tasks/Task.js):
+  //   GET /v1/start/{tool} → { task, server, remaining_files }
+  // Region is RETURNED in the response, not part of the URL.
+  // We use 'merge' as it's the cheapest tool.
+  //
+  // However when the account has 0 credits, /v1/start/... returns 401 with
+  // "Sorry, you already used all your monthly credits." — so we catch that
+  // and treat it as remaining=0 (the truth).
+  //
+  // Also try /v1/info first which works regardless of credit state.
   try {
-    // GET /v1/info returns { remaining_credits: N } for the current month.
-    // This is the OFFICIAL quota endpoint, not /v1/start/{tool}/{region}
-    // which was 404ing on the current iLoveAPI deployment.
-    const res = await fetch('https://api.ilovepdf.com/v1/info', {
+    // Plan A: /v1/info (undocumented but always works, account-level quota)
+    const infoRes = await fetch('https://api.ilovepdf.com/v1/info', {
       headers: { Authorization: `Bearer ${token}` },
     });
-    if (!res.ok) {
-      const errText = await res.text().catch(() => '');
+    if (infoRes.ok) {
+      const data: any = await infoRes.json();
+      const remaining = data.remaining_credits ?? data.remaining_files ?? data.remainingFiles ?? 0;
       return {
         source: 'ilovepdf/info',
-        error: `iLoveAPI ${res.status}: ${errText.slice(0, 200)}`,
+        quota: { used: 0, total: 0, remaining, percent: 0 },
       };
     }
-    const data: any = await res.json();
-    const remaining = data.remaining_credits ?? data.remainingFiles ?? 0;
+
+    // Plan B: /v1/start/merge (official SDK endpoint, may fail with 401 at 0 credits)
+    const startRes = await fetch('https://api.ilovepdf.com/v1/start/merge', {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (startRes.ok) {
+      const data: any = await startRes.json();
+      const remaining = data.remaining_files ?? data.remainingFiles ?? data.remaining_credits ?? 0;
+      return {
+        source: 'ilovepdf/start/merge',
+        quota: { used: 0, total: 0, remaining, percent: 0 },
+      };
+    }
+
+    // Plan C: 401 with "used all credits" = 0 remaining (this is success info, not error)
+    if (startRes.status === 401) {
+      const errText = await startRes.text().catch(() => '');
+      if (errText.toLowerCase().includes('used all') || errText.toLowerCase().includes('no credits')) {
+        return {
+          source: 'ilovepdf/start/merge',
+          quota: { used: 0, total: 0, remaining: 0, percent: 0 },
+        };
+      }
+    }
+
     return {
       source: 'ilovepdf/info',
-      // iLoveAPI doesn't return quota total via /v1/info; admin sets monthlyQuota in DB
-      quota: {
-        used: 0, // filled by caller from DB: total - remaining
-        total: 0, // filled by caller from DB
-        remaining,
-        percent: 0,
-      },
+      error: `iLoveAPI ${infoRes.status}/${startRes.status}: tous endpoints quota ont échoué`,
     };
   } catch (e: any) {
     return { source: 'ilovepdf/info', error: `Network: ${e?.message || 'erreur'}` };
