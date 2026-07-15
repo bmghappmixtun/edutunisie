@@ -172,7 +172,7 @@ export default function FournisseursClient() {
             info={providers.find((p) => p.provider === 'iloveapi')}
             liveQuota={liveQuota.iloveapi}
             title="iLoveAPI"
-            description="Plan A. Service payant, 250 docs/mois gratuit. Qualité haute (LibreOffice). Quota vérifié via /v1/start/merge/eu-1."
+            description="Plan A. Service payant. Qualité haute (LibreOffice). Quota vérifié en direct via /v1/info (remaining_credits)."
             docsUrl="https://www.iloveapi.com/docs/api-reference"
             onChanged={() => { refresh('providers'); refresh('iloveapi'); }}
             refreshing={refreshing === 'providers' || refreshing === 'iloveapi'}
@@ -186,7 +186,7 @@ export default function FournisseursClient() {
             info={providers.find((p) => p.provider === 'apiconvert')}
             liveQuota={liveQuota.apiconvert}
             title="APIConvert"
-            description="Plan B. Free tier 1500/mois. Quota vérifié via GET /v2/user."
+            description="Plan B. Free tier 1500 conversions/mois. Quota vérifié en direct via GET /v2/user."
             docsUrl="https://docs.convertapi.com/"
             onChanged={() => { refresh('providers'); refresh('apiconvert'); }}
             refreshing={refreshing === 'providers' || refreshing === 'apiconvert'}
