@@ -48,9 +48,9 @@ if (existing) {
       publicKey: PUBLIC_KEY,
       secretKey: encrypted,
       enabled: true,
-      monthlyQuota: 250,
-      displayName: 'iLoveAPI (free tier)',
-      notes: 'Compte iLoveAPI - 250 docs/mois (free tier)',
+      monthlyQuota: 2500,
+      displayName: 'iLoveAPI (Lite - 2 500 crédits/mois)',
+      notes: 'Compte iLoveAPI - plan Lite',
     },
   });
   console.log('✅ iLoveAPI updated');
@@ -61,9 +61,9 @@ if (existing) {
       publicKey: PUBLIC_KEY,
       secretKey: encrypted,
       enabled: true,
-      monthlyQuota: 250,
-      displayName: 'iLoveAPI (free tier)',
-      notes: 'Compte iLoveAPI - 250 docs/mois (free tier)',
+      monthlyQuota: 2500,
+      displayName: 'iLoveAPI (Lite - 2 500 crédits/mois)',
+      notes: 'Compte iLoveAPI - plan Lite',
     },
   });
   console.log('✅ iLoveAPI created');
