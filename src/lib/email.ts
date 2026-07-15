@@ -433,56 +433,50 @@ function renderResourceApprovedEmail(firstName: string, resourceTitle: string, a
   const fullResourceUrl = resourceUrl
     ? (resourceUrl.startsWith('http') ? resourceUrl : `${SITE_URL}${resourceUrl}`)
     : null;
+  // Email-safe font stack: SF Pro on Apple, Segoe UI on Windows, Roboto on Android/Gmail,
+  // Helvetica/Arial as universal fallback. Gmail specifically respects these.
+  const FONT_STACK = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif";
   if (approved) {
     return `<!DOCTYPE html>
-<html><body style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#F0FDF4 0%,#DCFCE7 100%);padding:0;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:linear-gradient(135deg,#F0FDF4 0%,#DCFCE7 100%);padding:40px 20px;">
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head><body style="margin:0;font-family:${FONT_STACK};background:#F1F5F9;padding:0;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F1F5F9;padding:40px 20px;">
 <tr><td align="center">
-<table role="presentation" width="520" cellpadding="0" cellspacing="0" style="background:white;border-radius:24px;overflow:hidden;box-shadow:0 20px 60px rgba(34,197,94,0.15);">
-  <tr><td style="background:linear-gradient(135deg,#10B981 0%,#059669 50%,#047857 100%);padding:32px 24px;text-align:center;">
-    <div style="margin:0 auto 16px;display:inline-block;background:rgba(255,255,255,0.15);border-radius:20px;padding:14px 20px;backdrop-filter:blur(10px);">
-      <img src="${SITE_URL}/logo-examanet.png" alt="Examanet" width="160" height="40" style="display:block;max-width:160px;height:auto;" />
+<table role="presentation" width="540" cellpadding="0" cellspacing="0" style="background:white;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(15,23,42,0.08);font-family:${FONT_STACK};">
+  <tr><td style="background:#FFFFFF;padding:36px 32px 24px;text-align:center;border-bottom:1px solid #F1F5F9;">
+    <img src="${SITE_URL}/logo-examanet.png" alt="Examanet" width="180" height="44" style="display:block;margin:0 auto 20px;max-width:180px;height:auto;" />
+    <div style="width:64px;height:64px;margin:0 auto 16px;background:linear-gradient(135deg,#D1FAE5,#A7F3D0);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;">
+      <div style="font-size:32px;line-height:64px;">✅</div>
     </div>
-    <div style="width:80px;height:80px;margin:20px auto 16px;background:rgba(255,255,255,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(10px);">
-      <div style="font-size:42px;line-height:80px;">✅</div>
-    </div>
-    <h1 style="margin:0;color:white;font-size:24px;font-weight:800;letter-spacing:-0.5px;">Ressource approuvée !</h1>
-    <p style="margin:8px 0 0;color:rgba(255,255,255,0.9);font-size:14px;">Votre ressource est maintenant en ligne</p>
+    <h1 style="margin:0;color:#0F172A;font-size:26px;font-weight:700;letter-spacing:-0.4px;font-family:${FONT_STACK};">Ressource approuvée !</h1>
+    <p style="margin:8px 0 0;color:#64748B;font-size:15px;font-weight:400;font-family:${FONT_STACK};">Votre ressource est maintenant en ligne</p>
   </td></tr>
-  <tr><td style="padding:32px;">
-    <p style="margin:0 0 8px;color:#0F172A;font-size:16px;">Bonjour <strong style="color:#0F172A;">${safeFirst}</strong>,</p>
-    <p style="margin:0 0 24px;color:#475569;font-size:15px;line-height:1.6;">
-      Excellente nouvelle ! La ressource que vous avez soumise a été approuvée par notre équipe et est désormais <strong>en ligne sur Examanet</strong>. Elle est maintenant visible par des milliers d'élèves et enseignants tunisiens.
+  <tr><td style="padding:32px;font-family:${FONT_STACK};">
+    <p style="margin:0 0 8px;color:#0F172A;font-size:16px;font-family:${FONT_STACK};">Bonjour <strong style="color:#0F172A;">${safeFirst}</strong>,</p>
+    <p style="margin:0 0 24px;color:#475569;font-size:15px;line-height:1.65;font-family:${FONT_STACK};">
+      Excellente nouvelle ! La ressource que vous avez soumise a été approuvée par notre équipe et est désormais <strong style="color:#0F172A;">en ligne sur Examanet</strong>. Elle est maintenant visible par des milliers d'élèves et enseignants tunisiens.
     </p>
-    <div style="background:linear-gradient(135deg,#F8FAFC 0%,#F1F5F9 100%);border:1px solid #E2E8F0;border-radius:16px;padding:20px;margin:0 0 24px;">
-      <div style="display:flex;align-items:flex-start;gap:12px;">
-        <div style="width:40px;height:40px;background:linear-gradient(135deg,#10B981,#059669);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-          <div style="color:white;font-size:20px;line-height:40px;text-align:center;width:100%;">📚</div>
-        </div>
-        <div style="flex:1;min-width:0;">
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#10B981;margin-bottom:4px;">Ressource publiée</div>
-          <div style="font-weight:700;color:#0F172A;font-size:15px;line-height:1.4;word-break:break-word;">${safeTitle}</div>
-        </div>
-      </div>
+    <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:18px 20px;margin:0 0 24px;">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:#10B981;margin-bottom:6px;font-family:${FONT_STACK};">Ressource publiée</div>
+      <div style="font-weight:600;color:#0F172A;font-size:15px;line-height:1.5;word-break:break-word;font-family:${FONT_STACK};">${safeTitle}</div>
     </div>
     ${fullResourceUrl ? `
     <div style="text-align:center;margin:0 0 8px;">
-      <a href="${fullResourceUrl}" style="display:inline-block;background:linear-gradient(135deg,#10B981,#059669);color:white;text-decoration:none;padding:16px 36px;border-radius:12px;font-weight:700;font-size:15px;box-shadow:0 8px 24px rgba(16,185,129,0.3);letter-spacing:-0.2px;">Voir la ressource en ligne →</a>
+      <a href="${fullResourceUrl}" style="display:inline-block;background:#10B981;color:white;text-decoration:none;padding:14px 32px;border-radius:10px;font-weight:600;font-size:15px;font-family:${FONT_STACK};mso-padding-alt:0;line-height:1.2;">Voir la ressource en ligne →</a>
     </div>
-    <p style="margin:0 0 24px;text-align:center;color:#94A3B8;font-size:12px;word-break:break-all;">${fullResourceUrl}</p>
+    <p style="margin:0 0 24px;text-align:center;color:#94A3B8;font-size:12px;word-break:break-all;font-family:${FONT_STACK};">${fullResourceUrl}</p>
     ` : ''}
-    <p style="margin:0;color:#475569;font-size:14px;line-height:1.6;">
+    <p style="margin:0;color:#475569;font-size:14px;line-height:1.65;font-family:${FONT_STACK};">
       Merci pour votre contribution à Examanet ! Vos ressources aident les élèves tunisiens à réussir leurs études.
     </p>
   </td></tr>
-  <tr><td style="background:#F8FAFC;padding:24px 32px;border-top:1px solid #E2E8F0;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+  <tr><td style="background:#F8FAFC;padding:20px 32px;border-top:1px solid #E2E8F0;font-family:${FONT_STACK};">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-family:${FONT_STACK};">
       <tr>
-        <td>
-          <div style="font-weight:800;color:#0F172A;font-size:16px;letter-spacing:-0.5px;">Examanet</div>
-          <div style="color:#94A3B8;font-size:12px;margin-top:2px;">Plateforme pédagogique #1 en Tunisie</div>
+        <td style="font-family:${FONT_STACK};">
+          <div style="font-weight:700;color:#0F172A;font-size:14px;letter-spacing:-0.2px;font-family:${FONT_STACK};">Examanet</div>
+          <div style="color:#94A3B8;font-size:12px;margin-top:2px;font-family:${FONT_STACK};">Plateforme pédagogique #1 en Tunisie</div>
         </td>
-        <td align="right" style="color:#94A3B8;font-size:11px;">
+        <td align="right" style="color:#94A3B8;font-size:11px;font-family:${FONT_STACK};">
           Conçu avec ❤️<br>pour les élèves tunisiens
         </td>
       </tr>
@@ -494,48 +488,39 @@ function renderResourceApprovedEmail(firstName: string, resourceTitle: string, a
 </body></html>`;
   }
   return `<!DOCTYPE html>
-<html><body style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#FEF2F2 0%,#FEE2E2 100%);padding:0;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:linear-gradient(135deg,#FEF2F2 0%,#FEE2E2 100%);padding:40px 20px;">
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head><body style="margin:0;font-family:${FONT_STACK};background:#F1F5F9;padding:0;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F1F5F9;padding:40px 20px;">
 <tr><td align="center">
-<table role="presentation" width="520" cellpadding="0" cellspacing="0" style="background:white;border-radius:24px;overflow:hidden;box-shadow:0 20px 60px rgba(239,68,68,0.15);">
-  <tr><td style="background:linear-gradient(135deg,#EF4444 0%,#DC2626 50%,#B91C1C 100%);padding:32px 24px;text-align:center;">
-    <div style="margin:0 auto 16px;display:inline-block;background:rgba(255,255,255,0.15);border-radius:20px;padding:14px 20px;backdrop-filter:blur(10px);">
-      <img src="${SITE_URL}/logo-examanet.png" alt="Examanet" width="160" height="40" style="display:block;max-width:160px;height:auto;" />
+<table role="presentation" width="540" cellpadding="0" cellspacing="0" style="background:white;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(15,23,42,0.08);font-family:${FONT_STACK};">
+  <tr><td style="background:#FFFFFF;padding:36px 32px 24px;text-align:center;border-bottom:1px solid #F1F5F9;">
+    <img src="${SITE_URL}/logo-examanet.png" alt="Examanet" width="180" height="44" style="display:block;margin:0 auto 20px;max-width:180px;height:auto;" />
+    <div style="width:64px;height:64px;margin:0 auto 16px;background:linear-gradient(135deg,#FEE2E2,#FECACA);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;">
+      <div style="font-size:32px;line-height:64px;">❌</div>
     </div>
-    <div style="width:80px;height:80px;margin:20px auto 16px;background:rgba(255,255,255,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(10px);">
-      <div style="font-size:42px;line-height:80px;">❌</div>
-    </div>
-    <h1 style="margin:0;color:white;font-size:24px;font-weight:800;letter-spacing:-0.5px;">Ressource non retenue</h1>
-    <p style="margin:8px 0 0;color:rgba(255,255,255,0.9);font-size:14px;">Votre soumission n'a pas été approuvée</p>
+    <h1 style="margin:0;color:#0F172A;font-size:26px;font-weight:700;letter-spacing:-0.4px;font-family:${FONT_STACK};">Ressource non retenue</h1>
+    <p style="margin:8px 0 0;color:#64748B;font-size:15px;font-weight:400;font-family:${FONT_STACK};">Votre soumission n'a pas été approuvée</p>
   </td></tr>
-  <tr><td style="padding:32px;">
-    <p style="margin:0 0 8px;color:#0F172A;font-size:16px;">Bonjour <strong style="color:#0F172A;">${safeFirst}</strong>,</p>
-    <p style="margin:0 0 24px;color:#475569;font-size:15px;line-height:1.6;">
+  <tr><td style="padding:32px;font-family:${FONT_STACK};">
+    <p style="margin:0 0 8px;color:#0F172A;font-size:16px;font-family:${FONT_STACK};">Bonjour <strong style="color:#0F172A;">${safeFirst}</strong>,</p>
+    <p style="margin:0 0 24px;color:#475569;font-size:15px;line-height:1.65;font-family:${FONT_STACK};">
       Malheureusement, la ressource que vous avez soumise n'a pas été retenue pour publication sur Examanet.
     </p>
-    <div style="background:linear-gradient(135deg,#F8FAFC 0%,#F1F5F9 100%);border:1px solid #E2E8F0;border-radius:16px;padding:20px;margin:0 0 24px;">
-      <div style="display:flex;align-items:flex-start;gap:12px;">
-        <div style="width:40px;height:40px;background:linear-gradient(135deg,#EF4444,#DC2626);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-          <div style="color:white;font-size:20px;line-height:40px;text-align:center;width:100%;">📄</div>
-        </div>
-        <div style="flex:1;min-width:0;">
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#EF4444;margin-bottom:4px;">Ressource refusée</div>
-          <div style="font-weight:700;color:#0F172A;font-size:15px;line-height:1.4;word-break:break-word;">${safeTitle}</div>
-        </div>
-      </div>
+    <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:18px 20px;margin:0 0 24px;">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:#EF4444;margin-bottom:6px;font-family:${FONT_STACK};">Ressource refusée</div>
+      <div style="font-weight:600;color:#0F172A;font-size:15px;line-height:1.5;word-break:break-word;font-family:${FONT_STACK};">${safeTitle}</div>
     </div>
-    <p style="margin:0;color:#475569;font-size:14px;line-height:1.6;">
-      N'hésitez pas à soumettre une nouvelle version après avoir consulté nos <a href="${SITE_URL}/cgu" style="color:#10B981;font-weight:600;text-decoration:underline;">conditions d'utilisation</a>.
+    <p style="margin:0;color:#475569;font-size:14px;line-height:1.65;font-family:${FONT_STACK};">
+      N'hésitez pas à soumettre une nouvelle version après avoir consulté nos <a href="${SITE_URL}/cgu" style="color:#10B981;font-weight:600;text-decoration:underline;font-family:${FONT_STACK};">conditions d'utilisation</a>.
     </p>
   </td></tr>
-  <tr><td style="background:#F8FAFC;padding:24px 32px;border-top:1px solid #E2E8F0;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+  <tr><td style="background:#F8FAFC;padding:20px 32px;border-top:1px solid #E2E8F0;font-family:${FONT_STACK};">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-family:${FONT_STACK};">
       <tr>
-        <td>
-          <div style="font-weight:800;color:#0F172A;font-size:16px;letter-spacing:-0.5px;">Examanet</div>
-          <div style="color:#94A3B8;font-size:12px;margin-top:2px;">Plateforme pédagogique #1 en Tunisie</div>
+        <td style="font-family:${FONT_STACK};">
+          <div style="font-weight:700;color:#0F172A;font-size:14px;letter-spacing:-0.2px;font-family:${FONT_STACK};">Examanet</div>
+          <div style="color:#94A3B8;font-size:12px;margin-top:2px;font-family:${FONT_STACK};">Plateforme pédagogique #1 en Tunisie</div>
         </td>
-        <td align="right" style="color:#94A3B8;font-size:11px;">
+        <td align="right" style="color:#94A3B8;font-size:11px;font-family:${FONT_STACK};">
           Conçu avec ❤️<br>pour les élèves tunisiens
         </td>
       </tr>
