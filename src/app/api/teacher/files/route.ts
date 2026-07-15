@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
         class: { select: { id: true, nameFr: true, nameAr: true } },
         section: { select: { id: true, nameFr: true, nameAr: true } },
         subject: { select: { id: true, nameFr: true, nameAr: true, color: true } },
-        resource: { select: { id: true, status: true } },
+        resource: { select: { id: true, numericId: true, slug: true, status: true } },
       },
     });
 
