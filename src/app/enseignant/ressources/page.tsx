@@ -178,7 +178,7 @@ function ResourceRow({ r }: { r: any }) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap mb-1">
             <Link
-              href={`/ressources/${r.slug}`}
+              href={r.numericId ? `/ressources/${r.numericId}/${r.slug}` : `/ressources/legacy-${r.id}/${r.slug}`}
               className={`font-bold text-slate-900 hover:text-primary-600 transition truncate ${isArabic(r.title) ? 'text-right' : 'text-left'}`}
               dir={isArabic(r.title) ? 'rtl' : 'ltr'}
               lang={isArabic(r.title) ? 'ar' : 'fr'}
@@ -231,7 +231,7 @@ function ResourceRow({ r }: { r: any }) {
 
         {/* Actions */}
         <div className="flex items-center gap-1 flex-shrink-0">
-          <Link href={`/ressources/${r.slug}`} title="Voir" className="p-2 hover:bg-slate-100 rounded-lg text-slate-600">
+          <Link href={r.numericId ? `/ressources/${r.numericId}/${r.slug}` : `/ressources/legacy-${r.id}/${r.slug}`} target="_blank" title="Voir" className="p-2 hover:bg-slate-100 rounded-lg text-slate-600">
             <Eye className="w-4 h-4" />
           </Link>
           <Link
