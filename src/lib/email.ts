@@ -1,6 +1,7 @@
 /* eslint-disable */
 import { Resend } from 'resend';
 import { renderResourceRejectedEmail, renderEditApprovedEmail, renderEditRejectedEmail, renderNewEditPendingEmail } from './email-templates';
+import { renderEmailShell, EMAIL_FONT_STACK, paragraph, muted, ctaButton, infoCard } from './email-shell';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 const FROM = process.env.EMAIL_FROM || 'Examanet <noreply@examanet.com>';
@@ -287,19 +288,67 @@ export async function sendResourceApprovedEmail(to: string, firstName: string, r
 }
 
 function renderOTPEmail(code: string, firstName: string): string {
-  return `<!DOCTYPE html><html><body style="font-family:sans-serif;background:#f1f5f9;margin:0;padding:20px"><div style="max-width:600px;margin:0 auto;background:white;border-radius:16px;overflow:hidden"><div style="background:linear-gradient(135deg,#0EA5E9,#0369A1);padding:32px;text-align:center;color:white"><h1 style="margin:0;font-size:24px">Vérifiez votre email</h1></div><div style="padding:32px"><p>Bonjour ${firstName || ''},</p><div style="background:#0EA5E9;color:white;font-size:36px;font-weight:800;text-align:center;padding:24px;border-radius:12px;letter-spacing:8px;margin:24px 0">${code}</div><p style="color:#64748b;font-size:14px">Valide 30 minutes.</p></div></div></body></html>`;
+  return renderEmailShell({
+    accent: 'blue',
+    icon: '🔐',
+    title: 'Vérifiez votre email',
+    subtitle: 'Votre code de confirmation',
+    preheader: 'Votre code OTP Examanet',
+    body: `
+      <p style="margin:0 0 8px;color:#0F172A;font-size:16px;font-family:${EMAIL_FONT_STACK};">Bonjour <strong style="color:#0F172A;">${firstName || ''}</strong>,</p>
+      ${paragraph('Utilisez le code ci-dessous pour confirmer votre adresse email et activer votre compte Examanet.')}
+      <div style="background:#0EA5E9;color:white;font-size:36px;font-weight:800;text-align:center;padding:24px;border-radius:12px;letter-spacing:8px;margin:24px 0;font-family:${EMAIL_FONT_STACK};">${code}</div>
+      ${muted('Ce code est valide 30 minutes. Si vous n\'êtes pas à l\'origine de cette demande, vous pouvez ignorer cet email en toute sécurité.')}
+    `,
+  });
 }
 
 function renderWelcomeEmail(firstName: string, role: string): string {
-  return `<!DOCTYPE html><html><body style="font-family:sans-serif"><div style="max-width:600px;margin:0 auto;padding:20px"><h1>Bienvenue ${firstName} !</h1><p>Votre compte a été créé. Vous êtes ${role === 'TEACHER' ? 'enseignant' : 'élève'}.</p><p>Vérifiez votre email pour activer votre compte.</p></div></body></html>`;
+  return renderEmailShell({
+    accent: 'blue',
+    icon: '👋',
+    title: `Bienvenue ${firstName} !`,
+    subtitle: 'Votre compte Examanet a été créé',
+    preheader: 'Bienvenue sur Examanet',
+    body: `
+      <p style="margin:0 0 8px;color:#0F172A;font-size:16px;font-family:${EMAIL_FONT_STACK};">Bonjour <strong style="color:#0F172A;">${firstName}</strong>,</p>
+      ${paragraph(`Votre compte Examanet a été créé avec succès. Vous êtes inscrit en tant que <strong>${role === 'TEACHER' ? 'enseignant' : 'élève'}</strong>.`)}
+      ${paragraph('Pour activer votre compte et accéder à toutes les fonctionnalités, veuillez vérifier votre adresse email en utilisant le code que nous venons de vous envoyer.')}
+    `,
+  });
 }
 
 function renderWelcomeConfirmedEmail(firstName: string, role: string): string {
-  return `<!DOCTYPE html><html><body style="font-family:sans-serif"><div style="max-width:600px;margin:0 auto;padding:20px"><h1>Compte activé !</h1><p>Bonjour ${firstName}, votre email a été vérifié.</p></div></body></html>`;
+  return renderEmailShell({
+    accent: 'green',
+    icon: '🎉',
+    title: 'Compte activé !',
+    subtitle: 'Votre email a été vérifié',
+    preheader: 'Compte activé',
+    body: `
+      <p style="margin:0 0 8px;color:#0F172A;font-size:16px;font-family:${EMAIL_FONT_STACK};">Bonjour <strong style="color:#0F172A;">${firstName}</strong>,</p>
+      ${paragraph('Votre adresse email a été vérifiée avec succès. Votre compte Examanet est maintenant actif !')}
+      ${paragraph(`Vous pouvez désormais profiter pleinement d'Examanet en tant que <strong>${role === 'TEACHER' ? 'enseignant' : 'élève'}</strong>.`)}
+    `,
+  });
 }
 
 function renderContactEmail(p: { name: string; email: string; subject: string; message: string }): string {
-  return `<!DOCTYPE html><html><body><h2>Contact: ${p.subject}</h2><p><strong>De:</strong> ${p.name} (${p.email})</p><p>${p.message}</p></body></html>`;
+  const safeName = p.name.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const safeEmail = p.email.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const safeSubject = p.subject.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const safeMessage = p.message.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+  return renderEmailShell({
+    accent: 'gray',
+    icon: '✉️',
+    title: `Contact: ${safeSubject}`,
+    subtitle: `Message de ${safeName}`,
+    preheader: `Nouveau message de ${safeName}`,
+    body: `
+      ${infoCard('Expéditeur', `${safeName} &lt;${safeEmail}&gt;`, 'gray')}
+      <div style="color:#0F172A;font-size:15px;line-height:1.65;font-family:${EMAIL_FONT_STACK};">${safeMessage}</div>
+    `,
+  });
 }
 
 function renderTeacherApprovalEmail(firstName: string, approved: boolean, opts?: {
@@ -312,72 +361,54 @@ function renderTeacherApprovalEmail(firstName: string, approved: boolean, opts?:
   const safeFirst = firstName.replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const safeLast = lastName.replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const fullName = `${safeFirst} ${safeLast}`.trim();
+  const F = EMAIL_FONT_STACK;
 
   if (approved) {
-    return `<!DOCTYPE html>
-<html><head><meta charset="UTF-8"></head>
-<body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background:#f8fafc;margin:0;padding:20px;color:#0f172a">
-  <div style="max-width:600px;margin:0 auto;background:#ffffff;border-radius:20px;overflow:hidden;border:1px solid #e2e8f0;box-shadow:0 4px 24px rgba(0,0,0,0.04)">
-    <!-- Hero header with confetti gradient -->
-    <div style="background:linear-gradient(135deg,#7c3aed 0%,#a855f7 50%,#ec4899 100%);padding:48px 32px;text-align:center;position:relative">
-      <div style="position:absolute;top:20px;left:20px;font-size:32px;opacity:0.4">✨</div>
-      <div style="position:absolute;top:32px;right:24px;font-size:28px;opacity:0.4">🎉</div>
-      <div style="position:absolute;bottom:24px;left:32px;font-size:24px;opacity:0.4">⭐</div>
-      <div style="position:absolute;bottom:32px;right:20px;font-size:28px;opacity:0.4">✨</div>
+    return renderEmailShell({
+      accent: 'violet',
+      icon: '🎓',
+      title: 'Bienvenue dans l\'équipe !',
+      subtitle: 'Votre compte enseignant est approuvé',
+      preheader: 'Compte enseignant approuvé',
+      body: `
+        <p style="margin:0 0 16px;font-size:18px;color:#0F172A;font-weight:700;font-family:${F};">Bonjour <span style="color:#7C3AED;">${safeFirst}</span> 👋</p>
+        ${paragraph(`C'est officiel ! Votre profil enseignant sur <strong>Examanet</strong> a été validé par notre équipe. Vous pouvez maintenant partager vos cours, séries d'exercices, devoirs et corrigés avec <strong>des milliers d'élèves tunisiens</strong>.`)}
 
-      <div style="display:inline-block;width:96px;height:96px;border-radius:50%;background:#ffffff;box-shadow:0 8px 32px rgba(0,0,0,0.12);margin-bottom:20px;line-height:96px;font-size:56px">
-        🎓
-      </div>
-
-      <h1 style="color:#ffffff;margin:0 0 8px;font-size:32px;font-weight:800;line-height:1.2;letter-spacing:-0.5px">
-        Bienvenue dans l'équipe !
-      </h1>
-      <p style="color:#fce7f3;margin:0;font-size:15px;font-weight:500">
-        Votre compte enseignant est approuvé ✨
-      </p>
-    </div>
-
-    <!-- Welcome message -->
-    <div style="padding:40px 32px">
-      <p style="margin:0 0 6px;font-size:18px;color:#0f172a;font-weight:700">Bonjour <span style="color:#7c3aed">${safeFirst}</span> 👋</p>
-      <p style="margin:0 0 24px;font-size:15px;color:#475569;line-height:1.6">
-        C'est officiel ! Votre profil enseignant sur <strong>Examanet</strong> a été validé par notre équipe.
-        Vous pouvez maintenant partager vos cours, séries d'exercices, devoirs et corrigés avec <strong>des milliers d'élèves tunisiens</strong>.
-      </p>
-
-      <!-- Account summary card -->
-      <div style="background:linear-gradient(135deg,#faf5ff 0%,#fef3c7 100%);border:2px solid #e9d5ff;border-radius:16px;padding:24px;margin:24px 0">
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
-          <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#7c3aed 0%,#a855f7 100%);color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;flex-shrink:0">
-            ${(safeFirst[0] || 'E').toUpperCase()}${(safeLast[0] || '').toUpperCase()}
+        <div style="background:linear-gradient(135deg,#FAF5FF 0%,#FEF3C7 100%);border:2px solid #E9D5FF;border-radius:16px;padding:24px;margin:24px 0;font-family:${F};">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+            <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#7C3AED,#A855F7);color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;flex-shrink:0;">${(safeFirst[0] || 'E').toUpperCase()}${(safeLast[0] || '').toUpperCase()}</div>
+            <div>
+              <div style="font-size:16px;font-weight:800;color:#0F172A;line-height:1.2;font-family:${F};">${fullName}</div>
+              <div style="font-size:13px;color:#7C3AED;font-weight:600;font-family:${F};">Compte enseignant vérifié ✓</div>
+            </div>
           </div>
-          <div>
-            <div style="font-size:16px;font-weight:800;color:#0f172a;line-height:1.2">${fullName}</div>
-            <div style="font-size:13px;color:#7c3aed;font-weight:600">Compte enseignant vérifié ✓</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;padding-top:16px;border-top:1px solid rgba(124,58,237,0.15);">
+            <span style="background:#fff;border:1px solid #E9D5FF;border-radius:10px;padding:8px 12px;font-size:12px;color:#6B21A8;font-weight:600;font-family:${F};">✓ Identité vérifiée</span>
+            <span style="background:#fff;border:1px solid #E9D5FF;border-radius:10px;padding:8px 12px;font-size:12px;color:#6B21A8;font-weight:600;font-family:${F};">✓ Fichiers contrôlés</span>
           </div>
         </div>
 
-        <div style="display:flex;flex-wrap:wrap;gap:8px;padding-top:16px;border-top:1px solid rgba(124,58,237,0.15)">
-          <div style="background:#ffffff;border:1px solid #e9d5ff;border-radius:10px;padding:8px 12px;font-size:12px;color:#6b21a8;font-weight:600">
-            ✓ Identité vérifiée
-          </div>
-          <div style="background:#ffffff;border:1px solid #e9d5ff;border-radius:10px;padding:8px 12px;font-size:12px;color:#6b21a8;font-weight:600">
-            ✓ Fichiers contrôlés
-
-      </div>
-    </div>
-  </div>
-</body></html>`;
+        ${ctaButton(dashboardUrl, 'Accéder à mon dashboard', 'violet')}
+        <div style="text-align:center;margin:0 0 24px;font-family:${F};">
+          <p style="margin:0 0 4px;color:#94A3B8;font-size:12px;font-family:${F};">ou connectez-vous sur :</p>
+          <p style="margin:0;color:#64748B;font-size:13px;word-break:break-all;font-family:${F};">${dashboardUrl}</p>
+        </div>
+        ${muted('Si vous avez des questions, n\'hésitez pas à nous contacter via notre page de contact.')}
+      `,
+    });
   } else {
-    return `<!DOCTYPE html>
-<html><body style="font-family:sans-serif;background:#f8fafc;padding:20px">
-<div style="max-width:600px;margin:0 auto;background:white;border-radius:16px;padding:32px">
-<h1 style="color:#0f172a">Bonjour ${safeFirst},</h1>
-<p>Votre demande d'inscription en tant qu'enseignant n'a pas été acceptée.</p>
-<p>Pour plus d'informations, contactez-nous via notre page de contact.</p>
-<p style="margin-top:24px">L'équipe Examanet</p>
-</div>
-</body></html>`;
+    return renderEmailShell({
+      accent: 'red',
+      icon: '😔',
+      title: 'Demande non retenue',
+      subtitle: 'Votre compte enseignant n\'a pas été approuvé',
+      preheader: 'Compte enseignant non approuvé',
+      body: `
+        <p style="margin:0 0 16px;font-size:18px;color:#0F172A;font-weight:700;font-family:${F};">Bonjour <span>${safeFirst}</span>,</p>
+        ${paragraph(`Après étude de votre dossier, nous ne sommes pas en mesure d'approuver votre demande d'inscription en tant qu'enseignant sur Examanet pour le moment.`)}
+        ${muted('Pour plus d\'informations, contactez-nous via notre page de contact. Nous serons heureux de vous aider.')}
+      `,
+    });
   }
 }
 
@@ -390,18 +421,19 @@ function renderAdminVerificationFilesEmail(opts: {
 }): string {
   const safeTeacherName = opts.teacherName.replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const safeResourceTitle = opts.resourceTitle.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  return `<!DOCTYPE html>
-<html><body style="font-family:sans-serif;background:#f8fafc;padding:20px">
-<div style="max-width:600px;margin:0 auto;background:white;border-radius:16px;padding:32px">
-<h1 style="color:#0f172a">📁 Fichier à vérifier</h1>
-<p><strong>Enseignant :</strong> ${safeTeacherName} (${opts.teacherEmail})</p>
-<p><strong>Ressource :</strong> ${safeResourceTitle}</p>
-<p><strong>ID :</strong> ${opts.resourceId}</p>
-<div style="text-align:center;margin:24px 0">
-<a href="${opts.reviewUrl}" style="background:linear-gradient(135deg,#3B82F6,#2563EB);color:white;text-decoration:none;padding:14px 28px;border-radius:12px;font-weight:bold;display:inline-block">Examiner le fichier</a>
-</div>
-</div>
-</body></html>`;
+  const F = EMAIL_FONT_STACK;
+  return renderEmailShell({
+    accent: 'blue',
+    icon: '📁',
+    title: 'Fichier à vérifier',
+    subtitle: 'Un nouvel enseignant attend votre validation',
+    preheader: `Nouveau fichier de ${safeTeacherName}`,
+    body: `
+      ${infoCard('Enseignant', `${safeTeacherName} &lt;${opts.teacherEmail}&gt;`, 'blue')}
+      ${infoCard('Ressource', `${safeResourceTitle} <span style="color:#94A3B8;font-size:12px;">(ID: ${opts.resourceId})</span>`, 'gray')}
+      ${ctaButton(opts.reviewUrl, 'Examiner le fichier →', 'blue')}
+    `,
+  });
 }
 
 function renderTeacherFileRequestEmail(opts: {
@@ -433,103 +465,36 @@ function renderResourceApprovedEmail(firstName: string, resourceTitle: string, a
   const fullResourceUrl = resourceUrl
     ? (resourceUrl.startsWith('http') ? resourceUrl : `${SITE_URL}${resourceUrl}`)
     : null;
-  // Email-safe font stack: SF Pro on Apple, Segoe UI on Windows, Roboto on Android/Gmail,
-  // Helvetica/Arial as universal fallback. Gmail specifically respects these.
-  const FONT_STACK = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif";
+  const F = EMAIL_FONT_STACK;
   if (approved) {
-    return `<!DOCTYPE html>
-<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head><body style="margin:0;font-family:${FONT_STACK};background:#F1F5F9;padding:0;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F1F5F9;padding:40px 20px;">
-<tr><td align="center">
-<table role="presentation" width="540" cellpadding="0" cellspacing="0" style="background:white;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(15,23,42,0.08);font-family:${FONT_STACK};">
-  <tr><td style="background:#FFFFFF;padding:36px 32px 24px;text-align:center;border-bottom:1px solid #F1F5F9;">
-    <img src="${SITE_URL}/logo-examanet.png" alt="Examanet" width="180" height="44" style="display:block;margin:0 auto 20px;max-width:180px;height:auto;" />
-    <div style="width:64px;height:64px;margin:0 auto 16px;background:linear-gradient(135deg,#D1FAE5,#A7F3D0);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;">
-      <div style="font-size:32px;line-height:64px;">✅</div>
-    </div>
-    <h1 style="margin:0;color:#0F172A;font-size:26px;font-weight:700;letter-spacing:-0.4px;font-family:${FONT_STACK};">Ressource approuvée !</h1>
-    <p style="margin:8px 0 0;color:#64748B;font-size:15px;font-weight:400;font-family:${FONT_STACK};">Votre ressource est maintenant en ligne</p>
-  </td></tr>
-  <tr><td style="padding:32px;font-family:${FONT_STACK};">
-    <p style="margin:0 0 8px;color:#0F172A;font-size:16px;font-family:${FONT_STACK};">Bonjour <strong style="color:#0F172A;">${safeFirst}</strong>,</p>
-    <p style="margin:0 0 24px;color:#475569;font-size:15px;line-height:1.65;font-family:${FONT_STACK};">
-      Excellente nouvelle ! La ressource que vous avez soumise a été approuvée par notre équipe et est désormais <strong style="color:#0F172A;">en ligne sur Examanet</strong>. Elle est maintenant visible par des milliers d'élèves et enseignants tunisiens.
-    </p>
-    <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:18px 20px;margin:0 0 24px;">
-      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:#10B981;margin-bottom:6px;font-family:${FONT_STACK};">Ressource publiée</div>
-      <div style="font-weight:600;color:#0F172A;font-size:15px;line-height:1.5;word-break:break-word;font-family:${FONT_STACK};">${safeTitle}</div>
-    </div>
-    ${fullResourceUrl ? `
-    <div style="text-align:center;margin:0 0 8px;">
-      <a href="${fullResourceUrl}" style="display:inline-block;background:#10B981;color:white;text-decoration:none;padding:14px 32px;border-radius:10px;font-weight:600;font-size:15px;font-family:${FONT_STACK};mso-padding-alt:0;line-height:1.2;">Voir la ressource en ligne →</a>
-    </div>
-    <p style="margin:0 0 24px;text-align:center;color:#94A3B8;font-size:12px;word-break:break-all;font-family:${FONT_STACK};">${fullResourceUrl}</p>
-    ` : ''}
-    <p style="margin:0;color:#475569;font-size:14px;line-height:1.65;font-family:${FONT_STACK};">
-      Merci pour votre contribution à Examanet ! Vos ressources aident les élèves tunisiens à réussir leurs études.
-    </p>
-  </td></tr>
-  <tr><td style="background:#F8FAFC;padding:20px 32px;border-top:1px solid #E2E8F0;font-family:${FONT_STACK};">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-family:${FONT_STACK};">
-      <tr>
-        <td style="font-family:${FONT_STACK};">
-          <div style="font-weight:700;color:#0F172A;font-size:14px;letter-spacing:-0.2px;font-family:${FONT_STACK};">Examanet</div>
-          <div style="color:#94A3B8;font-size:12px;margin-top:2px;font-family:${FONT_STACK};">Plateforme pédagogique #1 en Tunisie</div>
-        </td>
-        <td align="right" style="color:#94A3B8;font-size:11px;font-family:${FONT_STACK};">
-          Conçu avec ❤️<br>pour les élèves tunisiens
-        </td>
-      </tr>
-    </table>
-  </td></tr>
-</table>
-</td></tr>
-</table>
-</body></html>`;
+    return renderEmailShell({
+      accent: 'green',
+      icon: '✅',
+      title: 'Ressource approuvée !',
+      subtitle: 'Votre ressource est maintenant en ligne',
+      preheader: `Approuvée : ${safeTitle.slice(0, 60)}`,
+      body: `
+        <p style="margin:0 0 16px;font-size:16px;color:#0F172A;font-family:${F};">Bonjour <strong style="color:#0F172A;">${safeFirst}</strong>,</p>
+        ${paragraph(`Excellente nouvelle ! La ressource que vous avez soumise a été approuvée par notre équipe et est désormais <strong style="color:#0F172A;">en ligne sur Examanet</strong>. Elle est maintenant visible par des milliers d'élèves et enseignants tunisiens.`)}
+        ${infoCard('Ressource publiée', safeTitle, 'green')}
+        ${fullResourceUrl ? ctaButton(fullResourceUrl, 'Voir la ressource en ligne →', 'green') + `<p style="margin:0 0 24px;text-align:center;color:#94A3B8;font-size:12px;word-break:break-all;font-family:${F};">${fullResourceUrl}</p>` : ''}
+        ${muted('Merci pour votre contribution à Examanet ! Vos ressources aident les élèves tunisiens à réussir leurs études.')}
+      `,
+    });
   }
-  return `<!DOCTYPE html>
-<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head><body style="margin:0;font-family:${FONT_STACK};background:#F1F5F9;padding:0;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F1F5F9;padding:40px 20px;">
-<tr><td align="center">
-<table role="presentation" width="540" cellpadding="0" cellspacing="0" style="background:white;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(15,23,42,0.08);font-family:${FONT_STACK};">
-  <tr><td style="background:#FFFFFF;padding:36px 32px 24px;text-align:center;border-bottom:1px solid #F1F5F9;">
-    <img src="${SITE_URL}/logo-examanet.png" alt="Examanet" width="180" height="44" style="display:block;margin:0 auto 20px;max-width:180px;height:auto;" />
-    <div style="width:64px;height:64px;margin:0 auto 16px;background:linear-gradient(135deg,#FEE2E2,#FECACA);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;">
-      <div style="font-size:32px;line-height:64px;">❌</div>
-    </div>
-    <h1 style="margin:0;color:#0F172A;font-size:26px;font-weight:700;letter-spacing:-0.4px;font-family:${FONT_STACK};">Ressource non retenue</h1>
-    <p style="margin:8px 0 0;color:#64748B;font-size:15px;font-weight:400;font-family:${FONT_STACK};">Votre soumission n'a pas été approuvée</p>
-  </td></tr>
-  <tr><td style="padding:32px;font-family:${FONT_STACK};">
-    <p style="margin:0 0 8px;color:#0F172A;font-size:16px;font-family:${FONT_STACK};">Bonjour <strong style="color:#0F172A;">${safeFirst}</strong>,</p>
-    <p style="margin:0 0 24px;color:#475569;font-size:15px;line-height:1.65;font-family:${FONT_STACK};">
-      Malheureusement, la ressource que vous avez soumise n'a pas été retenue pour publication sur Examanet.
-    </p>
-    <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:18px 20px;margin:0 0 24px;">
-      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:#EF4444;margin-bottom:6px;font-family:${FONT_STACK};">Ressource refusée</div>
-      <div style="font-weight:600;color:#0F172A;font-size:15px;line-height:1.5;word-break:break-word;font-family:${FONT_STACK};">${safeTitle}</div>
-    </div>
-    <p style="margin:0;color:#475569;font-size:14px;line-height:1.65;font-family:${FONT_STACK};">
-      N'hésitez pas à soumettre une nouvelle version après avoir consulté nos <a href="${SITE_URL}/cgu" style="color:#10B981;font-weight:600;text-decoration:underline;font-family:${FONT_STACK};">conditions d'utilisation</a>.
-    </p>
-  </td></tr>
-  <tr><td style="background:#F8FAFC;padding:20px 32px;border-top:1px solid #E2E8F0;font-family:${FONT_STACK};">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-family:${FONT_STACK};">
-      <tr>
-        <td style="font-family:${FONT_STACK};">
-          <div style="font-weight:700;color:#0F172A;font-size:14px;letter-spacing:-0.2px;font-family:${FONT_STACK};">Examanet</div>
-          <div style="color:#94A3B8;font-size:12px;margin-top:2px;font-family:${FONT_STACK};">Plateforme pédagogique #1 en Tunisie</div>
-        </td>
-        <td align="right" style="color:#94A3B8;font-size:11px;font-family:${FONT_STACK};">
-          Conçu avec ❤️<br>pour les élèves tunisiens
-        </td>
-      </tr>
-    </table>
-  </td></tr>
-</table>
-</td></tr>
-</table>
-</body></html>`;
+  return renderEmailShell({
+    accent: 'red',
+    icon: '❌',
+    title: 'Ressource non retenue',
+    subtitle: 'Votre soumission n\'a pas été approuvée',
+    preheader: `Refusée : ${safeTitle.slice(0, 60)}`,
+    body: `
+      <p style="margin:0 0 16px;font-size:16px;color:#0F172A;font-family:${F};">Bonjour <strong style="color:#0F172A;">${safeFirst}</strong>,</p>
+      ${paragraph(`Malheureusement, la ressource que vous avez soumise n'a pas été retenue pour publication sur Examanet.`)}
+      ${infoCard('Ressource refusée', safeTitle, 'red')}
+      ${muted(`N'hésitez pas à soumettre une nouvelle version après avoir consulté nos <a href="${SITE_URL}/cgu" style="color:#10B981;font-weight:600;text-decoration:underline;">conditions d'utilisation</a>.`)}
+    `,
+  });
 }
 
 export async function sendResourceRejectedEmail(to: string, firstName: string, resourceTitle: string, reason: string, resourceUrl?: string): Promise<EmailResult> {
@@ -741,124 +706,59 @@ function renderPasswordChangedEmail(opts: {
   else if (/Linux/.test(opts.userAgent)) device = '💻 Linux';
   else if (/curl|wget|http/i.test(opts.userAgent)) device = '🤖 Outil automatisé';
 
-  return `<!DOCTYPE html>
-<html lang="fr"><head><meta charset="UTF-8"></head>
-<body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background:#f8fafc;color:#0f172a">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f8fafc;padding:32px 16px">
-<tr><td align="center">
-<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:20px;overflow:hidden;border:1px solid #e2e8f0;box-shadow:0 4px 24px rgba(0,0,0,0.04)">
+  return renderEmailShell({
+    accent: 'green',
+    icon: '🔒',
+    title: 'Mot de passe modifié',
+    subtitle: 'Votre compte Examanet est sécurisé',
+    preheader: 'Confirmation de modification du mot de passe',
+    body: `
+      <p style="margin:0 0 16px;font-size:16px;color:#0F172A;line-height:1.5;font-family:${EMAIL_FONT_STACK};">Bonjour <strong style="color:#0F172A;">${safeFirst}</strong> 👋</p>
+      ${paragraph(`Nous vous confirmons que le mot de passe de votre compte Examanet a été modifié avec succès. Vous pouvez désormais vous connecter avec votre nouveau mot de passe.`)}
 
-  <!-- Header: green check + gradient -->
-  <tr><td style="background:linear-gradient(135deg,#10B981 0%,#059669 100%);padding:40px 32px;text-align:center">
-    <div style="display:inline-block;width:80px;height:80px;border-radius:50%;background:#ffffff;box-shadow:0 8px 24px rgba(0,0,0,0.1);margin-bottom:16px;line-height:80px;font-size:48px">
-      🔒
-    </div>
-    <h1 style="color:#ffffff;margin:0;font-size:26px;font-weight:800;line-height:1.2;letter-spacing:-0.5px">
-      Mot de passe modifié
-    </h1>
-    <p style="color:#d1fae5;margin:8px 0 0;font-size:15px;font-weight:500">
-      Votre compte Examanet est sécurisé
-    </p>
-  </td></tr>
-
-  <!-- Body -->
-  <tr><td style="padding:40px 32px">
-
-    <p style="margin:0 0 16px;font-size:16px;color:#0f172a;line-height:1.5">
-      Bonjour <strong>${safeFirst}</strong> 👋
-    </p>
-
-    <p style="margin:0 0 24px;font-size:15px;color:#475569;line-height:1.6">
-      Nous vous confirmons que le mot de passe de votre compte Examanet
-      (<strong>${(opts as any).email || ''}</strong>) a été modifié avec succès.
-      Vous pouvez désormais vous connecter avec votre nouveau mot de passe.
-    </p>
-
-    <!-- Details card -->
-    <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:20px;margin:0 0 24px">
-      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#64748b;margin-bottom:12px">
-        📋 Détails de la modification
+      <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:20px;margin:0 0 24px;font-family:${EMAIL_FONT_STACK};">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:#64748B;margin-bottom:12px;">📋 Détails de la modification</div>
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;color:#334155;font-family:${EMAIL_FONT_STACK};">
+          <tr><td style="padding:6px 0;width:120px;color:#64748B;">📅 Date</td><td style="padding:6px 0;font-weight:600;">${changedAt} (heure de Tunis)</td></tr>
+          <tr><td style="padding:6px 0;color:#64748B;">🌐 Adresse IP</td><td style="padding:6px 0;font-family:monospace;">${safeIp}</td></tr>
+          <tr><td style="padding:6px 0;color:#64748B;">💻 Appareil</td><td style="padding:6px 0;">${device}</td></tr>
+        </table>
       </div>
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="font-size:14px;color:#334155">
+
+      ${ctaButton(`${SITE_URL}/connexion`, 'Se connecter', 'blue')}
+
+      <div style="background:#FEF2F2;border:2px solid #FECACA;border-radius:16px;padding:24px;margin:0 0 24px;font-family:${EMAIL_FONT_STACK};">
+        <div style="font-size:16px;font-weight:800;color:#991B1B;margin-bottom:8px;">⚠️ Ce n'est pas vous qui avez modifié le mot de passe ?</div>
+        <p style="margin:0 0 16px;font-size:14px;color:#7F1D1D;line-height:1.6;">Si vous n'êtes pas à l'origine de cette modification, votre compte est peut-être compromis. <strong>Contactez-nous immédiatement</strong> pour que nous puissions sécuriser votre compte.</p>
+        <a href="${SITE_URL}/contact?subject=Compte%20compromise&motif=password" style="display:inline-block;background:#DC2626;color:#FFFFFF;text-decoration:none;padding:12px 24px;border-radius:10px;font-weight:700;font-size:14px;font-family:${EMAIL_FONT_STACK};">🚨 Nous contacter d'urgence</a>
+      </div>
+
+      <div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:12px;padding:20px;font-family:${EMAIL_FONT_STACK};">
+        <div style="font-size:14px;font-weight:800;color:#92400E;margin-bottom:8px;">💡 Conseils de sécurité</div>
+        <ul style="margin:0;padding-left:20px;font-size:13px;color:#78350F;line-height:1.7;">
+          <li>Utilisez un mot de passe unique (différent de vos autres comptes)</li>
+          <li>Ne partagez jamais votre mot de passe avec qui que ce soit</li>
+          <li>Méfiez-vous des emails suspects vous demandant votre mot de passe</li>
+        </ul>
+      </div>
+    `,
+    footer: `
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-family:${EMAIL_FONT_STACK};">
         <tr>
-          <td style="padding:6px 0;width:120px;color:#64748b">📅 Date</td>
-          <td style="padding:6px 0;font-weight:600">${changedAt} (heure de Tunis)</td>
-        </tr>
-        <tr>
-          <td style="padding:6px 0;color:#64748b">🌐 Adresse IP</td>
-          <td style="padding:6px 0;font-family:monospace">${safeIp}</td>
-        </tr>
-        <tr>
-          <td style="padding:6px 0;color:#64748b">💻 Appareil</td>
-          <td style="padding:6px 0">${device}</td>
+          <td>
+            <div style="font-weight:700;color:#0F172A;font-size:14px;letter-spacing:-0.2px;font-family:${EMAIL_FONT_STACK};">Examanet</div>
+            <div style="color:#94A3B8;font-size:12px;margin-top:2px;font-family:${EMAIL_FONT_STACK};">Plateforme pédagogique #1 en Tunisie</div>
+          </td>
+          <td align="right" style="color:#94A3B8;font-size:11px;font-family:${EMAIL_FONT_STACK};">
+            Conçu avec ❤️<br>pour les élèves tunisiens
+          </td>
         </tr>
       </table>
-    </div>
-
-    <!-- CTA Login -->
-    <div style="text-align:center;margin:0 0 32px">
-      <a href="${SITE_URL}/connexion" style="display:inline-block;background:linear-gradient(135deg,#0EA5E9,#0369A1);color:#ffffff;text-decoration:none;padding:14px 32px;border-radius:12px;font-weight:700;font-size:15px;box-shadow:0 8px 24px rgba(14,165,233,0.3)">
-        Se connecter
-      </a>
-    </div>
-
-    <!-- Big warning: not you? -->
-    <div style="background:#fef2f2;border:2px solid #fecaca;border-radius:16px;padding:24px;margin:0 0 24px">
-      <div style="display:flex;align-items:flex-start;gap:12px">
-        <div style="font-size:32px;line-height:1;flex-shrink:0">⚠️</div>
-        <div>
-          <div style="font-size:16px;font-weight:800;color:#991b1b;margin-bottom:8px">
-            Ce n'est pas vous qui avez modifié le mot de passe ?
-          </div>
-          <p style="margin:0 0 16px;font-size:14px;color:#7f1d1d;line-height:1.6">
-            Si vous n'êtes pas à l'origine de cette modification, votre compte
-            est peut-être compromis. <strong>Contactez-nous immédiatement</strong>
-            pour que nous puissions sécuriser votre compte et annuler les changements.
-          </p>
-          <a href="${SITE_URL}/contact?subject=Compte%20compromise&motif=password" style="display:inline-block;background:#dc2626;color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:10px;font-weight:700;font-size:14px">
-            🚨 Nous contacter d'urgence
-          </a>
-        </div>
-      </div>
-    </div>
-
-    <!-- Security tips -->
-    <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:20px;margin:0 0 16px">
-      <div style="font-size:14px;font-weight:800;color:#92400e;margin-bottom:8px">
-        💡 Conseils de sécurité
-      </div>
-      <ul style="margin:0;padding-left:20px;font-size:13px;color:#78350f;line-height:1.7">
-        <li>Utilisez un mot de passe unique (différent de vos autres comptes)</li>
-        <li>Ne partagez jamais votre mot de passe avec qui que ce soit</li>
-        <li>Activez l'authentification à deux facteurs dès qu'elle sera disponible</li>
-        <li>Méfiez-vous des emails suspects vous demandant votre mot de passe</li>
-      </ul>
-    </div>
-
-  </td></tr>
-
-  <!-- Footer -->
-  <tr><td style="background:#f8fafc;padding:24px 32px;border-top:1px solid #e2e8f0">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-      <tr>
-        <td>
-          <div style="font-weight:800;color:#0f172a;font-size:15px;letter-spacing:-0.5px">Examanet</div>
-          <div style="color:#94a3b8;font-size:12px;margin-top:2px">Plateforme pédagogique #1 en Tunisie</div>
-        </td>
-        <td align="right" style="color:#94a3b8;font-size:11px">
-          Conçu avec ❤️<br>pour les élèves tunisiens
-        </td>
-      </tr>
-    </table>
-    <p style="margin:16px 0 0;font-size:11px;color:#cbd5e1;text-align:center">
-      Cet email a été envoyé automatiquement suite à la modification de votre mot de passe.<br>
-      Si vous n'êtes pas à l'origine de cette action, contactez-nous via
-      <a href="${SITE_URL}/contact" style="color:#0EA5E9;text-decoration:underline">examanet.com/contact</a>.
-    </p>
-  </td></tr>
-
-</table>
-</td></tr>
-</table>
-</body></html>`;
+      <p style="margin:16px 0 0;font-size:11px;color:#CBD5E1;text-align:center;font-family:${EMAIL_FONT_STACK};">
+        Cet email a été envoyé automatiquement suite à la modification de votre mot de passe.<br>
+        Si vous n'êtes pas à l'origine de cette action, contactez-nous via
+        <a href="${SITE_URL}/contact" style="color:#0EA5E9;text-decoration:underline;">examanet.com/contact</a>.
+      </p>
+    `,
+  });
 }
