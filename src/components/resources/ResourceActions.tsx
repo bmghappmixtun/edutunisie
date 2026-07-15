@@ -150,7 +150,7 @@ export default function ResourceActions({ resourceId, numericId, slug, title, fi
             {isOwner ? `Original (${originalFormat?.toUpperCase()})` : `Original ${originalFormat?.toUpperCase()} 👨‍🏫`}
           </button>
         )}
-        <button onClick={() => window.location.href = numericId ? `/ressources/${numericId}/${slug}/viewer` : `/ressources/${slug}/viewer`} className="btn-secondary justify-center text-sm">
+        <button onClick={() => window.location.href = `/ressources/${numericId}/${slug}/viewer`} className="btn-secondary justify-center text-sm">
           <Eye className="w-4 h-4" /> Lire en ligne
         </button>
         <button onClick={handlePrint} disabled={printing} className="btn-secondary justify-center text-sm disabled:opacity-50">
