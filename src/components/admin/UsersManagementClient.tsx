@@ -618,6 +618,16 @@ export default function UsersManagementClient({
                           isAdmin={u.role === 'ADMIN'}
                           resourcesCount={u._count?.uploadedFiles || 0}
                         />
+                        {u.role === 'TEACHER' && (
+                          <Link
+                            href={`/professeurs/${u.id}`}
+                            target="_blank"
+                            className="p-1 hover:bg-slate-100 rounded"
+                            title="Voir le profil public"
+                          >
+                            <ExternalLink className="w-4 h-4 text-slate-500" />
+                          </Link>
+                        )}
                       </div>
                     </td>
                   </tr>
