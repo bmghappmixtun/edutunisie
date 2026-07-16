@@ -31,6 +31,7 @@ export default async function AdminResourcesPage(props: { params: Promise<any>; 
       include: {
         subject: true,
         class: true,
+        section: true,
         teacher: { select: { firstName: true, lastName: true, email: true } }
       }
     }),
@@ -99,60 +100,72 @@ export default async function AdminResourcesPage(props: { params: Promise<any>; 
             <p>Aucune ressource trouvée</p>
           </div>
         ) : (
-          <table className="w-full text-sm">
-            <thead className="bg-slate-50">
-              <tr>
-                <th className="text-left px-4 py-3 font-semibold text-slate-600">Ressource</th>
-                <th className="text-left px-4 py-3 font-semibold text-slate-600 hidden md:table-cell">Enseignant</th>
-                <th className="text-left px-4 py-3 font-semibold text-slate-600 hidden lg:table-cell">Matière/Classe</th>
-                <th className="text-left px-4 py-3 font-semibold text-slate-600 hidden sm:table-cell">Stats</th>
-                <th className="text-left px-4 py-3 font-semibold text-slate-600">Statut</th>
-              </tr>
-            </thead>
-            <tbody>
-              {resources.map((r, i) => (
-                <tr key={r.id} className={`border-t border-slate-50 hover:bg-slate-50 ${i % 2 === 0 ? '' : 'bg-slate-50/30'}`}>
-                  <td className="px-4 py-3">
-                    <Link href={`/ressources/${r.slug}`} className="flex items-center gap-3 group">
-                      <div className="w-8 h-10 bg-slate-100 rounded flex items-center justify-center flex-shrink-0">
-                        <FileText className="w-4 h-4 text-slate-400" />
-                      </div>
-                      <div className="min-w-0">
-                        <div
-                          className={`font-semibold text-sm group-hover:text-primary-600 truncate max-w-xs ${isArabic(r.title) ? 'text-right' : 'text-left'}`}
-                          dir={isArabic(r.title) ? 'rtl' : 'ltr'}
-                          lang={isArabic(r.title) ? 'ar' : 'fr'}
-                        >
-                          {r.title}
-                        </div>
-                        <div className="text-xs text-slate-500">{timeAgo(r.createdAt)}</div>
-                      </div>
+          <div className="divide-y divide-slate-100">
+            {resources.map((r) => (
+              <div key={r.id} className="p-4 hover:bg-slate-50 transition group">
+                <div className="flex items-center gap-3">
+                  {/* File icon with subject color */}
+                  <div
+                    className="w-12 h-14 rounded-lg flex items-center justify-center flex-shrink-0 text-2xl"
+                    style={{ background: r.subject.color ? `${r.subject.color}20` : '#F1F5F9' }}
+                  >
+                    {r.subject.icon || '📄'}
+                  </div>
+                  {/* Main info */}
+                  <div className="flex-1 min-w-0">
+                    <Link
+                      href={r.numericId ? `/ressources/${r.numericId}/${r.slug}` : `/ressources/legacy-${r.id}/${r.slug}`}
+                      className={`font-semibold text-sm group-hover:text-primary-600 truncate block ${isArabic(r.title) ? 'text-right' : 'text-left'}`}
+                      dir={isArabic(r.title) ? 'rtl' : 'ltr'}
+                      lang={isArabic(r.title) ? 'ar' : 'fr'}
+                    >
+                      {r.title}
                     </Link>
-                  </td>
-                  <td className="px-4 py-3 hidden md:table-cell">
-                    <div className="text-sm font-medium">{r.teacher?.firstName} {r.teacher?.lastName}</div>
-                    <div className="text-xs text-slate-500">{r.teacher?.email}</div>
-                  </td>
-                  <td className="px-4 py-3 hidden lg:table-cell text-xs text-slate-600">
-                    <div className="font-medium">{r.subject.nameFr}</div>
-                    <div className="text-slate-500">{r.class?.nameFr || '—'}</div>
-                  </td>
-                  <td className="px-4 py-3 hidden sm:table-cell">
-                    <div className="flex items-center gap-3 text-xs text-slate-600">
-                      <span className="flex items-center gap-1" title="Vues"><Eye className="w-3 h-3" /> {formatNumber(r.viewsCount)}</span>
-                      <span className="flex items-center gap-1" title="Téléchargements"><Download className="w-3 h-3" /> {formatNumber(r.downloadsCount)}</span>
-                      <span className="flex items-center gap-1" title="Note"><Star className="w-3 h-3 text-amber-500" /> {r.avgRating.toFixed(1)}</span>
+                    <div className="flex items-center gap-2 mt-1 text-xs text-slate-500 flex-wrap">
+                      <span className="font-medium text-slate-700">{r.subject.nameFr}</span>
+                      {r.class && <span>• {r.class.nameFr}</span>}
+                      {r.section && <span>• {r.section.nameFr}</span>}
+                      <span>• {timeAgo(r.createdAt)}</span>
                     </div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className={`px-2 py-1 text-xs font-bold rounded ${statusColors[r.status] || 'bg-slate-100 text-slate-700'}`}>
+                    {r.teacher && (
+                      <div className="text-xs text-slate-400 mt-0.5">
+                        Par <span className="font-medium text-slate-600">{r.teacher.firstName} {r.teacher.lastName}</span>
+                      </div>
+                    )}
+                  </div>
+                  {/* Stats */}
+                  <div className="hidden md:flex items-center gap-3 text-xs text-slate-500 flex-shrink-0">
+                    <span className="flex items-center gap-1" title="Vues">
+                      <Eye className="w-3.5 h-3.5" /> {formatNumber(r.viewsCount)}
+                    </span>
+                    <span className="flex items-center gap-1" title="Téléchargements">
+                      <Download className="w-3.5 h-3.5" /> {formatNumber(r.downloadsCount)}
+                    </span>
+                    <span className="flex items-center gap-1" title="Note">
+                      <Star className="w-3.5 h-3.5 text-amber-500" /> {r.avgRating.toFixed(1)}
+                    </span>
+                  </div>
+                  {/* Status badge */}
+                  <div className="flex-shrink-0">
+                    <span className={`px-2.5 py-1 text-xs font-bold rounded-lg ${statusColors[r.status] || 'bg-slate-100 text-slate-700'}`}>
                       {statusLabels[r.status] || r.status}
                     </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  </div>
+                  {/* Quick actions */}
+                  <div className="flex-shrink-0 flex items-center gap-1">
+                    <Link
+                      href={r.numericId ? `/ressources/${r.numericId}/${r.slug}` : `/ressources/legacy-${r.id}/${r.slug}`}
+                      target="_blank"
+                      className="p-2 text-slate-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition"
+                      title="Voir la ressource"
+                    >
+                      <Eye className="w-4 h-4" />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         )}
       </div>
 
