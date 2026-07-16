@@ -287,7 +287,7 @@ export async function sendResourceApprovedEmail(to: string, firstName: string, r
   }
 }
 
-function renderOTPEmail(code: string, firstName: string): string {
+export function renderOTPEmail(code: string, firstName: string): string {
   return renderEmailShell({
     accent: 'blue',
     icon: '🔐',
@@ -303,7 +303,7 @@ function renderOTPEmail(code: string, firstName: string): string {
   });
 }
 
-function renderWelcomeEmail(firstName: string, role: string): string {
+export function renderWelcomeEmail(firstName: string, role: string): string {
   return renderEmailShell({
     accent: 'blue',
     icon: '👋',
@@ -318,7 +318,7 @@ function renderWelcomeEmail(firstName: string, role: string): string {
   });
 }
 
-function renderWelcomeConfirmedEmail(firstName: string, role: string): string {
+export function renderWelcomeConfirmedEmail(firstName: string, role: string): string {
   return renderEmailShell({
     accent: 'green',
     icon: '🎉',
@@ -333,7 +333,7 @@ function renderWelcomeConfirmedEmail(firstName: string, role: string): string {
   });
 }
 
-function renderContactEmail(p: { name: string; email: string; subject: string; message: string }): string {
+export function renderContactEmail(p: { name: string; email: string; subject: string; message: string }): string {
   const safeName = p.name.replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const safeEmail = p.email.replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const safeSubject = p.subject.replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -351,7 +351,7 @@ function renderContactEmail(p: { name: string; email: string; subject: string; m
   });
 }
 
-function renderTeacherApprovalEmail(firstName: string, approved: boolean, opts?: {
+export function renderTeacherApprovalEmail(firstName: string, approved: boolean, opts?: {
   lastName?: string;
   dashboardUrl?: string;
   subjects?: string[];
@@ -412,7 +412,7 @@ function renderTeacherApprovalEmail(firstName: string, approved: boolean, opts?:
   }
 }
 
-function renderAdminVerificationFilesEmail(opts: {
+export function renderAdminVerificationFilesEmail(opts: {
   teacherName: string;
   teacherEmail: string;
   resourceTitle: string;
@@ -436,7 +436,7 @@ function renderAdminVerificationFilesEmail(opts: {
   });
 }
 
-function renderTeacherFileRequestEmail(opts: {
+export function renderTeacherFileRequestEmail(opts: {
   to: string;
   firstName: string;
   lastName: string;
@@ -458,7 +458,7 @@ function renderTeacherFileRequestEmail(opts: {
 </body></html>`;
 }
 
-function renderResourceApprovedEmail(firstName: string, resourceTitle: string, approved: boolean, resourceUrl?: string): string {
+export function renderResourceApprovedEmail(firstName: string, resourceTitle: string, approved: boolean, resourceUrl?: string): string {
   const safeFirst = firstName.replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const safeTitle = resourceTitle.replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
@@ -676,7 +676,7 @@ export async function sendPasswordChangedEmail(opts: {
   }
 }
 
-function renderPasswordChangedEmail(opts: {
+export function renderPasswordChangedEmail(opts: {
   firstName: string;
   ip: string;
   userAgent: string;
