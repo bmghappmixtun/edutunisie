@@ -113,16 +113,17 @@ export default async function ResourcesPage(props: { searchParams: Promise<Searc
   if (year.length > 0) where.year = { in: year };
   if (language.length > 0) where.language = { in: language };
   if (hasCorrection) where.hasCorrection = true;
-  if (teacherNumericId) {
-    // Look up teacher by numericId
+
+  // Look up teacher for filter + title
+  let teacherInfo: { firstName: string | null; lastName: string | null; numericId: number } | null = null;
+  if (teacherNumericId && !Number.isNaN(teacherNumericId)) {
     const teacher = await prisma.user.findUnique({
       where: { numericId: teacherNumericId },
-      select: { id: true, firstName: true, lastName: true, slug: true, numericId: true },
+      select: { id: true, firstName: true, lastName: true, numericId: true },
     });
     if (teacher) {
       where.teacherId = teacher.id;
-      // Stash teacher info for the title
-      (where as any)._teacherInfo = teacher;
+      teacherInfo = { firstName: teacher.firstName, lastName: teacher.lastName, numericId: teacher.numericId! };
     }
   }
 
@@ -350,7 +351,6 @@ export default async function ResourcesPage(props: { searchParams: Promise<Searc
   // ============== Page header text ==============
   let pageTitle = 'Toutes les ressources';
   let pageSubtitle = `${total.toLocaleString('fr-FR')} ressources gratuites pour le système éducatif tunisien.`;
-  const teacherInfo = (where as any)._teacherInfo;
   if (q) {
     pageTitle = `Résultats pour « ${q} »`;
     pageSubtitle = `${total.toLocaleString('fr-FR')} résultats correspondants.`;
