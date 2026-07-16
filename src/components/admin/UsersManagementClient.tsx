@@ -86,6 +86,7 @@ export default function UsersManagementClient({
   initialSearch,
   initialPage,
   initialPageSize,
+  initialSort,
   totalFiltered,
 }: {
   initialUsers: User[];
@@ -94,6 +95,7 @@ export default function UsersManagementClient({
   initialSearch: string;
   initialPage: number;
   initialPageSize: number;
+  initialSort: string;
   totalFiltered: number;
 }) {
   const router = useRouter();
@@ -111,6 +113,7 @@ export default function UsersManagementClient({
   const [bulkLoading, setBulkLoading] = useState(false);
   const [confirmAction, setConfirmAction] = useState<{ action: string; title: string; description: string } | null>(null);
   const [sortByFiles, setSortByFiles] = useState<boolean>(initialRole === 'TEACHER');
+  const [sort, setSort] = useState<string>(initialSort || 'recent');
   const [refreshKey, setRefreshKey] = useState<number>(0);
 
   // Pagination
@@ -182,15 +185,22 @@ export default function UsersManagementClient({
     setSelected(new Set());
   }
 
-  function navigate(tab: string, q?: string, newPage = 1, newSize?: number) {
+  function navigate(tab: string, q?: string, newPage = 1, newSize?: number, newSort?: string) {
     clearSelection();
     const params = new URLSearchParams();
     params.set('role', tab);
     if (q) params.set('q', q);
+    const sortToUse = newSort !== undefined ? newSort : sort;
+    if (sortToUse && sortToUse !== 'recent') params.set('sort', sortToUse);
     params.set('page', String(newPage));
     if (newSize) params.set('size', String(newSize));
     else if (pageSize) params.set('size', String(pageSize));
     router.push(`/admin/utilisateurs?${params.toString()}`);
+  }
+
+  function changeSort(newSort: string) {
+    setSort(newSort);
+    navigate(activeTab, search, 1, undefined, newSort);
   }
 
   function goToPage(p: number) {
@@ -400,18 +410,30 @@ export default function UsersManagementClient({
           </span>
           <div className="flex items-center gap-1.5 flex-wrap">
             {activeTab === 'TEACHER' && (
-              <button
-                onClick={() => setSortByFiles(!sortByFiles)}
-                className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-lg transition ${
-                  sortByFiles
-                    ? 'bg-sky-100 text-sky-700 hover:bg-sky-200'
-                    : 'text-slate-600 hover:bg-slate-100'
-                }`}
-                title="Trier par nombre de fichiers"
+              <select
+                value={sort}
+                onChange={e => changeSort(e.target.value)}
+                className="text-xs font-semibold bg-slate-50 border border-slate-200 text-slate-700 rounded-lg px-2 py-1 outline-none focus:ring-2 focus:ring-primary-200"
+                title="Trier les profs par leurs stats (toutes les 2590 fiches)"
               >
-                <ArrowUpDown className="w-3 h-3" />
-                <span className="hidden sm:inline">{sortByFiles ? 'Trié par fichiers' : 'Trier par fichiers'}</span>
-              </button>
+                <optgroup label="📅 Date">
+                  <option value="recent">Plus récents</option>
+                  <option value="oldest">Plus anciens</option>
+                  <option value="last_login">Dernier login</option>
+                </optgroup>
+                <optgroup label="🔤 Nom">
+                  <option value="name_asc">Nom A→Z</option>
+                  <option value="name_desc">Nom Z→A</option>
+                </optgroup>
+                <optgroup label="📊 Statistiques fichiers (2590 profs)">
+                  <option value="files">📄 Plus de fichiers</option>
+                  <option value="views">👁 Plus de vues</option>
+                  <option value="downloads">⬇️ Plus de téléchargements</option>
+                  <option value="favorites">❤️ Plus de favoris</option>
+                  <option value="comments">💬 Plus de commentaires</option>
+                  <option value="rating">⭐ Mieux notés</option>
+                </optgroup>
+              </select>
             )}
             <Link
               href="/admin/invitations"
@@ -512,14 +534,25 @@ export default function UsersManagementClient({
                     </td>
                     {activeTab === 'TEACHER' ? (
                       <td className="px-3 py-2.5">
-                        <span className={`inline-flex items-center justify-center min-w-[2.5rem] px-2 py-1 text-sm font-extrabold rounded-lg ${
-                          fileCount > 100 ? 'bg-emerald-100 text-emerald-700' :
-                          fileCount > 30 ? 'bg-sky-100 text-sky-700' :
-                          fileCount > 0 ? 'bg-slate-100 text-slate-700' :
-                          'bg-slate-50 text-slate-400'
-                        }`}>
-                          {fileCount}
-                        </span>
+                        <div className="flex flex-col gap-0.5">
+                          <span className={`inline-flex items-center justify-center min-w-[2.5rem] px-2 py-1 text-sm font-extrabold rounded-lg ${
+                            fileCount > 100 ? 'bg-emerald-100 text-emerald-700' :
+                            fileCount > 30 ? 'bg-sky-100 text-sky-700' :
+                            fileCount > 0 ? 'bg-slate-100 text-slate-700' :
+                            'bg-slate-50 text-slate-400'
+                          }`}>
+                            {fileCount}
+                          </span>
+                          {(u as any).stats && (
+                            <div className="text-[10px] text-slate-400 flex flex-col gap-0.5">
+                              <span title="Vues totales sur tous les fichiers" className="whitespace-nowrap">👁 {(u as any).stats.totalViews.toLocaleString('fr-FR')}</span>
+                              <span title="Téléchargements totaux" className="whitespace-nowrap">⬇ {(u as any).stats.totalDownloads.toLocaleString('fr-FR')}</span>
+                              {(u as any).stats.weightedRating > 0 && (
+                                <span title="Note moyenne pondérée" className="whitespace-nowrap">⭐ {(u as any).stats.weightedRating.toFixed(1)}</span>
+                              )}
+                            </div>
+                          )}
+                        </div>
                       </td>
                     ) : (
                       <td className="px-3 py-2.5"></td>
