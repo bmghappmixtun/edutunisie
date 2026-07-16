@@ -217,14 +217,14 @@ export default function InvitationsClient({ initialInvitations, initialStats }: 
         <div className="overflow-x-auto">
           <table className="w-full text-sm table-fixed min-w-[900px]">
             <colgroup>
-              <col className="w-auto" />
-              <col className="w-32" />
-              <col className="w-32" />
-              <col className="w-32" />
-              <col className="w-32" />
+              <col className="w-[220px]" />
+              <col className="w-28" />
+              <col className="w-28" />
+              <col className="w-28" />
+              <col className="w-28" />
               <col className="w-24" />
               <col className="w-20" />
-              <col className="w-36" />
+              <col className="w-32" />
             </colgroup>
             <thead className="bg-slate-50">
               <tr>
@@ -252,8 +252,8 @@ export default function InvitationsClient({ initialInvitations, initialStats }: 
                         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-sky-400 to-cyan-500 text-white flex items-center justify-center font-bold text-xs flex-shrink-0">
                           {(inv.teacher.firstName?.[0] || inv.teacher.email[0]).toUpperCase()}
                         </div>
-                        <div className="min-w-0">
-                          <div className="font-semibold text-slate-900">
+                        <div className="min-w-0 flex-1">
+                          <div className="font-semibold text-slate-900 truncate">
                             {inv.teacher.firstName} {inv.teacher.lastName}
                           </div>
                           <div className="text-xs text-slate-500 truncate">{inv.teacher.email}</div>
