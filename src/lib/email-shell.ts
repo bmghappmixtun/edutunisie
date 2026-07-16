@@ -100,7 +100,7 @@ ${opts.preheader ? `<span style="display:none;font-size:1px;color:#F1F5F9;line-h
 <table role="presentation" width="${maxWidth}" cellpadding="0" cellspacing="0" style="background:white;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(15,23,42,0.08);font-family:${F};">
   <!-- Brand bar (logo only) -->
   <tr><td style="background:#F1F5F9;padding:20px 32px;text-align:center;border-bottom:1px solid #CBD5E1;font-family:${F};">
-    <img src="${SITE_URL}/logo-examanet.png" alt="Examanet" width="56" height="56" style="display:inline-block;border:0;outline:none;text-decoration:none;vertical-align:middle;" />
+    <img src="${SITE_URL}/logo-transparent.png" alt="Examanet" width="80" height="22" style="display:inline-block;border:0;outline:none;text-decoration:none;vertical-align:middle;" />
   </td></tr>
   <!-- Content area (icon + title + subtitle) -->
   <tr><td style="background:#FFFFFF;padding:36px 32px 28px;font-family:${F};">
