@@ -330,7 +330,7 @@ export default async function ResourcesPage(props: { searchParams: Promise<Searc
   if (q) {
     pageTitle = `Résultats pour « ${q} »`;
     pageSubtitle = `${total.toLocaleString('fr-FR')} résultats correspondants.`;
-  } else if (teacherId && currentUser) {
+  } else if (teacherNumericId && currentUser) {
     pageTitle = `Ressources de l'enseignant`;
   }
 
