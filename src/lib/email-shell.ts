@@ -98,9 +98,11 @@ ${opts.preheader ? `<span style="display:none;font-size:1px;color:#F1F5F9;line-h
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F1F5F9;padding:40px 20px;">
 <tr><td align="center">
 <table role="presentation" width="${maxWidth}" cellpadding="0" cellspacing="0" style="background:white;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(15,23,42,0.08);font-family:${F};">
-  <!-- Brand bar (logo only) -->
-  <tr><td style="background:#F1F5F9;padding:20px 32px;text-align:center;border-bottom:1px solid #CBD5E1;font-family:${F};">
-    <img src="${SITE_URL}/logo-transparent.png" alt="Examanet" width="80" height="22" style="display:inline-block;border:0;outline:none;text-decoration:none;vertical-align:middle;" />
+  <!-- Brand bar (logo in a gray pill) -->
+  <tr><td style="background:#FFFFFF;padding:24px 32px 16px;text-align:center;font-family:${F};">
+    <div style="display:inline-block;background:#F8FAFC;padding:10px 16px;border-radius:8px;">
+      <img src="${SITE_URL}/logo-transparent.png" alt="Examanet" width="80" height="22" style="display:block;border:0;outline:none;text-decoration:none;vertical-align:middle;" />
+    </div>
   </td></tr>
   <!-- Content area (icon + title + subtitle) -->
   <tr><td style="background:#FFFFFF;padding:36px 32px 28px;font-family:${F};">
