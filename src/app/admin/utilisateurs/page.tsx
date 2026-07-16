@@ -154,7 +154,7 @@ async function fetchUsersWithStats({ role, q, sort, skip, pageSize }: { role: st
       COALESCE(ts.weighted_rating, 0)::float AS "weightedRating"
     FROM "User" u
     LEFT JOIN teacher_stats ts ON ts."teacherId" = u.id
-    WHERE u.role = ${role}::text::"Role" ${searchFilter}
+    WHERE u.role = ${role} ${searchFilter}
     ORDER BY ${Prisma.raw(orderClause)}
     LIMIT ${pageSize} OFFSET ${skip}
   `);
