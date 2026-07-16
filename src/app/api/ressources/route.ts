@@ -94,21 +94,32 @@ export async function GET(req: NextRequest) {
     const teacherIdStr = String(where.teacherId);
     let resolvedCuid: string | null = null;
     try {
-      if (/^\d+$/.test(teacherIdStr)) {
+      // Always try numericId first if it's purely numeric
+      const isNumeric = /^\d+$/.test(teacherIdStr);
+      console.log(`[api/ressources] teacherId="${teacherIdStr}" isNumeric=${isNumeric} len=${teacherIdStr.length}`);
+      if (isNumeric) {
         const t = await prisma.user.findUnique({
           where: { numericId: parseInt(teacherIdStr, 10) },
           select: { id: true },
         });
+        console.log(`[api/ressources] numericId lookup result:`, t);
         resolvedCuid = t?.id ?? null;
-        console.log(`[api/ressources] numericId=${teacherIdStr} → cuid=${resolvedCuid}`);
+        if (!resolvedCuid) {
+          // Fallback: maybe the input is a cuid-shaped string
+          const t2 = await prisma.user.findUnique({
+            where: { id: teacherIdStr },
+            select: { id: true },
+          });
+          console.log(`[api/ressources] cuid fallback result:`, t2);
+          resolvedCuid = t2?.id ?? null;
+        }
       } else {
-        // Assume cuid - validate it exists (cheap)
         const t = await prisma.user.findUnique({
           where: { id: teacherIdStr },
           select: { id: true },
         });
+        console.log(`[api/ressources] cuid lookup result:`, t);
         resolvedCuid = t?.id ?? null;
-        console.log(`[api/ressources] cuid=${teacherIdStr} → resolved=${resolvedCuid}`);
       }
     } catch (err) {
       console.error('[api/ressources] teacher lookup failed:', err);
