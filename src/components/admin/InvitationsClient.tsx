@@ -147,7 +147,7 @@ export default function InvitationsClient({ initialInvitations, initialStats }: 
       </div>
 
       {/* Stats cards */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
         <StatCard icon={<Activity className="w-5 h-5" />} color="slate" label="Total" value={totals.total} />
         <StatCard icon={<Clock className="w-5 h-5" />} color="amber" label="En cours" value={totals.pending} />
         <StatCard icon={<UserCheck className="w-5 h-5" />} color="emerald" label="Activées" value={totals.activated} />
@@ -215,17 +215,27 @@ export default function InvitationsClient({ initialInvitations, initialStats }: 
       {/* Invitations table */}
       <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm table-fixed min-w-[900px]">
+            <colgroup>
+              <col className="w-auto" />
+              <col className="w-32" />
+              <col className="w-32" />
+              <col className="w-32" />
+              <col className="w-32" />
+              <col className="w-24" />
+              <col className="w-20" />
+              <col className="w-36" />
+            </colgroup>
             <thead className="bg-slate-50">
               <tr>
-                <th className="text-left px-4 py-3 font-semibold text-slate-600">Professeur</th>
-                <th className="text-left px-4 py-3 font-semibold text-slate-600">Statut</th>
-                <th className="text-left px-4 py-3 font-semibold text-slate-600 hidden lg:table-cell">Email envoyé</th>
-                <th className="text-left px-4 py-3 font-semibold text-slate-600 hidden lg:table-cell">Lien cliqué</th>
-                <th className="text-left px-4 py-3 font-semibold text-slate-600 hidden lg:table-cell">Activé</th>
-                <th className="text-left px-4 py-3 font-semibold text-slate-600 hidden md:table-cell">Expire</th>
-                <th className="text-left px-4 py-3 font-semibold text-slate-600">Fichiers</th>
-                <th className="px-4 py-3 font-semibold text-slate-600 text-right">Actions</th>
+                <th className="text-left px-3 py-2.5 font-semibold text-slate-600">Professeur</th>
+                <th className="text-left px-3 py-2.5 font-semibold text-slate-600">Statut</th>
+                <th className="text-left px-3 py-2.5 font-semibold text-slate-600 hidden lg:table-cell">Email envoyé</th>
+                <th className="text-left px-3 py-2.5 font-semibold text-slate-600 hidden lg:table-cell">Lien cliqué</th>
+                <th className="text-left px-3 py-2.5 font-semibold text-slate-600 hidden lg:table-cell">Activé</th>
+                <th className="text-left px-3 py-2.5 font-semibold text-slate-600 hidden md:table-cell">Expire</th>
+                <th className="text-left px-3 py-2.5 font-semibold text-slate-600">Fichiers</th>
+                <th className="px-3 py-2.5 font-semibold text-slate-600 text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -237,9 +247,9 @@ export default function InvitationsClient({ initialInvitations, initialStats }: 
                   (expiresAt.getTime() - Date.now()) < 2 * 24 * 3600 * 1000;
                 return (
                   <tr key={inv.id} className={`border-t border-slate-50 hover:bg-slate-50 transition ${i % 2 === 0 ? '' : 'bg-slate-50/30'}`}>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-sky-400 to-cyan-500 text-white flex items-center justify-center font-bold text-sm flex-shrink-0">
+                    <td className="px-3 py-2.5">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-sky-400 to-cyan-500 text-white flex items-center justify-center font-bold text-xs flex-shrink-0">
                           {(inv.teacher.firstName?.[0] || inv.teacher.email[0]).toUpperCase()}
                         </div>
                         <div className="min-w-0">
@@ -250,7 +260,7 @@ export default function InvitationsClient({ initialInvitations, initialStats }: 
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-3 py-2.5">
                       <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-bold rounded ${meta.color}`}>
                         {meta.icon} {meta.label}
                       </span>
@@ -258,7 +268,7 @@ export default function InvitationsClient({ initialInvitations, initialStats }: 
                         <div className="text-xs text-slate-400 mt-1">{inv.clickCount} clics</div>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-slate-500 hidden lg:table-cell">
+                    <td className="px-3 py-2.5 text-slate-500 hidden lg:table-cell">
                       {inv.emailSentAt ? (
                         <div>
                           <div>{timeAgo(inv.emailSentAt)}</div>
@@ -266,7 +276,7 @@ export default function InvitationsClient({ initialInvitations, initialStats }: 
                         </div>
                       ) : <span className="text-slate-300">—</span>}
                     </td>
-                    <td className="px-4 py-3 text-slate-500 hidden lg:table-cell">
+                    <td className="px-3 py-2.5 text-slate-500 hidden lg:table-cell">
                       {inv.linkClickedAt ? (
                         <div>
                           <div>{timeAgo(inv.linkClickedAt)}</div>
@@ -274,7 +284,7 @@ export default function InvitationsClient({ initialInvitations, initialStats }: 
                         </div>
                       ) : <span className="text-slate-300">—</span>}
                     </td>
-                    <td className="px-4 py-3 text-slate-500 hidden lg:table-cell">
+                    <td className="px-3 py-2.5 text-slate-500 hidden lg:table-cell">
                       {inv.activatedAt ? (
                         <div>
                           <div className="text-emerald-600 font-semibold">{timeAgo(inv.activatedAt)}</div>
@@ -282,12 +292,12 @@ export default function InvitationsClient({ initialInvitations, initialStats }: 
                         </div>
                       ) : <span className="text-slate-300">—</span>}
                     </td>
-                    <td className="px-4 py-3 hidden md:table-cell">
+                    <td className="px-3 py-2.5 hidden md:table-cell">
                       <div className={`text-xs ${isExpiringSoon ? 'text-rose-600 font-bold' : 'text-slate-500'}`}>
                         {isExpiringSoon && '⚠️ '}{new Date(inv.expiresAt).toLocaleDateString('fr-FR')}
                       </div>
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-3 py-2.5">
                       <span className={`inline-flex items-center justify-center min-w-[2rem] px-2 py-1 text-xs font-extrabold rounded ${
                         fileCount > 50 ? 'bg-emerald-100 text-emerald-700' :
                         fileCount > 10 ? 'bg-sky-100 text-sky-700' :
@@ -297,25 +307,26 @@ export default function InvitationsClient({ initialInvitations, initialStats }: 
                         {fileCount}
                       </span>
                     </td>
-                    <td className="px-4 py-3">
-                      <div className="flex gap-1 items-center justify-end">
+                    <td className="px-3 py-2.5">
+                      <div className="flex gap-1 items-center justify-end flex-wrap">
                         {(inv.status === 'SENT' || inv.status === 'CLICKED' || inv.status === 'EXPIRED') && (
                           <button
                             onClick={() => resend(inv.id)}
                             disabled={loadingId === inv.id}
-                            className="inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold bg-sky-50 text-sky-700 hover:bg-sky-100 rounded transition disabled:opacity-50"
+                            className="inline-flex items-center gap-1 px-1.5 py-1 text-[11px] font-semibold bg-sky-50 text-sky-700 hover:bg-sky-100 rounded transition disabled:opacity-50"
                             title="Renvoyer avec un nouveau mot de passe"
                           >
-                            <RotateCcw className="w-3 h-3" /> Renvoyer
+                            <RotateCcw className="w-3 h-3" /> <span className="hidden xl:inline">Renvoyer</span>
                           </button>
                         )}
                         {(inv.status === 'PENDING' || inv.status === 'SENT' || inv.status === 'CLICKED') && (
                           <button
                             onClick={() => cancel(inv.id)}
                             disabled={loadingId === inv.id}
-                            className="inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold bg-rose-50 text-rose-700 hover:bg-rose-100 rounded transition disabled:opacity-50"
+                            className="inline-flex items-center gap-1 px-1.5 py-1 text-[11px] font-semibold bg-rose-50 text-rose-700 hover:bg-rose-100 rounded transition disabled:opacity-50"
+                            title="Annuler cette invitation"
                           >
-                            <Ban className="w-3 h-3" /> Annuler
+                            <Ban className="w-3 h-3" /> <span className="hidden xl:inline">Annuler</span>
                           </button>
                         )}
                       </div>

@@ -51,8 +51,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     <div className="min-h-screen flex flex-col bg-slate-50 overflow-x-hidden">
       <Header />
       <div className="flex-1 pt-20 overflow-x-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="grid lg:grid-cols-[280px_1fr] gap-6 overflow-x-hidden">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="grid lg:grid-cols-[260px_1fr] gap-6 overflow-x-hidden">
             <aside className="lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto space-y-3">
               {/* Profile card */}
               <div className="bg-gradient-to-br from-red-500 to-rose-600 rounded-2xl p-4 text-white shadow-md">
