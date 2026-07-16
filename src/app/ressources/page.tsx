@@ -73,7 +73,7 @@ export default async function ResourcesPage(props: { searchParams: Promise<Searc
   const year = toArr(sp.year);
   const language = toArr(sp.language);
   const hasCorrection = sp.hasCorrection === '1';
-  const teacherId = sp.teacherId || '';
+  const teacherNumericId = sp.teacherId ? parseInt(sp.teacherId, 10) : null;
   const sort = sp.sort || 'recent';
   const page = Math.max(1, parseInt(sp.page || '1'));
 
@@ -94,7 +94,14 @@ export default async function ResourcesPage(props: { searchParams: Promise<Searc
   if (year.length > 0) where.year = { in: year };
   if (language.length > 0) where.language = { in: language };
   if (hasCorrection) where.hasCorrection = true;
-  if (teacherId) where.teacherId = teacherId;
+  if (teacherNumericId) {
+    // Look up teacher cuid by numericId
+    const teacher = await prisma.user.findUnique({
+      where: { numericId: teacherNumericId },
+      select: { id: true },
+    });
+    if (teacher) where.teacherId = teacher.id;
+  }
 
   const orderBy: Prisma.ResourceOrderByWithRelationInput =
     sort === 'popular' ? { viewsCount: 'desc' }
@@ -113,7 +120,13 @@ export default async function ResourcesPage(props: { searchParams: Promise<Searc
   if (year.length > 0) facetBase.year = { in: year };
   if (language.length > 0) facetBase.language = { in: language };
   if (hasCorrection) facetBase.hasCorrection = true;
-  if (teacherId) facetBase.teacherId = teacherId;
+  if (teacherNumericId) {
+    const teacher = await prisma.user.findUnique({
+      where: { numericId: teacherNumericId },
+      select: { id: true },
+    });
+    if (teacher) facetBase.teacherId = teacher.id;
+  }
 
   // ============== Run all queries in parallel ==============
   const PAGE_SIZE = 24;
