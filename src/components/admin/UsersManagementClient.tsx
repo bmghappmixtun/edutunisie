@@ -259,7 +259,7 @@ export default function UsersManagementClient({
       <p className="text-slate-500 mb-6">{counts.TOTAL} utilisateurs au total</p>
 
       {/* Tabs */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-1 mb-4 flex gap-1">
+      <div className="bg-white rounded-2xl border border-slate-200 p-1 mb-4 flex flex-wrap gap-1">
         {TABS.map((t) => {
           const Icon = t.icon;
           const count = counts[t.value];
@@ -268,15 +268,15 @@ export default function UsersManagementClient({
             <button
               key={t.value}
               onClick={() => navigate(t.value, search)}
-              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-semibold text-sm transition ${
+              className={`flex-1 min-w-[140px] flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl font-semibold text-xs sm:text-sm transition ${
                 isActive
                   ? `bg-gradient-to-br from-${t.color}-500 to-${t.color}-600 text-white shadow-md`
                   : 'text-slate-600 hover:bg-slate-50'
               }`}
             >
-              <Icon className="w-4 h-4" />
-              <span>{t.label}</span>
-              <span className={`px-2 py-0.5 rounded-full text-xs font-extrabold ${
+              <Icon className="w-4 h-4 flex-shrink-0" />
+              <span className="truncate">{t.label}</span>
+              <span className={`px-1.5 py-0.5 rounded-full text-[10px] sm:text-xs font-extrabold flex-shrink-0 ${
                 isActive ? 'bg-white/25 text-white' : 'bg-slate-100 text-slate-700'
               }`}>
                 {count}
@@ -392,55 +392,56 @@ export default function UsersManagementClient({
 
       {/* Users table */}
       <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
-        <div className="p-4 border-b border-slate-100 text-sm text-slate-500 flex items-center justify-between flex-wrap gap-2">
-          <span>
+        <div className="p-3 border-b border-slate-100 text-xs sm:text-sm text-slate-500 flex items-center justify-between flex-wrap gap-2">
+          <span className="whitespace-nowrap">
             {total === 0
               ? `0 ${tab.label.toLowerCase()} trouvé${total > 1 ? 's' : ''}`
               : `${startIndex}–${endIndex} sur ${total} ${tab.label.toLowerCase()}`}
           </span>
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-1.5 flex-wrap">
             {activeTab === 'TEACHER' && (
               <button
                 onClick={() => setSortByFiles(!sortByFiles)}
-                className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition ${
+                className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-lg transition ${
                   sortByFiles
                     ? 'bg-sky-100 text-sky-700 hover:bg-sky-200'
                     : 'text-slate-600 hover:bg-slate-100'
                 }`}
                 title="Trier par nombre de fichiers"
               >
-                <ArrowUpDown className="w-3.5 h-3.5" />
-                {sortByFiles ? 'Trié par fichiers' : 'Trier par fichiers'}
+                <ArrowUpDown className="w-3 h-3" />
+                <span className="hidden sm:inline">{sortByFiles ? 'Trié par fichiers' : 'Trier par fichiers'}</span>
               </button>
             )}
             <Link
               href="/admin/invitations"
-              className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 bg-sky-50 text-sky-700 hover:bg-sky-100 rounded-lg transition"
+              className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-1 bg-sky-50 text-sky-700 hover:bg-sky-100 rounded-lg transition"
             >
-              <Mail className="w-3.5 h-3.5" />
-              Toutes les invitations
+              <Mail className="w-3 h-3" />
+              <span className="hidden sm:inline">Toutes les invitations</span>
+              <span className="sm:hidden">Invitations</span>
               <ExternalLink className="w-3 h-3" />
             </Link>
             {filteredUsers.length > 0 && (
               <button
                 onClick={toggleAllInTab}
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary-600 hover:text-primary-700"
+                className="inline-flex items-center gap-1 text-xs font-semibold text-primary-600 hover:text-primary-700 px-2 py-1"
               >
                 {filteredUsers.every((u) => selected.has(u.id)) ? (
-                  <CheckSquare className="w-4 h-4" />
+                  <CheckSquare className="w-3.5 h-3.5" />
                 ) : (
-                  <Square className="w-4 h-4" />
+                  <Square className="w-3.5 h-3.5" />
                 )}
-                Tout sélectionner
+                <span className="hidden sm:inline">Tout sélectionner</span>
               </button>
             )}
           </div>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm min-w-[800px]">
             <thead className="bg-slate-50">
               <tr>
-                <th className="px-4 py-3 w-10">
+                <th className="px-3 py-2.5 w-10">
                   <input
                     type="checkbox"
                     checked={filteredUsers.length > 0 && filteredUsers.every((u) => selected.has(u.id))}
@@ -448,15 +449,15 @@ export default function UsersManagementClient({
                     className="w-4 h-4 rounded border-slate-300 text-primary-600 focus:ring-primary"
                   />
                 </th>
-                <th className="text-left px-4 py-3 font-semibold text-slate-600">Utilisateur</th>
-                <th className="text-left px-4 py-3 font-semibold text-slate-600">
+                <th className="text-left px-3 py-2.5 font-semibold text-slate-600">Utilisateur</th>
+                <th className="text-left px-3 py-2.5 font-semibold text-slate-600">
                   {activeTab === 'TEACHER' ? 'Fichiers' : ''}
                 </th>
-                <th className="text-left px-4 py-3 font-semibold text-slate-600">Statut</th>
-                <th className="text-left px-4 py-3 font-semibold text-slate-600 hidden lg:table-cell">Invitation</th>
-                <th className="text-left px-4 py-3 font-semibold text-slate-600 hidden sm:table-cell">Inscription</th>
-                <th className="text-left px-4 py-3 font-semibold text-slate-600 hidden md:table-cell">Dernier login</th>
-                <th className="px-4 py-3 font-semibold text-slate-600 text-right">Actions</th>
+                <th className="text-left px-3 py-2.5 font-semibold text-slate-600">Statut</th>
+                <th className="text-left px-3 py-2.5 font-semibold text-slate-600 hidden xl:table-cell">Invitation</th>
+                <th className="text-left px-3 py-2.5 font-semibold text-slate-600 hidden md:table-cell">Inscription</th>
+                <th className="text-left px-3 py-2.5 font-semibold text-slate-600 hidden lg:table-cell">Dernier login</th>
+                <th className="px-3 py-2.5 font-semibold text-slate-600 text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -469,7 +470,7 @@ export default function UsersManagementClient({
                     key={u.id}
                     className={`border-t border-slate-50 hover:bg-slate-50 transition ${i % 2 === 0 ? '' : 'bg-slate-50/30'} ${isSelected ? 'bg-primary-50' : ''}`}
                   >
-                    <td className="px-4 py-3">
+                    <td className="px-3 py-2.5">
                       <input
                         type="checkbox"
                         checked={isSelected}
@@ -478,7 +479,7 @@ export default function UsersManagementClient({
                         className="w-4 h-4 rounded border-slate-300 text-primary-600 focus:ring-primary disabled:opacity-30"
                       />
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-3 py-2.5">
                       <div className="flex items-center gap-3">
                         <div className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0 ${
                           u.role === 'ADMIN' ? 'bg-red-100 text-red-700' :
@@ -500,7 +501,7 @@ export default function UsersManagementClient({
                       </div>
                     </td>
                     {activeTab === 'TEACHER' ? (
-                      <td className="px-4 py-3">
+                      <td className="px-3 py-2.5">
                         <span className={`inline-flex items-center justify-center min-w-[2.5rem] px-2 py-1 text-sm font-extrabold rounded-lg ${
                           fileCount > 100 ? 'bg-emerald-100 text-emerald-700' :
                           fileCount > 30 ? 'bg-sky-100 text-sky-700' :
@@ -511,14 +512,14 @@ export default function UsersManagementClient({
                         </span>
                       </td>
                     ) : (
-                      <td className="px-4 py-3"></td>
+                      <td className="px-3 py-2.5"></td>
                     )}
-                    <td className="px-4 py-3">
+                    <td className="px-3 py-2.5">
                       <span className={`px-2 py-1 text-xs font-bold rounded ${statusColors[u.status] || 'bg-slate-100 text-slate-700'}`}>
                         {STATUS_LABELS[u.status] || u.status}
                       </span>
                     </td>
-                    <td className="px-4 py-3 hidden lg:table-cell">
+                    <td className="px-3 py-2.5 hidden xl:table-cell">
                       {u.role === 'TEACHER' && invLabel ? (
                         <div className="flex flex-col gap-0.5">
                           <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-bold rounded ${invLabel.color}`}>
@@ -534,10 +535,10 @@ export default function UsersManagementClient({
                         <span className="text-xs text-slate-400">—</span>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-slate-500 hidden sm:table-cell">{timeAgo(u.createdAt)}</td>
-                    <td className="px-4 py-3 text-slate-500 hidden md:table-cell">{u.lastLoginAt ? timeAgo(u.lastLoginAt) : '—'}</td>
-                    <td className="px-4 py-3">
-                      <div className="flex gap-1 items-center justify-end">
+                    <td className="px-3 py-2.5 text-slate-500 hidden md:table-cell">{timeAgo(u.createdAt)}</td>
+                    <td className="px-3 py-2.5 text-slate-500 hidden lg:table-cell">{u.lastLoginAt ? timeAgo(u.lastLoginAt) : '—'}</td>
+                    <td className="px-3 py-2.5">
+                      <div className="flex gap-0.5 items-center justify-end">
                         {u.role === 'TEACHER' && u.email && !u.email.includes('examanet-import.local') && (
                           <InviteTeacherButton
                             teacherIds={[u.id]}
@@ -548,7 +549,7 @@ export default function UsersManagementClient({
                         {u.role !== 'ADMIN' && (
                           <form action={`/api/admin/users/${u.id}/toggle-status`} method="POST">
                             <button
-                              className="p-1.5 hover:bg-slate-100 rounded"
+                              className="p-1 hover:bg-slate-100 rounded"
                               title={u.status === 'ACTIVE' ? 'Suspendre' : 'Réactiver'}
                             >
                               {u.status === 'ACTIVE' ? (
