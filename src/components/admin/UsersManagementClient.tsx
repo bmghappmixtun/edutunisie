@@ -441,13 +441,13 @@ export default function UsersManagementClient({
           <table className="w-full text-sm min-w-[800px] table-fixed">
             <colgroup>
               <col className="w-10" />
-              <col />
+              <col className="w-[240px]" />
               <col className="w-20" />
               <col className="w-24" />
-              <col className="hidden xl:table-column w-40" />
+              <col className="hidden xl:table-column w-36" />
               <col className="hidden md:table-column w-28" />
               <col className="hidden lg:table-column w-28" />
-              <col className="w-24" />
+              <col className="w-28" />
             </colgroup>
             <thead className="bg-slate-50">
               <tr>
@@ -498,15 +498,15 @@ export default function UsersManagementClient({
                         }`}>
                           {(u.firstName?.[0] || u.email[0]).toUpperCase()}
                         </div>
-                        <div className="min-w-0">
-                          <div className="font-semibold flex items-center gap-1">
+                        <div className="min-w-0 flex-1">
+                          <div className="font-semibold flex items-center gap-1 truncate">
                             {u.firstName} {u.lastName}
                             {u.role === 'TEACHER' && u.isVerifiedTeacher && (
-                              <span className="text-blue-500" title="Enseignant vérifié">✓</span>
+                              <span className="text-blue-500 flex-shrink-0" title="Enseignant vérifié">✓</span>
                             )}
                           </div>
                           <div className="text-xs text-slate-500 truncate">{u.email}</div>
-                          {u.schoolName && <div className="text-xs text-slate-400">{u.schoolName}</div>}
+                          {u.schoolName && <div className="text-xs text-slate-400 truncate">{u.schoolName}</div>}
                         </div>
                       </div>
                     </td>
