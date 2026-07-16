@@ -21,8 +21,8 @@ export default async function ConversationPage({ params }: { params: Promise<{ i
       OR: [{ studentId: user.id }, { teacherId: user.id }]
     },
     include: {
-      student: { select: { id: true, firstName: true, lastName: true, avatarUrl: true, schoolName: true } },
-      teacher: { select: { id: true, firstName: true, lastName: true, avatarUrl: true, schoolName: true } },
+      student: { select: { id: true, numericId: true, slug: true, firstName: true, lastName: true, avatarUrl: true, schoolName: true } },
+      teacher: { select: { id: true, numericId: true, slug: true, firstName: true, lastName: true, avatarUrl: true, schoolName: true } },
       messages: {
         orderBy: { createdAt: 'asc' },
         include: { sender: { select: { id: true, firstName: true, lastName: true, avatarUrl: true } } }
@@ -44,7 +44,7 @@ export default async function ConversationPage({ params }: { params: Promise<{ i
             <Link href="/messages" className="p-2 hover:bg-slate-100 rounded-lg">
               <ArrowLeft className="w-5 h-5" />
             </Link>
-            <Link href={`/professeurs/${other.id}`} className="flex items-center gap-3 group">
+            <Link href={`/professeurs/${other.numericId}/${other.slug}`} className="flex items-center gap-3 group">
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 text-white font-bold flex items-center justify-center overflow-hidden">
                 {other.avatarUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element

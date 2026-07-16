@@ -71,7 +71,7 @@ async function searchTeachers(q: string, limit: number): Promise<SuggestResult[]
 
   const results = await prisma.$queryRaw<any[]>`
     SELECT 
-      u.id, u."firstName", u."lastName", u."schoolName", u."avatarUrl",
+      u.id, u."numericId", u."slug", u."firstName", u."lastName", u."schoolName", u."avatarUrl",
       (SELECT COUNT(*) FROM "Resource" r WHERE r."teacherId" = u.id AND r.status = 'PUBLISHED')::int as "resourceCount"
     FROM "User" u
     WHERE u.role = 'TEACHER' AND u.status = 'ACTIVE'
@@ -88,7 +88,7 @@ async function searchTeachers(q: string, limit: number): Promise<SuggestResult[]
     id: u.id,
     title: `${u.firstName || ""} ${u.lastName || ""}`,
     subtitle: [u.schoolName, `${u.resourceCount} ressource(s)`].filter(Boolean).join(' · '),
-    href: `/professeurs/${u.id}`,
+    href: `/professeurs/${u.numericId}/${u.slug}`,
     icon: '👨‍🏫'
   }));
 }

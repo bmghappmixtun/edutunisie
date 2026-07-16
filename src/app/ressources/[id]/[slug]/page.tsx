@@ -150,7 +150,7 @@ export default async function ResourcePage({ params }: { params: Promise<{ id: s
       avgRating: true,
       subject: { select: { nameFr: true, color: true } },
       class: { select: { nameFr: true, slug: true } },
-      teacher: { select: { firstName: true, lastName: true, firstNameAr: true, lastNameAr: true, schoolName: true, schoolNameAr: true } },
+      teacher: { select: { numericId: true, slug: true, firstName: true, lastName: true, firstNameAr: true, lastNameAr: true, schoolName: true, schoolNameAr: true } },
     },
   });
 
@@ -442,7 +442,7 @@ export default async function ResourcePage({ params }: { params: Promise<{ id: s
                     </div>
                   </div>
                   {resource.teacher.bio && <p className="text-sm text-slate-600 line-clamp-3">{resource.teacher.bio}</p>}
-                  <Link href={`/professeurs/${resource.teacher.id}`} className="text-sm text-primary-600 font-semibold hover:underline mt-2 inline-block">Voir le profil →</Link>
+                  <Link href={`/professeurs/${resource.teacher.numericId}/${resource.teacher.slug}`} className="text-sm text-primary-600 font-semibold hover:underline mt-2 inline-block">Voir le profil →</Link>
                 </div>
               )}
 

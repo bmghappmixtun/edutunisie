@@ -268,6 +268,8 @@ export default async function TeachersPage(props: { searchParams: Promise<Search
       where: teacherWhere,
       select: {
         id: true,
+        numericId: true,
+        slug: true,
         firstName: true,
         lastName: true,
         firstNameAr: true,
@@ -352,7 +354,7 @@ export default async function TeachersPage(props: { searchParams: Promise<Search
     url: `${baseUrl}/professeurs`,
     items: teachers.slice(0, 50).map((t) => ({
       name: `${t.firstName || ''} ${t.lastName || ''}`.replace(/\s+/g, ' ').trim(),
-      url: `${baseUrl}/professeurs/${t.id}`,
+      url: `${baseUrl}/professeurs/${t.numericId}/${t.slug}`,
       description: t.bio || (t.schoolName ? tt('teacher.atSchool').replace('{school}', t.schoolName) : tt('teacher.onExamanet')),
     })),
   }) : null;
@@ -483,6 +485,8 @@ function TeacherCard({
 }: {
   t: {
     id: string;
+    numericId: number | null;
+    slug: string;
     firstName: string | null;
     lastName: string | null;
     firstNameAr: string | null;
@@ -516,7 +520,7 @@ function TeacherCard({
 
   return (
     <Link
-      href={`/professeurs/${t.id}`}
+      href={`/professeurs/${t.numericId}/${t.slug}`}
       className={`card card-hover p-6 group relative ${featured ? 'ring-2 ring-amber-300 hover:ring-amber-400' : ''}`}
     >
       {featured && (

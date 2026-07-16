@@ -56,6 +56,14 @@ model User {
   approvedAt      DateTime?
   approvedById    String?
 
+  // URL identity (Etsy-style: stable numericId + cosmetic slug)
+  /// Sequential numeric ID (1, 2, 3, ...) used in URLs as the stable identifier.
+  /// The slug is purely cosmetic; this numericId never changes.
+  numericId       Int?           @unique @default(autoincrement())
+  /// URL slug — purely cosmetic / SEO. NOT unique. Lookup is by numericId.
+  /// Format: firstname-lastname (or email-local-part if no name).
+  slug            String
+
   // Preferences
   preferredLang   String     @default("fr")
   themePref       String     @default("light")
