@@ -89,16 +89,25 @@ export async function GET(req: NextRequest) {
   const where = buildWhere(filters);
 
   // Convert teacherId from numericId to cuid (DB stores cuid on Resource.teacherId)
-  if (where.teacherId && /^\d+$/.test(String(where.teacherId))) {
-    const teacher = await prisma.user.findUnique({
-      where: { numericId: parseInt(String(where.teacherId), 10) },
-      select: { id: true },
-    });
-    if (teacher) {
-      where.teacherId = teacher.id;
+  // Accept both numericId (preferred, stable, exposed in URLs) and cuid (legacy)
+  if (where.teacherId) {
+    const teacherIdStr = String(where.teacherId);
+    let resolvedCuid: string | null = null;
+    if (/^\d+$/.test(teacherIdStr)) {
+      const t = await prisma.user.findUnique({
+        where: { numericId: parseInt(teacherIdStr, 10) },
+        select: { id: true },
+      });
+      resolvedCuid = t?.id ?? null;
     } else {
-      where.teacherId = '__no_match__';  // forces 0 results
+      // Assume cuid - validate it exists (cheap)
+      const t = await prisma.user.findUnique({
+        where: { id: teacherIdStr },
+        select: { id: true },
+      });
+      resolvedCuid = t?.id ?? null;
     }
+    where.teacherId = resolvedCuid ?? '__no_match__';
   }
 
   // Build base where for facets (excludes search OR to avoid type conflicts)
