@@ -15,6 +15,7 @@ export default async function AdminResourcesPage(props: { params: Promise<any>; 
 
   const q = sp?.q || '';
   const status = sp?.status || 'ALL';
+  const sort = sp?.sort || 'recent';
   const page = parseInt(sp?.page || '1');
   const perPage = 20;
 
@@ -22,12 +23,26 @@ export default async function AdminResourcesPage(props: { params: Promise<any>; 
   if (q) where.OR = [{ title: { contains: q } }, { description: { contains: q } }];
   if (status !== 'ALL') where.status = status;
 
+  // Sort options
+  const sortMap: Record<string, any> = {
+    recent: { createdAt: 'desc' },
+    oldest: { createdAt: 'asc' },
+    views: { viewsCount: 'desc' },
+    downloads: { downloadsCount: 'desc' },
+    favorites: { favoritesCount: 'desc' },
+    rating: { avgRating: 'desc' },
+    comments: { commentsCount: 'desc' },
+    title_asc: { title: 'asc' },
+    title_desc: { title: 'desc' }
+  };
+  const orderBy = sortMap[sort] || sortMap.recent;
+
   const [resources, total] = await Promise.all([
     prisma.resource.findMany({
       where,
       take: perPage,
       skip: (page - 1) * perPage,
-      orderBy: { createdAt: 'desc' },
+      orderBy,
       include: {
         subject: true,
         class: true,
@@ -74,6 +89,17 @@ export default async function AdminResourcesPage(props: { params: Promise<any>; 
           <option value="DRAFT">Brouillons</option>
           <option value="ARCHIVED">Archivés</option>
         </select>
+        <select name="sort" defaultValue={sort} className="bg-slate-50 border-0 rounded-lg px-3 py-2 text-sm outline-none flex-shrink-0" title="Trier par">
+          <option value="recent">📅 Plus récents</option>
+          <option value="oldest">📅 Plus anciens</option>
+          <option value="views">👁 Plus vus</option>
+          <option value="downloads">⬇️ Plus téléchargés</option>
+          <option value="favorites">❤️ Plus favoris</option>
+          <option value="rating">⭐ Mieux notés</option>
+          <option value="comments">💬 Plus commentés</option>
+          <option value="title_asc">🔤 Titre A→Z</option>
+          <option value="title_desc">🔤 Titre Z→A</option>
+        </select>
         <button type="submit" className="btn-primary text-sm flex-shrink-0">Filtrer</button>
       </form>
 
@@ -82,7 +108,7 @@ export default async function AdminResourcesPage(props: { params: Promise<any>; 
         {['ALL', 'PUBLISHED', 'PENDING_APPROVAL', 'REJECTED'].map(s => (
           <Link
             key={s}
-            href={`/admin/ressources?status=${s}${q ? `&q=${q}` : ''}`}
+            href={`/admin/ressources?status=${s}${q ? `&q=${q}` : ''}${sort !== 'recent' ? `&sort=${sort}` : ''}`}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${status === s ? 'bg-primary-500 text-white' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-100'}`}
           >
             {s === 'ALL' ? 'Tous' : statusLabels[s] || s}
@@ -169,7 +195,7 @@ export default async function AdminResourcesPage(props: { params: Promise<any>; 
           {/* Prev button */}
           {page > 1 && (
             <Link
-              href={`/admin/ressources?page=${page - 1}${status !== 'ALL' ? `&status=${status}` : ''}${q ? `&q=${q}` : ''}`}
+              href={`/admin/ressources?page=${page - 1}${status !== 'ALL' ? `&status=${status}` : ''}${q ? `&q=${q}` : ''}${sort !== 'recent' ? `&sort=${sort}` : ''}`}
               className="px-3 py-1.5 rounded-lg text-sm font-semibold bg-white text-slate-600 hover:bg-slate-100 border border-slate-100 transition"
             >
               ‹ Précédent
@@ -178,7 +204,7 @@ export default async function AdminResourcesPage(props: { params: Promise<any>; 
           {/* Page numbers with ellipsis */}
           {(() => {
             const buildHref = (p: number) =>
-              `/admin/ressources?page=${p}${status !== 'ALL' ? `&status=${status}` : ''}${q ? `&q=${q}` : ''}`;
+              `/admin/ressources?page=${p}${status !== 'ALL' ? `&status=${status}` : ''}${q ? `&q=${q}` : ''}${sort !== 'recent' ? `&sort=${sort}` : ''}`;
             const pages: (number | '…')[] = [];
             if (totalPages <= 7) {
               for (let i = 1; i <= totalPages; i++) pages.push(i);
@@ -215,7 +241,7 @@ export default async function AdminResourcesPage(props: { params: Promise<any>; 
           {/* Next button */}
           {page < totalPages && (
             <Link
-              href={`/admin/ressources?page=${page + 1}${status !== 'ALL' ? `&status=${status}` : ''}${q ? `&q=${q}` : ''}`}
+              href={`/admin/ressources?page=${page + 1}${status !== 'ALL' ? `&status=${status}` : ''}${q ? `&q=${q}` : ''}${sort !== 'recent' ? `&sort=${sort}` : ''}`}
               className="px-3 py-1.5 rounded-lg text-sm font-semibold bg-white text-slate-600 hover:bg-slate-100 border border-slate-100 transition"
             >
               Suivant ›
