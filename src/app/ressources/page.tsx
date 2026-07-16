@@ -10,18 +10,37 @@ import FilterShell from '@/components/ressources/FilterShell';
 import type { Facets } from '@/lib/facets';
 import { getCurrentUser } from '@/lib/auth';
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({ searchParams }: { searchParams: Promise<SearchParams> }): Promise<Metadata> {
   const locale = getLocale();
   const isAr = locale === 'ar';
+  const sp = await searchParams;
+  const teacherNumericId = sp.teacherId ? parseInt(sp.teacherId, 10) : null;
+
+  // Look up teacher for personalized title
+  let teacherName: string | null = null;
+  if (teacherNumericId && !Number.isNaN(teacherNumericId)) {
+    const t = await prisma.user.findUnique({
+      where: { numericId: teacherNumericId },
+      select: { firstName: true, lastName: true },
+    });
+    if (t) teacherName = `${t.firstName || ''} ${t.lastName || ''}`.trim() || null;
+  }
+
   const totalResources = await prisma.resource.count({ where: { status: 'PUBLISHED' } });
+  const baseTitle = isAr ? 'جميع الموارد التربوية' : 'Toutes les ressources pédagogiques';
+  const title = teacherName
+    ? (isAr ? `موارد ${teacherName}` : `Ressources de ${teacherName}`)
+    : baseTitle;
+  const description = teacherName
+    ? (isAr ? `جميع موارد ${teacherName} على إكسامانت: دروس، فروض، تمارين، سلاسل.` : `Découvrez toutes les ressources partagées par ${teacherName} sur Examanet : cours, devoirs, exercices, séries et corrigés.`)
+    : (isAr
+      ? `اكتشف أكثر من ${totalResources.toLocaleString('ar-TN')} مورد: دروس، فروض، تمارين، سلاسل، ملخصات، مواضيع باك وإصلاحات.`
+      : 'Explorez plus de 15 000 ressources : cours, devoirs, exercices, séries, résumés, sujets de bac et corrigés.');
+
   return {
-    title: isAr
-      ? 'جميع الموارد التربوية'
-      : 'Toutes les ressources pédagogiques',
-    description: isAr
-      ? `اكتشف أكثر من ${totalResources.toLocaleString('ar-TN')} مورد: دروس، فروض، تمارين، سلاسل، ملخصات، مواضيع باك وإصلاحات. مرشحات حسب المادة، القسم، الشعبة، السنة، الثلاثي.`
-      : 'Explorez plus de 15 000 ressources : cours, devoirs, exercices, séries, résumés, sujets de bac et corrigés. Filtres par matière, classe, section, année et trimestre.',
-    alternates: { canonical: '/ressources' },
+    title,
+    description,
+    alternates: { canonical: teacherNumericId ? `/ressources?teacherId=${teacherNumericId}` : '/ressources' },
     openGraph: {
       title: isAr
         ? 'جميع الموارد — إكسامانت'
@@ -95,12 +114,16 @@ export default async function ResourcesPage(props: { searchParams: Promise<Searc
   if (language.length > 0) where.language = { in: language };
   if (hasCorrection) where.hasCorrection = true;
   if (teacherNumericId) {
-    // Look up teacher cuid by numericId
+    // Look up teacher by numericId
     const teacher = await prisma.user.findUnique({
       where: { numericId: teacherNumericId },
-      select: { id: true },
+      select: { id: true, firstName: true, lastName: true, slug: true, numericId: true },
     });
-    if (teacher) where.teacherId = teacher.id;
+    if (teacher) {
+      where.teacherId = teacher.id;
+      // Stash teacher info for the title
+      (where as any)._teacherInfo = teacher;
+    }
   }
 
   const orderBy: Prisma.ResourceOrderByWithRelationInput =
@@ -327,11 +350,14 @@ export default async function ResourcesPage(props: { searchParams: Promise<Searc
   // ============== Page header text ==============
   let pageTitle = 'Toutes les ressources';
   let pageSubtitle = `${total.toLocaleString('fr-FR')} ressources gratuites pour le système éducatif tunisien.`;
+  const teacherInfo = (where as any)._teacherInfo;
   if (q) {
     pageTitle = `Résultats pour « ${q} »`;
     pageSubtitle = `${total.toLocaleString('fr-FR')} résultats correspondants.`;
-  } else if (teacherNumericId && currentUser) {
-    pageTitle = `Ressources de l'enseignant`;
+  } else if (teacherInfo) {
+    const teacherName = `${teacherInfo.firstName || ''} ${teacherInfo.lastName || ''}`.trim() || 'cet enseignant';
+    pageTitle = `Ressources de ${teacherName}`;
+    pageSubtitle = `${total.toLocaleString('fr-FR')} ressources partagées par ${teacherName} sur Examanet.`;
   }
 
   return (
