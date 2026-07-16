@@ -8,9 +8,9 @@ import {
   Search, UserCheck, UserX, Trash2, Shield, CheckCircle2, Ban,
   GraduationCap, Users, MoreHorizontal, ChevronDown, X, AlertTriangle,
   CheckSquare, Square, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight,
-  Mail, ArrowUpDown, Send, ExternalLink
+  Mail, ArrowUpDown, Send, ExternalLink, Eye, Download, Star, Heart
 } from 'lucide-react';
-import { timeAgo } from '@/lib/utils';
+import { timeAgo, formatNumber } from '@/lib/utils';
 import DeleteUserButton from './DeleteUserButton';
 import InviteTeacherButton from './InviteTeacherButton';
 
@@ -544,11 +544,20 @@ export default function UsersManagementClient({
                             {fileCount}
                           </span>
                           {(u as any).stats && (
-                            <div className="text-[10px] text-slate-400 flex flex-col gap-0.5">
-                              <span title="Vues totales sur tous les fichiers" className="whitespace-nowrap">👁 {(u as any).stats.totalViews.toLocaleString('fr-FR')}</span>
-                              <span title="Téléchargements totaux" className="whitespace-nowrap">⬇ {(u as any).stats.totalDownloads.toLocaleString('fr-FR')}</span>
+                            <div className="text-xs text-slate-500 flex items-center gap-1.5 flex-wrap">
+                              <span className="flex items-center gap-0.5" title="Vues totales sur tous les fichiers">
+                                <Eye className="w-3 h-3" /> {formatNumber((u as any).stats.totalViews)}
+                              </span>
+                              <span className="flex items-center gap-0.5" title="Téléchargements totaux">
+                                <Download className="w-3 h-3" /> {formatNumber((u as any).stats.totalDownloads)}
+                              </span>
+                              <span className="flex items-center gap-0.5" title="Favoris totaux">
+                                <Heart className="w-3 h-3" /> {formatNumber((u as any).stats.totalFavorites)}
+                              </span>
                               {(u as any).stats.weightedRating > 0 && (
-                                <span title="Note moyenne pondérée" className="whitespace-nowrap">⭐ {(u as any).stats.weightedRating.toFixed(1)}</span>
+                                <span className="flex items-center gap-0.5" title="Note moyenne pondérée">
+                                  <Star className="w-3 h-3 text-amber-500" /> {(u as any).stats.weightedRating.toFixed(1)}
+                                </span>
                               )}
                             </div>
                           )}
