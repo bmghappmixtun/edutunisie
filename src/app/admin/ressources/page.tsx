@@ -165,16 +165,62 @@ export default async function AdminResourcesPage(props: { params: Promise<any>; 
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2 mt-6">
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
+        <div className="flex items-center justify-center gap-1 mt-6 flex-wrap">
+          {/* Prev button */}
+          {page > 1 && (
             <Link
-              key={p}
-              href={`/admin/ressources?page=${p}${status !== 'ALL' ? `&status=${status}` : ''}${q ? `&q=${q}` : ''}`}
-              className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition ${page === p ? 'bg-primary-500 text-white' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-100'}`}
+              href={`/admin/ressources?page=${page - 1}${status !== 'ALL' ? `&status=${status}` : ''}${q ? `&q=${q}` : ''}`}
+              className="px-3 py-1.5 rounded-lg text-sm font-semibold bg-white text-slate-600 hover:bg-slate-100 border border-slate-100 transition"
             >
-              {p}
+              ‹ Précédent
             </Link>
-          ))}
+          )}
+          {/* Page numbers with ellipsis */}
+          {(() => {
+            const buildHref = (p: number) =>
+              `/admin/ressources?page=${p}${status !== 'ALL' ? `&status=${status}` : ''}${q ? `&q=${q}` : ''}`;
+            const pages: (number | '…')[] = [];
+            if (totalPages <= 7) {
+              for (let i = 1; i <= totalPages; i++) pages.push(i);
+            } else {
+              // Always show first
+              pages.push(1);
+              // Left ellipsis
+              if (page > 4) pages.push('…');
+              // Window around current
+              const start = Math.max(2, page - 1);
+              const end = Math.min(totalPages - 1, page + 1);
+              for (let i = start; i <= end; i++) pages.push(i);
+              // Right ellipsis
+              if (page < totalPages - 3) pages.push('…');
+              // Always show last
+              pages.push(totalPages);
+            }
+            return pages.map((p, idx) =>
+              p === '…' ? (
+                <span key={`ellipsis-${idx}`} className="px-2 py-1.5 text-sm text-slate-400 select-none">
+                  …
+                </span>
+              ) : (
+                <Link
+                  key={p}
+                  href={buildHref(p)}
+                  className={`min-w-[36px] text-center px-3 py-1.5 rounded-lg text-sm font-semibold transition ${page === p ? 'bg-primary-500 text-white' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-100'}`}
+                >
+                  {p}
+                </Link>
+              )
+            );
+          })()}
+          {/* Next button */}
+          {page < totalPages && (
+            <Link
+              href={`/admin/ressources?page=${page + 1}${status !== 'ALL' ? `&status=${status}` : ''}${q ? `&q=${q}` : ''}`}
+              className="px-3 py-1.5 rounded-lg text-sm font-semibold bg-white text-slate-600 hover:bg-slate-100 border border-slate-100 transition"
+            >
+              Suivant ›
+            </Link>
+          )}
         </div>
       )}
     </div>
