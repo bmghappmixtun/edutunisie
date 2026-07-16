@@ -100,11 +100,11 @@ ${opts.preheader ? `<span style="display:none;font-size:1px;color:#F1F5F9;line-h
 <table role="presentation" width="${maxWidth}" cellpadding="0" cellspacing="0" style="background:white;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(15,23,42,0.08);font-family:${F};">
   <tr><td style="background:#FFFFFF;padding:36px 32px 24px;text-align:center;border-bottom:1px solid #F1F5F9;font-family:${F};">
     <img src="${SITE_URL}/logo-examanet.png" alt="Examanet" width="180" height="44" style="display:block;margin:0 auto 20px;max-width:180px;height:auto;" />
-    <div style="width:64px;height:64px;margin:0 auto 16px;background:${accentBg};border-radius:50%;display:inline-flex;align-items:center;justify-content:center;">
-      <div style="font-size:32px;line-height:64px;">${opts.icon}</div>
+    <div style="width:40px;height:40px;margin:0 auto 14px;background:${accentBg};border-radius:50%;display:flex;align-items:center;justify-content:center;">
+      <div style="font-size:20px;line-height:40px;">${opts.icon}</div>
     </div>
-    <h1 style="margin:0;color:#0F172A;font-size:26px;font-weight:700;letter-spacing:-0.4px;font-family:${F};">${opts.title}</h1>
-    ${opts.subtitle ? `<p style="margin:8px 0 0;color:#64748B;font-size:15px;font-weight:400;font-family:${F};">${opts.subtitle}</p>` : ''}
+    <h1 style="margin:0;color:#0F172A;font-size:24px;font-weight:700;letter-spacing:-0.4px;font-family:${F};">${opts.title}</h1>
+    ${opts.subtitle ? `<p style="margin:6px 0 0;color:#64748B;font-size:14px;font-weight:400;font-family:${F};">${opts.subtitle}</p>` : ''}
   </td></tr>
   <tr><td style="padding:32px;font-family:${F};">
     ${opts.body}
