@@ -103,7 +103,7 @@ export default async function AdminResourcesPage(props: { params: Promise<any>; 
           <div className="divide-y divide-slate-100">
             {resources.map((r) => (
               <div key={r.id} className="p-4 hover:bg-slate-50 transition group">
-                <div className="flex items-center gap-3">
+                <div className="flex items-start gap-3">
                   {/* File icon with subject color */}
                   <div
                     className="w-12 h-14 rounded-lg flex items-center justify-center flex-shrink-0 text-2xl"
@@ -111,11 +111,11 @@ export default async function AdminResourcesPage(props: { params: Promise<any>; 
                   >
                     {r.subject.icon || '📄'}
                   </div>
-                  {/* Main info */}
+                  {/* Main info (stacked vertically) */}
                   <div className="flex-1 min-w-0">
                     <Link
                       href={r.numericId ? `/ressources/${r.numericId}/${r.slug}` : `/ressources/legacy-${r.id}/${r.slug}`}
-                      className={`font-semibold text-sm group-hover:text-primary-600 truncate block ${isArabic(r.title) ? 'text-right' : 'text-left'}`}
+                      className={`font-semibold text-sm group-hover:text-primary-600 block ${isArabic(r.title) ? 'text-right' : 'text-left'}`}
                       dir={isArabic(r.title) ? 'rtl' : 'ltr'}
                       lang={isArabic(r.title) ? 'ar' : 'fr'}
                     >
@@ -132,35 +132,29 @@ export default async function AdminResourcesPage(props: { params: Promise<any>; 
                         Par <span className="font-medium text-slate-600">{r.teacher.firstName} {r.teacher.lastName}</span>
                       </div>
                     )}
-                  </div>
-                  {/* Stats */}
-                  <div className="hidden md:flex items-center gap-3 text-xs text-slate-500 flex-shrink-0">
-                    <span className="flex items-center gap-1" title="Vues">
-                      <Eye className="w-3.5 h-3.5" /> {formatNumber(r.viewsCount)}
-                    </span>
-                    <span className="flex items-center gap-1" title="Téléchargements">
-                      <Download className="w-3.5 h-3.5" /> {formatNumber(r.downloadsCount)}
-                    </span>
-                    <span className="flex items-center gap-1" title="Note">
-                      <Star className="w-3.5 h-3.5 text-amber-500" /> {r.avgRating.toFixed(1)}
-                    </span>
-                  </div>
-                  {/* Status badge */}
-                  <div className="flex-shrink-0">
-                    <span className={`px-2.5 py-1 text-xs font-bold rounded-lg ${statusColors[r.status] || 'bg-slate-100 text-slate-700'}`}>
-                      {statusLabels[r.status] || r.status}
-                    </span>
-                  </div>
-                  {/* Quick actions */}
-                  <div className="flex-shrink-0 flex items-center gap-1">
-                    <Link
-                      href={r.numericId ? `/ressources/${r.numericId}/${r.slug}` : `/ressources/legacy-${r.id}/${r.slug}`}
-                      target="_blank"
-                      className="p-2 text-slate-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition"
-                      title="Voir la ressource"
-                    >
-                      <Eye className="w-4 h-4" />
-                    </Link>
+                    {/* Bottom row: stats + status + action */}
+                    <div className="flex items-center gap-3 mt-2 text-xs text-slate-500 flex-wrap">
+                      <span className="flex items-center gap-1" title="Vues">
+                        <Eye className="w-3.5 h-3.5" /> {formatNumber(r.viewsCount)}
+                      </span>
+                      <span className="flex items-center gap-1" title="Téléchargements">
+                        <Download className="w-3.5 h-3.5" /> {formatNumber(r.downloadsCount)}
+                      </span>
+                      <span className="flex items-center gap-1" title="Note">
+                        <Star className="w-3.5 h-3.5 text-amber-500" /> {r.avgRating.toFixed(1)}
+                      </span>
+                      <span className={`px-2 py-0.5 text-xs font-bold rounded ${statusColors[r.status] || 'bg-slate-100 text-slate-700'}`}>
+                        {statusLabels[r.status] || r.status}
+                      </span>
+                      <Link
+                        href={r.numericId ? `/ressources/${r.numericId}/${r.slug}` : `/ressources/legacy-${r.id}/${r.slug}`}
+                        target="_blank"
+                        className="ml-auto inline-flex items-center gap-1 px-2 py-1 text-xs text-slate-600 hover:text-primary-600 hover:bg-primary-50 rounded transition"
+                        title="Voir la ressource"
+                      >
+                        <Eye className="w-3.5 h-3.5" /> Voir
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </div>
