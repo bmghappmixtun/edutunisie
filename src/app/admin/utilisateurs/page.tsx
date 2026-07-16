@@ -93,6 +93,8 @@ async function fetchUsersNormal({ where, sort, skip, pageSize }: { where: any; s
     orderBy,
     select: {
       id: true,
+      numericId: true,
+      slug: true,
       email: true,
       firstName: true,
       lastName: true,

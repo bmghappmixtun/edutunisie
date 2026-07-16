@@ -65,6 +65,7 @@ export const authOptions: AuthOptions = {
               emailVerifiedAt: new Date(),
               oauthProvider: account.provider,
               oauthId: account.providerAccountId,
+              slug: '', // auto-filled by Prisma middleware
             }
           });
         }

@@ -29,7 +29,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const action = body.action;
     const reason: string | undefined = body.reason;
 
-    const resource = await prisma.resource.findUnique({ where: { id } });
+    const resource = await prisma.resource.findUnique({
+      where: { id },
+      include: { teacher: { select: { numericId: true, slug: true } } },
+    });
     if (!resource) return NextResponse.json({ error: 'Ressource introuvable' }, { status: 404 });
 
     if (resource.editStatus !== 'PENDING_EDIT_APPROVAL') {
@@ -81,7 +84,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       revalidatePath('/enseignant/ressources');
       revalidatePath('/admin/ressources/editions');
       revalidatePath('/admin/ressources');
-      if (resource.teacherId) revalidatePath(`/professeurs/${resource.teacherId}`);
+      if (resource.teacherId && resource.teacher) revalidatePath(`/professeurs/${resource.teacher.numericId}/${resource.teacher.slug}`);
 
       const finalUrl = `${siteUrl}/ressources/${pending.numericId}/${newSlug(pending)}`;
 
@@ -129,7 +132,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       });
       revalidatePath('/admin/ressources/editions');
       revalidatePath('/enseignant/ressources');
-      if (resource.teacherId) revalidatePath(`/professeurs/${resource.teacherId}`);
+      if (resource.teacherId && resource.teacher) revalidatePath(`/professeurs/${resource.teacher.numericId}/${resource.teacher.slug}`);
 
       // Notify teacher
       if (resource.editRequestedById) {

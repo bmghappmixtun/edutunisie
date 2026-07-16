@@ -16,6 +16,8 @@ import InviteTeacherButton from './InviteTeacherButton';
 
 type User = {
   id: string;
+  numericId?: number | null;
+  slug?: string | null;
   email: string;
   firstName: string | null;
   lastName: string | null;
@@ -620,7 +622,7 @@ export default function UsersManagementClient({
                         />
                         {u.role === 'TEACHER' && (
                           <Link
-                            href={`/professeurs/${u.id}`}
+                            href={`/professeurs/${u.numericId}/${u.slug}`}
                             target="_blank"
                             className="p-1 hover:bg-slate-100 rounded"
                             title="Voir le profil public"

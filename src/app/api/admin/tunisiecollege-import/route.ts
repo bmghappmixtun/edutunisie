@@ -80,6 +80,7 @@ async function ensureTeacher(name: string, teacherId?: string, source: string = 
       lastName,
       role: 'TEACHER',
       status: 'ACTIVE',
+      slug: '', // auto-filled by Prisma middleware
       schoolName: null,
       teachingSubjects: JSON.stringify(['mathematiques']),
       teachingLevels: JSON.stringify(['7eme', '8eme', '9eme']),

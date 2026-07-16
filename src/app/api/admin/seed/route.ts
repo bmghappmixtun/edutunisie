@@ -122,6 +122,7 @@ export async function POST(req: NextRequest) {
         emailVerifiedAt: new Date(),
         firstName: 'Admin', lastName: 'Principal',
         schoolName: 'Examanet', governorate: 'Tunis',
+        slug: 'admin-principal',
       }
     });
 
@@ -145,6 +146,7 @@ export async function POST(req: NextRequest) {
         bio: 'Professeur passionné avec plus de 10 ans d\'expérience dans l\'enseignement.',
         teachingSubjects: JSON.stringify(t.subjects),
         lastLoginAt: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000),
+        slug: '',
       }
     })));
 
@@ -165,6 +167,7 @@ export async function POST(req: NextRequest) {
         schoolName: 'Lycée Pilote', classLevel: s.classLevel, section: s.section,
         governorate: 'Tunis',
         lastLoginAt: new Date(Date.now() - Math.random() * 3 * 24 * 60 * 60 * 1000),
+        slug: '',
       }
     })));
 

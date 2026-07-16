@@ -65,11 +65,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Teachers (top 200 by resource count)
   const teachers = await prisma.user.findMany({
     where: { uploadedFiles: { some: {} } },
-    select: { id: true },
+    select: { id: true, numericId: true, slug: true },
     take: 200,
   });
   const teacherPages: MetadataRoute.Sitemap = teachers.map(t => ({
-    url: `${baseUrl}/professeurs/${t.id}`,
+    url: `${baseUrl}/professeurs/${t.numericId}/${t.slug}`,
     changeFrequency: 'monthly' as const,
     priority: 0.5,
   }));

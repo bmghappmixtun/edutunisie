@@ -65,6 +65,7 @@ export async function POST(req: NextRequest) {
         role,
         status,
         emailVerifiedAt: null,
+        slug: '', // auto-filled by Prisma middleware
       }
     });
 

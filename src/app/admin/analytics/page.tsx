@@ -153,6 +153,8 @@ export default async function AdminAnalyticsPage({
     take: 5,
     select: {
       id: true,
+      numericId: true,
+      slug: true,
       firstName: true,
       lastName: true,
       avatarUrl: true,
@@ -377,7 +379,7 @@ export default async function AdminAnalyticsPage({
                 </div>
                 <div className="flex-1 min-w-0">
                   <Link
-                    href={`/professeurs/${t.id}`}
+                    href={`/professeurs/${t.numericId}/${t.slug}`}
                     target="_blank"
                     className="font-semibold text-sm text-slate-800 hover:text-primary-600 truncate block"
                   >

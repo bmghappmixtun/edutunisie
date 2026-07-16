@@ -23,11 +23,12 @@ export const dynamic = 'force-dynamic';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
 
-export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+export async function generateMetadata({ params }: { params: Promise<{ numericId: string; slug: string }> }) {
+  const { numericId: numericIdStr, slug } = await params;
+  const numericId = parseInt(numericIdStr, 10);
   const teacher = await prisma.user.findUnique({
-    where: { id },
-    select: { firstName: true, lastName: true, firstNameAr: true, lastNameAr: true, bio: true, schoolName: true, schoolNameAr: true },
+    where: { numericId },
+    select: { slug: true, firstName: true, lastName: true, firstNameAr: true, lastNameAr: true, bio: true, schoolName: true, schoolNameAr: true },
   });
   if (!teacher) return { title: 'Enseignant non trouvé' };
   const fullName = `${teacher.firstName || ''} ${teacher.lastName || ''}`.replace(/\s+/g, ' ').trim();
@@ -37,11 +38,11 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   return {
     title: `${fullName} — Enseignant`,
     description,
-    alternates: { canonical: `${SITE_URL}/professeurs/${id}` },
+    alternates: { canonical: `${SITE_URL}/professeurs/${numericId}/${teacher.slug || ''}` },
     openGraph: {
       title: `${fullName} — Enseignant sur Examanet`,
       description,
-      url: `${SITE_URL}/professeurs/${id}`,
+      url: `${SITE_URL}/professeurs/${numericId}/${teacher.slug || ''}`,
       locale: 'fr_TN',
       type: 'profile',
     },
@@ -66,18 +67,19 @@ const TYPE_COLORS: Record<string, string> = {
   OTHER: 'from-slate-500 to-slate-700'
 };
 
-export default async function TeacherProfilePage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+export default async function TeacherProfilePage({ params }: { params: Promise<{ numericId: string; slug: string }> }) {
+  const { numericId: numericIdStr, slug } = await params;
+  const numericId = parseInt(numericIdStr, 10);
 
   const teacher = await prisma.user.findFirst({
     where: {
-      id,
+      numericId,
       role: 'TEACHER',
       // Show ACTIVE teachers, or any teacher if admin wants to see
       OR: [{ status: 'ACTIVE' }, { isVerifiedTeacher: true }]
     },
     select: {
-      id: true, firstName: true, lastName: true, firstNameAr: true, lastNameAr: true, avatarUrl: true, bio: true,
+      id: true, numericId: true, slug: true, firstName: true, lastName: true, firstNameAr: true, lastNameAr: true, avatarUrl: true, bio: true,
       email: true, schoolName: true, schoolNameAr: true, governorate: true, diploma: true,
       teachingSubjects: true, teachingLevels: true, createdAt: true,
       lastLoginAt: true
@@ -92,11 +94,11 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
   let followersCount = 0;
   if (currentUser) {
     const follow = await prisma.follow.findUnique({
-      where: { followerId_followingId: { followerId: currentUser.id, followingId: id } }
+      where: { followerId_followingId: { followerId: currentUser.id, followingId: teacher.id } }
     });
     isFollowing = !!follow;
   }
-  followersCount = await prisma.follow.count({ where: { followingId: id } });
+  followersCount = await prisma.follow.count({ where: { followingId: teacher.id } });
 
   // Get all published resources by this teacher
   const resources = await prisma.resource.findMany({
@@ -148,7 +150,7 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
   // Latest resources (top 6)
   const latestResources = resources.slice(0, 6);
 
-  const profileUrl = `${SITE_URL}/professeurs/${teacher.id}`;
+  const profileUrl = `${SITE_URL}/professeurs/${teacher.numericId}/${teacher.slug}`;
   const initials = getInitials(teacher.firstName, teacher.lastName);
 
   // JSON-LD: Person schema + BreadcrumbList

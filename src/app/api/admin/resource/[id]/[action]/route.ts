@@ -9,7 +9,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (!user || user.role !== 'ADMIN') return NextResponse.json({ error: 'Non autorisé' }, { status: 403 });
 
   const { id, action } = await params;
-  const resource = await prisma.resource.findUnique({ where: { id } });
+  const resource = await prisma.resource.findUnique({
+    where: { id },
+    include: { teacher: { select: { numericId: true, slug: true } } },
+  });
   if (!resource) return NextResponse.json({ error: 'Ressource non trouvée' }, { status: 404 });
 
   // Accept optional body (e.g., rejection reason)
@@ -33,8 +36,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     revalidatePath('/admin/approbations');
     revalidatePath('/admin/ressources');
     revalidatePath('/admin');
-    if (resource.teacherId) {
-      revalidatePath(`/professeurs/${resource.teacherId}`);
+    if (resource.teacherId && resource.teacher) {
+      revalidatePath(`/professeurs/${resource.teacher.numericId}/${resource.teacher.slug}`);
     }
     if (resource.teacherId) {
       await prisma.notification.create({

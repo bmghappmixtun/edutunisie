@@ -89,6 +89,8 @@ export default async function CollegePillar() {
     },
     select: {
       id: true,
+      numericId: true,
+      slug: true,
       firstName: true,
       lastName: true,
       avatarUrl: true,
@@ -358,7 +360,7 @@ export default async function CollegePillar() {
                 {topTeachers.map((t) => (
                   <Link
                     key={t.id}
-                    href={`/professeurs/${t.id}`}
+                    href={`/professeurs/${t.numericId}/${t.slug}`}
                     className="group bg-slate-50 rounded-2xl p-5 text-center hover:bg-white hover:shadow-lg transition-all border border-transparent hover:border-primary-200"
                   >
                     <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-primary-400 to-primary-600 text-white font-bold text-xl flex items-center justify-center mb-3">
