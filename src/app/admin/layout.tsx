@@ -53,7 +53,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       <div className="flex-1 pt-20 overflow-x-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="grid lg:grid-cols-[280px_1fr] gap-6 overflow-x-hidden">
-            <aside className="lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto space-y-2">
+            <aside className="lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto space-y-3">
               {/* Profile card */}
               <div className="bg-gradient-to-br from-red-500 to-rose-600 rounded-2xl p-4 text-white shadow-md">
                 <div className="flex items-center gap-3">
@@ -72,35 +72,48 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                 )}
               </div>
 
-              {/* Nav groups */}
+              {/* Nav groups (each in a rounded container) */}
               {(() => {
-                let currentGroup: string | null = null;
-                return navItems.map((item, idx) => {
+                // Group nav items by their group header
+                const groups: { name: string; items: any[] }[] = [];
+                let current: { name: string; items: any[] } | null = null;
+                for (const item of navItems) {
                   if (item.group) {
-                    currentGroup = item.group;
-                    return (
-                      <div key={`g-${idx}`} className="px-3 pt-3 pb-1 text-xs font-bold text-slate-400 uppercase tracking-wide">
-                        {item.group}
-                      </div>
-                    );
+                    if (current) groups.push(current);
+                    current = { name: item.group, items: [] };
+                  } else if (current) {
+                    current.items.push(item);
                   }
-                  const Icon = item.icon;
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:bg-red-50 hover:text-red-700 transition"
-                    >
-                      <Icon className="w-4 h-4 flex-shrink-0" />
-                      <span className="flex-1 truncate">{item.label}</span>
-                      {item.badge !== undefined && item.badge > 0 && (
-                        <span className={`px-1.5 py-0.5 text-white text-[10px] font-bold rounded-full ${item.badgeColor || 'bg-slate-500'}`}>
-                          {item.badge}
-                        </span>
-                      )}
-                    </Link>
-                  );
-                });
+                }
+                if (current) groups.push(current);
+
+                return groups.map((g, gi) => (
+                  <div key={gi} className="bg-white rounded-2xl border border-slate-100 p-2 shadow-sm">
+                    <div className="px-3 pt-2 pb-1.5 text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
+                      {g.name}
+                    </div>
+                    <div className="space-y-0.5">
+                      {g.items.map((item: any) => {
+                        const Icon = item.icon;
+                        return (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:bg-red-50 hover:text-red-700 transition"
+                          >
+                            <Icon className="w-4 h-4 flex-shrink-0" />
+                            <span className="flex-1 truncate">{item.label}</span>
+                            {item.badge !== undefined && item.badge > 0 && (
+                              <span className={`px-1.5 py-0.5 text-white text-[10px] font-bold rounded-full ${item.badgeColor || 'bg-slate-500'}`}>
+                                {item.badge}
+                              </span>
+                            )}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ));
               })()}
             </aside>
 
