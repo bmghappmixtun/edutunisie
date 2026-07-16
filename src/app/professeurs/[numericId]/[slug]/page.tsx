@@ -386,7 +386,7 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
                 </h2>
                 {resources.length > 6 && (
                   <Link
-                    href={`/ressources?teacher=${teacher.id}`}
+                    href={`/ressources?teacherId=${teacher.id}`}
                     className="text-sm text-primary-600 hover:text-primary-700 font-semibold"
                   >
                     Tout voir →
