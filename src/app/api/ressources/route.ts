@@ -94,38 +94,32 @@ export async function GET(req: NextRequest) {
     const teacherIdStr = String(where.teacherId);
     let resolvedCuid: string | null = null;
     try {
-      // Always try numericId first if it's purely numeric
       const isNumeric = /^\d+$/.test(teacherIdStr);
-      console.log(`[api/ressources] teacherId="${teacherIdStr}" isNumeric=${isNumeric} len=${teacherIdStr.length}`);
       if (isNumeric) {
-        const t = await prisma.user.findUnique({
-          where: { numericId: parseInt(teacherIdStr, 10) },
-          select: { id: true },
-        });
-        console.log(`[api/ressources] numericId lookup result:`, t);
-        resolvedCuid = t?.id ?? null;
+        // Use raw SQL — guaranteed to hit the right DB column without
+        // depending on which Prisma client / schema is loaded by this
+        // serverless runtime. numericId is INT, id is TEXT (cuid).
+        const rows = await prisma.$queryRaw<Array<{ id: string }>>`
+          SELECT id FROM "User" WHERE "numericId" = ${parseInt(teacherIdStr, 10)} LIMIT 1
+        `;
+        resolvedCuid = rows[0]?.id ?? null;
         if (!resolvedCuid) {
-          // Fallback: maybe the input is a cuid-shaped string
-          const t2 = await prisma.user.findUnique({
-            where: { id: teacherIdStr },
-            select: { id: true },
-          });
-          console.log(`[api/ressources] cuid fallback result:`, t2);
-          resolvedCuid = t2?.id ?? null;
+          // Maybe it's actually a cuid in the URL (legacy or test data)
+          const rows2 = await prisma.$queryRaw<Array<{ id: string }>>`
+            SELECT id FROM "User" WHERE "id" = ${teacherIdStr} LIMIT 1
+          `;
+          resolvedCuid = rows2[0]?.id ?? null;
         }
       } else {
-        const t = await prisma.user.findUnique({
-          where: { id: teacherIdStr },
-          select: { id: true },
-        });
-        console.log(`[api/ressources] cuid lookup result:`, t);
-        resolvedCuid = t?.id ?? null;
+        const rows = await prisma.$queryRaw<Array<{ id: string }>>`
+          SELECT id FROM "User" WHERE "id" = ${teacherIdStr} LIMIT 1
+        `;
+        resolvedCuid = rows[0]?.id ?? null;
       }
     } catch (err) {
       console.error('[api/ressources] teacher lookup failed:', err);
     }
     where.teacherId = resolvedCuid ?? '__no_match__';
-    console.log('[api/ressources] final where.teacherId:', where.teacherId);
   }
 
   // Build base where for facets (excludes search OR to avoid type conflicts)
