@@ -93,21 +93,28 @@ export async function GET(req: NextRequest) {
   if (where.teacherId) {
     const teacherIdStr = String(where.teacherId);
     let resolvedCuid: string | null = null;
-    if (/^\d+$/.test(teacherIdStr)) {
-      const t = await prisma.user.findUnique({
-        where: { numericId: parseInt(teacherIdStr, 10) },
-        select: { id: true },
-      });
-      resolvedCuid = t?.id ?? null;
-    } else {
-      // Assume cuid - validate it exists (cheap)
-      const t = await prisma.user.findUnique({
-        where: { id: teacherIdStr },
-        select: { id: true },
-      });
-      resolvedCuid = t?.id ?? null;
+    try {
+      if (/^\d+$/.test(teacherIdStr)) {
+        const t = await prisma.user.findUnique({
+          where: { numericId: parseInt(teacherIdStr, 10) },
+          select: { id: true },
+        });
+        resolvedCuid = t?.id ?? null;
+        console.log(`[api/ressources] numericId=${teacherIdStr} → cuid=${resolvedCuid}`);
+      } else {
+        // Assume cuid - validate it exists (cheap)
+        const t = await prisma.user.findUnique({
+          where: { id: teacherIdStr },
+          select: { id: true },
+        });
+        resolvedCuid = t?.id ?? null;
+        console.log(`[api/ressources] cuid=${teacherIdStr} → resolved=${resolvedCuid}`);
+      }
+    } catch (err) {
+      console.error('[api/ressources] teacher lookup failed:', err);
     }
     where.teacherId = resolvedCuid ?? '__no_match__';
+    console.log('[api/ressources] final where.teacherId:', where.teacherId);
   }
 
   // Build base where for facets (excludes search OR to avoid type conflicts)
