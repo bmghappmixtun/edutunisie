@@ -88,6 +88,19 @@ export async function GET(req: NextRequest) {
 
   const where = buildWhere(filters);
 
+  // Convert teacherId from numericId to cuid (DB stores cuid on Resource.teacherId)
+  if (where.teacherId && /^\d+$/.test(String(where.teacherId))) {
+    const teacher = await prisma.user.findUnique({
+      where: { numericId: parseInt(String(where.teacherId), 10) },
+      select: { id: true },
+    });
+    if (teacher) {
+      where.teacherId = teacher.id;
+    } else {
+      where.teacherId = '__no_match__';  // forces 0 results
+    }
+  }
+
   // Build base where for facets (excludes search OR to avoid type conflicts)
   const facetBase: Prisma.ResourceWhereInput = { status: 'PUBLISHED' };
   if (filters.type.length > 0) facetBase.type = { in: filters.type };
@@ -98,7 +111,10 @@ export async function GET(req: NextRequest) {
   if (filters.year.length > 0) facetBase.year = { in: filters.year };
   if (filters.language.length > 0) facetBase.language = { in: filters.language };
   if (filters.hasCorrection) facetBase.hasCorrection = true;
-  if (filters.teacherId) facetBase.teacherId = filters.teacherId;
+  if (filters.teacherId) {
+    // Reuse the converted cuid from the main where clause
+    facetBase.teacherId = where.teacherId as string;
+  }
 
   // Sort
   let orderBy: Prisma.ResourceOrderByWithRelationInput = { publishedAt: 'desc' };
