@@ -31,16 +31,19 @@ export async function generateMetadata({ params }: { params: Promise<{ numericId
     select: { slug: true, firstName: true, lastName: true, firstNameAr: true, lastNameAr: true, bio: true, schoolName: true, schoolNameAr: true },
   });
   if (!teacher) return { title: 'Enseignant non trouvé' };
-  const fullName = `${teacher.firstName || ''} ${teacher.lastName || ''}`.replace(/\s+/g, ' ').trim();
+  // Capitalize first letters of name parts ("chaabane mounir" -> "Chaabane Mounir").
+  // Source data is sometimes stored lowercase; SEO displays look better capitalized.
+  const capitalize = (s: string) => (s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : s);
+  const fullName = `${capitalize(teacher.firstName || '')} ${capitalize(teacher.lastName || '')}`.replace(/\s+/g, ' ').trim();
   const description = teacher.bio
     ? teacher.bio.slice(0, 160)
-    : `${fullName}${teacher.schoolName ? ' - ' + teacher.schoolName : ''} — Enseignant sur Examanet. Cours, devoirs et exercices gratuits.`;
+    : `${fullName}${teacher.schoolName ? ' — ' + teacher.schoolName : ''} — Enseignant. Cours, devoirs et exercices gratuits.`;
   return {
     title: `${fullName} — Enseignant`,
     description,
     alternates: { canonical: `${SITE_URL}/professeurs/${numericId}/${teacher.slug || ''}` },
     openGraph: {
-      title: `${fullName} — Enseignant sur Examanet`,
+      title: `${fullName} — Enseignant`,
       description,
       url: `${SITE_URL}/professeurs/${numericId}/${teacher.slug || ''}`,
       locale: 'fr_TN',

@@ -19,8 +19,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const isAr = locale === 'ar';
   return {
     title: isAr
-      ? 'المرجع الوطني للمنظومة التربوية التونسية — إكسامانت'
-      : 'Référentiel National du Système Éducatif Tunisien — Examanet',
+      ? 'المرجع الوطني للمنظومة التربوية التونسية'
+      : 'Référentiel National du Système Éducatif Tunisien',
     description: isAr
       ? '📘 المرجع الوطني الرسمي: المسار الكامل من السنة السابعة أساسي إلى الباكالوريا التونسية (الرائد الرسمي عدد 2019-1085). جميع الأقسام والشعب والمواد مع الحصص الرسمية، وفقاً لوزارة التربية.'
       : "📘 Référentiel national officiel : parcours complet de la 7ème année de base au Baccalauréat tunisien (JORT n° 2019-1085). Toutes les classes, sections et matières avec horaires officiels, conformes au Ministère de l'Éducation.",
