@@ -88,71 +88,31 @@ export async function GET(req: NextRequest) {
 
   const where = buildWhere(filters);
 
-  // Debug mode: ?debug=1 returns diagnostic info
-  if (searchParams.get('debug') === '1') {
-    const debug: any = { input: where.teacherId };
-    try {
-      const u = await prisma.user.findUnique({
-        where: { numericId: 953 },
-        select: { id: true, numericId: true, firstName: true, lastName: true },
-      });
-      debug.byPrisma953 = u;
-    } catch (e: any) {
-      debug.byPrisma953Error = e.message;
-    }
-    try {
-      const raw = await prisma.$queryRawUnsafe<Array<any>>(
-        `SELECT id, "numericId", "firstName" FROM "User" WHERE "numericId" = 953 LIMIT 1`
-      );
-      debug.byRaw953 = raw;
-    } catch (e: any) {
-      debug.byRaw953Error = e.message;
-    }
-    try {
-      const cnt = await prisma.$queryRaw<Array<{ count: bigint }>>`SELECT COUNT(*)::bigint as count FROM "User" WHERE "numericId" IS NOT NULL`;
-      debug.totalWithNumericId = Number(cnt[0]?.count || 0);
-    } catch (e: any) {
-      debug.totalError = e.message;
-    }
-    try {
-      const col = await prisma.$queryRaw<Array<any>>`SELECT column_name, data_type FROM information_schema.columns WHERE table_name = 'User' AND column_name IN ('id', 'numericId', 'slug')`;
-      debug.columns = col;
-    } catch (e: any) {
-      debug.columnsError = e.message;
-    }
-    return NextResponse.json(debug);
-  }
-
   // Convert teacherId from numericId to cuid (DB stores cuid on Resource.teacherId)
   // Accept both numericId (preferred, stable, exposed in URLs) and cuid (legacy)
   if (where.teacherId) {
     const teacherIdStr = String(where.teacherId);
     let resolvedCuid: string | null = null;
-    try {
-      const isNumeric = /^\d+$/.test(teacherIdStr);
-      if (isNumeric) {
-        // Use raw SQL — guaranteed to hit the right DB column without
-        // depending on which Prisma client / schema is loaded by this
-        // serverless runtime. numericId is INT, id is TEXT (cuid).
-        const rows = await prisma.$queryRaw<Array<{ id: string }>>`
-          SELECT id FROM "User" WHERE "numericId" = ${parseInt(teacherIdStr, 10)} LIMIT 1
-        `;
-        resolvedCuid = rows[0]?.id ?? null;
-        if (!resolvedCuid) {
-          // Maybe it's actually a cuid in the URL (legacy or test data)
-          const rows2 = await prisma.$queryRaw<Array<{ id: string }>>`
-            SELECT id FROM "User" WHERE "id" = ${teacherIdStr} LIMIT 1
-          `;
-          resolvedCuid = rows2[0]?.id ?? null;
-        }
-      } else {
-        const rows = await prisma.$queryRaw<Array<{ id: string }>>`
-          SELECT id FROM "User" WHERE "id" = ${teacherIdStr} LIMIT 1
-        `;
-        resolvedCuid = rows[0]?.id ?? null;
+    if (/^\d+$/.test(teacherIdStr)) {
+      const t = await prisma.user.findUnique({
+        where: { numericId: parseInt(teacherIdStr, 10) },
+        select: { id: true },
+      });
+      resolvedCuid = t?.id ?? null;
+      if (!resolvedCuid) {
+        // Maybe the input is actually a cuid (legacy URL)
+        const t2 = await prisma.user.findUnique({
+          where: { id: teacherIdStr },
+          select: { id: true },
+        });
+        resolvedCuid = t2?.id ?? null;
       }
-    } catch (err) {
-      console.error('[api/ressources] teacher lookup failed:', err);
+    } else {
+      const t = await prisma.user.findUnique({
+        where: { id: teacherIdStr },
+        select: { id: true },
+      });
+      resolvedCuid = t?.id ?? null;
     }
     where.teacherId = resolvedCuid ?? '__no_match__';
   }
