@@ -17,7 +17,7 @@ export function generateMetadata({ searchParams }: { searchParams: any }): Metad
   const isAr = locale === 'ar';
   const hasQuery = !!(searchParams?.q || searchParams?.subject || searchParams?.class);
   return {
-    title: isAr ? 'بحث | إكسامانت' : 'Recherche | Examanet',
+    title: isAr ? 'بحث' : 'Recherche',
     description: isAr
       ? 'ابحث في آلاف الموارد التربوية المجانية: دروس، فروض، تمارين، مواضيع باك وإصلاحات. بحث متسامح مع الأخطاء، مرادفات فرنسية/عربية مشمولة.'
       : 'Recherchez parmi des milliers de ressources pédagogiques gratuites : cours, devoirs, exercices, sujets de bac et corrigés. Recherche tolérante aux fautes, synonymes FR/AR inclus.',

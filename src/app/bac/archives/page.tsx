@@ -27,8 +27,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const isAr = locale === 'ar';
   const stats = getBacStats();
   const title = isAr
-    ? `أرشيف الباكالوريا التونسية — ${stats.totalFiles} ملف من 2010 إلى 2025 | إكسامانت`
-    : `Archives Bac Tunisie — ${stats.totalFiles} fichiers de 2010 à 2025 | Examanet`;
+    ? `أرشيف الباكالوريا التونسية — ${stats.totalFiles} ملف من 2010 إلى 2025`
+    : `Archives Bac Tunisie — ${stats.totalFiles} fichiers de 2010 à 2025`;
   const desc = isAr
     ? `📥 ${stats.totalFiles} ملف من مواضيع وإصلاحات الباكالوريا التونسية من 2010 إلى 2025 — ${stats.sectionsCount} شعب، ${stats.subjectsCount} مواد، دورة رئيسية ومراقبة. تصفية، بحث، تحميل مباشر.`
     : `📥 ${stats.totalFiles} fichiers de sujets et corrigés du Bac tunisien de 2010 à 2025 — ${stats.sectionsCount} sections, ${stats.subjectsCount} matières, sessions principale et contrôle. Filtre, recherche, téléchargement direct.`;
