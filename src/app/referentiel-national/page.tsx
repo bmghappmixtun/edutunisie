@@ -24,25 +24,27 @@ export async function generateMetadata(): Promise<Metadata> {
     description: isAr
       ? '📘 المرجع الوطني الرسمي: المسار الكامل من السنة السابعة أساسي إلى الباكالوريا التونسية (الرائد الرسمي عدد 2019-1085). جميع الأقسام والشعب والمواد مع الحصص الرسمية، وفقاً لوزارة التربية.'
       : "📘 Référentiel national officiel : parcours complet de la 7ème année de base au Baccalauréat tunisien (JORT n° 2019-1085). Toutes les classes, sections et matières avec horaires officiels, conformes au Ministère de l'Éducation.",
-    keywords: isAr ? [
-      'المرجع الوطني تونس',
-      'المنظومة التربوية التونسية',
-      'البرنامج الرسمي وزارة التربية',
-      'الرائد الرسمي 2019-1085',
-      'الأقسام السابعة والثامنة والتاسعة تونس',
-      'شعبة الباكالوريا تونس',
-      'الباكالوريا التونسية',
-      'إصلاح التعليم تونس',
-    ] : [
-      'référentiel national Tunisie',
-      'système éducatif tunisien',
-      'programme officiel Ministère Éducation Tunisie',
-      'JORT 2019-1085',
-      'classes 7ème 8ème 9ème Tunisie',
-      'sections baccalauréat Tunisie',
-      'baccalauréat tunisien',
-      'réforme éducative Tunisie',
-    ],
+    keywords: isAr
+      ? [
+          'المرجع الوطني تونس',
+          'المنظومة التربوية التونسية',
+          'البرنامج الرسمي وزارة التربية',
+          'الرائد الرسمي 2019-1085',
+          'الأقسام السابعة والثامنة والتاسعة تونس',
+          'شعبة الباكالوريا تونس',
+          'الباكالوريا التونسية',
+          'إصلاح التعليم تونس',
+        ]
+      : [
+          'référentiel national Tunisie',
+          'système éducatif tunisien',
+          'programme officiel Ministère Éducation Tunisie',
+          'JORT 2019-1085',
+          'classes 7ème 8ème 9ème Tunisie',
+          'sections baccalauréat Tunisie',
+          'baccalauréat tunisien',
+          'réforme éducative Tunisie',
+        ],
     alternates: { canonical: `${SITE_URL}/referentiel-national` },
     openGraph: {
       title: isAr
@@ -74,7 +76,10 @@ export default function ReferentielNationalPage() {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <Header />
       {/* Inline the page-specific CSS so it scopes itself */}
       <style dangerouslySetInnerHTML={{ __html: css }} />

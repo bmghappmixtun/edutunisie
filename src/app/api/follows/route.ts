@@ -12,18 +12,19 @@ export async function POST(req: NextRequest) {
   const { teacherId } = await req.json();
   if (!teacherId) return NextResponse.json({ error: 'teacherId requis' }, { status: 400 });
 
-  if (teacherId === user.id) return NextResponse.json({ error: 'Impossible de se suivre soi-même' }, { status: 400 });
+  if (teacherId === user.id)
+    return NextResponse.json({ error: 'Impossible de se suivre soi-même' }, { status: 400 });
 
   // Verify teacher exists
   const teacher = await prisma.user.findFirst({
     where: { id: teacherId, role: 'TEACHER' },
-    select: { id: true }
+    select: { id: true },
   });
   if (!teacher) return NextResponse.json({ error: 'Professeur introuvable' }, { status: 404 });
 
   // Check if already following
   const existing = await prisma.follow.findUnique({
-    where: { followerId_followingId: { followerId: user.id, followingId: teacherId } }
+    where: { followerId_followingId: { followerId: user.id, followingId: teacherId } },
   });
 
   if (existing) {
@@ -32,7 +33,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ following: false, followersCount: count });
   } else {
     await prisma.follow.create({
-      data: { followerId: user.id, followingId: teacherId }
+      data: { followerId: user.id, followingId: teacherId },
     });
     // Notify teacher
     await prisma.notification.create({
@@ -41,8 +42,8 @@ export async function POST(req: NextRequest) {
         type: 'new_follower',
         title: 'Nouveau follower 👋',
         message: `${user.firstName || 'Un utilisateur'} ${user.lastName || ''} vous suit maintenant.`,
-        link: `/profil/${user.id}`
-      }
+        link: `/profil/${user.id}`,
+      },
     });
     const count = await prisma.follow.count({ where: { followingId: teacherId } });
     return NextResponse.json({ following: true, followersCount: count });
@@ -60,7 +61,7 @@ export async function GET(req: NextRequest) {
   let following = false;
   if (user) {
     const follow = await prisma.follow.findUnique({
-      where: { followerId_followingId: { followerId: user.id, followingId: teacherId } }
+      where: { followerId_followingId: { followerId: user.id, followingId: teacherId } },
     });
     following = !!follow;
   }

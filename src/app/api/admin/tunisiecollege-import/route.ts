@@ -29,8 +29,7 @@ const ROOT_URL = 'https://examanet.com/';
 
 async function checkAdmin(req: NextRequest) {
   // Allow SEED_TOKEN bypass for script-based imports
-  const seedToken = req.headers.get('x-seed-token') ||
-    req.nextUrl.searchParams.get('token');
+  const seedToken = req.headers.get('x-seed-token') || req.nextUrl.searchParams.get('token');
   if (seedToken && seedToken === process.env.SEED_TOKEN) {
     // Find admin user for attribution
     const admin = await prisma.user.findFirst({
@@ -46,13 +45,20 @@ async function checkAdmin(req: NextRequest) {
   return user;
 }
 
-async function ensureTeacher(name: string, teacherId?: string, source: string = 'tunisiecollege.net') {
+async function ensureTeacher(
+  name: string,
+  teacherId?: string,
+  source: string = 'tunisiecollege.net',
+) {
   if (teacherId) {
     const existing = await prisma.user.findUnique({ where: { id: teacherId } });
     if (existing) return existing;
   }
   // Normalize the name (uppercase, trimmed, no extra spaces)
-  const cleanedName = name.replace(/^(Mr|Mme|Mlle|Prof|Professeur)\.?\s+/i, '').trim().replace(/\s+/g, ' ');
+  const cleanedName = name
+    .replace(/^(Mr|Mme|Mlle|Prof|Professeur)\.?\s+/i, '')
+    .trim()
+    .replace(/\s+/g, ' ');
   const parts = cleanedName.split(' ');
   const firstName = parts[0] || 'Unknown';
   const lastName = parts.slice(1).join(' ') || 'Unknown';
@@ -94,17 +100,25 @@ function slugify(text: string): string {
   // SECURITY/QUALITY FIX: transliterate accents BEFORE filtering non-ASCII
   // (was: directly removing non-ASCII chars, which made "série" → "srie"
   //  instead of "serie" — silent data loss for French/Arabic titles)
-  return text
-    .toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // strip diacritics
-    .replace(/[àáâãäå]/g, 'a').replace(/[èéêë]/g, 'e').replace(/[ìíîï]/g, 'i')
-    .replace(/[òóôõö]/g, 'o').replace(/[ùúûü]/g, 'u').replace(/[ç]/g, 'c')
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .substring(0, 60)
-    + '-' + nanoid(6);
+  return (
+    text
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '') // strip diacritics
+      .replace(/[àáâãäå]/g, 'a')
+      .replace(/[èéêë]/g, 'e')
+      .replace(/[ìíîï]/g, 'i')
+      .replace(/[òóôõö]/g, 'o')
+      .replace(/[ùúûü]/g, 'u')
+      .replace(/[ç]/g, 'c')
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .substring(0, 60) +
+    '-' +
+    nanoid(6)
+  );
 }
 
 export async function POST(req: NextRequest) {
@@ -156,9 +170,12 @@ export async function POST(req: NextRequest) {
       : null;
 
     if (!subjectId || !classId) {
-      return NextResponse.json({
-        error: `Missing subject or class (subjectSlug=${parsed.subjectSlug}, classSlug=${parsed.classSlug})`,
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          error: `Missing subject or class (subjectSlug=${parsed.subjectSlug}, classSlug=${parsed.classSlug})`,
+        },
+        { status: 400 },
+      );
     }
 
     // Upload PDF to Vercel Blob (public, on examanet)
@@ -226,7 +243,7 @@ export async function POST(req: NextRequest) {
     // pdfKey/pdfUrl/pdfSize: always the PDF version
     await prisma.teacherFile.create({
       data: {
-        fileName: originalFile?.name || (parsed.title + '.pdf'),
+        fileName: originalFile?.name || parsed.title + '.pdf',
         fileKey: originalBlob?.pathname || blob.pathname,
         fileUrl: originalBlob?.url || blob.url,
         fileSize: originalBuffer?.length || pdfBuffer.length,
@@ -255,7 +272,6 @@ export async function POST(req: NextRequest) {
       originalFileUrl: originalBlob?.url || null,
       originalFormat: originalFormat || null,
     });
-
   } catch (e: any) {
     console.error('[tunisiecollege-import]', e);
     return NextResponse.json({ error: e.message }, { status: 500 });

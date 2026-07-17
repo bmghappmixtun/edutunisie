@@ -16,24 +16,114 @@
  * Max 12 tags per resource
  */
 
-import { CLASSES, getSectionsForClass } from './teacher-workflow-data';
-
 // ============================================================================
 // STOP WORDS (FR + AR transliterated)
 // ============================================================================
 const STOP_WORDS_FR = new Set([
-  'le', 'la', 'les', 'un', 'une', 'des', 'de', 'du', 'au', 'aux', 'a', 'à',
-  'et', 'ou', 'mais', 'donc', 'or', 'ni', 'car',
-  'ce', 'cette', 'ces', 'ceci', 'cela', 'ça', 'ceux', 'celles',
-  'mon', 'ma', 'mes', 'ton', 'ta', 'tes', 'son', 'sa', 'ses', 'notre', 'votre', 'leur', 'leurs',
-  'je', 'tu', 'il', 'elle', 'on', 'nous', 'vous', 'ils', 'elles',
-  'qui', 'que', 'quoi', 'dont', 'où', 'lequel', 'laquelle',
-  'est', 'sont', 'était', 'étaient', 'soit', 'sera', 'seront',
-  'a', 'as', 'avons', 'avez', 'ont',
-  'pour', 'par', 'avec', 'sans', 'sous', 'sur', 'dans', 'entre', 'vers', 'chez',
-  'si', 'oui', 'non', 'peut', 'être',
-  'mr', 'mme', 'm.', 'monsieur', 'madame', 'élève', 'eleve', 'prof', 'professeur', 'enseignant',
-  'n', 'n°', 'no', 'numéro', 'numero', 'n°1', 'n°2', 'n°3', 'n°4', 'n°5', 'n°6',
+  'le',
+  'la',
+  'les',
+  'un',
+  'une',
+  'des',
+  'de',
+  'du',
+  'au',
+  'aux',
+  'a',
+  'à',
+  'et',
+  'ou',
+  'mais',
+  'donc',
+  'or',
+  'ni',
+  'car',
+  'ce',
+  'cette',
+  'ces',
+  'ceci',
+  'cela',
+  'ça',
+  'ceux',
+  'celles',
+  'mon',
+  'ma',
+  'mes',
+  'ton',
+  'ta',
+  'tes',
+  'son',
+  'sa',
+  'ses',
+  'notre',
+  'votre',
+  'leur',
+  'leurs',
+  'je',
+  'tu',
+  'il',
+  'elle',
+  'on',
+  'nous',
+  'vous',
+  'ils',
+  'elles',
+  'qui',
+  'que',
+  'quoi',
+  'dont',
+  'où',
+  'lequel',
+  'laquelle',
+  'est',
+  'sont',
+  'était',
+  'étaient',
+  'soit',
+  'sera',
+  'seront',
+  'a',
+  'as',
+  'avons',
+  'avez',
+  'ont',
+  'pour',
+  'par',
+  'avec',
+  'sans',
+  'sous',
+  'sur',
+  'dans',
+  'entre',
+  'vers',
+  'chez',
+  'si',
+  'oui',
+  'non',
+  'peut',
+  'être',
+  'mr',
+  'mme',
+  'm.',
+  'monsieur',
+  'madame',
+  'élève',
+  'eleve',
+  'prof',
+  'professeur',
+  'enseignant',
+  'n',
+  'n°',
+  'no',
+  'numéro',
+  'numero',
+  'n°1',
+  'n°2',
+  'n°3',
+  'n°4',
+  'n°5',
+  'n°6',
 ]);
 
 // ============================================================================
@@ -47,16 +137,16 @@ const SUBJECT_KEYWORDS: Record<string, string[]> = {
   anglais: ['anglais', 'english', 'langue-anglaise'],
   arabe: ['arabe', 'عربية', 'langue-arabe'],
   'histoire-geographie': ['histoire', 'geographie', 'hg', 'histoire-geographie'],
-  'philosophie': ['philo', 'philosophie'],
-  'informatique': ['informatique', 'info', 'tic', 'numérique'],
+  philosophie: ['philo', 'philosophie'],
+  informatique: ['informatique', 'info', 'tic', 'numérique'],
   'algo-prog': ['algorithmique', 'programmation', 'algo', 'coding'],
-  'tic': ['tic', 'technologies-information'],
+  tic: ['tic', 'technologies-information'],
   'bases-donnees': ['bd', 'sql', 'base-de-donnees', 'bases-de-donnees'],
   'systeme-exploitation-reseaux': ['reseaux', 'systeme-exploitation', 'os', 'linux', 'windows'],
-  'economie': ['economie', 'économie', 'sciences-economiques'],
-  'gestion': ['gestion', 'comptabilite', 'management'],
-  'sport': ['sport', 'eps', 'education-physique'],
-  'technologie': ['technologie', 'techno', 'technique'],
+  economie: ['economie', 'économie', 'sciences-economiques'],
+  gestion: ['gestion', 'comptabilite', 'management'],
+  sport: ['sport', 'eps', 'education-physique'],
+  technologie: ['technologie', 'techno', 'technique'],
   'education-islamique': ['education-islamique', 'islamique', 'religion'],
   'education-civique': ['education-civique', 'civique', 'civisme'],
   'education-artistique': ['education-artistique', 'art', 'arts-plastiques'],
@@ -67,9 +157,9 @@ const SUBJECT_KEYWORDS: Record<string, string[]> = {
 // CLASS → KEYWORDS MAPPING
 // ============================================================================
 const CLASS_KEYWORDS: Record<string, string[]> = {
-  '7eme':  ['7eme', '7eme-annee', 'college', 'enseignement-base'],
-  '8eme':  ['8eme', '8eme-annee', 'college', 'enseignement-base'],
-  '9eme':  ['9eme', '9eme-annee', 'college', 'enseignement-base', 'concours-9eme'],
+  '7eme': ['7eme', '7eme-annee', 'college', 'enseignement-base'],
+  '8eme': ['8eme', '8eme-annee', 'college', 'enseignement-base'],
+  '9eme': ['9eme', '9eme-annee', 'college', 'enseignement-base', 'concours-9eme'],
   '1ere-annee': ['1ere-annee', '1as', 'lycee', 'seconde', 'tronc-commun'],
   '2eme-annee': ['2eme-annee', '2as', 'lycee'],
   '3eme-annee': ['3eme-annee', '3as', 'lycee', 'bac'],
@@ -84,43 +174,43 @@ const CLASS_KEYWORDS: Record<string, string[]> = {
 // ============================================================================
 const SECTION_KEYWORDS: Record<string, string[]> = {
   // 2AS
-  'sciences':                  ['sciences', '2as-sciences'],
+  sciences: ['sciences', '2as-sciences'],
   'technologies-informatique': ['ti', 'technologies-informatique', '2as-ti'],
-  'eco-services':              ['eco-services', 'economie-services', '2as-eco'],
-  'lettres':                   ['lettres', 'adab', '2as-lettres'],
-  'sport':                     ['sport', '2as-sport'],
+  'eco-services': ['eco-services', 'economie-services', '2as-eco'],
+  lettres: ['lettres', 'adab', '2as-lettres'],
+  sport: ['sport', '2as-sport'],
   // 3AS + 4AS
-  'maths':                     ['maths', 'bac-math', 'bac-mathematiques'],
-  'sciences-exp':              ['sciences-exp', 'bac-sciences', 'sc-exp', 'sciences-experimentales'],
-  'technique':                 ['technique', 'bac-technique', 'sciences-techniques'],
-  'sciences-informatique':     ['si', 'sciences-informatique', 'bac-info', 'bac-si'],
-  'eco-gestion':               ['eco-gestion', 'bac-eco', 'economie-gestion'],
-  'bac-sport':                 ['bac-sport'],
-  'bac-lettres':               ['bac-lettres'],
+  maths: ['maths', 'bac-math', 'bac-mathematiques'],
+  'sciences-exp': ['sciences-exp', 'bac-sciences', 'sc-exp', 'sciences-experimentales'],
+  technique: ['technique', 'bac-technique', 'sciences-techniques'],
+  'sciences-informatique': ['si', 'sciences-informatique', 'bac-info', 'bac-si'],
+  'eco-gestion': ['eco-gestion', 'bac-eco', 'economie-gestion'],
+  'bac-sport': ['bac-sport'],
+  'bac-lettres': ['bac-lettres'],
 };
 
 // Map 2AS sciences slug to 'sciences' (already mapped above)
 // 3AS/4AS 'sciences' slug actually means Sciences Expérimentales — map separately:
 const SECTION_KEYWORDS_3AS_4AS: Record<string, string[]> = {
   // 3AS + 4AS — different slugs
-  'sciences':                  ['sciences-exp', 'bac-sciences', 'sc-exp', 'sciences-experimentales'],
-  'sport':                     ['bac-sport'],
-  'lettres':                   ['bac-lettres'],
+  sciences: ['sciences-exp', 'bac-sciences', 'sc-exp', 'sciences-experimentales'],
+  sport: ['bac-sport'],
+  lettres: ['bac-lettres'],
 };
 
 // ============================================================================
 // TYPE → KEYWORDS MAPPING
 // ============================================================================
 const TYPE_KEYWORDS: Record<string, string[]> = {
-  HOMEWORK:   ['devoir', 'homework', 'devoir-surveille', 'controle', 'synthese', 'maison'],
-  EXERCISE:   ['exercice', 'serie', 'td', 'tp', 'entrainement', 'applications'],
-  COURSE:     ['cours', 'lecon', 'chapitre', 'fiche-cours'],
-  REVISION:   ['revision', 'bac-blanc', 'rattrapage', 'synthese'],
-  EXAM:       ['examen', 'epreuve', 'controle', 'composition'],
-  BAC_SUBJECT:['bac', 'sujet-bac', 'epreuve-bac', 'baccalaureat'],
+  HOMEWORK: ['devoir', 'homework', 'devoir-surveille', 'controle', 'synthese', 'maison'],
+  EXERCISE: ['exercice', 'serie', 'td', 'tp', 'entrainement', 'applications'],
+  COURSE: ['cours', 'lecon', 'chapitre', 'fiche-cours'],
+  REVISION: ['revision', 'bac-blanc', 'rattrapage', 'synthese'],
+  EXAM: ['examen', 'epreuve', 'controle', 'composition'],
+  BAC_SUBJECT: ['bac', 'sujet-bac', 'epreuve-bac', 'baccalaureat'],
   CORRECTION: ['corrige', 'correction', 'solution'],
-  SUMMARY:    ['resume', 'fiche', 'synthese'],
-  OTHER:      ['document', 'ressource', 'pedagogique'],
+  SUMMARY: ['resume', 'fiche', 'synthese'],
+  OTHER: ['document', 'ressource', 'pedagogique'],
 };
 
 // ============================================================================
@@ -153,7 +243,7 @@ export function autoGenerateTags(input: AutoTaggerInput): string[] {
   // 2) Subject keywords
   const subjectKw = SUBJECT_KEYWORDS[input.subjectSlug];
   if (subjectKw) {
-    subjectKw.forEach(k => tags.add(k));
+    subjectKw.forEach((k) => tags.add(k));
   }
   // Always add the subject slug itself
   if (input.subjectSlug) {
@@ -163,17 +253,17 @@ export function autoGenerateTags(input: AutoTaggerInput): string[] {
   // 3) Class keywords
   const classKw = CLASS_KEYWORDS[input.classSlug];
   if (classKw) {
-    classKw.forEach(k => tags.add(k));
+    classKw.forEach((k) => tags.add(k));
   }
 
   // 4) Section keywords
   if (input.sectionSlug) {
     const isLycee = ['3eme-annee', '4eme-annee'].includes(input.classSlug);
     const sectionKw = isLycee
-      ? (SECTION_KEYWORDS_3AS_4AS[input.sectionSlug] || SECTION_KEYWORDS[input.sectionSlug])
+      ? SECTION_KEYWORDS_3AS_4AS[input.sectionSlug] || SECTION_KEYWORDS[input.sectionSlug]
       : SECTION_KEYWORDS[input.sectionSlug];
     if (sectionKw) {
-      sectionKw.forEach(k => tags.add(k));
+      sectionKw.forEach((k) => tags.add(k));
     }
     tags.add(input.sectionSlug);
   }
@@ -181,7 +271,7 @@ export function autoGenerateTags(input: AutoTaggerInput): string[] {
   // 5) Type keywords
   const typeKw = TYPE_KEYWORDS[input.type];
   if (typeKw) {
-    typeKw.forEach(k => tags.add(k));
+    typeKw.forEach((k) => tags.add(k));
   }
   tags.add(input.type.toLowerCase());
 
@@ -211,9 +301,9 @@ export function autoGenerateTags(input: AutoTaggerInput): string[] {
 
   // Convert to array, dedupe (case-insensitive on ASCII, preserve Arabic as-is), limit to 15
   const result = Array.from(tags)
-    .map(t => isArabic(t) ? t : normalize(t))
+    .map((t) => (isArabic(t) ? t : normalize(t)))
     .filter(Boolean)
-    .filter((t, i, arr) => arr.findIndex(x => x.toLowerCase() === t.toLowerCase()) === i)
+    .filter((t, i, arr) => arr.findIndex((x) => x.toLowerCase() === t.toLowerCase()) === i)
     .slice(0, 15);
 
   return result;
@@ -234,11 +324,11 @@ function normalize(s: string): string {
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '') // remove accents
-    .replace(/[''`]/g, '-')           // apostrophes → dash
-    .replace(/[^a-z0-9\s-]/g, ' ')    // remove special chars
-    .replace(/\s+/g, '-')             // spaces → dash
-    .replace(/-+/g, '-')              // collapse multiple dashes
-    .replace(/^-|-$/g, '');           // trim dashes
+    .replace(/[''`]/g, '-') // apostrophes → dash
+    .replace(/[^a-z0-9\s-]/g, ' ') // remove special chars
+    .replace(/\s+/g, '-') // spaces → dash
+    .replace(/-+/g, '-') // collapse multiple dashes
+    .replace(/^-|-$/g, ''); // trim dashes
 }
 
 /** Tokenize title into meaningful tags (filter stop words) */
@@ -248,13 +338,12 @@ function tokenizeTitle(title: string): string[] {
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '') // strip accents
     .split(/[\s,;:!?()\/]+/)
-    .filter(w => w.length >= 3)
-    .filter(w => !STOP_WORDS_FR.has(w))
-    .filter(w => !/^\d+$/.test(w)); // skip pure numbers
+    .filter((w) => w.length >= 3)
+    .filter((w) => !STOP_WORDS_FR.has(w))
+    .filter((w) => !/^\d+$/.test(w)); // skip pure numbers
 
-  return words.map(w => w.replace(/[''`]/g, ''));
+  return words.map((w) => w.replace(/[''`]/g, ''));
 }
-
 
 // ============================================================================
 // ENRICHED VERSION — uses AI fields (summary, metaDescription, description,
@@ -263,74 +352,345 @@ function tokenizeTitle(title: string): string[] {
 
 // Stop words FR (no useful SEO value)
 const STOP_WORDS_FR_ENRICHED = new Set([
-  'le', 'la', 'les', 'un', 'une', 'des', 'de', 'du', 'au', 'aux', 'a', 'à',
-  'et', 'ou', 'mais', 'donc', 'or', 'ni', 'car', 'si', 'non', 'oui',
-  'ce', 'cette', 'ces', 'ceci', 'cela', 'ça', 'ceux', 'celles',
-  'mon', 'ma', 'mes', 'ton', 'ta', 'tes', 'son', 'sa', 'ses', 'notre', 'votre', 'leur', 'leurs',
-  'je', 'tu', 'il', 'elle', 'on', 'nous', 'vous', 'ils', 'elles',
-  'qui', 'que', 'quoi', 'dont', 'où', 'lequel', 'laquelle', 'quels', 'quelles',
-  'est', 'sont', 'était', 'étaient', 'soit', 'sera', 'seront', 'seraient',
-  'as', 'avons', 'avez', 'ont', 'avoir', 'être',
-  'pour', 'par', 'avec', 'sans', 'sous', 'sur', 'dans', 'entre', 'vers', 'chez', 'contre', 'depuis',
-  'peut', 'peuvent', 'pouvons', 'doit', 'doivent', 'faut',
-  'mr', 'mme', 'm.', 'monsieur', 'madame', 'élève', 'eleve', 'élèves', 'eleves',
-  'prof', 'professeur', 'enseignant', 'enseignants', 'profs',
-  'document', 'documents', 'fiche', 'fiches', 'fichier', 'fichiers', 'ressource', 'ressources',
-  'pedagogique', 'pédagogique', 'pédagogiques', 'pedagogiques',
-  'présente', 'presente', 'comprend', 'contient', 'inclut', 'aborde', 'traite',
-  'theme', 'thème', 'thèmes', 'themes',
-  'n', 'n°', 'no', 'numéro', 'numero',
-  'an', 'ans', 'annee', 'année', 'annees', 'années',
-  'cycle', 'niveau', 'classe', 'classes', 'niveaux', 'section', 'sections',
-  'en', 'au', 'du', 'il', 'on',
+  'le',
+  'la',
+  'les',
+  'un',
+  'une',
+  'des',
+  'de',
+  'du',
+  'au',
+  'aux',
+  'a',
+  'à',
+  'et',
+  'ou',
+  'mais',
+  'donc',
+  'or',
+  'ni',
+  'car',
+  'si',
+  'non',
+  'oui',
+  'ce',
+  'cette',
+  'ces',
+  'ceci',
+  'cela',
+  'ça',
+  'ceux',
+  'celles',
+  'mon',
+  'ma',
+  'mes',
+  'ton',
+  'ta',
+  'tes',
+  'son',
+  'sa',
+  'ses',
+  'notre',
+  'votre',
+  'leur',
+  'leurs',
+  'je',
+  'tu',
+  'il',
+  'elle',
+  'on',
+  'nous',
+  'vous',
+  'ils',
+  'elles',
+  'qui',
+  'que',
+  'quoi',
+  'dont',
+  'où',
+  'lequel',
+  'laquelle',
+  'quels',
+  'quelles',
+  'est',
+  'sont',
+  'était',
+  'étaient',
+  'soit',
+  'sera',
+  'seront',
+  'seraient',
+  'as',
+  'avons',
+  'avez',
+  'ont',
+  'avoir',
+  'être',
+  'pour',
+  'par',
+  'avec',
+  'sans',
+  'sous',
+  'sur',
+  'dans',
+  'entre',
+  'vers',
+  'chez',
+  'contre',
+  'depuis',
+  'peut',
+  'peuvent',
+  'pouvons',
+  'doit',
+  'doivent',
+  'faut',
+  'mr',
+  'mme',
+  'm.',
+  'monsieur',
+  'madame',
+  'élève',
+  'eleve',
+  'élèves',
+  'eleves',
+  'prof',
+  'professeur',
+  'enseignant',
+  'enseignants',
+  'profs',
+  'document',
+  'documents',
+  'fiche',
+  'fiches',
+  'fichier',
+  'fichiers',
+  'ressource',
+  'ressources',
+  'pedagogique',
+  'pédagogique',
+  'pédagogiques',
+  'pedagogiques',
+  'présente',
+  'presente',
+  'comprend',
+  'contient',
+  'inclut',
+  'aborde',
+  'traite',
+  'theme',
+  'thème',
+  'thèmes',
+  'themes',
+  'n',
+  'n°',
+  'no',
+  'numéro',
+  'numero',
+  'an',
+  'ans',
+  'annee',
+  'année',
+  'annees',
+  'années',
+  'cycle',
+  'niveau',
+  'classe',
+  'classes',
+  'niveaux',
+  'section',
+  'sections',
+  'en',
+  'au',
+  'du',
+  'il',
+  'on',
 ]);
 
 // Stop words AR (high-frequency, low SEO value)
 const STOP_WORDS_AR_ENRICHED = new Set([
-  'في', 'من', 'إلى', 'على', 'عن', 'مع', 'لدى', 'لدي',
-  'هذا', 'هذه', 'ذلك', 'تلك', 'هؤلاء', 'أولئك',
-  'التي', 'الذي', 'الذين', 'اللاتي', 'اللواتي', 'اللذان', 'اللتان',
-  'أن', 'إن', 'كان', 'كانت', 'يكون', 'تكون', 'ليس', 'ليست',
-  'هو', 'هي', 'هم', 'هن', 'هما', 'أنت', 'أنتم', 'أنتن',
-  'أنا', 'نحن', 'كما', 'لقد', 'قد', 'سوف',
-  'ما', 'لا', 'لم', 'لن', 'إنما', 'لكن', 'غير', 'كل', 'كلا', 'كلم',
-  'بعض', 'كل', 'جميع', 'بين', 'عند', 'حيث', 'كيف', 'متى', 'أين', 'هنا', 'هناك',
-  'درس', 'الدّرس', 'دروس', 'سلسلة', 'الحصة', 'تمارين', 'تطبيق', 'تطبيقات',
-  'الدرس', 'يهدف', 'يتناول', 'يركز', 'يستعرض', 'يشرح', 'تتضمن', 'يشمل', 'تتعلق',
-  'يحتوي', 'تتألف', 'تتكون', 'يقوم', 'تقوم', 'تعد', 'تعتبر',
-  'كذلك', 'أيضا', 'أيضًا', 'بما', 'ذلك', 'إن', 'لكن', 'ولذلك', 'ومن', 'وفي',
-  'الى', 'عبر', 'خلال', 'بعد', 'قبل', 'حتى', 'أمام', 'خلف',
-  'أو', 'ثم', 'إنها', 'انه', 'فإن', 'وهو', 'وهي', 'وهم',
-  'حول', 'ضد', 'بدون', 'تحت', 'فوق', 'يمين', 'يسار',
-  'شيء', 'أحد', 'إحدى',
-  'جدا', 'جدًا', 'كثير', 'كثيرا', 'قليلا',
-  'صف', 'الصف', 'أساسي', 'الأساسي', 'ثانوي', 'الثانوي', 'ثالث', 'الثالث',
-  'الأول', 'الثاني', 'الثالثة', 'الثالث', 'الرابع', 'الرابعة',
-  'مادة', 'المادة', 'متم', 'مهم', 'هام',
+  'في',
+  'من',
+  'إلى',
+  'على',
+  'عن',
+  'مع',
+  'لدى',
+  'لدي',
+  'هذا',
+  'هذه',
+  'ذلك',
+  'تلك',
+  'هؤلاء',
+  'أولئك',
+  'التي',
+  'الذي',
+  'الذين',
+  'اللاتي',
+  'اللواتي',
+  'اللذان',
+  'اللتان',
+  'أن',
+  'إن',
+  'كان',
+  'كانت',
+  'يكون',
+  'تكون',
+  'ليس',
+  'ليست',
+  'هو',
+  'هي',
+  'هم',
+  'هن',
+  'هما',
+  'أنت',
+  'أنتم',
+  'أنتن',
+  'أنا',
+  'نحن',
+  'كما',
+  'لقد',
+  'قد',
+  'سوف',
+  'ما',
+  'لا',
+  'لم',
+  'لن',
+  'إنما',
+  'لكن',
+  'غير',
+  'كل',
+  'كلا',
+  'كلم',
+  'بعض',
+  'كل',
+  'جميع',
+  'بين',
+  'عند',
+  'حيث',
+  'كيف',
+  'متى',
+  'أين',
+  'هنا',
+  'هناك',
+  'درس',
+  'الدّرس',
+  'دروس',
+  'سلسلة',
+  'الحصة',
+  'تمارين',
+  'تطبيق',
+  'تطبيقات',
+  'الدرس',
+  'يهدف',
+  'يتناول',
+  'يركز',
+  'يستعرض',
+  'يشرح',
+  'تتضمن',
+  'يشمل',
+  'تتعلق',
+  'يحتوي',
+  'تتألف',
+  'تتكون',
+  'يقوم',
+  'تقوم',
+  'تعد',
+  'تعتبر',
+  'كذلك',
+  'أيضا',
+  'أيضًا',
+  'بما',
+  'ذلك',
+  'إن',
+  'لكن',
+  'ولذلك',
+  'ومن',
+  'وفي',
+  'الى',
+  'عبر',
+  'خلال',
+  'بعد',
+  'قبل',
+  'حتى',
+  'أمام',
+  'خلف',
+  'أو',
+  'ثم',
+  'إنها',
+  'انه',
+  'فإن',
+  'وهو',
+  'وهي',
+  'وهم',
+  'حول',
+  'ضد',
+  'بدون',
+  'تحت',
+  'فوق',
+  'يمين',
+  'يسار',
+  'شيء',
+  'أحد',
+  'إحدى',
+  'جدا',
+  'جدًا',
+  'كثير',
+  'كثيرا',
+  'قليلا',
+  'صف',
+  'الصف',
+  'أساسي',
+  'الأساسي',
+  'ثانوي',
+  'الثانوي',
+  'ثالث',
+  'الثالث',
+  'الأول',
+  'الثاني',
+  'الثالثة',
+  'الثالث',
+  'الرابع',
+  'الرابعة',
+  'مادة',
+  'المادة',
+  'متم',
+  'مهم',
+  'هام',
 ]);
 
 function stripHtml(s: string): string {
-  return s.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&[a-z]+;/gi, '').replace(/\s+/g, ' ').trim();
+  return s
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&[a-z]+;/gi, '')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 function tokenizeFr(s: string, stopWords: Set<string>): string[] {
   if (!s) return [];
-  return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+  return s
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
     .split(/[\s,;:!?()\/،؛:.؟!"'\[\]{}<>]+/)
-    .filter(w => w.length >= 3)
-    .filter(w => !stopWords.has(w))
-    .filter(w => !/^\d+$/.test(w))
-    .filter(w => !/^n\d+$/i.test(w));
+    .filter((w) => w.length >= 3)
+    .filter((w) => !stopWords.has(w))
+    .filter((w) => !/^\d+$/.test(w))
+    .filter((w) => !/^n\d+$/i.test(w));
 }
 
 function extractArabicWords(s: string): string[] {
   if (!s) return [];
-  return Array.from(new Set(
-    (s.match(/[\u0600-\u06FF]{3,}/g) || [])
-      .filter(w => !STOP_WORDS_AR_ENRICHED.has(w))
-      .map(w => w.replace(/[،؛:.؟!,]/g, ''))  // strip punctuation
-      .filter(w => w.length >= 3)
-  ));
+  return Array.from(
+    new Set(
+      (s.match(/[\u0600-\u06FF]{3,}/g) || [])
+        .filter((w) => !STOP_WORDS_AR_ENRICHED.has(w))
+        .map((w) => w.replace(/[،؛:.؟!,]/g, '')) // strip punctuation
+        .filter((w) => w.length >= 3),
+    ),
+  );
 }
 
 export interface EnrichedTagInput extends AutoTaggerInput {
@@ -383,14 +743,19 @@ export function autoGenerateTagsEnriched(input: EnrichedTagInput): string[] {
   // This way metadata is always preserved for filtering, topics add semantic value
   const TOPIC_MAX = 5;
   const topArWords = arWords.slice(0, Math.ceil(TOPIC_MAX * 0.6)); // 60% AR
-  const topFrWords = topFr.slice(0, Math.ceil(TOPIC_MAX * 0.6));  // 40% FR
+  const topFrWords = topFr.slice(0, Math.ceil(TOPIC_MAX * 0.6)); // 40% FR
   const topicWords = [...topArWords, ...topFrWords].slice(0, TOPIC_MAX);
 
   // Step 7: Merge with dedup
   // Order: topic words (HIGH) → baseline (MID) → school/cycle (LOW)
   const final: string[] = [];
   const seen = new Set<string>();
-  for (const t of [...topicWords, ...baseline, ...schoolTags.map(t => normalize(t)), ...(cycleTag ? [cycleTag] : [])]) {
+  for (const t of [
+    ...topicWords,
+    ...baseline,
+    ...schoolTags.map((t) => normalize(t)),
+    ...(cycleTag ? [cycleTag] : []),
+  ]) {
     if (!t || t.length < 2) continue;
     const key = isArabic(t) ? t : normalize(t);
     if (!key) continue;

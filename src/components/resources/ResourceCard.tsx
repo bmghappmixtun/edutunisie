@@ -31,7 +31,12 @@ export interface ResourceCardData {
   hasCorrection?: boolean;
   subject: { slug: string; nameFr: string; color: string | null; icon?: string | null };
   class: { slug: string; nameFr: string } | null;
-  teacher: { firstName: string | null; lastName: string | null; firstNameAr?: string | null; lastNameAr?: string | null } | null;
+  teacher: {
+    firstName: string | null;
+    lastName: string | null;
+    firstNameAr?: string | null;
+    lastNameAr?: string | null;
+  } | null;
 }
 
 function formatSize(bytes: number): string {
@@ -68,9 +73,10 @@ export default function ResourceCard({ resource }: { resource: ResourceCardData 
   const teacherName = resource.teacher
     ? `${resource.teacher.firstName || ''} ${resource.teacher.lastName || ''}`.trim()
     : null;
-  const teacherNameAr = resource.teacher && (resource.teacher.firstNameAr || resource.teacher.lastNameAr)
-    ? `${resource.teacher.firstNameAr || ''} ${resource.teacher.lastNameAr || ''}`.trim()
-    : null;
+  const teacherNameAr =
+    resource.teacher && (resource.teacher.firstNameAr || resource.teacher.lastNameAr)
+      ? `${resource.teacher.firstNameAr || ''} ${resource.teacher.lastNameAr || ''}`.trim()
+      : null;
   const subjectColor = resource.subject.color || '#0EA5E9';
   const titleIsAr = isArabic(resource.title);
   const summaryIsAr = resource.summary ? isArabic(resource.summary) : false;
@@ -124,14 +130,18 @@ export default function ResourceCard({ resource }: { resource: ResourceCardData 
         </div>
 
         {/* Homework subtype */}
-        {resource.type === 'HOMEWORK' && resource.homeworkSubtype && HOMEWORK_SUBTYPE_LABELS[resource.homeworkSubtype] && (
-          <div className="mb-2">
-            <span className={`inline-flex px-2 py-0.5 rounded text-[10px] font-bold ${HOMEWORK_SUBTYPE_LABELS[resource.homeworkSubtype].color}`}>
-              {HOMEWORK_SUBTYPE_LABELS[resource.homeworkSubtype].fr}
-              {resource.homeworkNumber ? ` N°${resource.homeworkNumber}` : ''}
-            </span>
-          </div>
-        )}
+        {resource.type === 'HOMEWORK' &&
+          resource.homeworkSubtype &&
+          HOMEWORK_SUBTYPE_LABELS[resource.homeworkSubtype] && (
+            <div className="mb-2">
+              <span
+                className={`inline-flex px-2 py-0.5 rounded text-[10px] font-bold ${HOMEWORK_SUBTYPE_LABELS[resource.homeworkSubtype].color}`}
+              >
+                {HOMEWORK_SUBTYPE_LABELS[resource.homeworkSubtype].fr}
+                {resource.homeworkNumber ? ` N°${resource.homeworkNumber}` : ''}
+              </span>
+            </div>
+          )}
 
         {/* Title */}
         <h3
@@ -152,13 +162,17 @@ export default function ResourceCard({ resource }: { resource: ResourceCardData 
             {resource.summary}
           </p>
         ) : (
-          <p className="text-sm text-slate-400 italic mb-3 line-clamp-2">Pas de résumé disponible.</p>
+          <p className="text-sm text-slate-400 italic mb-3 line-clamp-2">
+            Pas de résumé disponible.
+          </p>
         )}
 
         {/* Metadata chips */}
         <div className="flex items-center gap-1.5 mb-3 flex-wrap">
           {resource.year && (
-            <span className="text-[11px] text-slate-500 bg-slate-50 px-2 py-0.5 rounded">📅 {resource.year}</span>
+            <span className="text-[11px] text-slate-500 bg-slate-50 px-2 py-0.5 rounded">
+              📅 {resource.year}
+            </span>
           )}
           {resource.pageCount != null && resource.pageCount > 0 && (
             <span className="text-[11px] text-slate-500 bg-slate-50 px-2 py-0.5 rounded">
@@ -166,9 +180,13 @@ export default function ResourceCard({ resource }: { resource: ResourceCardData 
             </span>
           )}
           {resource.fileSize && (
-            <span className="text-[11px] text-slate-500 bg-slate-50 px-2 py-0.5 rounded">💾 {formatSize(resource.fileSize)}</span>
+            <span className="text-[11px] text-slate-500 bg-slate-50 px-2 py-0.5 rounded">
+              💾 {formatSize(resource.fileSize)}
+            </span>
           )}
-          <span className="text-[11px] text-slate-500 bg-slate-50 px-2 py-0.5 rounded">{langBadge(resource.language)}</span>
+          <span className="text-[11px] text-slate-500 bg-slate-50 px-2 py-0.5 rounded">
+            {langBadge(resource.language)}
+          </span>
         </div>
 
         {/* Teacher */}
@@ -199,19 +217,34 @@ export default function ResourceCard({ resource }: { resource: ResourceCardData 
             <span className="text-slate-300">·</span>
             <span className="flex items-center gap-1" title="Téléchargements">
               <Download className="w-3 h-3" />
-              <span className="text-slate-900 font-bold">{formatCount(resource.downloadsCount)}</span>
+              <span className="text-slate-900 font-bold">
+                {formatCount(resource.downloadsCount)}
+              </span>
             </span>
             <span className="text-slate-300">·</span>
             <span className="flex items-center gap-1" title={`${resource.ratingCount} avis`}>
-              <Star className={`w-3 h-3 ${resource.ratingCount > 0 ? 'fill-amber-400 text-amber-400' : 'text-slate-300'}`} />
-              <span className={resource.ratingCount > 0 ? 'text-slate-900 font-bold' : 'text-slate-400'}>
+              <Star
+                className={`w-3 h-3 ${resource.ratingCount > 0 ? 'fill-amber-400 text-amber-400' : 'text-slate-300'}`}
+              />
+              <span
+                className={resource.ratingCount > 0 ? 'text-slate-900 font-bold' : 'text-slate-400'}
+              >
                 {resource.ratingCount > 0 ? resource.avgRating.toFixed(1) : '—'}
               </span>
             </span>
             <span className="text-slate-300">·</span>
-            <span className="flex items-center gap-1" title={`${resource.commentsCount} commentaires`}>
-              <MessageCircle className={`w-3 h-3 ${resource.commentsCount > 0 ? 'text-slate-700' : 'text-slate-300'}`} />
-              <span className={resource.commentsCount > 0 ? 'text-slate-900 font-bold' : 'text-slate-400'}>
+            <span
+              className="flex items-center gap-1"
+              title={`${resource.commentsCount} commentaires`}
+            >
+              <MessageCircle
+                className={`w-3 h-3 ${resource.commentsCount > 0 ? 'text-slate-700' : 'text-slate-300'}`}
+              />
+              <span
+                className={
+                  resource.commentsCount > 0 ? 'text-slate-900 font-bold' : 'text-slate-400'
+                }
+              >
                 {resource.commentsCount || 0}
               </span>
             </span>

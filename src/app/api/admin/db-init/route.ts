@@ -18,10 +18,13 @@ export async function POST(req: NextRequest) {
 
   try {
     console.log('Pushing schema to database...');
-    const { stdout, stderr } = await execAsync('npx prisma db push --skip-generate --accept-data-loss', {
-      cwd: process.cwd(),
-      env: { ...process.env }
-    });
+    const { stdout, stderr } = await execAsync(
+      'npx prisma db push --skip-generate --accept-data-loss',
+      {
+        cwd: process.cwd(),
+        env: { ...process.env },
+      },
+    );
 
     return NextResponse.json({
       success: true,
@@ -30,10 +33,13 @@ export async function POST(req: NextRequest) {
       stderr: stderr.slice(-500),
     });
   } catch (e: any) {
-    return NextResponse.json({
-      error: e.message,
-      stdout: e.stdout?.slice(-500),
-      stderr: e.stderr?.slice(-500),
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: e.message,
+        stdout: e.stdout?.slice(-500),
+        stderr: e.stderr?.slice(-500),
+      },
+      { status: 500 },
+    );
   }
 }

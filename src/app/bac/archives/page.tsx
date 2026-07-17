@@ -2,19 +2,10 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
-import {
-  getBacStats,
-  groupByYearForArchive,
-} from '@/lib/bac-data';
-import {
-  itemListSchema,
-  breadcrumbSchema,
-  SITE_URL,
-} from '@/lib/structured-data';
+import { getBacStats, groupByYearForArchive } from '@/lib/bac-data';
+import { itemListSchema, breadcrumbSchema, SITE_URL } from '@/lib/structured-data';
 import { getLocale, getT, getDict } from '@/lib/i18n-server';
-import {
-  ChevronRight, ArrowLeft,
-} from 'lucide-react';
+import { ChevronRight, ArrowLeft } from 'lucide-react';
 import { BacArchivesClient } from './client';
 
 export const revalidate = 3600;
@@ -36,27 +27,74 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title,
     description: desc,
-    keywords: isAr ? [
-      'أرشيف الباكالوريا تونس', 'مواضيع باكالوريا 2010-2025',
-      'إصلاحات باكالوريا تونس', 'باكالوريا 2025', 'باكالوريا 2024', 'باكالوريا 2023',
-      'باكالوريا 2022', 'باكالوريا 2021', 'باكالوريا 2020', 'باكالوريا 2019',
-      'باكالوريا 2018', 'باكالوريا 2017', 'باكالوريا 2016', 'باكالوريا 2015',
-      'باكالوريا 2014', 'باكالوريا 2013', 'باكالوريا 2012', 'باكالوريا 2011',
-      'باكالوريا 2010', 'دورة رئيسية', 'دورة مراقبة', 'مواضيع', 'إصلاحات',
-      'شعبة الرياضيات', 'شعبة العلوم التجريبية', 'شعبة الاقتصاد',
-      'تحميل', 'PDF مجاني', 'examanet', 'إكسامانت',
-    ] : [
-      'archives bac tunisie', 'sujets bac 2010-2025', 'corrigés bac tunisie',
-      'bac 2025', 'bac 2024', 'bac 2023', 'bac 2022', 'bac 2021', 'bac 2020',
-      'bac 2019', 'bac 2018', 'bac 2017', 'bac 2016', 'bac 2015', 'bac 2014',
-      'bac 2013', 'bac 2012', 'bac 2011', 'bac 2010',
-      'session principale', 'session controle', 'rattrapage bac',
-      'sujets', 'corrigés', 'math bac', 'physique bac', 'svt bac',
-      'télécharger', 'PDF gratuit', 'examanet bac',
-    ],
+    keywords: isAr
+      ? [
+          'أرشيف الباكالوريا تونس',
+          'مواضيع باكالوريا 2010-2025',
+          'إصلاحات باكالوريا تونس',
+          'باكالوريا 2025',
+          'باكالوريا 2024',
+          'باكالوريا 2023',
+          'باكالوريا 2022',
+          'باكالوريا 2021',
+          'باكالوريا 2020',
+          'باكالوريا 2019',
+          'باكالوريا 2018',
+          'باكالوريا 2017',
+          'باكالوريا 2016',
+          'باكالوريا 2015',
+          'باكالوريا 2014',
+          'باكالوريا 2013',
+          'باكالوريا 2012',
+          'باكالوريا 2011',
+          'باكالوريا 2010',
+          'دورة رئيسية',
+          'دورة مراقبة',
+          'مواضيع',
+          'إصلاحات',
+          'شعبة الرياضيات',
+          'شعبة العلوم التجريبية',
+          'شعبة الاقتصاد',
+          'تحميل',
+          'PDF مجاني',
+          'examanet',
+          'إكسامانت',
+        ]
+      : [
+          'archives bac tunisie',
+          'sujets bac 2010-2025',
+          'corrigés bac tunisie',
+          'bac 2025',
+          'bac 2024',
+          'bac 2023',
+          'bac 2022',
+          'bac 2021',
+          'bac 2020',
+          'bac 2019',
+          'bac 2018',
+          'bac 2017',
+          'bac 2016',
+          'bac 2015',
+          'bac 2014',
+          'bac 2013',
+          'bac 2012',
+          'bac 2011',
+          'bac 2010',
+          'session principale',
+          'session controle',
+          'rattrapage bac',
+          'sujets',
+          'corrigés',
+          'math bac',
+          'physique bac',
+          'svt bac',
+          'télécharger',
+          'PDF gratuit',
+          'examanet bac',
+        ],
     alternates: {
       canonical: PAGE_URL,
-      languages: { 'fr': PAGE_URL, 'ar': PAGE_URL, 'x-default': PAGE_URL },
+      languages: { fr: PAGE_URL, ar: PAGE_URL, 'x-default': PAGE_URL },
     },
     openGraph: {
       title,
@@ -77,7 +115,14 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 interface PageProps {
-  searchParams: { year?: string; section?: string; subject?: string; session?: string; type?: string; q?: string };
+  searchParams: {
+    year?: string;
+    section?: string;
+    subject?: string;
+    session?: string;
+    type?: string;
+    q?: string;
+  };
 }
 
 export default function BacArchivesPage({ searchParams }: PageProps) {
@@ -117,7 +162,8 @@ export default function BacArchivesPage({ searchParams }: PageProps) {
           }
           if (qFilter) {
             filtered = filtered.filter((f: any) => {
-              const searchStr = `${yg.year} ${section} ${session} ${f.subject} ${f.type}`.toLowerCase();
+              const searchStr =
+                `${yg.year} ${section} ${session} ${f.subject} ${f.type}`.toLowerCase();
               return searchStr.includes(qFilter);
             });
           }
@@ -134,18 +180,18 @@ export default function BacArchivesPage({ searchParams }: PageProps) {
     .filter((yg): yg is NonNullable<typeof yg> => yg !== null);
 
   // For structured data — list first 50 files
-  const allFiles = filteredYears.flatMap((yg) =>
-    Object.values(yg.sections).flatMap((sess) =>
-      Object.values(sess).flatMap((files) => files),
-    ),
-  ).slice(0, 50);
+  const allFiles = filteredYears
+    .flatMap((yg) =>
+      Object.values(yg.sections).flatMap((sess) => Object.values(sess).flatMap((files) => files)),
+    )
+    .slice(0, 50);
 
   const itemListJsonLd = itemListSchema({
     name: t('bac.archives.title') || 'Archives Bac Tunisie',
     description: `${stats.totalFiles} fichiers de sujets et corrigés du Bac tunisien de 2010 à 2025`,
     url: PAGE_URL,
     items: allFiles.map((f: any) => ({
-      name: `${f.subject} ${f.year} ${f.session === 'principale' ? (isAr ? 'د.ر' : 'P') : (isAr ? 'د.م' : 'C')} ${f.type === 'sujets' ? (isAr ? 'موضوع' : 'Sujet') : (isAr ? 'إصلاح' : 'Corrigé')}`,
+      name: `${f.subject} ${f.year} ${f.session === 'principale' ? (isAr ? 'د.ر' : 'P') : isAr ? 'د.م' : 'C'} ${f.type === 'sujets' ? (isAr ? 'موضوع' : 'Sujet') : isAr ? 'إصلاح' : 'Corrigé'}`,
       url: f.url,
     })),
   });
@@ -158,8 +204,14 @@ export default function BacArchivesPage({ searchParams }: PageProps) {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
 
       <Header />
 
@@ -170,35 +222,54 @@ export default function BacArchivesPage({ searchParams }: PageProps) {
           <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-gradient-to-br from-amber-300 to-orange-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20" />
 
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-            <nav aria-label="Fil d'Ariane" className="flex items-center gap-1 text-xs text-slate-500 mb-4 flex-wrap">
-              <Link href="/" className="hover:text-primary-600 transition">{t('common.home') || 'Accueil'}</Link>
+            <nav
+              aria-label="Fil d'Ariane"
+              className="flex items-center gap-1 text-xs text-slate-500 mb-4 flex-wrap"
+            >
+              <Link href="/" className="hover:text-primary-600 transition">
+                {t('common.home') || 'Accueil'}
+              </Link>
               <ChevronRight className="w-3 h-3 text-slate-300" />
-              <Link href="/bac" className="hover:text-primary-600 transition">{t('levels.bac') || 'Bac'}</Link>
+              <Link href="/bac" className="hover:text-primary-600 transition">
+                {t('levels.bac') || 'Bac'}
+              </Link>
               <ChevronRight className="w-3 h-3 text-slate-300" />
-              <span className="text-slate-900 font-semibold">{t('bac.archives.title') || 'Archives'}</span>
+              <span className="text-slate-900 font-semibold">
+                {t('bac.archives.title') || 'Archives'}
+              </span>
             </nav>
 
             <Link
               href="/bac"
               className="inline-flex items-center gap-1 text-sm text-violet-600 hover:text-violet-700 font-semibold mb-4"
             >
-              <ArrowLeft className="w-4 h-4 rtl:rotate-180" /> {t('bac.archives.backToPillar') || (isAr ? 'العودة إلى الباكالوريا' : 'Retour à Bac')}
+              <ArrowLeft className="w-4 h-4 rtl:rotate-180" />{' '}
+              {t('bac.archives.backToPillar') || (isAr ? 'العودة إلى الباكالوريا' : 'Retour à Bac')}
             </Link>
 
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
               <div>
                 <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight mb-2">
                   {(() => {
-                    const title = t('bac.archives.heroTitle') || (isAr ? `أرشيف الباكالوريا` : `Archives du Baccalauréat`);
+                    const title =
+                      t('bac.archives.heroTitle') ||
+                      (isAr ? `أرشيف الباكالوريا` : `Archives du Baccalauréat`);
                     const parts = title.split('{highlight}');
-                    return (<>
-                      {parts[0]}
-                      <span className="bg-gradient-to-r from-violet-600 via-purple-600 to-amber-600 bg-clip-text text-transparent">{parts[1] || ''}</span>
-                    </>);
+                    return (
+                      <>
+                        {parts[0]}
+                        <span className="bg-gradient-to-r from-violet-600 via-purple-600 to-amber-600 bg-clip-text text-transparent">
+                          {parts[1] || ''}
+                        </span>
+                      </>
+                    );
                   })()}
                 </h1>
                 <p className="text-base lg:text-lg text-slate-600">
-                  <strong>{stats.totalFiles} {isAr ? 'ملف' : 'fichiers'}</strong> {isAr
+                  <strong>
+                    {stats.totalFiles} {isAr ? 'ملف' : 'fichiers'}
+                  </strong>{' '}
+                  {isAr
                     ? `من 2010 إلى 2025 — ${stats.sectionsCount} شعب، ${stats.subjectsCount} مواد. تصفية، بحث، تحميل مباشر.`
                     : `collectés depuis 2010 — ${stats.sectionsCount} sections, ${stats.subjectsCount} matières. Filtre, recherche, téléchargement.`}
                 </p>
@@ -260,7 +331,7 @@ export default function BacArchivesPage({ searchParams }: PageProps) {
                 Object.fromEntries(
                   Object.entries(sessions).map(([session, files]) => [
                     session,
-                    files.slice(0, 1),  // only need to know subjects exist
+                    files.slice(0, 1), // only need to know subjects exist
                   ]),
                 ),
               ]),

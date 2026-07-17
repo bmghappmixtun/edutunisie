@@ -15,10 +15,7 @@ export function isProduction(): boolean {
  */
 export function notInProductionResponse() {
   if (isProduction()) {
-    return Response.json(
-      { error: 'Not found' },
-      { status: 404 }
-    );
+    return Response.json({ error: 'Not found' }, { status: 404 });
   }
   return null;
 }
@@ -65,17 +62,12 @@ export function isValidOrigin(request: Request): boolean {
     return false;
   }
 
-  const allowedHosts = [
-    'examanet.com',
-    'www.examanet.com',
-    'localhost',
-    '127.0.0.1',
-  ];
+  const allowedHosts = ['examanet.com', 'www.examanet.com', 'localhost', '127.0.0.1'];
 
   const checkUrl = origin || referer || '';
   try {
     const url = new URL(checkUrl);
-    return allowedHosts.some(h => url.hostname === h || url.hostname.endsWith('.' + h));
+    return allowedHosts.some((h) => url.hostname === h || url.hostname.endsWith('.' + h));
   } catch {
     return false;
   }
@@ -105,7 +97,7 @@ export function rateLimit(
   identifier: string,
   endpoint: string,
   maxRequests: number,
-  windowMs: number
+  windowMs: number,
 ): { allowed: boolean; remaining: number; resetIn: number } {
   const key = `${endpoint}:${identifier}`;
   const now = Date.now();

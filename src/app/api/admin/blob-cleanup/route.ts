@@ -17,8 +17,7 @@ export const runtime = 'nodejs';
 export async function POST(req: NextRequest) {
   try {
     const user = await getCurrentUser();
-    const seedToken = req.headers.get('x-seed-token') ||
-      req.nextUrl.searchParams.get('token');
+    const seedToken = req.headers.get('x-seed-token') || req.nextUrl.searchParams.get('token');
 
     let isAdmin = user?.role === 'ADMIN';
     if (!isAdmin && seedToken === process.env.SEED_TOKEN) {
@@ -37,7 +36,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'urls requis' }, { status: 400 });
     }
 
-    let deleted = 0, failed = 0;
+    let deleted = 0,
+      failed = 0;
     const errors: string[] = [];
 
     for (const url of urls) {

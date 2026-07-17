@@ -47,7 +47,9 @@ export default function HoverSearchBar() {
           setExpanded(true);
           // Focus the input after a short delay
           setTimeout(() => {
-            const input = containerRef.current?.querySelector('input[type="search"]') as HTMLInputElement;
+            const input = containerRef.current?.querySelector(
+              'input[type="search"]',
+            ) as HTMLInputElement;
             input?.focus();
           }, 50);
         }}
@@ -62,9 +64,7 @@ export default function HoverSearchBar() {
       {/* Expanded: full search bar */}
       <div
         className={`transition-all duration-300 ease-out ${
-          expanded
-            ? 'w-72 lg:w-80 opacity-100'
-            : 'w-9 opacity-0 pointer-events-none'
+          expanded ? 'w-72 lg:w-80 opacity-100' : 'w-9 opacity-0 pointer-events-none'
         }`}
         style={{ overflow: 'visible' }}
       >

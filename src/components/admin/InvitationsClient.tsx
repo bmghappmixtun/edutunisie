@@ -5,9 +5,21 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import {
-  Mail, Send, Clock, CheckCircle2, XCircle, Eye, RotateCcw, Ban,
-  ChevronLeft, ArrowLeft, Filter, Globe, Activity, UserCheck, AlertTriangle,
-  Search, X
+  Mail,
+  Send,
+  Clock,
+  CheckCircle2,
+  XCircle,
+  Eye,
+  RotateCcw,
+  Ban,
+  ArrowLeft,
+  Filter,
+  Activity,
+  UserCheck,
+  AlertTriangle,
+  Search,
+  X,
 } from 'lucide-react';
 import { timeAgo } from '@/lib/utils';
 
@@ -33,19 +45,54 @@ type Invitation = {
     email: string;
     _count?: { uploadedFiles?: number };
   };
-  invitedBy: { id: string; firstName: string | null; lastName: string | null; email: string } | null;
+  invitedBy: {
+    id: string;
+    firstName: string | null;
+    lastName: string | null;
+    email: string;
+  } | null;
 };
 
 const STATUS_META: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
-  PENDING:   { label: 'En attente',    color: 'bg-slate-100 text-slate-700',    icon: <Clock className="w-3.5 h-3.5" /> },
-  SENT:      { label: 'Envoyée',       color: 'bg-sky-100 text-sky-700',        icon: <Send className="w-3.5 h-3.5" /> },
-  CLICKED:   { label: 'Lien cliqué',   color: 'bg-amber-100 text-amber-700',    icon: <Eye className="w-3.5 h-3.5" /> },
-  ACTIVATED: { label: '✅ Activée',     color: 'bg-emerald-100 text-emerald-700',icon: <CheckCircle2 className="w-3.5 h-3.5" /> },
-  EXPIRED:   { label: 'Expirée',       color: 'bg-rose-100 text-rose-700',      icon: <XCircle className="w-3.5 h-3.5" /> },
-  CANCELLED: { label: 'Annulée',       color: 'bg-rose-100 text-rose-700',      icon: <Ban className="w-3.5 h-3.5" /> },
+  PENDING: {
+    label: 'En attente',
+    color: 'bg-slate-100 text-slate-700',
+    icon: <Clock className="w-3.5 h-3.5" />,
+  },
+  SENT: {
+    label: 'Envoyée',
+    color: 'bg-sky-100 text-sky-700',
+    icon: <Send className="w-3.5 h-3.5" />,
+  },
+  CLICKED: {
+    label: 'Lien cliqué',
+    color: 'bg-amber-100 text-amber-700',
+    icon: <Eye className="w-3.5 h-3.5" />,
+  },
+  ACTIVATED: {
+    label: '✅ Activée',
+    color: 'bg-emerald-100 text-emerald-700',
+    icon: <CheckCircle2 className="w-3.5 h-3.5" />,
+  },
+  EXPIRED: {
+    label: 'Expirée',
+    color: 'bg-rose-100 text-rose-700',
+    icon: <XCircle className="w-3.5 h-3.5" />,
+  },
+  CANCELLED: {
+    label: 'Annulée',
+    color: 'bg-rose-100 text-rose-700',
+    icon: <Ban className="w-3.5 h-3.5" />,
+  },
 };
 
-export default function InvitationsClient({ initialInvitations, initialStats }: { initialInvitations: Invitation[]; initialStats: Record<string, number> }) {
+export default function InvitationsClient({
+  initialInvitations,
+  initialStats,
+}: {
+  initialInvitations: Invitation[];
+  initialStats: Record<string, number>;
+}) {
   const router = useRouter();
   const [invitations, setInvitations] = useState<Invitation[]>(initialInvitations);
   const [stats, setStats] = useState(initialStats);
@@ -56,14 +103,17 @@ export default function InvitationsClient({ initialInvitations, initialStats }: 
   const filtered = useMemo(() => {
     let result = invitations;
     if (filterStatus) {
-      result = result.filter(inv => inv.status === filterStatus);
+      result = result.filter((inv) => inv.status === filterStatus);
     }
     if (search.trim()) {
       const q = search.trim().toLowerCase();
-      result = result.filter(inv =>
-        inv.email.toLowerCase().includes(q) ||
-        `${inv.teacher.firstName || ''} ${inv.teacher.lastName || ''}`.toLowerCase().includes(q) ||
-        inv.teacher.email.toLowerCase().includes(q)
+      result = result.filter(
+        (inv) =>
+          inv.email.toLowerCase().includes(q) ||
+          `${inv.teacher.firstName || ''} ${inv.teacher.lastName || ''}`
+            .toLowerCase()
+            .includes(q) ||
+          inv.teacher.email.toLowerCase().includes(q),
       );
     }
     return result;
@@ -148,11 +198,36 @@ export default function InvitationsClient({ initialInvitations, initialStats }: 
 
       {/* Stats cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
-        <StatCard icon={<Activity className="w-5 h-5" />} color="slate" label="Total" value={totals.total} />
-        <StatCard icon={<Clock className="w-5 h-5" />} color="amber" label="En cours" value={totals.pending} />
-        <StatCard icon={<UserCheck className="w-5 h-5" />} color="emerald" label="Activées" value={totals.activated} />
-        <StatCard icon={<XCircle className="w-5 h-5" />} color="rose" label="Expirées" value={totals.expired} />
-        <StatCard icon={<CheckCircle2 className="w-5 h-5" />} color="sky" label="Conversion" value={`${totals.conversionRate}%`} />
+        <StatCard
+          icon={<Activity className="w-5 h-5" />}
+          color="slate"
+          label="Total"
+          value={totals.total}
+        />
+        <StatCard
+          icon={<Clock className="w-5 h-5" />}
+          color="amber"
+          label="En cours"
+          value={totals.pending}
+        />
+        <StatCard
+          icon={<UserCheck className="w-5 h-5" />}
+          color="emerald"
+          label="Activées"
+          value={totals.activated}
+        />
+        <StatCard
+          icon={<XCircle className="w-5 h-5" />}
+          color="rose"
+          label="Expirées"
+          value={totals.expired}
+        />
+        <StatCard
+          icon={<CheckCircle2 className="w-5 h-5" />}
+          color="sky"
+          label="Conversion"
+          value={`${totals.conversionRate}%`}
+        />
       </div>
 
       {/* Filters */}
@@ -162,7 +237,7 @@ export default function InvitationsClient({ initialInvitations, initialStats }: 
           <input
             type="text"
             value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={(e) => setSearch(e.target.value)}
             placeholder="Rechercher par nom ou email..."
             className="flex-1 bg-transparent outline-none text-sm"
           />
@@ -176,12 +251,14 @@ export default function InvitationsClient({ initialInvitations, initialStats }: 
           <Filter className="w-4 h-4 text-slate-400" />
           <select
             value={filterStatus}
-            onChange={e => setFilterStatus(e.target.value)}
+            onChange={(e) => setFilterStatus(e.target.value)}
             className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-sm font-semibold outline-none"
           >
             <option value="">Tous les statuts</option>
             {Object.entries(STATUS_META).map(([key, m]) => (
-              <option key={key} value={key}>{m.label}</option>
+              <option key={key} value={key}>
+                {m.label}
+              </option>
             ))}
           </select>
         </div>
@@ -197,14 +274,14 @@ export default function InvitationsClient({ initialInvitations, initialStats }: 
               key={key}
               onClick={() => setFilterStatus(isActive ? '' : key)}
               className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition ${
-                isActive
-                  ? 'bg-sky-600 text-white shadow-md'
-                  : `${m.color} hover:opacity-80`
+                isActive ? 'bg-sky-600 text-white shadow-md' : `${m.color} hover:opacity-80`
               }`}
             >
               {m.icon}
               {m.label}
-              <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-extrabold ${isActive ? 'bg-white/20 text-white' : 'bg-white/70 text-slate-700'}`}>
+              <span
+                className={`px-1.5 py-0.5 rounded-full text-[10px] font-extrabold ${isActive ? 'bg-white/20 text-white' : 'bg-white/70 text-slate-700'}`}
+              >
                 {count}
               </span>
             </button>
@@ -230,10 +307,18 @@ export default function InvitationsClient({ initialInvitations, initialStats }: 
               <tr>
                 <th className="text-left px-3 py-2.5 font-semibold text-slate-600">Professeur</th>
                 <th className="text-left px-3 py-2.5 font-semibold text-slate-600">Statut</th>
-                <th className="text-left px-3 py-2.5 font-semibold text-slate-600 hidden lg:table-cell">Email envoyé</th>
-                <th className="text-left px-3 py-2.5 font-semibold text-slate-600 hidden lg:table-cell">Lien cliqué</th>
-                <th className="text-left px-3 py-2.5 font-semibold text-slate-600 hidden lg:table-cell">Activé</th>
-                <th className="text-left px-3 py-2.5 font-semibold text-slate-600 hidden md:table-cell">Expire</th>
+                <th className="text-left px-3 py-2.5 font-semibold text-slate-600 hidden lg:table-cell">
+                  Email envoyé
+                </th>
+                <th className="text-left px-3 py-2.5 font-semibold text-slate-600 hidden lg:table-cell">
+                  Lien cliqué
+                </th>
+                <th className="text-left px-3 py-2.5 font-semibold text-slate-600 hidden lg:table-cell">
+                  Activé
+                </th>
+                <th className="text-left px-3 py-2.5 font-semibold text-slate-600 hidden md:table-cell">
+                  Expire
+                </th>
                 <th className="text-left px-3 py-2.5 font-semibold text-slate-600">Fichiers</th>
                 <th className="px-3 py-2.5 font-semibold text-slate-600 text-right">Actions</th>
               </tr>
@@ -243,10 +328,16 @@ export default function InvitationsClient({ initialInvitations, initialStats }: 
                 const meta = STATUS_META[inv.status];
                 const fileCount = inv.teacher._count?.uploadedFiles || 0;
                 const expiresAt = new Date(inv.expiresAt);
-                const isExpiringSoon = inv.status !== 'ACTIVATED' && inv.status !== 'EXPIRED' && inv.status !== 'CANCELLED' &&
-                  (expiresAt.getTime() - Date.now()) < 2 * 24 * 3600 * 1000;
+                const isExpiringSoon =
+                  inv.status !== 'ACTIVATED' &&
+                  inv.status !== 'EXPIRED' &&
+                  inv.status !== 'CANCELLED' &&
+                  expiresAt.getTime() - Date.now() < 2 * 24 * 3600 * 1000;
                 return (
-                  <tr key={inv.id} className={`border-t border-slate-50 hover:bg-slate-50 transition ${i % 2 === 0 ? '' : 'bg-slate-50/30'}`}>
+                  <tr
+                    key={inv.id}
+                    className={`border-t border-slate-50 hover:bg-slate-50 transition ${i % 2 === 0 ? '' : 'bg-slate-50/30'}`}
+                  >
                     <td className="px-3 py-2.5">
                       <div className="flex items-center gap-2">
                         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-sky-400 to-cyan-500 text-white flex items-center justify-center font-bold text-xs flex-shrink-0">
@@ -261,7 +352,9 @@ export default function InvitationsClient({ initialInvitations, initialStats }: 
                       </div>
                     </td>
                     <td className="px-3 py-2.5">
-                      <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-bold rounded ${meta.color}`}>
+                      <span
+                        className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-bold rounded ${meta.color}`}
+                      >
                         {meta.icon} {meta.label}
                       </span>
                       {inv.clickCount > 1 && (
@@ -272,61 +365,93 @@ export default function InvitationsClient({ initialInvitations, initialStats }: 
                       {inv.emailSentAt ? (
                         <div>
                           <div>{timeAgo(inv.emailSentAt)}</div>
-                          <div className="text-xs text-slate-400">{new Date(inv.emailSentAt).toLocaleDateString('fr-FR')}</div>
+                          <div className="text-xs text-slate-400">
+                            {new Date(inv.emailSentAt).toLocaleDateString('fr-FR')}
+                          </div>
                         </div>
-                      ) : <span className="text-slate-300">—</span>}
+                      ) : (
+                        <span className="text-slate-300">—</span>
+                      )}
                     </td>
                     <td className="px-3 py-2.5 text-slate-500 hidden lg:table-cell">
                       {inv.linkClickedAt ? (
                         <div>
                           <div>{timeAgo(inv.linkClickedAt)}</div>
-                          {inv.clickIpAddress && <div className="text-xs text-slate-400 truncate max-w-[120px]">{inv.clickIpAddress}</div>}
+                          {inv.clickIpAddress && (
+                            <div className="text-xs text-slate-400 truncate max-w-[120px]">
+                              {inv.clickIpAddress}
+                            </div>
+                          )}
                         </div>
-                      ) : <span className="text-slate-300">—</span>}
+                      ) : (
+                        <span className="text-slate-300">—</span>
+                      )}
                     </td>
                     <td className="px-3 py-2.5 text-slate-500 hidden lg:table-cell">
                       {inv.activatedAt ? (
                         <div>
-                          <div className="text-emerald-600 font-semibold">{timeAgo(inv.activatedAt)}</div>
-                          {inv.activateIpAddress && <div className="text-xs text-slate-400 truncate max-w-[120px]">{inv.activateIpAddress}</div>}
+                          <div className="text-emerald-600 font-semibold">
+                            {timeAgo(inv.activatedAt)}
+                          </div>
+                          {inv.activateIpAddress && (
+                            <div className="text-xs text-slate-400 truncate max-w-[120px]">
+                              {inv.activateIpAddress}
+                            </div>
+                          )}
                         </div>
-                      ) : <span className="text-slate-300">—</span>}
+                      ) : (
+                        <span className="text-slate-300">—</span>
+                      )}
                     </td>
                     <td className="px-3 py-2.5 hidden md:table-cell">
-                      <div className={`text-xs ${isExpiringSoon ? 'text-rose-600 font-bold' : 'text-slate-500'}`}>
-                        {isExpiringSoon && '⚠️ '}{new Date(inv.expiresAt).toLocaleDateString('fr-FR')}
+                      <div
+                        className={`text-xs ${isExpiringSoon ? 'text-rose-600 font-bold' : 'text-slate-500'}`}
+                      >
+                        {isExpiringSoon && '⚠️ '}
+                        {new Date(inv.expiresAt).toLocaleDateString('fr-FR')}
                       </div>
                     </td>
                     <td className="px-3 py-2.5">
-                      <span className={`inline-flex items-center justify-center min-w-[2rem] px-2 py-1 text-xs font-extrabold rounded ${
-                        fileCount > 50 ? 'bg-emerald-100 text-emerald-700' :
-                        fileCount > 10 ? 'bg-sky-100 text-sky-700' :
-                        fileCount > 0 ? 'bg-slate-100 text-slate-700' :
-                        'bg-slate-50 text-slate-400'
-                      }`}>
+                      <span
+                        className={`inline-flex items-center justify-center min-w-[2rem] px-2 py-1 text-xs font-extrabold rounded ${
+                          fileCount > 50
+                            ? 'bg-emerald-100 text-emerald-700'
+                            : fileCount > 10
+                              ? 'bg-sky-100 text-sky-700'
+                              : fileCount > 0
+                                ? 'bg-slate-100 text-slate-700'
+                                : 'bg-slate-50 text-slate-400'
+                        }`}
+                      >
                         {fileCount}
                       </span>
                     </td>
                     <td className="px-3 py-2.5">
                       <div className="flex gap-1 items-center justify-end flex-wrap">
-                        {(inv.status === 'SENT' || inv.status === 'CLICKED' || inv.status === 'EXPIRED') && (
+                        {(inv.status === 'SENT' ||
+                          inv.status === 'CLICKED' ||
+                          inv.status === 'EXPIRED') && (
                           <button
                             onClick={() => resend(inv.id)}
                             disabled={loadingId === inv.id}
                             className="inline-flex items-center gap-1 px-1.5 py-1 text-[11px] font-semibold bg-sky-50 text-sky-700 hover:bg-sky-100 rounded transition disabled:opacity-50"
                             title="Renvoyer avec un nouveau mot de passe"
                           >
-                            <RotateCcw className="w-3 h-3" /> <span className="hidden xl:inline">Renvoyer</span>
+                            <RotateCcw className="w-3 h-3" />{' '}
+                            <span className="hidden xl:inline">Renvoyer</span>
                           </button>
                         )}
-                        {(inv.status === 'PENDING' || inv.status === 'SENT' || inv.status === 'CLICKED') && (
+                        {(inv.status === 'PENDING' ||
+                          inv.status === 'SENT' ||
+                          inv.status === 'CLICKED') && (
                           <button
                             onClick={() => cancel(inv.id)}
                             disabled={loadingId === inv.id}
                             className="inline-flex items-center gap-1 px-1.5 py-1 text-[11px] font-semibold bg-rose-50 text-rose-700 hover:bg-rose-100 rounded transition disabled:opacity-50"
                             title="Annuler cette invitation"
                           >
-                            <Ban className="w-3 h-3" /> <span className="hidden xl:inline">Annuler</span>
+                            <Ban className="w-3 h-3" />{' '}
+                            <span className="hidden xl:inline">Annuler</span>
                           </button>
                         )}
                       </div>
@@ -338,7 +463,8 @@ export default function InvitationsClient({ initialInvitations, initialStats }: 
                 <tr>
                   <td colSpan={8} className="p-12 text-center text-slate-500">
                     <Mail className="w-12 h-12 mx-auto text-slate-300 mb-2" />
-                    Aucune invitation {filterStatus ? `avec le statut "${STATUS_META[filterStatus]?.label}"` : ''}
+                    Aucune invitation{' '}
+                    {filterStatus ? `avec le statut "${STATUS_META[filterStatus]?.label}"` : ''}
                   </td>
                 </tr>
               )}
@@ -350,13 +476,24 @@ export default function InvitationsClient({ initialInvitations, initialStats }: 
       {/* Footer info */}
       <div className="mt-4 text-xs text-slate-400 flex items-center gap-2">
         <AlertTriangle className="w-3.5 h-3.5" />
-        Les invitations expirent automatiquement après 10 jours. Utilisez "Renvoyer" pour générer un nouveau lien + mot de passe.
+        Les invitations expirent automatiquement après 10 jours. Utilisez "Renvoyer" pour générer un
+        nouveau lien + mot de passe.
       </div>
     </div>
   );
 }
 
-function StatCard({ icon, color, label, value }: { icon: React.ReactNode; color: string; label: string; value: number | string }) {
+function StatCard({
+  icon,
+  color,
+  label,
+  value,
+}: {
+  icon: React.ReactNode;
+  color: string;
+  label: string;
+  value: number | string;
+}) {
   const colors: Record<string, string> = {
     slate: 'bg-slate-100 text-slate-700',
     sky: 'bg-sky-100 text-sky-700',

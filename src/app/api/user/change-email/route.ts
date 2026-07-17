@@ -36,10 +36,13 @@ export async function POST(req: NextRequest) {
 
     await prisma.user.update({
       where: { id: user.id },
-      data: { email: newEmail, emailVerifiedAt: null }
+      data: { email: newEmail, emailVerifiedAt: null },
     });
 
-    return NextResponse.json({ success: true, message: 'Email changé. Vérifiez votre nouvelle adresse.' });
+    return NextResponse.json({
+      success: true,
+      message: 'Email changé. Vérifiez votre nouvelle adresse.',
+    });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }

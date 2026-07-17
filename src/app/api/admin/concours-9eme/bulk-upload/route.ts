@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
   if (files.length > MAX_FILES_PER_BATCH) {
     return NextResponse.json(
       { error: `Too many files in batch: ${files.length} (max ${MAX_FILES_PER_BATCH})` },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
       } catch (e: any) {
         failed.push({ ...task, error: e.message || 'Unknown error' });
       }
-    })
+    }),
   );
 
   return NextResponse.json({

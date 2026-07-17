@@ -22,7 +22,7 @@ export default function LoginPage() {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, password }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -44,8 +44,11 @@ export default function LoginPage() {
       if (data.user.role === 'ADMIN') router.push('/admin');
       else if (data.user.role === 'TEACHER') router.push('/enseignant');
       else router.push('/mon-compte');
-    } catch { toast.error(t('common.error')); }
-    finally { setLoading(false); }
+    } catch {
+      toast.error(t('common.error'));
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -61,33 +64,63 @@ export default function LoginPage() {
           <p className="text-slate-500 mt-1">{t('auth.loginSubtitle')}</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl p-6 lg:p-8 shadow-xl border border-slate-100">
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white rounded-2xl p-6 lg:p-8 shadow-xl border border-slate-100"
+        >
           <div className="mb-4">
             <label className="label">{t('auth.email')}</label>
-            <input type="email" value={email} onChange={e => setEmail(e.target.value)} required className="input" placeholder="votre@email.com" />
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="input"
+              placeholder="votre@email.com"
+            />
           </div>
           <div className="mb-6">
             <label className="label">{t('auth.password')}</label>
             <div className="relative">
-              <input type={showPw ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} required className="input pr-10" placeholder="••••••••" />
-              <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+              <input
+                type={showPw ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="input pr-10"
+                placeholder="••••••••"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPw(!showPw)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+              >
                 {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
           </div>
-          <button type="submit" disabled={loading} className="btn-primary w-full justify-center py-3 text-base">
+          <button
+            type="submit"
+            disabled={loading}
+            className="btn-primary w-full justify-center py-3 text-base"
+          >
             {loading ? '...' : t('auth.loginButton')}
           </button>
 
           <OAuthButtons />
 
           <div className="text-center mt-4">
-            <Link href="/mot-de-passe-oublie" className="text-sm text-primary-600 hover:underline">{t('auth.forgotPassword')}</Link>
+            <Link href="/mot-de-passe-oublie" className="text-sm text-primary-600 hover:underline">
+              {t('auth.forgotPassword')}
+            </Link>
           </div>
         </form>
 
         <p className="text-center mt-6 text-sm text-slate-500">
-          {t('auth.noAccount')} <Link href="/inscription" className="text-primary-600 font-semibold hover:underline">{t('auth.signupNow')}</Link>
+          {t('auth.noAccount')}{' '}
+          <Link href="/inscription" className="text-primary-600 font-semibold hover:underline">
+            {t('auth.signupNow')}
+          </Link>
         </p>
       </div>
     </div>

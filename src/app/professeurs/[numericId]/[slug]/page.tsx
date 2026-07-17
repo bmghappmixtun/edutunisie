@@ -7,34 +7,58 @@ import { prisma } from '@/lib/prisma';
 import { getUserFavorites, decorateWithFavorites } from '@/lib/resource-helpers';
 import { getCurrentUser } from '@/lib/auth';
 import {
-  GraduationCap, MapPin, BookOpen, FileText, Star,
-  Award, Mail, Calendar, Download, Eye,
-  Briefcase, Layers, MessageSquare, Share2, CheckCircle
+  GraduationCap,
+  MapPin,
+  BookOpen,
+  FileText,
+  Star,
+  Award,
+  Calendar,
+  Download,
+  Eye,
+  Briefcase,
+  Layers,
+  MessageSquare,
+  CheckCircle,
 } from 'lucide-react';
 import ShareButton from '@/components/share/ShareButton';
 import FollowButton from '@/components/social/FollowButton';
 import MessageTeacherButton from '@/components/social/MessageTeacherButton';
 import { timeAgo } from '@/lib/utils';
 import { isArabic } from '@/lib/text-utils';
-import ResourceCard from '@/components/resources/ResourceCard';
 import { personSchema, breadcrumbSchema } from '@/lib/structured-data';
 
 export const dynamic = 'force-dynamic';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
 
-export async function generateMetadata({ params }: { params: Promise<{ numericId: string; slug: string }> }) {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ numericId: string; slug: string }>;
+}) {
   const { numericId: numericIdStr, slug } = await params;
   const numericId = parseInt(numericIdStr, 10);
   const teacher = await prisma.user.findUnique({
     where: { numericId },
-    select: { slug: true, firstName: true, lastName: true, firstNameAr: true, lastNameAr: true, bio: true, schoolName: true, schoolNameAr: true },
+    select: {
+      slug: true,
+      firstName: true,
+      lastName: true,
+      firstNameAr: true,
+      lastNameAr: true,
+      bio: true,
+      schoolName: true,
+      schoolNameAr: true,
+    },
   });
   if (!teacher) return { title: 'Enseignant non trouvé' };
   // Capitalize first letters of name parts ("chaabane mounir" -> "Chaabane Mounir").
   // Source data is sometimes stored lowercase; SEO displays look better capitalized.
   const capitalize = (s: string) => (s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : s);
-  const fullName = `${capitalize(teacher.firstName || '')} ${capitalize(teacher.lastName || '')}`.replace(/\s+/g, ' ').trim();
+  const fullName = `${capitalize(teacher.firstName || '')} ${capitalize(teacher.lastName || '')}`
+    .replace(/\s+/g, ' ')
+    .trim();
   const description = teacher.bio
     ? teacher.bio.slice(0, 160)
     : `${fullName}${teacher.schoolName ? ' — ' + teacher.schoolName : ''} — Enseignant. Cours, devoirs et exercices gratuits.`;
@@ -53,9 +77,15 @@ export async function generateMetadata({ params }: { params: Promise<{ numericId
 }
 
 const TYPE_LABELS: Record<string, string> = {
-  COURSE: 'Cours', HOMEWORK: 'Devoir', EXERCISE: "Série d'exercices",
-  REVISION: 'Révision', EXAM: 'Contrôle/Examen', BAC_SUBJECT: 'Sujet Bac',
-  CORRECTION: 'Corrigé', SUMMARY: 'Résumé', OTHER: 'Autre'
+  COURSE: 'Cours',
+  HOMEWORK: 'Devoir',
+  EXERCISE: "Série d'exercices",
+  REVISION: 'Révision',
+  EXAM: 'Contrôle/Examen',
+  BAC_SUBJECT: 'Sujet Bac',
+  CORRECTION: 'Corrigé',
+  SUMMARY: 'Résumé',
+  OTHER: 'Autre',
 };
 
 const TYPE_COLORS: Record<string, string> = {
@@ -67,10 +97,14 @@ const TYPE_COLORS: Record<string, string> = {
   BAC_SUBJECT: 'from-amber-500 to-amber-700',
   CORRECTION: 'from-teal-500 to-teal-700',
   SUMMARY: 'from-pink-500 to-pink-700',
-  OTHER: 'from-slate-500 to-slate-700'
+  OTHER: 'from-slate-500 to-slate-700',
 };
 
-export default async function TeacherProfilePage({ params }: { params: Promise<{ numericId: string; slug: string }> }) {
+export default async function TeacherProfilePage({
+  params,
+}: {
+  params: Promise<{ numericId: string; slug: string }>;
+}) {
   const { numericId: numericIdStr, slug } = await params;
   const numericId = parseInt(numericIdStr, 10);
 
@@ -79,14 +113,28 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
       numericId,
       role: 'TEACHER',
       // Show ACTIVE teachers, or any teacher if admin wants to see
-      OR: [{ status: 'ACTIVE' }, { isVerifiedTeacher: true }]
+      OR: [{ status: 'ACTIVE' }, { isVerifiedTeacher: true }],
     },
     select: {
-      id: true, numericId: true, slug: true, firstName: true, lastName: true, firstNameAr: true, lastNameAr: true, avatarUrl: true, bio: true,
-      email: true, schoolName: true, schoolNameAr: true, governorate: true, diploma: true,
-      teachingSubjects: true, teachingLevels: true, createdAt: true,
-      lastLoginAt: true
-    }
+      id: true,
+      numericId: true,
+      slug: true,
+      firstName: true,
+      lastName: true,
+      firstNameAr: true,
+      lastNameAr: true,
+      avatarUrl: true,
+      bio: true,
+      email: true,
+      schoolName: true,
+      schoolNameAr: true,
+      governorate: true,
+      diploma: true,
+      teachingSubjects: true,
+      teachingLevels: true,
+      createdAt: true,
+      lastLoginAt: true,
+    },
   });
 
   if (!teacher) notFound();
@@ -97,7 +145,7 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
   let followersCount = 0;
   if (currentUser) {
     const follow = await prisma.follow.findUnique({
-      where: { followerId_followingId: { followerId: currentUser.id, followingId: teacher.id } }
+      where: { followerId_followingId: { followerId: currentUser.id, followingId: teacher.id } },
     });
     isFollowing = !!follow;
   }
@@ -111,7 +159,8 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
       subject: { select: { slug: true, nameFr: true, color: true, icon: true } },
       class: { select: { slug: true, nameFr: true } },
       section: { select: { slug: true, nameFr: true } },
-      _count: { select: { comments: true, ratings: true } },}
+      _count: { select: { comments: true, ratings: true } },
+    },
   });
 
   // Stats
@@ -122,25 +171,31 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
     ? resources.reduce((s, r) => s + r.avgRating, 0) / resources.length
     : 0;
   const totalFavorites = await prisma.favorite.count({
-    where: { resource: { teacherId: teacher.id } }
+    where: { resource: { teacherId: teacher.id } },
   });
 
   // Decorate with isFavorited
-  const profFavIds = await getUserFavorites(resources.map(r => r.id));
+  const profFavIds = await getUserFavorites(resources.map((r) => r.id));
   const decoratedProfResources = decorateWithFavorites(resources, profFavIds);
 
   // Group by type
-  const byType = resources.reduce((acc, r) => {
-    acc[r.type] = (acc[r.type] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+  const byType = resources.reduce(
+    (acc, r) => {
+      acc[r.type] = (acc[r.type] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
 
   // Group by subject
-  const bySubject = resources.reduce((acc, r) => {
-    const key = r.subject?.nameFr || 'Autre';
-    acc[key] = (acc[key] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+  const bySubject = resources.reduce(
+    (acc, r) => {
+      const key = r.subject?.nameFr || 'Autre';
+      acc[key] = (acc[key] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
 
   // Parse teaching data
   const teachingSubjects = teacher.teachingSubjects
@@ -157,11 +212,14 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
   const initials = getInitials(teacher.firstName, teacher.lastName);
 
   // JSON-LD: Person schema + BreadcrumbList
-  const fullName = `${teacher.firstName || ''} ${teacher.lastName || ''}`.replace(/\s+/g, ' ').trim();
+  const fullName = `${teacher.firstName || ''} ${teacher.lastName || ''}`
+    .replace(/\s+/g, ' ')
+    .trim();
   const personJsonLd = personSchema({
     id: `${profileUrl}#person`,
     name: fullName,
-    description: teacher.bio || `Enseignant sur Examanet — ${resources.length} ressources pédagogiques`,
+    description:
+      teacher.bio || `Enseignant sur Examanet — ${resources.length} ressources pédagogiques`,
     url: profileUrl,
     schoolName: teacher.schoolName,
     schoolNameAr: teacher.schoolNameAr,
@@ -176,17 +234,30 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
 
   return (
     <div className="min-h-screen flex flex-col">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <Header />
 
       <main className="flex-1 pt-20">
         {/* Visual breadcrumb (matches BreadcrumbList JSON-LD) */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-          <nav aria-label="Fil d'Ariane" className="flex items-center gap-1 text-xs text-slate-500 flex-wrap">
-            <Link href="/" className="hover:text-primary-600 transition">Accueil</Link>
+          <nav
+            aria-label="Fil d'Ariane"
+            className="flex items-center gap-1 text-xs text-slate-500 flex-wrap"
+          >
+            <Link href="/" className="hover:text-primary-600 transition">
+              Accueil
+            </Link>
             <span className="text-slate-300">›</span>
-            <Link href="/professeurs" className="hover:text-primary-600 transition">Professeurs</Link>
+            <Link href="/professeurs" className="hover:text-primary-600 transition">
+              Professeurs
+            </Link>
             <span className="text-slate-300">›</span>
             <span className="text-slate-900 font-semibold truncate">{fullName}</span>
           </nav>
@@ -204,7 +275,9 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={teacher.avatarUrl}
-                    alt={`${teacher.firstName || ''} ${teacher.lastName || ''}`.replace(/\s+/g, ' ').trim()}
+                    alt={`${teacher.firstName || ''} ${teacher.lastName || ''}`
+                      .replace(/\s+/g, ' ')
+                      .trim()}
                     className="w-32 h-32 md:w-40 md:h-40 rounded-3xl object-cover shadow-2xl border-4 border-white"
                   />
                 ) : (
@@ -238,11 +311,15 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
                         return (
                           <>
                             <h1 className="text-3xl md:text-5xl font-extrabold text-slate-900 mb-2">
-                              {(teacher.firstName || "") + " " + (teacher.lastName || "")}
+                              {(teacher.firstName || '') + ' ' + (teacher.lastName || '')}
                             </h1>
                             {hasAr && (
-                              <h2 className="text-xl md:text-2xl font-bold text-slate-600 mb-2" dir="rtl" lang="ar">
-                                {(teacher.firstNameAr || "") + " " + (teacher.lastNameAr || "")}
+                              <h2
+                                className="text-xl md:text-2xl font-bold text-slate-600 mb-2"
+                                dir="rtl"
+                                lang="ar"
+                              >
+                                {(teacher.firstNameAr || '') + ' ' + (teacher.lastNameAr || '')}
                               </h2>
                             )}
                           </>
@@ -250,12 +327,20 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
                       }
                       if (hasAr) {
                         return (
-                          <h1 className="text-3xl md:text-5xl font-extrabold text-slate-900 mb-2" dir="rtl" lang="ar">
+                          <h1
+                            className="text-3xl md:text-5xl font-extrabold text-slate-900 mb-2"
+                            dir="rtl"
+                            lang="ar"
+                          >
                             {teacher.firstNameAr} {teacher.lastNameAr}
                           </h1>
                         );
                       }
-                      return <h1 className="text-3xl md:text-5xl font-extrabold text-slate-900 mb-2">Enseignant</h1>;
+                      return (
+                        <h1 className="text-3xl md:text-5xl font-extrabold text-slate-900 mb-2">
+                          Enseignant
+                        </h1>
+                      );
                     })()}
 
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-600 mt-3">
@@ -263,8 +348,14 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
                         <div className="flex items-center gap-1.5">
                           <Briefcase className="w-4 h-4 text-slate-400" />
                           <div className="flex flex-col">
-                            {teacher.schoolName && <span className="font-semibold">{teacher.schoolName}</span>}
-                            {teacher.schoolNameAr && <span className="text-xs text-slate-500" dir="rtl" lang="ar">{teacher.schoolNameAr}</span>}
+                            {teacher.schoolName && (
+                              <span className="font-semibold">{teacher.schoolName}</span>
+                            )}
+                            {teacher.schoolNameAr && (
+                              <span className="text-xs text-slate-500" dir="rtl" lang="ar">
+                                {teacher.schoolNameAr}
+                              </span>
+                            )}
                           </div>
                         </div>
                       )}
@@ -289,8 +380,8 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
 
                   <ShareButton
                     url={profileUrl}
-                    title={`${teacher.firstName || ""} ${teacher.lastName || ""} sur Examanet`}
-                    description={`Découvrez les ressources de ${teacher.firstName || ""} ${teacher.lastName || ""}`}
+                    title={`${teacher.firstName || ''} ${teacher.lastName || ''} sur Examanet`}
+                    description={`Découvrez les ressources de ${teacher.firstName || ''} ${teacher.lastName || ''}`}
                   />
                 </div>
 
@@ -316,18 +407,32 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
                     {teachingSubjects.length > 0 && (
                       <div className="flex flex-wrap items-center gap-2">
                         <BookOpen className="w-4 h-4 text-slate-500" />
-                        <span className="text-xs font-semibold text-slate-500 uppercase">Matières :</span>
-                        {teachingSubjects.map(s => (
-                          <span key={s} className="text-xs bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full font-semibold">{s}</span>
+                        <span className="text-xs font-semibold text-slate-500 uppercase">
+                          Matières :
+                        </span>
+                        {teachingSubjects.map((s) => (
+                          <span
+                            key={s}
+                            className="text-xs bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full font-semibold"
+                          >
+                            {s}
+                          </span>
                         ))}
                       </div>
                     )}
                     {teachingLevels.length > 0 && (
                       <div className="flex flex-wrap items-center gap-2">
                         <Layers className="w-4 h-4 text-slate-500" />
-                        <span className="text-xs font-semibold text-slate-500 uppercase">Niveaux :</span>
-                        {teachingLevels.map(l => (
-                          <span key={l} className="text-xs bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full font-semibold">{l}</span>
+                        <span className="text-xs font-semibold text-slate-500 uppercase">
+                          Niveaux :
+                        </span>
+                        {teachingLevels.map((l) => (
+                          <span
+                            key={l}
+                            className="text-xs bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full font-semibold"
+                          >
+                            {l}
+                          </span>
                         ))}
                       </div>
                     )}
@@ -357,7 +462,9 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
               <StatCard
                 icon={<Download className="w-5 h-5" />}
                 label="Téléchargements"
-                value={totalDownloads > 999 ? `${(totalDownloads / 1000).toFixed(1)}k` : totalDownloads}
+                value={
+                  totalDownloads > 999 ? `${(totalDownloads / 1000).toFixed(1)}k` : totalDownloads
+                }
                 color="text-emerald-600 bg-emerald-50"
               />
               <StatCard
@@ -400,19 +507,25 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
               {resources.length === 0 ? (
                 <div className="bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl p-12 text-center">
                   <FileText className="w-12 h-12 mx-auto mb-3 text-slate-300" />
-                  <p className="font-semibold text-slate-600">Aucune ressource publiée pour l'instant</p>
-                  <p className="text-sm text-slate-500 mt-1">Ce professeur n'a pas encore partagé de contenu.</p>
+                  <p className="font-semibold text-slate-600">
+                    Aucune ressource publiée pour l'instant
+                  </p>
+                  <p className="text-sm text-slate-500 mt-1">
+                    Ce professeur n'a pas encore partagé de contenu.
+                  </p>
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {latestResources.map(r => (
+                  {latestResources.map((r) => (
                     <Link
                       key={r.id}
                       href={`/ressources/${r.numericId}/${r.slug}`}
                       className="block bg-white rounded-2xl border border-slate-200 hover:border-primary-300 hover:shadow-md transition p-4 group"
                     >
                       <div className="flex items-start gap-3">
-                        <div className={`w-12 h-14 rounded-lg bg-gradient-to-br ${TYPE_COLORS[r.type] || TYPE_COLORS.OTHER} flex items-center justify-center flex-shrink-0`}>
+                        <div
+                          className={`w-12 h-14 rounded-lg bg-gradient-to-br ${TYPE_COLORS[r.type] || TYPE_COLORS.OTHER} flex items-center justify-center flex-shrink-0`}
+                        >
                           <FileText className="w-5 h-5 text-white" />
                         </div>
                         <div className="flex-1 min-w-0">
@@ -472,7 +585,8 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
                   Contact
                 </h3>
                 <p className="text-sm text-slate-600 mb-3">
-                  Vous êtes élève de ce professeur ? Connectez-vous pour lui envoyer un message ou suivre ses publications.
+                  Vous êtes élève de ce professeur ? Connectez-vous pour lui envoyer un message ou
+                  suivre ses publications.
                 </p>
                 <Link
                   href="/connexion"
@@ -526,7 +640,9 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
                       .map(([type, count]) => (
                         <div key={type} className="flex items-center justify-between text-sm">
                           <span className="text-slate-700">{TYPE_LABELS[type] || type}</span>
-                          <span className="text-xs font-bold bg-slate-100 text-slate-700 px-2 py-0.5 rounded">{count}</span>
+                          <span className="text-xs font-bold bg-slate-100 text-slate-700 px-2 py-0.5 rounded">
+                            {count}
+                          </span>
                         </div>
                       ))}
                   </div>
@@ -543,7 +659,11 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
 }
 
 function StatCard({
-  icon, label, value, subValue, color
+  icon,
+  label,
+  value,
+  subValue,
+  color,
 }: {
   icon: React.ReactNode;
   label: string;
@@ -553,7 +673,9 @@ function StatCard({
 }) {
   return (
     <div className="flex items-center gap-3">
-      <div className={`w-11 h-11 rounded-xl ${color} flex items-center justify-center flex-shrink-0`}>
+      <div
+        className={`w-11 h-11 rounded-xl ${color} flex items-center justify-center flex-shrink-0`}
+      >
         {icon}
       </div>
       <div className="min-w-0">

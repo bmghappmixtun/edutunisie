@@ -16,11 +16,7 @@ function createPrismaClient() {
     if (params.model === 'User' && (params.action === 'create' || params.action === 'createMany')) {
       const fillSlug = (data: any) => {
         if (!data || data.slug) return;
-        data.slug = buildTeacherSlug(
-          data.firstName ?? null,
-          data.lastName ?? null,
-          data.email
-        );
+        data.slug = buildTeacherSlug(data.firstName ?? null, data.lastName ?? null, data.email);
       };
       if (params.action === 'createMany' && Array.isArray(params.args?.data)) {
         for (const d of params.args.data) fillSlug(d);

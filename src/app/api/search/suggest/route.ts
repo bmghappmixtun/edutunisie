@@ -54,13 +54,13 @@ async function searchResources(q: string, limit: number): Promise<SuggestResult[
     LIMIT ${limit}
   `;
 
-  return (results as any[]).map(r => ({
+  return (results as any[]).map((r) => ({
     type: 'resource' as SuggestType,
     id: r.id,
     title: r.title,
     subtitle: [r.subjectName, r.className, typeLabel(r.type)].filter(Boolean).join(' · '),
     href: `/ressources/${r.numericId}/${r.slug}`,
-    icon: typeIcon(r.type)
+    icon: typeIcon(r.type),
   }));
 }
 
@@ -83,13 +83,13 @@ async function searchTeachers(q: string, limit: number): Promise<SuggestResult[]
     LIMIT ${limit}
   `;
 
-  return (results as any[]).map(u => ({
+  return (results as any[]).map((u) => ({
     type: 'teacher' as SuggestType,
     id: u.id,
-    title: `${u.firstName || ""} ${u.lastName || ""}`,
+    title: `${u.firstName || ''} ${u.lastName || ''}`,
     subtitle: [u.schoolName, `${u.resourceCount} ressource(s)`].filter(Boolean).join(' · '),
     href: `/professeurs/${u.numericId}/${u.slug}`,
-    icon: '👨‍🏫'
+    icon: '👨‍🏫',
   }));
 }
 
@@ -109,13 +109,13 @@ async function searchSubjects(q: string, limit: number): Promise<SuggestResult[]
     LIMIT ${limit}
   `;
 
-  return (results as any[]).map(s => ({
+  return (results as any[]).map((s) => ({
     type: 'subject' as SuggestType,
     id: s.id,
     title: s.nameFr,
     subtitle: `${s.resourceCount} ressource(s)`,
     href: `/matieres/${s.slug}`,
-    icon: s.icon || '📚'
+    icon: s.icon || '📚',
   }));
 }
 
@@ -137,13 +137,13 @@ async function searchClasses(q: string, limit: number): Promise<SuggestResult[]>
     LIMIT ${limit}
   `;
 
-  return (results as any[]).map(c => ({
+  return (results as any[]).map((c) => ({
     type: 'class' as SuggestType,
     id: c.id,
     title: c.nameFr,
     subtitle: [c.levelName, `${c.resourceCount} ressource(s)`].filter(Boolean).join(' · '),
     href: `/niveaux/${c.levelSlug}#${c.slug}`,
-    icon: '🎒'
+    icon: '🎒',
   }));
 }
 
@@ -166,13 +166,13 @@ async function searchSections(q: string, limit: number): Promise<SuggestResult[]
     LIMIT ${limit}
   `;
 
-  return (results as any[]).map(s => ({
+  return (results as any[]).map((s) => ({
     type: 'section' as SuggestType,
     id: s.id,
     title: s.nameFr,
     subtitle: [s.className, `${s.resourceCount} ressource(s)`].filter(Boolean).join(' · '),
     href: `/niveaux/${s.levelSlug}#${s.classSlug}`,
-    icon: '📁'
+    icon: '📁',
   }));
 }
 
@@ -211,14 +211,14 @@ export async function GET(req: NextRequest) {
   const limit = Math.min(parseInt(req.nextUrl.searchParams.get('limit') || '8'), 20);
   const types = (req.nextUrl.searchParams.get('types') || 'resource,teacher,subject,class')
     .split(',')
-    .filter(t => SUGGEST_TYPES.includes(t as SuggestType)) as SuggestType[];
+    .filter((t) => SUGGEST_TYPES.includes(t as SuggestType)) as SuggestType[];
 
   if (!q.trim() || q.length < 2) {
     return NextResponse.json({
       query: q,
       results: [],
       groups: {},
-      took: Date.now() - start
+      took: Date.now() - start,
     });
   }
 
@@ -228,7 +228,7 @@ export async function GET(req: NextRequest) {
     types.includes('teacher') ? searchTeachers(q, 3) : Promise.resolve([]),
     types.includes('subject') ? searchSubjects(q, 3) : Promise.resolve([]),
     types.includes('class') ? searchClasses(q, 3) : Promise.resolve([]),
-    types.includes('section') ? searchSections(q, 2) : Promise.resolve([])
+    types.includes('section') ? searchSections(q, 2) : Promise.resolve([]),
   ]);
 
   // Combine all results
@@ -240,7 +240,7 @@ export async function GET(req: NextRequest) {
     teacher: teachers,
     subject: subjects,
     class: classes,
-    section: sections
+    section: sections,
   };
 
   return NextResponse.json({
@@ -253,8 +253,8 @@ export async function GET(req: NextRequest) {
       subject: subjects.length,
       class: classes.length,
       section: sections.length,
-      total: all.length
+      total: all.length,
     },
-    took: Date.now() - start
+    took: Date.now() - start,
   });
 }

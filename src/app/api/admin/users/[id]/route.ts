@@ -17,8 +17,19 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   try {
     const body = await req.json();
     const allowed = [
-      'firstName', 'lastName', 'email', 'bio', 'schoolName', 'governorate', 'diploma',
-      'avatarUrl', 'phone', 'website', 'isVerifiedTeacher', 'role', 'status'
+      'firstName',
+      'lastName',
+      'email',
+      'bio',
+      'schoolName',
+      'governorate',
+      'diploma',
+      'avatarUrl',
+      'phone',
+      'website',
+      'isVerifiedTeacher',
+      'role',
+      'status',
     ];
     const updateData: any = {};
     for (const k of allowed) {
@@ -30,7 +41,14 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       let arr: string[] = [];
       if (Array.isArray(body.teachingSubjects)) arr = body.teachingSubjects;
       else if (typeof body.teachingSubjects === 'string') {
-        try { arr = JSON.parse(body.teachingSubjects); } catch { arr = body.teachingSubjects.split(',').map((s: string) => s.trim()).filter(Boolean); }
+        try {
+          arr = JSON.parse(body.teachingSubjects);
+        } catch {
+          arr = body.teachingSubjects
+            .split(',')
+            .map((s: string) => s.trim())
+            .filter(Boolean);
+        }
       }
       updateData.teachingSubjects = JSON.stringify(arr);
     }
@@ -38,7 +56,14 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       let arr: string[] = [];
       if (Array.isArray(body.teachingLevels)) arr = body.teachingLevels;
       else if (typeof body.teachingLevels === 'string') {
-        try { arr = JSON.parse(body.teachingLevels); } catch { arr = body.teachingLevels.split(',').map((s: string) => s.trim()).filter(Boolean); }
+        try {
+          arr = JSON.parse(body.teachingLevels);
+        } catch {
+          arr = body.teachingLevels
+            .split(',')
+            .map((s: string) => s.trim())
+            .filter(Boolean);
+        }
       }
       updateData.teachingLevels = JSON.stringify(arr);
     }
@@ -47,11 +72,23 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       where: { id },
       data: updateData,
       select: {
-        id: true, email: true, firstName: true, lastName: true, role: true, status: true,
-        bio: true, schoolName: true, governorate: true, diploma: true,
-        teachingSubjects: true, teachingLevels: true, isVerifiedTeacher: true,
-        avatarUrl: true, phone: true, website: true
-      }
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        role: true,
+        status: true,
+        bio: true,
+        schoolName: true,
+        governorate: true,
+        diploma: true,
+        teachingSubjects: true,
+        teachingLevels: true,
+        isVerifiedTeacher: true,
+        avatarUrl: true,
+        phone: true,
+        website: true,
+      },
     });
 
     return NextResponse.json({ success: true, user: updated });
@@ -69,11 +106,25 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   const target = await prisma.user.findUnique({
     where: { id },
     select: {
-      id: true, email: true, firstName: true, lastName: true, role: true, status: true,
-      bio: true, schoolName: true, governorate: true, diploma: true,
-      teachingSubjects: true, teachingLevels: true, isVerifiedTeacher: true,
-      avatarUrl: true, phone: true, website: true, createdAt: true, lastLoginAt: true
-    }
+      id: true,
+      email: true,
+      firstName: true,
+      lastName: true,
+      role: true,
+      status: true,
+      bio: true,
+      schoolName: true,
+      governorate: true,
+      diploma: true,
+      teachingSubjects: true,
+      teachingLevels: true,
+      isVerifiedTeacher: true,
+      avatarUrl: true,
+      phone: true,
+      website: true,
+      createdAt: true,
+      lastLoginAt: true,
+    },
   });
   if (!target) return NextResponse.json({ error: 'Non trouvé' }, { status: 404 });
   return NextResponse.json(target);

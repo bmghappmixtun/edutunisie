@@ -1,9 +1,21 @@
 'use client';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, Loader2, X, Clock, TrendingUp, ArrowRight, Users, BookOpen, GraduationCap, FileText, FolderOpen, ChevronRight } from 'lucide-react';
+import {
+  Search,
+  Loader2,
+  X,
+  Clock,
+  TrendingUp,
+  ArrowRight,
+  Users,
+  BookOpen,
+  GraduationCap,
+  FileText,
+  FolderOpen,
+  ChevronRight,
+} from 'lucide-react';
 import { useI18n } from '@/lib/i18n';
-import toast from 'react-hot-toast';
 
 type SuggestResult = {
   type: 'resource' | 'teacher' | 'subject' | 'class' | 'section';
@@ -30,7 +42,7 @@ const ICON_MAP: Record<string, any> = {
   teacher: Users,
   subject: BookOpen,
   class: GraduationCap,
-  section: FolderOpen
+  section: FolderOpen,
 };
 
 const LABEL_MAP: Record<string, string> = {
@@ -38,12 +50,20 @@ const LABEL_MAP: Record<string, string> = {
   teacher: 'Professeurs',
   subject: 'Matières',
   class: 'Classes',
-  section: 'Sections'
+  section: 'Sections',
 };
 
 const TRENDING = ['Mathématiques', 'SVT', 'Français', 'Bac', 'Devoir', 'Exercice', 'Physique'];
 
-export default function SearchBar({ className = '', size = 'md', initialQuery = '' }: { className?: string; size?: 'sm' | 'md' | 'lg'; initialQuery?: string }) {
+export default function SearchBar({
+  className = '',
+  size = 'md',
+  initialQuery = '',
+}: {
+  className?: string;
+  size?: 'sm' | 'md' | 'lg';
+  initialQuery?: string;
+}) {
   const router = useRouter();
   const { t, locale } = useI18n();
   const [query, setQuery] = useState(initialQuery);
@@ -73,9 +93,11 @@ export default function SearchBar({ className = '', size = 'md', initialQuery = 
   // Save recent search
   const saveRecent = useCallback((q: string) => {
     if (!q.trim()) return;
-    setRecent(prev => {
-      const updated = [q, ...prev.filter(x => x !== q)].slice(0, MAX_RECENT);
-      try { localStorage.setItem(RECENT_KEY, JSON.stringify(updated)); } catch {}
+    setRecent((prev) => {
+      const updated = [q, ...prev.filter((x) => x !== q)].slice(0, MAX_RECENT);
+      try {
+        localStorage.setItem(RECENT_KEY, JSON.stringify(updated));
+      } catch {}
       return updated;
     });
   }, []);
@@ -93,7 +115,9 @@ export default function SearchBar({ className = '', size = 'md', initialQuery = 
       abortRef.current = controller;
       setLoading(true);
       try {
-        const res = await fetch(`/api/search/suggest?q=${encodeURIComponent(query)}`, { signal: controller.signal });
+        const res = await fetch(`/api/search/suggest?q=${encodeURIComponent(query)}`, {
+          signal: controller.signal,
+        });
         const data = await res.json();
         if (data.success) setResults(data.data);
       } catch (e: any) {
@@ -139,7 +163,9 @@ export default function SearchBar({ className = '', size = 'md', initialQuery = 
 
   const clearRecent = () => {
     setRecent([]);
-    try { localStorage.removeItem(RECENT_KEY); } catch {}
+    try {
+      localStorage.removeItem(RECENT_KEY);
+    } catch {}
   };
 
   const clearQuery = () => {
@@ -150,16 +176,22 @@ export default function SearchBar({ className = '', size = 'md', initialQuery = 
 
   // Flatten results for keyboard nav
   const flatResults: SuggestResult[] = results
-    ? [...results.resource, ...results.teacher, ...results.subject, ...results.class, ...results.section]
+    ? [
+        ...results.resource,
+        ...results.teacher,
+        ...results.subject,
+        ...results.class,
+        ...results.section,
+      ]
     : [];
 
   const onKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'ArrowDown') {
       e.preventDefault();
-      setActiveIndex(i => Math.min(i + 1, flatResults.length - 1));
+      setActiveIndex((i) => Math.min(i + 1, flatResults.length - 1));
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
-      setActiveIndex(i => Math.max(i - 1, -1));
+      setActiveIndex((i) => Math.max(i - 1, -1));
     } else if (e.key === 'Enter' && activeIndex >= 0 && flatResults[activeIndex]) {
       e.preventDefault();
       handleSelect(flatResults[activeIndex].href);
@@ -171,19 +203,25 @@ export default function SearchBar({ className = '', size = 'md', initialQuery = 
   const sizeClasses = {
     sm: 'h-9 text-sm',
     md: 'h-11 text-base',
-    lg: 'h-14 text-lg'
+    lg: 'h-14 text-lg',
   }[size];
 
   return (
     <div ref={containerRef} className={`relative ${className}`}>
       <form onSubmit={handleSubmit}>
         <div className="relative">
-          <Search className={`absolute top-1/2 -translate-y-1/2 text-slate-400 ${size === 'lg' ? 'left-4 w-5 h-5' : 'left-3 w-4 h-4'}`} />
+          <Search
+            className={`absolute top-1/2 -translate-y-1/2 text-slate-400 ${size === 'lg' ? 'left-4 w-5 h-5' : 'left-3 w-4 h-4'}`}
+          />
           <input
             ref={inputRef}
             type="text"
             value={query}
-            onChange={e => { setQuery(e.target.value); setOpen(true); setActiveIndex(-1); }}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setOpen(true);
+              setActiveIndex(-1);
+            }}
             onFocus={() => setOpen(true)}
             onKeyDown={onKeyDown}
             placeholder={t('search.placeholder')}
@@ -211,7 +249,7 @@ export default function SearchBar({ className = '', size = 'md', initialQuery = 
           {/* Query results */}
           {query.trim().length >= 2 && results && (
             <div className="p-2">
-              {(['resource', 'teacher', 'subject', 'class', 'section'] as const).map(groupKey => {
+              {(['resource', 'teacher', 'subject', 'class', 'section'] as const).map((groupKey) => {
                 const group = results[groupKey];
                 if (!group || group.length === 0) return null;
                 const Icon = ICON_MAP[groupKey];
@@ -232,8 +270,12 @@ export default function SearchBar({ className = '', size = 'md', initialQuery = 
                         >
                           <span className="text-lg shrink-0">{item.icon || '📄'}</span>
                           <div className="flex-1 min-w-0">
-                            <div className="font-semibold text-slate-900 truncate text-sm">{item.title}</div>
-                            {item.subtitle && <div className="text-xs text-slate-500 truncate">{item.subtitle}</div>}
+                            <div className="font-semibold text-slate-900 truncate text-sm">
+                              {item.title}
+                            </div>
+                            {item.subtitle && (
+                              <div className="text-xs text-slate-500 truncate">{item.subtitle}</div>
+                            )}
                           </div>
                           <ChevronRight className="w-4 h-4 text-slate-300" />
                         </button>
@@ -272,7 +314,10 @@ export default function SearchBar({ className = '', size = 'md', initialQuery = 
                       <Clock className="w-3 h-3" />
                       {t('search.recentSearches')}
                     </span>
-                    <button onClick={clearRecent} className="text-xs text-slate-400 hover:text-slate-600">
+                    <button
+                      onClick={clearRecent}
+                      className="text-xs text-slate-400 hover:text-slate-600"
+                    >
                       {t('search.clear')}
                     </button>
                   </div>
@@ -295,7 +340,7 @@ export default function SearchBar({ className = '', size = 'md', initialQuery = 
                   Tendances
                 </div>
                 <div className="flex flex-wrap gap-2 px-3 pb-2">
-                  {TRENDING.map(t => (
+                  {TRENDING.map((t) => (
                     <button
                       key={t}
                       onClick={() => handleRecent(t)}

@@ -15,7 +15,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const target = await prisma.user.findUnique({ where: { id } });
   if (!target) return NextResponse.json({ error: 'Utilisateur non trouvé' }, { status: 404 });
   if (target.role === 'ADMIN') {
-    return NextResponse.json({ error: 'Impossible de supprimer un administrateur' }, { status: 403 });
+    return NextResponse.json(
+      { error: 'Impossible de supprimer un administrateur' },
+      { status: 403 },
+    );
   }
   if (target.id === user.id) {
     return NextResponse.json({ error: 'Impossible de vous supprimer vous-même' }, { status: 403 });
@@ -40,7 +43,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   try {
     const teacherResources = await prisma.resource.findMany({
       where: { teacherId: id },
-      select: { id: true, fileKey: true, fileUrl: true, title: true }
+      select: { id: true, fileKey: true, fileUrl: true, title: true },
     });
 
     // Clean up foreign-key dependencies that don't have onDelete: Cascade in the schema
@@ -57,7 +60,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       // Keep them visible but now attributed to admin
       await prisma.resource.updateMany({
         where: { teacherId: id },
-        data: { teacherId: user.id }
+        data: { teacherId: user.id },
       });
 
       // Resources that the user authored are no longer theirs (transferred above).
@@ -75,7 +78,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
       // Delete files from blob storage in background
       Promise.all(
-        teacherResources.map(r => deleteFile(r.fileUrl).catch(e => console.error('File delete error:', e)))
+        teacherResources.map((r) =>
+          deleteFile(r.fileUrl).catch((e) => console.error('File delete error:', e)),
+        ),
       ).catch(() => {});
 
       return NextResponse.json({

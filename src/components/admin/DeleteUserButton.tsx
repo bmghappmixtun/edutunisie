@@ -7,7 +7,7 @@ export default function DeleteUserButton({
   userId,
   userName,
   isAdmin,
-  resourcesCount = 0
+  resourcesCount = 0,
 }: {
   userId: string;
   userName: string;
@@ -21,7 +21,10 @@ export default function DeleteUserButton({
 
   if (isAdmin) {
     return (
-      <span title="Impossible de supprimer un admin" className="text-xs text-slate-300 cursor-not-allowed">
+      <span
+        title="Impossible de supprimer un admin"
+        className="text-xs text-slate-300 cursor-not-allowed"
+      >
         🛡️
       </span>
     );
@@ -37,7 +40,7 @@ export default function DeleteUserButton({
       const res = await fetch(`/api/admin/users/${userId}/delete`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ keepFiles })
+        body: JSON.stringify({ keepFiles }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -64,8 +67,14 @@ export default function DeleteUserButton({
       </button>
 
       {open && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/50" onClick={() => !loading && setOpen(false)}>
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl" onClick={e => e.stopPropagation()}>
+        <div
+          className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/50"
+          onClick={() => !loading && setOpen(false)}
+        >
+          <div
+            className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-start gap-3 mb-4">
               <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
                 <AlertTriangle className="w-6 h-6 text-red-600" />
@@ -76,7 +85,11 @@ export default function DeleteUserButton({
                   Cette action est irréversible. L'utilisateur sera définitivement supprimé.
                 </p>
               </div>
-              <button onClick={() => setOpen(false)} disabled={loading} className="text-slate-400 hover:text-slate-600">
+              <button
+                onClick={() => setOpen(false)}
+                disabled={loading}
+                className="text-slate-400 hover:text-slate-600"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -90,7 +103,9 @@ export default function DeleteUserButton({
                 </div>
 
                 <div className="space-y-2">
-                  <label className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer border-2 transition ${keepFiles ? 'border-primary-400 bg-primary-50' : 'border-slate-200 hover:border-slate-300'}`}>
+                  <label
+                    className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer border-2 transition ${keepFiles ? 'border-primary-400 bg-primary-50' : 'border-slate-200 hover:border-slate-300'}`}
+                  >
                     <input
                       type="radio"
                       name="files-option"
@@ -103,12 +118,15 @@ export default function DeleteUserButton({
                         🗑️ Supprimer aussi les fichiers
                       </div>
                       <div className="text-xs text-slate-500 mt-1">
-                        Action définitive. Toutes les ressources ({resourcesCount}) seront supprimées du stockage.
+                        Action définitive. Toutes les ressources ({resourcesCount}) seront
+                        supprimées du stockage.
                       </div>
                     </div>
                   </label>
 
-                  <label className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer border-2 transition ${keepFiles ? 'border-primary-400 bg-primary-50' : 'border-slate-200 hover:border-slate-300'}`}>
+                  <label
+                    className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer border-2 transition ${keepFiles ? 'border-primary-400 bg-primary-50' : 'border-slate-200 hover:border-slate-300'}`}
+                  >
                     <input
                       type="radio"
                       name="files-option"
@@ -122,7 +140,8 @@ export default function DeleteUserButton({
                         Conserver les fichiers (recommandé)
                       </div>
                       <div className="text-xs text-slate-500 mt-1">
-                        Les {resourcesCount} ressource(s) seront transférées à votre compte admin et resteront visibles publiquement.
+                        Les {resourcesCount} ressource(s) seront transférées à votre compte admin et
+                        resteront visibles publiquement.
                       </div>
                     </div>
                   </label>
@@ -132,14 +151,15 @@ export default function DeleteUserButton({
 
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4">
               <p className="text-xs text-amber-800">
-                ⚠️ Pour confirmer, tape <strong className="font-mono">SUPPRIMER</strong> en majuscules :
+                ⚠️ Pour confirmer, tape <strong className="font-mono">SUPPRIMER</strong> en
+                majuscules :
               </p>
             </div>
 
             <input
               type="text"
               value={confirmText}
-              onChange={e => setConfirmText(e.target.value)}
+              onChange={(e) => setConfirmText(e.target.value)}
               placeholder="SUPPRIMER"
               className="input mb-4 font-mono"
               autoComplete="off"
@@ -158,7 +178,11 @@ export default function DeleteUserButton({
                 disabled={loading || confirmText !== 'SUPPRIMER'}
                 className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
-                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                {loading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Trash2 className="w-4 h-4" />
+                )}
                 Supprimer
               </button>
             </div>

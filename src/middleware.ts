@@ -34,7 +34,7 @@ export function middleware(request: NextRequest) {
     pathname.startsWith('/messages') ||
     pathname.startsWith('/verifier') ||
     pathname.startsWith('/invitation') ||
-    pathname.includes('.')  // static files (favicon.ico, etc.)
+    pathname.includes('.') // static files (favicon.ico, etc.)
   ) {
     return NextResponse.next();
   }

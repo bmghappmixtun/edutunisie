@@ -29,7 +29,7 @@ export class IloveapiError extends Error {
   constructor(
     message: string,
     public step: 'start' | 'upload' | 'process' | 'download' = 'start',
-    public status?: number
+    public status?: number,
   ) {
     super(message);
     this.name = 'IloveapiError';
@@ -44,11 +44,11 @@ export async function convertOfficeToPdfViaIloveapi(
   fileBuffer: Buffer,
   fileName: string,
   publicKey: string,
-  secretKey: string
+  secretKey: string,
 ): Promise<{ pdfBuffer: Buffer; pdfSize: number; warnings: string[] }> {
   if (!publicKey || !secretKey) {
     throw new IloveapiError(
-      'I_LOVE_API_PUBLIC_KEY et I_LOVE_API_SECRET_KEY requis. Configurez-les dans Vercel.'
+      'I_LOVE_API_PUBLIC_KEY et I_LOVE_API_SECRET_KEY requis. Configurez-les dans Vercel.',
     );
   }
 
@@ -62,7 +62,7 @@ export async function convertOfficeToPdfViaIloveapi(
     throw new IloveapiError(
       `iLoveAPI start failed: ${e?.message || 'erreur inconnue'}`,
       'start',
-      e?.response?.status
+      e?.response?.status,
     );
   }
 
@@ -75,7 +75,7 @@ export async function convertOfficeToPdfViaIloveapi(
     throw new IloveapiError(
       `iLoveAPI upload failed: ${e?.message || 'erreur inconnue'}`,
       'upload',
-      e?.response?.status
+      e?.response?.status,
     );
   }
 
@@ -86,7 +86,7 @@ export async function convertOfficeToPdfViaIloveapi(
     throw new IloveapiError(
       `iLoveAPI process failed: ${e?.message || 'erreur inconnue'}`,
       'process',
-      e?.response?.status
+      e?.response?.status,
     );
   }
 
@@ -95,10 +95,7 @@ export async function convertOfficeToPdfViaIloveapi(
     const data = await task.download();
     const buffer = Buffer.isBuffer(data) ? data : Buffer.from(data);
     if (!buffer.subarray(0, 4).toString().startsWith('%PDF')) {
-      throw new IloveapiError(
-        'iLoveAPI returned non-PDF content',
-        'download'
-      );
+      throw new IloveapiError('iLoveAPI returned non-PDF content', 'download');
     }
     return { pdfBuffer: buffer, pdfSize: buffer.length, warnings: [] };
   } catch (e: any) {
@@ -106,7 +103,7 @@ export async function convertOfficeToPdfViaIloveapi(
     throw new IloveapiError(
       `iLoveAPI download failed: ${e?.message || 'erreur inconnue'}`,
       'download',
-      e?.response?.status
+      e?.response?.status,
     );
   }
 }
@@ -116,7 +113,7 @@ export async function convertOfficeToPdfViaIloveapi(
  */
 export async function checkIloveapiHealth(
   publicKey: string,
-  secretKey: string
+  secretKey: string,
 ): Promise<{ ok: boolean; error?: string; server?: string; remainingFiles?: number }> {
   if (!publicKey || !secretKey) {
     return { ok: false, error: 'Missing public or secret key' };

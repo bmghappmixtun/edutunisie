@@ -24,15 +24,17 @@ export async function notifyAdminsNewTeacher(teacherId: string) {
         type: 'new_teacher_pending',
         title: '👨‍🏫 Nouveau professeur en attente',
         message: `${teacher.firstName || ''} ${teacher.lastName || ''} (${teacher.email}) a postulé comme enseignant.`,
-        link: '/admin/approbations'
-      }
+        link: '/admin/approbations',
+      },
     });
   }
 
   // Email notifications
   const adminEmails = getAdminEmailsFromConfig();
   if (!resend) {
-    console.log(`\n📧 [ADMIN EMAIL - DEV] New teacher: ${teacher.firstName || ""} ${teacher.lastName || ""} → ${adminEmails.join(', ')}\n`);
+    console.log(
+      `\n📧 [ADMIN EMAIL - DEV] New teacher: ${teacher.firstName || ''} ${teacher.lastName || ''} → ${adminEmails.join(', ')}\n`,
+    );
     return;
   }
 
@@ -41,7 +43,7 @@ export async function notifyAdminsNewTeacher(teacherId: string) {
       teacher.firstName || '',
       teacher.lastName || '',
       teacher.email,
-      teacher.schoolName
+      teacher.schoolName,
     );
     // Send to BOTH DB admins + hardcoded fallback
     const recipients = new Set<string>(adminEmails);
@@ -52,7 +54,7 @@ export async function notifyAdminsNewTeacher(teacherId: string) {
     await resend.emails.send({
       from: FROM,
       to: Array.from(recipients),
-      subject: `👨‍🏫 Nouveau professeur à approuver : ${teacher.firstName || ""} ${teacher.lastName || ""}`,
+      subject: `👨‍🏫 Nouveau professeur à approuver : ${teacher.firstName || ''} ${teacher.lastName || ''}`,
       html,
     });
   } catch (e) {
@@ -66,7 +68,7 @@ export async function notifyAdminsNewTeacher(teacherId: string) {
 export async function notifyAdminsNewResource(resourceId: string) {
   const resource = await prisma.resource.findUnique({
     where: { id: resourceId },
-    include: { teacher: true, subject: true }
+    include: { teacher: true, subject: true },
   });
   if (!resource) return;
 
@@ -81,15 +83,17 @@ export async function notifyAdminsNewResource(resourceId: string) {
         type: 'new_resource_pending',
         title: '📄 Ressource à valider',
         message: `${resource.teacher?.firstName || 'Un enseignant'} a ajouté "${resource.title}"`,
-        link: '/admin/approbations'
-      }
+        link: '/admin/approbations',
+      },
     });
   }
 
   // Email notifications
   const adminEmails = getAdminEmailsFromConfig();
   if (!resend) {
-    console.log(`\n📧 [ADMIN EMAIL - DEV] New resource: ${resource.title} → ${adminEmails.join(', ')}\n`);
+    console.log(
+      `\n📧 [ADMIN EMAIL - DEV] New resource: ${resource.title} → ${adminEmails.join(', ')}\n`,
+    );
     return;
   }
 
@@ -97,7 +101,7 @@ export async function notifyAdminsNewResource(resourceId: string) {
     const html = renderNewResourceEmail(
       `${resource.teacher?.firstName || ''} ${resource.teacher?.lastName || ''}`.trim(),
       resource.title,
-      resource.subject.nameFr
+      resource.subject.nameFr,
     );
     // Send to BOTH DB admins + hardcoded fallback
     const recipients = new Set<string>(adminEmails);

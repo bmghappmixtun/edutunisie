@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
     console.log(`[change-password] rate limited userId=${session.id} ip=${ip}`);
     return NextResponse.json(
       { error: 'Trop de tentatives. Réessayez dans 1 heure.' },
-      { status: 429 }
+      { status: 429 },
     );
   }
 
@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
   if (newPassword.length < MIN_PASSWORD_LENGTH) {
     return NextResponse.json(
       { error: `Le nouveau mot de passe doit contenir au moins ${MIN_PASSWORD_LENGTH} caractères` },
-      { status: 400 }
+      { status: 400 },
     );
   }
   if (newPassword.length > MAX_PASSWORD_LENGTH) {
@@ -95,18 +95,15 @@ export async function POST(req: NextRequest) {
   }
   if (currentPassword === newPassword) {
     return NextResponse.json(
-      { error: 'Le nouveau mot de passe doit être différent de l\'actuel' },
-      { status: 400 }
+      { error: "Le nouveau mot de passe doit être différent de l'actuel" },
+      { status: 400 },
     );
   }
 
   // Load the user
   const user = await prisma.user.findUnique({ where: { id: session.id } });
   if (!user?.passwordHash) {
-    return NextResponse.json(
-      { error: 'Compte sans mot de passe (OAuth ?)' },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: 'Compte sans mot de passe (OAuth ?)' }, { status: 400 });
   }
 
   // Status check — blocked users cannot change password
@@ -119,10 +116,7 @@ export async function POST(req: NextRequest) {
   const valid = await bcrypt.compare(currentPassword, user.passwordHash);
   if (!valid) {
     console.log(`[change-password] wrong current password userId=${user.id} ip=${ip}`);
-    return NextResponse.json(
-      { error: 'Mot de passe actuel incorrect' },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: 'Mot de passe actuel incorrect' }, { status: 400 });
   }
 
   // Hash and update the new password
@@ -138,9 +132,7 @@ export async function POST(req: NextRequest) {
   });
 
   // Audit log
-  console.log(
-    `[change-password] success userId=${user.id} email=${user.email} ip=${ip}`
-  );
+  console.log(`[change-password] success userId=${user.id} email=${user.email} ip=${ip}`);
 
   // Send confirmation email (non-blocking — log on failure, don't fail the request)
   sendPasswordChangedEmail({

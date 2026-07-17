@@ -31,10 +31,7 @@ function getFilenameFromKey(key: string): string {
   return parts[parts.length - 1] || 'document.pdf';
 }
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: Promise<{ key: string[] }> }
-) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ key: string[] }> }) {
   const { key: keyParts } = await params;
   const key = keyParts.map(decodeURIComponent).join('/');
 

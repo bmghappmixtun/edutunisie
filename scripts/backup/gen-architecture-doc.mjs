@@ -19,8 +19,18 @@ const prisma = new PrismaClient();
 
 async function main() {
   const [
-    users, teachers, students, resources, files, classes, subjects, sections,
-    synonyms, views, favorites, comments
+    users,
+    teachers,
+    students,
+    resources,
+    files,
+    classes,
+    subjects,
+    sections,
+    synonyms,
+    views,
+    favorites,
+    comments,
   ] = await Promise.all([
     prisma.user.count(),
     prisma.user.count({ where: { role: 'TEACHER' } }),
@@ -36,9 +46,11 @@ async function main() {
     prisma.comment.count(),
   ]);
 
-  const totalBlobSize = (await prisma.teacherFile.aggregate({
-    _sum: { fileSize: true, pdfSize: true },
-  }))._sum;
+  const totalBlobSize = (
+    await prisma.teacherFile.aggregate({
+      _sum: { fileSize: true, pdfSize: true },
+    })
+  )._sum;
   const blobBytes = (totalBlobSize.fileSize || 0) + (totalBlobSize.pdfSize || 0);
   const blobGB = blobBytes / 1024 / 1024 / 1024;
   const blobMB = blobBytes / 1024 / 1024;
@@ -54,13 +66,37 @@ async function main() {
   const recentCommits = execSync('git log -3 --oneline').toString().trim();
 
   // Get all stable tags
-  const tags = execSync('git tag -l "stable-*" --sort=-creatordate').toString().trim().split('\n').filter(Boolean);
+  const tags = execSync('git tag -l "stable-*" --sort=-creatordate')
+    .toString()
+    .trim()
+    .split('\n')
+    .filter(Boolean);
 
   // List main routes
   const appDir = 'src/app';
-  const publicRoutes = fs.readdirSync(appDir, { withFileTypes: true })
-    .filter((d) => d.isDirectory() && !d.name.startsWith('(') && !d.name.startsWith('_') && !d.name.startsWith('.'))
-    .filter((d) => !['api', 'admin', 'enseignant', 'mon-compte', 'connexion', 'inscription', 'en-attente', 'messages', 'verifier'].includes(d.name))
+  const publicRoutes = fs
+    .readdirSync(appDir, { withFileTypes: true })
+    .filter(
+      (d) =>
+        d.isDirectory() &&
+        !d.name.startsWith('(') &&
+        !d.name.startsWith('_') &&
+        !d.name.startsWith('.'),
+    )
+    .filter(
+      (d) =>
+        ![
+          'api',
+          'admin',
+          'enseignant',
+          'mon-compte',
+          'connexion',
+          'inscription',
+          'en-attente',
+          'messages',
+          'verifier',
+        ].includes(d.name),
+    )
     .map((d) => '/' + d.name);
   // Add root page
   publicRoutes.unshift('/');
@@ -298,7 +334,9 @@ node scripts/backup/blob-restore-r2.mjs --restore-all
   console.log(`[ARCHITECTURE.md] Written: ${md.length} chars, ${md.split('\n').length} lines`);
   console.log(`[ARCHITECTURE.md] Tag: stable-2026-07-09-pre-AR-routing`);
   console.log(`[ARCHITECTURE.md] Current commit: ${currentCommitShort}`);
-  console.log(`[ARCHITECTURE.md] Captures: ${users} users, ${resources} resources, ${files} files (${blobGB.toFixed(2)} GB)`);
+  console.log(
+    `[ARCHITECTURE.md] Captures: ${users} users, ${resources} resources, ${files} files (${blobGB.toFixed(2)} GB)`,
+  );
 
   await prisma.$disconnect();
 }

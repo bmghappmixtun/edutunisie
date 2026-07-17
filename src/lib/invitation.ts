@@ -10,11 +10,11 @@ const INVITATION_TTL_DAYS = 10;
 
 // Status constants
 export const INV_STATUS = {
-  PENDING: 'PENDING',     // Created, email not yet sent
-  SENT: 'SENT',           // Email sent, link not clicked
-  CLICKED: 'CLICKED',     // Link clicked, not yet activated
+  PENDING: 'PENDING', // Created, email not yet sent
+  SENT: 'SENT', // Email sent, link not clicked
+  CLICKED: 'CLICKED', // Link clicked, not yet activated
   ACTIVATED: 'ACTIVATED', // Teacher set their own password
-  EXPIRED: 'EXPIRED',     // Past 10 days without activation
+  EXPIRED: 'EXPIRED', // Past 10 days without activation
   CANCELLED: 'CANCELLED', // Admin cancelled
 } as const;
 
@@ -50,10 +50,14 @@ export function generateTempPassword(): string {
 /**
  * Create an invitation record for a teacher
  */
-export async function createInvitation(teacherId: string, invitedById?: string, customMessage?: string) {
+export async function createInvitation(
+  teacherId: string,
+  invitedById?: string,
+  customMessage?: string,
+) {
   const teacher = await prisma.user.findUnique({
     where: { id: teacherId },
-    select: { id: true, email: true, firstName: true, lastName: true, status: true }
+    select: { id: true, email: true, firstName: true, lastName: true, status: true },
   });
   if (!teacher) throw new Error('Teacher not found');
   if (!teacher.email) throw new Error('Teacher has no email');
@@ -73,7 +77,7 @@ export async function createInvitation(teacherId: string, invitedById?: string, 
       status: INV_STATUS.PENDING,
       invitedById,
       customMessage,
-    }
+    },
   });
 
   // Update User: lock account with new temp password
@@ -85,7 +89,7 @@ export async function createInvitation(teacherId: string, invitedById?: string, 
       lastInvitationId: invitation.id,
       mustChangePassword: true,
       status: 'PENDING_OTP', // Force activation flow
-    }
+    },
   });
 
   return { invitation, tempPassword, token };
@@ -94,20 +98,24 @@ export async function createInvitation(teacherId: string, invitedById?: string, 
 /**
  * Send invitation email
  */
-export async function sendInvitationEmail(invitationId: string, tempPassword: string): Promise<{ ok: boolean; error?: string }> {
+export async function sendInvitationEmail(
+  invitationId: string,
+  tempPassword: string,
+): Promise<{ ok: boolean; error?: string }> {
   const inv = await prisma.teacherInvitation.findUnique({
     where: { id: invitationId },
-    include: { teacher: { select: { firstName: true, lastName: true } } }
+    include: { teacher: { select: { firstName: true, lastName: true } } },
   });
   if (!inv) return { ok: false, error: 'Invitation not found' };
 
-  const teacherName = `${inv.teacher.firstName || ''} ${inv.teacher.lastName || ''}`.trim() || 'Cher enseignant';
+  const teacherName =
+    `${inv.teacher.firstName || ''} ${inv.teacher.lastName || ''}`.trim() || 'Cher enseignant';
   const acceptUrl = `${SITE_URL}/invitation/${inv.token}`;
   const landingUrl = `${SITE_URL}/enseignants/rejoindre`;
 
   // Count their files
   const fileCount = await prisma.resource.count({
-    where: { teacherId: inv.teacherId, status: 'PUBLISHED' }
+    where: { teacherId: inv.teacherId, status: 'PUBLISHED' },
   });
 
   const html = renderInvitationEmail({
@@ -123,9 +131,10 @@ export async function sendInvitationEmail(invitationId: string, tempPassword: st
 
   // Smart subject line
   const greeting = computeFirstName(teacherName, inv.email);
-  const subject = fileCount > 0
-    ? `${greeting}, vos ${fileCount} ressources sont prêtes sur Examanet 🎓`
-    : `${greeting}, rejoignez Examanet — la plateforme #1 en Tunisie 🎓`;
+  const subject =
+    fileCount > 0
+      ? `${greeting}, vos ${fileCount} ressources sont prêtes sur Examanet 🎓`
+      : `${greeting}, rejoignez Examanet — la plateforme #1 en Tunisie 🎓`;
 
   if (!resend) {
     console.log(`\n📧 [INVITATION - DEV] To: ${inv.email}`);
@@ -155,7 +164,7 @@ export async function sendInvitationEmail(invitationId: string, tempPassword: st
       data: {
         status: INV_STATUS.SENT,
         emailSentAt: new Date(),
-      }
+      },
     });
 
     await prisma.user.update({
@@ -163,7 +172,7 @@ export async function sendInvitationEmail(invitationId: string, tempPassword: st
       data: {
         invitationStatus: USER_INV_STATUS.INVITED,
         invitationSentAt: new Date(),
-      }
+      },
     });
 
     return { ok: true };
@@ -179,7 +188,11 @@ export async function sendInvitationEmail(invitationId: string, tempPassword: st
 export async function recordInvitationClick(token: string, ipAddress?: string, userAgent?: string) {
   const inv = await prisma.teacherInvitation.findUnique({ where: { token } });
   if (!inv) return null;
-  if (inv.status === INV_STATUS.ACTIVATED || inv.status === INV_STATUS.EXPIRED || inv.status === INV_STATUS.CANCELLED) {
+  if (
+    inv.status === INV_STATUS.ACTIVATED ||
+    inv.status === INV_STATUS.EXPIRED ||
+    inv.status === INV_STATUS.CANCELLED
+  ) {
     return inv;
   }
 
@@ -187,7 +200,7 @@ export async function recordInvitationClick(token: string, ipAddress?: string, u
   if (new Date() > inv.expiresAt) {
     await prisma.teacherInvitation.update({
       where: { id: inv.id },
-      data: { status: INV_STATUS.EXPIRED }
+      data: { status: INV_STATUS.EXPIRED },
     });
     return { ...inv, status: INV_STATUS.EXPIRED };
   }
@@ -211,16 +224,24 @@ export async function recordInvitationClick(token: string, ipAddress?: string, u
 /**
  * Activate an invitation: teacher sets their own password
  */
-export async function activateInvitation(token: string, newPassword: string, ipAddress?: string, userAgent?: string) {
+export async function activateInvitation(
+  token: string,
+  newPassword: string,
+  ipAddress?: string,
+  userAgent?: string,
+) {
   const inv = await prisma.teacherInvitation.findUnique({ where: { token } });
   if (!inv) return { ok: false, error: 'Invitation introuvable' };
-  if (inv.status === INV_STATUS.ACTIVATED) return { ok: false, error: 'Cette invitation a déjà été activée' };
-  if (inv.status === INV_STATUS.CANCELLED) return { ok: false, error: 'Cette invitation a été annulée' };
-  if (inv.status === INV_STATUS.EXPIRED) return { ok: false, error: 'Cette invitation a expiré (10 jours)' };
+  if (inv.status === INV_STATUS.ACTIVATED)
+    return { ok: false, error: 'Cette invitation a déjà été activée' };
+  if (inv.status === INV_STATUS.CANCELLED)
+    return { ok: false, error: 'Cette invitation a été annulée' };
+  if (inv.status === INV_STATUS.EXPIRED)
+    return { ok: false, error: 'Cette invitation a expiré (10 jours)' };
   if (new Date() > inv.expiresAt) {
     await prisma.teacherInvitation.update({
       where: { id: inv.id },
-      data: { status: INV_STATUS.EXPIRED }
+      data: { status: INV_STATUS.EXPIRED },
     });
     return { ok: false, error: 'Cette invitation a expiré (10 jours)' };
   }
@@ -242,7 +263,7 @@ export async function activateInvitation(token: string, newPassword: string, ipA
         invitationActivatedAt: new Date(),
         status: 'ACTIVE',
         emailVerifiedAt: new Date(), // Email is verified by receiving the invitation
-      }
+      },
     }),
     prisma.teacherInvitation.update({
       where: { id: inv.id },
@@ -251,7 +272,7 @@ export async function activateInvitation(token: string, newPassword: string, ipA
         activatedAt: new Date(),
         activateIpAddress: ipAddress,
         activateUserAgent: userAgent,
-      }
+      },
     }),
   ]);
 
@@ -264,7 +285,8 @@ export async function activateInvitation(token: string, newPassword: string, ipA
 export async function cancelInvitation(invitationId: string) {
   const inv = await prisma.teacherInvitation.findUnique({ where: { id: invitationId } });
   if (!inv) return { ok: false, error: 'Invitation introuvable' };
-  if (inv.status === INV_STATUS.ACTIVATED) return { ok: false, error: 'Impossible d\'annuler une invitation activée' };
+  if (inv.status === INV_STATUS.ACTIVATED)
+    return { ok: false, error: "Impossible d'annuler une invitation activée" };
 
   await prisma.$transaction([
     prisma.teacherInvitation.update({
@@ -272,13 +294,13 @@ export async function cancelInvitation(invitationId: string) {
       data: {
         status: INV_STATUS.CANCELLED,
         cancelledAt: new Date(),
-      }
+      },
     }),
     prisma.user.update({
       where: { id: inv.teacherId },
       data: {
         invitationStatus: USER_INV_STATUS.INVITATION_EXPIRED,
-      }
+      },
     }),
   ]);
 
@@ -295,19 +317,19 @@ export async function expireStaleInvitations() {
       status: { in: [INV_STATUS.PENDING, INV_STATUS.SENT, INV_STATUS.CLICKED] },
       expiresAt: { lt: now },
     },
-    select: { id: true, teacherId: true }
+    select: { id: true, teacherId: true },
   });
 
   if (stale.length === 0) return { expired: 0 };
 
   await prisma.$transaction([
     prisma.teacherInvitation.updateMany({
-      where: { id: { in: stale.map(s => s.id) } },
-      data: { status: INV_STATUS.EXPIRED }
+      where: { id: { in: stale.map((s) => s.id) } },
+      data: { status: INV_STATUS.EXPIRED },
     }),
     prisma.user.updateMany({
-      where: { id: { in: stale.map(s => s.teacherId) } },
-      data: { invitationStatus: USER_INV_STATUS.INVITATION_EXPIRED }
+      where: { id: { in: stale.map((s) => s.teacherId) } },
+      data: { invitationStatus: USER_INV_STATUS.INVITATION_EXPIRED },
     }),
   ]);
 
@@ -317,11 +339,48 @@ export async function expireStaleInvitations() {
 // ======================== HELPER FUNCTIONS ========================
 
 const GENERIC_FIRST_NAMES = new Set([
-  'enseignant', 'teacher', 'prof', 'professeur',
-  'm.', 'mr', 'mme', 'mme.', 'monsieur', 'madame',
-  'utilisateur', 'user', 'admin', 'test', 'élève', 'eleve',
-  'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
-  'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+  'enseignant',
+  'teacher',
+  'prof',
+  'professeur',
+  'm.',
+  'mr',
+  'mme',
+  'mme.',
+  'monsieur',
+  'madame',
+  'utilisateur',
+  'user',
+  'admin',
+  'test',
+  'élève',
+  'eleve',
+  'a',
+  'b',
+  'c',
+  'd',
+  'e',
+  'f',
+  'g',
+  'h',
+  'i',
+  'j',
+  'k',
+  'l',
+  'm',
+  'n',
+  'o',
+  'p',
+  'q',
+  'r',
+  's',
+  't',
+  'u',
+  'v',
+  'w',
+  'x',
+  'y',
+  'z',
 ]);
 
 /**
@@ -345,7 +404,7 @@ function computeFirstName(fullName: string, email: string): string {
       return cleaned
         .split(' ')
         .filter(Boolean)
-        .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
         .join(' ')
         .slice(0, 30);
     }
@@ -374,7 +433,15 @@ function renderInvitationEmail(args: {
   customMessage?: string | null;
   expiresAt: Date;
 }): string {
-  const { teacherName, teacherEmail, acceptUrl, landingUrl, tempPassword, fileCount, customMessage } = args;
+  const {
+    teacherName,
+    teacherEmail,
+    acceptUrl,
+    landingUrl,
+    tempPassword,
+    fileCount,
+    customMessage,
+  } = args;
   const firstName = computeFirstName(teacherName, teacherEmail);
   const safeName = htmlEscape(teacherName);
   const safeFirst = htmlEscape(firstName);
@@ -412,9 +479,11 @@ function renderInvitationEmail(args: {
         ${hasFiles ? `Vos ressources vous attendent` : `Rejoignez l'aventure`} 🎓
       </h1>
       <p style="margin:14px auto 0;color:rgba(255,255,255,0.95);font-size:16px;line-height:1.5;max-width:480px">
-        ${hasFiles
-          ? `${safeFirst}, on a préparé <strong style="background:rgba(255,255,255,0.2);padding:2px 10px;border-radius:8px">${fileCount} de vos ressources</strong> pour les rendre visibles à des milliers d'élèves tunisiens.`
-          : `${safeFirst}, on vous a réservé une place dans la communauté <strong>Examanet</strong> — la plateforme pédagogique #1 en Tunisie.`}
+        ${
+          hasFiles
+            ? `${safeFirst}, on a préparé <strong style="background:rgba(255,255,255,0.2);padding:2px 10px;border-radius:8px">${fileCount} de vos ressources</strong> pour les rendre visibles à des milliers d'élèves tunisiens.`
+            : `${safeFirst}, on vous a réservé une place dans la communauté <strong>Examanet</strong> — la plateforme pédagogique #1 en Tunisie.`
+        }
       </p>
     </div>
   </td></tr>
@@ -426,21 +495,27 @@ function renderInvitationEmail(args: {
 
     <p style="margin:0 0 16px 0;font-size:17px;line-height:1.6;color:#0f172a">Bonjour <strong style="color:#7c3aed">${safeFirst}</strong> 👋</p>
 
-    ${hasFiles ? `
+    ${
+      hasFiles
+        ? `
       <p style="margin:0 0 24px 0;font-size:16px;line-height:1.6;color:#334155">
         Vous avez partagé <strong>${fileCount} ressource${fileCount > 1 ? 's' : ''}</strong> via JotForm / devoirat.net ces dernières années.
         Nous les avons <strong>conservées, indexées et publiées</strong> sur Examanet — la plateforme qui rassemble désormais des milliers de profs et d'élèves tunisiens.
       </p>
-    ` : `
+    `
+        : `
       <p style="margin:0 0 24px 0;font-size:16px;line-height:1.6;color:#334155">
         <strong>Examanet</strong> est la plateforme pédagogique de référence en Tunisie :
         des milliers de ressources (devoirs, cours, exercices, corrigés) partagées par des profs comme vous,
         consultées chaque mois par des dizaines de milliers d'élèves.
       </p>
-    `}
+    `
+    }
 
     <!-- ${hasFiles ? 'Files summary' : 'Why join'} box -->
-    ${hasFiles ? `
+    ${
+      hasFiles
+        ? `
       <div style="background:linear-gradient(135deg,#faf5ff 0%,#fef3c7 100%);border:2px solid #e9d5ff;border-radius:16px;padding:24px;margin:24px 0">
         <div style="display:flex;align-items:center;gap:14px">
           <div style="background:linear-gradient(135deg,#7c3aed 0%,#a855f7 100%);color:white;width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;box-shadow:0 4px 12px rgba(124,58,237,0.25)">📚</div>
@@ -450,7 +525,8 @@ function renderInvitationEmail(args: {
           </div>
         </div>
       </div>
-    ` : `
+    `
+        : `
       <div style="background:linear-gradient(135deg,#faf5ff 0%,#fef3c7 100%);border:2px solid #e9d5ff;border-radius:16px;padding:24px;margin:24px 0">
         <div style="display:flex;align-items:center;gap:14px">
           <div style="background:linear-gradient(135deg,#7c3aed 0%,#a855f7 100%);color:white;width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;box-shadow:0 4px 12px rgba(124,58,237,0.25)">🚀</div>
@@ -460,17 +536,22 @@ function renderInvitationEmail(args: {
           </div>
         </div>
       </div>
-    `}
+    `
+    }
 
     <p style="margin:24px 0 16px 0;font-size:16px;line-height:1.6;color:#334155">
-      ${hasFiles
-        ? `En activant votre compte enseignant gratuit, vous pouvez :`
-        : `Voici ce que vous obtenez en activant votre compte gratuit :`}
+      ${
+        hasFiles
+          ? `En activant votre compte enseignant gratuit, vous pouvez :`
+          : `Voici ce que vous obtenez en activant votre compte gratuit :`
+      }
     </p>
 
     <!-- Benefits list -->
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:16px 0 8px">
-      ${hasFiles ? `
+      ${
+        hasFiles
+          ? `
       <tr><td style="padding:12px 0">
         <table role="presentation"><tr>
           <td style="vertical-align:top;padding-right:14px">
@@ -481,7 +562,8 @@ function renderInvitationEmail(args: {
           </td>
         </tr></table>
       </td></tr>
-      ` : `
+      `
+          : `
       <tr><td style="padding:12px 0">
         <table role="presentation"><tr>
           <td style="vertical-align:top;padding-right:14px">
@@ -492,7 +574,8 @@ function renderInvitationEmail(args: {
           </td>
         </tr></table>
       </td></tr>
-      `}
+      `
+      }
       <tr><td style="padding:12px 0">
         <table role="presentation"><tr>
           <td style="vertical-align:top;padding-right:14px">

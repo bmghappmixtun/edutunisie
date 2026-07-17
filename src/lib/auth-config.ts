@@ -25,7 +25,7 @@ export const authOptions: AuthOptions = {
       name: 'Email',
       credentials: {
         email: { label: 'Email', type: 'email' },
-        password: { label: 'Password', type: 'password' }
+        password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
@@ -41,7 +41,7 @@ export const authOptions: AuthOptions = {
           name: `${user.firstName || ''} ${user.lastName || ''}`.trim(),
           image: user.avatarUrl || undefined,
         };
-      }
+      },
     }),
   ],
   pages: {
@@ -66,7 +66,7 @@ export const authOptions: AuthOptions = {
               oauthProvider: account.provider,
               oauthId: account.providerAccountId,
               slug: '', // auto-filled by Prisma middleware
-            }
+            },
           });
         }
       }

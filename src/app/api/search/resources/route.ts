@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { sanitizeHighlightHtml } from '@/lib/security';
 import { prisma } from '@/lib/prisma';
 
 export const runtime = 'nodejs';
@@ -56,32 +55,69 @@ export async function GET(req: NextRequest) {
 
   if (q.trim()) {
     // Sanitize query for FTS: max 200 chars, strip non-word chars
-    const trimmed = q.trim().slice(0, 200).replace(/[^\w\s\-àâäéèêëïîôöùûüÿçñ]/gi, ' ');
+    const trimmed = q
+      .trim()
+      .slice(0, 200)
+      .replace(/[^\w\s\-àâäéèêëïîôöùûüÿçñ]/gi, ' ');
 
     // Build WHERE conditions for filters
     // $1 = trimmed (always), filters use $2..$N, limit and offset are the last 2
     const filterConditions: string[] = [];
     const filterParams: any[] = [];
     let paramIndex = 1; // $1 = trimmed
-    if (subjectId) { filterConditions.push(`AND r."subjectId" = $${++paramIndex}`); filterParams.push(subjectId); }
-    if (classId) { filterConditions.push(`AND r."classId" = $${++paramIndex}`); filterParams.push(classId); }
-    if (teacherId) { filterConditions.push(`AND r."teacherId" = $${++paramIndex}`); filterParams.push(teacherId); }
-    if (sectionId) { filterConditions.push(`AND r."sectionId" = $${++paramIndex}`); filterParams.push(sectionId); }
-    if (type) { filterConditions.push(`AND r.type = $${++paramIndex}`); filterParams.push(type); }
-    if (year) { filterConditions.push(`AND r.year = $${++paramIndex}`); filterParams.push(year); }
+    if (subjectId) {
+      filterConditions.push(`AND r."subjectId" = $${++paramIndex}`);
+      filterParams.push(subjectId);
+    }
+    if (classId) {
+      filterConditions.push(`AND r."classId" = $${++paramIndex}`);
+      filterParams.push(classId);
+    }
+    if (teacherId) {
+      filterConditions.push(`AND r."teacherId" = $${++paramIndex}`);
+      filterParams.push(teacherId);
+    }
+    if (sectionId) {
+      filterConditions.push(`AND r."sectionId" = $${++paramIndex}`);
+      filterParams.push(sectionId);
+    }
+    if (type) {
+      filterConditions.push(`AND r.type = $${++paramIndex}`);
+      filterParams.push(type);
+    }
+    if (year) {
+      filterConditions.push(`AND r.year = $${++paramIndex}`);
+      filterParams.push(year);
+    }
     if (hasCorrection === 'true') filterConditions.push(`AND r."hasCorrection" = true`);
     if (hasCorrection === 'false') filterConditions.push(`AND r."hasCorrection" = false`);
-    if (homeworkSubtype) { filterConditions.push(`AND r."homeworkSubtype" = $${++paramIndex}`); filterParams.push(homeworkSubtype); }
-    if (schoolType) { filterConditions.push(`AND r."schoolType" = $${++paramIndex}`); filterParams.push(schoolType); }
-    if (fromDate) { filterConditions.push(`AND r."publishedAt" >= $${++paramIndex}`); filterParams.push(new Date(fromDate)); }
-    if (toDate) { filterConditions.push(`AND r."publishedAt" <= $${++paramIndex}`); filterParams.push(new Date(toDate)); }
+    if (homeworkSubtype) {
+      filterConditions.push(`AND r."homeworkSubtype" = $${++paramIndex}`);
+      filterParams.push(homeworkSubtype);
+    }
+    if (schoolType) {
+      filterConditions.push(`AND r."schoolType" = $${++paramIndex}`);
+      filterParams.push(schoolType);
+    }
+    if (fromDate) {
+      filterConditions.push(`AND r."publishedAt" >= $${++paramIndex}`);
+      filterParams.push(new Date(fromDate));
+    }
+    if (toDate) {
+      filterConditions.push(`AND r."publishedAt" <= $${++paramIndex}`);
+      filterParams.push(new Date(toDate));
+    }
     const limitParam = ++paramIndex;
     const offsetParam = ++paramIndex;
-    const orderByClause = sort === 'popular' ? 'r."viewsCount" DESC'
-      : sort === 'downloads' ? 'r."downloadsCount" DESC'
-      : sort === 'recent' ? 'r."publishedAt" DESC NULLS LAST'
-      : 'rank DESC';
-    
+    const orderByClause =
+      sort === 'popular'
+        ? 'r."viewsCount" DESC'
+        : sort === 'downloads'
+          ? 'r."downloadsCount" DESC'
+          : sort === 'recent'
+            ? 'r."publishedAt" DESC NULLS LAST'
+            : 'rank DESC';
+
     const sql = `
       SELECT
         r.id, r.slug, r.title, r.description, r.summary, r.type, r.status,
@@ -100,7 +136,7 @@ export async function GET(req: NextRequest) {
       ORDER BY ${orderByClause}
       LIMIT $${limitParam} OFFSET $${offsetParam}
     `;
-    
+
     const countSql = `
       SELECT COUNT(*)::int as total
       FROM "Resource" r
@@ -110,9 +146,15 @@ export async function GET(req: NextRequest) {
     `;
 
     try {
-      const ftsResults = await prisma.$queryRawUnsafe<any[]>(sql, trimmed, ...filterParams, limit, (page - 1) * limit);
+      const ftsResults = await prisma.$queryRawUnsafe<any[]>(
+        sql,
+        trimmed,
+        ...filterParams,
+        limit,
+        (page - 1) * limit,
+      );
       const countResult = await prisma.$queryRawUnsafe<any[]>(countSql, trimmed, ...filterParams);
-      
+
       results = ftsResults;
       total = Number(countResult[0]?.total || 0);
     } catch (ftsError: any) {
@@ -124,10 +166,13 @@ export async function GET(req: NextRequest) {
   } else {
     // No search query - just filters
     const orderBy: any =
-      sort === 'recent' ? { publishedAt: 'desc' } :
-      sort === 'popular' ? { viewsCount: 'desc' } :
-      sort === 'downloads' ? { downloadsCount: 'desc' } :
-      { publishedAt: 'desc' };
+      sort === 'recent'
+        ? { publishedAt: 'desc' }
+        : sort === 'popular'
+          ? { viewsCount: 'desc' }
+          : sort === 'downloads'
+            ? { downloadsCount: 'desc' }
+            : { publishedAt: 'desc' };
 
     [results, total] = await Promise.all([
       prisma.resource.findMany({
@@ -137,51 +182,74 @@ export async function GET(req: NextRequest) {
         take: limit,
         include: {
           subject: { select: { nameFr: true, nameAr: true, slug: true, color: true, icon: true } },
-          class: { select: { nameFr: true, nameAr: true, slug: true  } },
-          section: { select: { nameFr: true, nameAr: true, slug: true, } },
-          teacher: { select: { id: true, firstName: true, lastName: true, firstNameAr: true, lastNameAr: true, avatarUrl: true, schoolName: true } },}
+          class: { select: { nameFr: true, nameAr: true, slug: true } },
+          section: { select: { nameFr: true, nameAr: true, slug: true } },
+          teacher: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              firstNameAr: true,
+              lastNameAr: true,
+              avatarUrl: true,
+              schoolName: true,
+            },
+          },
+        },
       }),
-      prisma.resource.count({ where })
+      prisma.resource.count({ where }),
     ]);
   }
 
   // Get filter options (counts) + lookup names
-  const [subjectCounts, classCounts, typeCounts, yearCounts, teacherCounts, allSubjects, allClasses, allTeachers] = await Promise.all([
+  const [
+    subjectCounts,
+    classCounts,
+    typeCounts,
+    yearCounts,
+    teacherCounts,
+    allSubjects,
+    allClasses,
+    allTeachers,
+  ] = await Promise.all([
     prisma.resource.groupBy({
       by: ['subjectId'],
       where: { status: 'PUBLISHED' },
-      _count: { _all: true }
+      _count: { _all: true },
     }),
     prisma.resource.groupBy({
       by: ['classId'],
       where: { status: 'PUBLISHED', classId: { not: null } },
-      _count: { _all: true }
+      _count: { _all: true },
     }),
     prisma.resource.groupBy({
       by: ['type'],
       where: { status: 'PUBLISHED' },
-      _count: { _all: true }
+      _count: { _all: true },
     }),
     prisma.resource.groupBy({
       by: ['year'],
       where: { status: 'PUBLISHED', year: { not: null } },
       _count: { _all: true },
-      orderBy: { year: 'desc' }
+      orderBy: { year: 'desc' },
     }),
     prisma.resource.groupBy({
       by: ['teacherId'],
       where: { status: 'PUBLISHED' },
       _count: { _all: true },
       take: 20,
-      orderBy: { _count: { teacherId: 'desc' } }
+      orderBy: { _count: { teacherId: 'desc' } },
     }),
-    prisma.subject.findMany({ orderBy: { order: 'asc' }, select: { id: true, nameFr: true, icon: true } }),
+    prisma.subject.findMany({
+      orderBy: { order: 'asc' },
+      select: { id: true, nameFr: true, icon: true },
+    }),
     prisma.class.findMany({ orderBy: { order: 'asc' }, select: { id: true, nameFr: true } }),
     prisma.user.findMany({
       where: { role: 'TEACHER', status: 'ACTIVE' },
       select: { id: true, firstName: true, lastName: true },
-      take: 30
-    })
+      take: 30,
+    }),
   ]);
 
   return NextResponse.json({
@@ -192,7 +260,7 @@ export async function GET(req: NextRequest) {
     totalPages: Math.ceil(total / limit),
     sort,
     filters: { subjectId, classId, teacherId, sectionId, type, year, fromDate, toDate },
-    results: results.map(r => ({
+    results: results.map((r) => ({
       id: r.id,
       slug: r.slug,
       title: r.title,
@@ -217,25 +285,29 @@ export async function GET(req: NextRequest) {
       class: r.class,
       section: r.section,
       teacher: r.teacher,
-      rank: r.rank
+      rank: r.rank,
     })),
     facets: {
-      subjects: subjectCounts.map(s => ({ id: s.subjectId, count: s._count._all })),
-      classes: classCounts.map(c => ({ id: c.classId, count: c._count._all })),
-      types: typeCounts.map(t => ({ value: t.type, count: t._count._all })),
-      years: yearCounts.map(y => ({ value: y.year, count: y._count._all })),
-      teachers: teacherCounts.map(t => ({ id: t.teacherId, count: t._count._all }))
+      subjects: subjectCounts.map((s) => ({ id: s.subjectId, count: s._count._all })),
+      classes: classCounts.map((c) => ({ id: c.classId, count: c._count._all })),
+      types: typeCounts.map((t) => ({ value: t.type, count: t._count._all })),
+      years: yearCounts.map((y) => ({ value: y.year, count: y._count._all })),
+      teachers: teacherCounts.map((t) => ({ id: t.teacherId, count: t._count._all })),
     },
     options: {
-      subjects: allSubjects.filter(s => subjectCounts.some(c => c.subjectId === s.id && c._count._all > 0)),
-      classes: allClasses.filter(c => classCounts.some(cc => cc.classId === c.id && cc._count._all > 0)),
+      subjects: allSubjects.filter((s) =>
+        subjectCounts.some((c) => c.subjectId === s.id && c._count._all > 0),
+      ),
+      classes: allClasses.filter((c) =>
+        classCounts.some((cc) => cc.classId === c.id && cc._count._all > 0),
+      ),
       teachers: allTeachers
-        .filter(t => teacherCounts.some(tc => tc.teacherId === t.id && tc._count._all > 0))
-        .map(t => ({ id: t.id, name: `${t.firstName || ""} ${t.lastName || ""}` })),
+        .filter((t) => teacherCounts.some((tc) => tc.teacherId === t.id && tc._count._all > 0))
+        .map((t) => ({ id: t.id, name: `${t.firstName || ''} ${t.lastName || ''}` })),
       types: typeCounts,
-      years: yearCounts
+      years: yearCounts,
     },
-    took: Date.now() - start
+    took: Date.now() - start,
   });
 }
 

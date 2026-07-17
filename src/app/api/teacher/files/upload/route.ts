@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
     if (user.role !== 'TEACHER' && user.role !== 'ADMIN') {
       return NextResponse.json(
         { error: 'Seuls les enseignants peuvent uploader des fichiers' },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
     if (file.size > MAX_FILE_SIZE) {
       return NextResponse.json(
         { error: `Fichier trop volumineux (max ${MAX_FILE_SIZE / 1024 / 1024} MB)` },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -94,7 +94,7 @@ export async function POST(req: NextRequest) {
     if (format.format === 'unknown') {
       return NextResponse.json(
         { error: `Format non supporté: ${file.name}. Formats acceptés: .pdf, .docx, .doc, .odt` },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -107,18 +107,24 @@ export async function POST(req: NextRequest) {
       magicNumberValid = firstBytes.toString('ascii', 0, 5) === '%PDF-';
     } else if (format.format === 'docx' || format.format === 'doc') {
       // DOCX/DOC are ZIP-based (start with PK) or OLE (D0 CF 11 E0)
-      const isPK = firstBytes[0] === 0x50 && firstBytes[1] === 0x4B; // ZIP (DOCX)
-      const isOLE = firstBytes[0] === 0xD0 && firstBytes[1] === 0xCF && firstBytes[2] === 0x11 && firstBytes[3] === 0xE0; // OLE (DOC)
+      const isPK = firstBytes[0] === 0x50 && firstBytes[1] === 0x4b; // ZIP (DOCX)
+      const isOLE =
+        firstBytes[0] === 0xd0 &&
+        firstBytes[1] === 0xcf &&
+        firstBytes[2] === 0x11 &&
+        firstBytes[3] === 0xe0; // OLE (DOC)
       magicNumberValid = isPK || isOLE;
     } else if (format.format === 'odt') {
       // ODT is ZIP-based
-      magicNumberValid = firstBytes[0] === 0x50 && firstBytes[1] === 0x4B;
+      magicNumberValid = firstBytes[0] === 0x50 && firstBytes[1] === 0x4b;
     }
     if (!magicNumberValid) {
-      console.warn(`[security] Rejected ${file.name} (${format.format}) — magic number mismatch: ${firstBytes.toString('hex')}`);
+      console.warn(
+        `[security] Rejected ${file.name} (${format.format}) — magic number mismatch: ${firstBytes.toString('hex')}`,
+      );
       return NextResponse.json(
-        { error: 'Type de fichier invalide. Le contenu ne correspond pas à l\'extension.' },
-        { status: 400 }
+        { error: "Type de fichier invalide. Le contenu ne correspond pas à l'extension." },
+        { status: 400 },
       );
     }
 
@@ -129,7 +135,11 @@ export async function POST(req: NextRequest) {
     const timestamp = Date.now();
     const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
     const originalKey = `teacher-library/${teacherId}/${timestamp}-${safeName}`;
-    const originalBlob = await uploadFile(originalKey, fileBuffer, file.type || 'application/octet-stream');
+    const originalBlob = await uploadFile(
+      originalKey,
+      fileBuffer,
+      file.type || 'application/octet-stream',
+    );
     const originalUrl = originalBlob.url;
 
     // 2. Convert to PDF if needed
@@ -157,7 +167,7 @@ export async function POST(req: NextRequest) {
         if (!result.pdfBuffer) {
           conversionStatus = 'FAILED';
           warnings.push(...result.warnings);
-          warnings.push('Conversion PDF indisponible. L\'original est sauvegardé.');
+          warnings.push("Conversion PDF indisponible. L'original est sauvegardé.");
         } else {
           pdfKey = `teacher-library/${teacherId}/${timestamp}-converted.pdf`;
           const pdfBlob = await uploadFile(pdfKey, result.pdfBuffer, 'application/pdf');
@@ -170,7 +180,7 @@ export async function POST(req: NextRequest) {
         console.error('[teacher/files/upload] Conversion failed:', convErr);
         conversionStatus = 'FAILED';
         warnings.push(
-          `Conversion échouée: ${convErr instanceof Error ? convErr.message : 'erreur inconnue'}. L'original a été sauvegardé. Vous pouvez ré-uploader en PDF manuellement.`
+          `Conversion échouée: ${convErr instanceof Error ? convErr.message : 'erreur inconnue'}. L'original a été sauvegardé. Vous pouvez ré-uploader en PDF manuellement.`,
         );
       }
     }
@@ -221,7 +231,7 @@ export async function POST(req: NextRequest) {
     console.error('[teacher/files/upload]', err);
     return NextResponse.json(
       { error: err instanceof Error ? err.message : 'Erreur serveur' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

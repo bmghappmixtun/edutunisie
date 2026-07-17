@@ -1,5 +1,14 @@
 import Link from 'next/link';
-import { Download, Eye, Star, FileText, User, Calendar, HardDrive, CheckCircle2, GraduationCap } from 'lucide-react';
+import {
+  Download,
+  Eye,
+  Star,
+  FileText,
+  User,
+  HardDrive,
+  CheckCircle2,
+  GraduationCap,
+} from 'lucide-react';
 import { HOMEWORK_SUBTYPE_LABELS } from '@/lib/utils';
 import { isArabic } from '@/lib/text-utils';
 
@@ -23,7 +32,12 @@ type Resource = {
   hasCorrection?: boolean;
   subject: { slug: string; nameFr: string; color: string | null; icon: string | null } | null;
   class: { slug: string; nameFr: string } | null;
-  teacher: { firstName: string | null; lastName: string | null; firstNameAr?: string | null; lastNameAr?: string | null } | null;
+  teacher: {
+    firstName: string | null;
+    lastName: string | null;
+    firstNameAr?: string | null;
+    lastNameAr?: string | null;
+  } | null;
 };
 
 const TYPE_LABELS: Record<string, string> = {
@@ -81,11 +95,16 @@ export default function ResourceListItem({ resource }: { resource: Resource }) {
               <span className="text-xs text-slate-500">{resource.class.nameFr}</span>
             </>
           )}
-          {resource.type === 'HOMEWORK' && resource.homeworkSubtype && HOMEWORK_SUBTYPE_LABELS[resource.homeworkSubtype] && (
-            <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${HOMEWORK_SUBTYPE_LABELS[resource.homeworkSubtype].color}`}>
-              {HOMEWORK_SUBTYPE_LABELS[resource.homeworkSubtype].fr}{resource.homeworkNumber ? ` N°${resource.homeworkNumber}` : ''}
-            </span>
-          )}
+          {resource.type === 'HOMEWORK' &&
+            resource.homeworkSubtype &&
+            HOMEWORK_SUBTYPE_LABELS[resource.homeworkSubtype] && (
+              <span
+                className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${HOMEWORK_SUBTYPE_LABELS[resource.homeworkSubtype].color}`}
+              >
+                {HOMEWORK_SUBTYPE_LABELS[resource.homeworkSubtype].fr}
+                {resource.homeworkNumber ? ` N°${resource.homeworkNumber}` : ''}
+              </span>
+            )}
           {resource.hasCorrection && (
             <span className="px-1.5 py-0.5 bg-emerald-100 text-emerald-700 rounded text-[10px] font-bold inline-flex items-center gap-0.5">
               <CheckCircle2 className="w-2.5 h-2.5" /> Corrigé
@@ -128,7 +147,8 @@ export default function ResourceListItem({ resource }: { resource: Resource }) {
         </div>
         {resource.ratingCount > 0 && (
           <div className="flex items-center gap-1">
-            <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" /> {resource.avgRating.toFixed(1)}
+            <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />{' '}
+            {resource.avgRating.toFixed(1)}
           </div>
         )}
         <div className="flex items-center gap-1">

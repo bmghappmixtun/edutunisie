@@ -33,7 +33,12 @@
  *   TOTAL:  ~$0.13/month
  */
 
-import { S3Client, HeadObjectCommand, PutObjectCommand, ListObjectsV2Command } from '@aws-sdk/client-s3';
+import {
+  S3Client,
+  HeadObjectCommand,
+  PutObjectCommand,
+  ListObjectsV2Command,
+} from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import { PrismaClient } from '@prisma/client';
 import fs from 'fs';
@@ -131,12 +136,28 @@ async function collectUrls(args) {
   }
   console.log('  Querying DB for TeacherFile URLs...');
   const teacherFiles = await prisma.teacherFile.findMany({
-    select: { id: true, fileName: true, fileUrl: true, fileKey: true, fileSize: true, pdfUrl: true, pdfKey: true, pdfSize: true },
+    select: {
+      id: true,
+      fileName: true,
+      fileUrl: true,
+      fileKey: true,
+      fileSize: true,
+      pdfUrl: true,
+      pdfKey: true,
+      pdfSize: true,
+    },
   });
   const urls = [];
   for (const f of teacherFiles) {
-    if (f.fileUrl) urls.push({ url: f.fileUrl, filename: f.fileName, size: f.fileSize, key: f.fileKey });
-    if (f.pdfUrl) urls.push({ url: f.pdfUrl, filename: f.fileName?.replace(/\.[^.]+$/, '') + '.pdf', size: f.pdfSize, key: f.pdfKey });
+    if (f.fileUrl)
+      urls.push({ url: f.fileUrl, filename: f.fileName, size: f.fileSize, key: f.fileKey });
+    if (f.pdfUrl)
+      urls.push({
+        url: f.pdfUrl,
+        filename: f.fileName?.replace(/\.[^.]+$/, '') + '.pdf',
+        size: f.pdfSize,
+        key: f.pdfKey,
+      });
   }
   return urls;
 }
@@ -166,7 +187,7 @@ async function syncFile(client, bucket, url, key, dryRun) {
         'source-md5': hash,
         'synced-at': new Date().toISOString(),
       },
-    })
+    }),
   );
   return { uploaded: true, size: buffer.length, etag: hash };
 }
@@ -190,7 +211,9 @@ async function main() {
   if (args.prefix) {
     const before = allItems.length;
     const filtered = allItems.filter((i) => urlToKey(i.url)?.startsWith(args.prefix));
-    console.log(`  Filtered to ${filtered.length} (prefix=${args.prefix}, dropped ${before - filtered.length})`);
+    console.log(
+      `  Filtered to ${filtered.length} (prefix=${args.prefix}, dropped ${before - filtered.length})`,
+    );
     allItems.length = 0;
     allItems.push(...filtered);
   }
@@ -228,7 +251,9 @@ async function main() {
   }
 
   // 4. Upload with concurrency
-  let uploaded = 0, errors = 0, bytes = 0;
+  let uploaded = 0,
+    errors = 0,
+    bytes = 0;
   const start = Date.now();
   const queue = [...toUpload];
   const concurrency = args.concurrency;
@@ -253,7 +278,9 @@ async function main() {
       if ((uploaded + errors) % 50 === 0) {
         const pct = Math.round(((uploaded + errors) / toUpload.length) * 100);
         const elapsed = ((Date.now() - start) / 1000).toFixed(0);
-        process.stdout.write(`\r  ${uploaded + errors}/${toUpload.length} (${pct}%) — ${(bytes / 1024 / 1024).toFixed(1)} MB uploaded, ${errors} errors [${elapsed}s, w${workerId}]`);
+        process.stdout.write(
+          `\r  ${uploaded + errors}/${toUpload.length} (${pct}%) — ${(bytes / 1024 / 1024).toFixed(1)} MB uploaded, ${errors} errors [${elapsed}s, w${workerId}]`,
+        );
       }
     }
   }
@@ -270,16 +297,23 @@ async function main() {
   // 6. Save sync manifest
   const manifestPath = `backups/blob/sync-${new Date().toISOString().slice(0, 10)}.json`;
   fs.mkdirSync(path.dirname(manifestPath), { recursive: true });
-  fs.writeFileSync(manifestPath, JSON.stringify({
-    timestamp: new Date().toISOString(),
-    duration: parseFloat(duration),
-    total: allItems.length,
-    uploaded,
-    skipped: skipped.length,
-    errors,
-    bytes,
-    bucket,
-  }, null, 2));
+  fs.writeFileSync(
+    manifestPath,
+    JSON.stringify(
+      {
+        timestamp: new Date().toISOString(),
+        duration: parseFloat(duration),
+        total: allItems.length,
+        uploaded,
+        skipped: skipped.length,
+        errors,
+        bytes,
+        bucket,
+      },
+      null,
+      2,
+    ),
+  );
   console.log(`  Manifest: ${manifestPath}`);
 
   console.log('═══════════════════════════════════════════════════════');

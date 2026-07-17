@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
   if (newPassword.length < MIN_PASSWORD_LENGTH) {
     return NextResponse.json(
       { error: `Le mot de passe doit contenir au moins ${MIN_PASSWORD_LENGTH} caractères` },
-      { status: 400 }
+      { status: 400 },
     );
   }
   if (newPassword.length > MAX_PASSWORD_LENGTH) {
@@ -86,19 +86,16 @@ export async function POST(req: NextRequest) {
   if (!otp) {
     return NextResponse.json(
       { error: 'Aucun code en attente. Demandez un nouveau code.' },
-      { status: 400 }
+      { status: 400 },
     );
   }
   if (otp.expiresAt < new Date()) {
-    return NextResponse.json(
-      { error: 'Code expiré. Demandez un nouveau code.' },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: 'Code expiré. Demandez un nouveau code.' }, { status: 400 });
   }
   if (otp.attempts >= MAX_CODE_ATTEMPTS) {
     return NextResponse.json(
       { error: 'Trop de tentatives. Demandez un nouveau code.' },
-      { status: 429 }
+      { status: 429 },
     );
   }
   if (otp.code !== code) {
@@ -141,9 +138,7 @@ export async function POST(req: NextRequest) {
   });
 
   // Audit log (security monitoring)
-  console.log(
-    `[password-reset] success email=${email} userId=${user.id} ip=${ip}`
-  );
+  console.log(`[password-reset] success email=${email} userId=${user.id} ip=${ip}`);
 
   // Send confirmation email (do not block the response)
   // We still await it but in a non-blocking way using `.catch` to swallow errors

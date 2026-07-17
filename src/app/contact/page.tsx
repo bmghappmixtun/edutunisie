@@ -10,17 +10,21 @@ export const revalidate = 3600; // 1 hour cache
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = getLocale();
-  const isAr = locale === "ar";
+  const isAr = locale === 'ar';
   return {
-    title: isAr ? "اتصل بنا — إكسامانت" : "Contact — Nous contacter",
-    description: isAr ? "تواصل مع فريق إكسامانت. سؤال، خطأ، اقتراح؟ سنرد عليك خلال 24-48 ساعة." : "Contactez l'équipe Examanet. Une question, un bug, une suggestion ? Nous vous répondons sous 24-48h.",
-    alternates: isAr ? {"canonical":"/contact"} : {"canonical":"/contact"},
+    title: isAr ? 'اتصل بنا — إكسامانت' : 'Contact — Nous contacter',
+    description: isAr
+      ? 'تواصل مع فريق إكسامانت. سؤال، خطأ، اقتراح؟ سنرد عليك خلال 24-48 ساعة.'
+      : "Contactez l'équipe Examanet. Une question, un bug, une suggestion ? Nous vous répondons sous 24-48h.",
+    alternates: isAr ? { canonical: '/contact' } : { canonical: '/contact' },
     openGraph: {
-      title: isAr ? "اتصل بإكسامانت" : "Contact Examanet",
-      description: isAr ? "اطرح أسئلتك، أبلغ عن خطأ أو اقترح تحسيناً." : "Posez vos questions, signalez un bug ou suggérez une amélioration.",
-      url: isAr ? "/contact" : "/contact",
-      type: isAr ? "website" : "website",
-      locale: isAr ? "ar_TN" : "fr_TN",
+      title: isAr ? 'اتصل بإكسامانت' : 'Contact Examanet',
+      description: isAr
+        ? 'اطرح أسئلتك، أبلغ عن خطأ أو اقترح تحسيناً.'
+        : 'Posez vos questions, signalez un bug ou suggérez une amélioration.',
+      url: isAr ? '/contact' : '/contact',
+      type: isAr ? 'website' : 'website',
+      locale: isAr ? 'ar_TN' : 'fr_TN',
     },
   };
 }
@@ -35,7 +39,10 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <Header />
 
       <main className="flex-1 pt-16 lg:pt-20">
@@ -59,7 +66,6 @@ export default function ContactPage() {
         <section className="py-16 bg-white">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid lg:grid-cols-3 gap-8">
-
               {/* Coordonnées */}
               <div className="space-y-4">
                 <h2 className="text-2xl font-extrabold mb-6">{t('contact.info.title')}</h2>
@@ -70,11 +76,18 @@ export default function ContactPage() {
                       <Mail className="w-5 h-5" />
                     </div>
                     <div>
-                      <div className="text-sm font-semibold text-slate-500 mb-1">{t('contact.info.email')}</div>
-                      <a href="mailto:contact@examanet.com" className="text-slate-900 font-semibold hover:text-primary-600">
+                      <div className="text-sm font-semibold text-slate-500 mb-1">
+                        {t('contact.info.email')}
+                      </div>
+                      <a
+                        href="mailto:contact@examanet.com"
+                        className="text-slate-900 font-semibold hover:text-primary-600"
+                      >
                         contact@examanet.com
                       </a>
-                      <div className="text-xs text-slate-500 mt-1">{t('contact.info.emailResponse')}</div>
+                      <div className="text-xs text-slate-500 mt-1">
+                        {t('contact.info.emailResponse')}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -85,9 +98,13 @@ export default function ContactPage() {
                       <Phone className="w-5 h-5" />
                     </div>
                     <div>
-                      <div className="text-sm font-semibold text-slate-500 mb-1">{t('contact.info.phone')}</div>
+                      <div className="text-sm font-semibold text-slate-500 mb-1">
+                        {t('contact.info.phone')}
+                      </div>
                       <div className="text-slate-900 font-semibold">+216 50 000 000</div>
-                      <div className="text-xs text-slate-500 mt-1">{t('contact.info.phoneHours')}</div>
+                      <div className="text-xs text-slate-500 mt-1">
+                        {t('contact.info.phoneHours')}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -98,9 +115,13 @@ export default function ContactPage() {
                       <MapPin className="w-5 h-5" />
                     </div>
                     <div>
-                      <div className="text-sm font-semibold text-slate-500 mb-1">{t('contact.info.address')}</div>
+                      <div className="text-sm font-semibold text-slate-500 mb-1">
+                        {t('contact.info.address')}
+                      </div>
                       <div className="text-slate-900 font-semibold">Tunis, Tunisie</div>
-                      <div className="text-xs text-slate-500 mt-1">{t('contact.info.addressHQ')}</div>
+                      <div className="text-xs text-slate-500 mt-1">
+                        {t('contact.info.addressHQ')}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -111,23 +132,31 @@ export default function ContactPage() {
                       <Clock className="w-5 h-5" />
                     </div>
                     <div>
-                      <div className="text-sm font-semibold text-slate-500 mb-1">{t('contact.info.responseTime')}</div>
-                      <div className="text-slate-900 font-semibold">{t('contact.info.responseValue')}</div>
-                      <div className="text-xs text-slate-500 mt-1">{t('contact.info.workDays')}</div>
+                      <div className="text-sm font-semibold text-slate-500 mb-1">
+                        {t('contact.info.responseTime')}
+                      </div>
+                      <div className="text-slate-900 font-semibold">
+                        {t('contact.info.responseValue')}
+                      </div>
+                      <div className="text-xs text-slate-500 mt-1">
+                        {t('contact.info.workDays')}
+                      </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Réseaux sociaux */}
                 <div className="mt-6">
-                  <div className="text-sm font-semibold text-slate-500 mb-3">{t('contact.info.followUs')}</div>
+                  <div className="text-sm font-semibold text-slate-500 mb-3">
+                    {t('contact.info.followUs')}
+                  </div>
                   <div className="flex gap-2">
                     {[
                       { name: 'Facebook', icon: '📘', url: '#' },
                       { name: 'Twitter', icon: '🐦', url: '#' },
                       { name: 'Instagram', icon: '📷', url: '#' },
-                      { name: 'YouTube', icon: '▶️', url: '#' }
-                    ].map(s => (
+                      { name: 'YouTube', icon: '▶️', url: '#' },
+                    ].map((s) => (
                       <a
                         key={s.name}
                         href={s.url}
@@ -163,7 +192,9 @@ export default function ContactPage() {
                     <details key={i} className="bg-slate-50 rounded-xl p-4 cursor-pointer group">
                       <summary className="font-semibold text-slate-900 flex items-center justify-between">
                         {f.q}
-                        <span className="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                        <span className="text-slate-400 group-open:rotate-180 transition-transform">
+                          ▼
+                        </span>
                       </summary>
                       <p className="mt-2 text-sm text-slate-600">{f.a}</p>
                     </details>

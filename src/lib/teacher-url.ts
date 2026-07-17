@@ -10,7 +10,12 @@
 
 import { properSlugify } from './slugify';
 
-export function teacherSlug(t: { firstName?: string | null; lastName?: string | null; slug?: string | null; email?: string }): string {
+export function teacherSlug(t: {
+  firstName?: string | null;
+  lastName?: string | null;
+  slug?: string | null;
+  email?: string;
+}): string {
   if (t.slug) return t.slug;
   const first = (t.firstName || '').trim();
   const last = (t.lastName || '').trim();
@@ -26,7 +31,11 @@ export function teacherSlug(t: { firstName?: string | null; lastName?: string | 
  * Build a slug to be stored in the DB. Same logic as teacherSlug() but
  * intended for use BEFORE the row exists (no slug yet).
  */
-export function buildTeacherSlug(firstName: string | null, lastName: string | null, email?: string): string {
+export function buildTeacherSlug(
+  firstName: string | null,
+  lastName: string | null,
+  email?: string,
+): string {
   return teacherSlug({ firstName, lastName, email });
 }
 
@@ -34,7 +43,14 @@ export function buildTeacherSlug(firstName: string | null, lastName: string | nu
  * Build a teacher profile URL from a teacher object (or partial).
  * Always returns a URL in the new format.
  */
-export function teacherUrl(t: { numericId?: number | null; slug?: string | null; id: string; firstName?: string | null; lastName?: string | null; email?: string }): string {
+export function teacherUrl(t: {
+  numericId?: number | null;
+  slug?: string | null;
+  id: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  email?: string;
+}): string {
   const slug = teacherSlug(t);
   if (t.numericId != null) {
     return `/professeurs/${t.numericId}/${slug}`;
@@ -47,8 +63,15 @@ export function teacherUrl(t: { numericId?: number | null; slug?: string | null;
  * Build an absolute URL (with site domain).
  */
 export function absoluteTeacherUrl(
-  t: { numericId?: number | null; slug?: string | null; id: string; firstName?: string | null; lastName?: string | null; email?: string },
-  siteUrl: string = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com'
+  t: {
+    numericId?: number | null;
+    slug?: string | null;
+    id: string;
+    firstName?: string | null;
+    lastName?: string | null;
+    email?: string;
+  },
+  siteUrl: string = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com',
 ): string {
   return `${siteUrl}${teacherUrl(t)}`;
 }

@@ -17,7 +17,14 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 
     const target = await prisma.user.findUnique({
       where: { id: params.id },
-      select: { id: true, email: true, role: true, status: true, lockedUntil: true, failedLoginCount: true }
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        status: true,
+        lockedUntil: true,
+        failedLoginCount: true,
+      },
     });
     if (!target) {
       return NextResponse.json({ error: 'Utilisateur non trouvé' }, { status: 404 });
@@ -26,14 +33,16 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     // Reset lockout state
     await prisma.user.update({
       where: { id: params.id },
-      data: { failedLoginCount: 0, lockedUntil: null }
+      data: { failedLoginCount: 0, lockedUntil: null },
     });
 
-    console.log(`[admin] ${me.email} unlocked account for ${target.email} (was: lockedUntil=${target.lockedUntil}, failed=${target.failedLoginCount})`);
+    console.log(
+      `[admin] ${me.email} unlocked account for ${target.email} (was: lockedUntil=${target.lockedUntil}, failed=${target.failedLoginCount})`,
+    );
 
     return NextResponse.json({
       success: true,
-      message: `Compte ${target.email} déverrouillé.`
+      message: `Compte ${target.email} déverrouillé.`,
     });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });

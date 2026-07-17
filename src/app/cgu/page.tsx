@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { Scale, CheckCircle } from 'lucide-react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -10,11 +9,13 @@ export const revalidate = 3600; // 1 hour cache
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = getLocale();
-  const isAr = locale === "ar";
+  const isAr = locale === 'ar';
   return {
-    title: isAr ? "شروط الاستخدام — إكسامانت" : "CGU — Conditions Générales d'Utilisation",
-    description: isAr ? "شروط استخدام منصة إكسامانت. الحقوق والالتزامات والمسؤوليات." : "Conditions générales d'utilisation de la plateforme Examanet. Droits, obligations et responsabilités des utilisateurs.",
-    alternates: isAr ? {"canonical":"/cgu"} : {"canonical":"/cgu"},
+    title: isAr ? 'شروط الاستخدام — إكسامانت' : "CGU — Conditions Générales d'Utilisation",
+    description: isAr
+      ? 'شروط استخدام منصة إكسامانت. الحقوق والالتزامات والمسؤوليات.'
+      : "Conditions générales d'utilisation de la plateforme Examanet. Droits, obligations et responsabilités des utilisateurs.",
+    alternates: isAr ? { canonical: '/cgu' } : { canonical: '/cgu' },
   };
 }
 
@@ -26,11 +27,15 @@ const breadcrumbJsonLd = breadcrumbSchema([
 export default function CGUPage() {
   const t = getT();
   const dict = getDict();
-  const sections = (dict.cgu?.sections as Array<{ id: string; title: string; content: string }>) || [];
+  const sections =
+    (dict.cgu?.sections as Array<{ id: string; title: string; content: string }>) || [];
 
   return (
     <div className="min-h-screen flex flex-col">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <Header />
 
       <main className="flex-1 pt-16 lg:pt-20">
@@ -45,21 +50,26 @@ export default function CGUPage() {
               {t('cgu.hero.title')}
             </h1>
             <p className="text-lg text-slate-600 mb-2">
-              {t('cgu.hero.lastUpdate')}<strong>{t('cgu.hero.lastUpdateDate')}</strong>
+              {t('cgu.hero.lastUpdate')}
+              <strong>{t('cgu.hero.lastUpdateDate')}</strong>
             </p>
-            <p className="text-slate-500">
-              {t('cgu.hero.intro')}
-            </p>
+            <p className="text-slate-500">{t('cgu.hero.intro')}</p>
           </div>
         </section>
 
         {/* Sommaire */}
         <section className="py-8 bg-slate-50 border-b border-slate-200">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">{t('cgu.sommaire')}</h2>
+            <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">
+              {t('cgu.sommaire')}
+            </h2>
             <div className="grid sm:grid-cols-2 gap-x-6 gap-y-1 text-sm">
-              {sections.map(s => (
-                <a key={s.id} href={`#${s.id}`} className="text-primary-600 hover:text-primary-700 hover:underline py-1">
+              {sections.map((s) => (
+                <a
+                  key={s.id}
+                  href={`#${s.id}`}
+                  className="text-primary-600 hover:text-primary-700 hover:underline py-1"
+                >
                   → {s.title}
                 </a>
               ))}
@@ -70,7 +80,7 @@ export default function CGUPage() {
         {/* Contenu */}
         <article className="py-16 bg-white">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            {sections.map(s => (
+            {sections.map((s) => (
               <section key={s.id} id={s.id} className="mb-12 scroll-mt-20">
                 <h2 className="text-2xl font-extrabold text-slate-900 mb-4 flex items-center gap-3">
                   <span className="w-8 h-8 rounded-lg bg-primary-100 text-primary-600 flex items-center justify-center text-sm font-bold flex-shrink-0">
@@ -92,7 +102,12 @@ export default function CGUPage() {
                   <h3 className="font-bold text-slate-900 mb-2">{t('cgu.acceptation.title')}</h3>
                   <p className="text-slate-600 text-sm">
                     {t('cgu.acceptation.body')}
-                    <a href="mailto:contact@examanet.com" className="text-primary-600 font-semibold hover:underline">contact@examanet.com</a>
+                    <a
+                      href="mailto:contact@examanet.com"
+                      className="text-primary-600 font-semibold hover:underline"
+                    >
+                      contact@examanet.com
+                    </a>
                   </p>
                 </div>
               </div>

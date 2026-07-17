@@ -35,7 +35,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
           activatedAt: null,
           cancelledAt: null,
           clickCount: 0,
-        }
+        },
       }),
       prisma.user.update({
         where: { id: inv.teacherId },
@@ -43,8 +43,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
           passwordHash: newHash,
           invitationStatus: USER_INV_STATUS.PENDING_INVITATION,
           mustChangePassword: true,
-        }
-      })
+        },
+      }),
     ]);
 
     // Send the email
@@ -52,7 +52,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const sendResult = await sendInvitationEmail(id, newTemp);
 
     if (!sendResult.ok) {
-      return NextResponse.json({ error: sendResult.error || 'Erreur envoi email' }, { status: 500 });
+      return NextResponse.json(
+        { error: sendResult.error || 'Erreur envoi email' },
+        { status: 500 },
+      );
     }
 
     return NextResponse.json({ success: true });

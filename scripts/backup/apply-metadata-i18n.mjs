@@ -8,7 +8,8 @@ import path from 'path';
 const META_JSON = process.argv[2] || '.build-cache/i18n-metadata.json';
 const pages = JSON.parse(fs.readFileSync(META_JSON, 'utf8'));
 
-let okCount = 0, failCount = 0;
+let okCount = 0,
+  failCount = 0;
 for (const page of pages) {
   const { filePath, fr, ar, addImport } = page;
   const filepath = path.join(process.cwd(), filePath);
@@ -20,7 +21,9 @@ for (const page of pages) {
   const orig = fs.readFileSync(filepath, 'utf8');
 
   // Find existing static metadata block (export const metadata = { ... } OR export const metadata: Metadata = { ... })
-  let startIdx = -1, endIdx = -1, depth = 0;
+  let startIdx = -1,
+    endIdx = -1,
+    depth = 0;
   const lines = orig.split('\n');
   for (let i = 0; i < lines.length; i++) {
     if (startIdx === -1 && /^export const metadata(: Metadata)? = \{/.test(lines[i])) {
@@ -53,26 +56,26 @@ for (const page of pages) {
 
   // Add import
   if (addImport && !newContent.includes("getLocale } from '@/lib/i18n-server'")) {
-    if (newContent.includes("import { breadcrumbSchema")) {
+    if (newContent.includes('import { breadcrumbSchema')) {
       newContent = newContent.replace(
         /(import { breadcrumbSchema[^\n]*;)/,
         "import { getLocale } from '@/lib/i18n-server';\n$1",
-        1
+        1,
       );
-    } else if (newContent.includes("import { itemListSchema")) {
+    } else if (newContent.includes('import { itemListSchema')) {
       newContent = newContent.replace(
         /(import { itemListSchema[^\n]*;)/,
         "import { getLocale } from '@/lib/i18n-server';\n$1",
-        1
+        1,
       );
-    } else if (newContent.includes("import Link from") || newContent.includes("import Header")) {
+    } else if (newContent.includes('import Link from') || newContent.includes('import Header')) {
       // Add before first layout import
       const m = newContent.match(/^(import .+ from .+\.tsx?;)$/m);
       if (m) {
         newContent = newContent.replace(
           m[1],
           "import { getLocale } from '@/lib/i18n-server';\n" + m[1],
-          1
+          1,
         );
       }
     } else {

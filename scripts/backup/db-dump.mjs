@@ -101,7 +101,9 @@ async function main() {
         const filePath = path.join(outDir, `${table}.json`);
         fs.writeFileSync(filePath, JSON.stringify(allRows, null, 2));
         const sizeKB = Math.round(fs.statSync(filePath).size / 1024);
-        console.log(`  [ok]   ${table.padEnd(30)} ${String(count).padStart(8)} rows (${sizeKB} KB)`);
+        console.log(
+          `  [ok]   ${table.padEnd(30)} ${String(count).padStart(8)} rows (${sizeKB} KB)`,
+        );
       } else {
         console.log(`  [empty] ${table}`);
       }
@@ -115,7 +117,9 @@ async function main() {
   fs.writeFileSync(path.join(outDir, 'meta.json'), JSON.stringify(meta, null, 2));
 
   const duration = ((Date.now() - start) / 1000).toFixed(1);
-  console.log(`\n[db-dump] DONE in ${duration}s — ${totalRows} rows across ${schema.tables.length} tables`);
+  console.log(
+    `\n[db-dump] DONE in ${duration}s — ${totalRows} rows across ${schema.tables.length} tables`,
+  );
   console.log(`[db-dump] Output: ${outDir}`);
 }
 

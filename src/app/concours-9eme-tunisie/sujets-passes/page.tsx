@@ -2,19 +2,10 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
-import {
-  getConcoursStats,
-  groupByYear,
-} from '@/lib/concours-9eme-data';
-import {
-  itemListSchema,
-  breadcrumbSchema,
-  SITE_URL,
-} from '@/lib/structured-data';
+import { getConcoursStats, groupByYear } from '@/lib/concours-9eme-data';
+import { itemListSchema, breadcrumbSchema, SITE_URL } from '@/lib/structured-data';
 import { getLocale, getT } from '@/lib/i18n-server';
-import {
-  ChevronRight, Download, ArrowLeft,
-} from 'lucide-react';
+import { ChevronRight, ArrowLeft } from 'lucide-react';
 import { ConcoursSujetsClient } from './client';
 
 export const revalidate = 3600; // ISR: refresh every hour
@@ -33,18 +24,33 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title,
     description: desc,
-    keywords: locale === 'ar' ? [
-      'مواضيع التاسعة', 'إصلاحات التاسعة تونس', 'مناظرة التاسعة 2001',
-      'مناظرة التاسعة 2024', 'مناظرة التاسعة 2025', 'مناظرة التاسعة 2026',
-      'تحميل مواضيع التاسعة', 'PDF مجاني تاسعة', 'مناظرة التاسعة أساسي',
-    ] : [
-      'sujets 9ème année', 'corrigés 9ème tunisie', 'concours 9eme 2001',
-      'concours 9eme 2024', 'concours 9eme 2025', 'concours 9eme 2026',
-      'télécharger sujets 9eme', 'PDF gratuit 9eme', 'مناظرة التاسعة أساسي',
-    ],
+    keywords:
+      locale === 'ar'
+        ? [
+            'مواضيع التاسعة',
+            'إصلاحات التاسعة تونس',
+            'مناظرة التاسعة 2001',
+            'مناظرة التاسعة 2024',
+            'مناظرة التاسعة 2025',
+            'مناظرة التاسعة 2026',
+            'تحميل مواضيع التاسعة',
+            'PDF مجاني تاسعة',
+            'مناظرة التاسعة أساسي',
+          ]
+        : [
+            'sujets 9ème année',
+            'corrigés 9ème tunisie',
+            'concours 9eme 2001',
+            'concours 9eme 2024',
+            'concours 9eme 2025',
+            'concours 9eme 2026',
+            'télécharger sujets 9eme',
+            'PDF gratuit 9eme',
+            'مناظرة التاسعة أساسي',
+          ],
     alternates: {
       canonical: PAGE_URL,
-      languages: { 'fr': PAGE_URL, 'ar': PAGE_URL, 'x-default': PAGE_URL },
+      languages: { fr: PAGE_URL, ar: PAGE_URL, 'x-default': PAGE_URL },
     },
     openGraph: {
       title,
@@ -89,7 +95,8 @@ export default function ConcoursSujetsPassesPage({ searchParams }: PageProps) {
           }
           if (Object.keys(filtered).length === 0) continue;
           if (qFilter) {
-            const searchStr = `${yg.year} ${subject} ${voie} ${Object.keys(filtered).join(' ')}`.toLowerCase();
+            const searchStr =
+              `${yg.year} ${subject} ${voie} ${Object.keys(filtered).join(' ')}`.toLowerCase();
             if (!searchStr.includes(qFilter)) continue;
           }
           filteredSubjects[subject] = filtered;
@@ -104,19 +111,30 @@ export default function ConcoursSujetsPassesPage({ searchParams }: PageProps) {
     .filter((yg): yg is NonNullable<typeof yg> => yg !== null);
 
   const allFiles = stats.gold2020Corrige
-    ? [stats.gold2020Corrige, ...filteredYears.flatMap((yg) =>
-        Object.values(yg.voies).flatMap((s) =>
-          Object.values(s).flatMap((f) => [f.sujet, f.corrige, f.sujetPlusCorrige].filter(Boolean)),
+    ? [
+        stats.gold2020Corrige,
+        ...filteredYears.flatMap((yg) =>
+          Object.values(yg.voies).flatMap((s) =>
+            Object.values(s).flatMap((f) =>
+              [f.sujet, f.corrige, f.sujetPlusCorrige].filter(Boolean),
+            ),
+          ),
         ),
-      )].slice(0, 50)
-    : filteredYears.flatMap((yg) =>
-        Object.values(yg.voies).flatMap((s) =>
-          Object.values(s).flatMap((f) => [f.sujet, f.corrige, f.sujetPlusCorrige].filter(Boolean)),
-        ),
-      ).slice(0, 50);
+      ].slice(0, 50)
+    : filteredYears
+        .flatMap((yg) =>
+          Object.values(yg.voies).flatMap((s) =>
+            Object.values(s).flatMap((f) =>
+              [f.sujet, f.corrige, f.sujetPlusCorrige].filter(Boolean),
+            ),
+          ),
+        )
+        .slice(0, 50);
 
   const itemListJsonLd = itemListSchema({
-    name: t('concours.passes.title').replace('{highlight}', '').replace('{total}', String(stats.totalFiles)),
+    name: t('concours.passes.title')
+      .replace('{highlight}', '')
+      .replace('{total}', String(stats.totalFiles)),
     description: `Liste complète des ${stats.totalFiles} sujets et corrigés du concours 9ème depuis 2001`,
     url: PAGE_URL,
     items: allFiles.map((f: any) => ({
@@ -134,8 +152,14 @@ export default function ConcoursSujetsPassesPage({ searchParams }: PageProps) {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
 
       <Header />
 
@@ -143,14 +167,25 @@ export default function ConcoursSujetsPassesPage({ searchParams }: PageProps) {
         {/* COMPACT HERO */}
         <section className="relative bg-gradient-to-br from-primary-50 via-white to-amber-50 py-8 lg:py-12 overflow-hidden">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-            <nav aria-label="Fil d'Ariane" className="flex items-center gap-1 text-xs text-slate-500 mb-4 flex-wrap">
-              <Link href="/" className="hover:text-primary-600 transition">{t('nav.home') || 'Accueil'}</Link>
+            <nav
+              aria-label="Fil d'Ariane"
+              className="flex items-center gap-1 text-xs text-slate-500 mb-4 flex-wrap"
+            >
+              <Link href="/" className="hover:text-primary-600 transition">
+                {t('nav.home') || 'Accueil'}
+              </Link>
               <ChevronRight className="w-3 h-3 text-slate-300" />
-              <Link href="/college" className="hover:text-primary-600 transition">Collège</Link>
+              <Link href="/college" className="hover:text-primary-600 transition">
+                Collège
+              </Link>
               <ChevronRight className="w-3 h-3 text-slate-300" />
-              <Link href="/concours-9eme-tunisie" className="hover:text-primary-600 transition">{t('concours.breadcrumb.concours9eme')}</Link>
+              <Link href="/concours-9eme-tunisie" className="hover:text-primary-600 transition">
+                {t('concours.breadcrumb.concours9eme')}
+              </Link>
               <ChevronRight className="w-3 h-3 text-slate-300" />
-              <span className="text-slate-900 font-semibold">{t('concours.breadcrumb.sujetsPasses')}</span>
+              <span className="text-slate-900 font-semibold">
+                {t('concours.breadcrumb.sujetsPasses')}
+              </span>
             </nav>
 
             <Link
@@ -164,16 +199,22 @@ export default function ConcoursSujetsPassesPage({ searchParams }: PageProps) {
               <div>
                 <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight mb-2">
                   {(() => {
-                    const title = t('concours.passes.title').replace('{total}', String(stats.totalFiles));
+                    const title = t('concours.passes.title').replace(
+                      '{total}',
+                      String(stats.totalFiles),
+                    );
                     const parts = title.split('{highlight}');
-                    return (<>
-                      {parts[0]}
-                      <span className="gradient-text">{parts[1] || ''}</span>
-                    </>);
+                    return (
+                      <>
+                        {parts[0]}
+                        <span className="gradient-text">{parts[1] || ''}</span>
+                      </>
+                    );
                   })()}
                 </h1>
                 <p className="text-base lg:text-lg text-slate-600">
-                  <strong>{stats.totalFiles} fichiers</strong> collectés depuis 2001 — filtre, recherche, téléchargement.
+                  <strong>{stats.totalFiles} fichiers</strong> collectés depuis 2001 — filtre,
+                  recherche, téléchargement.
                 </p>
               </div>
               <div className="flex items-center gap-2 text-sm">
@@ -181,11 +222,17 @@ export default function ConcoursSujetsPassesPage({ searchParams }: PageProps) {
                   {t('concours.passes.statSujets').replace('{count}', String(stats.totalSujets))}
                 </span>
                 <span className="bg-amber-100 text-amber-700 border border-amber-200 rounded-full px-3 py-1.5 font-semibold">
-                  {t('concours.passes.statCorriges').replace('{count}', String(stats.totalCorriges))}
+                  {t('concours.passes.statCorriges').replace(
+                    '{count}',
+                    String(stats.totalCorriges),
+                  )}
                 </span>
                 {stats.totalCorriges2020Plus > 0 && (
                   <span className="bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-full px-3 py-1.5 font-semibold">
-                    {t('concours.passes.statGold').replace('{count}', String(stats.totalCorriges2020Plus))}
+                    {t('concours.passes.statGold').replace(
+                      '{count}',
+                      String(stats.totalCorriges2020Plus),
+                    )}
                   </span>
                 )}
               </div>

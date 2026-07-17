@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import bcrypt from 'bcryptjs';
 
 export const runtime = 'nodejs';
 
@@ -18,13 +17,13 @@ export async function POST(req: NextRequest) {
     // Update all admin emails to the new one
     const result = await prisma.user.updateMany({
       where: { role: 'ADMIN' },
-      data: { email }
+      data: { email },
     });
 
     return NextResponse.json({
       success: true,
       message: `${result.count} compte(s) admin mis à jour avec ${email}`,
-      count: result.count
+      count: result.count,
     });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });

@@ -13,9 +13,15 @@ export default async function FavoritesPage() {
     orderBy: { createdAt: 'desc' },
     include: {
       resource: {
-        include: { subject: true, class: true, teacher: { select: { firstName: true, lastName: true, firstNameAr: true, lastNameAr: true } },}
-      }
-    }
+        include: {
+          subject: true,
+          class: true,
+          teacher: {
+            select: { firstName: true, lastName: true, firstNameAr: true, lastNameAr: true },
+          },
+        },
+      },
+    },
   });
 
   return (
@@ -25,12 +31,16 @@ export default async function FavoritesPage() {
         <div className="bg-white rounded-2xl p-12 text-center border border-slate-100">
           <div className="text-5xl mb-3">💔</div>
           <h3 className="font-bold text-xl mb-2">Aucun favori</h3>
-          <p className="text-slate-500 mb-4">Ajoutez des ressources à vos favoris pour les retrouver ici</p>
-          <a href="/ressources" className="btn-primary">Explorer les ressources</a>
+          <p className="text-slate-500 mb-4">
+            Ajoutez des ressources à vos favoris pour les retrouver ici
+          </p>
+          <a href="/ressources" className="btn-primary">
+            Explorer les ressources
+          </a>
         </div>
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {favorites.map(f => (
+          {favorites.map((f) => (
             <form key={f.id} action={`/api/favorites/${f.resource.id}`} method="POST">
               <input type="hidden" name="_action" value="remove" />
               <ResourceCard resource={f.resource as any} />

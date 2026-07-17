@@ -26,10 +26,5 @@ export default function ReferentielContent({ html }: { html: string }) {
     });
   }, [html]);
 
-  return (
-    <div
-      id="referentiel-body"
-      dangerouslySetInnerHTML={{ __html: html }}
-    />
-  );
+  return <div id="referentiel-body" dangerouslySetInnerHTML={{ __html: html }} />;
 }

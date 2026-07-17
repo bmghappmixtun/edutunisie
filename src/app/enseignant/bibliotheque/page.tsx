@@ -22,7 +22,7 @@ export default async function TeacherLibraryPage() {
   const [classes, subjects] = await Promise.all([
     prisma.class.findMany({
       orderBy: { order: 'asc' },
-      select: { id: true, nameFr: true, nameAr: true, slug: true, },
+      select: { id: true, nameFr: true, nameAr: true, slug: true },
     }),
     prisma.subject.findMany({
       orderBy: { order: 'asc' },
@@ -37,8 +37,8 @@ export default async function TeacherLibraryPage() {
           📚 Ma bibliothèque
         </h1>
         <p className="text-slate-600 dark:text-slate-400">
-          Tous vos fichiers originaux (Word, PDF) sont sauvegardés ici. Vous pouvez les
-          télécharger à tout moment et les réutiliser pour publier de nouvelles ressources.
+          Tous vos fichiers originaux (Word, PDF) sont sauvegardés ici. Vous pouvez les télécharger
+          à tout moment et les réutiliser pour publier de nouvelles ressources.
         </p>
       </div>
       <TeacherLibraryClient classes={classes} subjects={subjects} />

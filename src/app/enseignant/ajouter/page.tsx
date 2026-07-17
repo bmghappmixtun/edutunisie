@@ -2,9 +2,19 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  Info, Loader2, ChevronRight, Library, CheckCircle2, Wrench, School,
-  Upload, FileCheck, Sparkles, ArrowRight, Hash, Calendar, BookOpen,
-  GraduationCap, Layers, AlertCircle, CheckCircle, ChevronLeft,
+  Info,
+  Loader2,
+  Library,
+  CheckCircle2,
+  Upload,
+  FileCheck,
+  Sparkles,
+  Calendar,
+  BookOpen,
+  GraduationCap,
+  Layers,
+  AlertCircle,
+  CheckCircle,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ModernUploader from '@/components/teacher/ModernUploader';
@@ -35,24 +45,24 @@ type UploadedFile = {
 };
 
 const COLOR_BG: Record<string, string> = {
-  amber:    'bg-amber-100 text-amber-700',
-  emerald:  'bg-emerald-100 text-emerald-700',
-  violet:   'bg-violet-100 text-violet-700',
-  sky:      'bg-sky-100 text-sky-700',
-  slate:    'bg-slate-100 text-slate-700',
-  red:      'bg-red-100 text-red-700',
-  orange:   'bg-orange-100 text-orange-700',
-  blue:     'bg-blue-100 text-blue-700',
+  amber: 'bg-amber-100 text-amber-700',
+  emerald: 'bg-emerald-100 text-emerald-700',
+  violet: 'bg-violet-100 text-violet-700',
+  sky: 'bg-sky-100 text-sky-700',
+  slate: 'bg-slate-100 text-slate-700',
+  red: 'bg-red-100 text-red-700',
+  orange: 'bg-orange-100 text-orange-700',
+  blue: 'bg-blue-100 text-blue-700',
 };
 const COLOR_RING: Record<string, string> = {
-  amber:    'ring-amber-400 border-amber-400 bg-amber-50',
-  emerald:  'ring-emerald-400 border-emerald-400 bg-emerald-50',
-  violet:   'ring-violet-400 border-violet-400 bg-violet-50',
-  sky:      'ring-sky-400 border-sky-400 bg-sky-50',
-  slate:    'ring-slate-400 border-slate-400 bg-slate-50',
-  red:      'bg-red-100 border-red-400 text-red-800',
-  orange:   'bg-orange-100 border-orange-400 text-orange-800',
-  blue:     'bg-blue-100 border-blue-400 text-blue-800',
+  amber: 'ring-amber-400 border-amber-400 bg-amber-50',
+  emerald: 'ring-emerald-400 border-emerald-400 bg-emerald-50',
+  violet: 'ring-violet-400 border-violet-400 bg-violet-50',
+  sky: 'ring-sky-400 border-sky-400 bg-sky-50',
+  slate: 'ring-slate-400 border-slate-400 bg-slate-50',
+  red: 'bg-red-100 border-red-400 text-red-800',
+  orange: 'bg-orange-100 border-orange-400 text-orange-800',
+  blue: 'bg-blue-100 border-blue-400 text-blue-800',
 };
 
 export default function AddResourcePage() {
@@ -114,7 +124,7 @@ export default function AddResourcePage() {
   const sections = useMemo(() => getSectionsForClass(classSlug), [classSlug]);
   const subjects: SubjectOption[] = useMemo(
     () => getSubjectsForClassSection(classSlug, sectionSlug || null),
-    [classSlug, sectionSlug]
+    [classSlug, sectionSlug],
   );
   const isTronc = isTroncCommun(classSlug);
 
@@ -147,11 +157,11 @@ export default function AddResourcePage() {
         type: fileType,
         year: schoolYear,
         trimester: trimester || null,
-        homeworkSubtype: fileType === 'HOMEWORK' ? (homeworkSubtype || null) : null,
-        homeworkNumber: fileType === 'HOMEWORK' ? (homeworkNumber || null) : null,
+        homeworkSubtype: fileType === 'HOMEWORK' ? homeworkSubtype || null : null,
+        homeworkNumber: fileType === 'HOMEWORK' ? homeworkNumber || null : null,
         hasCorrection,
         description,
-        summary: description,  // Use description as summary
+        summary: description, // Use description as summary
       });
     }
     return autoGenerateTags({
@@ -162,17 +172,34 @@ export default function AddResourcePage() {
       type: fileType,
       year: schoolYear,
       trimester: trimester || null,
-      homeworkSubtype: fileType === 'HOMEWORK' ? (homeworkSubtype || null) : null,
-      homeworkNumber: fileType === 'HOMEWORK' ? (homeworkNumber || null) : null,
+      homeworkSubtype: fileType === 'HOMEWORK' ? homeworkSubtype || null : null,
+      homeworkNumber: fileType === 'HOMEWORK' ? homeworkNumber || null : null,
       hasCorrection,
     });
-  }, [fileType, subjectSlug, classSlug, sectionSlug, customTitle, otherTypeLabel, schoolYear, trimester, homeworkSubtype, homeworkNumber, hasCorrection]);
+  }, [
+    fileType,
+    subjectSlug,
+    classSlug,
+    sectionSlug,
+    customTitle,
+    otherTypeLabel,
+    schoolYear,
+    trimester,
+    homeworkSubtype,
+    homeworkNumber,
+    hasCorrection,
+  ]);
 
   // Auto-apply suggested tags if user hasn't manually edited them yet
   useEffect(() => {
     if (!tagsManuallyEdited && suggestedTags.length > 0) {
       // Add new suggestions to existing user tags
-      const currentTags = tags ? tags.split(',').map((t: string) => t.trim()).filter(Boolean) : [];
+      const currentTags = tags
+        ? tags
+            .split(',')
+            .map((t: string) => t.trim())
+            .filter(Boolean)
+        : [];
       const merged = Array.from(new Set([...currentTags, ...suggestedTags])).slice(0, 15);
       setTags(merged.join(', '));
     }
@@ -186,7 +213,7 @@ export default function AddResourcePage() {
 
     // 1) Type + sous-type / N°
     if (fileType === 'HOMEWORK') {
-      const sub = HOMEWORK_SUBTYPES.find(s => s.key === homeworkSubtype);
+      const sub = HOMEWORK_SUBTYPES.find((s) => s.key === homeworkSubtype);
       if (sub) {
         // Strip leading emoji: 📋📝🏠
         const cleanLabel = sub.label.replace(/^[\u{1F4CD}\u{1F4DD}\u{1F3E0}]\s*/u, '');
@@ -205,25 +232,31 @@ export default function AddResourcePage() {
     }
 
     // 2) Objet / Sujet (custom title) - pour série, cours, révision
-    if ((fileType === 'EXERCISE' || fileType === 'COURSE' || fileType === 'REVISION' || fileType === 'OTHER') && customTitle) {
+    if (
+      (fileType === 'EXERCISE' ||
+        fileType === 'COURSE' ||
+        fileType === 'REVISION' ||
+        fileType === 'OTHER') &&
+      customTitle
+    ) {
       parts.push(`- ${customTitle}`);
     }
 
     // 3) Matière
     if (subjectSlug) {
-      const subName = subjects.find(s => s.slug === subjectSlug)?.name;
+      const subName = subjects.find((s) => s.slug === subjectSlug)?.name;
       if (subName) parts.push(`- ${subName}`);
     }
 
     // 4) Classe
     if (classSlug) {
-      const className = CLASSES.find(c => c.slug === classSlug)?.name;
+      const className = CLASSES.find((c) => c.slug === classSlug)?.name;
       if (className) parts.push(`- ${className}`);
     }
 
     // 5) Section (si pas tronc commun)
     if (sectionSlug && !isTronc) {
-      const sectionName = sections.find(s => s.slug === sectionSlug)?.name;
+      const sectionName = sections.find((s) => s.slug === sectionSlug)?.name;
       if (sectionName) parts.push(`- ${sectionName}`);
     }
 
@@ -234,7 +267,22 @@ export default function AddResourcePage() {
     if (teacherName) parts.push(`- ${teacherName}`);
 
     return parts.filter(Boolean).join(' ').trim();
-  }, [fileType, homeworkSubtype, homeworkNumber, exerciseNumber, customTitle, otherTypeLabel, subjectSlug, classSlug, sectionSlug, schoolYear, teacherName, subjects, sections, isTronc]);
+  }, [
+    fileType,
+    homeworkSubtype,
+    homeworkNumber,
+    exerciseNumber,
+    customTitle,
+    otherTypeLabel,
+    subjectSlug,
+    classSlug,
+    sectionSlug,
+    schoolYear,
+    teacherName,
+    subjects,
+    sections,
+    isTronc,
+  ]);
 
   // Validation per type
   const validation = useMemo(() => {
@@ -242,16 +290,30 @@ export default function AddResourcePage() {
     if (!uploadedFile) errors.push('Uploadez un fichier');
     if (!fileType) errors.push('Choisissez le type de fichier');
     if (fileType === 'HOMEWORK' && !homeworkSubtype) errors.push('Choisissez le type de devoir');
-    if (fileType === 'EXERCISE' && !customTitle.trim()) errors.push("Saisissez l'objet de la série");
-    if ((fileType === 'COURSE' || fileType === 'REVISION') && !customTitle.trim()) errors.push("Saisissez l'objet du cours/révision");
+    if (fileType === 'EXERCISE' && !customTitle.trim())
+      errors.push("Saisissez l'objet de la série");
+    if ((fileType === 'COURSE' || fileType === 'REVISION') && !customTitle.trim())
+      errors.push("Saisissez l'objet du cours/révision");
     if (fileType === 'OTHER' && !otherTypeLabel.trim()) errors.push('Précisez le type de fichier');
     if (!classSlug) errors.push('Choisissez la classe');
     if (!isTronc && sections.length > 0 && !sectionSlug) errors.push('Choisissez la section');
     if (!subjectSlug) errors.push('Choisissez la matière');
     return errors;
-  }, [uploadedFile, fileType, homeworkSubtype, customTitle, otherTypeLabel, classSlug, sectionSlug, subjectSlug, isTronc, sections.length]);
+  }, [
+    uploadedFile,
+    fileType,
+    homeworkSubtype,
+    customTitle,
+    otherTypeLabel,
+    classSlug,
+    sectionSlug,
+    subjectSlug,
+    isTronc,
+    sections.length,
+  ]);
 
-  const canSubmit = validation.length === 0 && uploadedFile && uploadedFile.conversionStatus !== 'FAILED';
+  const canSubmit =
+    validation.length === 0 && uploadedFile && uploadedFile.conversionStatus !== 'FAILED';
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -281,18 +343,21 @@ export default function AddResourcePage() {
           fileUrl: uploadedFile!.fileUrl,
           fileSize: uploadedFile!.fileSize,
           // Homework
-          homeworkSubtype: fileType === 'HOMEWORK' ? (homeworkSubtype || null) : null,
+          homeworkSubtype: fileType === 'HOMEWORK' ? homeworkSubtype || null : null,
           homeworkNumber: fileType === 'HOMEWORK' && homeworkNumber ? Number(homeworkNumber) : null,
           // School
           schoolType,
           // Correction
           hasCorrection,
           correctionSummary: hasCorrection && correctionSummary ? correctionSummary : null,
-        })
+        }),
       });
       const result = await res.json();
-      if (!res.ok) { toast.error(result.error || 'Erreur'); return; }
-      toast.success('Ressource ajoutée et en attente d\'approbation ! 🎉');
+      if (!res.ok) {
+        toast.error(result.error || 'Erreur');
+        return;
+      }
+      toast.success("Ressource ajoutée et en attente d'approbation ! 🎉");
       setTimeout(() => router.push('/enseignant/ressources'), 1500);
     } catch (e) {
       toast.error('Erreur réseau');
@@ -321,7 +386,7 @@ export default function AddResourcePage() {
       {/* ============================ STEP 0: FILE TYPE ============================ */}
       <Section step={1} title="Type de fichier" icon={<Layers className="w-4 h-4" />}>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-          {FILE_TYPES.map(ft => {
+          {FILE_TYPES.map((ft) => {
             const active = fileType === ft.key;
             return (
               <button
@@ -341,7 +406,9 @@ export default function AddResourcePage() {
                     : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
                 }`}
               >
-                <div className={`w-10 h-10 rounded-xl ${COLOR_BG[ft.color]} flex items-center justify-center text-xl mb-2`}>
+                <div
+                  className={`w-10 h-10 rounded-xl ${COLOR_BG[ft.color]} flex items-center justify-center text-xl mb-2`}
+                >
                   {ft.icon}
                 </div>
                 <div className="font-bold text-slate-900 text-sm">{ft.label}</div>
@@ -355,9 +422,11 @@ export default function AddResourcePage() {
         {fileType === 'HOMEWORK' && (
           <SubSection title="📝 Détails du devoir" tone="amber">
             <div>
-              <Label>Type de devoir <Required /></Label>
+              <Label>
+                Type de devoir <Required />
+              </Label>
               <div className="flex flex-wrap gap-2">
-                {HOMEWORK_SUBTYPES.map(opt => (
+                {HOMEWORK_SUBTYPES.map((opt) => (
                   <button
                     key={opt.key}
                     type="button"
@@ -375,9 +444,12 @@ export default function AddResourcePage() {
             </div>
             {homeworkSubtype && (
               <div>
-                <Label>Numéro du devoir <span className="text-xs text-slate-400 font-normal">(optionnel)</span></Label>
+                <Label>
+                  Numéro du devoir{' '}
+                  <span className="text-xs text-slate-400 font-normal">(optionnel)</span>
+                </Label>
                 <div className="flex flex-wrap gap-2">
-                  {HOMEWORK_NUMBERS.map(n => (
+                  {HOMEWORK_NUMBERS.map((n) => (
                     <button
                       key={n}
                       type="button"
@@ -392,7 +464,9 @@ export default function AddResourcePage() {
                     </button>
                   ))}
                 </div>
-                <p className="text-xs text-slate-500 mt-2">💡 Le numéro indique le trimestre (N°1 = T1, N°2 = T2, N°3+ = T3)</p>
+                <p className="text-xs text-slate-500 mt-2">
+                  💡 Le numéro indique le trimestre (N°1 = T1, N°2 = T2, N°3+ = T3)
+                </p>
               </div>
             )}
           </SubSection>
@@ -404,7 +478,7 @@ export default function AddResourcePage() {
             <div>
               <Label>Numéro de série</Label>
               <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
-                {EXERCISE_NUMBERS.map(n => (
+                {EXERCISE_NUMBERS.map((n) => (
                   <button
                     key={n}
                     type="button"
@@ -421,11 +495,13 @@ export default function AddResourcePage() {
               </div>
             </div>
             <div>
-              <Label>Objet / Titre de la série <Required /></Label>
+              <Label>
+                Objet / Titre de la série <Required />
+              </Label>
               <input
                 type="text"
                 value={customTitle}
-                onChange={e => setCustomTitle(e.target.value)}
+                onChange={(e) => setCustomTitle(e.target.value)}
                 className="input"
                 placeholder="Ex: Trigonométrie, Suites numériques, Les probabilités..."
               />
@@ -437,11 +513,13 @@ export default function AddResourcePage() {
         {fileType === 'COURSE' && (
           <SubSection title="📚 Détails du cours" tone="violet">
             <div>
-              <Label>Objet / Titre du cours <Required /></Label>
+              <Label>
+                Objet / Titre du cours <Required />
+              </Label>
               <input
                 type="text"
                 value={customTitle}
-                onChange={e => setCustomTitle(e.target.value)}
+                onChange={(e) => setCustomTitle(e.target.value)}
                 className="input"
                 placeholder="Ex: Chapitre 3 — Les fonctions exponentielles, Leçon n°5..."
               />
@@ -453,11 +531,13 @@ export default function AddResourcePage() {
         {fileType === 'REVISION' && (
           <SubSection title="🔄 Détails de la révision" tone="sky">
             <div>
-              <Label>Objet / Titre de la révision <Required /></Label>
+              <Label>
+                Objet / Titre de la révision <Required />
+              </Label>
               <input
                 type="text"
                 value={customTitle}
-                onChange={e => setCustomTitle(e.target.value)}
+                onChange={(e) => setCustomTitle(e.target.value)}
                 className="input"
                 placeholder="Ex: Bac Blanc — Math, Fiche de révision Physique, Sujets types..."
               />
@@ -469,15 +549,19 @@ export default function AddResourcePage() {
         {fileType === 'OTHER' && (
           <SubSection title="📦 Précisez le type" tone="slate">
             <div>
-              <Label>Type de fichier <Required /></Label>
+              <Label>
+                Type de fichier <Required />
+              </Label>
               <input
                 type="text"
                 value={otherTypeLabel}
-                onChange={e => setOtherTypeLabel(e.target.value)}
+                onChange={(e) => setOtherTypeLabel(e.target.value)}
                 className="input"
                 placeholder="Ex: Résumé de cours, Fiche méthode, Projet, Activité, Évaluation..."
               />
-              <p className="text-xs text-slate-500 mt-2">💡 Décrivez en quelques mots ce que contient votre fichier</p>
+              <p className="text-xs text-slate-500 mt-2">
+                💡 Décrivez en quelques mots ce que contient votre fichier
+              </p>
             </div>
           </SubSection>
         )}
@@ -522,27 +606,44 @@ export default function AddResourcePage() {
             <div className="text-sm text-blue-800">
               <strong>Original sauvegardé.</strong> Vous retrouverez{' '}
               <span className="font-mono text-xs">{uploadedFile.fileName}</span> dans votre{' '}
-              <a href="/enseignant/bibliotheque" className="font-bold underline">bibliothèque</a>.
+              <a href="/enseignant/bibliotheque" className="font-bold underline">
+                bibliothèque
+              </a>
+              .
             </div>
           </div>
         )}
       </Section>
 
       {/* ============================ STEP 2: CLASSE / SECTION / MATIÈRE ============================ */}
-      <Section step={3} title="Classe, section & matière" icon={<GraduationCap className="w-4 h-4" />}>
+      <Section
+        step={3}
+        title="Classe, section & matière"
+        icon={<GraduationCap className="w-4 h-4" />}
+      >
         <div className="space-y-4">
           <div>
-            <Label>Classe <Required /></Label>
-            <select value={classSlug} onChange={e => setClassSlug(e.target.value)} className="input">
+            <Label>
+              Classe <Required />
+            </Label>
+            <select
+              value={classSlug}
+              onChange={(e) => setClassSlug(e.target.value)}
+              className="input"
+            >
               <option value="">— Choisir une classe —</option>
               <optgroup label="Collège">
-                {CLASSES.filter(c => c.level === 'college').map(c => (
-                  <option key={c.slug} value={c.slug}>{c.name}</option>
+                {CLASSES.filter((c) => c.level === 'college').map((c) => (
+                  <option key={c.slug} value={c.slug}>
+                    {c.name}
+                  </option>
                 ))}
               </optgroup>
               <optgroup label="Lycée">
-                {CLASSES.filter(c => c.level === 'lycee').map(c => (
-                  <option key={c.slug} value={c.slug}>{c.name}</option>
+                {CLASSES.filter((c) => c.level === 'lycee').map((c) => (
+                  <option key={c.slug} value={c.slug}>
+                    {c.name}
+                  </option>
                 ))}
               </optgroup>
             </select>
@@ -554,16 +655,26 @@ export default function AddResourcePage() {
                 <div className="p-3 rounded-lg bg-violet-50 border border-violet-200 flex items-start gap-2">
                   <Info className="w-4 h-4 text-violet-600 flex-shrink-0 mt-0.5" />
                   <div className="text-sm text-violet-800">
-                    <strong>{CLASSES.find(c => c.slug === classSlug)?.name}</strong> est un tronc commun — toutes les matières sont enseignées à tous les élèves, sans distinction de section.
+                    <strong>{CLASSES.find((c) => c.slug === classSlug)?.name}</strong> est un tronc
+                    commun — toutes les matières sont enseignées à tous les élèves, sans distinction
+                    de section.
                   </div>
                 </div>
               ) : (
                 <div>
-                  <Label>Section <Required /></Label>
-                  <select value={sectionSlug} onChange={e => setSectionSlug(e.target.value)} className="input">
+                  <Label>
+                    Section <Required />
+                  </Label>
+                  <select
+                    value={sectionSlug}
+                    onChange={(e) => setSectionSlug(e.target.value)}
+                    className="input"
+                  >
                     <option value="">— Choisir une section —</option>
-                    {sections.map(s => (
-                      <option key={s.slug} value={s.slug}>{s.name}</option>
+                    {sections.map((s) => (
+                      <option key={s.slug} value={s.slug}>
+                        {s.name}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -573,15 +684,25 @@ export default function AddResourcePage() {
 
           {classSlug && (isTronc || sectionSlug) && (
             <div>
-              <Label>Matière <Required /></Label>
-              <select value={subjectSlug} onChange={e => setSubjectSlug(e.target.value)} className="input">
+              <Label>
+                Matière <Required />
+              </Label>
+              <select
+                value={subjectSlug}
+                onChange={(e) => setSubjectSlug(e.target.value)}
+                className="input"
+              >
                 <option value="">— Choisir une matière —</option>
-                {subjects.map(s => (
-                  <option key={s.slug} value={s.slug}>{s.name}</option>
+                {subjects.map((s) => (
+                  <option key={s.slug} value={s.slug}>
+                    {s.name}
+                  </option>
                 ))}
               </select>
               {subjects.length === 0 && (
-                <p className="text-xs text-amber-600 mt-1">⚠️ Aucune matière disponible pour cette combinaison</p>
+                <p className="text-xs text-amber-600 mt-1">
+                  ⚠️ Aucune matière disponible pour cette combinaison
+                </p>
               )}
             </div>
           )}
@@ -592,16 +713,30 @@ export default function AddResourcePage() {
       <Section step={4} title="Année scolaire & école" icon={<Calendar className="w-4 h-4" />}>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <Label>Année scolaire <Required /></Label>
-            <select value={schoolYear} onChange={e => setSchoolYear(e.target.value)} className="input">
-              {SCHOOL_YEARS.map(y => (
-                <option key={y} value={y}>{y}</option>
+            <Label>
+              Année scolaire <Required />
+            </Label>
+            <select
+              value={schoolYear}
+              onChange={(e) => setSchoolYear(e.target.value)}
+              className="input"
+            >
+              {SCHOOL_YEARS.map((y) => (
+                <option key={y} value={y}>
+                  {y}
+                </option>
               ))}
             </select>
           </div>
           <div>
-            <Label>Trimestre <span className="text-xs text-slate-400 font-normal">(optionnel)</span></Label>
-            <select value={trimester} onChange={e => setTrimester(e.target.value)} className="input">
+            <Label>
+              Trimestre <span className="text-xs text-slate-400 font-normal">(optionnel)</span>
+            </Label>
+            <select
+              value={trimester}
+              onChange={(e) => setTrimester(e.target.value)}
+              className="input"
+            >
               <option value="">— Non spécifié —</option>
               <option value="T1">1er trimestre</option>
               <option value="T2">2ème trimestre</option>
@@ -612,7 +747,7 @@ export default function AddResourcePage() {
         <div className="mt-4">
           <Label>Type d'école</Label>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {SCHOOL_TYPES.map(st => {
+            {SCHOOL_TYPES.map((st) => {
               const active = schoolType === st.key;
               return (
                 <button
@@ -640,10 +775,12 @@ export default function AddResourcePage() {
       {/* ============================ STEP 4: OPTIONNEL ============================ */}
       <Section step={5} title="Détails optionnels" icon={<Info className="w-4 h-4" />}>
         <div>
-          <Label>Description <span className="text-xs text-slate-400 font-normal">(optionnel)</span></Label>
+          <Label>
+            Description <span className="text-xs text-slate-400 font-normal">(optionnel)</span>
+          </Label>
           <textarea
             value={description}
-            onChange={e => setDescription(e.target.value)}
+            onChange={(e) => setDescription(e.target.value)}
             className="input min-h-[80px] resize-none"
             placeholder="Décrivez votre ressource..."
             maxLength={500}
@@ -651,12 +788,18 @@ export default function AddResourcePage() {
         </div>
         <div>
           <Label>
-            Tags <span className="text-xs text-slate-400 font-normal">(séparés par des virgules — suggestions automatiques)</span>
+            Tags{' '}
+            <span className="text-xs text-slate-400 font-normal">
+              (séparés par des virgules — suggestions automatiques)
+            </span>
           </Label>
           <input
             type="text"
             value={tags}
-            onChange={e => { setTags(e.target.value); setTagsManuallyEdited(true); }}
+            onChange={(e) => {
+              setTags(e.target.value);
+              setTagsManuallyEdited(true);
+            }}
             className="input"
             placeholder="math, bac, 2024, fonction"
           />
@@ -664,15 +807,24 @@ export default function AddResourcePage() {
             <div className="mt-2">
               <div className="text-xs text-slate-500 mb-1.5 flex items-center gap-1">
                 <Sparkles className="w-3 h-3 text-violet-500" />
-                <span>{tagsManuallyEdited ? 'Suggestions (cliquez pour ajouter)' : 'Auto-générés depuis le formulaire'}</span>
+                <span>
+                  {tagsManuallyEdited
+                    ? 'Suggestions (cliquez pour ajouter)'
+                    : 'Auto-générés depuis le formulaire'}
+                </span>
               </div>
               <div className="flex flex-wrap gap-1.5">
-                {suggestedTags.map(t => (
+                {suggestedTags.map((t) => (
                   <button
                     key={t}
                     type="button"
                     onClick={() => {
-                      const current = tags ? tags.split(',').map((s: string) => s.trim()).filter(Boolean) : [];
+                      const current = tags
+                        ? tags
+                            .split(',')
+                            .map((s: string) => s.trim())
+                            .filter(Boolean)
+                        : [];
                       if (!current.includes(t)) {
                         setTags([...current, t].join(', '));
                         setTagsManuallyEdited(true);
@@ -694,7 +846,7 @@ export default function AddResourcePage() {
             <input
               type="checkbox"
               checked={hasCorrection}
-              onChange={e => setHasCorrection(e.target.checked)}
+              onChange={(e) => setHasCorrection(e.target.checked)}
               className="mt-1 w-5 h-5 rounded text-emerald-600 focus:ring-emerald-500"
             />
             <div className="flex-1">
@@ -706,7 +858,8 @@ export default function AddResourcePage() {
                 </span>
               </div>
               <p className="text-xs text-emerald-700 mt-1">
-                Cochez si votre PDF inclut le corrigé détaillé. Un badge vert proéminent sera affiché.
+                Cochez si votre PDF inclut le corrigé détaillé. Un badge vert proéminent sera
+                affiché.
               </p>
             </div>
           </label>
@@ -715,7 +868,7 @@ export default function AddResourcePage() {
               <Label>Description du corrigé</Label>
               <textarea
                 value={correctionSummary}
-                onChange={e => setCorrectionSummary(e.target.value)}
+                onChange={(e) => setCorrectionSummary(e.target.value)}
                 className="input min-h-[60px] resize-none text-sm"
                 placeholder="Ex: Corrigé détaillé des exercices 1 à 4 avec barème..."
                 maxLength={500}
@@ -731,26 +884,32 @@ export default function AddResourcePage() {
           {/* Title preview */}
           {generatedTitle && (
             <div className="p-4 rounded-xl bg-gradient-to-br from-violet-50 to-amber-50 border-2 border-violet-200">
-              <div className="text-xs font-bold text-violet-600 uppercase tracking-wide mb-1">📋 Titre généré</div>
+              <div className="text-xs font-bold text-violet-600 uppercase tracking-wide mb-1">
+                📋 Titre généré
+              </div>
               <div className="text-lg font-bold text-slate-900">{generatedTitle}</div>
               <div className="mt-2 flex flex-wrap gap-2 text-xs">
                 {subjectSlug && (
                   <span className="inline-flex items-center gap-1 bg-white border border-violet-200 rounded-full px-2.5 py-1 text-violet-700">
-                    <BookOpen className="w-3 h-3" />{subjects.find(s => s.slug === subjectSlug)?.name}
+                    <BookOpen className="w-3 h-3" />
+                    {subjects.find((s) => s.slug === subjectSlug)?.name}
                   </span>
                 )}
                 {classSlug && (
                   <span className="inline-flex items-center gap-1 bg-white border border-violet-200 rounded-full px-2.5 py-1 text-violet-700">
-                    <GraduationCap className="w-3 h-3" />{CLASSES.find(c => c.slug === classSlug)?.name}
+                    <GraduationCap className="w-3 h-3" />
+                    {CLASSES.find((c) => c.slug === classSlug)?.name}
                   </span>
                 )}
                 {sectionSlug && (
                   <span className="inline-flex items-center gap-1 bg-white border border-violet-200 rounded-full px-2.5 py-1 text-violet-700">
-                    <Layers className="w-3 h-3" />{sections.find(s => s.slug === sectionSlug)?.name}
+                    <Layers className="w-3 h-3" />
+                    {sections.find((s) => s.slug === sectionSlug)?.name}
                   </span>
                 )}
                 <span className="inline-flex items-center gap-1 bg-white border border-violet-200 rounded-full px-2.5 py-1 text-violet-700">
-                  <Calendar className="w-3 h-3" />{schoolYear}
+                  <Calendar className="w-3 h-3" />
+                  {schoolYear}
                 </span>
                 {trimester && (
                   <span className="inline-flex items-center gap-1 bg-white border border-violet-200 rounded-full px-2.5 py-1 text-violet-700">
@@ -759,7 +918,8 @@ export default function AddResourcePage() {
                 )}
                 {hasCorrection && (
                   <span className="inline-flex items-center gap-1 bg-emerald-100 border border-emerald-300 rounded-full px-2.5 py-1 text-emerald-700">
-                    <CheckCircle2 className="w-3 h-3" />Avec corrigé
+                    <CheckCircle2 className="w-3 h-3" />
+                    Avec corrigé
                   </span>
                 )}
               </div>
@@ -789,9 +949,12 @@ export default function AddResourcePage() {
                   <span className="text-amber-700">⚠️ Conversion échouée. Ré-uploadez en PDF.</span>
                 ) : (
                   <span>
-                    ✅ Fichier <span className="font-bold text-slate-900">{uploadedFile.fileName}</span> prêt
+                    ✅ Fichier{' '}
+                    <span className="font-bold text-slate-900">{uploadedFile.fileName}</span> prêt
                     {uploadedFile.originalFormat !== 'pdf' && (
-                      <span className="ml-1 text-blue-600">(original {uploadedFile.originalFormat.toUpperCase()})</span>
+                      <span className="ml-1 text-blue-600">
+                        (original {uploadedFile.originalFormat.toUpperCase()})
+                      </span>
                     )}
                   </span>
                 )
@@ -804,7 +967,7 @@ export default function AddResourcePage() {
                 type="button"
                 onClick={() => {
                   setUploadedFile(null);
-                  setResetKey(k => k + 1);
+                  setResetKey((k) => k + 1);
                 }}
                 className="px-4 py-2.5 rounded-lg border border-slate-200 font-semibold text-slate-700 hover:bg-slate-50"
               >
@@ -816,9 +979,13 @@ export default function AddResourcePage() {
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-violet-600 to-purple-600 text-white font-bold shadow-lg hover:shadow-xl hover:scale-[1.02] transition disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
                 {submitting ? (
-                  <><Loader2 className="w-4 h-4 animate-spin" /> Publication...</>
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" /> Publication...
+                  </>
                 ) : (
-                  <><CheckCircle className="w-4 h-4" /> Publier la ressource</>
+                  <>
+                    <CheckCircle className="w-4 h-4" /> Publier la ressource
+                  </>
                 )}
               </button>
             </div>
@@ -832,29 +999,48 @@ export default function AddResourcePage() {
 // ============================================================================
 // UI HELPERS
 // ============================================================================
-function Section({ step, title, icon, children }: { step: number; title: string; icon: React.ReactNode; children: React.ReactNode }) {
+function Section({
+  step,
+  title,
+  icon,
+  children,
+}: {
+  step: number;
+  title: string;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+}) {
   return (
     <div>
       <div className="flex items-center gap-2 mb-3">
         <span className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-600 to-purple-600 text-white font-extrabold text-sm flex items-center justify-center shadow-md">
           {step}
         </span>
-        <h2 className="font-bold text-lg flex items-center gap-1.5">{icon}{title}</h2>
+        <h2 className="font-bold text-lg flex items-center gap-1.5">
+          {icon}
+          {title}
+        </h2>
       </div>
-      <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-4">
-        {children}
-      </div>
+      <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-4">{children}</div>
     </div>
   );
 }
 
-function SubSection({ title, tone, children }: { title: string; tone: string; children: React.ReactNode }) {
+function SubSection({
+  title,
+  tone,
+  children,
+}: {
+  title: string;
+  tone: string;
+  children: React.ReactNode;
+}) {
   const toneClass: Record<string, string> = {
-    amber:   'bg-amber-50 border-amber-200',
+    amber: 'bg-amber-50 border-amber-200',
     emerald: 'bg-emerald-50 border-emerald-200',
-    violet:  'bg-violet-50 border-violet-200',
-    sky:     'bg-sky-50 border-sky-200',
-    slate:   'bg-slate-50 border-slate-200',
+    violet: 'bg-violet-50 border-violet-200',
+    sky: 'bg-sky-50 border-sky-200',
+    slate: 'bg-slate-50 border-slate-200',
   };
   return (
     <div className={`p-4 rounded-xl border ${toneClass[tone] || toneClass.slate} space-y-3`}>
@@ -865,9 +1051,7 @@ function SubSection({ title, tone, children }: { title: string; tone: string; ch
 }
 
 function Label({ children }: { children: React.ReactNode }) {
-  return (
-    <label className="block text-sm font-semibold text-slate-700 mb-1.5">{children}</label>
-  );
+  return <label className="block text-sm font-semibold text-slate-700 mb-1.5">{children}</label>;
 }
 
 function Required() {

@@ -12,7 +12,7 @@ export async function getUserFavorites(resourceIds: string[]): Promise<Set<strin
     where: { userId: user.id, resourceId: { in: resourceIds } },
     select: { resourceId: true },
   });
-  return new Set(favs.map(f => f.resourceId));
+  return new Set(favs.map((f) => f.resourceId));
 }
 
 /**
@@ -20,9 +20,9 @@ export async function getUserFavorites(resourceIds: string[]): Promise<Set<strin
  */
 export function decorateWithFavorites<T extends { id: string }>(
   resources: T[],
-  favoriteIds: Set<string>
+  favoriteIds: Set<string>,
 ): (T & { isFavorited: boolean })[] {
-  return resources.map(r => ({
+  return resources.map((r) => ({
     ...r,
     isFavorited: favoriteIds.has(r.id),
   }));

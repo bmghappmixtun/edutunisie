@@ -4,10 +4,23 @@ import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 import {
-  ZoomIn, ZoomOut, Maximize2, Minimize2,
-  ChevronLeft, ChevronRight, Download,
-  Loader2, AlertCircle, RefreshCw, FileWarning,
-  Maximize, Minimize, Search, X, Copy, Check
+  ZoomIn,
+  ZoomOut,
+  Maximize2,
+  Minimize2,
+  ChevronLeft,
+  ChevronRight,
+  Download,
+  Loader2,
+  AlertCircle,
+  RefreshCw,
+  FileWarning,
+  Maximize,
+  Minimize,
+  Search,
+  X,
+  Copy,
+  Check,
 } from 'lucide-react';
 
 // ============================================================================
@@ -108,7 +121,7 @@ export default function PDFViewer({
   fileName,
   initialPage = 1,
   onDownload,
-  className = ''
+  className = '',
 }: PDFViewerProps) {
   // ==========================================================================
   // State
@@ -125,7 +138,9 @@ export default function PDFViewer({
   const [loading, setLoading] = useState(true);
   const [containerWidth, setContainerWidth] = useState<number>(800);
   const [containerHeight, setContainerHeight] = useState<number>(600);
-  const [pageNaturalSize, setPageNaturalSize] = useState<{ width: number; height: number } | null>(null);
+  const [pageNaturalSize, setPageNaturalSize] = useState<{ width: number; height: number } | null>(
+    null,
+  );
 
   // Layer enablement — auto-disabled on error
   const [textLayerEnabled, setTextLayerEnabled] = useState(true);
@@ -135,7 +150,10 @@ export default function PDFViewer({
   // Search & copy
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<{ count: number; active: number }>({ count: 0, active: 0 });
+  const [searchResults, setSearchResults] = useState<{ count: number; active: number }>({
+    count: 0,
+    active: 0,
+  });
   const [copySuccess, setCopySuccess] = useState(false);
 
   // Worker error tracking
@@ -233,12 +251,12 @@ export default function PDFViewer({
         case 'PageDown':
         case ' ':
           e.preventDefault();
-          setPageNumber(p => Math.min(numPages, p + 1));
+          setPageNumber((p) => Math.min(numPages, p + 1));
           break;
         case 'ArrowLeft':
         case 'PageUp':
           e.preventDefault();
-          setPageNumber(p => Math.max(1, p - 1));
+          setPageNumber((p) => Math.max(1, p - 1));
           break;
         case '+':
         case '=':
@@ -278,7 +296,7 @@ export default function PDFViewer({
   useEffect(() => {
     if (!searchOpen) {
       const marks = document.querySelectorAll('.pdf-search-mark, .pdf-search-current');
-      marks.forEach(m => {
+      marks.forEach((m) => {
         const parent = m.parentNode;
         if (parent) {
           parent.replaceChild(document.createTextNode(m.textContent || ''), m);
@@ -303,7 +321,7 @@ export default function PDFViewer({
       const matches = text.match(regex);
       setSearchResults({
         count: matches?.length || 0,
-        active: 1
+        active: 1,
       });
     }, 500);
     return () => clearTimeout(timer);
@@ -326,12 +344,12 @@ export default function PDFViewer({
 
   const zoomIn = useCallback(() => {
     setFitMode('manual');
-    setScale(s => Math.min(MAX_SCALE, +(s + SCALE_STEP).toFixed(2)));
+    setScale((s) => Math.min(MAX_SCALE, +(s + SCALE_STEP).toFixed(2)));
   }, []);
 
   const zoomOut = useCallback(() => {
     setFitMode('manual');
-    setScale(s => Math.max(MIN_SCALE, +(s - SCALE_STEP).toFixed(2)));
+    setScale((s) => Math.max(MIN_SCALE, +(s - SCALE_STEP).toFixed(2)));
   }, []);
 
   const fitToWidth = useCallback(() => {
@@ -343,11 +361,11 @@ export default function PDFViewer({
   }, []);
 
   const prevPage = useCallback(() => {
-    setPageNumber(p => Math.max(1, p - 1));
+    setPageNumber((p) => Math.max(1, p - 1));
   }, []);
 
   const nextPage = useCallback(() => {
-    setPageNumber(p => Math.min(numPages || 1, p + 1));
+    setPageNumber((p) => Math.min(numPages || 1, p + 1));
   }, [numPages]);
 
   const onLoadSuccess = useCallback(({ numPages: n }: { numPages: number }) => {
@@ -413,7 +431,9 @@ export default function PDFViewer({
   // Render
   // ==========================================================================
   return (
-    <div className={`bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm ${className}`}>
+    <div
+      className={`bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm ${className}`}
+    >
       {/* Toolbar */}
       <div className="pdf-viewer-toolbar bg-slate-900 text-white px-2 sm:px-3 py-2 flex items-center justify-between gap-1 sm:gap-2 flex-wrap">
         {/* Page navigation */}
@@ -499,7 +519,11 @@ export default function PDFViewer({
             title="Ajuster à la page"
             aria-label="Ajuster à la page"
           >
-            {fitMode === 'page' ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
+            {fitMode === 'page' ? (
+              <Minimize className="w-4 h-4" />
+            ) : (
+              <Maximize className="w-4 h-4" />
+            )}
           </button>
         </div>
 
@@ -507,7 +531,7 @@ export default function PDFViewer({
         <div className="flex items-center gap-1">
           <button
             type="button"
-            onClick={() => setSearchOpen(o => !o)}
+            onClick={() => setSearchOpen((o) => !o)}
             className={`p-2 hover:bg-white/10 rounded-lg transition ${searchOpen ? 'bg-white/20' : ''}`}
             title="Rechercher dans le PDF (Ctrl+F)"
             aria-label="Rechercher"
@@ -521,7 +545,11 @@ export default function PDFViewer({
             title="Copier la sélection"
             aria-label="Copier"
           >
-            {copySuccess ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+            {copySuccess ? (
+              <Check className="w-4 h-4 text-emerald-400" />
+            ) : (
+              <Copy className="w-4 h-4" />
+            )}
           </button>
           <button
             type="button"
@@ -553,7 +581,7 @@ export default function PDFViewer({
           <input
             type="search"
             value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
+            onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Rechercher dans cette page..."
             className="flex-1 bg-transparent outline-none text-sm placeholder-slate-400"
             autoFocus
@@ -565,7 +593,10 @@ export default function PDFViewer({
           )}
           <button
             type="button"
-            onClick={() => { setSearchOpen(false); setSearchQuery(''); }}
+            onClick={() => {
+              setSearchOpen(false);
+              setSearchQuery('');
+            }}
             className="p-1 hover:bg-white/10 rounded transition"
             aria-label="Fermer la recherche"
           >
@@ -594,7 +625,7 @@ export default function PDFViewer({
         // - Fullscreen: 100vh
         style={{
           height: isFullscreen ? '100vh' : '95vh',
-          minHeight: '800px'
+          minHeight: '800px',
         }}
         // Mobile-friendly touch + swipe handlers (see useEffect below for the gesture)
         onTouchStart={(e) => {
@@ -621,10 +652,10 @@ export default function PDFViewer({
           if (isHorizontalSwipe && isFastEnough) {
             if (dx < 0) {
               // Swipe left → next page
-              setPageNumber(p => Math.min(numPages, p + 1));
+              setPageNumber((p) => Math.min(numPages, p + 1));
             } else {
               // Swipe right → previous page
-              setPageNumber(p => Math.max(1, p - 1));
+              setPageNumber((p) => Math.max(1, p - 1));
             }
           }
           touchStartRef.current = null;
@@ -652,10 +683,7 @@ export default function PDFViewer({
             </div>
           </div>
         ) : (
-          <div
-            ref={scrollRef}
-            className="flex justify-center items-start min-h-full p-4"
-          >
+          <div ref={scrollRef} className="flex justify-center items-start min-h-full p-4">
             <DocumentErrorBoundary onError={setError}>
               <Document
                 file={url}
@@ -674,7 +702,9 @@ export default function PDFViewer({
                   <div className="flex items-center justify-center min-h-[500px]">
                     <div className="text-center max-w-md p-6">
                       <FileWarning className="w-10 h-10 mx-auto mb-2 text-red-500" />
-                      <p className="text-sm text-slate-600 mb-3">Erreur de chargement du document</p>
+                      <p className="text-sm text-slate-600 mb-3">
+                        Erreur de chargement du document
+                      </p>
                       <a
                         href={url}
                         target="_blank"
@@ -688,14 +718,8 @@ export default function PDFViewer({
                 }
                 externalLinkTarget="_blank"
               >
-                <PageLayerBoundary
-                  onLayerError={onTextLayerError}
-                  label="text"
-                >
-                  <PageLayerBoundary
-                    onLayerError={onAnnotationLayerError}
-                    label="annotation"
-                  >
+                <PageLayerBoundary onLayerError={onTextLayerError} label="text">
+                  <PageLayerBoundary onLayerError={onAnnotationLayerError} label="annotation">
                     <Page
                       pageNumber={pageNumber}
                       scale={scale}
@@ -728,12 +752,18 @@ export default function PDFViewer({
       {/* Status bar */}
       {numPages && !error && (
         <div className="bg-slate-50 border-t border-slate-200 px-3 py-1.5 flex items-center justify-center gap-3 text-xs text-slate-500">
-          <span>📄 {numPages} page{numPages > 1 ? 's' : ''}</span>
+          <span>
+            📄 {numPages} page{numPages > 1 ? 's' : ''}
+          </span>
           <span className="text-slate-300">|</span>
-          <span>Page {pageNumber} sur {numPages}</span>
+          <span>
+            Page {pageNumber} sur {numPages}
+          </span>
           <span className="text-slate-300">|</span>
           <span className="font-mono">
-            {fitMode === 'manual' ? `${Math.round(scale * 100)}%` : `Auto (${fitMode === 'width' ? 'largeur' : 'page'})`}
+            {fitMode === 'manual'
+              ? `${Math.round(scale * 100)}%`
+              : `Auto (${fitMode === 'width' ? 'largeur' : 'page'})`}
           </span>
           <span className="text-slate-300">|</span>
           <span className="hidden sm:inline">⌨️ ← → / +/- / 0 = auto / F = plein écran</span>

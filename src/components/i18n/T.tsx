@@ -18,7 +18,8 @@ export default function T({ k, vars }: { k: string; vars?: Record<string, string
 export function createT(locale: 'fr' | 'ar') {
   return function t(key: string, vars?: Record<string, string>): string {
     // Dynamic import to avoid bundling in client
-    const messages = locale === 'ar' ? require('@/messages/ar.json') : require('@/messages/fr.json');
+    const messages =
+      locale === 'ar' ? require('@/messages/ar.json') : require('@/messages/fr.json');
     const keys = key.split('.');
     let value: any = messages;
     for (const k of keys) {
@@ -28,7 +29,7 @@ export function createT(locale: 'fr' | 'ar') {
     if (!vars) return value;
     return Object.entries(vars).reduce(
       (acc, [k, v]) => acc.replace(new RegExp(`\\{${k}\\}`, 'g'), v),
-      value
+      value,
     );
   };
 }

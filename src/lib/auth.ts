@@ -5,9 +5,8 @@ import { prisma } from './prisma';
 // SECURITY: in production, use the __Secure- prefix to prevent cookie
 // injection over insecure channels (e.g. http://). The __Secure- prefix
 // requires Secure attribute, blocking any downgrades.
-const SESSION_COOKIE = process.env.NODE_ENV === 'production'
-  ? '__Secure-examanet_session'
-  : 'examanet_session';
+const SESSION_COOKIE =
+  process.env.NODE_ENV === 'production' ? '__Secure-examanet_session' : 'examanet_session';
 const SESSION_DURATION = 30 * 24 * 60 * 60 * 1000; // 30 days
 
 export async function hashPassword(password: string): Promise<string> {
@@ -22,7 +21,7 @@ export async function createSession(userId: string, userAgent?: string, ipAddres
   const token = crypto.randomUUID() + '-' + crypto.randomUUID();
   const expiresAt = new Date(Date.now() + SESSION_DURATION);
   await prisma.session.create({
-    data: { userId, token, userAgent, ipAddress, expiresAt }
+    data: { userId, token, userAgent, ipAddress, expiresAt },
   });
   return { token, expiresAt };
 }
@@ -34,7 +33,7 @@ export async function getSession() {
 
   const session = await prisma.session.findUnique({
     where: { token },
-    include: { user: true }
+    include: { user: true },
   });
   if (!session || session.expiresAt < new Date()) {
     return null;

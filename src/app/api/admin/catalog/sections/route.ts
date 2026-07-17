@@ -13,9 +13,9 @@ export async function GET() {
   const sections = await prisma.section.findMany({
     orderBy: [{ class: { order: 'asc' } }, { nameFr: 'asc' }],
     include: {
-      class: { select: { nameFr: true, slug: true, } },
-      _count: { select: { resources: true } }
-    }
+      class: { select: { nameFr: true, slug: true } },
+      _count: { select: { resources: true } },
+    },
   });
 
   return NextResponse.json({ sections });
@@ -38,13 +38,16 @@ export async function POST(req: NextRequest) {
         slug: slug.toLowerCase().trim(),
         nameFr: nameFr.trim(),
         nameAr: nameAr.trim(),
-        classId
-      }
+        classId,
+      },
     });
     return NextResponse.json({ success: true, section });
   } catch (e: any) {
     if (e.message?.includes('Unique')) {
-      return NextResponse.json({ error: 'Cette section existe déjà pour cette classe' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Cette section existe déjà pour cette classe' },
+        { status: 400 },
+      );
     }
     return NextResponse.json({ error: e.message }, { status: 500 });
   }

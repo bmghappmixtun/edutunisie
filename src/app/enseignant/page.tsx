@@ -2,14 +2,27 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
-import { FileText, Eye, Download, Star, Clock, TrendingUp, Upload, AlertCircle, CheckCircle } from 'lucide-react';
+import {
+  FileText,
+  Eye,
+  Download,
+  Star,
+  Clock,
+  TrendingUp,
+  Upload,
+  AlertCircle,
+  CheckCircle,
+} from 'lucide-react';
 import { formatNumber, timeAgo } from '@/lib/utils';
 import { isArabic } from '@/lib/text-utils';
 import VerificationFilesUploader from '@/components/teacher/VerificationFilesUploader';
 
 export const dynamic = 'force-dynamic';
 
-export default async function TeacherDashboard(props: { params: Promise<any>; searchParams: Promise<any> }) {
+export default async function TeacherDashboard(props: {
+  params: Promise<any>;
+  searchParams: Promise<any>;
+}) {
   const sp = await props.searchParams;
   const user = await getCurrentUser();
   if (!user) redirect('/connexion');
@@ -24,7 +37,7 @@ export default async function TeacherDashboard(props: { params: Promise<any>; se
       verificationFilesCount: true,
       verificationFilesNote: true,
       verificationFilesReceivedAt: true,
-    }
+    },
   });
   const needsVerification = fullUser?.status === 'PENDING_FILE_VERIFICATION';
 
@@ -46,22 +59,24 @@ export default async function TeacherDashboard(props: { params: Promise<any>; se
       where: { teacherId: user.id },
       take: 5,
       orderBy: { createdAt: 'desc' },
-      include: { subject: true }
-    })
+      include: { subject: true },
+    }),
   ]);
 
   const allPublished = await prisma.resource.findMany({
     where: { teacherId: user.id, status: 'PUBLISHED' },
-    select: { viewsCount: true, downloadsCount: true, avgRating: true }
+    select: { viewsCount: true, downloadsCount: true, avgRating: true },
   });
 
   const totalViews = allPublished.reduce((s, r) => s + r.viewsCount, 0);
   const totalDownloads = allPublished.reduce((s, r) => s + r.downloadsCount, 0);
-  const avgRating = allPublished.length ? allPublished.reduce((s, r) => s + r.avgRating, 0) / allPublished.length : 0;
+  const avgRating = allPublished.length
+    ? allPublished.reduce((s, r) => s + r.avgRating, 0) / allPublished.length
+    : 0;
 
   const pendingResources = await prisma.resource.findMany({
     where: { teacherId: user.id, status: 'PENDING_APPROVAL' },
-    include: { subject: true }
+    include: { subject: true },
   });
 
   return (
@@ -84,14 +99,15 @@ export default async function TeacherDashboard(props: { params: Promise<any>; se
               </div>
               <p className="text-sm text-slate-700 leading-relaxed">
                 Pour finaliser la vérification de votre compte enseignant, merci de nous envoyer
-                <strong> 5 fichiers Word/PDF</strong> parmi vos productions (cours, séries, devoirs, corrigés).
-                Chaque fichier doit contenir <strong>votre nom et prénom</strong> ({user.firstName} {user.lastName}).
+                <strong> 5 fichiers Word/PDF</strong> parmi vos productions (cours, séries, devoirs,
+                corrigés). Chaque fichier doit contenir <strong>votre nom et prénom</strong> (
+                {user.firstName} {user.lastName}).
               </p>
             </div>
           </div>
 
           <VerificationFilesUploader
-            initialFiles={verificationFiles.map(f => ({
+            initialFiles={verificationFiles.map((f) => ({
               id: f.id,
               fileName: f.fileName,
               originalFormat: f.originalFormat,
@@ -114,17 +130,29 @@ export default async function TeacherDashboard(props: { params: Promise<any>; se
 
       {showWelcome && (
         <div className="mb-6 bg-gradient-to-r from-sky-50 to-cyan-50 border-2 border-sky-200 rounded-2xl p-5 flex items-start gap-4">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-500 to-cyan-600 text-white flex items-center justify-center text-2xl flex-shrink-0">🎉</div>
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-500 to-cyan-600 text-white flex items-center justify-center text-2xl flex-shrink-0">
+            🎉
+          </div>
           <div className="flex-1">
             <h2 className="font-extrabold text-lg text-slate-900 mb-1">
               Bienvenue sur Examanet, {user.firstName} !
             </h2>
             <p className="text-sm text-slate-700 leading-relaxed">
               Votre compte enseignant est activé. Vous retrouvez ci-dessous tous vos fichiers.
-              <strong className="text-sky-700"> {totalResources} {totalResources > 1 ? 'ressources sont déjà en ligne' : 'ressource est déjà en ligne'}</strong> sur la plateforme.
-              N'hésitez pas à explorer les statistiques et à modifier vos fichiers à tout moment.
+              <strong className="text-sky-700">
+                {' '}
+                {totalResources}{' '}
+                {totalResources > 1
+                  ? 'ressources sont déjà en ligne'
+                  : 'ressource est déjà en ligne'}
+              </strong>{' '}
+              sur la plateforme. N'hésitez pas à explorer les statistiques et à modifier vos
+              fichiers à tout moment.
             </p>
-            <a href="/enseignant/bibliotheque" className="inline-flex items-center gap-1 mt-3 text-sm font-semibold text-sky-700 hover:text-sky-800">
+            <a
+              href="/enseignant/bibliotheque"
+              className="inline-flex items-center gap-1 mt-3 text-sm font-semibold text-sky-700 hover:text-sky-800"
+            >
               Voir ma bibliothèque →
             </a>
           </div>
@@ -142,18 +170,28 @@ export default async function TeacherDashboard(props: { params: Promise<any>; se
             title="Soumettez vos fichiers de vérification pour activer cette fonctionnalité"
           >
             <Upload className="w-4 h-4" /> Ajouter une ressource
-            <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">Vérification requise</span>
+            <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">
+              Vérification requise
+            </span>
           </span>
         )}
       </div>
 
       {/* Quick links to new features */}
       <div className="grid sm:grid-cols-1 gap-3 mb-6">
-        <Link href="/enseignant/bibliotheque" className="group flex items-center gap-3 p-4 rounded-xl bg-gradient-to-br from-blue-50 to-cyan-50 border-2 border-blue-200 hover:border-blue-400 transition">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-2xl shadow-md group-hover:scale-110 transition">📚</div>
+        <Link
+          href="/enseignant/bibliotheque"
+          className="group flex items-center gap-3 p-4 rounded-xl bg-gradient-to-br from-blue-50 to-cyan-50 border-2 border-blue-200 hover:border-blue-400 transition"
+        >
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-2xl shadow-md group-hover:scale-110 transition">
+            📚
+          </div>
           <div className="flex-1">
             <div className="font-bold text-slate-900">Ma bibliothèque personnelle</div>
-            <div className="text-xs text-slate-600">Vos fichiers Word (.docx) originaux, jamais perdus. Téléchargeables par tous les enseignants.</div>
+            <div className="text-xs text-slate-600">
+              Vos fichiers Word (.docx) originaux, jamais perdus. Téléchargeables par tous les
+              enseignants.
+            </div>
           </div>
           <span className="text-blue-500 group-hover:translate-x-1 transition">→</span>
         </Link>
@@ -162,14 +200,51 @@ export default async function TeacherDashboard(props: { params: Promise<any>; se
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-8">
         {[
-          { icon: FileText, value: totalResources, label: 'Total', color: 'from-slate-500 to-slate-600', bg: 'bg-slate-100', text: 'text-slate-600' },
-          { icon: CheckCircle, value: published, label: 'Publiés', color: 'from-emerald-500 to-emerald-600', bg: 'bg-emerald-100', text: 'text-emerald-600' },
-          { icon: Clock, value: pending, label: 'En attente', color: 'from-amber-500 to-amber-600', bg: 'bg-amber-100', text: 'text-amber-600' },
-          { icon: AlertCircle, value: rejected, label: 'Rejetés', color: 'from-red-500 to-red-600', bg: 'bg-red-100', text: 'text-red-600' },
-          { icon: Eye, value: totalViews, label: 'Vues totales', color: 'from-primary-500 to-primary-600', bg: 'bg-primary-100', text: 'text-primary-600' },
+          {
+            icon: FileText,
+            value: totalResources,
+            label: 'Total',
+            color: 'from-slate-500 to-slate-600',
+            bg: 'bg-slate-100',
+            text: 'text-slate-600',
+          },
+          {
+            icon: CheckCircle,
+            value: published,
+            label: 'Publiés',
+            color: 'from-emerald-500 to-emerald-600',
+            bg: 'bg-emerald-100',
+            text: 'text-emerald-600',
+          },
+          {
+            icon: Clock,
+            value: pending,
+            label: 'En attente',
+            color: 'from-amber-500 to-amber-600',
+            bg: 'bg-amber-100',
+            text: 'text-amber-600',
+          },
+          {
+            icon: AlertCircle,
+            value: rejected,
+            label: 'Rejetés',
+            color: 'from-red-500 to-red-600',
+            bg: 'bg-red-100',
+            text: 'text-red-600',
+          },
+          {
+            icon: Eye,
+            value: totalViews,
+            label: 'Vues totales',
+            color: 'from-primary-500 to-primary-600',
+            bg: 'bg-primary-100',
+            text: 'text-primary-600',
+          },
         ].map((s, i) => (
           <div key={i} className="bg-white rounded-xl p-4 border border-slate-100">
-            <div className={`w-8 h-8 rounded-lg ${s.bg} flex items-center justify-center mb-2`}><s.icon className={`w-4 h-4 ${s.text}`} /></div>
+            <div className={`w-8 h-8 rounded-lg ${s.bg} flex items-center justify-center mb-2`}>
+              <s.icon className={`w-4 h-4 ${s.text}`} />
+            </div>
             <div className="text-xl font-extrabold">{formatNumber(s.value)}</div>
             <div className="text-xs text-slate-500">{s.label}</div>
           </div>
@@ -179,7 +254,9 @@ export default async function TeacherDashboard(props: { params: Promise<any>; se
       <div className="grid lg:grid-cols-2 gap-6 mb-8">
         {/* Global stats */}
         <div className="bg-white rounded-2xl p-6 border border-slate-100">
-          <h2 className="font-bold text-lg mb-4 flex items-center gap-2"><TrendingUp className="w-5 h-5 text-primary-600" /> Performance globale</h2>
+          <h2 className="font-bold text-lg mb-4 flex items-center gap-2">
+            <TrendingUp className="w-5 h-5 text-primary-600" /> Performance globale
+          </h2>
           <div className="grid grid-cols-2 gap-4">
             <div className="text-center p-4 bg-slate-50 rounded-xl">
               <Download className="w-6 h-6 mx-auto mb-1 text-emerald-500" />
@@ -197,11 +274,19 @@ export default async function TeacherDashboard(props: { params: Promise<any>; se
         {/* Pending approval alert */}
         {pending > 0 && (
           <div className="bg-amber-50 rounded-2xl p-6 border border-amber-200">
-            <h2 className="font-bold text-lg mb-4 flex items-center gap-2"><Clock className="w-5 h-5 text-amber-600" /> Ressources en attente</h2>
-            <p className="text-sm text-amber-700 mb-3">Vos {pending} ressource{pending > 1 ? 's' : ''} sont en attente d'approbation par l'administrateur.</p>
+            <h2 className="font-bold text-lg mb-4 flex items-center gap-2">
+              <Clock className="w-5 h-5 text-amber-600" /> Ressources en attente
+            </h2>
+            <p className="text-sm text-amber-700 mb-3">
+              Vos {pending} ressource{pending > 1 ? 's' : ''} sont en attente d'approbation par
+              l'administrateur.
+            </p>
             <div className="space-y-2">
-              {pendingResources.map(r => (
-                <div key={r.id} className="flex items-center justify-between bg-white rounded-lg p-3">
+              {pendingResources.map((r) => (
+                <div
+                  key={r.id}
+                  className="flex items-center justify-between bg-white rounded-lg p-3"
+                >
                   <span
                     className={`text-sm font-medium truncate ${isArabic(r.title) ? 'text-right' : 'text-left'}`}
                     dir={isArabic(r.title) ? 'rtl' : 'ltr'}
@@ -209,7 +294,9 @@ export default async function TeacherDashboard(props: { params: Promise<any>; se
                   >
                     {r.title}
                   </span>
-                  <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded font-bold flex-shrink-0">En attente</span>
+                  <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded font-bold flex-shrink-0">
+                    En attente
+                  </span>
                 </div>
               ))}
             </div>
@@ -224,8 +311,12 @@ export default async function TeacherDashboard(props: { params: Promise<any>; se
           <p className="text-slate-500 text-sm">Aucune ressource. Ajoutez votre première !</p>
         ) : (
           <div className="space-y-3">
-            {recentResources.map(r => (
-              <Link key={r.id} href={`/ressources/${r.numericId}/${r.slug}`} className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 transition">
+            {recentResources.map((r) => (
+              <Link
+                key={r.id}
+                href={`/ressources/${r.numericId}/${r.slug}`}
+                className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 transition"
+              >
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-12 bg-slate-100 rounded flex items-center justify-center">
                     <FileText className="w-5 h-5 text-slate-400" />
@@ -238,18 +329,30 @@ export default async function TeacherDashboard(props: { params: Promise<any>; se
                     >
                       {r.title}
                     </div>
-                    <div className="text-xs text-slate-500">{r.subject.nameFr} · {timeAgo(r.createdAt)}</div>
+                    <div className="text-xs text-slate-500">
+                      {r.subject.nameFr} · {timeAgo(r.createdAt)}
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className={`px-2 py-1 text-xs font-bold rounded ${
-                    r.status === 'PUBLISHED' ? 'bg-emerald-100 text-emerald-700' :
-                    r.status === 'PENDING_APPROVAL' ? 'bg-amber-100 text-amber-700' :
-                    'bg-red-100 text-red-700'
-                  }`}>
-                    {r.status === 'PUBLISHED' ? '✓ Publié' : r.status === 'PENDING_APPROVAL' ? '⏳ En attente' : '✕ Rejeté'}
+                  <span
+                    className={`px-2 py-1 text-xs font-bold rounded ${
+                      r.status === 'PUBLISHED'
+                        ? 'bg-emerald-100 text-emerald-700'
+                        : r.status === 'PENDING_APPROVAL'
+                          ? 'bg-amber-100 text-amber-700'
+                          : 'bg-red-100 text-red-700'
+                    }`}
+                  >
+                    {r.status === 'PUBLISHED'
+                      ? '✓ Publié'
+                      : r.status === 'PENDING_APPROVAL'
+                        ? '⏳ En attente'
+                        : '✕ Rejeté'}
                   </span>
-                  <div className="text-xs text-slate-400 hidden sm:block">{formatNumber(r.viewsCount)} vues</div>
+                  <div className="text-xs text-slate-400 hidden sm:block">
+                    {formatNumber(r.viewsCount)} vues
+                  </div>
                 </div>
               </Link>
             ))}

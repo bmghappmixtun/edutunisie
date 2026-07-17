@@ -5,12 +5,17 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { getCurrentUser } from '@/lib/auth';
 import Link from 'next/link';
-import { LayoutDashboard, Heart, Settings, Bell, User } from 'lucide-react';
+import { LayoutDashboard, Heart, Settings, Bell } from 'lucide-react';
 
 // Student account pages should never be indexed
 export const metadata: Metadata = {
   title: 'Mon compte',
-  robots: { index: false, follow: false, nocache: true, googleBot: { index: false, follow: false } },
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+    googleBot: { index: false, follow: false },
+  },
 };
 
 export default async function AccountLayout({ children }: { children: React.ReactNode }) {
@@ -45,15 +50,25 @@ export default async function AccountLayout({ children }: { children: React.Reac
                   <div className="w-16 h-16 mx-auto rounded-full bg-white/20 flex items-center justify-center text-white font-extrabold text-2xl mb-2">
                     {initials}
                   </div>
-                  <div className="font-bold text-white">{user.firstName} {user.lastName}</div>
+                  <div className="font-bold text-white">
+                    {user.firstName} {user.lastName}
+                  </div>
                   <div className="text-xs text-primary-100">{user.email}</div>
                   <div className="mt-2 inline-block px-3 py-1 bg-white/20 text-white text-xs font-bold rounded-full">
-                    {user.role === 'TEACHER' ? '👨‍🏫 Enseignant' : user.role === 'ADMIN' ? '🛡️ Admin' : '👨‍🎓 Élève'}
+                    {user.role === 'TEACHER'
+                      ? '👨‍🏫 Enseignant'
+                      : user.role === 'ADMIN'
+                        ? '🛡️ Admin'
+                        : '👨‍🎓 Élève'}
                   </div>
                 </div>
                 <nav className="p-2">
-                  {navItems.map(item => (
-                    <Link key={item.href} href={item.href} className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-50 text-sm font-medium text-slate-700 transition">
+                  {navItems.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-50 text-sm font-medium text-slate-700 transition"
+                    >
                       <item.icon className="w-4 h-4" /> {item.label}
                     </Link>
                   ))}

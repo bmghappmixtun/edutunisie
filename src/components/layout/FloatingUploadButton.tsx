@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { Plus, Upload, Lock, X } from 'lucide-react';
+import { Upload, Lock } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 /**
@@ -19,14 +19,17 @@ export default function FloatingUploadButton() {
 
   useEffect(() => {
     // Auto-hide on the upload page itself
-    if (typeof window !== 'undefined' && window.location.pathname.startsWith('/enseignant/ajouter')) {
+    if (
+      typeof window !== 'undefined' &&
+      window.location.pathname.startsWith('/enseignant/ajouter')
+    ) {
       setHidden(true);
       return;
     }
     // Check user status
     fetch('/api/teacher/status')
-      .then(r => r.json())
-      .then(data => {
+      .then((r) => r.json())
+      .then((data) => {
         if (data?.canUpload) {
           setCanUpload(true);
         } else {

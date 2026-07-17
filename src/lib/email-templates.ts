@@ -1,10 +1,22 @@
 // Templates additionnels pour notifications admin
-import { renderEmailShell, EMAIL_FONT_STACK, paragraph, muted, ctaButton, infoCard } from './email-shell';
+import {
+  renderEmailShell,
+  EMAIL_FONT_STACK,
+  paragraph,
+  muted,
+  ctaButton,
+  infoCard,
+} from './email-shell';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
 const F = EMAIL_FONT_STACK;
 
-export function renderNewTeacherEmail(firstName: string, lastName: string, email: string, school: string | null): string {
+export function renderNewTeacherEmail(
+  firstName: string,
+  lastName: string,
+  email: string,
+  school: string | null,
+): string {
   const safeSchool = school ? school.replace(/</g, '&lt;').replace(/>/g, '&gt;') : null;
   return renderEmailShell({
     accent: 'amber',
@@ -14,7 +26,7 @@ export function renderNewTeacherEmail(firstName: string, lastName: string, email
     preheader: `Inscription de ${firstName} ${lastName}`,
     body: `
       <p style="margin:0 0 16px;font-size:16px;color:#0F172A;font-family:${F};">Bonjour Admin,</p>
-      ${paragraph('Un nouvel enseignant vient de s\'inscrire sur Examanet et attend votre approbation.')}
+      ${paragraph("Un nouvel enseignant vient de s'inscrire sur Examanet et attend votre approbation.")}
       <div style="background:#FEF3C7;border-left:4px solid #F59E0B;border-radius:8px;padding:16px;margin:20px 0;font-family:${F};">
         <p style="margin:0 0 8px;color:#92400E;font-weight:bold;">📋 Informations du compte</p>
         <p style="margin:4px 0;color:#78350F;font-size:14px;"><strong>Nom :</strong> ${firstName} ${lastName}</p>
@@ -28,7 +40,11 @@ export function renderNewTeacherEmail(firstName: string, lastName: string, email
   });
 }
 
-export function renderNewResourceEmail(teacherName: string, title: string, subject: string): string {
+export function renderNewResourceEmail(
+  teacherName: string,
+  title: string,
+  subject: string,
+): string {
   const safeTitle = title.replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const safeSubject = subject.replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const safeTeacher = teacherName.replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -56,7 +72,7 @@ export function renderResourceRejectedEmail(
   firstName: string,
   resourceTitle: string,
   reason: string,
-  resourceUrl?: string
+  resourceUrl?: string,
 ): string {
   const safeReason = (reason || 'Aucun motif fourni').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const safeTitle = resourceTitle.replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -68,7 +84,7 @@ export function renderResourceRejectedEmail(
     preheader: `Refusée : ${safeTitle.slice(0, 60)}`,
     body: `
       <p style="margin:0 0 16px;font-size:16px;color:#0F172A;font-family:${F};">Bonjour <strong style="color:#0F172A;">${firstName}</strong>,</p>
-      ${paragraph('Après examen, votre ressource n\'a malheureusement pas pu être validée en l\'état. Pas d\'inquiétude, c\'est tout à fait réversible !')}
+      ${paragraph("Après examen, votre ressource n'a malheureusement pas pu être validée en l'état. Pas d'inquiétude, c'est tout à fait réversible !")}
       ${infoCard('Ressource concernée', safeTitle, 'red')}
       <div style="background:#FEF2F2;border-left:4px solid #EF4444;border-radius:0 12px 12px 0;padding:20px;margin:0 0 24px;font-family:${F};">
         <div style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#B91C1C;margin-bottom:8px;">💬 Motif du refus</div>
@@ -83,7 +99,7 @@ export function renderResourceRejectedEmail(
           <li>Soumettez à nouveau votre ressource</li>
         </ul>
       </div>
-      ${muted('Besoin d\'aide ? Répondez simplement à cet email, notre équipe vous accompagnera volontiers.')}
+      ${muted("Besoin d'aide ? Répondez simplement à cet email, notre équipe vous accompagnera volontiers.")}
     `,
   });
 }
@@ -91,7 +107,7 @@ export function renderResourceRejectedEmail(
 export function renderEditApprovedEmail(
   firstName: string,
   resourceTitle: string,
-  resourceUrl: string
+  resourceUrl: string,
 ): string {
   const safeTitle = resourceTitle.replace(/</g, '&lt;').replace(/>/g, '&gt;');
   return renderEmailShell({
@@ -114,7 +130,7 @@ export function renderEditRejectedEmail(
   firstName: string,
   resourceTitle: string,
   reason: string,
-  resourceUrl: string
+  resourceUrl: string,
 ): string {
   const safeTitle = resourceTitle.replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const safeReason = (reason || 'Aucun motif fourni').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -126,7 +142,7 @@ export function renderEditRejectedEmail(
     preheader: `Refusée : ${safeTitle.slice(0, 60)}`,
     body: `
       <p style="margin:0 0 16px;font-size:16px;color:#0F172A;font-family:${F};">Bonjour <strong style="color:#0F172A;">${firstName}</strong>,</p>
-      ${paragraph('Après examen, la modification que vous avez soumise pour la ressource ci-dessous n\'a malheureusement pas pu être validée en l\'état. Pas d\'inquiétude, c\'est tout à fait réversible !')}
+      ${paragraph("Après examen, la modification que vous avez soumise pour la ressource ci-dessous n'a malheureusement pas pu être validée en l'état. Pas d'inquiétude, c'est tout à fait réversible !")}
       ${infoCard('Ressource concernée', safeTitle, 'red')}
       <div style="background:#FEF2F2;border-left:4px solid #EF4444;border-radius:0 12px 12px 0;padding:20px;margin:0 0 24px;font-family:${F};">
         <div style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#B91C1C;margin-bottom:8px;">💬 Motif du refus</div>
@@ -141,7 +157,7 @@ export function renderEditRejectedEmail(
           <li>Le contenu original est conservé (modification annulée)</li>
         </ul>
       </div>
-      ${muted('Besoin d\'aide ? Répondez simplement à cet email, notre équipe vous accompagnera volontiers.')}
+      ${muted("Besoin d'aide ? Répondez simplement à cet email, notre équipe vous accompagnera volontiers.")}
     `,
   });
 }
@@ -152,31 +168,41 @@ export function renderNewEditPendingEmail(
   editSummary: string,
   resourceUrl: string,
   wasPreviouslyRejected: boolean,
-  previousRejectionReason?: string
+  previousRejectionReason?: string,
 ): string {
   const safeTitle = resourceTitle.replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const safeSummary = (editSummary || 'modification').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const safeTeacher = teacherName.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  const safePrevReason = (previousRejectionReason || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const safePrevReason = (previousRejectionReason || '')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
 
   return renderEmailShell({
     accent: 'blue',
     icon: wasPreviouslyRejected ? '🔄' : '✏️',
     title: wasPreviouslyRejected ? 'Nouvelle soumission à valider' : 'Modification à valider',
-    subtitle: wasPreviouslyRejected ? 'Le prof a corrigé et re-soumis sa modification' : 'Un enseignant a soumis une modification',
+    subtitle: wasPreviouslyRejected
+      ? 'Le prof a corrigé et re-soumis sa modification'
+      : 'Un enseignant a soumis une modification',
     preheader: `${safeTeacher} - ${safeTitle.slice(0, 50)}`,
     body: `
       <p style="margin:0 0 16px;font-size:16px;color:#0F172A;font-family:${F};">Bonjour Admin,</p>
-      ${paragraph(wasPreviouslyRejected
-        ? `L'enseignant <strong style="color:#0F172A;">${safeTeacher}</strong> a corrigé sa modification suite à votre refus et l'a re-soumise pour validation.`
-        : `L'enseignant <strong style="color:#0F172A;">${safeTeacher}</strong> a soumis une modification sur la ressource ci-dessous.`)}
+      ${paragraph(
+        wasPreviouslyRejected
+          ? `L'enseignant <strong style="color:#0F172A;">${safeTeacher}</strong> a corrigé sa modification suite à votre refus et l'a re-soumise pour validation.`
+          : `L'enseignant <strong style="color:#0F172A;">${safeTeacher}</strong> a soumis une modification sur la ressource ci-dessous.`,
+      )}
 
-      ${wasPreviouslyRejected && safePrevReason ? `
+      ${
+        wasPreviouslyRejected && safePrevReason
+          ? `
       <div style="background:#FEF2F2;border-left:4px solid #EF4444;border-radius:0 12px 12px 0;padding:16px;margin:0 0 16px;font-family:${F};">
         <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#B91C1C;margin-bottom:6px;">⚠️ Motif du refus précédent</div>
         <div style="color:#7F1D1D;font-size:13px;line-height:1.5;font-style:italic;">${safePrevReason}</div>
       </div>
-      ` : ''}
+      `
+          : ''
+      }
 
       <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:18px 20px;margin:0 0 16px;font-family:${F};">
         <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:#3B82F6;margin-bottom:6px;">Ressource modifiée</div>

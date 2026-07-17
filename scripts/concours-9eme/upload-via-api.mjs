@@ -95,7 +95,9 @@ async function uploadBatch(batch, attempt = 1) {
   } catch (e) {
     if (attempt <= RETRY_DELAYS.length) {
       const delay = RETRY_DELAYS[attempt - 1];
-      console.log(`  ⚠️  Batch failed (${e.message}), retrying in ${delay}ms (attempt ${attempt + 1})`);
+      console.log(
+        `  ⚠️  Batch failed (${e.message}), retrying in ${delay}ms (attempt ${attempt + 1})`,
+      );
       await new Promise((r) => setTimeout(r, delay));
       return uploadBatch(batch, attempt + 1);
     }
@@ -142,7 +144,7 @@ async function main() {
           }
           return null;
         }
-      })
+      }),
     );
     for (const r of results) {
       if (!r) continue;
@@ -155,7 +157,7 @@ async function main() {
     const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
     const completed = Math.min(i + CONCURRENT_BATCHES, batches.length);
     process.stdout.write(
-      `  [${elapsed}s] Batch ${completed}/${batches.length} — ${totalUploaded} uploaded, ${totalFailed} failed\n`
+      `  [${elapsed}s] Batch ${completed}/${batches.length} — ${totalUploaded} uploaded, ${totalFailed} failed\n`,
     );
   }
 
@@ -174,8 +176,8 @@ async function main() {
         failed: allFailed,
       },
       null,
-      2
-    )
+      2,
+    ),
   );
 
   const totalSize = allUploaded.reduce((s, u) => s + (u.size || 0), 0);

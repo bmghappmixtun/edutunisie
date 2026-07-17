@@ -75,7 +75,9 @@ export function renderEmailShell(opts: EmailShellOpts): string {
   const maxWidth = opts.maxWidth ?? 540;
   const F = EMAIL_FONT_STACK;
 
-  const footer = opts.footer ?? `
+  const footer =
+    opts.footer ??
+    `
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-family:${F};">
       <tr>
         <td style="font-family:${F};">

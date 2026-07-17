@@ -31,7 +31,9 @@ async function callBing(endpoint, body) {
   });
   const text = await res.text();
   let json = null;
-  try { json = JSON.parse(text); } catch {}
+  try {
+    json = JSON.parse(text);
+  } catch {}
   return { status: res.status, ok: res.ok, json, text };
 }
 
@@ -58,7 +60,9 @@ async function main() {
     }
   }
 
-  console.log(`=== Bing Webmaster: Submit URLs ===\nSite: ${SITE_URL}\nURLs to submit: ${urls.length}\n`);
+  console.log(
+    `=== Bing Webmaster: Submit URLs ===\nSite: ${SITE_URL}\nURLs to submit: ${urls.length}\n`,
+  );
 
   // SubmitUrlBatch (more efficient than SubmitUrl for multiple URLs)
   const r = await callBing('SubmitUrlBatch', {

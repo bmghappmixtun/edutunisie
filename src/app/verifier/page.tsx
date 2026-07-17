@@ -3,7 +3,17 @@ import { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
-import { Mail, ArrowLeft, Loader2, RefreshCw, CheckCircle2, AlertCircle, KeyRound, Copy, Check } from 'lucide-react';
+import {
+  Mail,
+  ArrowLeft,
+  Loader2,
+  RefreshCw,
+  CheckCircle2,
+  AlertCircle,
+  KeyRound,
+  Copy,
+  Check,
+} from 'lucide-react';
 
 function VerifyOtpForm() {
   const router = useRouter();
@@ -27,7 +37,7 @@ function VerifyOtpForm() {
 
   useEffect(() => {
     if (resendCooldown <= 0) return;
-    const t = setTimeout(() => setResendCooldown(s => s - 1), 1000);
+    const t = setTimeout(() => setResendCooldown((s) => s - 1), 1000);
     return () => clearTimeout(t);
   }, [resendCooldown]);
 
@@ -49,7 +59,7 @@ function VerifyOtpForm() {
     if (e.key === 'Backspace' && !code[index] && index > 0) {
       inputRefs.current[index - 1]?.focus();
     }
-    if (e.key === 'Enter' && code.every(c => c)) {
+    if (e.key === 'Enter' && code.every((c) => c)) {
       verify();
     }
   }
@@ -96,14 +106,16 @@ function VerifyOtpForm() {
       const res = await fetch('/api/auth/verify-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, code: fullCode })
+        body: JSON.stringify({ email, code: fullCode }),
       });
       const data = await res.json();
 
       if (!res.ok) {
         const errMsg = data.error || 'Code invalide';
         // Detect expired/invalid codes: show inline resend button
-        const canResend = /expir|invalid|incorrect|épuis|atteint|introuvable|consommé/i.test(errMsg);
+        const canResend = /expir|invalid|incorrect|épuis|atteint|introuvable|consommé/i.test(
+          errMsg,
+        );
         setError({ message: errMsg, canResend });
         toast.error(errMsg);
         // Clear code on error
@@ -138,7 +150,7 @@ function VerifyOtpForm() {
       const res = await fetch('/api/auth/resend-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -160,7 +172,10 @@ function VerifyOtpForm() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-amber-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        <Link href="/" className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-6 text-sm font-semibold">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-6 text-sm font-semibold"
+        >
           <ArrowLeft className="w-4 h-4" />
           Retour à l'accueil
         </Link>
@@ -192,7 +207,9 @@ function VerifyOtpForm() {
                   </div>
                 </div>
                 <div className="bg-white rounded-lg p-3 mt-2 flex items-center justify-between">
-                  <code className="text-2xl font-extrabold text-amber-900 tracking-widest">{devCode}</code>
+                  <code className="text-2xl font-extrabold text-amber-900 tracking-widest">
+                    {devCode}
+                  </code>
                   <div className="flex gap-1">
                     <button
                       type="button"
@@ -220,7 +237,7 @@ function VerifyOtpForm() {
               <input
                 type="email"
                 value={email}
-                onChange={e => setEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="vous@exemple.com"
                 className="input"
                 disabled={!!initialEmail}
@@ -234,13 +251,15 @@ function VerifyOtpForm() {
                 {code.map((digit, i) => (
                   <input
                     key={i}
-                    ref={el => { inputRefs.current[i] = el; }}
+                    ref={(el) => {
+                      inputRefs.current[i] = el;
+                    }}
                     type="text"
                     inputMode="numeric"
                     maxLength={1}
                     value={digit}
-                    onChange={e => handleCodeChange(i, e.target.value)}
-                    onKeyDown={e => handleKeyDown(i, e)}
+                    onChange={(e) => handleCodeChange(i, e.target.value)}
+                    onKeyDown={(e) => handleKeyDown(i, e)}
                     disabled={loading}
                     className="w-12 h-14 text-center text-2xl font-extrabold border-2 border-slate-200 rounded-xl focus:border-primary-500 focus:ring-4 focus:ring-primary-100 outline-none transition disabled:opacity-50"
                   />
@@ -255,9 +274,7 @@ function VerifyOtpForm() {
                 <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
                   <div className="flex items-start gap-2 mb-2">
                     <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
-                    <p className="text-sm text-red-700 font-semibold">
-                      {error.message}
-                    </p>
+                    <p className="text-sm text-red-700 font-semibold">{error.message}</p>
                   </div>
                   {error.canResend && (
                     <button
@@ -266,7 +283,9 @@ function VerifyOtpForm() {
                       className="w-full text-sm font-semibold text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed px-3 py-2 rounded-lg inline-flex items-center justify-center gap-1.5 transition"
                     >
                       <RefreshCw className="w-3.5 h-3.5" />
-                      {resendCooldown > 0 ? `Renvoyer dans ${resendCooldown}s` : '📧 Renvoyer un nouveau code'}
+                      {resendCooldown > 0
+                        ? `Renvoyer dans ${resendCooldown}s`
+                        : '📧 Renvoyer un nouveau code'}
                     </button>
                   )}
                 </div>
@@ -278,7 +297,11 @@ function VerifyOtpForm() {
               disabled={loading || code.join('').length !== 6 || !email}
               className="btn-primary w-full flex items-center justify-center gap-2 mb-4"
             >
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
+              {loading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <CheckCircle2 className="w-4 h-4" />
+              )}
               Vérifier
             </button>
 
@@ -298,9 +321,7 @@ function VerifyOtpForm() {
             )}
 
             <div className="mt-6 pt-6 border-t border-slate-100 text-center">
-              <p className="text-xs text-slate-500">
-                Code valide 30 minutes · Max 5 tentatives
-              </p>
+              <p className="text-xs text-slate-500">Code valide 30 minutes · Max 5 tentatives</p>
             </div>
           </div>
         </div>
@@ -318,11 +339,13 @@ function VerifyOtpForm() {
 
 export default function VerifyOtpPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
+        </div>
+      }
+    >
       <VerifyOtpForm />
     </Suspense>
   );

@@ -66,10 +66,34 @@ export type BacSubject = {
 // =============================================================================
 export const BAC_SECTIONS: BacSection[] = [
   { slug: 'math', nameFr: 'Mathématiques', nameAr: 'الرياضيات', icon: '📐', color: 'blue' },
-  { slug: 'sc-exp', nameFr: 'Sciences Expérimentales', nameAr: 'العلوم التجريبية', icon: '🧪', color: 'emerald' },
-  { slug: 'sc-tech', nameFr: 'Sciences Techniques', nameAr: 'العلوم التقنية', icon: '⚙️', color: 'slate' },
-  { slug: 'sc-info', nameFr: 'Sciences Informatiques', nameAr: 'علوم الإعلامية', icon: '💻', color: 'indigo' },
-  { slug: 'eco-gestion', nameFr: 'Économie et Gestion', nameAr: 'الاقتصاد والتصرف', icon: '💼', color: 'amber' },
+  {
+    slug: 'sc-exp',
+    nameFr: 'Sciences Expérimentales',
+    nameAr: 'العلوم التجريبية',
+    icon: '🧪',
+    color: 'emerald',
+  },
+  {
+    slug: 'sc-tech',
+    nameFr: 'Sciences Techniques',
+    nameAr: 'العلوم التقنية',
+    icon: '⚙️',
+    color: 'slate',
+  },
+  {
+    slug: 'sc-info',
+    nameFr: 'Sciences Informatiques',
+    nameAr: 'علوم الإعلامية',
+    icon: '💻',
+    color: 'indigo',
+  },
+  {
+    slug: 'eco-gestion',
+    nameFr: 'Économie et Gestion',
+    nameAr: 'الاقتصاد والتصرف',
+    icon: '💼',
+    color: 'amber',
+  },
   { slug: 'lettres', nameFr: 'Lettres', nameAr: 'الآداب', icon: '📚', color: 'purple' },
   { slug: 'sport', nameFr: 'Sport', nameAr: 'الرياضة', icon: '⚽', color: 'orange' },
 ];
@@ -77,7 +101,12 @@ export const BAC_SECTIONS: BacSection[] = [
 export const BAC_SUBJECTS: BacSubject[] = [
   { slug: 'math', nameFr: 'Mathématiques', nameAr: 'الرياضيات', icon: '📐' },
   { slug: 'physique', nameFr: 'Sciences Physiques', nameAr: 'العلوم الفيزيائية', icon: '⚛️' },
-  { slug: 'svt', nameFr: 'Sciences de la Vie et de la Terre', nameAr: 'علوم الحياة والأرض', icon: '🧬' },
+  {
+    slug: 'svt',
+    nameFr: 'Sciences de la Vie et de la Terre',
+    nameAr: 'علوم الحياة والأرض',
+    icon: '🧬',
+  },
   { slug: 'arabe', nameFr: 'Arabe', nameAr: 'العربية', icon: '📖' },
   { slug: 'francais', nameFr: 'Français', nameAr: 'الفرنسية', icon: '📕' },
   { slug: 'anglais', nameFr: 'Anglais', nameAr: 'الإنجليزية', icon: '🌍' },
@@ -113,7 +142,9 @@ function loadManifest(): any {
 // =============================================================================
 // KEY PARSER — extracts year/section/session/type/subject from key path
 // =============================================================================
-function parseKey(key: string): { year: number; section: string; session: string; type: string; subject: string } | null {
+function parseKey(
+  key: string,
+): { year: number; section: string; session: string; type: string; subject: string } | null {
   // bac/officials/{year}/{section}/{session}/{type}/{subject}.pdf
   const match = key.match(/^bac\/([^/]+)\/(\d{4})\/([^/]+)\/([^/]+)\/([^/]+)\/([^/.]+)\.pdf$/);
   if (!match) return null;
@@ -213,7 +244,9 @@ export function getBacStats(): BacStats {
     yearRange: minYear !== null && maxYear !== null ? { min: minYear, max: maxYear } : null,
     sectionsCount: Object.keys(bySection).length,
     subjectsCount: Object.keys(bySubject).length,
-    yearsWithFiles: Object.keys(byYear).map(Number).sort((a, b) => b - a),
+    yearsWithFiles: Object.keys(byYear)
+      .map(Number)
+      .sort((a, b) => b - a),
     byYear,
     bySection,
     bySubject,
@@ -286,7 +319,11 @@ export function groupBySection(): SectionGroup[] {
       total: sectionFiles.length,
       sujets: sectionFiles.filter((f) => f.type === 'sujets').length,
       corriges: sectionFiles.filter((f) => f.type === 'corriges').length,
-      years: [...new Set(sectionFiles.map((f) => f.year).filter((y): y is number => typeof y === 'number'))].sort((a, b) => b - a),
+      years: [
+        ...new Set(
+          sectionFiles.map((f) => f.year).filter((y): y is number => typeof y === 'number'),
+        ),
+      ].sort((a, b) => b - a),
     };
   });
 }
@@ -327,7 +364,6 @@ export function groupByYearForArchive(): ArchiveYearGroup[] {
 
   return Object.values(grouped).sort((a, b) => b.year - a.year);
 }
-
 
 export function getSectionMeta(slug: string): BacSection | null {
   return BAC_SECTIONS.find((s) => s.slug === slug) || null;

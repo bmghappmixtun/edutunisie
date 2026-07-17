@@ -16,7 +16,7 @@ export class ApiconvertError extends Error {
   constructor(
     message: string,
     public step: 'start' | 'upload' | 'convert' = 'start',
-    public status?: number
+    public status?: number,
   ) {
     super(message);
     this.name = 'ApiconvertError';
@@ -36,7 +36,7 @@ export type ApiconvertResult = {
 export async function convertOfficeToPdfViaConvertApi(
   fileBuffer: Buffer,
   fileName: string,
-  secret: string
+  secret: string,
 ): Promise<ApiconvertResult> {
   if (!secret) {
     throw new ApiconvertError('APICONVERT_API_KEY non configuré');
@@ -66,7 +66,10 @@ export async function convertOfficeToPdfViaConvertApi(
   });
   form.append('File', blob, fileName);
 
-  const baseUrl = (process.env.APICONVERT_API_URL || 'https://v2.convertapi.com').replace(/\/+$/, '');
+  const baseUrl = (process.env.APICONVERT_API_URL || 'https://v2.convertapi.com').replace(
+    /\/+$/,
+    '',
+  );
   const url = `${baseUrl}/convert/${sourceFormat}/to/pdf`;
 
   let res: Response;
@@ -81,7 +84,7 @@ export async function convertOfficeToPdfViaConvertApi(
   } catch (e: any) {
     throw new ApiconvertError(
       `APIConvert requête échouée: ${e?.message || 'erreur réseau'}`,
-      'start'
+      'start',
     );
   }
 
@@ -96,7 +99,7 @@ export async function convertOfficeToPdfViaConvertApi(
     throw new ApiconvertError(
       `APIConvert error: ${errMsg}`,
       res.status === 401 || res.status === 403 ? 'start' : 'convert',
-      res.status
+      res.status,
     );
   }
 
@@ -110,7 +113,7 @@ export async function convertOfficeToPdfViaConvertApi(
   if (!pdfBuffer.subarray(0, 4).toString().startsWith('%PDF')) {
     throw new ApiconvertError(
       'APIConvert a renvoyé du contenu non-PDF (rate limit? erreur?)',
-      'convert'
+      'convert',
     );
   }
 
@@ -131,12 +134,11 @@ export async function checkApiconvertHealth(secret: string): Promise<{
   if (!secret) return { ok: false, error: 'Missing APICONVERT_API_KEY' };
   try {
     const form = new FormData();
-    form.append(
-      'File',
-      new Blob(['Hello Examanet'], { type: 'text/plain' }),
-      'test.txt'
+    form.append('File', new Blob(['Hello Examanet'], { type: 'text/plain' }), 'test.txt');
+    const baseUrl = (process.env.APICONVERT_API_URL || 'https://v2.convertapi.com').replace(
+      /\/+$/,
+      '',
     );
-    const baseUrl = (process.env.APICONVERT_API_URL || 'https://v2.convertapi.com').replace(/\/+$/, '');
     const res = await fetch(`${baseUrl}/convert/txt/to/pdf`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${secret}` },

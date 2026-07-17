@@ -7,10 +7,7 @@ import { prisma } from '@/lib/prisma';
  * Returns the verification files uploaded by a specific teacher.
  * Used by the admin UI to review them.
  */
-export async function GET(
-  _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const admin = await getCurrentUser();
   if (!admin || admin.role !== 'ADMIN') {
     return NextResponse.json({ error: 'Non autorisé' }, { status: 403 });
@@ -22,10 +19,17 @@ export async function GET(
     prisma.user.findUnique({
       where: { id },
       select: {
-        id: true, firstName: true, lastName: true, email: true,
-        schoolName: true, governorate: true, diploma: true,
-        status: true, verificationFilesRequestedAt: true,
-        verificationFilesCount: true, verificationFilesReceivedAt: true,
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        schoolName: true,
+        governorate: true,
+        diploma: true,
+        status: true,
+        verificationFilesRequestedAt: true,
+        verificationFilesCount: true,
+        verificationFilesReceivedAt: true,
         verificationFilesNote: true,
       },
     }),
@@ -41,7 +45,7 @@ export async function GET(
 
   return NextResponse.json({
     teacher,
-    files: files.map(f => ({
+    files: files.map((f) => ({
       id: f.id,
       fileName: f.fileName,
       fileSize: f.fileSize,
@@ -63,10 +67,7 @@ export async function GET(
  * Mark a file as reviewed (or unmark).
  * Body: { fileId: string, reviewed: boolean, note?: string }
  */
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const admin = await getCurrentUser();
   if (!admin || admin.role !== 'ADMIN') {
     return NextResponse.json({ error: 'Non autorisé' }, { status: 403 });

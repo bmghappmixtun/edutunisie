@@ -53,7 +53,10 @@ export function properSlugify(text: string, maxLength = 60): string {
   if (!text) return '';
   let s = decodeHtmlEntities(text);
   // Strip file extensions
-  s = s.replace(/\.pdf$/i, '').replace(/\.docx?$/i, '').replace(/\.odt$/i, '');
+  s = s
+    .replace(/\.pdf$/i, '')
+    .replace(/\.docx?$/i, '')
+    .replace(/\.odt$/i, '');
 
   s = s.toLowerCase().trim();
   // NFD: decompose accented chars into base + combining diacritic, then strip diacritics

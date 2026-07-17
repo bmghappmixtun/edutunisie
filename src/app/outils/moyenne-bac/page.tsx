@@ -19,7 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
       : 'Calcul Moyenne Bac Tunisie 2025 — Coefficients officiels',
     description: isAr
       ? 'احسب معدلك في الباكالوريا التونسية حسب شعبتك مع المعاملات الرسمية لوزارة التربية (الدورة الرئيسية والمراقبة).'
-      : 'Calculez votre moyenne du Bac tunisien selon votre section, avec les coefficients officiels du Ministère de l\'Éducation (sessions principale et de contrôle).',
+      : "Calculez votre moyenne du Bac tunisien selon votre section, avec les coefficients officiels du Ministère de l'Éducation (sessions principale et de contrôle).",
     alternates: { canonical: PAGE_URL },
     openGraph: {
       title: isAr ? 'حساب معدل الباكالوريا' : 'Calcul Moyenne Bac',
@@ -43,7 +43,10 @@ export default function MoyenneBacPage() {
       <Header />
       <main className="flex-1 pt-20">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <Link href="/bac" className="inline-flex items-center gap-2 text-sm text-primary-600 hover:text-primary-700 mb-6">
+          <Link
+            href="/bac"
+            className="inline-flex items-center gap-2 text-sm text-primary-600 hover:text-primary-700 mb-6"
+          >
             <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
             {isAr ? 'العودة إلى الباكالوريا' : 'Retour au Bac'}
           </Link>
@@ -61,7 +64,7 @@ export default function MoyenneBacPage() {
             <p className="text-slate-600 mb-6">
               {isAr
                 ? 'هذه الأداة ستحسب معدلك تلقائياً حسب شعبتك ومعاملات وزارة التربية الرسمية 2025-2026.'
-                : 'Cet outil calcule automatiquement votre moyenne selon votre section, avec les coefficients officiels 2025-2026 du Ministère de l\'Éducation.'}
+                : "Cet outil calcule automatiquement votre moyenne selon votre section, avec les coefficients officiels 2025-2026 du Ministère de l'Éducation."}
             </p>
             <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border-2 border-violet-100 text-center">
               <div className="text-6xl mb-3">🚧</div>

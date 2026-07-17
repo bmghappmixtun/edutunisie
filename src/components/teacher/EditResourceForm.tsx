@@ -3,7 +3,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { Save, Upload, X, FileText, Loader2, AlertCircle } from 'lucide-react';
+import { Save, Upload, FileText, Loader2, AlertCircle } from 'lucide-react';
 
 type Resource = {
   id: string;
@@ -58,7 +58,12 @@ const LANGUAGES = [
 ];
 
 export default function EditResourceForm({
-  resource, pending, subjects, classes, sections, readOnly
+  resource,
+  pending,
+  subjects,
+  classes,
+  sections,
+  readOnly,
 }: {
   resource: Resource;
   pending: any;
@@ -88,27 +93,37 @@ export default function EditResourceForm({
   const [schoolType, setSchoolType] = useState<string>(resource.schoolType || 'PUBLIC');
   const [product, setProduct] = useState<string>(resource.product || '');
   const [hasCorrection, setHasCorrection] = useState<boolean>(resource.hasCorrection || false);
-  const [correctionSummary, setCorrectionSummary] = useState<string>(resource.correctionSummary || '');
+  const [correctionSummary, setCorrectionSummary] = useState<string>(
+    resource.correctionSummary || '',
+  );
 
   // Look up class slug to determine if college technologie
-  const selectedClass = classes.find(c => c.id === classId);
-  const selectedSubject = subjects.find(s => s.id === subjectId);
-  const showProductField = selectedSubject?.slug === 'technologie' && ['7eme', '8eme', '9eme'].includes(selectedClass?.slug || '');
+  const selectedClass = classes.find((c) => c.id === classId);
+  const selectedSubject = subjects.find((s) => s.id === subjectId);
+  const showProductField =
+    selectedSubject?.slug === 'technologie' &&
+    ['7eme', '8eme', '9eme'].includes(selectedClass?.slug || '');
 
   // Filter sections by selected class
-  const filteredSections = classId ? sections.filter(s => s.classId === classId) : sections;
+  const filteredSections = classId ? sections.filter((s) => s.classId === classId) : sections;
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
     if (readOnly) return;
-    if (title.length < 5) { toast.error('Titre trop court (min 5 caractères)'); return; }
+    if (title.length < 5) {
+      toast.error('Titre trop court (min 5 caractères)');
+      return;
+    }
     setLoading(true);
     try {
       const res = await fetch(`/api/teacher/resources/${resource.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title, description, type, subjectId,
+          title,
+          description,
+          type,
+          subjectId,
           classId: classId || null,
           sectionId: sectionId || null,
           trimester: trimester || null,
@@ -122,7 +137,7 @@ export default function EditResourceForm({
           product: showProductField && product ? product : null,
           hasCorrection,
           correctionSummary: hasCorrection && correctionSummary ? correctionSummary : null,
-        })
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Erreur');
@@ -140,8 +155,14 @@ export default function EditResourceForm({
     if (readOnly) return;
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.type !== 'application/pdf') { toast.error('Le fichier doit être un PDF'); return; }
-    if (file.size > 50 * 1024 * 1024) { toast.error('Max 50 MB'); return; }
+    if (file.type !== 'application/pdf') {
+      toast.error('Le fichier doit être un PDF');
+      return;
+    }
+    if (file.size > 50 * 1024 * 1024) {
+      toast.error('Max 50 MB');
+      return;
+    }
 
     setFileLoading(true);
     try {
@@ -149,11 +170,11 @@ export default function EditResourceForm({
       formData.append('file', file);
       const res = await fetch(`/api/teacher/resources/${resource.id}/file`, {
         method: 'POST',
-        body: formData
+        body: formData,
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Erreur');
-      toast.success(data.message || 'Nouveau fichier en attente d\'approbation');
+      toast.success(data.message || "Nouveau fichier en attente d'approbation");
       router.push('/enseignant/ressources');
       router.refresh();
     } catch (e: any) {
@@ -168,8 +189,12 @@ export default function EditResourceForm({
       <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center">
         <AlertCircle className="w-12 h-12 mx-auto mb-3 text-blue-500" />
         <h3 className="font-bold text-lg mb-2">Modifications en cours d'approbation</h3>
-        <p className="text-slate-500 mb-4">Vous pourrez proposer de nouvelles modifications une fois la précédente traitée.</p>
-        <Link href="/enseignant/ressources" className="btn-primary">Retour à mes ressources</Link>
+        <p className="text-slate-500 mb-4">
+          Vous pourrez proposer de nouvelles modifications une fois la précédente traitée.
+        </p>
+        <Link href="/enseignant/ressources" className="btn-primary">
+          Retour à mes ressources
+        </Link>
       </div>
     );
   }
@@ -184,13 +209,27 @@ export default function EditResourceForm({
         <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg mb-3">
           <FileText className="w-8 h-8 text-red-500" />
           <div className="flex-1 min-w-0">
-            <div className="text-sm font-semibold truncate">{resource.fileKey.split('/').pop()}</div>
-            <div className="text-xs text-slate-500">{(resource.fileSize / 1024 / 1024).toFixed(2)} MB</div>
+            <div className="text-sm font-semibold truncate">
+              {resource.fileKey.split('/').pop()}
+            </div>
+            <div className="text-xs text-slate-500">
+              {(resource.fileSize / 1024 / 1024).toFixed(2)} MB
+            </div>
           </div>
         </div>
         <label className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-slate-300 rounded-lg cursor-pointer hover:border-primary-400 hover:bg-primary-50 transition">
-          <input type="file" accept="application/pdf" onChange={handleFileChange} className="hidden" disabled={fileLoading} />
-          {fileLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+          <input
+            type="file"
+            accept="application/pdf"
+            onChange={handleFileChange}
+            className="hidden"
+            disabled={fileLoading}
+          />
+          {fileLoading ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <Upload className="w-4 h-4" />
+          )}
           <span className="text-sm font-semibold">
             {fileLoading ? 'Envoi en cours...' : 'Remplacer par un autre PDF'}
           </span>
@@ -208,7 +247,7 @@ export default function EditResourceForm({
           <input
             type="text"
             value={title}
-            onChange={e => setTitle(e.target.value)}
+            onChange={(e) => setTitle(e.target.value)}
             className="input"
             required
             minLength={5}
@@ -218,7 +257,7 @@ export default function EditResourceForm({
         <Field label="Description">
           <textarea
             value={description}
-            onChange={e => setDescription(e.target.value)}
+            onChange={(e) => setDescription(e.target.value)}
             className="input min-h-[100px]"
             rows={4}
           />
@@ -226,50 +265,111 @@ export default function EditResourceForm({
 
         <div className="grid grid-cols-2 gap-3">
           <Field label="Type *">
-            <select value={type} onChange={e => setType(e.target.value)} className="input">
-              {TYPES.map(t => <option key={t.v} value={t.v}>{t.l}</option>)}
+            <select value={type} onChange={(e) => setType(e.target.value)} className="input">
+              {TYPES.map((t) => (
+                <option key={t.v} value={t.v}>
+                  {t.l}
+                </option>
+              ))}
             </select>
           </Field>
           <Field label="Matière *">
-            <select value={subjectId} onChange={e => setSubjectId(e.target.value)} className="input" required>
-              {subjects.map(s => <option key={s.id} value={s.id}>{s.icon} {s.nameFr}</option>)}
+            <select
+              value={subjectId}
+              onChange={(e) => setSubjectId(e.target.value)}
+              className="input"
+              required
+            >
+              {subjects.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.icon} {s.nameFr}
+                </option>
+              ))}
             </select>
           </Field>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <Field label="Classe">
-            <select value={classId} onChange={e => { setClassId(e.target.value); setSectionId(''); }} className="input">
+            <select
+              value={classId}
+              onChange={(e) => {
+                setClassId(e.target.value);
+                setSectionId('');
+              }}
+              className="input"
+            >
               <option value="">— Aucune —</option>
-              {classes.map(c => <option key={c.id} value={c.id}>{c.nameFr}</option>)}
+              {classes.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.nameFr}
+                </option>
+              ))}
             </select>
           </Field>
           <Field label="Section">
-            <select value={sectionId} onChange={e => setSectionId(e.target.value)} className="input" disabled={!classId}>
+            <select
+              value={sectionId}
+              onChange={(e) => setSectionId(e.target.value)}
+              className="input"
+              disabled={!classId}
+            >
               <option value="">— Aucune —</option>
-              {filteredSections.map(s => <option key={s.id} value={s.id}>{s.nameFr}</option>)}
+              {filteredSections.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.nameFr}
+                </option>
+              ))}
             </select>
           </Field>
         </div>
 
         <div className="grid grid-cols-3 gap-3">
           <Field label="Trimestre">
-            <select value={trimester} onChange={e => setTrimester(e.target.value)} className="input">
-              {TRIMESTERS.map(t => <option key={t.v} value={t.v}>{t.l}</option>)}
+            <select
+              value={trimester}
+              onChange={(e) => setTrimester(e.target.value)}
+              className="input"
+            >
+              {TRIMESTERS.map((t) => (
+                <option key={t.v} value={t.v}>
+                  {t.l}
+                </option>
+              ))}
             </select>
           </Field>
           <Field label="Année">
-            <input type="text" value={year} onChange={e => setYear(e.target.value)} placeholder="2024" className="input" />
+            <input
+              type="text"
+              value={year}
+              onChange={(e) => setYear(e.target.value)}
+              placeholder="2024"
+              className="input"
+            />
           </Field>
           <Field label="Langue">
-            <select value={language} onChange={e => setLanguage(e.target.value)} className="input">
-              {LANGUAGES.map(l => <option key={l.v} value={l.v}>{l.l}</option>)}
+            <select
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+              className="input"
+            >
+              {LANGUAGES.map((l) => (
+                <option key={l.v} value={l.v}>
+                  {l.l}
+                </option>
+              ))}
             </select>
           </Field>
         </div>
 
         <Field label="Tags (séparés par des virgules)">
-          <input type="text" value={tags} onChange={e => setTags(e.target.value)} placeholder="math, bac, 2024" className="input" />
+          <input
+            type="text"
+            value={tags}
+            onChange={(e) => setTags(e.target.value)}
+            placeholder="math, bac, 2024"
+            className="input"
+          />
         </Field>
 
         {/* Homework subtype + number — only when type=HOMEWORK */}
@@ -283,16 +383,18 @@ export default function EditResourceForm({
                   { value: 'CONTROL', label: '📋 Contrôle', cls: 'red' },
                   { value: 'SYNTHESIS', label: '📝 Synthèse', cls: 'violet' },
                   { value: 'HOUSEWORK', label: '🏠 Maison', cls: 'orange' },
-                ].map(opt => (
+                ].map((opt) => (
                   <button
                     key={opt.value}
                     type="button"
                     onClick={() => setHomeworkSubtype(opt.value)}
                     className={`px-3 py-2 rounded-lg text-sm font-bold border transition ${
                       homeworkSubtype === opt.value
-                        ? opt.cls === 'red' ? 'bg-red-100 border-red-400 text-red-800'
-                        : opt.cls === 'violet' ? 'bg-violet-100 border-violet-400 text-violet-800'
-                        : 'bg-orange-100 border-orange-400 text-orange-800'
+                        ? opt.cls === 'red'
+                          ? 'bg-red-100 border-red-400 text-red-800'
+                          : opt.cls === 'violet'
+                            ? 'bg-violet-100 border-violet-400 text-violet-800'
+                            : 'bg-orange-100 border-orange-400 text-orange-800'
                         : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
                     }`}
                   >
@@ -305,12 +407,16 @@ export default function EditResourceForm({
               <label className="label">Numéro du devoir</label>
               <select
                 value={homeworkNumber}
-                onChange={e => setHomeworkNumber(e.target.value ? parseInt(e.target.value, 10) : '')}
+                onChange={(e) =>
+                  setHomeworkNumber(e.target.value ? parseInt(e.target.value, 10) : '')
+                }
                 className="input"
               >
                 <option value="">— Non spécifié —</option>
-                {[1,2,3,4,5,6,7,8,9,10].map(n => (
-                  <option key={n} value={n}>N°{n}</option>
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+                  <option key={n} value={n}>
+                    N°{n}
+                  </option>
                 ))}
               </select>
             </div>
@@ -353,7 +459,7 @@ export default function EditResourceForm({
             <input
               type="text"
               value={product}
-              onChange={e => setProduct(e.target.value)}
+              onChange={(e) => setProduct(e.target.value)}
               className="input text-right"
               dir="rtl"
               placeholder="مثال: مطوية، برنامج سكراتش..."
@@ -368,18 +474,20 @@ export default function EditResourceForm({
             <input
               type="checkbox"
               checked={hasCorrection}
-              onChange={e => setHasCorrection(e.target.checked)}
+              onChange={(e) => setHasCorrection(e.target.checked)}
               className="mt-1 w-5 h-5 rounded text-emerald-600"
             />
             <div>
-              <div className="font-bold text-emerald-900 text-sm">✅ Ce document contient un corrigé</div>
+              <div className="font-bold text-emerald-900 text-sm">
+                ✅ Ce document contient un corrigé
+              </div>
               <div className="text-xs text-emerald-700">Un badge vert proéminent sera affiché.</div>
             </div>
           </label>
           {hasCorrection && (
             <textarea
               value={correctionSummary}
-              onChange={e => setCorrectionSummary(e.target.value)}
+              onChange={(e) => setCorrectionSummary(e.target.value)}
               className="input min-h-[60px] resize-none text-sm"
               placeholder="Description du corrigé..."
               maxLength={500}
@@ -390,7 +498,10 @@ export default function EditResourceForm({
 
       {/* Submit */}
       <div className="flex items-center justify-end gap-3 sticky bottom-0 bg-slate-50 -mx-4 px-4 py-3 border-t border-slate-200">
-        <Link href="/enseignant/ressources" className="px-4 py-2.5 rounded-lg border border-slate-200 font-semibold text-slate-700 hover:bg-white">
+        <Link
+          href="/enseignant/ressources"
+          className="px-4 py-2.5 rounded-lg border border-slate-200 font-semibold text-slate-700 hover:bg-white"
+        >
           Annuler
         </Link>
         <button
@@ -406,10 +517,21 @@ export default function EditResourceForm({
   );
 }
 
-function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
+function Field({
+  label,
+  required,
+  children,
+}: {
+  label: string;
+  required?: boolean;
+  children: React.ReactNode;
+}) {
   return (
     <div>
-      <label className="label">{label}{required && ' *'}</label>
+      <label className="label">
+        {label}
+        {required && ' *'}
+      </label>
       {children}
     </div>
   );

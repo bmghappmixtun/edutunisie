@@ -63,7 +63,13 @@ const LABELS_AR: Record<string, string[]> = {
   type: ['النوع', 'نوع'],
   exercises: ['التمارين', 'التمرين'],
   summary: ['ملخص', 'الملخص', 'الموضوع', 'ملخص الدرس'],
-  concepts: ['المفاهيم', 'المفاهيم/الشخصيات', 'المفاهيم/المهارات المكتسبة', 'المفاهيم المكتسبة', 'الأفكار الرئيسية'],
+  concepts: [
+    'المفاهيم',
+    'المفاهيم/الشخصيات',
+    'المفاهيم/المهارات المكتسبة',
+    'المفاهيم المكتسبة',
+    'الأفكار الرئيسية',
+  ],
 };
 
 const LABELS_FR: Record<string, string[]> = {
@@ -83,20 +89,26 @@ const LABELS_FR: Record<string, string[]> = {
  * Parse the AI-generated description into structured fields.
  * Each field has a label (in AR or FR) and a value.
  */
-function parseFields(html: string, isAr: boolean, bilingual: boolean = false): { fields: Field[]; summary: string } {
+function parseFields(
+  html: string,
+  isAr: boolean,
+  bilingual: boolean = false,
+): { fields: Field[]; summary: string } {
   // If bilingual mode, merge both label sets. Otherwise pick by detected language.
   const labels: Record<string, string[]> = bilingual
     ? mergeBilingualLabels(LABELS_AR, LABELS_FR, isAr)
-    : (isAr ? LABELS_AR : LABELS_FR);
+    : isAr
+      ? LABELS_AR
+      : LABELS_FR;
   const fields: Field[] = [];
   let summary = '';
 
   // First, convert <ul><li>X</li><li>Y</li></ul> into a comma-separated list
   // so it survives the HTML stripping. We use a unique placeholder.
   const lists: string[] = [];
-  let withPlaceholders = html.replace(/<ul>([\s\S]*?)<\/ul>/gi, (_m: string, inner: string) => {
-    const items = Array.from(inner.matchAll(/<li[^>]*>([\s\S]*?)<\/li>/gi)).map((mm: RegExpMatchArray) =>
-      (mm[1] || '').replace(/<[^>]+>/g, '').trim()
+  const withPlaceholders = html.replace(/<ul>([\s\S]*?)<\/ul>/gi, (_m: string, inner: string) => {
+    const items = Array.from(inner.matchAll(/<li[^>]*>([\s\S]*?)<\/li>/gi)).map(
+      (mm: RegExpMatchArray) => (mm[1] || '').replace(/<[^>]+>/g, '').trim(),
     );
     const joined = items.join(', ');
     lists.push(joined);
@@ -110,9 +122,15 @@ function parseFields(html: string, isAr: boolean, bilingual: boolean = false): {
     .replace(/<[^>]+>/g, '');
 
   // Restore list placeholders to their comma-separated values
-  const textWithLists = text.replace(/\u0000LIST(\d+)\u0000/g, (_m, idx) => lists[parseInt(idx)] || '');
+  const textWithLists = text.replace(
+    /\u0000LIST(\d+)\u0000/g,
+    (_m, idx) => lists[parseInt(idx)] || '',
+  );
 
-  const lines = textWithLists.split('\n').map((l) => l.trim()).filter(Boolean);
+  const lines = textWithLists
+    .split('\n')
+    .map((l) => l.trim())
+    .filter(Boolean);
 
   const iconMap: Record<string, typeof User> = {
     teacher: User,
@@ -175,7 +193,7 @@ function escapeRe(s: string) {
 function mergeBilingualLabels(
   ar: Record<string, string[]>,
   fr: Record<string, string[]>,
-  isAr: boolean
+  isAr: boolean,
 ): Record<string, string[]> {
   const merged: Record<string, string[]> = {};
   const keys = new Set([...Object.keys(ar), ...Object.keys(fr)]);
@@ -196,7 +214,15 @@ function mergeBilingualLabels(
  * - In LTR: the icon appears on the LEFT
  * No flex-row-reverse needed — the dir attribute handles it correctly.
  */
-export default function AiDescription({ text, source, language, className = '', headerData, classNameFr, classNameAr }: AiDescriptionProps) {
+export default function AiDescription({
+  text,
+  source,
+  language,
+  className = '',
+  headerData,
+  classNameFr,
+  classNameAr,
+}: AiDescriptionProps) {
   const [tooltipOpen, setTooltipOpen] = useState(false);
   const isAi = !!source && source.startsWith('agent-');
 
@@ -206,7 +232,7 @@ export default function AiDescription({ text, source, language, className = '', 
   // wrong label set and dumping everything into the summary.
   const arabicCharCount = (text.match(/[\u0600-\u06FF]/g) || []).length;
   const latinCharCount = (text.match(/[A-Za-zÀ-ÿ]/g) || []).length;
-  const detectedLang = arabicCharCount > latinCharCount * 0.3 ? 'ar' : (language || 'fr');
+  const detectedLang = arabicCharCount > latinCharCount * 0.3 ? 'ar' : language || 'fr';
   const isRtl = detectedLang === 'ar';
 
   const html = text
@@ -223,7 +249,12 @@ export default function AiDescription({ text, source, language, className = '', 
   const headerFields: Field[] = [];
   if (headerData) {
     const h = headerData;
-    const tryAdd = (labelAr: string, labelFr: string, val: string | null | undefined, Icon: typeof User) => {
+    const tryAdd = (
+      labelAr: string,
+      labelFr: string,
+      val: string | null | undefined,
+      Icon: typeof User,
+    ) => {
       if (!val || typeof val !== 'string') return;
       const v = val.trim();
       if (!v || v === 'null' || v === 'None') return;
@@ -233,7 +264,12 @@ export default function AiDescription({ text, source, language, className = '', 
       existingLabels.add(lbl);
     };
     // tryOverride: always set/override the value (used for fields we want authoritative)
-    const tryOverride = (labelAr: string, labelFr: string, val: string | null | undefined, Icon: typeof User) => {
+    const tryOverride = (
+      labelAr: string,
+      labelFr: string,
+      val: string | null | undefined,
+      Icon: typeof User,
+    ) => {
       if (!val || typeof val !== 'string') return;
       const v = val.trim();
       if (!v || v === 'null' || v === 'None') return;
@@ -250,8 +286,18 @@ export default function AiDescription({ text, source, language, className = '', 
     tryAdd('\u0627\u0644\u0623\u0633\u062a\u0627\u0630', 'Enseignant', h.teacher, User);
     // Override 'المستوى'/'Niveau' with the authoritative cycle from headerData
     // (AI description sometimes uses the class name as level, but they are different)
-    tryOverride('\u0627\u0644\u0645\u0633\u062a\u0648\u0649', 'Niveau', isRtl ? (h.cycleAr || h.cycle) : h.cycle, GraduationCap);
-    tryAdd('\u0627\u0644\u0633\u0646\u0629 \u0627\u0644\u062f\u0631\u0627\u0633\u064a\u0629', 'Ann\u00e9e scolaire', h.year, CalendarDays);
+    tryOverride(
+      '\u0627\u0644\u0645\u0633\u062a\u0648\u0649',
+      'Niveau',
+      isRtl ? h.cycleAr || h.cycle : h.cycle,
+      GraduationCap,
+    );
+    tryAdd(
+      '\u0627\u0644\u0633\u0646\u0629 \u0627\u0644\u062f\u0631\u0627\u0633\u064a\u0629',
+      'Ann\u00e9e scolaire',
+      h.year,
+      CalendarDays,
+    );
     tryAdd('\u0627\u0644\u0645\u0627\u062f\u0629', 'Mati\u00e8re', h.subject, BookOpen);
     tryAdd('\u0627\u0644\u0646\u0648\u0639', 'Type', h.type, FileText);
   }
@@ -261,7 +307,7 @@ export default function AiDescription({ text, source, language, className = '', 
   // Some AI-generated descriptions have truncated values like "9ème année" — use the
   // authoritative class name from the DB instead.
   if (classNameFr || classNameAr) {
-    const fullClass = isRtl ? (classNameAr || classNameFr) : (classNameFr || classNameAr);
+    const fullClass = isRtl ? classNameAr || classNameFr : classNameFr || classNameAr;
     const classeLabel = isRtl ? 'الصف' : 'Classe';
     const idx = fields.findIndex((f) => f.label === classeLabel);
     if (fullClass) {
@@ -301,7 +347,9 @@ export default function AiDescription({ text, source, language, className = '', 
               IA
             </span>
             {tooltipOpen && (
-              <span className={`absolute z-50 top-full mt-1.5 w-56 px-3 py-2 rounded-lg bg-slate-900 text-white text-xs leading-relaxed shadow-xl pointer-events-none ${isRtl ? 'left-0' : 'right-0'}`}>
+              <span
+                className={`absolute z-50 top-full mt-1.5 w-56 px-3 py-2 rounded-lg bg-slate-900 text-white text-xs leading-relaxed shadow-xl pointer-events-none ${isRtl ? 'left-0' : 'right-0'}`}
+              >
                 <span className="block font-semibold mb-0.5">
                   {isRtl ? '✨ ملخص مُولَّد بالذكاء الاصطناعي' : '✨ Résumé généré par IA'}
                 </span>
@@ -310,7 +358,9 @@ export default function AiDescription({ text, source, language, className = '', 
                     ? 'ملخص تلقائي لمحتوى الـ PDF لمساعدتك في إيجاد المورد المناسب.'
                     : 'Résumé automatique du contenu du PDF pour vous aider à trouver la bonne ressource.'}
                 </span>
-                <span className={`absolute -top-1 w-2 h-2 bg-slate-900 rotate-45 ${isRtl ? 'left-3' : 'right-3'}`} />
+                <span
+                  className={`absolute -top-1 w-2 h-2 bg-slate-900 rotate-45 ${isRtl ? 'left-3' : 'right-3'}`}
+                />
               </span>
             )}
           </div>
@@ -345,10 +395,7 @@ export default function AiDescription({ text, source, language, className = '', 
 
       {/* Summary block */}
       {summary && (
-        <div
-          dir={isRtl ? 'rtl' : 'ltr'}
-          className="mt-3 pt-3 border-t border-violet-100"
-        >
+        <div dir={isRtl ? 'rtl' : 'ltr'} className="mt-3 pt-3 border-t border-violet-100">
           <div className="flex items-start gap-2">
             <ScrollText className="w-4 h-4 mt-1 flex-shrink-0 text-violet-600" />
             <div
@@ -379,6 +426,5 @@ function iconColor(Icon: typeof User): string {
 }
 
 // Force rebuild for bilingual parser - 1782666834
-
 
 // Build marker 2026-06-30-12:40

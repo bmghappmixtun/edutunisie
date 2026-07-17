@@ -23,7 +23,10 @@ export async function POST(req: NextRequest) {
     }
 
     if (message.length > 2000) {
-      return NextResponse.json({ error: 'Message trop long (max 2000 caractères)' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Message trop long (max 2000 caractères)' },
+        { status: 400 },
+      );
     }
 
     const subjectValue = subject && VALID_SUBJECTS.includes(subject) ? subject : 'other';
@@ -36,8 +39,8 @@ export async function POST(req: NextRequest) {
         subject: subjectValue,
         message: message.trim(),
         ip: req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || null,
-        userAgent: req.headers.get('user-agent')?.slice(0, 500) || null
-      }
+        userAgent: req.headers.get('user-agent')?.slice(0, 500) || null,
+      },
     });
 
     // Send email notification to admin
@@ -45,8 +48,8 @@ export async function POST(req: NextRequest) {
       name: name.trim(),
       email: email.toLowerCase().trim(),
       subject: subjectValue,
-      message: message.trim()
-    }).catch(e => console.error('Contact email error:', e));
+      message: message.trim(),
+    }).catch((e) => console.error('Contact email error:', e));
 
     return NextResponse.json({ success: true, message: 'Message envoyé' });
   } catch (e: any) {

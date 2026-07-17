@@ -33,11 +33,11 @@ export async function GET(req: NextRequest) {
               firstName: true,
               lastName: true,
               email: true,
-              _count: { select: { uploadedFiles: true } }
-            }
+              _count: { select: { uploadedFiles: true } },
+            },
           },
-          invitedBy: { select: { id: true, firstName: true, lastName: true, email: true } }
-        }
+          invitedBy: { select: { id: true, firstName: true, lastName: true, email: true } },
+        },
       }),
       prisma.teacherInvitation.count({ where }),
     ]);
@@ -54,7 +54,7 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.json({
-      invitations: invitations.map(inv => ({
+      invitations: invitations.map((inv) => ({
         id: inv.id,
         token: inv.token,
         email: inv.email,

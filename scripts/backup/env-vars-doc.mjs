@@ -17,9 +17,18 @@ const ENV_FILES = ['.env', '.env.local', '.env.example', '.vercel/.env.developme
 
 // Vars we should NEVER log content of (just count chars)
 const SECRET_VARS = [
-  'DATABASE_URL', 'NEXTAUTH_SECRET', 'BLOB_READ_WRITE_TOKEN', 'RESEND_API_KEY',
-  'OPENAI_API_KEY', 'JOTFORM_API_KEY', 'SEED_TOKEN', 'I_LOVE_API_KEY',
-  'I_LOVE_API_PUBLIC_KEY', 'VERCEL_OIDC_TOKEN', 'GITHUB_TOKEN', 'GITLAB_TOKEN',
+  'DATABASE_URL',
+  'NEXTAUTH_SECRET',
+  'BLOB_READ_WRITE_TOKEN',
+  'RESEND_API_KEY',
+  'OPENAI_API_KEY',
+  'JOTFORM_API_KEY',
+  'SEED_TOKEN',
+  'I_LOVE_API_KEY',
+  'I_LOVE_API_PUBLIC_KEY',
+  'VERCEL_OIDC_TOKEN',
+  'GITHUB_TOKEN',
+  'GITLAB_TOKEN',
 ];
 
 function loadEnvFile(file) {
@@ -115,4 +124,6 @@ fs.mkdirSync(path.dirname(outPath), { recursive: true });
 fs.writeFileSync(outPath, out);
 console.log(`[env-vars] Wrote ${outPath}`);
 console.log(`[env-vars] ${sortedKeys.length} variables found across ${ENV_FILES.length} files`);
-console.log(`[env-vars] ${sortedKeys.filter(isSecret).length} secrets, ${sortedKeys.filter((k) => !isSecret(k)).length} public`);
+console.log(
+  `[env-vars] ${sortedKeys.filter(isSecret).length} secrets, ${sortedKeys.filter((k) => !isSecret(k)).length} public`,
+);

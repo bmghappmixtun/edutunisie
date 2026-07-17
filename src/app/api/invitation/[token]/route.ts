@@ -5,7 +5,10 @@ import { recordInvitationClick, INV_STATUS } from '@/lib/invitation';
 export async function GET(req: NextRequest, { params }: { params: Promise<{ token: string }> }) {
   try {
     const { token } = await params;
-    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || req.headers.get('x-real-ip') || undefined;
+    const ip =
+      req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+      req.headers.get('x-real-ip') ||
+      undefined;
     const ua = req.headers.get('user-agent') || undefined;
 
     const inv = await recordInvitationClick(token, ip, ua);
@@ -15,11 +18,11 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ toke
 
     const teacher = await prisma.user.findUnique({
       where: { id: inv.teacherId },
-      select: { firstName: true, lastName: true, email: true }
+      select: { firstName: true, lastName: true, email: true },
     });
 
     const fileCount = await prisma.resource.count({
-      where: { teacherId: inv.teacherId, status: 'PUBLISHED' }
+      where: { teacherId: inv.teacherId, status: 'PUBLISHED' },
     });
 
     return NextResponse.json({
@@ -30,7 +33,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ toke
       status: inv.status,
       expiresAt: inv.expiresAt,
       alreadyActivated: inv.status === INV_STATUS.ACTIVATED,
-      expired: inv.status === INV_STATUS.EXPIRED || (new Date() > inv.expiresAt),
+      expired: inv.status === INV_STATUS.EXPIRED || new Date() > inv.expiresAt,
       cancelled: inv.status === INV_STATUS.CANCELLED,
     });
   } catch (e: any) {

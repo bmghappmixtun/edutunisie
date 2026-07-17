@@ -23,7 +23,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isValidOrigin, isProduction, getClientIp } from '@/lib/security';
 import { prisma } from '@/lib/prisma';
-import { generateOTP, hashPassword } from '@/lib/auth';
+import { generateOTP } from '@/lib/auth';
 import { sendOTPEmail } from '@/lib/email';
 
 export const runtime = 'nodejs';
@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
   if (!checkRateLimit(`ip:${ip}`, RATE_LIMIT_PER_IP)) {
     return NextResponse.json(
       { error: 'Trop de tentatives. Réessayez dans 15 minutes.' },
-      { status: 429 }
+      { status: 429 },
     );
   }
 
@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
   if (!checkRateLimit(`email:${email}`, RATE_LIMIT_PER_EMAIL)) {
     return NextResponse.json(
       { error: 'Trop de tentatives pour cet email. Réessayez dans 15 minutes.' },
-      { status: 429 }
+      { status: 429 },
     );
   }
 
@@ -100,7 +100,9 @@ export async function POST(req: NextRequest) {
   });
 
   // Log every attempt for security audit (regardless of result)
-  console.log(`[forgot-password] attempt email=${email} ip=${ip} exists=${!!user} status=${user?.status || 'NO_USER'}`);
+  console.log(
+    `[forgot-password] attempt email=${email} ip=${ip} exists=${!!user} status=${user?.status || 'NO_USER'}`,
+  );
 
   if (!user) {
     // No user found — but don't reveal this to the caller
@@ -156,7 +158,7 @@ export async function POST(req: NextRequest) {
   const result = await sendOTPEmail(user.email, code, user.firstName ?? undefined);
 
   console.log(
-    `[forgot-password] code sent email=${email} success=${result.success} devMode=${!!result.devCode}`
+    `[forgot-password] code sent email=${email} success=${result.success} devMode=${!!result.devCode}`,
   );
 
   return NextResponse.json({

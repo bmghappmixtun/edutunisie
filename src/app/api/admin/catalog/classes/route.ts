@@ -13,9 +13,9 @@ export async function GET() {
   const classes = await prisma.class.findMany({
     orderBy: { order: 'asc' },
     include: {
-      level: { select: { nameFr: true, slug: true, } },
-      _count: { select: { resources: true, sections: true } }
-    }
+      level: { select: { nameFr: true, slug: true } },
+      _count: { select: { resources: true, sections: true } },
+    },
   });
 
   return NextResponse.json({ classes });
@@ -42,8 +42,8 @@ export async function POST(req: NextRequest) {
         nameFr: nameFr.trim(),
         nameAr: nameAr.trim(),
         levelId,
-        order: order ?? 0
-      }
+        order: order ?? 0,
+      },
     });
     return NextResponse.json({ success: true, class: cls });
   } catch (e: any) {

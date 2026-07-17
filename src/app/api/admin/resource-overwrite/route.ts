@@ -12,8 +12,7 @@ export const maxDuration = 60;
 export const runtime = 'nodejs';
 
 async function checkAdmin(req: NextRequest) {
-  const seedToken = req.headers.get('x-seed-token') ||
-    req.nextUrl.searchParams.get('token');
+  const seedToken = req.headers.get('x-seed-token') || req.nextUrl.searchParams.get('token');
   if (seedToken && seedToken === process.env.SEED_TOKEN) {
     const admin = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
     if (admin) return admin;
@@ -51,15 +50,16 @@ export async function POST(req: NextRequest) {
     // Strategy: upload to NEW path with random suffix to bypass CDN cache
     // Then delete old blob (after confirming new is live)
     const pdfBuffer = Buffer.from(await file.arrayBuffer());
-    
+
     // Get directory from old key (e.g., "teacher-library/teacherId/imported/")
-    const keyDir = oldKey?.substring(0, oldKey.lastIndexOf('/') + 1) || 
-                   `teacher-library/${resource.teacherId}/imported/`;
-    
+    const keyDir =
+      oldKey?.substring(0, oldKey.lastIndexOf('/') + 1) ||
+      `teacher-library/${resource.teacherId}/imported/`;
+
     // New filename: timestamp + nanoid to ensure CDN freshness
     const newFilename = `${Date.now()}-${Math.random().toString(36).substring(2, 10)}-${resourceId.substring(0, 6)}.pdf`;
     const newKey = `${keyDir}${newFilename}`;
-    
+
     const blob = await put(newKey, pdfBuffer, {
       access: 'public',
       addRandomSuffix: false,

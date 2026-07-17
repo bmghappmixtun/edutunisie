@@ -23,7 +23,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
     const subject = await prisma.subject.update({
       where: { id },
-      data
+      data,
     });
 
     return NextResponse.json({ success: true, subject });
@@ -44,9 +44,12 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
   // Check if subject has resources
   const resourceCount = await prisma.resource.count({ where: { subjectId: id } });
   if (resourceCount > 0) {
-    return NextResponse.json({
-      error: `Impossible : ${resourceCount} ressource(s) utilisent cette matière. Réassigniez-les d'abord.`
-    }, { status: 400 });
+    return NextResponse.json(
+      {
+        error: `Impossible : ${resourceCount} ressource(s) utilisent cette matière. Réassigniez-les d'abord.`,
+      },
+      { status: 400 },
+    );
   }
 
   await prisma.subject.delete({ where: { id } });

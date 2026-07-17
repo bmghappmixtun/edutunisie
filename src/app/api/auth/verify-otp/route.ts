@@ -32,17 +32,26 @@ export async function POST(req: NextRequest) {
 
     const otp = await prisma.otpCode.findFirst({
       where: { userId: user.id, purpose: 'email_verification', consumedAt: null },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
 
     if (!otp) {
-      return NextResponse.json({ error: 'Aucun code en attente. Demandez un nouveau code.' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Aucun code en attente. Demandez un nouveau code.' },
+        { status: 400 },
+      );
     }
     if (otp.expiresAt < new Date()) {
-      return NextResponse.json({ error: 'Code expiré. Demandez un nouveau code.' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Code expiré. Demandez un nouveau code.' },
+        { status: 400 },
+      );
     }
     if (otp.attempts >= 5) {
-      return NextResponse.json({ error: 'Trop de tentatives. Demandez un nouveau code.' }, { status: 429 });
+      return NextResponse.json(
+        { error: 'Trop de tentatives. Demandez un nouveau code.' },
+        { status: 429 },
+      );
     }
     if (otp.code !== code) {
       await prisma.otpCode.update({ where: { id: otp.id }, data: { attempts: { increment: 1 } } });
@@ -60,13 +69,13 @@ export async function POST(req: NextRequest) {
       where: { id: user.id },
       data: {
         status: newStatus,
-        emailVerifiedAt: new Date()
-      }
+        emailVerifiedAt: new Date(),
+      },
     });
 
     // Send confirmation email after successful verification
-    await sendWelcomeConfirmedEmail(updated.email, updated.firstName ?? '', updated.role).catch(e =>
-      console.error('Confirmation email error:', e)
+    await sendWelcomeConfirmedEmail(updated.email, updated.firstName ?? '', updated.role).catch(
+      (e) => console.error('Confirmation email error:', e),
     );
 
     // Auto-login for students
@@ -79,9 +88,10 @@ export async function POST(req: NextRequest) {
       success: true,
       status: updated.status,
       role: updated.role,
-      message: updated.status === 'ACTIVE'
-        ? 'Email vérifié ! Bienvenue sur Examanet.'
-        : 'Email vérifié ! Votre compte enseignant est en attente d\'approbation par un administrateur.'
+      message:
+        updated.status === 'ACTIVE'
+          ? 'Email vérifié ! Bienvenue sur Examanet.'
+          : "Email vérifié ! Votre compte enseignant est en attente d'approbation par un administrateur.",
     });
   } catch (e: any) {
     console.error('Verify OTP error:', e);

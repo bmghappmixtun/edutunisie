@@ -14,26 +14,26 @@ export default async function AdminCatalogPage() {
   const [subjects, levels, classes, sections] = await Promise.all([
     prisma.subject.findMany({
       orderBy: { nameFr: 'asc' },
-      include: { _count: { select: { resources: true } } }
+      include: { _count: { select: { resources: true } } },
     }),
     prisma.level.findMany({
       orderBy: { order: 'asc' },
-      include: { _count: { select: { classes: true } } }
+      include: { _count: { select: { classes: true } } },
     }),
     prisma.class.findMany({
       orderBy: [{ level: { order: 'asc' } }, { order: 'asc' }],
       include: {
-        level: { select: { nameFr: true, slug: true, } },
-        _count: { select: { resources: true, sections: true } }
-      }
+        level: { select: { nameFr: true, slug: true } },
+        _count: { select: { resources: true, sections: true } },
+      },
     }),
     prisma.section.findMany({
       orderBy: [{ class: { order: 'asc' } }, { nameFr: 'asc' }],
       include: {
-        class: { select: { nameFr: true, slug: true, } },
-        _count: { select: { resources: true } }
-      }
-    })
+        class: { select: { nameFr: true, slug: true } },
+        _count: { select: { resources: true } },
+      },
+    }),
   ]);
 
   return (
@@ -42,7 +42,7 @@ export default async function AdminCatalogPage() {
         subjects: JSON.parse(JSON.stringify(subjects)),
         levels: JSON.parse(JSON.stringify(levels)),
         classes: JSON.parse(JSON.stringify(classes)),
-        sections: JSON.parse(JSON.stringify(sections))
+        sections: JSON.parse(JSON.stringify(sections)),
       }}
     />
   );

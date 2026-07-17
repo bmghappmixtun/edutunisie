@@ -84,8 +84,8 @@ export async function DELETE(req: NextRequest) {
     // Block deletion if used by an active resource
     if (file.resource) {
       return NextResponse.json(
-        { error: 'Ce fichier est utilisé par une ressource publiée. Supprimez-la d\'abord.' },
-        { status: 409 }
+        { error: "Ce fichier est utilisé par une ressource publiée. Supprimez-la d'abord." },
+        { status: 409 },
       );
     }
 

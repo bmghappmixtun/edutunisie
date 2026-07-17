@@ -21,7 +21,13 @@ function getNested(obj: any, path: string): any {
   return path.split('.').reduce((acc, key) => acc?.[key], obj);
 }
 
-export function I18nProvider({ children, initialLocale }: { children: React.ReactNode; initialLocale?: Locale }) {
+export function I18nProvider({
+  children,
+  initialLocale,
+}: {
+  children: React.ReactNode;
+  initialLocale?: Locale;
+}) {
   const [locale, setLocaleState] = useState<Locale>(initialLocale || 'fr');
 
   // Load saved locale (from localStorage OR cookie)
@@ -35,7 +41,7 @@ export function I18nProvider({ children, initialLocale }: { children: React.Reac
     // Fallback to cookie (in case user switched via server-rendered page)
     const cookieLocale = document.cookie
       .split('; ')
-      .find(c => c.startsWith('locale='))
+      .find((c) => c.startsWith('locale='))
       ?.split('=')[1] as Locale | undefined;
     if (cookieLocale && (cookieLocale === 'fr' || cookieLocale === 'ar')) {
       setLocaleState(cookieLocale);
@@ -64,16 +70,14 @@ export function I18nProvider({ children, initialLocale }: { children: React.Reac
     if (!vars) return value;
     return Object.entries(vars).reduce(
       (acc, [k, v]) => acc.replace(new RegExp(`\\{${k}\\}`, 'g'), v),
-      value
+      value,
     );
   }
 
   const dir: 'ltr' | 'rtl' = locale === 'ar' ? 'rtl' : 'ltr';
 
   return (
-    <I18nContext.Provider value={{ locale, setLocale, t, dir }}>
-      {children}
-    </I18nContext.Provider>
+    <I18nContext.Provider value={{ locale, setLocale, t, dir }}>{children}</I18nContext.Provider>
   );
 }
 

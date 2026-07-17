@@ -45,7 +45,9 @@ export default function FavoriteButton({
         setFavorited(prevFavorited);
         setCount(prevCount);
         // Optional: redirect to login after a moment
-        setTimeout(() => { window.location.href = '/connexion'; }, 800);
+        setTimeout(() => {
+          window.location.href = '/connexion';
+        }, 800);
         return;
       }
       if (!res.ok) throw new Error('Failed');
@@ -86,7 +88,9 @@ export default function FavoriteButton({
         {loading ? (
           <Loader2 className="w-3.5 h-3.5 animate-spin" />
         ) : (
-          <Heart className={`w-3.5 h-3.5 transition-all ${favorited ? 'fill-red-500 text-red-500 scale-110' : ''}`} />
+          <Heart
+            className={`w-3.5 h-3.5 transition-all ${favorited ? 'fill-red-500 text-red-500 scale-110' : ''}`}
+          />
         )}
         <span>{count}</span>
       </button>
@@ -111,7 +115,9 @@ export default function FavoriteButton({
       {loading ? (
         <Loader2 className="w-4 h-4 animate-spin" />
       ) : (
-        <Heart className={`w-4 h-4 transition-all ${favorited ? 'fill-red-500 text-red-500' : ''}`} />
+        <Heart
+          className={`w-4 h-4 transition-all ${favorited ? 'fill-red-500 text-red-500' : ''}`}
+        />
       )}
     </button>
   );

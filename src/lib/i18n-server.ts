@@ -50,7 +50,7 @@ export function tServer(key: string, vars?: Record<string, string>, locale?: Loc
   if (!vars) return value;
   return Object.entries(vars).reduce(
     (acc, [k, v]) => acc.replace(new RegExp(`\\{${k}\\}`, 'g'), v),
-    value
+    value,
   );
 }
 

@@ -8,14 +8,29 @@ import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import {
-  LayoutDashboard, Upload, FileText, BarChart3, User, Bell, Shield,
-  ChevronRight, BookOpen, Settings, Heart, Plus, CheckCircle2
+  LayoutDashboard,
+  FileText,
+  BarChart3,
+  User,
+  Bell,
+  Shield,
+  ChevronRight,
+  BookOpen,
+  Settings,
+  Heart,
+  Plus,
+  CheckCircle2,
 } from 'lucide-react';
 
 // Teacher dashboard pages should never be indexed
 export const metadata: Metadata = {
   title: 'Espace enseignant',
-  robots: { index: false, follow: false, nocache: true, googleBot: { index: false, follow: false } },
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+    googleBot: { index: false, follow: false },
+  },
 };
 
 export default async function TeacherLayout({ children }: { children: React.ReactNode }) {
@@ -26,7 +41,7 @@ export default async function TeacherLayout({ children }: { children: React.Reac
   // Check if teacher is blocked from uploading (pending file verification or approval)
   const teacherStatus = await prisma.user.findUnique({
     where: { id: user.id },
-    select: { status: true, verificationFilesCount: true, verificationFilesReceivedAt: true }
+    select: { status: true, verificationFilesCount: true, verificationFilesReceivedAt: true },
   });
   const canUpload = teacherStatus?.status === 'ACTIVE';
 
@@ -71,8 +86,12 @@ export default async function TeacherLayout({ children }: { children: React.Reac
                     {initials}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="font-bold truncate">{user.firstName} {user.lastName}</div>
-                    <div className="text-xs text-amber-100 truncate">{user.schoolName || 'Enseignant'}</div>
+                    <div className="font-bold truncate">
+                      {user.firstName} {user.lastName}
+                    </div>
+                    <div className="text-xs text-amber-100 truncate">
+                      {user.schoolName || 'Enseignant'}
+                    </div>
                   </div>
                   <ChevronRight className="w-4 h-4 opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition" />
                 </div>
@@ -119,17 +138,15 @@ export default async function TeacherLayout({ children }: { children: React.Reac
                   label="Ajouter"
                   highlight
                   disabled={!canUpload}
-                  disabledReason={!canUpload ? 'Terminez la vérification de vos fichiers pour publier' : undefined}
+                  disabledReason={
+                    !canUpload ? 'Terminez la vérification de vos fichiers pour publier' : undefined
+                  }
                 />
               </SidebarGroup>
 
               {/* ===== MON ACTIVITÉ (2 items) ===== */}
               <SidebarGroup title="Mon activité" icon={BarChart3}>
-                <SidebarLink
-                  href="/enseignant/stats"
-                  icon={BarChart3}
-                  label="Statistiques"
-                />
+                <SidebarLink href="/enseignant/stats" icon={BarChart3} label="Statistiques" />
                 <SidebarLink
                   href="/enseignant/notifications"
                   icon={Bell}
@@ -141,11 +158,7 @@ export default async function TeacherLayout({ children }: { children: React.Reac
 
               {/* ===== MON COMPTE (3 items) ===== */}
               <SidebarGroup title="Mon compte" icon={User}>
-                <SidebarLink
-                  href="/enseignant/profil"
-                  icon={User}
-                  label="Mon profil"
-                />
+                <SidebarLink href="/enseignant/profil" icon={User} label="Mon profil" />
                 <SidebarLink
                   href="/enseignant/favoris"
                   icon={Heart}
@@ -153,11 +166,7 @@ export default async function TeacherLayout({ children }: { children: React.Reac
                   badge={favoritesCount}
                   badgeColor="bg-pink-500"
                 />
-                <SidebarLink
-                  href="/enseignant/parametres"
-                  icon={Settings}
-                  label="Paramètres"
-                />
+                <SidebarLink href="/enseignant/parametres" icon={Settings} label="Paramètres" />
               </SidebarGroup>
 
               {user.role === 'ADMIN' && (
@@ -182,7 +191,15 @@ export default async function TeacherLayout({ children }: { children: React.Reac
   );
 }
 
-function SidebarGroup({ title, icon: Icon, children }: { title: string; icon: any; children: React.ReactNode }) {
+function SidebarGroup({
+  title,
+  icon: Icon,
+  children,
+}: {
+  title: string;
+  icon: any;
+  children: React.ReactNode;
+}) {
   return (
     <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
       <div className="px-4 py-2.5 bg-slate-50 border-b border-slate-200 flex items-center gap-2">
@@ -195,7 +212,15 @@ function SidebarGroup({ title, icon: Icon, children }: { title: string; icon: an
 }
 
 function SidebarLink({
-  href, icon: Icon, label, exact, badge, badgeColor, highlight, disabled, disabledReason
+  href,
+  icon: Icon,
+  label,
+  exact,
+  badge,
+  badgeColor,
+  highlight,
+  disabled,
+  disabledReason,
 }: {
   href: string;
   icon: any;
@@ -224,7 +249,9 @@ function SidebarLink({
           🔒
         </span>
         {badge !== undefined && badge > 0 && (
-          <span className={`px-1.5 py-0.5 text-white text-[10px] font-bold rounded-full ${badgeColor || 'bg-slate-500'}`}>
+          <span
+            className={`px-1.5 py-0.5 text-white text-[10px] font-bold rounded-full ${badgeColor || 'bg-slate-500'}`}
+          >
             {badge}
           </span>
         )}
@@ -244,7 +271,9 @@ function SidebarLink({
       <span className="flex-1 truncate">{label}</span>
 
       {badge !== undefined && badge > 0 && (
-        <span className={`px-1.5 py-0.5 text-white text-[10px] font-bold rounded-full ${badgeColor || 'bg-slate-500'}`}>
+        <span
+          className={`px-1.5 py-0.5 text-white text-[10px] font-bold rounded-full ${badgeColor || 'bg-slate-500'}`}
+        >
           {badge}
         </span>
       )}

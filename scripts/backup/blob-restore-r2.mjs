@@ -30,7 +30,13 @@
  *   BLOB_READ_WRITE_TOKEN (for re-upload to Vercel Blob)
  */
 
-import { S3Client, ListObjectsV2Command, GetObjectCommand, PutObjectCommand, HeadBucketCommand } from '@aws-sdk/client-s3';
+import {
+  S3Client,
+  ListObjectsV2Command,
+  GetObjectCommand,
+  PutObjectCommand,
+  HeadBucketCommand,
+} from '@aws-sdk/client-s3';
 import { put } from '@vercel/blob';
 import { PrismaClient } from '@prisma/client';
 import fs from 'fs';
@@ -39,7 +45,15 @@ import path from 'path';
 const prisma = new PrismaClient();
 
 function parseArgs() {
-  const args = { list: false, report: false, restoreAll: false, key: null, publicUrl: false, prefix: null, dryRun: false };
+  const args = {
+    list: false,
+    report: false,
+    restoreAll: false,
+    key: null,
+    publicUrl: false,
+    prefix: null,
+    dryRun: false,
+  };
   for (const arg of process.argv.slice(2)) {
     if (arg === '--list') args.list = true;
     else if (arg === '--report') args.report = true;
@@ -68,7 +82,11 @@ function getR2Client() {
     process.exit(1);
   }
   return {
-    client: new S3Client({ region: 'auto', endpoint, credentials: { accessKeyId, secretAccessKey } }),
+    client: new S3Client({
+      region: 'auto',
+      endpoint,
+      credentials: { accessKeyId, secretAccessKey },
+    }),
     bucket,
   };
 }
@@ -77,9 +95,14 @@ async function listAllR2Keys(client, bucket, prefix = null) {
   const keys = [];
   let token = undefined;
   do {
-    const res = await client.send(new ListObjectsV2Command({
-      Bucket: bucket, Prefix: prefix, ContinuationToken: token, MaxKeys: 1000,
-    }));
+    const res = await client.send(
+      new ListObjectsV2Command({
+        Bucket: bucket,
+        Prefix: prefix,
+        ContinuationToken: token,
+        MaxKeys: 1000,
+      }),
+    );
     for (const obj of res.Contents || []) keys.push(obj);
     token = res.NextContinuationToken;
   } while (token);
@@ -119,7 +142,9 @@ async function main() {
     console.log('    --restore-all       Restore all files to Vercel Blob');
     console.log('    --public-url        Just generate a public R2 URL (no re-upload)');
     console.log('    --dry-run           Report only, no changes');
-    console.log('\n  Required env vars: R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET');
+    console.log(
+      '\n  Required env vars: R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET',
+    );
     return;
   }
 
@@ -145,9 +170,12 @@ async function main() {
       byFolder[folder] = (byFolder[folder] || 0) + 1;
     }
     console.log('  By folder:');
-    Object.entries(byFolder).sort((a, b) => b[1] - a[1]).slice(0, 20).forEach(([f, c]) => {
-      console.log(`    ${f.padEnd(50)} ${c} files`);
-    });
+    Object.entries(byFolder)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 20)
+      .forEach(([f, c]) => {
+        console.log(`    ${f.padEnd(50)} ${c} files`);
+      });
     return;
   }
 
@@ -156,8 +184,12 @@ async function main() {
     const keys = await listAllR2Keys(client, bucket, args.prefix);
     const totalSize = keys.reduce((sum, k) => sum + (k.Size || 0), 0);
     console.log(`  Total files: ${keys.length}`);
-    console.log(`  Total size:  ${(totalSize / 1024 / 1024).toFixed(1)} MB ($${(totalSize / 1024 / 1024 / 1024 * 0.015).toFixed(2)}/mo at R2 pricing)`);
-    console.log(`  Storage at R2 cost: $${(totalSize / 1024 / 1024 / 1024 * 0.015).toFixed(4)}/month`);
+    console.log(
+      `  Total size:  ${(totalSize / 1024 / 1024).toFixed(1)} MB ($${((totalSize / 1024 / 1024 / 1024) * 0.015).toFixed(2)}/mo at R2 pricing)`,
+    );
+    console.log(
+      `  Storage at R2 cost: $${((totalSize / 1024 / 1024 / 1024) * 0.015).toFixed(4)}/month`,
+    );
     if (keys.length > 0) {
       console.log(`  Oldest:  ${new Date(keys[0].LastModified).toISOString()}`);
       console.log(`  Newest:  ${new Date(keys[keys.length - 1].LastModified).toISOString()}`);
@@ -208,14 +240,17 @@ async function main() {
       console.log('  DRY-RUN: would restore all files');
       return;
     }
-    let ok = 0, err = 0;
+    let ok = 0,
+      err = 0;
     for (const obj of keys) {
       try {
         const buffer = await downloadFromR2(client, bucket, obj.Key);
         const url = await uploadToVercelBlob(buffer, path.basename(obj.Key));
         await prisma.teacherFile.updateMany({
           where: { OR: [{ fileKey: obj.Key }, { pdfKey: obj.Key }] },
-          data: obj.Key.endsWith('.pdf') ? { pdfUrl: url, pdfKey: obj.Key } : { fileUrl: url, fileKey: obj.Key },
+          data: obj.Key.endsWith('.pdf')
+            ? { pdfUrl: url, pdfKey: obj.Key }
+            : { fileUrl: url, fileKey: obj.Key },
         });
         ok++;
         if (ok % 50 === 0) process.stdout.write(`\r  Restored ${ok}/${keys.length}`);

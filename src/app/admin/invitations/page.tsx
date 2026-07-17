@@ -26,29 +26,29 @@ export default async function AdminInvitationsPage() {
             firstName: true,
             lastName: true,
             email: true,
-            _count: { select: { uploadedFiles: true } }
-          }
+            _count: { select: { uploadedFiles: true } },
+          },
         },
-        invitedBy: { select: { id: true, firstName: true, lastName: true, email: true } }
-      }
+        invitedBy: { select: { id: true, firstName: true, lastName: true, email: true } },
+      },
     }),
     prisma.teacherInvitation.groupBy({
       by: ['status'],
       _count: { status: true },
-    })
+    }),
   ]);
 
   const statsMap: Record<string, number> = {
-    PENDING: 0, SENT: 0, CLICKED: 0, ACTIVATED: 0, EXPIRED: 0, CANCELLED: 0,
+    PENDING: 0,
+    SENT: 0,
+    CLICKED: 0,
+    ACTIVATED: 0,
+    EXPIRED: 0,
+    CANCELLED: 0,
   };
   stats.forEach((s: any) => {
     statsMap[s.status] = s._count.status;
   });
 
-  return (
-    <InvitationsClient
-      initialInvitations={invitations as any}
-      initialStats={statsMap}
-    />
-  );
+  return <InvitationsClient initialInvitations={invitations as any} initialStats={statsMap} />;
 }

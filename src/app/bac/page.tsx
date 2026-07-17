@@ -10,44 +10,69 @@ import {
   SITE_URL,
 } from '@/lib/structured-data';
 import { getLocale, getT, getDict } from '@/lib/i18n-server';
-import { getBacFiles, getBacStats, getSectionMeta, getSubjectMeta } from '@/lib/bac-data';
+import { getBacFiles, getSectionMeta, getSubjectMeta } from '@/lib/bac-data';
 import {
-  Sparkles, BookOpen, Award, Clock, Target, CheckCircle,
-  ArrowRight, Calendar, Trophy, FileText, Download, Star,
-  GraduationCap, ChevronRight, ChevronDown, BarChart3,
-  TrendingUp, Calculator, Archive, Calculator as CalculatorIcon,
-  Atom, Leaf, BookText, Globe, Brain, Landmark, Monitor,
-  BookHeart, Dumbbell, Languages, Cog, Code2, Database,
-  Briefcase, Palette, Music, Drama,
+  BookOpen,
+  Target,
+  CheckCircle,
+  ArrowRight,
+  Calendar,
+  Trophy,
+  FileText,
+  Download,
+  GraduationCap,
+  ChevronRight,
+  ChevronDown,
+  TrendingUp,
+  Calculator,
+  Archive,
+  Calculator as CalculatorIcon,
+  Atom,
+  Leaf,
+  BookText,
+  Globe,
+  Brain,
+  Landmark,
+  Monitor,
+  BookHeart,
+  Dumbbell,
+  Languages,
+  Cog,
+  Code2,
+  Database,
+  Briefcase,
+  Palette,
+  Music,
+  Drama,
 } from 'lucide-react';
 
 const SUBJECT_ICONS: Record<string, any> = {
-  'mathematiques': CalculatorIcon,
-  'physique': Atom,
-  'svt': Leaf,
-  'francais': BookText,
-  'anglais': Globe,
-  'arabe': BookOpen,
-  'philosophie': Brain,
+  mathematiques: CalculatorIcon,
+  physique: Atom,
+  svt: Leaf,
+  francais: BookText,
+  anglais: Globe,
+  arabe: BookOpen,
+  philosophie: Brain,
   'histoire-geo': Landmark,
-  'informatique': Monitor,
+  informatique: Monitor,
   'pensee-islamique': BookHeart,
-  'eps': Dumbbell,
-  'allemand': Languages,
-  'espagnol': Languages,
-  'italien': Languages,
-  'chinois': Languages,
-  'russe': Languages,
-  'portugais': Languages,
-  'turc': Languages,
-  'technique': Cog,
-  'algorithme': Code2,
+  eps: Dumbbell,
+  allemand: Languages,
+  espagnol: Languages,
+  italien: Languages,
+  chinois: Languages,
+  russe: Languages,
+  portugais: Languages,
+  turc: Languages,
+  technique: Cog,
+  algorithme: Code2,
   'bases-donnees': Database,
-  'economie': TrendingUp,
-  'gestion': Briefcase,
-  'art': Palette,
-  'musique': Music,
-  'theatre': Drama,
+  economie: TrendingUp,
+  gestion: Briefcase,
+  art: Palette,
+  musique: Music,
+  theatre: Drama,
 };
 
 export const revalidate = 3600; // ISR: refresh hourly
@@ -71,52 +96,118 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title,
     description,
-    keywords: isAr ? [
-      // Section names
-      'باكالوريا تونس', 'باكالوريا تونسية', 'امتحان الباكالوريا', 'دورة رئيسية', 'دورة مراقبة',
-      // Sections
-      'شعبة الرياضيات', 'شعبة العلوم التجريبية', 'شعبة العلوم التقنية',
-      'شعبة علوم الإعلامية', 'شعبة الاقتصاد والتصرف', 'شعبة الآداب', 'شعبة الرياضة',
-      // Matières
-      'رياضيات باكالوريا', 'فيزياء باكالوريا', 'علوم الحياة باكالوريا',
-      'فلسفة باكالوريا', 'فرنسية باكالوريا', 'انجليزية باكالوريا', 'عربية باكالوريا',
-      // Actions
-      'مواضيع باكالوريا تونس', 'إصلاحات باكالوريا', 'مراجعة باكالوريا', 'تحضير باكالوريا',
-      'تحميل مواضيع باكالوريا', 'تصحيح باكالوريا', 'باكالوريا بيضاء', 'باكالوريا تجريبية',
-      // Tools
-      'احتساب معدل الباكالوريا', 'معدل الباكالوريا', 'معاملات الباكالوريا',
-      // Long-tail
-      'باكالوريا تونس 2025', 'باكالوريا تونس 2024', 'بكالوريا تونس', 'examanet bac',
-      'coefficient bac tunisie', 'mention bac tunisie', 'معدّل الباكالوريا',
-    ] : [
-      // Primary
-      'bac tunisie', 'bac tunisie 2025', 'bac tunisie 2026', 'baccalauréat tunisie',
-      'bac tunisien', 'tunisian baccalaureate',
-      // Sections
-      'bac mathématique tunisie', 'bac sciences expérimentales tunisie', 'bac technique tunisie',
-      'bac informatique tunisie', 'bac economie gestion tunisie', 'bac lettres tunisie', 'bac sport tunisie',
-      // Matières
-      'math bac tunisie', 'physique bac tunisie', 'svt bac tunisie', 'philo bac tunisie',
-      'français bac tunisie', 'anglais bac tunisie', 'arabe bac tunisie',
-      'philosophie bac tunisie', 'histoire geo bac tunisie', 'economie bac tunisie',
-      // Actions
-      'sujet bac tunisie', 'corrigé bac tunisie', 'devoir bac tunisie', 'examen bac tunisie',
-      'révision bac tunisie', 'préparation bac tunisie', 'réussir bac tunisie',
-      'télécharger sujet bac', 'pdf bac tunisie', 'gratuit bac tunisie',
-      // Tools
-      'calcul moyenne bac tunisie', 'moyenne bac tunisie', 'coefficient bac tunisie',
-      'score bac tunisie', 'orientation bac tunisie', 'mention bac tunisie',
-      // Long-tail
-      'sujets bac 2024', 'sujets bac 2023', 'sujets bac 2025', 'sujets bac 2026',
-      'annales bac tunisie', 'archives bac tunisie', 'séries bac tunisie',
-      'bac blanc tunisie', 'bac principal', 'bac controle', 'session principale',
-      'session de contrôle', 'examanet bac', 'coefficient bac math tunisie',
-    ],
+    keywords: isAr
+      ? [
+          // Section names
+          'باكالوريا تونس',
+          'باكالوريا تونسية',
+          'امتحان الباكالوريا',
+          'دورة رئيسية',
+          'دورة مراقبة',
+          // Sections
+          'شعبة الرياضيات',
+          'شعبة العلوم التجريبية',
+          'شعبة العلوم التقنية',
+          'شعبة علوم الإعلامية',
+          'شعبة الاقتصاد والتصرف',
+          'شعبة الآداب',
+          'شعبة الرياضة',
+          // Matières
+          'رياضيات باكالوريا',
+          'فيزياء باكالوريا',
+          'علوم الحياة باكالوريا',
+          'فلسفة باكالوريا',
+          'فرنسية باكالوريا',
+          'انجليزية باكالوريا',
+          'عربية باكالوريا',
+          // Actions
+          'مواضيع باكالوريا تونس',
+          'إصلاحات باكالوريا',
+          'مراجعة باكالوريا',
+          'تحضير باكالوريا',
+          'تحميل مواضيع باكالوريا',
+          'تصحيح باكالوريا',
+          'باكالوريا بيضاء',
+          'باكالوريا تجريبية',
+          // Tools
+          'احتساب معدل الباكالوريا',
+          'معدل الباكالوريا',
+          'معاملات الباكالوريا',
+          // Long-tail
+          'باكالوريا تونس 2025',
+          'باكالوريا تونس 2024',
+          'بكالوريا تونس',
+          'examanet bac',
+          'coefficient bac tunisie',
+          'mention bac tunisie',
+          'معدّل الباكالوريا',
+        ]
+      : [
+          // Primary
+          'bac tunisie',
+          'bac tunisie 2025',
+          'bac tunisie 2026',
+          'baccalauréat tunisie',
+          'bac tunisien',
+          'tunisian baccalaureate',
+          // Sections
+          'bac mathématique tunisie',
+          'bac sciences expérimentales tunisie',
+          'bac technique tunisie',
+          'bac informatique tunisie',
+          'bac economie gestion tunisie',
+          'bac lettres tunisie',
+          'bac sport tunisie',
+          // Matières
+          'math bac tunisie',
+          'physique bac tunisie',
+          'svt bac tunisie',
+          'philo bac tunisie',
+          'français bac tunisie',
+          'anglais bac tunisie',
+          'arabe bac tunisie',
+          'philosophie bac tunisie',
+          'histoire geo bac tunisie',
+          'economie bac tunisie',
+          // Actions
+          'sujet bac tunisie',
+          'corrigé bac tunisie',
+          'devoir bac tunisie',
+          'examen bac tunisie',
+          'révision bac tunisie',
+          'préparation bac tunisie',
+          'réussir bac tunisie',
+          'télécharger sujet bac',
+          'pdf bac tunisie',
+          'gratuit bac tunisie',
+          // Tools
+          'calcul moyenne bac tunisie',
+          'moyenne bac tunisie',
+          'coefficient bac tunisie',
+          'score bac tunisie',
+          'orientation bac tunisie',
+          'mention bac tunisie',
+          // Long-tail
+          'sujets bac 2024',
+          'sujets bac 2023',
+          'sujets bac 2025',
+          'sujets bac 2026',
+          'annales bac tunisie',
+          'archives bac tunisie',
+          'séries bac tunisie',
+          'bac blanc tunisie',
+          'bac principal',
+          'bac controle',
+          'session principale',
+          'session de contrôle',
+          'examanet bac',
+          'coefficient bac math tunisie',
+        ],
     alternates: {
       canonical: PAGE_URL,
       languages: {
-        'fr': PAGE_URL,
-        'ar': `${SITE_URL}/ar/bac`,
+        fr: PAGE_URL,
+        ar: `${SITE_URL}/ar/bac`,
         'x-default': PAGE_URL,
       },
     },
@@ -127,12 +218,14 @@ export async function generateMetadata(): Promise<Metadata> {
       siteName: 'Examanet',
       locale: isAr ? 'ar_TN' : 'fr_TN',
       type: 'website',
-      images: [{
-        url: '/api/og/page/bac',
-        width: 1200,
-        height: 630,
-        alt: isAr ? 'إكسامانت — الباكالوريا التونسية 2025' : 'Examanet — Bac Tunisie 2025',
-      }],
+      images: [
+        {
+          url: '/api/og/page/bac',
+          width: 1200,
+          height: 630,
+          alt: isAr ? 'إكسامانت — الباكالوريا التونسية 2025' : 'Examanet — Bac Tunisie 2025',
+        },
+      ],
     },
     twitter: {
       card: 'summary_large_image',
@@ -198,9 +291,9 @@ export default function BacPillar() {
 
   // Archives preview - get latest year files for preview
   const allFiles = getBacFiles();
-  const latestYear = Math.max(...allFiles.map(f => f.year || 0));
+  const latestYear = Math.max(...allFiles.map((f) => f.year || 0));
   const previewFiles = allFiles
-    .filter(f => f.year === latestYear && f.session === 'principale' && f.type === 'sujets')
+    .filter((f) => f.year === latestYear && f.session === 'principale' && f.type === 'sujets')
     .slice(0, 8);
 
   // FAQ schema
@@ -210,7 +303,7 @@ export default function BacPillar() {
     faqItems.map((f) => ({
       question: f.q,
       answer: f.a,
-    }))
+    })),
   );
 
   // Combine all schemas
@@ -254,8 +347,13 @@ export default function BacPillar() {
           <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-gradient-to-br from-amber-300 to-orange-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30" />
 
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-            <nav aria-label="Fil d'Ariane" className="flex items-center gap-1 text-xs text-slate-500 mb-6 flex-wrap">
-              <Link href="/" className="hover:text-primary-600 transition">{t('common.home')}</Link>
+            <nav
+              aria-label="Fil d'Ariane"
+              className="flex items-center gap-1 text-xs text-slate-500 mb-6 flex-wrap"
+            >
+              <Link href="/" className="hover:text-primary-600 transition">
+                {t('common.home')}
+              </Link>
               <ChevronRight className="w-3 h-3 text-slate-300" />
               <span className="text-slate-900 font-semibold">{t('levels.bac')}</span>
             </nav>
@@ -297,19 +395,31 @@ export default function BacPillar() {
                 {t('bac.hero.subtitle')}
               </p>
               <div className="flex flex-wrap items-center justify-center gap-3">
-                <Link href="#sections" className="btn-primary text-base inline-flex items-center gap-2 px-7 py-3.5">
+                <Link
+                  href="#sections"
+                  className="btn-primary text-base inline-flex items-center gap-2 px-7 py-3.5"
+                >
                   <FileText className="w-4 h-4" />
                   {t('bac.hero.ctaPrimary')}
                 </Link>
-                <Link href="/bac/archives" className="inline-flex items-center gap-2 px-7 py-3.5 bg-gradient-to-r from-violet-600 to-purple-700 text-white font-bold rounded-xl hover:from-violet-700 hover:to-purple-800 transition shadow-md">
+                <Link
+                  href="/bac/archives"
+                  className="inline-flex items-center gap-2 px-7 py-3.5 bg-gradient-to-r from-violet-600 to-purple-700 text-white font-bold rounded-xl hover:from-violet-700 hover:to-purple-800 transition shadow-md"
+                >
                   <Archive className="w-4 h-4" />
                   {t('bac.hero.ctaArchives') || 'Archives 2010-2025'}
                 </Link>
-                <Link href="/outils/moyenne-bac" className="inline-flex items-center gap-2 px-7 py-3.5 bg-white border-2 border-violet-300 text-violet-700 font-bold rounded-xl hover:bg-violet-50 transition shadow-sm">
+                <Link
+                  href="/outils/moyenne-bac"
+                  className="inline-flex items-center gap-2 px-7 py-3.5 bg-white border-2 border-violet-300 text-violet-700 font-bold rounded-xl hover:bg-violet-50 transition shadow-sm"
+                >
                   <Calculator className="w-4 h-4" />
                   {t('bac.hero.ctaSecondary')}
                 </Link>
-                <Link href="#methodo" className="inline-flex items-center gap-2 px-7 py-3.5 bg-white border-2 border-amber-300 text-amber-700 font-bold rounded-xl hover:bg-amber-50 transition shadow-sm">
+                <Link
+                  href="#methodo"
+                  className="inline-flex items-center gap-2 px-7 py-3.5 bg-white border-2 border-amber-300 text-amber-700 font-bold rounded-xl hover:bg-amber-50 transition shadow-sm"
+                >
                   <Target className="w-4 h-4" />
                   {t('bac.hero.ctaTertiary')}
                 </Link>
@@ -319,16 +429,43 @@ export default function BacPillar() {
             {/* Stats */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl mx-auto">
               {[
-                { value: '2010', label: t('bac.stats.subjects'), icon: FileText, color: 'bg-violet-100 text-violet-600' },
-                { value: '15+', label: t('bac.stats.years'), icon: CheckCircle, color: 'bg-emerald-100 text-emerald-600' },
-                { value: '7', label: t('bac.stats.sections'), icon: Trophy, color: 'bg-amber-100 text-amber-600' },
-                { value: '13', label: t('bac.stats.matieres'), icon: BookOpen, color: 'bg-rose-100 text-rose-600' },
+                {
+                  value: '2010',
+                  label: t('bac.stats.subjects'),
+                  icon: FileText,
+                  color: 'bg-violet-100 text-violet-600',
+                },
+                {
+                  value: '15+',
+                  label: t('bac.stats.years'),
+                  icon: CheckCircle,
+                  color: 'bg-emerald-100 text-emerald-600',
+                },
+                {
+                  value: '7',
+                  label: t('bac.stats.sections'),
+                  icon: Trophy,
+                  color: 'bg-amber-100 text-amber-600',
+                },
+                {
+                  value: '13',
+                  label: t('bac.stats.matieres'),
+                  icon: BookOpen,
+                  color: 'bg-rose-100 text-rose-600',
+                },
               ].map((s, i) => (
-                <div key={i} className="bg-white/80 backdrop-blur-sm rounded-2xl p-5 shadow-md border border-slate-100 text-center">
-                  <div className={`w-12 h-12 mx-auto mb-3 rounded-xl ${s.color} flex items-center justify-center`}>
+                <div
+                  key={i}
+                  className="bg-white/80 backdrop-blur-sm rounded-2xl p-5 shadow-md border border-slate-100 text-center"
+                >
+                  <div
+                    className={`w-12 h-12 mx-auto mb-3 rounded-xl ${s.color} flex items-center justify-center`}
+                  >
                     <s.icon className="w-6 h-6" />
                   </div>
-                  <div className="text-2xl lg:text-3xl font-extrabold text-slate-900 mb-1">{s.value}</div>
+                  <div className="text-2xl lg:text-3xl font-extrabold text-slate-900 mb-1">
+                    {s.value}
+                  </div>
                   <div className="text-xs text-slate-500 font-semibold uppercase">{s.label}</div>
                 </div>
               ))}
@@ -381,7 +518,9 @@ export default function BacPillar() {
                     className={`group relative bg-gradient-to-br ${colorMap[s.color]} rounded-3xl p-6 border-2 hover:shadow-xl hover:-translate-y-1 transition-all duration-300`}
                   >
                     <div className="flex items-start gap-4 mb-3">
-                      <div className={`w-14 h-14 rounded-2xl ${iconBg[s.color]} flex items-center justify-center text-2xl flex-shrink-0`}>
+                      <div
+                        className={`w-14 h-14 rounded-2xl ${iconBg[s.color]} flex items-center justify-center text-2xl flex-shrink-0`}
+                      >
                         {s.icon}
                       </div>
                       <div className="flex-1">
@@ -393,7 +532,8 @@ export default function BacPillar() {
                     </div>
                     <p className="text-sm text-slate-700 leading-relaxed mb-3">{s.desc}</p>
                     <div className="flex items-center gap-2 text-sm font-semibold text-slate-700 group-hover:text-slate-900">
-                      {isAr ? 'المواضيع والإصلاحات' : 'Voir les sujets'} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition rtl:group-hover:-translate-x-1" />
+                      {isAr ? 'المواضيع والإصلاحات' : 'Voir les sujets'}{' '}
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition rtl:group-hover:-translate-x-1" />
                     </div>
                   </Link>
                 );
@@ -421,7 +561,9 @@ export default function BacPillar() {
 
             {(() => {
               const subjects = (dict.bac?.matieres?.list as Array<any>) || [];
-              const categories = (dict.bac?.matieres?.categories as Record<string, { fr: string; ar: string }>) || {};
+              const categories =
+                (dict.bac?.matieres?.categories as Record<string, { fr: string; ar: string }>) ||
+                {};
               const catOrder = ['common', 'sciences', 'langues', 'arts'];
               const catGradient: Record<string, string> = {
                 common: 'from-slate-100/50 to-white',
@@ -438,7 +580,10 @@ export default function BacPillar() {
                     const catMeta = categories[catKey] || { fr: catKey, ar: catKey };
 
                     return (
-                      <div key={catKey} className={`rounded-3xl bg-gradient-to-br ${catGradient[catKey]} border border-slate-200/60 p-6 lg:p-8`}>
+                      <div
+                        key={catKey}
+                        className={`rounded-3xl bg-gradient-to-br ${catGradient[catKey]} border border-slate-200/60 p-6 lg:p-8`}
+                      >
                         {/* Category header */}
                         <div className="flex items-center gap-3 mb-5">
                           <div className="h-px flex-1 bg-slate-200" />
@@ -533,7 +678,10 @@ export default function BacPillar() {
 
             <div className="grid md:grid-cols-2 gap-5">
               {(['step1', 'step2', 'step3', 'step4'] as const).map((step, i) => (
-                <div key={i} className="bg-gradient-to-br from-slate-50 to-white rounded-2xl p-6 border-2 border-slate-100 hover:border-emerald-300 transition-all">
+                <div
+                  key={i}
+                  className="bg-gradient-to-br from-slate-50 to-white rounded-2xl p-6 border-2 border-slate-100 hover:border-emerald-300 transition-all"
+                >
                   <div className="flex items-start gap-4">
                     <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-extrabold text-lg">
                       {i + 1}
@@ -572,16 +720,18 @@ export default function BacPillar() {
 
             <div className="grid md:grid-cols-2 gap-6">
               {(['principale', 'controle'] as const).map((s, i) => {
-                const colors = i === 0
-                  ? 'from-violet-50 to-purple-50 border-violet-300'
-                  : 'from-amber-50 to-orange-50 border-amber-300';
-                const iconColors = i === 0
-                  ? 'bg-violet-100 text-violet-700'
-                  : 'bg-amber-100 text-amber-700';
+                const colors =
+                  i === 0
+                    ? 'from-violet-50 to-purple-50 border-violet-300'
+                    : 'from-amber-50 to-orange-50 border-amber-300';
+                const iconColors =
+                  i === 0 ? 'bg-violet-100 text-violet-700' : 'bg-amber-100 text-amber-700';
                 return (
                   <div key={i} className={`bg-gradient-to-br ${colors} rounded-3xl p-8 border-2`}>
                     <div className="flex items-start gap-4 mb-4">
-                      <div className={`w-14 h-14 rounded-2xl ${iconColors} flex items-center justify-center flex-shrink-0`}>
+                      <div
+                        className={`w-14 h-14 rounded-2xl ${iconColors} flex items-center justify-center flex-shrink-0`}
+                      >
                         <Calendar className="w-7 h-7" />
                       </div>
                       <div>
@@ -596,9 +746,7 @@ export default function BacPillar() {
                     <div className="text-3xl font-extrabold text-slate-900 mb-3">
                       {t(`bac.sessions.${s}.date`)}
                     </div>
-                    <p className="text-slate-700 leading-relaxed">
-                      {t(`bac.sessions.${s}.desc`)}
-                    </p>
+                    <p className="text-slate-700 leading-relaxed">{t(`bac.sessions.${s}.desc`)}</p>
                   </div>
                 );
               })}
@@ -624,14 +772,44 @@ export default function BacPillar() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-              {([
-                { key: 'passable', bg: 'from-slate-50 to-slate-100', text: 'text-slate-700', border: 'border-slate-200' },
-                { key: 'assezBien', bg: 'from-yellow-50 to-amber-50', text: 'text-amber-700', border: 'border-amber-200' },
-                { key: 'bien', bg: 'from-orange-50 to-orange-100', text: 'text-orange-700', border: 'border-orange-200' },
-                { key: 'tresBien', bg: 'from-rose-50 to-rose-100', text: 'text-rose-700', border: 'border-rose-200' },
-                { key: 'excellent', bg: 'from-violet-100 to-purple-200', text: 'text-purple-800', border: 'border-purple-400' },
-              ] as const).map((m, i) => (
-                <div key={i} className={`bg-gradient-to-br ${m.bg} rounded-2xl p-5 border-2 ${m.border} text-center`}>
+              {(
+                [
+                  {
+                    key: 'passable',
+                    bg: 'from-slate-50 to-slate-100',
+                    text: 'text-slate-700',
+                    border: 'border-slate-200',
+                  },
+                  {
+                    key: 'assezBien',
+                    bg: 'from-yellow-50 to-amber-50',
+                    text: 'text-amber-700',
+                    border: 'border-amber-200',
+                  },
+                  {
+                    key: 'bien',
+                    bg: 'from-orange-50 to-orange-100',
+                    text: 'text-orange-700',
+                    border: 'border-orange-200',
+                  },
+                  {
+                    key: 'tresBien',
+                    bg: 'from-rose-50 to-rose-100',
+                    text: 'text-rose-700',
+                    border: 'border-rose-200',
+                  },
+                  {
+                    key: 'excellent',
+                    bg: 'from-violet-100 to-purple-200',
+                    text: 'text-purple-800',
+                    border: 'border-purple-400',
+                  },
+                ] as const
+              ).map((m, i) => (
+                <div
+                  key={i}
+                  className={`bg-gradient-to-br ${m.bg} rounded-2xl p-5 border-2 ${m.border} text-center`}
+                >
                   <div className={`text-xs font-bold uppercase tracking-wider ${m.text} mb-2`}>
                     {t(`bac.mentions.${m.key}Range`)}
                   </div>
@@ -681,67 +859,71 @@ export default function BacPillar() {
             ARCHIVES PREVIEW - Latest year files
             ================================================================= */}
         {previewFiles.length > 0 && (
-        <section className="py-16 bg-gradient-to-br from-slate-50 via-white to-violet-50">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-10">
-              <div className="inline-flex items-center gap-2 bg-white border-2 border-violet-200 rounded-full px-4 py-1.5 mb-3 shadow-sm">
-                <Archive className="w-4 h-4 text-violet-600" />
-                <span className="text-xs font-bold text-violet-700 uppercase">
-                  {isAr ? `الأرشيف ${latestYear}` : `ARCHIVES BAC ${latestYear}`}
-                </span>
+          <section className="py-16 bg-gradient-to-br from-slate-50 via-white to-violet-50">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center mb-10">
+                <div className="inline-flex items-center gap-2 bg-white border-2 border-violet-200 rounded-full px-4 py-1.5 mb-3 shadow-sm">
+                  <Archive className="w-4 h-4 text-violet-600" />
+                  <span className="text-xs font-bold text-violet-700 uppercase">
+                    {isAr ? `الأرشيف ${latestYear}` : `ARCHIVES BAC ${latestYear}`}
+                  </span>
+                </div>
+                <h2 className="text-3xl lg:text-4xl font-extrabold mb-3 text-slate-900">
+                  {isAr
+                    ? `أحدث مواضيع الباكالوريا ${latestYear}`
+                    : `Derniers sujets du Bac ${latestYear}`}
+                </h2>
+                <p className="text-slate-600 max-w-2xl mx-auto">
+                  {isAr
+                    ? `تحميل مباشر لمواضيع الدورة الرئيسية ${latestYear} - 7 شعب كاملة`
+                    : `Téléchargement direct des sujets de la session principale ${latestYear} - 7 sections complètes`}
+                </p>
               </div>
-              <h2 className="text-3xl lg:text-4xl font-extrabold mb-3 text-slate-900">
-                {isAr ? `أحدث مواضيع الباكالوريا ${latestYear}` : `Derniers sujets du Bac ${latestYear}`}
-              </h2>
-              <p className="text-slate-600 max-w-2xl mx-auto">
-                {isAr
-                  ? `تحميل مباشر لمواضيع الدورة الرئيسية ${latestYear} - 7 شعب كاملة`
-                  : `Téléchargement direct des sujets de la session principale ${latestYear} - 7 sections complètes`}
-              </p>
-            </div>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 max-w-5xl mx-auto mb-8">
-              {previewFiles.map((f, i) => {
-                const sectionMeta = getSectionMeta(f.section || '');
-                const subjectMeta = getSubjectMeta(f.subject || '');
-                return (
-                  <a
-                    key={i}
-                    href={f.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group bg-white rounded-2xl p-4 border-2 border-slate-100 hover:border-violet-300 hover:shadow-lg transition-all"
-                  >
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="text-2xl">{sectionMeta?.icon || '📄'}</div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-xs font-bold text-slate-900 truncate">
-                          {subjectMeta?.nameFr || f.subject}
-                        </div>
-                        <div className="text-xs text-slate-500">
-                          {sectionMeta?.nameFr || f.section}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 max-w-5xl mx-auto mb-8">
+                {previewFiles.map((f, i) => {
+                  const sectionMeta = getSectionMeta(f.section || '');
+                  const subjectMeta = getSubjectMeta(f.subject || '');
+                  return (
+                    <a
+                      key={i}
+                      href={f.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group bg-white rounded-2xl p-4 border-2 border-slate-100 hover:border-violet-300 hover:shadow-lg transition-all"
+                    >
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="text-2xl">{sectionMeta?.icon || '📄'}</div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-xs font-bold text-slate-900 truncate">
+                            {subjectMeta?.nameFr || f.subject}
+                          </div>
+                          <div className="text-xs text-slate-500">
+                            {sectionMeta?.nameFr || f.section}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-slate-400">{latestYear}</span>
-                      <Download className="w-4 h-4 text-violet-500 group-hover:text-violet-700" />
-                    </div>
-                  </a>
-                );
-              })}
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-slate-400">{latestYear}</span>
+                        <Download className="w-4 h-4 text-violet-500 group-hover:text-violet-700" />
+                      </div>
+                    </a>
+                  );
+                })}
+              </div>
+              <div className="text-center">
+                <Link
+                  href="/bac/archives"
+                  className="inline-flex items-center gap-2 bg-gradient-to-r from-violet-600 to-purple-700 text-white font-bold px-6 py-3 rounded-xl hover:from-violet-700 hover:to-purple-800 transition shadow-md"
+                >
+                  <Archive className="w-4 h-4" />
+                  {isAr
+                    ? 'استكشف كل الأرشيف (2634 ملف)'
+                    : 'Explorer toutes les archives (2634 fichiers)'}
+                  <ArrowRight className="w-4 h-4 rtl:rotate-180" />
+                </Link>
+              </div>
             </div>
-            <div className="text-center">
-              <Link
-                href="/bac/archives"
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-violet-600 to-purple-700 text-white font-bold px-6 py-3 rounded-xl hover:from-violet-700 hover:to-purple-800 transition shadow-md"
-              >
-                <Archive className="w-4 h-4" />
-                {isAr ? 'استكشف كل الأرشيف (2634 ملف)' : 'Explorer toutes les archives (2634 fichiers)'}
-                <ArrowRight className="w-4 h-4 rtl:rotate-180" />
-              </Link>
-            </div>
-          </div>
-        </section>
+          </section>
         )}
 
         {/* =================================================================
@@ -754,19 +936,23 @@ export default function BacPillar() {
             <div className="inline-block px-4 py-1.5 bg-white/20 backdrop-blur-sm rounded-full text-xs font-bold mb-3">
               {isAr ? '🚀 ابدأ الآن' : '🚀 COMMENCEZ MAINTENANT'}
             </div>
-            <h2 className="text-3xl lg:text-5xl font-extrabold mb-4">
-              {t('bac.cta.title')}
-            </h2>
+            <h2 className="text-3xl lg:text-5xl font-extrabold mb-4">{t('bac.cta.title')}</h2>
             <p className="text-lg lg:text-xl text-violet-100 mb-8 max-w-2xl mx-auto">
               {t('bac.cta.subtitle')}
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3">
-              <Link href="/ressources?class=4eme-secondaire" className="inline-flex items-center gap-2 bg-white text-violet-700 font-extrabold px-7 py-3.5 rounded-xl hover:bg-violet-50 transition shadow-2xl">
+              <Link
+                href="/ressources?class=4eme-secondaire"
+                className="inline-flex items-center gap-2 bg-white text-violet-700 font-extrabold px-7 py-3.5 rounded-xl hover:bg-violet-50 transition shadow-2xl"
+              >
                 <FileText className="w-5 h-5" />
                 {t('bac.cta.cta1')}
                 <ArrowRight className="w-5 h-5 rtl:rotate-180" />
               </Link>
-              <Link href="/ressources" className="inline-flex items-center gap-2 bg-violet-500 text-white font-extrabold px-7 py-3.5 rounded-xl hover:bg-violet-400 transition border-2 border-violet-300">
+              <Link
+                href="/ressources"
+                className="inline-flex items-center gap-2 bg-violet-500 text-white font-extrabold px-7 py-3.5 rounded-xl hover:bg-violet-400 transition border-2 border-violet-300"
+              >
                 {t('bac.cta.cta2')}
               </Link>
             </div>

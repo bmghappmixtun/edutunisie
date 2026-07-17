@@ -7,7 +7,7 @@ import toast from 'react-hot-toast';
 export default function FollowButton({
   teacherId,
   initialFollowing,
-  initialCount
+  initialCount,
 }: {
   teacherId: string;
   initialFollowing: boolean;
@@ -24,7 +24,7 @@ export default function FollowButton({
       const res = await fetch('/api/follows', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ teacherId })
+        body: JSON.stringify({ teacherId }),
       });
       const data = await res.json();
       if (!res.ok) {

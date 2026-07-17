@@ -24,16 +24,23 @@ export async function POST(req: NextRequest) {
   }
   // Block teachers who haven't completed file verification
   if (user.role === 'TEACHER' && user.status === 'PENDING_FILE_VERIFICATION') {
-    return NextResponse.json({
-      error: 'Vous devez d\'abord soumettre vos 5 fichiers de vérification avant de pouvoir publier des ressources. Rendez-vous sur votre tableau de bord.',
-      code: 'PENDING_FILE_VERIFICATION',
-    }, { status: 403 });
+    return NextResponse.json(
+      {
+        error:
+          "Vous devez d'abord soumettre vos 5 fichiers de vérification avant de pouvoir publier des ressources. Rendez-vous sur votre tableau de bord.",
+        code: 'PENDING_FILE_VERIFICATION',
+      },
+      { status: 403 },
+    );
   }
   if (user.role === 'TEACHER' && user.status === 'PENDING_APPROVAL') {
-    return NextResponse.json({
-      error: 'Votre compte est en attente d\'approbation par l\'administrateur.',
-      code: 'PENDING_APPROVAL',
-    }, { status: 403 });
+    return NextResponse.json(
+      {
+        error: "Votre compte est en attente d'approbation par l'administrateur.",
+        code: 'PENDING_APPROVAL',
+      },
+      { status: 403 },
+    );
   }
 
   try {
@@ -54,12 +61,12 @@ export async function POST(req: NextRequest) {
     let libraryFileId: string | null = null; // <- NEW: link to teacher library file
 
     // Homework & school metadata (NEW)
-    let homeworkSubtype: string | null = null;       // CONTROL | SYNTHESIS | HOUSEWORK
-    let homeworkNumber: number | null = null;        // 1, 2, 3, 4, 5+ ...
-    let schoolType: string | null = null;            // PUBLIC | PILOTE
-    let product: string | null = null;               // المنتج (Arabic text)
-    let hasCorrection: boolean = false;              // file contains corrigé
-    let correctionSummary: string | null = null;     // description of correction
+    let homeworkSubtype: string | null = null; // CONTROL | SYNTHESIS | HOUSEWORK
+    let homeworkNumber: number | null = null; // 1, 2, 3, 4, 5+ ...
+    let schoolType: string | null = null; // PUBLIC | PILOTE
+    let product: string | null = null; // المنتج (Arabic text)
+    let hasCorrection: boolean = false; // file contains corrigé
+    let correctionSummary: string | null = null; // description of correction
 
     const contentType = req.headers.get('content-type') || '';
 
@@ -100,7 +107,11 @@ export async function POST(req: NextRequest) {
       }
       if (rawHasCorrection === 'true' || rawHasCorrection === 'on' || rawHasCorrection === '1') {
         hasCorrection = true;
-        if (rawCorrectionSummary && typeof rawCorrectionSummary === 'string' && rawCorrectionSummary.trim()) {
+        if (
+          rawCorrectionSummary &&
+          typeof rawCorrectionSummary === 'string' &&
+          rawCorrectionSummary.trim()
+        ) {
           correctionSummary = String(rawCorrectionSummary).trim().substring(0, 500);
         }
       }
@@ -128,7 +139,8 @@ export async function POST(req: NextRequest) {
       }
       const allowedSchool = ['PUBLIC', 'PRIVATE', 'PILOTE'];
       if (allowedSchool.includes(body.schoolType)) schoolType = body.schoolType;
-      if (body.product && typeof body.product === 'string') product = body.product.trim().substring(0, 200);
+      if (body.product && typeof body.product === 'string')
+        product = body.product.trim().substring(0, 200);
       hasCorrection = body.hasCorrection === true || body.hasCorrection === 'true';
       if (body.correctionSummary && typeof body.correctionSummary === 'string') {
         correctionSummary = body.correctionSummary.trim().substring(0, 500);
@@ -172,7 +184,7 @@ export async function POST(req: NextRequest) {
       if (libFile.resourceId) {
         return NextResponse.json(
           { error: 'Ce fichier a déjà été utilisé pour publier une ressource' },
-          { status: 409 }
+          { status: 409 },
         );
       }
 
@@ -186,7 +198,7 @@ export async function POST(req: NextRequest) {
           {
             error: 'Conversion PDF échouée. Ré-uploadez le fichier en PDF manuellement.',
           },
-          { status: 400 }
+          { status: 400 },
         );
       }
       fileUrl = finalPdfUrl;
@@ -204,11 +216,14 @@ export async function POST(req: NextRequest) {
       if (fmt.format === 'unknown') {
         return NextResponse.json(
           { error: 'Format non supporté. Formats acceptés: .pdf, .docx, .doc, .odt' },
-          { status: 400 }
+          { status: 400 },
         );
       }
       if (file.size > 50 * 1024 * 1024) {
-        return NextResponse.json({ error: 'Le fichier doit faire moins de 50 Mo' }, { status: 400 });
+        return NextResponse.json(
+          { error: 'Le fichier doit faire moins de 50 Mo' },
+          { status: 400 },
+        );
       }
 
       // PDF: upload as-is. Word: upload as-is too (will be in originalFileKey)
@@ -224,7 +239,7 @@ export async function POST(req: NextRequest) {
       const originalBlob = await uploadFile(
         originalKey,
         Buffer.from(await file.arrayBuffer()),
-        file.type || 'application/octet-stream'
+        file.type || 'application/octet-stream',
       );
       originalFileKey = originalKey;
 
@@ -236,14 +251,14 @@ export async function POST(req: NextRequest) {
         // Convert non-PDF to PDF on the fly
         try {
           const { convertDocxToPdf } = await import('@/lib/document-converter');
-          const result = await convertDocxToPdf(
-            Buffer.from(await file.arrayBuffer()),
-            { fileName: file.name, title: file.name.replace(/\.[^.]+$/, '') }
-          );
+          const result = await convertDocxToPdf(Buffer.from(await file.arrayBuffer()), {
+            fileName: file.name,
+            title: file.name.replace(/\.[^.]+$/, ''),
+          });
           if (!result.pdfBuffer) {
             return NextResponse.json(
               { error: 'Conversion PDF échouée. Uploadez le fichier en PDF manuellement.' },
-              { status: 400 }
+              { status: 400 },
             );
           }
           const pdfKey = `teacher-resources/${user.id}/${timestamp}-converted.pdf`;
@@ -255,10 +270,9 @@ export async function POST(req: NextRequest) {
           console.error('[teacher/resources] conversion failed:', convErr);
           return NextResponse.json(
             {
-              error:
-                'Conversion PDF échouée. Uploadez le fichier en PDF manuellement.',
+              error: 'Conversion PDF échouée. Uploadez le fichier en PDF manuellement.',
             },
-            { status: 400 }
+            { status: 400 },
           );
         }
       }
@@ -284,10 +298,19 @@ export async function POST(req: NextRequest) {
       hasCorrection,
     });
     // Merge: user-provided tags + auto-generated (deduped, max 15)
-    const finalTags = Array.from(new Set([
-      ...(tags ? tags.split(',').map((t: string) => t.trim()).filter(Boolean) : []),
-      ...autoTags,
-    ])).slice(0, 15).join(',');
+    const finalTags = Array.from(
+      new Set([
+        ...(tags
+          ? tags
+              .split(',')
+              .map((t: string) => t.trim())
+              .filter(Boolean)
+          : []),
+        ...autoTags,
+      ]),
+    )
+      .slice(0, 15)
+      .join(',');
 
     const resource = await prisma.resource.create({
       data: {
@@ -332,7 +355,7 @@ export async function POST(req: NextRequest) {
 
     // Notify admins
     await notifyAdminsNewResource(resource.id).catch((e) =>
-      console.error('Admin notify error:', e)
+      console.error('Admin notify error:', e),
     );
 
     return NextResponse.json({ success: true, resource });

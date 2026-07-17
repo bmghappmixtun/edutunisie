@@ -12,7 +12,7 @@ export async function GET() {
 
   const levels = await prisma.level.findMany({
     orderBy: { order: 'asc' },
-    include: { _count: { select: { classes: true } } }
+    include: { _count: { select: { classes: true } } },
   });
 
   return NextResponse.json({ levels });
@@ -37,8 +37,8 @@ export async function POST(req: NextRequest) {
         slug: slug.toLowerCase().trim(),
         nameFr: nameFr.trim(),
         nameAr: nameAr.trim(),
-        order: order ?? 0
-      }
+        order: order ?? 0,
+      },
     });
     return NextResponse.json({ success: true, level });
   } catch (e: any) {

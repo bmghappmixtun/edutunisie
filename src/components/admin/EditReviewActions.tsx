@@ -4,7 +4,13 @@ import { useRouter } from 'next/navigation';
 import { CheckCircle2, XCircle, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-export default function EditReviewActions({ resourceId, resourceTitle }: { resourceId: string; resourceTitle: string }) {
+export default function EditReviewActions({
+  resourceId,
+  resourceTitle,
+}: {
+  resourceId: string;
+  resourceTitle: string;
+}) {
   const router = useRouter();
   const [loading, setLoading] = useState<'approve' | 'reject' | null>(null);
   const [showRejectForm, setShowRejectForm] = useState(false);
@@ -17,7 +23,7 @@ export default function EditReviewActions({ resourceId, resourceTitle }: { resou
       const res = await fetch(`/api/admin/resource/${resourceId}/edit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'approve' })
+        body: JSON.stringify({ action: 'approve' }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Erreur');
@@ -31,13 +37,16 @@ export default function EditReviewActions({ resourceId, resourceTitle }: { resou
   }
 
   async function reject() {
-    if (!reason.trim()) { toast.error('Indiquez une raison'); return; }
+    if (!reason.trim()) {
+      toast.error('Indiquez une raison');
+      return;
+    }
     setLoading('reject');
     try {
       const res = await fetch(`/api/admin/resource/${resourceId}/edit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'reject', reason: reason.trim() })
+        body: JSON.stringify({ action: 'reject', reason: reason.trim() }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Erreur');
@@ -61,7 +70,11 @@ export default function EditReviewActions({ resourceId, resourceTitle }: { resou
             disabled={!!loading}
             className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 disabled:opacity-50"
           >
-            {loading === 'approve' ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
+            {loading === 'approve' ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <CheckCircle2 className="w-4 h-4" />
+            )}
             Approuver et publier
           </button>
           <button
@@ -78,7 +91,7 @@ export default function EditReviewActions({ resourceId, resourceTitle }: { resou
           <label className="text-sm font-semibold text-red-900">Raison du refus :</label>
           <textarea
             value={reason}
-            onChange={e => setReason(e.target.value)}
+            onChange={(e) => setReason(e.target.value)}
             placeholder="Expliquez pourquoi la modification est refusée..."
             className="w-full px-3 py-2 border border-red-200 rounded-lg focus:border-red-500 outline-none"
             rows={3}
@@ -90,11 +103,18 @@ export default function EditReviewActions({ resourceId, resourceTitle }: { resou
               disabled={!!loading}
               className="px-4 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 disabled:opacity-50 inline-flex items-center gap-2"
             >
-              {loading === 'reject' ? <Loader2 className="w-4 h-4 animate-spin" /> : <XCircle className="w-4 h-4" />}
+              {loading === 'reject' ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <XCircle className="w-4 h-4" />
+              )}
               Confirmer le refus
             </button>
             <button
-              onClick={() => { setShowRejectForm(false); setReason(''); }}
+              onClick={() => {
+                setShowRejectForm(false);
+                setReason('');
+              }}
               className="px-4 py-2 border border-slate-200 rounded-lg font-semibold text-slate-700 hover:bg-white"
             >
               Annuler

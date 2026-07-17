@@ -3,9 +3,16 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import {
-  ChevronDown, ChevronRight, BookOpen, ArrowRight, FileText,
-  Calendar, HardDrive, Eye, Download, Star, X,
-  type LucideIcon,
+  ChevronDown,
+  ChevronRight,
+  BookOpen,
+  ArrowRight,
+  FileText,
+  Calendar,
+  HardDrive,
+  Eye,
+  Download,
+  X,
 } from 'lucide-react';
 
 // ============== TYPES ==============
@@ -54,26 +61,26 @@ interface ClassAccordionProps {
 
 // Resource type chips (simplified)
 const RESOURCE_TYPE_CHIPS: { value: string; label: string; color: string }[] = [
-  { value: 'all',         label: 'Tous',          color: 'bg-slate-100 text-slate-700' },
-  { value: 'COURSE',      label: 'Cours',         color: 'bg-blue-100 text-blue-700' },
-  { value: 'EXERCISE',    label: 'Exercices',     color: 'bg-green-100 text-green-700' },
-  { value: 'HOMEWORK',    label: 'Devoirs',       color: 'bg-amber-100 text-amber-700' },
-  { value: 'BAC_SUBJECT', label: 'Sujets Bac',    color: 'bg-pink-100 text-pink-700' },
-  { value: 'CORRECTION',  label: 'Corrigés',      color: 'bg-emerald-100 text-emerald-700' },
-  { value: 'EXAM',        label: 'Examens',       color: 'bg-red-100 text-red-700' },
-  { value: 'SUMMARY',     label: 'Résumés',       color: 'bg-indigo-100 text-indigo-700' },
+  { value: 'all', label: 'Tous', color: 'bg-slate-100 text-slate-700' },
+  { value: 'COURSE', label: 'Cours', color: 'bg-blue-100 text-blue-700' },
+  { value: 'EXERCISE', label: 'Exercices', color: 'bg-green-100 text-green-700' },
+  { value: 'HOMEWORK', label: 'Devoirs', color: 'bg-amber-100 text-amber-700' },
+  { value: 'BAC_SUBJECT', label: 'Sujets Bac', color: 'bg-pink-100 text-pink-700' },
+  { value: 'CORRECTION', label: 'Corrigés', color: 'bg-emerald-100 text-emerald-700' },
+  { value: 'EXAM', label: 'Examens', color: 'bg-red-100 text-red-700' },
+  { value: 'SUMMARY', label: 'Résumés', color: 'bg-indigo-100 text-indigo-700' },
 ];
 
 const TYPE_LABELS: Record<string, { fr: string; color: string }> = {
-  COURSE:      { fr: 'Cours',       color: 'bg-blue-100 text-blue-700' },
-  HOMEWORK:    { fr: 'Devoir',      color: 'bg-amber-100 text-amber-700' },
-  EXERCISE:    { fr: 'Exercice',    color: 'bg-green-100 text-green-700' },
-  REVISION:    { fr: 'Révision',    color: 'bg-purple-100 text-purple-700' },
-  EXAM:        { fr: 'Examen',      color: 'bg-red-100 text-red-700' },
-  BAC_SUBJECT: { fr: 'Sujet Bac',   color: 'bg-pink-100 text-pink-700' },
-  CORRECTION:  { fr: 'Corrigé',     color: 'bg-emerald-100 text-emerald-700' },
-  SUMMARY:     { fr: 'Résumé',      color: 'bg-indigo-100 text-indigo-700' },
-  OTHER:       { fr: 'Autre',       color: 'bg-slate-100 text-slate-700' },
+  COURSE: { fr: 'Cours', color: 'bg-blue-100 text-blue-700' },
+  HOMEWORK: { fr: 'Devoir', color: 'bg-amber-100 text-amber-700' },
+  EXERCISE: { fr: 'Exercice', color: 'bg-green-100 text-green-700' },
+  REVISION: { fr: 'Révision', color: 'bg-purple-100 text-purple-700' },
+  EXAM: { fr: 'Examen', color: 'bg-red-100 text-red-700' },
+  BAC_SUBJECT: { fr: 'Sujet Bac', color: 'bg-pink-100 text-pink-700' },
+  CORRECTION: { fr: 'Corrigé', color: 'bg-emerald-100 text-emerald-700' },
+  SUMMARY: { fr: 'Résumé', color: 'bg-indigo-100 text-indigo-700' },
+  OTHER: { fr: 'Autre', color: 'bg-slate-100 text-slate-700' },
 };
 
 function formatSize(bytes: number | null): string | null {
@@ -135,11 +142,7 @@ export default function ClassAccordion({
 
       {/* AR name */}
       {classData.nameAr && (
-        <p
-          dir="rtl"
-          className="relative text-xs text-slate-500 leading-tight mb-3"
-          lang="ar"
-        >
+        <p dir="rtl" className="relative text-xs text-slate-500 leading-tight mb-3" lang="ar">
           {classData.nameAr}
         </p>
       )}
@@ -151,9 +154,7 @@ export default function ClassAccordion({
           className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold"
           style={{ background: `${tint}15`, color: tint }}
         >
-          <span className="tabular-nums">
-            {totalCount.toLocaleString('fr-FR')}
-          </span>
+          <span className="tabular-nums">{totalCount.toLocaleString('fr-FR')}</span>
           <span className="font-normal opacity-80">ressources</span>
         </span>
       </div>
@@ -168,9 +169,7 @@ export default function ClassAccordion({
         />
       )}
       {!hasSections && (
-        <ArrowRight
-          className="absolute bottom-3 right-3 w-4 h-4 text-slate-300 group-hover:text-slate-600 group-hover:translate-x-1 transition-all duration-300"
-        />
+        <ArrowRight className="absolute bottom-3 right-3 w-4 h-4 text-slate-300 group-hover:text-slate-600 group-hover:translate-x-1 transition-all duration-300" />
       )}
     </>
   );
@@ -208,12 +207,11 @@ export default function ClassAccordion({
           >
             <BookOpen className="w-5 h-5" style={{ color: design.color }} />
             <div className="flex-1">
-              <h4 className="font-bold text-slate-900 text-sm">
-                Sections de {classData.nameFr}
-              </h4>
+              <h4 className="font-bold text-slate-900 text-sm">Sections de {classData.nameFr}</h4>
               <p className="text-xs text-slate-500">
                 {sections.length} sections ·{' '}
-                {sections.reduce((a, s) => a + s._count.resources, 0).toLocaleString('fr-FR')} ressources au total
+                {sections.reduce((a, s) => a + s._count.resources, 0).toLocaleString('fr-FR')}{' '}
+                ressources au total
               </p>
             </div>
             <button
@@ -321,9 +319,10 @@ function SectionResourceView({
   onTypeFilterChange: (t: string) => void;
   onClose: () => void;
 }) {
-  const filtered = typeFilter === 'all'
-    ? section.resources
-    : section.resources.filter((r) => r.type === typeFilter);
+  const filtered =
+    typeFilter === 'all'
+      ? section.resources
+      : section.resources.filter((r) => r.type === typeFilter);
 
   // Type counts for chips
   const typeCounts: Record<string, number> = { all: section.resources.length };
@@ -380,9 +379,7 @@ function SectionResourceView({
             >
               {chip.label}
               <span
-                className={`tabular-nums text-[10px] ${
-                  isActive ? 'opacity-80' : 'opacity-70'
-                }`}
+                className={`tabular-nums text-[10px] ${isActive ? 'opacity-80' : 'opacity-70'}`}
               >
                 {count}
               </span>
@@ -400,7 +397,10 @@ function SectionResourceView({
       ) : (
         <div className="space-y-2">
           {filtered.map((r) => {
-            const typeInfo = TYPE_LABELS[r.type] || { fr: r.type, color: 'bg-slate-100 text-slate-700' };
+            const typeInfo = TYPE_LABELS[r.type] || {
+              fr: r.type,
+              color: 'bg-slate-100 text-slate-700',
+            };
             const subjectColor = r.subject.color || '#0EA5E9';
             const teacherName =
               [r.teacher?.firstName, r.teacher?.lastName].filter(Boolean).join(' ') || null;

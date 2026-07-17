@@ -22,22 +22,29 @@ function ensureDir(p) {
 function download(url, dest) {
   return new Promise((resolve, reject) => {
     const client = url.startsWith('https') ? https : http;
-    const req = client.get(url, { timeout: TIMEOUT_MS, headers: { 'User-Agent': 'Mozilla/5.0' } }, (res) => {
-      if (res.statusCode === 302 || res.statusCode === 301) {
-        return download(res.headers.location, dest).then(resolve).catch(reject);
-      }
-      if (res.statusCode !== 200) {
-        reject(new Error(`HTTP ${res.statusCode}`));
-        return;
-      }
-      ensureDir(path.dirname(dest));
-      const ws = fs.createWriteStream(dest);
-      res.pipe(ws);
-      ws.on('finish', () => ws.close(() => resolve(fs.statSync(dest).size)));
-      ws.on('error', reject);
-    });
+    const req = client.get(
+      url,
+      { timeout: TIMEOUT_MS, headers: { 'User-Agent': 'Mozilla/5.0' } },
+      (res) => {
+        if (res.statusCode === 302 || res.statusCode === 301) {
+          return download(res.headers.location, dest).then(resolve).catch(reject);
+        }
+        if (res.statusCode !== 200) {
+          reject(new Error(`HTTP ${res.statusCode}`));
+          return;
+        }
+        ensureDir(path.dirname(dest));
+        const ws = fs.createWriteStream(dest);
+        res.pipe(ws);
+        ws.on('finish', () => ws.close(() => resolve(fs.statSync(dest).size)));
+        ws.on('error', reject);
+      },
+    );
     req.on('error', reject);
-    req.on('timeout', () => { req.destroy(); reject(new Error('timeout')); });
+    req.on('timeout', () => {
+      req.destroy();
+      reject(new Error('timeout'));
+    });
   });
 }
 
@@ -87,7 +94,9 @@ async function main() {
         continue;
       }
       downloaded++;
-      process.stdout.write(`\r  Downloaded ${downloaded}/${tasks.length}, ${(downloaded * 100 / tasks.length).toFixed(1)}%    `);
+      process.stdout.write(
+        `\r  Downloaded ${downloaded}/${tasks.length}, ${((downloaded * 100) / tasks.length).toFixed(1)}%    `,
+      );
     } catch (e) {
       failed++;
       // silent for 404
@@ -97,7 +106,7 @@ async function main() {
   console.log(`Total: ${downloaded + failed}, Downloaded: ${downloaded}, Failed: ${failed}`);
 
   // List what we have
-  const files = fs.readdirSync(OUT_DIR, { recursive: true }).filter(f => f.endsWith('.pdf'));
+  const files = fs.readdirSync(OUT_DIR, { recursive: true }).filter((f) => f.endsWith('.pdf'));
   console.log(`\nFiles on disk: ${files.length}`);
   // Group by year
   const byYear = {};

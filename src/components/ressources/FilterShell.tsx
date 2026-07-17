@@ -1,7 +1,6 @@
 'use client';
 
 import {
-  useQueryState,
   useQueryStates,
   parseAsString,
   parseAsArrayOf,
@@ -9,31 +8,37 @@ import {
   parseAsStringEnum,
   parseAsBoolean,
 } from 'nuqs';
+import { useState, useEffect, useTransition, useMemo, useCallback, useRef } from 'react';
 import {
-  useState,
-  useEffect,
-  useTransition,
-  useDeferredValue,
-  useMemo,
-  useCallback,
-  useRef,
-} from 'react';
-import {
-  Search, X, ChevronDown, SlidersHorizontal, Star,
-  Check, BookOpen, GraduationCap, Calendar, Languages,
-  FileText, CheckCircle2, ArrowUpDown, LayoutGrid, List,
-  RotateCcw, Loader2, Sparkles, Filter as FilterIcon,
+  Search,
+  X,
+  ChevronDown,
+  SlidersHorizontal,
+  Check,
+  BookOpen,
+  GraduationCap,
+  Calendar,
+  Languages,
+  FileText,
+  CheckCircle2,
+  ArrowUpDown,
+  LayoutGrid,
+  List,
+  RotateCcw,
+  Loader2,
+  Sparkles,
+  Filter as FilterIcon,
 } from 'lucide-react';
 import * as Popover from '@radix-ui/react-popover';
 import * as ToggleGroup from '@radix-ui/react-toggle-group';
 import * as Switch from '@radix-ui/react-switch';
 import type { LucideIcon } from 'lucide-react';
-import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import ResourceCard from '@/components/resources/ResourceCard';
 import ResourceListItem from '@/components/resources/ResourceListItem';
 
 // ============== TYPES ==============
-import type { Facets as FacetsType, RessourcesResponse } from '@/lib/facets';
+import type { RessourcesResponse } from '@/lib/facets';
 
 export type { Facets } from '@/lib/facets';
 
@@ -47,15 +52,35 @@ type ApiResponse = FilterShellProps['initialData'];
 
 // ============== RESOURCE TYPE / TRIMESTRE / LANGUAGE / YEAR META ==============
 const TYPE_META: Record<string, { label: string; emoji: string; color: string }> = {
-  COURSE:      { label: 'Cours',         emoji: '📘', color: 'bg-blue-100 text-blue-700 border-blue-200' },
-  HOMEWORK:    { label: 'Devoir',        emoji: '📝', color: 'bg-amber-100 text-amber-700 border-amber-200' },
-  EXERCISE:    { label: 'Exercice',      emoji: '📊', color: 'bg-green-100 text-green-700 border-green-200' },
-  REVISION:    { label: 'Révision',      emoji: '🔄', color: 'bg-purple-100 text-purple-700 border-purple-200' },
-  EXAM:        { label: 'Examen',        emoji: '📃', color: 'bg-red-100 text-red-700 border-red-200' },
-  BAC_SUBJECT: { label: 'Sujet Bac',     emoji: '🎯', color: 'bg-pink-100 text-pink-700 border-pink-200' },
-  CORRECTION:  { label: 'Corrigé',       emoji: '✅', color: 'bg-emerald-100 text-emerald-700 border-emerald-200' },
-  SUMMARY:     { label: 'Résumé',        emoji: '📋', color: 'bg-indigo-100 text-indigo-700 border-indigo-200' },
-  OTHER:       { label: 'Autre',         emoji: '📦', color: 'bg-slate-100 text-slate-700 border-slate-200' },
+  COURSE: { label: 'Cours', emoji: '📘', color: 'bg-blue-100 text-blue-700 border-blue-200' },
+  HOMEWORK: { label: 'Devoir', emoji: '📝', color: 'bg-amber-100 text-amber-700 border-amber-200' },
+  EXERCISE: {
+    label: 'Exercice',
+    emoji: '📊',
+    color: 'bg-green-100 text-green-700 border-green-200',
+  },
+  REVISION: {
+    label: 'Révision',
+    emoji: '🔄',
+    color: 'bg-purple-100 text-purple-700 border-purple-200',
+  },
+  EXAM: { label: 'Examen', emoji: '📃', color: 'bg-red-100 text-red-700 border-red-200' },
+  BAC_SUBJECT: {
+    label: 'Sujet Bac',
+    emoji: '🎯',
+    color: 'bg-pink-100 text-pink-700 border-pink-200',
+  },
+  CORRECTION: {
+    label: 'Corrigé',
+    emoji: '✅',
+    color: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+  },
+  SUMMARY: {
+    label: 'Résumé',
+    emoji: '📋',
+    color: 'bg-indigo-100 text-indigo-700 border-indigo-200',
+  },
+  OTHER: { label: 'Autre', emoji: '📦', color: 'bg-slate-100 text-slate-700 border-slate-200' },
 };
 
 const TRIMESTRE_META: Record<string, { label: string; emoji: string }> = {
@@ -66,8 +91,8 @@ const TRIMESTRE_META: Record<string, { label: string; emoji: string }> = {
 
 const LANGUAGE_META: Record<string, { label: string; flag: string }> = {
   fr: { label: 'Français', flag: '🇫🇷' },
-  ar: { label: 'Arabe',    flag: '🇹🇳' },
-  en: { label: 'Anglais',  flag: '🇬🇧' },
+  ar: { label: 'Arabe', flag: '🇹🇳' },
+  en: { label: 'Anglais', flag: '🇬🇧' },
 };
 
 const SORT_META: Record<string, string> = {
@@ -79,8 +104,7 @@ const SORT_META: Record<string, string> = {
 };
 
 // ============== HELPERS ==============
-const empty = (s: string | null | undefined) =>
-  !s || s === '' || s === '[]';
+const empty = (s: string | null | undefined) => !s || s === '' || s === '[]';
 
 // ============== MAIN COMPONENT ==============
 export default function FilterShell({ initialData, userId, initialFavorites }: FilterShellProps) {
@@ -100,7 +124,9 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
     language: parseAsArrayOf(parseAsString).withDefault([]),
     hasCorrection: parseAsBoolean.withDefault(false),
     teacherId: parseAsString.withDefault(''),
-    sort: parseAsStringEnum(['recent', 'popular', 'downloads', 'rating', 'oldest']).withDefault('recent'),
+    sort: parseAsStringEnum(['recent', 'popular', 'downloads', 'rating', 'oldest']).withDefault(
+      'recent',
+    ),
     page: parseAsInteger.withDefault(1),
     view: parseAsStringEnum(['grid', 'list']).withDefault('grid'),
   });
@@ -112,20 +138,24 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
   const lastFetchKey = useRef<string>('');
 
   // Compute a stable key for current filters (used to dedupe fetches)
-  const filterKey = useMemo(() => JSON.stringify({
-    q: filters.q,
-    type: [...filters.type].sort(),
-    class: [...filters.class].sort(),
-    section: [...filters.section].sort(),
-    subject: [...filters.subject].sort(),
-    trimestre: [...filters.trimestre].sort(),
-    year: [...filters.year].sort(),
-    language: [...filters.language].sort(),
-    hasCorrection: filters.hasCorrection,
-    teacherId: filters.teacherId,
-    sort: filters.sort,
-    page: filters.page,
-  }), [filters]);
+  const filterKey = useMemo(
+    () =>
+      JSON.stringify({
+        q: filters.q,
+        type: [...filters.type].sort(),
+        class: [...filters.class].sort(),
+        section: [...filters.section].sort(),
+        subject: [...filters.subject].sort(),
+        trimestre: [...filters.trimestre].sort(),
+        year: [...filters.year].sort(),
+        language: [...filters.language].sort(),
+        hasCorrection: filters.hasCorrection,
+        teacherId: filters.teacherId,
+        sort: filters.sort,
+        page: filters.page,
+      }),
+    [filters],
+  );
 
   // Compute the key the initial SSR data was loaded with so we can
   // skip the first client refetch when filters haven't actually changed.
@@ -147,7 +177,7 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
     if (isFirstRender.current) {
       isFirstRender.current = false;
       if (filterKey === firstRenderKey.current) {
-        lastFetchKey.current = filterKey;  // mark as "already fetched" (with SSR data)
+        lastFetchKey.current = filterKey; // mark as "already fetched" (with SSR data)
         return;
       }
     }
@@ -202,7 +232,7 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
         void setFilters(next as any);
       });
     },
-    [setFilters]
+    [setFilters],
   );
 
   const reset = useCallback(() => {
@@ -225,7 +255,10 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
     });
   }, [setFilters, filters.view]);
 
-  const toggleMulti = (key: 'type' | 'class' | 'section' | 'subject' | 'trimestre' | 'year' | 'language', value: string) => {
+  const toggleMulti = (
+    key: 'type' | 'class' | 'section' | 'subject' | 'trimestre' | 'year' | 'language',
+    value: string,
+  ) => {
     const current = filters[key];
     const next = current.includes(value) ? current.filter((v) => v !== value) : [...current, value];
     update({ [key]: next });
@@ -245,19 +278,19 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
   // ============== FACET OPTIONS (only those with count > 0) ==============
   const yearOptions = useMemo(
     () => Object.entries(data.facets.byYear).sort(([a], [b]) => b.localeCompare(a)),
-    [data.facets.byYear]
+    [data.facets.byYear],
   );
   const subjectOptions = useMemo(
     () => Object.entries(data.facets.bySubject).sort(([, a], [, b]) => b - a),
-    [data.facets.bySubject]
+    [data.facets.bySubject],
   );
   const classOptions = useMemo(
     () => Object.entries(data.facets.byClass).sort(([, a], [, b]) => b - a),
-    [data.facets.byClass]
+    [data.facets.byClass],
   );
   const sectionOptions = useMemo(
     () => Object.entries(data.facets.bySection).sort(([, a], [, b]) => b - a),
-    [data.facets.bySection]
+    [data.facets.bySection],
   );
 
   // Filter sections to only those matching selected classes
@@ -485,9 +518,7 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
               <strong className="font-bold text-slate-900">
                 {data.total.toLocaleString('fr-FR')}
               </strong>{' '}
-              <span className="text-slate-500">
-                ressource{data.total > 1 ? 's' : ''}
-              </span>
+              <span className="text-slate-500">ressource{data.total > 1 ? 's' : ''}</span>
               {data.total > 0 && data.totalPages > 1 && (
                 <span className="text-slate-400 ml-1">
                   · page {data.currentPage}/{data.totalPages}
@@ -591,10 +622,16 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
           >
             {data.resources.map((r) =>
               filters.view === 'list' ? (
-                <ResourceListItem key={r.id} resource={{ ...r, isFavorited: favorites.has(r.id) }} />
+                <ResourceListItem
+                  key={r.id}
+                  resource={{ ...r, isFavorited: favorites.has(r.id) }}
+                />
               ) : (
-                <ResourceCard key={r.id} resource={{ ...r, isFavorited: favorites.has(r.id) } as any} />
-              )
+                <ResourceCard
+                  key={r.id}
+                  resource={{ ...r, isFavorited: favorites.has(r.id) } as any}
+                />
+              ),
             )}
           </div>
         )}
@@ -629,9 +666,7 @@ function MultiSelectChips({
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
 
-  const filtered = options.filter((o) =>
-    o.label.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = options.filter((o) => o.label.toLowerCase().includes(search.toLowerCase()));
 
   // Show top 6 inline, with a "voir plus" popover
   const topInline = options.slice(0, 6);
@@ -642,9 +677,7 @@ function MultiSelectChips({
       <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
         <Icon className="w-3.5 h-3.5" />
         {label}
-        <span className="text-slate-400 font-normal normal-case ml-auto">
-          ({options.length})
-        </span>
+        <span className="text-slate-400 font-normal normal-case ml-auto">({options.length})</span>
       </label>
 
       <div className="flex flex-wrap gap-1.5">
@@ -709,7 +742,9 @@ function MultiSelectChips({
                       >
                         {opt.emoji && <span>{opt.emoji}</span>}
                         <span className="flex-1 truncate">{opt.label}</span>
-                        <span className={`text-xs tabular-nums ${isSelected ? 'opacity-70' : 'text-slate-400'}`}>
+                        <span
+                          className={`text-xs tabular-nums ${isSelected ? 'opacity-70' : 'text-slate-400'}`}
+                        >
                           {opt.count}
                         </span>
                       </button>
@@ -738,7 +773,11 @@ function ActiveFilterChips({
   filters: any;
   onRemove: (patch: any) => void;
   onReset: () => void;
-  nameMaps?: { class?: Record<string, string>; section?: Record<string, string>; subject?: Record<string, string> };
+  nameMaps?: {
+    class?: Record<string, string>;
+    section?: Record<string, string>;
+    subject?: Record<string, string>;
+  };
 }) {
   const chips: { key: string; label: string; onRemove: () => void; color: string }[] = [];
 
@@ -864,7 +903,11 @@ function Pagination({
   for (let i = 1; i <= total; i++) {
     if (set.has(i)) {
       // Add ellipsis before if needed
-      if (pages.length > 0 && typeof pages[pages.length - 1] === 'number' && i - (pages[pages.length - 1] as number) > 1) {
+      if (
+        pages.length > 0 &&
+        typeof pages[pages.length - 1] === 'number' &&
+        i - (pages[pages.length - 1] as number) > 1
+      ) {
         add('...');
       }
       add(i);
@@ -897,7 +940,7 @@ function Pagination({
           >
             {p}
           </button>
-        )
+        ),
       )}
       <button
         onClick={() => onChange(current + 1)}

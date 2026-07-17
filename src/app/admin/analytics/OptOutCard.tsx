@@ -40,10 +40,10 @@ export default function OptOutCard() {
         Exclure tes propres visites
       </h2>
       <p className="text-sm text-slate-600 mb-4">
-        Pour ne pas être compté dans les stats quand tu navigues sur ton propre site
-        (même sur les pages publiques), active l'opt-out ci-dessous. Vercel utilise
-        un cookie <code className="px-1.5 py-0.5 bg-slate-100 rounded text-xs">va-disable</code>{' '}
-        officiel pour respecter ton choix — il dure 1 an et s'applique à toutes tes visites depuis ce navigateur.
+        Pour ne pas être compté dans les stats quand tu navigues sur ton propre site (même sur les
+        pages publiques), active l'opt-out ci-dessous. Vercel utilise un cookie{' '}
+        <code className="px-1.5 py-0.5 bg-slate-100 rounded text-xs">va-disable</code> officiel pour
+        respecter ton choix — il dure 1 an et s'applique à toutes tes visites depuis ce navigateur.
       </p>
       {!ready ? (
         <div className="h-10 bg-slate-100 rounded-xl animate-pulse w-48" />
@@ -63,7 +63,8 @@ export default function OptOutCard() {
         </button>
       )}
       <p className="text-xs text-slate-400 mt-3">
-        Astuce : ouvre aussi un navigateur en navigation privée pour voir le site "comme un visiteur".
+        Astuce : ouvre aussi un navigateur en navigation privée pour voir le site "comme un
+        visiteur".
       </p>
     </div>
   );

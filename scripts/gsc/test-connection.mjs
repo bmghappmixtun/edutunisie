@@ -19,7 +19,7 @@ async function main() {
   }
 }
 
-main().catch(e => {
+main().catch((e) => {
   console.error('ERROR:', e.message);
   console.error('Code:', e.code);
   console.error('Status:', e.response?.status);

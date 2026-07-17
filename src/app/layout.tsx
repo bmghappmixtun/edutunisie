@@ -42,15 +42,19 @@ const nunito = Nunito({
 const LOCALE_DEFAULTS = {
   fr: {
     title: 'Examanet — La plateforme pédagogique #1 en Tunisie',
-    description: 'Cours, devoirs, séries, révisions, sujets bac et corrigés — 100% gratuits pour les élèves du Primaire, Collège et Lycée en Tunisie.',
+    description:
+      'Cours, devoirs, séries, révisions, sujets bac et corrigés — 100% gratuits pour les élèves du Primaire, Collège et Lycée en Tunisie.',
     ogTitle: 'Examanet — La plateforme pédagogique #1 en Tunisie',
-    ogDescription: 'Cours, devoirs, séries, révisions, sujets bac et corrigés — 100% gratuits pour les élèves tunisiens.',
+    ogDescription:
+      'Cours, devoirs, séries, révisions, sujets bac et corrigés — 100% gratuits pour les élèves tunisiens.',
     twitterTitle: 'Examanet — La plateforme pédagogique #1 en Tunisie',
-    twitterDescription: 'Cours, devoirs, séries, révisions, sujets bac et corrigés — 100% gratuits.',
+    twitterDescription:
+      'Cours, devoirs, séries, révisions, sujets bac et corrigés — 100% gratuits.',
   },
   ar: {
     title: 'إكسامانت — المنصة التربوية #1 في تونس',
-    description: 'دروس، فروض، سلاسل، ملخصات، مواضيع باكالوريا وإصلاحات — مجانية 100% لتلاميذ الابتدائي، الإعدادي والثانوي في تونس.',
+    description:
+      'دروس، فروض، سلاسل، ملخصات، مواضيع باكالوريا وإصلاحات — مجانية 100% لتلاميذ الابتدائي، الإعدادي والثانوي في تونس.',
     ogTitle: 'إكسامانت — المنصة التربوية #1 في تونس',
     ogDescription: 'دروس، فروض، ملخصات، مواضيع باك وإصلاحات — مجانية 100% للتلاميذ التونسيين.',
     twitterTitle: 'إكسامانت — المنصة التربوية #1 في تونس',
@@ -76,8 +80,30 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     description: t.description,
     keywords: isAr
-      ? ['إكسامانت', 'تعليم تونس', 'دروس', 'فروض', 'باكالوريا', 'إعدادي', 'ثانوي', 'ابتدائي', 'تمارين', 'مراجعة']
-      : ['examanet', 'éducation tunisie', 'cours', 'devoirs', 'bac', 'collège', 'lycée', 'primaire', 'exercices', 'révisions'],
+      ? [
+          'إكسامانت',
+          'تعليم تونس',
+          'دروس',
+          'فروض',
+          'باكالوريا',
+          'إعدادي',
+          'ثانوي',
+          'ابتدائي',
+          'تمارين',
+          'مراجعة',
+        ]
+      : [
+          'examanet',
+          'éducation tunisie',
+          'cours',
+          'devoirs',
+          'bac',
+          'collège',
+          'lycée',
+          'primaire',
+          'exercices',
+          'révisions',
+        ],
     authors: [{ name: 'Examanet' }],
     creator: 'Examanet',
     publisher: 'Examanet',
@@ -91,9 +117,7 @@ export async function generateMetadata(): Promise<Metadata> {
         { url: '/favicon-96x96.png', sizes: '96x96', type: 'image/png' },
         { url: '/favicon-192x192.png', sizes: '192x192', type: 'image/png' },
       ],
-      apple: [
-        { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
-      ],
+      apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
     },
     manifest: '/manifest.json',
     openGraph: {
@@ -108,7 +132,9 @@ export async function generateMetadata(): Promise<Metadata> {
           url: '/api/og/page/home',
           width: 1200,
           height: 630,
-          alt: isAr ? 'إكسامانت - المنصة التربوية التونسية' : 'Examanet - Plateforme pédagogique tunisienne',
+          alt: isAr
+            ? 'إكسامانت - المنصة التربوية التونسية'
+            : 'Examanet - Plateforme pédagogique tunisienne',
         },
       ],
     },
@@ -167,10 +193,18 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const dir = locale === 'ar' ? 'rtl' : 'ltr';
 
   return (
-    <html lang={locale} dir={dir} className={`${inter.variable} ${cairo.variable} ${nunito.variable}`} suppressHydrationWarning>
+    <html
+      lang={locale}
+      dir={dir}
+      className={`${inter.variable} ${cairo.variable} ${nunito.variable}`}
+      suppressHydrationWarning
+    >
       <head>
         {/* Explicit Google site verification meta tag (HTML tag verification) */}
-        <meta name="google-site-verification" content="GXE5A9gq9-K7q7IztCatkSHhYrgtWWBbPloJymofPUY" />
+        <meta
+          name="google-site-verification"
+          content="GXE5A9gq9-K7q7IztCatkSHhYrgtWWBbPloJymofPUY"
+        />
         {/* Bing Webmaster Tools verification meta tag (HTML tag verification) */}
         <meta name="msvalidate.01" content="C04AC04227DB04DAC96552F4A27BCD73" />
         {/* OpenGraph locale: dynamic based on x-locale header (set by middleware for /ar/*) */}
@@ -184,11 +218,26 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body className="font-sans">
         <NuqsAdapter>
-          <I18nProviderWrapper initialLocale={(() => { try { const h = headers(); const l = h.get('x-locale'); return l === 'ar' || l === 'fr' ? l : 'fr'; } catch { return 'fr'; } })()}>{children}</I18nProviderWrapper>
+          <I18nProviderWrapper
+            initialLocale={(() => {
+              try {
+                const h = headers();
+                const l = h.get('x-locale');
+                return l === 'ar' || l === 'fr' ? l : 'fr';
+              } catch {
+                return 'fr';
+              }
+            })()}
+          >
+            {children}
+          </I18nProviderWrapper>
         </NuqsAdapter>
-        <Toaster position="top-right" toastOptions={{
-          style: { borderRadius: '12px', background: '#0F172A', color: '#fff' }
-        }} />
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            style: { borderRadius: '12px', background: '#0F172A', color: '#fff' },
+          }}
+        />
         {/* Organization + WebSite + SearchAction JSON-LD — enables Google knowledge panel + sitelinks searchbox */}
         {organizationSchema().map((schema, i) => (
           <script

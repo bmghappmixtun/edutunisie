@@ -3,8 +3,17 @@ import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
 import {
-  FileText, Eye, Download, Edit, Trash2, CheckCircle, Clock, XCircle, Plus,
-  AlertCircle, RefreshCw, Filter
+  FileText,
+  Eye,
+  Download,
+  Edit,
+  CheckCircle,
+  Clock,
+  XCircle,
+  Plus,
+  AlertCircle,
+  RefreshCw,
+  Filter,
 } from 'lucide-react';
 import { formatNumber, timeAgo } from '@/lib/utils';
 import { isArabic } from '@/lib/text-utils';
@@ -12,7 +21,10 @@ import DeleteResourceButton from '@/components/teacher/DeleteResourceButton';
 
 export const dynamic = 'force-dynamic';
 
-export default async function TeacherResourcesPage(props: { params: Promise<any>; searchParams: Promise<any> }) {
+export default async function TeacherResourcesPage(props: {
+  params: Promise<any>;
+  searchParams: Promise<any>;
+}) {
   const sp = await props.searchParams;
   const user = await getCurrentUser();
   if (!user) redirect('/connexion');
@@ -25,7 +37,7 @@ export default async function TeacherResourcesPage(props: { params: Promise<any>
   // Check if teacher can upload (status === ACTIVE)
   const teacher = await prisma.user.findUnique({
     where: { id: user.id },
-    select: { status: true }
+    select: { status: true },
   });
   const canUpload = teacher?.status === 'ACTIVE';
 
@@ -39,10 +51,13 @@ export default async function TeacherResourcesPage(props: { params: Promise<any>
       take: limit,
       skip: (page - 1) * limit,
       orderBy: { updatedAt: 'desc' },
-      include: { subject: true, class: true, section: true }
+      include: { subject: true, class: true, section: true },
     }),
     prisma.resource.count({ where }),
-    prisma.subject.findMany({ orderBy: { order: 'asc' }, select: { id: true, nameFr: true, icon: true } }),
+    prisma.subject.findMany({
+      orderBy: { order: 'asc' },
+      select: { id: true, nameFr: true, icon: true },
+    }),
   ]);
 
   const totalPages = Math.ceil(total / limit);
@@ -62,7 +77,9 @@ export default async function TeacherResourcesPage(props: { params: Promise<any>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-3xl font-extrabold text-slate-900">Mes ressources 📚</h1>
-          <p className="text-slate-500 text-sm mt-1">{total} ressource{total > 1 ? 's' : ''} au total</p>
+          <p className="text-slate-500 text-sm mt-1">
+            {total} ressource{total > 1 ? 's' : ''} au total
+          </p>
         </div>
         {canUpload ? (
           <Link href="/enseignant/ajouter" className="btn-primary inline-flex items-center gap-2">
@@ -74,24 +91,59 @@ export default async function TeacherResourcesPage(props: { params: Promise<any>
             title="Soumettez vos fichiers de vérification pour publier"
           >
             <Plus className="w-4 h-4" /> Nouvelle ressource
-            <span className="text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-bold">🔒</span>
+            <span className="text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-bold">
+              🔒
+            </span>
           </span>
         )}
       </div>
 
       {/* Stats cards */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-        <StatCard label="Publiées" value={published} dot="bg-emerald-500" href="/enseignant/ressources?status=PUBLISHED" active={status === 'PUBLISHED'} />
-        <StatCard label="En attente" value={pendingApproval} dot="bg-amber-500" href="/enseignant/ressources?status=PENDING_APPROVAL" active={status === 'PENDING_APPROVAL'} />
-        <StatCard label="Refusées" value={rejected} dot="bg-red-500" href="/enseignant/ressources?status=REJECTED" active={status === 'REJECTED'} />
-        <StatCard label="Modifs en attente" value={pendingEdit} dot="bg-blue-500" href="/enseignant/ressources?editStatus=PENDING_EDIT_APPROVAL" active={editStatus === 'PENDING_EDIT_APPROVAL'} />
-        <StatCard label="Modifs refusées" value={editRejected} dot="bg-orange-500" href="/enseignant/ressources?editStatus=EDIT_REJECTED" active={editStatus === 'EDIT_REJECTED'} />
+        <StatCard
+          label="Publiées"
+          value={published}
+          dot="bg-emerald-500"
+          href="/enseignant/ressources?status=PUBLISHED"
+          active={status === 'PUBLISHED'}
+        />
+        <StatCard
+          label="En attente"
+          value={pendingApproval}
+          dot="bg-amber-500"
+          href="/enseignant/ressources?status=PENDING_APPROVAL"
+          active={status === 'PENDING_APPROVAL'}
+        />
+        <StatCard
+          label="Refusées"
+          value={rejected}
+          dot="bg-red-500"
+          href="/enseignant/ressources?status=REJECTED"
+          active={status === 'REJECTED'}
+        />
+        <StatCard
+          label="Modifs en attente"
+          value={pendingEdit}
+          dot="bg-blue-500"
+          href="/enseignant/ressources?editStatus=PENDING_EDIT_APPROVAL"
+          active={editStatus === 'PENDING_EDIT_APPROVAL'}
+        />
+        <StatCard
+          label="Modifs refusées"
+          value={editRejected}
+          dot="bg-orange-500"
+          href="/enseignant/ressources?editStatus=EDIT_REJECTED"
+          active={editStatus === 'EDIT_REJECTED'}
+        />
       </div>
 
       {/* Filters */}
       <div className="bg-white rounded-xl border border-slate-200 p-3 flex items-center gap-2 overflow-x-auto">
         <Filter className="w-4 h-4 text-slate-400 ml-2 flex-shrink-0" />
-        <Link href="/enseignant/ressources" className={`px-3 py-1.5 rounded-lg text-sm font-semibold whitespace-nowrap ${status === 'ALL' && editStatus === 'ALL' ? 'bg-slate-900 text-white' : 'hover:bg-slate-100 text-slate-600'}`}>
+        <Link
+          href="/enseignant/ressources"
+          className={`px-3 py-1.5 rounded-lg text-sm font-semibold whitespace-nowrap ${status === 'ALL' && editStatus === 'ALL' ? 'bg-slate-900 text-white' : 'hover:bg-slate-100 text-slate-600'}`}
+        >
           Toutes
         </Link>
         <span className="text-slate-300">|</span>
@@ -100,9 +152,12 @@ export default async function TeacherResourcesPage(props: { params: Promise<any>
           { v: 'PUBLISHED', label: 'Publiées', cls: 'text-emerald-700' },
           { v: 'PENDING_APPROVAL', label: 'En attente', cls: 'text-amber-700' },
           { v: 'REJECTED', label: 'Refusées', cls: 'text-red-700' },
-        ].map(s => (
-          <Link key={s.v} href={`/enseignant/ressources?status=${s.v}`}
-            className={`px-3 py-1.5 rounded-lg text-sm font-semibold whitespace-nowrap ${status === s.v ? 'bg-slate-900 text-white' : `hover:bg-slate-100 ${s.cls}`}`}>
+        ].map((s) => (
+          <Link
+            key={s.v}
+            href={`/enseignant/ressources?status=${s.v}`}
+            className={`px-3 py-1.5 rounded-lg text-sm font-semibold whitespace-nowrap ${status === s.v ? 'bg-slate-900 text-white' : `hover:bg-slate-100 ${s.cls}`}`}
+          >
             {s.label}
           </Link>
         ))}
@@ -126,7 +181,7 @@ export default async function TeacherResourcesPage(props: { params: Promise<any>
         </div>
       ) : (
         <div className="space-y-3">
-          {resources.map(r => (
+          {resources.map((r) => (
             <ResourceRow key={r.id} r={r} />
           ))}
         </div>
@@ -135,23 +190,45 @@ export default async function TeacherResourcesPage(props: { params: Promise<any>
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex items-center justify-center gap-2 pt-2">
-          {Array.from({ length: totalPages }, (_, i) => i + 1).slice(0, 10).map(p => (
-            <Link key={p} href={`/enseignant/ressources?${new URLSearchParams({ ...sp, page: String(p) })}`}
-              className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-semibold ${
-                p === page ? 'bg-primary-600 text-white' : 'bg-white border border-slate-200 hover:bg-slate-50'
-              }`}>
-              {p}
-            </Link>
-          ))}
+          {Array.from({ length: totalPages }, (_, i) => i + 1)
+            .slice(0, 10)
+            .map((p) => (
+              <Link
+                key={p}
+                href={`/enseignant/ressources?${new URLSearchParams({ ...sp, page: String(p) })}`}
+                className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-semibold ${
+                  p === page
+                    ? 'bg-primary-600 text-white'
+                    : 'bg-white border border-slate-200 hover:bg-slate-50'
+                }`}
+              >
+                {p}
+              </Link>
+            ))}
         </div>
       )}
     </div>
   );
 }
 
-function StatCard({ label, value, dot, href, active }: { label: string; value: number; dot: string; href: string; active?: boolean }) {
+function StatCard({
+  label,
+  value,
+  dot,
+  href,
+  active,
+}: {
+  label: string;
+  value: number;
+  dot: string;
+  href: string;
+  active?: boolean;
+}) {
   return (
-    <Link href={href} className={`bg-white rounded-xl border p-3 transition ${active ? 'border-primary-500 ring-2 ring-primary-100' : 'border-slate-200 hover:border-slate-300'}`}>
+    <Link
+      href={href}
+      className={`bg-white rounded-xl border p-3 transition ${active ? 'border-primary-500 ring-2 ring-primary-100' : 'border-slate-200 hover:border-slate-300'}`}
+    >
       <div className="flex items-center gap-2 mb-1">
         <span className={`w-2 h-2 rounded-full ${dot}`}></span>
         <span className="text-xs text-slate-500 font-semibold">{label}</span>
@@ -178,7 +255,11 @@ function ResourceRow({ r }: { r: any }) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap mb-1">
             <Link
-              href={r.numericId ? `/ressources/${r.numericId}/${r.slug}` : `/ressources/legacy-${r.id}/${r.slug}`}
+              href={
+                r.numericId
+                  ? `/ressources/${r.numericId}/${r.slug}`
+                  : `/ressources/legacy-${r.id}/${r.slug}`
+              }
               className={`font-bold text-slate-900 hover:text-primary-600 transition truncate ${isArabic(r.title) ? 'text-right' : 'text-left'}`}
               dir={isArabic(r.title) ? 'rtl' : 'ltr'}
               lang={isArabic(r.title) ? 'ar' : 'fr'}
@@ -198,8 +279,12 @@ function ResourceRow({ r }: { r: any }) {
           </div>
 
           <div className="flex items-center gap-4 text-xs text-slate-400">
-            <span className="flex items-center gap-1"><Eye className="w-3 h-3" /> {formatNumber(r.viewsCount)}</span>
-            <span className="flex items-center gap-1"><Download className="w-3 h-3" /> {formatNumber(r.downloadsCount)}</span>
+            <span className="flex items-center gap-1">
+              <Eye className="w-3 h-3" /> {formatNumber(r.viewsCount)}
+            </span>
+            <span className="flex items-center gap-1">
+              <Download className="w-3 h-3" /> {formatNumber(r.downloadsCount)}
+            </span>
             <span className="flex items-center gap-1">⭐ {r.avgRating.toFixed(1)}</span>
             <span>{(r.fileSize / 1024 / 1024).toFixed(1)} MB</span>
           </div>
@@ -208,15 +293,25 @@ function ResourceRow({ r }: { r: any }) {
           {hasPending && pending && (
             <div className="mt-2 p-2 bg-amber-50 border border-amber-200 rounded-lg text-xs">
               <div className="font-bold text-amber-800 flex items-center gap-1 mb-1">
-                <AlertCircle className="w-3 h-3" /> Modifications proposées (en attente d'approbation)
+                <AlertCircle className="w-3 h-3" /> Modifications proposées (en attente
+                d'approbation)
               </div>
               <div className="text-amber-700">
-                {Object.keys(pending).filter(k => k !== 'fileKey' && k !== 'fileUrl').map(k => (
-                  <span key={k} className="inline-block px-1.5 py-0.5 bg-amber-100 rounded mr-1 mb-1">
-                    {k}
+                {Object.keys(pending)
+                  .filter((k) => k !== 'fileKey' && k !== 'fileUrl')
+                  .map((k) => (
+                    <span
+                      key={k}
+                      className="inline-block px-1.5 py-0.5 bg-amber-100 rounded mr-1 mb-1"
+                    >
+                      {k}
+                    </span>
+                  ))}
+                {pending.fileKey && (
+                  <span className="inline-block px-1.5 py-0.5 bg-amber-100 rounded mr-1 mb-1">
+                    📎 nouveau fichier
                   </span>
-                ))}
-                {pending.fileKey && <span className="inline-block px-1.5 py-0.5 bg-amber-100 rounded mr-1 mb-1">📎 nouveau fichier</span>}
+                )}
               </div>
             </div>
           )}
@@ -231,7 +326,16 @@ function ResourceRow({ r }: { r: any }) {
 
         {/* Actions */}
         <div className="flex items-center gap-1 flex-shrink-0">
-          <Link href={r.numericId ? `/ressources/${r.numericId}/${r.slug}` : `/ressources/legacy-${r.id}/${r.slug}`} target="_blank" title="Voir" className="p-2 hover:bg-slate-100 rounded-lg text-slate-600">
+          <Link
+            href={
+              r.numericId
+                ? `/ressources/${r.numericId}/${r.slug}`
+                : `/ressources/legacy-${r.id}/${r.slug}`
+            }
+            target="_blank"
+            title="Voir"
+            className="p-2 hover:bg-slate-100 rounded-lg text-slate-600"
+          >
             <Eye className="w-4 h-4" />
           </Link>
           <Link
@@ -258,7 +362,9 @@ function StatusBadge({ status }: { status: string }) {
   const s = map[status] || map.DRAFT;
   const Icon = s.icon;
   return (
-    <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold rounded-full ${s.cls}`}>
+    <span
+      className={`inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold rounded-full ${s.cls}`}
+    >
       <Icon className="w-3 h-3" /> {s.label}
     </span>
   );

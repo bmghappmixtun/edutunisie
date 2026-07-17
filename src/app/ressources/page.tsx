@@ -10,7 +10,11 @@ import FilterShell from '@/components/ressources/FilterShell';
 import type { Facets } from '@/lib/facets';
 import { getCurrentUser } from '@/lib/auth';
 
-export async function generateMetadata({ searchParams }: { searchParams: Promise<SearchParams> }): Promise<Metadata> {
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}): Promise<Metadata> {
   const locale = getLocale();
   const isAr = locale === 'ar';
   const sp = await searchParams;
@@ -29,22 +33,26 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
   const totalResources = await prisma.resource.count({ where: { status: 'PUBLISHED' } });
   const baseTitle = isAr ? 'جميع الموارد التربوية' : 'Toutes les ressources pédagogiques';
   const title = teacherName
-    ? (isAr ? `موارد ${teacherName}` : `Ressources de ${teacherName}`)
+    ? isAr
+      ? `موارد ${teacherName}`
+      : `Ressources de ${teacherName}`
     : baseTitle;
   const description = teacherName
-    ? (isAr ? `جميع موارد ${teacherName} على إكسامانت: دروس، فروض، تمارين، سلاسل.` : `Découvrez toutes les ressources partagées par ${teacherName} sur Examanet : cours, devoirs, exercices, séries et corrigés.`)
-    : (isAr
+    ? isAr
+      ? `جميع موارد ${teacherName} على إكسامانت: دروس، فروض، تمارين، سلاسل.`
+      : `Découvrez toutes les ressources partagées par ${teacherName} sur Examanet : cours, devoirs, exercices, séries et corrigés.`
+    : isAr
       ? `اكتشف أكثر من ${totalResources.toLocaleString('ar-TN')} مورد: دروس، فروض، تمارين، سلاسل، ملخصات، مواضيع باك وإصلاحات.`
-      : 'Explorez plus de 15 000 ressources : cours, devoirs, exercices, séries, résumés, sujets de bac et corrigés.');
+      : 'Explorez plus de 15 000 ressources : cours, devoirs, exercices, séries, résumés, sujets de bac et corrigés.';
 
   return {
     title,
     description,
-    alternates: { canonical: teacherNumericId ? `/ressources?teacherId=${teacherNumericId}` : '/ressources' },
+    alternates: {
+      canonical: teacherNumericId ? `/ressources?teacherId=${teacherNumericId}` : '/ressources',
+    },
     openGraph: {
-      title: isAr
-        ? 'جميع الموارد — إكسامانت'
-        : 'Toutes les ressources — Examanet',
+      title: isAr ? 'جميع الموارد — إكسامانت' : 'Toutes les ressources — Examanet',
       description: isAr
         ? `${totalResources.toLocaleString('ar-TN')} درس, تمرين, موضوع باك وإصلاح للبرنامج التونسي.`
         : '15 000+ cours, exercices, sujets de bac et corrigés pour le programme tunisien.',
@@ -52,7 +60,11 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
       type: 'website',
       locale: isAr ? 'ar_TN' : 'fr_TN',
     },
-    robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-snippet': -1 } },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: { index: true, follow: true, 'max-snippet': -1 },
+    },
   };
 }
 
@@ -115,7 +127,8 @@ export default async function ResourcesPage(props: { searchParams: Promise<Searc
   if (hasCorrection) where.hasCorrection = true;
 
   // Look up teacher for filter + title
-  let teacherInfo: { firstName: string | null; lastName: string | null; numericId: number } | null = null;
+  let teacherInfo: { firstName: string | null; lastName: string | null; numericId: number } | null =
+    null;
   if (teacherNumericId && !Number.isNaN(teacherNumericId)) {
     const teacher = await prisma.user.findUnique({
       where: { numericId: teacherNumericId },
@@ -123,16 +136,24 @@ export default async function ResourcesPage(props: { searchParams: Promise<Searc
     });
     if (teacher) {
       where.teacherId = teacher.id;
-      teacherInfo = { firstName: teacher.firstName, lastName: teacher.lastName, numericId: teacher.numericId! };
+      teacherInfo = {
+        firstName: teacher.firstName,
+        lastName: teacher.lastName,
+        numericId: teacher.numericId!,
+      };
     }
   }
 
   const orderBy: Prisma.ResourceOrderByWithRelationInput =
-    sort === 'popular' ? { viewsCount: 'desc' }
-    : sort === 'downloads' ? { downloadsCount: 'desc' }
-    : sort === 'rating' ? { ratingCount: 'desc' }
-    : sort === 'oldest' ? { publishedAt: 'asc' }
-    : { publishedAt: 'desc' };
+    sort === 'popular'
+      ? { viewsCount: 'desc' }
+      : sort === 'downloads'
+        ? { downloadsCount: 'desc' }
+        : sort === 'rating'
+          ? { ratingCount: 'desc' }
+          : sort === 'oldest'
+            ? { publishedAt: 'asc' }
+            : { publishedAt: 'desc' };
 
   // ============== Build base where for facets (excludes search OR) ==============
   const facetBase: Prisma.ResourceWhereInput = { status: 'PUBLISHED' };
@@ -231,24 +252,33 @@ export default async function ResourcesPage(props: { searchParams: Promise<Searc
 
   // Group manually
   const classGroups = Object.entries(
-    classRecords.reduce((acc, r) => {
-      if (r.classId) acc[r.classId] = (acc[r.classId] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>)
+    classRecords.reduce(
+      (acc, r) => {
+        if (r.classId) acc[r.classId] = (acc[r.classId] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>,
+    ),
   ).map(([classId, count]) => ({ classId, _count: { _all: count } }));
 
   const sectionGroups = Object.entries(
-    sectionRecords.reduce((acc, r) => {
-      if (r.sectionId) acc[r.sectionId] = (acc[r.sectionId] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>)
+    sectionRecords.reduce(
+      (acc, r) => {
+        if (r.sectionId) acc[r.sectionId] = (acc[r.sectionId] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>,
+    ),
   ).map(([sectionId, count]) => ({ sectionId, _count: { _all: count } }));
 
   const subjectGroups = Object.entries(
-    subjectRecords.reduce((acc, r) => {
-      if (r.subjectId) acc[r.subjectId] = (acc[r.subjectId] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>)
+    subjectRecords.reduce(
+      (acc, r) => {
+        if (r.subjectId) acc[r.subjectId] = (acc[r.subjectId] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>,
+    ),
   ).map(([subjectId, count]) => ({ subjectId, _count: { _all: count } }));
 
   // Resolve class/section/subject names
@@ -274,7 +304,9 @@ export default async function ResourcesPage(props: { searchParams: Promise<Searc
           where: { id: { in: subjectIds } },
           select: { id: true, slug: true, nameFr: true, color: true },
         })
-      : Promise.resolve([] as Array<{ id: string; slug: string; nameFr: string; color: string | null }>),
+      : Promise.resolve(
+          [] as Array<{ id: string; slug: string; nameFr: string; color: string | null }>,
+        ),
     // Always load ALL classes/sections/subjects for the display name maps
     // (used to display 'Sciences' instead of 'sciences' in the filter)
     prisma.class.findMany({ select: { slug: true, nameFr: true } }),
@@ -305,22 +337,22 @@ export default async function ResourcesPage(props: { searchParams: Promise<Searc
     byType: Object.fromEntries(
       byType
         .filter((b) => b.type && b._count && typeof b._count === 'object')
-        .map((b) => [b.type, b._count!._all])
+        .map((b) => [b.type, b._count!._all]),
     ),
     byTrimestre: Object.fromEntries(
       byTrimestre
         .filter((b) => b.trimester && b._count && typeof b._count === 'object')
-        .map((b) => [b.trimester!, b._count!._all])
+        .map((b) => [b.trimester!, b._count!._all]),
     ),
     byYear: Object.fromEntries(
       byYear
         .filter((b) => b.year && b._count && typeof b._count === 'object')
-        .map((b) => [b.year!, b._count!._all])
+        .map((b) => [b.year!, b._count!._all]),
     ),
     byLanguage: Object.fromEntries(
       byLanguage
         .filter((b) => b.language && b._count && typeof b._count === 'object')
-        .map((b) => [b.language!, b._count!._all])
+        .map((b) => [b.language!, b._count!._all]),
     ),
     byClass: byClassMap,
     bySection: bySectionMap,
@@ -335,18 +367,24 @@ export default async function ResourcesPage(props: { searchParams: Promise<Searc
 
   // ============== JSON-LD ==============
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
-  const jsonLd = resources.length > 0
-    ? itemListSchema({
-        name: 'Toutes les ressources pédagogiques — Examanet',
-        description: `Catalogue de ${total.toLocaleString('fr-FR')} ressources pédagogiques gratuites du système éducatif tunisien.`,
-        url: `${baseUrl}/ressources`,
-        items: resources.slice(0, 50).map((r) => ({
-          name: r.title,
-          url: `${baseUrl}/ressources/${r.numericId}/${r.slug}`,
-          description: r.description?.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 200) || undefined,
-        })),
-      })
-    : null;
+  const jsonLd =
+    resources.length > 0
+      ? itemListSchema({
+          name: 'Toutes les ressources pédagogiques — Examanet',
+          description: `Catalogue de ${total.toLocaleString('fr-FR')} ressources pédagogiques gratuites du système éducatif tunisien.`,
+          url: `${baseUrl}/ressources`,
+          items: resources.slice(0, 50).map((r) => ({
+            name: r.title,
+            url: `${baseUrl}/ressources/${r.numericId}/${r.slug}`,
+            description:
+              r.description
+                ?.replace(/<[^>]+>/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim()
+                .slice(0, 200) || undefined,
+          })),
+        })
+      : null;
 
   // ============== Page header text ==============
   let pageTitle = 'Toutes les ressources';
@@ -355,7 +393,8 @@ export default async function ResourcesPage(props: { searchParams: Promise<Searc
     pageTitle = `Résultats pour « ${q} »`;
     pageSubtitle = `${total.toLocaleString('fr-FR')} résultats correspondants.`;
   } else if (teacherInfo) {
-    const teacherName = `${teacherInfo.firstName || ''} ${teacherInfo.lastName || ''}`.trim() || 'cet enseignant';
+    const teacherName =
+      `${teacherInfo.firstName || ''} ${teacherInfo.lastName || ''}`.trim() || 'cet enseignant';
     pageTitle = `Ressources de ${teacherName}`;
     pageSubtitle = `${total.toLocaleString('fr-FR')} ressources partagées par ${teacherName} sur Examanet.`;
   }
@@ -377,9 +416,7 @@ export default async function ResourcesPage(props: { searchParams: Promise<Searc
             <h1 className="text-3xl lg:text-4xl font-extrabold mb-2 leading-tight text-slate-900">
               {pageTitle}
             </h1>
-            <p className="text-slate-600 text-sm lg:text-base">
-              {pageSubtitle}
-            </p>
+            <p className="text-slate-600 text-sm lg:text-base">{pageSubtitle}</p>
           </div>
 
           {/* FilterShell (client) */}
@@ -391,9 +428,9 @@ export default async function ResourcesPage(props: { searchParams: Promise<Searc
               currentPage: page,
               facets,
               nameMaps: {
-                class: Object.fromEntries(allClasses.map(c => [c.slug, c.nameFr])),
-                section: Object.fromEntries(allSections.map(s => [s.slug, s.nameFr])),
-                subject: Object.fromEntries(allSubjects.map(s => [s.slug, s.nameFr])),
+                class: Object.fromEntries(allClasses.map((c) => [c.slug, c.nameFr])),
+                section: Object.fromEntries(allSections.map((s) => [s.slug, s.nameFr])),
+                subject: Object.fromEntries(allSubjects.map((s) => [s.slug, s.nameFr])),
               },
             }}
             userId={currentUser?.id ?? null}
@@ -415,7 +452,10 @@ function FilterShellSkeleton() {
         <div className="h-14 bg-white rounded-xl border border-slate-200 animate-pulse" />
         <div className="grid grid-cols-3 gap-5">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-72 bg-white rounded-2xl border border-slate-200 animate-pulse" />
+            <div
+              key={i}
+              className="h-72 bg-white rounded-2xl border border-slate-200 animate-pulse"
+            />
           ))}
         </div>
       </div>

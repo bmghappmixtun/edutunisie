@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isValidOrigin, isProduction } from '@/lib/security';
-import { rateLimit, getClientIp } from '@/lib/security';
 import { prisma } from '@/lib/prisma';
 import { hashPassword, generateOTP } from '@/lib/auth';
 import { sendOTPEmail, sendWelcomeEmail } from '@/lib/email';
@@ -19,7 +18,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Champs requis manquants' }, { status: 400 });
     }
     if (password.length < 6) {
-      return NextResponse.json({ error: 'Le mot de passe doit contenir au moins 6 caractères' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Le mot de passe doit contenir au moins 6 caractères' },
+        { status: 400 },
+      );
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return NextResponse.json({ error: 'Email invalide' }, { status: 400 });
@@ -35,12 +37,19 @@ export async function POST(req: NextRequest) {
         const otpCode = generateOTP();
         await prisma.otpCode.updateMany({
           where: { userId: existing.id, purpose: 'email_verification', consumedAt: null },
-          data: { consumedAt: new Date() }
+          data: { consumedAt: new Date() },
         });
         await prisma.otpCode.create({
-          data: { userId: existing.id, code: otpCode, purpose: 'email_verification', expiresAt: new Date(Date.now() + 30 * 60 * 1000) }
+          data: {
+            userId: existing.id,
+            code: otpCode,
+            purpose: 'email_verification',
+            expiresAt: new Date(Date.now() + 30 * 60 * 1000),
+          },
         });
-        sendOTPEmail(existing.email, otpCode, existing.firstName ?? undefined).catch(e => console.error('Re-OTP error:', e));
+        sendOTPEmail(existing.email, otpCode, existing.firstName ?? undefined).catch((e) =>
+          console.error('Re-OTP error:', e),
+        );
       }
       // SECURITY: same response shape as a fresh registration
       return NextResponse.json({
@@ -66,7 +75,7 @@ export async function POST(req: NextRequest) {
         status,
         emailVerifiedAt: null,
         slug: '', // auto-filled by Prisma middleware
-      }
+      },
     });
 
     // Create OTP code (30 min expiry)
@@ -76,21 +85,21 @@ export async function POST(req: NextRequest) {
         code: otpCode,
         purpose: 'email_verification',
         expiresAt: new Date(Date.now() + 30 * 60 * 1000),
-      }
+      },
     });
 
     // Send OTP (for verification) - await so we know if it failed
     const otpResult = await sendOTPEmail(user.email, otpCode, user.firstName ?? undefined);
-    console.log(`[register] OTP email result for ${user.email}: success=${otpResult.success} id=${otpResult.id} devCode=${otpResult.devCode ? 'YES' : 'NO'}`);
+    console.log(
+      `[register] OTP email result for ${user.email}: success=${otpResult.success} id=${otpResult.id} devCode=${otpResult.devCode ? 'YES' : 'NO'}`,
+    );
 
     // Send welcome email (different purpose - confirms account creation)
     await sendWelcomeEmail(user.email, user.firstName ?? '', user.role);
 
     // If teacher, notify admins in-app
     if (user.role === 'TEACHER') {
-      await notifyAdminsNewTeacher(user.id).catch(e =>
-        console.error('Admin notify error:', e)
-      );
+      await notifyAdminsNewTeacher(user.id).catch((e) => console.error('Admin notify error:', e));
     }
 
     // Build response - in dev mode OR if email failed, expose the OTP

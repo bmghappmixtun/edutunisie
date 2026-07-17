@@ -1,11 +1,23 @@
-import type { Metadata } from 'next';
 import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { prisma } from '@/lib/prisma';
 import { itemListSchema, breadcrumbSchema, SITE_URL } from '@/lib/structured-data';
 import { getLocale, getT } from '@/lib/i18n-server';
-import { GraduationCap, MapPin, Star, Search, ChevronLeft, ChevronRight, Award, Sparkles, Users, CheckCircle2, X, BookOpen } from 'lucide-react';
+import {
+  GraduationCap,
+  MapPin,
+  Star,
+  Search,
+  ChevronLeft,
+  ChevronRight,
+  Award,
+  Sparkles,
+  Users,
+  CheckCircle2,
+  X,
+  BookOpen,
+} from 'lucide-react';
 import type { Prisma } from '@prisma/client';
 import TeachersSearchBar from './TeachersSearchBar';
 import TeachersFilters from './TeachersFilters';
@@ -17,9 +29,9 @@ const PAGE_SIZE = 24;
 
 type SearchParams = {
   q?: string;
-  subject?: string;          // subject slug (comma-separated for multi-select)
-  class?: string;            // class slug (comma-separated for multi-select)
-  verified?: string;         // '1' to require verified only
+  subject?: string; // subject slug (comma-separated for multi-select)
+  class?: string; // class slug (comma-separated for multi-select)
+  verified?: string; // '1' to require verified only
   sort?: 'popular' | 'rating' | 'followers' | 'recent' | 'name';
   page?: string;
 };
@@ -37,16 +49,20 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
     alternates: { canonical: 'https://examanet.com/professeurs' },
     openGraph: {
       title: isAr ? 'المعلمون التونسيون على إكسامانت' : 'Professeurs tunisiens sur Examanet',
-      description: isAr ? 'اكتشف معلمينا المعتمدين ومواردهم المجانية.' : 'Découvrez nos enseignants certifiés et leurs ressources gratuites.',
+      description: isAr
+        ? 'اكتشف معلمينا المعتمدين ومواردهم المجانية.'
+        : 'Découvrez nos enseignants certifiés et leurs ressources gratuites.',
       url: '/professeurs',
       type: 'website',
       locale: isAr ? 'ar_TN' : 'fr_TN',
-      images: [{
-        url: `/api/og/page/professeurs`,
-        width: 1200,
-        height: 630,
-        alt: isAr ? 'Examanet — المعلمون التونسيون' : 'Examanet — Professeurs tunisiens',
-      }],
+      images: [
+        {
+          url: `/api/og/page/professeurs`,
+          width: 1200,
+          height: 630,
+          alt: isAr ? 'Examanet — المعلمون التونسيون' : 'Examanet — Professeurs tunisiens',
+        },
+      ],
     },
   };
 }
@@ -172,7 +188,7 @@ export default async function TeachersPage(props: { searchParams: Promise<Search
   // Strategy: get resource aggregates per teacher first, then sort+paginate teacher IDs.
 
   let teacherIdOrder: string[] | undefined;
-  let useManualSort = sort !== 'recent';
+  const useManualSort = sort !== 'recent';
 
   if (useManualSort) {
     const groups = await prisma.resource.groupBy({
@@ -244,10 +260,14 @@ export default async function TeachersPage(props: { searchParams: Promise<Search
       : meta;
 
     let sorted: typeof filtered;
-    if (sort === 'popular') sorted = filtered.sort((a, b) => b.count - a.count || b.downloads - a.downloads);
-    else if (sort === 'rating') sorted = filtered.sort((a, b) => b.rating - a.rating || b.count - a.count);
-    else if (sort === 'followers') sorted = filtered.sort((a, b) => b.followers - a.followers || b.count - a.count);
-    else if (sort === 'name') sorted = filtered.sort((a, b) => 0); // placeholder, will use name on DB
+    if (sort === 'popular')
+      sorted = filtered.sort((a, b) => b.count - a.count || b.downloads - a.downloads);
+    else if (sort === 'rating')
+      sorted = filtered.sort((a, b) => b.rating - a.rating || b.count - a.count);
+    else if (sort === 'followers')
+      sorted = filtered.sort((a, b) => b.followers - a.followers || b.count - a.count);
+    else if (sort === 'name')
+      sorted = filtered.sort((a, b) => 0); // placeholder, will use name on DB
     else sorted = filtered;
 
     teacherIdOrder = sorted.map((m) => m.id);
@@ -316,7 +336,14 @@ export default async function TeachersPage(props: { searchParams: Promise<Search
           _avg: { avgRating: true },
           _count: { _all: true },
         })
-      : Promise.resolve([] as Array<{ teacherId: string | null; _sum: { viewsCount: number | null; downloadsCount: number | null }; _avg: { avgRating: number | null }; _count: { _all: number } }>),
+      : Promise.resolve(
+          [] as Array<{
+            teacherId: string | null;
+            _sum: { viewsCount: number | null; downloadsCount: number | null };
+            _avg: { avgRating: number | null };
+            _count: { _all: number };
+          }>,
+        ),
     teacherIds.length
       ? prisma.follow.groupBy({
           by: ['followingId'],
@@ -326,7 +353,10 @@ export default async function TeachersPage(props: { searchParams: Promise<Search
       : Promise.resolve([] as Array<{ followingId: string; _count: { _all: number } }>),
   ]);
 
-  const statsMap = new Map<string, { files: number; downloads: number; views: number; rating: number; followers: number }>();
+  const statsMap = new Map<
+    string,
+    { files: number; downloads: number; views: number; rating: number; followers: number }
+  >();
   for (const r of resourceAgg) {
     if (!r.teacherId) continue;
     statsMap.set(r.teacherId, {
@@ -338,7 +368,13 @@ export default async function TeachersPage(props: { searchParams: Promise<Search
     });
   }
   for (const f of followCounts) {
-    const ex = statsMap.get(f.followingId) || { files: 0, downloads: 0, views: 0, rating: 0, followers: 0 };
+    const ex = statsMap.get(f.followingId) || {
+      files: 0,
+      downloads: 0,
+      views: 0,
+      rating: 0,
+      followers: 0,
+    };
     ex.followers = f._count._all;
     statsMap.set(f.followingId, ex);
   }
@@ -348,23 +384,36 @@ export default async function TeachersPage(props: { searchParams: Promise<Search
 
   // JSON-LD: ItemList of teachers for rich SERP results
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
-  const teacherListJsonLd = teachers.length > 0 ? itemListSchema({
-    name: hasFilters ? tt('teacher.filteredResults') : tt('teacher.allResults'),
-    description: tt('teacher.richSnippet').replace('{count}', String(totalMatching)),
-    url: `${baseUrl}/professeurs`,
-    items: teachers.slice(0, 50).map((t) => ({
-      name: `${t.firstName || ''} ${t.lastName || ''}`.replace(/\s+/g, ' ').trim(),
-      url: `${baseUrl}/professeurs/${t.numericId}/${t.slug}`,
-      description: t.bio || (t.schoolName ? tt('teacher.atSchool').replace('{school}', t.schoolName) : tt('teacher.onExamanet')),
-    })),
-  }) : null;
+  const teacherListJsonLd =
+    teachers.length > 0
+      ? itemListSchema({
+          name: hasFilters ? tt('teacher.filteredResults') : tt('teacher.allResults'),
+          description: tt('teacher.richSnippet').replace('{count}', String(totalMatching)),
+          url: `${baseUrl}/professeurs`,
+          items: teachers.slice(0, 50).map((t) => ({
+            name: `${t.firstName || ''} ${t.lastName || ''}`.replace(/\s+/g, ' ').trim(),
+            url: `${baseUrl}/professeurs/${t.numericId}/${t.slug}`,
+            description:
+              t.bio ||
+              (t.schoolName
+                ? tt('teacher.atSchool').replace('{school}', t.schoolName)
+                : tt('teacher.onExamanet')),
+          })),
+        })
+      : null;
 
   return (
     <div className="min-h-screen flex flex-col">
       {teacherListJsonLd && (
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(teacherListJsonLd) }} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(teacherListJsonLd) }}
+        />
       )}
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <Header />
       <main className="flex-1 pt-20">
         {/* HERO */}
@@ -375,7 +424,8 @@ export default async function TeachersPage(props: { searchParams: Promise<Search
               <span>Enseignants certifiés</span>
             </div>
             <h1 className="text-4xl lg:text-5xl font-extrabold mb-3 tracking-tight">
-              {tt('teacher.hero.h1A')} <span className="gradient-text">{tt('teacher.hero.h1B')}</span>
+              {tt('teacher.hero.h1A')}{' '}
+              <span className="gradient-text">{tt('teacher.hero.h1B')}</span>
             </h1>
             <p className="text-lg text-slate-600 max-w-2xl mb-6">
               {tt('teacher.hero.subtitle').replace('{count}', String(totalActive))}
@@ -397,7 +447,8 @@ export default async function TeachersPage(props: { searchParams: Promise<Search
             <TeachersSearchBar initialQ={q} />
             <div className="flex items-center justify-between gap-3 mt-3 flex-wrap">
               <p className="text-sm text-slate-600">
-                <span className="font-bold text-slate-900">{totalMatching}</span> professeur{totalMatching > 1 ? 's' : ''}
+                <span className="font-bold text-slate-900">{totalMatching}</span> professeur
+                {totalMatching > 1 ? 's' : ''}
                 {hasFilters ? <span className="text-slate-500"> · filtré</span> : null}
               </p>
               <TeachersSort current={sort} />
@@ -440,7 +491,13 @@ export default async function TeachersPage(props: { searchParams: Promise<Search
 
                   {/* Active filter chips */}
                   {hasFilters && (
-                    <ActiveChips sp={sp} subjectSlugs={subjectSlugs} classSlugs={classSlugs} subjects={subjectsTaught} classes={classesTaught} />
+                    <ActiveChips
+                      sp={sp}
+                      subjectSlugs={subjectSlugs}
+                      classSlugs={classSlugs}
+                      subjects={subjectsTaught}
+                      classes={classesTaught}
+                    />
                   )}
 
                   <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -451,7 +508,11 @@ export default async function TeachersPage(props: { searchParams: Promise<Search
 
                   {/* Pagination */}
                   {totalPages > 1 && (
-                    <Pagination current={page} total={totalPages} buildHref={(p) => buildHref({ ...sp, page: String(p) })} />
+                    <Pagination
+                      current={page}
+                      total={totalPages}
+                      buildHref={(p) => buildHref({ ...sp, page: String(p) })}
+                    />
                   )}
                 </>
               )}
@@ -468,7 +529,15 @@ export default async function TeachersPage(props: { searchParams: Promise<Search
 // Sub-components
 // =====================================================================
 
-function Stat({ icon: Icon, value, label }: { icon: React.ComponentType<{ className?: string }>; value: number | string; label: string }) {
+function Stat({
+  icon: Icon,
+  value,
+  label,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  value: number | string;
+  label: string;
+}) {
   return (
     <div className="bg-white rounded-xl border border-amber-200 p-3 shadow-sm">
       <Icon className="w-4 h-4 text-amber-600 mb-1" />
@@ -504,7 +573,9 @@ function TeacherCard({
   const hasAr = !!(t.firstNameAr || t.lastNameAr);
   const initials = (() => {
     if (hasFr) {
-      return `${(t.firstName?.[0] || '').toUpperCase()}${(t.lastName?.[0] || '').toUpperCase()}` || '؟';
+      return (
+        `${(t.firstName?.[0] || '').toUpperCase()}${(t.lastName?.[0] || '').toUpperCase()}` || '؟'
+      );
     }
     if (hasAr) {
       const ar = `${t.firstNameAr || ''} ${t.lastNameAr || ''}`.trim();
@@ -514,9 +585,10 @@ function TeacherCard({
     }
     return '؟';
   })();
-  const fullName = `${t.firstName || ''} ${t.lastName || ''}`.trim()
-    || `${t.firstNameAr || ''} ${t.lastNameAr || ''}`.trim()
-    || 'Enseignant';
+  const fullName =
+    `${t.firstName || ''} ${t.lastName || ''}`.trim() ||
+    `${t.firstNameAr || ''} ${t.lastNameAr || ''}`.trim() ||
+    'Enseignant';
 
   return (
     <Link
@@ -532,7 +604,11 @@ function TeacherCard({
       <div className="flex items-start gap-4">
         {t.avatarUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={t.avatarUrl} alt={fullName} className="w-14 h-14 rounded-2xl object-cover flex-shrink-0" />
+          <img
+            src={t.avatarUrl}
+            alt={fullName}
+            className="w-14 h-14 rounded-2xl object-cover flex-shrink-0"
+          />
         ) : (
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 text-white font-extrabold text-xl flex items-center justify-center flex-shrink-0">
             {initials}
@@ -541,21 +617,32 @@ function TeacherCard({
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             {hasFr ? (
-              <h3 className="font-bold text-lg group-hover:text-primary-600 transition truncate">{fullName}</h3>
+              <h3 className="font-bold text-lg group-hover:text-primary-600 transition truncate">
+                {fullName}
+              </h3>
             ) : hasAr ? (
-              <h3 className="font-bold text-2xl group-hover:text-primary-600 transition truncate" dir="rtl" lang="ar">
-                {(t.firstNameAr || "") + " " + (t.lastNameAr || "")}
+              <h3
+                className="font-bold text-2xl group-hover:text-primary-600 transition truncate"
+                dir="rtl"
+                lang="ar"
+              >
+                {(t.firstNameAr || '') + ' ' + (t.lastNameAr || '')}
               </h3>
             ) : (
-              <h3 className="font-bold text-lg group-hover:text-primary-600 transition truncate">{fullName}</h3>
+              <h3 className="font-bold text-lg group-hover:text-primary-600 transition truncate">
+                {fullName}
+              </h3>
             )}
             {t.isVerifiedTeacher && (
-              <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" aria-label="Enseignant vérifié" />
+              <CheckCircle2
+                className="w-4 h-4 text-emerald-500 flex-shrink-0"
+                aria-label="Enseignant vérifié"
+              />
             )}
           </div>
           {hasFr && hasAr && (
             <p className="text-sm text-slate-500 truncate" dir="rtl" lang="ar">
-              {(t.firstNameAr || "") + " " + (t.lastNameAr || "")}
+              {(t.firstNameAr || '') + ' ' + (t.lastNameAr || '')}
             </p>
           )}
           {t.schoolName && <p className="text-sm text-slate-500 truncate">{t.schoolName}</p>}
@@ -602,7 +689,7 @@ function EmptyState({ q }: { q: string }) {
       <p className="text-slate-500 max-w-md mx-auto">
         {q
           ? `Aucun résultat pour "${q}". Essayez d'élargir vos critères.`
-          : 'Aucun résultat pour ces filtres. Essayez d\'enlever certains filtres.'}
+          : "Aucun résultat pour ces filtres. Essayez d'enlever certains filtres."}
       </p>
       <Link
         href="/professeurs"
@@ -715,11 +802,17 @@ function ActiveChips({
   if (sp.q) chips.push({ label: `« ${sp.q} »`, removeHref: buildHref({ ...sp, q: '' }) });
   for (const s of subjectSlugs) {
     const newSubs = subjectSlugs.filter((x) => x !== s).join(',');
-    chips.push({ label: subjectMap.get(s) || s, removeHref: buildHref({ ...sp, subject: newSubs, page: '1' }) });
+    chips.push({
+      label: subjectMap.get(s) || s,
+      removeHref: buildHref({ ...sp, subject: newSubs, page: '1' }),
+    });
   }
   for (const c of classSlugs) {
     const newClasses = classSlugs.filter((x) => x !== c).join(',');
-    chips.push({ label: classMap.get(c) || c, removeHref: buildHref({ ...sp, class: newClasses, page: '1' }) });
+    chips.push({
+      label: classMap.get(c) || c,
+      removeHref: buildHref({ ...sp, class: newClasses, page: '1' }),
+    });
   }
   if (sp.verified === '1') {
     chips.push({ label: '✓ Vérifiés', removeHref: buildHref({ ...sp, verified: '', page: '1' }) });
@@ -739,7 +832,10 @@ function ActiveChips({
           <X className="w-3.5 h-3.5" />
         </Link>
       ))}
-      <Link href="/professeurs" className="text-sm text-slate-500 underline hover:text-slate-700 ml-2">
+      <Link
+        href="/professeurs"
+        className="text-sm text-slate-500 underline hover:text-slate-700 ml-2"
+      >
         Tout effacer
       </Link>
     </div>
@@ -748,15 +844,33 @@ function ActiveChips({
 
 // Empty-state wrapper (preserves filters UI)
 async function renderEmpty(props: any) {
-  const { sp, q, subjectSlugs, classSlugs, verifiedOnly, sort, page, subjectsTaught, classesTaught, totalActive, totalVerified, totalResources, teacherCountFiltered } = props;
+  const {
+    sp,
+    q,
+    subjectSlugs,
+    classSlugs,
+    verifiedOnly,
+    sort,
+    page,
+    subjectsTaught,
+    classesTaught,
+    totalActive,
+    totalVerified,
+    totalResources,
+    teacherCountFiltered,
+  } = props;
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-1 pt-20">
         <section className="bg-gradient-to-br from-amber-50 to-orange-50 py-12">
           <div className="max-w-7xl mx-auto px-4">
-            <h1 className="text-4xl font-extrabold mb-2">Nos <span className="gradient-text">professeurs</span></h1>
-            <p className="text-slate-600">{totalActive} enseignants · 0 résultats pour ces filtres</p>
+            <h1 className="text-4xl font-extrabold mb-2">
+              Nos <span className="gradient-text">professeurs</span>
+            </h1>
+            <p className="text-slate-600">
+              {totalActive} enseignants · 0 résultats pour ces filtres
+            </p>
           </div>
         </section>
         <section className="bg-white border-b sticky top-16 z-30">

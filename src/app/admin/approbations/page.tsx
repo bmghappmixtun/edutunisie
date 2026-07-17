@@ -15,13 +15,23 @@ export default async function AdminApprovationsPage() {
       where: { role: 'TEACHER', status: { in: ['PENDING_APPROVAL', 'PENDING_FILE_VERIFICATION'] } },
       orderBy: { createdAt: 'desc' },
       select: {
-        id: true, email: true, firstName: true, lastName: true,
-        schoolName: true, governorate: true, diploma: true,
-        teachingSubjects: true, teachingLevels: true, createdAt: true,
-        status: true, invitationStatus: true, lastInvitationId: true,
-        verificationFilesRequestedAt: true, verificationFilesCount: true,
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        schoolName: true,
+        governorate: true,
+        diploma: true,
+        teachingSubjects: true,
+        teachingLevels: true,
+        createdAt: true,
+        status: true,
+        invitationStatus: true,
+        lastInvitationId: true,
+        verificationFilesRequestedAt: true,
+        verificationFilesCount: true,
         verificationFilesReceivedAt: true,
-      }
+      },
     }),
     prisma.resource.findMany({
       where: { status: 'PENDING_APPROVAL' },
@@ -29,9 +39,9 @@ export default async function AdminApprovationsPage() {
       include: {
         subject: { select: { nameFr: true } },
         class: { select: { nameFr: true } },
-        teacher: { select: { firstName: true, lastName: true, email: true, schoolName: true } }
-      }
-    })
+        teacher: { select: { firstName: true, lastName: true, email: true, schoolName: true } },
+      },
+    }),
   ]);
 
   return (
@@ -49,15 +59,15 @@ export default async function AdminApprovationsPage() {
         </div>
       ) : (
         <ApprobationsClient
-          initialTeachers={pendingTeachers.map(t => ({
+          initialTeachers={pendingTeachers.map((t) => ({
             ...t,
             createdAt: t.createdAt.toISOString(),
             verificationFilesRequestedAt: t.verificationFilesRequestedAt?.toISOString() || null,
             verificationFilesReceivedAt: t.verificationFilesReceivedAt?.toISOString() || null,
           }))}
-          initialResources={pendingResources.map(r => ({
+          initialResources={pendingResources.map((r) => ({
             ...r,
-            createdAt: r.createdAt.toISOString()
+            createdAt: r.createdAt.toISOString(),
           }))}
         />
       )}

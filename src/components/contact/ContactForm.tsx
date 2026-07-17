@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Send, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import T from '@/components/i18n/T';
 import { useI18n } from '@/lib/i18n';
 
 export default function ContactForm() {
@@ -40,7 +39,7 @@ export default function ContactForm() {
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form)
+        body: JSON.stringify(form),
       });
       const data = await res.json();
 
@@ -66,9 +65,7 @@ export default function ContactForm() {
           <CheckCircle className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
           <div className="text-sm">
             <div className="font-bold text-emerald-900 mb-1">{t('contact.form.sentTitle')}</div>
-            <div className="text-emerald-700">
-              {t('contact.form.sentDesc')}
-            </div>
+            <div className="text-emerald-700">{t('contact.form.sentDesc')}</div>
           </div>
         </div>
       )}
@@ -81,7 +78,7 @@ export default function ContactForm() {
               type="text"
               required
               value={form.name}
-              onChange={e => setForm({ ...form, name: e.target.value })}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
               className="input"
               placeholder={t('contact.form.namePlaceholder')}
             />
@@ -92,7 +89,7 @@ export default function ContactForm() {
               type="email"
               required
               value={form.email}
-              onChange={e => setForm({ ...form, email: e.target.value })}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
               className="input"
               placeholder={t('contact.form.emailPlaceholder')}
             />
@@ -103,7 +100,7 @@ export default function ContactForm() {
           <label className="label">{t('contact.form.subject')}</label>
           <select
             value={form.subject}
-            onChange={e => setForm({ ...form, subject: e.target.value })}
+            onChange={(e) => setForm({ ...form, subject: e.target.value })}
             className="input"
           >
             <option value="">{t('contact.form.chooseSubject')}</option>
@@ -123,20 +120,22 @@ export default function ContactForm() {
           <textarea
             required
             value={form.message}
-            onChange={e => setForm({ ...form, message: e.target.value })}
+            onChange={(e) => setForm({ ...form, message: e.target.value })}
             rows={6}
             className="input resize-none"
             placeholder={t('contact.form.messagePlaceholder')}
           />
-          <div className="text-xs text-slate-500 mt-1 text-right">
-            {form.message.length} / 2000
-          </div>
+          <div className="text-xs text-slate-500 mt-1 text-right">{form.message.length} / 2000</div>
         </div>
 
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-sm text-amber-800 flex items-start gap-2">
           <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
           <div>
-            <strong>{t('contact.form.rgpd')}:</strong> {t('contact.form.rgpdText')} <a href="/cgu" className="underline font-semibold">CGU</a>.
+            <strong>{t('contact.form.rgpd')}:</strong> {t('contact.form.rgpdText')}{' '}
+            <a href="/cgu" className="underline font-semibold">
+              CGU
+            </a>
+            .
           </div>
         </div>
 

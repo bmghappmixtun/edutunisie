@@ -34,9 +34,12 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
 
   const classCount = await prisma.class.count({ where: { levelId: id } });
   if (classCount > 0) {
-    return NextResponse.json({
-      error: `Impossible : ${classCount} classe(s) utilisent ce niveau.`
-    }, { status: 400 });
+    return NextResponse.json(
+      {
+        error: `Impossible : ${classCount} classe(s) utilisent ce niveau.`,
+      },
+      { status: 400 },
+    );
   }
 
   await prisma.level.delete({ where: { id } });
