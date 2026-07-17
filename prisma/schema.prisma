@@ -218,7 +218,8 @@ model Resource {
   status          String @default("DRAFT")
 
   fileKey         String
-  fileUrl         String
+  /// Public URL of the file (Vercel Blob or R2). Unique per file — prevents accidental re-imports of the same blob.
+  fileUrl         String         @unique
   fileSize        Int            @default(0)
   pageCount       Int?
   thumbnailKey    String?
