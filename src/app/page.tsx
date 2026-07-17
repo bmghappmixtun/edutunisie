@@ -10,13 +10,16 @@ import { getUserFavorites, decorateWithFavorites } from '@/lib/resource-helpers'
 // The root layout's locale defaults stay for children, but this overrides the
 // title/description/canonical when the request comes in via the /ar rewrite.
 export async function generateMetadata(): Promise<Metadata> {
-  let isAr = false;
-  try {
-    const h = await headers();
-    isAr = h.get('x-locale') === 'ar'
-      || (h.get('x-pathname') || '').startsWith('/ar')
-      || h.get('cookie')?.includes('locale=ar');
-  } catch {}
+  const isAr: boolean = await (async () => {
+    try {
+      const h = await headers();
+      return h.get('x-locale') === 'ar'
+        || (h.get('x-pathname') || '').startsWith('/ar')
+        || (h.get('cookie') || '').includes('locale=ar');
+    } catch {
+      return false;
+    }
+  })();
   if (!isAr) {
     return {
       title: 'Examanet — Cours, devoirs, exercices et corrigés gratuits en Tunisie',
