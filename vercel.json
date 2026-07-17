@@ -5,6 +5,12 @@
   "devCommand": "next dev",
   "installCommand": "npm install",
   "regions": ["fra1"],
+  "crons": [
+    {
+      "path": "/api/cron/cleanup-views",
+      "schedule": "0 3 * * *"
+    }
+  ],
   "headers": [
     {
       "source": "/uploads/(.*)",
