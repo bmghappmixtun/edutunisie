@@ -1,28 +1,43 @@
 import type { Metadata } from 'next';
+import { headers } from 'next/headers';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import HomeClient from '@/components/home/HomeClient';
 import { prisma } from '@/lib/prisma';
 import { getUserFavorites, decorateWithFavorites } from '@/lib/resource-helpers';
 
-export const metadata: Metadata = {
-  title: 'Examanet — Cours, devoirs, exercices et corrigés gratuits en Tunisie',
-  description: 'Plateforme pédagogique tunisienne #1 : cours, devoirs, exercices, sujets de bac et corrigés pour le Primaire, Collège et Lycée. 100% gratuit.',
-  alternates: { canonical: '/' },
-  openGraph: {
-    title: 'Examanet — La plateforme pédagogique #1 en Tunisie',
-    description: '15 000+ ressources gratuites : cours, devoirs, séries, révisions, sujets bac et corrigés.',
-    url: '/',
-    type: 'website',
-    images: [{ url: '/api/og/page/home', width: 1200, height: 630, alt: 'Examanet — Plateforme pédagogique tunisienne' }],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Examanet — La plateforme pédagogique #1 en Tunisie',
-    description: '15 000+ ressources gratuites : cours, devoirs, séries, révisions, sujets bac et corrigés.',
-    images: ['/api/og/page/home'],
-  },
-};
+// Page-level generateMetadata so /ar (rewritten to /) can serve Arabic metadata.
+// The root layout's locale defaults stay for children, but this overrides the
+// title/description/canonical when the request comes in via the /ar rewrite.
+export async function generateMetadata(): Promise<Metadata> {
+  let isAr = false;
+  try {
+    const h = await headers();
+    isAr = h.get('x-locale') === 'ar'
+      || (h.get('x-pathname') || '').startsWith('/ar')
+      || h.get('cookie')?.includes('locale=ar');
+  } catch {}
+  if (!isAr) {
+    return {
+      title: 'Examanet — Cours, devoirs, exercices et corrigés gratuits en Tunisie',
+      description: 'Plateforme pédagogique tunisienne #1 : cours, devoirs, exercices, sujets de bac et corrigés pour le Primaire, Collège et Lycée. 100% gratuit.',
+      alternates: { canonical: '/' },
+    };
+  }
+  return {
+    title: 'إكسامانت — دروس، فروض، تمارين وإصلاحات مجانية في تونس',
+    description: 'المنصة التربوية التونسية #1: دروس، فروض، تمارين، مواضيع باكالوريا وإصلاحات للابتدائي، الإعدادي والثانوي. 100% مجاني.',
+    alternates: { canonical: '/ar' },
+    openGraph: {
+      title: 'إكسامانت — المنصة التربوية التونسية #1',
+      description: 'دروس، فروض، سلاسل، ملخصات، مواضيع باك وإصلاحات — مجانية 100%.',
+      url: '/ar',
+      type: 'website',
+      locale: 'ar_TN',
+      images: [{ url: '/api/og/page/home', width: 1200, height: 630, alt: 'إكسامانت - المنصة التربوية التونسية' }],
+    },
+  };
+}
 
 export const revalidate = 300; // 5 min cache
 
