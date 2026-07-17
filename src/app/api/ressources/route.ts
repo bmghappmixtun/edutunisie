@@ -88,6 +88,41 @@ export async function GET(req: NextRequest) {
 
   const where = buildWhere(filters);
 
+  // Debug mode: ?debug=1 returns diagnostic info
+  if (searchParams.get('debug') === '1') {
+    const debug: any = { input: where.teacherId };
+    try {
+      const u = await prisma.user.findUnique({
+        where: { numericId: 953 },
+        select: { id: true, numericId: true, firstName: true, lastName: true },
+      });
+      debug.byPrisma953 = u;
+    } catch (e: any) {
+      debug.byPrisma953Error = e.message;
+    }
+    try {
+      const raw = await prisma.$queryRawUnsafe<Array<any>>(
+        `SELECT id, "numericId", "firstName" FROM "User" WHERE "numericId" = 953 LIMIT 1`
+      );
+      debug.byRaw953 = raw;
+    } catch (e: any) {
+      debug.byRaw953Error = e.message;
+    }
+    try {
+      const cnt = await prisma.$queryRaw<Array<{ count: bigint }>>`SELECT COUNT(*)::bigint as count FROM "User" WHERE "numericId" IS NOT NULL`;
+      debug.totalWithNumericId = Number(cnt[0]?.count || 0);
+    } catch (e: any) {
+      debug.totalError = e.message;
+    }
+    try {
+      const col = await prisma.$queryRaw<Array<any>>`SELECT column_name, data_type FROM information_schema.columns WHERE table_name = 'User' AND column_name IN ('id', 'numericId', 'slug')`;
+      debug.columns = col;
+    } catch (e: any) {
+      debug.columnsError = e.message;
+    }
+    return NextResponse.json(debug);
+  }
+
   // Convert teacherId from numericId to cuid (DB stores cuid on Resource.teacherId)
   // Accept both numericId (preferred, stable, exposed in URLs) and cuid (legacy)
   if (where.teacherId) {
