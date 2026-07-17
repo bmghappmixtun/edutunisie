@@ -127,8 +127,31 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
     page: filters.page,
   }), [filters]);
 
+  // Compute the key the initial SSR data was loaded with so we can
+  // skip the first client refetch when filters haven't actually changed.
+  // Prevents "resources appear, then disappear" race on first paint.
+  // `filters` at first render matches the URL → matches the SSR data.
+  // So if the current filterKey === first render filterKey, we can trust
+  // initialData and skip the refetch.
+  const isFirstRender = useRef(true);
+  const firstRenderKey = useRef('');
+  if (isFirstRender.current && !firstRenderKey.current) {
+    firstRenderKey.current = filterKey;
+  }
+
   // ============== FETCH ON FILTER CHANGE (debounced) ==============
   useEffect(() => {
+    // Skip the initial fetch on first render if the SSR data already
+    // matches the current filter key (prevents the brief "resources
+    // appear then disappear" race when the page first hydrates).
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      if (filterKey === firstRenderKey.current) {
+        lastFetchKey.current = filterKey;  // mark as "already fetched" (with SSR data)
+        return;
+      }
+    }
+
     if (lastFetchKey.current === filterKey) return;
     lastFetchKey.current = filterKey;
 
