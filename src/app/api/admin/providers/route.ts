@@ -102,7 +102,7 @@ export async function GET() {
             }
           : null,
       };
-    })
+    }),
   );
 
   return NextResponse.json({ providers: result });
@@ -135,15 +135,12 @@ export async function POST(req: NextRequest) {
   if (!provider || !['iloveapi', 'apiconvert'].includes(provider)) {
     return NextResponse.json(
       { error: 'provider doit être "iloveapi" ou "apiconvert"' },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
   if (!body.secretKey || body.secretKey.trim().length < 4) {
-    return NextResponse.json(
-      { error: 'secretKey requis (min 4 caractères)' },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: 'secretKey requis (min 4 caractères)' }, { status: 400 });
   }
 
   const data: any = {

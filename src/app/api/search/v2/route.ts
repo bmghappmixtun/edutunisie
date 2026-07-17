@@ -27,6 +27,9 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(data);
   } catch (e: any) {
     console.error('[search v2]', e);
-    return NextResponse.json({ error: 'Search failed', message: e.message?.slice(0, 500) }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Search failed', message: e.message?.slice(0, 500) },
+      { status: 500 },
+    );
   }
 }

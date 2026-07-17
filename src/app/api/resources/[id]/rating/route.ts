@@ -12,7 +12,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     return NextResponse.json({ error: 'Note invalide' }, { status: 400 });
   }
 
-  const existing = await prisma.rating.findUnique({ where: { resourceId_userId: { resourceId: id, userId: user.id } } });
+  const existing = await prisma.rating.findUnique({
+    where: { resourceId_userId: { resourceId: id, userId: user.id } },
+  });
   if (existing) {
     await prisma.rating.update({ where: { id: existing.id }, data: { stars, review } });
   } else {
@@ -21,7 +23,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   const allRatings = await prisma.rating.findMany({ where: { resourceId: id } });
   const avgRating = allRatings.reduce((sum, r) => sum + r.stars, 0) / allRatings.length;
-  await prisma.resource.update({ where: { id }, data: { avgRating, ratingCount: allRatings.length } });
+  await prisma.resource.update({
+    where: { id },
+    data: { avgRating, ratingCount: allRatings.length },
+  });
 
   return NextResponse.json({ success: true });
 }

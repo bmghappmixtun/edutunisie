@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import bcrypt from 'bcryptjs';
 
 export const runtime = 'nodejs';
 
@@ -13,15 +12,29 @@ export async function GET() {
   const account = await prisma.user.findUnique({
     where: { id: user.id },
     select: {
-      id: true, email: true, role: true, status: true,
-      firstName: true, lastName: true, avatarUrl: true,
-      bio: true, schoolName: true, governorate: true, diploma: true,
-      teachingSubjects: true, teachingLevels: true,
-      phone: true, website: true,
-      preferredLang: true, themePref: true,
-      notifyEmail: true, notifyInApp: true,
-      createdAt: true, lastLoginAt: true, emailVerifiedAt: true
-    }
+      id: true,
+      email: true,
+      role: true,
+      status: true,
+      firstName: true,
+      lastName: true,
+      avatarUrl: true,
+      bio: true,
+      schoolName: true,
+      governorate: true,
+      diploma: true,
+      teachingSubjects: true,
+      teachingLevels: true,
+      phone: true,
+      website: true,
+      preferredLang: true,
+      themePref: true,
+      notifyEmail: true,
+      notifyInApp: true,
+      createdAt: true,
+      lastLoginAt: true,
+      emailVerifiedAt: true,
+    },
   });
 
   return NextResponse.json({ account });
@@ -35,11 +48,19 @@ export async function PATCH(req: NextRequest) {
   try {
     const body = await req.json();
     const allowed = [
-      'firstName', 'lastName', 'avatarUrl', 'bio',
-      'schoolName', 'governorate', 'diploma',
-      'phone', 'website',
-      'preferredLang', 'themePref',
-      'notifyEmail', 'notifyInApp'
+      'firstName',
+      'lastName',
+      'avatarUrl',
+      'bio',
+      'schoolName',
+      'governorate',
+      'diploma',
+      'phone',
+      'website',
+      'preferredLang',
+      'themePref',
+      'notifyEmail',
+      'notifyInApp',
     ];
     const data: any = {};
     for (const k of allowed) {
@@ -51,7 +72,14 @@ export async function PATCH(req: NextRequest) {
       let arr: string[] = [];
       if (Array.isArray(body.teachingSubjects)) arr = body.teachingSubjects;
       else if (typeof body.teachingSubjects === 'string') {
-        try { arr = JSON.parse(body.teachingSubjects); } catch { arr = body.teachingSubjects.split(',').map((s: string) => s.trim()).filter(Boolean); }
+        try {
+          arr = JSON.parse(body.teachingSubjects);
+        } catch {
+          arr = body.teachingSubjects
+            .split(',')
+            .map((s: string) => s.trim())
+            .filter(Boolean);
+        }
       }
       data.teachingSubjects = JSON.stringify(arr);
     }
@@ -59,7 +87,14 @@ export async function PATCH(req: NextRequest) {
       let arr: string[] = [];
       if (Array.isArray(body.teachingLevels)) arr = body.teachingLevels;
       else if (typeof body.teachingLevels === 'string') {
-        try { arr = JSON.parse(body.teachingLevels); } catch { arr = body.teachingLevels.split(',').map((s: string) => s.trim()).filter(Boolean); }
+        try {
+          arr = JSON.parse(body.teachingLevels);
+        } catch {
+          arr = body.teachingLevels
+            .split(',')
+            .map((s: string) => s.trim())
+            .filter(Boolean);
+        }
       }
       data.teachingLevels = JSON.stringify(arr);
     }
@@ -68,13 +103,23 @@ export async function PATCH(req: NextRequest) {
       where: { id: user.id },
       data,
       select: {
-        id: true, firstName: true, lastName: true, avatarUrl: true,
-        bio: true, schoolName: true, governorate: true, diploma: true,
-        teachingSubjects: true, teachingLevels: true,
-        phone: true, website: true,
-        preferredLang: true, themePref: true,
-        notifyEmail: true, notifyInApp: true
-      }
+        id: true,
+        firstName: true,
+        lastName: true,
+        avatarUrl: true,
+        bio: true,
+        schoolName: true,
+        governorate: true,
+        diploma: true,
+        teachingSubjects: true,
+        teachingLevels: true,
+        phone: true,
+        website: true,
+        preferredLang: true,
+        themePref: true,
+        notifyEmail: true,
+        notifyInApp: true,
+      },
     });
 
     return NextResponse.json({ success: true, account: updated });
@@ -88,7 +133,10 @@ export async function DELETE() {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
   if (user.role === 'ADMIN') {
-    return NextResponse.json({ error: 'Les admins ne peuvent pas supprimer leur compte ici' }, { status: 403 });
+    return NextResponse.json(
+      { error: 'Les admins ne peuvent pas supprimer leur compte ici' },
+      { status: 403 },
+    );
   }
 
   await prisma.user.delete({ where: { id: user.id } });

@@ -3,7 +3,25 @@ import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { getT, getLocale } from '@/lib/i18n-server';
-import { Eye, MessageCircle, Edit3, BarChart3, Users, ShieldCheck, Sparkles, Heart, Globe, ArrowRight, GraduationCap, CheckCircle2, Star, Zap, TrendingUp, Mail, Lock } from 'lucide-react';
+import {
+  Eye,
+  MessageCircle,
+  Edit3,
+  BarChart3,
+  Users,
+  ShieldCheck,
+  Sparkles,
+  Heart,
+  Globe,
+  ArrowRight,
+  GraduationCap,
+  CheckCircle2,
+  Star,
+  Zap,
+  TrendingUp,
+  Mail,
+  Lock,
+} from 'lucide-react';
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = getLocale();
@@ -12,7 +30,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title: isAr ? 'انضم كمعلم — Examanet' : 'Espace Enseignants — Rejoignez Examanet',
     description: isAr
       ? 'منصة تعليمية تونسية: انشر تمارينك ودروسك. احصل على رؤية، تابع إحصائياتك وساعد آلاف التلاميذ.'
-      : 'Plateforme éducative tunisienne : publiez vos devoirs, cours et exercices. Gagnez en visibilité, suivez vos statistiques et aidez des milliers d\'élèves.',
+      : "Plateforme éducative tunisienne : publiez vos devoirs, cours et exercices. Gagnez en visibilité, suivez vos statistiques et aidez des milliers d'élèves.",
     alternates: {
       canonical: 'https://examanet.com/enseignants/rejoindre',
       languages: {
@@ -51,16 +69,25 @@ export default function TeacherLandingPage() {
 
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative">
             {/* Breadcrumb */}
-            <nav aria-label="Fil d'Ariane" className="flex items-center gap-1 text-xs text-slate-500 mb-6 flex-wrap">
-              <Link href="/" className="hover:text-violet-600 transition">{t('common.home')}</Link>
+            <nav
+              aria-label="Fil d'Ariane"
+              className="flex items-center gap-1 text-xs text-slate-500 mb-6 flex-wrap"
+            >
+              <Link href="/" className="hover:text-violet-600 transition">
+                {t('common.home')}
+              </Link>
               <span className="text-slate-300">›</span>
-              <span className="text-slate-900 font-semibold">{t('landingTeachers.breadcrumb')}</span>
+              <span className="text-slate-900 font-semibold">
+                {t('landingTeachers.breadcrumb')}
+              </span>
             </nav>
 
             {/* Badge */}
             <div className="inline-flex items-center gap-2 bg-white border-2 border-violet-200 rounded-full px-5 py-2 mb-6 shadow-sm">
               <Sparkles className="w-4 h-4 text-violet-600" />
-              <span className="text-sm font-bold text-violet-700">{t('landingTeachers.badge')}</span>
+              <span className="text-sm font-bold text-violet-700">
+                {t('landingTeachers.badge')}
+              </span>
             </div>
 
             {/* Title */}
@@ -95,7 +122,10 @@ export default function TeacherLandingPage() {
             {/* Trust indicators */}
             <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl">
               {stats.map((s, i) => (
-                <div key={i} className="bg-white/70 backdrop-blur-sm border border-white rounded-2xl p-4 shadow-sm">
+                <div
+                  key={i}
+                  className="bg-white/70 backdrop-blur-sm border border-white rounded-2xl p-4 shadow-sm"
+                >
                   <div className="text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-violet-600 to-amber-500 bg-clip-text text-transparent">
                     {s.value}
                   </div>
@@ -252,7 +282,10 @@ export default function TeacherLandingPage() {
               </Link>
               <div className="mt-6 text-sm text-violet-200">
                 {t('landingTeachers.noInvite')}{' '}
-                <Link href="/contact" className="text-amber-300 underline font-semibold hover:text-amber-200">
+                <Link
+                  href="/contact"
+                  className="text-amber-300 underline font-semibold hover:text-amber-200"
+                >
                   {t('landingTeachers.contactUs')}
                 </Link>
               </div>
@@ -279,26 +312,11 @@ export default function TeacherLandingPage() {
             </div>
 
             <div className="space-y-4">
-              <Faq
-                q={t('landingTeachers.faq1Q')}
-                a={t('landingTeachers.faq1A')}
-              />
-              <Faq
-                q={t('landingTeachers.faq2Q')}
-                a={t('landingTeachers.faq2A')}
-              />
-              <Faq
-                q={t('landingTeachers.faq3Q')}
-                a={t('landingTeachers.faq3A')}
-              />
-              <Faq
-                q={t('landingTeachers.faq4Q')}
-                a={t('landingTeachers.faq4A')}
-              />
-              <Faq
-                q={t('landingTeachers.faq5Q')}
-                a={t('landingTeachers.faq5A')}
-              />
+              <Faq q={t('landingTeachers.faq1Q')} a={t('landingTeachers.faq1A')} />
+              <Faq q={t('landingTeachers.faq2Q')} a={t('landingTeachers.faq2A')} />
+              <Faq q={t('landingTeachers.faq3Q')} a={t('landingTeachers.faq3A')} />
+              <Faq q={t('landingTeachers.faq4Q')} a={t('landingTeachers.faq4A')} />
+              <Faq q={t('landingTeachers.faq5Q')} a={t('landingTeachers.faq5A')} />
             </div>
           </div>
         </section>
@@ -311,9 +329,7 @@ export default function TeacherLandingPage() {
             <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 mb-4">
               {t('landingTeachers.footerCtaTitle')}
             </h2>
-            <p className="text-slate-600 mb-8 text-lg">
-              {t('landingTeachers.footerCtaSubtitle')}
-            </p>
+            <p className="text-slate-600 mb-8 text-lg">{t('landingTeachers.footerCtaSubtitle')}</p>
             <Link
               href="/connexion"
               className="inline-flex items-center gap-2 bg-gradient-to-r from-violet-600 to-purple-600 text-white px-10 py-5 rounded-xl font-bold text-lg hover:shadow-2xl hover:scale-[1.02] transition shadow-lg"
@@ -330,7 +346,17 @@ export default function TeacherLandingPage() {
   );
 }
 
-function BenefitCard({ icon, color, title, description }: { icon: React.ReactNode; color: string; title: string; description: string }) {
+function BenefitCard({
+  icon,
+  color,
+  title,
+  description,
+}: {
+  icon: React.ReactNode;
+  color: string;
+  title: string;
+  description: string;
+}) {
   const colorClasses: Record<string, string> = {
     violet: 'bg-violet-100 text-violet-700',
     emerald: 'bg-emerald-100 text-emerald-700',
@@ -341,7 +367,9 @@ function BenefitCard({ icon, color, title, description }: { icon: React.ReactNod
   };
   return (
     <div className="bg-white p-6 rounded-2xl border border-slate-200 hover:shadow-xl hover:border-violet-200 transition group">
-      <div className={`w-12 h-12 rounded-xl ${colorClasses[color]} flex items-center justify-center mb-4 group-hover:scale-110 transition`}>
+      <div
+        className={`w-12 h-12 rounded-xl ${colorClasses[color]} flex items-center justify-center mb-4 group-hover:scale-110 transition`}
+      >
         {icon}
       </div>
       <h3 className="font-bold text-lg text-slate-900 mb-2">{title}</h3>
@@ -350,7 +378,17 @@ function BenefitCard({ icon, color, title, description }: { icon: React.ReactNod
   );
 }
 
-function Step({ number, icon, title, description }: { number: number; icon: React.ReactNode; title: string; description: string }) {
+function Step({
+  number,
+  icon,
+  title,
+  description,
+}: {
+  number: number;
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+}) {
   return (
     <div className="text-center bg-white rounded-2xl p-8 border border-slate-200 shadow-sm hover:shadow-lg transition">
       <div className="relative inline-block mb-4">
@@ -372,7 +410,9 @@ function Faq({ q, a }: { q: string; a: string }) {
     <details className="group bg-slate-800/60 backdrop-blur-sm rounded-xl border border-slate-700/50 hover:bg-slate-800 hover:border-violet-500/30 transition cursor-pointer">
       <summary className="font-semibold text-lg flex items-center justify-between p-6 list-none">
         <span>{q}</span>
-        <span className="text-violet-400 text-2xl group-open:rotate-45 transition-transform">+</span>
+        <span className="text-violet-400 text-2xl group-open:rotate-45 transition-transform">
+          +
+        </span>
       </summary>
       <div className="px-6 pb-6 text-slate-300 leading-relaxed">{a}</div>
     </details>

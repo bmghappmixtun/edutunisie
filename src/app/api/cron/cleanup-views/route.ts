@@ -6,10 +6,10 @@ export const runtime = 'nodejs';
 
 /**
  * Vercel Cron endpoint — runs nightly to delete old View records.
- * 
+ *
  * Schedule (vercel.json):
  *   { "crons": [{ "path": "/api/cron/cleanup-views", "schedule": "0 3 * * *" }] }
- * 
+ *
  * Auth: requires CRON_SECRET in the Authorization header (Vercel sets this automatically).
  */
 export async function GET(req: NextRequest) {
@@ -21,17 +21,17 @@ export async function GET(req: NextRequest) {
   }
 
   const start = Date.now();
-  
+
   // Count
   const count = await prisma.$queryRaw<{ c: bigint }[]>`
     SELECT count(*) as c FROM "View" WHERE "createdAt" < NOW() - INTERVAL '90 days'
   `;
   const toDelete = Number(count[0]?.c ?? 0);
-  
+
   if (toDelete === 0) {
-    return NextResponse.json({ 
-      ok: true, 
-      deleted: 0, 
+    return NextResponse.json({
+      ok: true,
+      deleted: 0,
       message: 'No old views to clean up',
       duration: Date.now() - start,
     });
@@ -41,10 +41,10 @@ export async function GET(req: NextRequest) {
   const result = await prisma.$executeRaw`
     DELETE FROM "View" WHERE "createdAt" < NOW() - INTERVAL '90 days'
   `;
-  
-  return NextResponse.json({ 
-    ok: true, 
-    deleted: Number(result), 
+
+  return NextResponse.json({
+    ok: true,
+    deleted: Number(result),
     duration: Date.now() - start,
   });
 }

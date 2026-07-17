@@ -6,23 +6,45 @@ import { prisma } from '@/lib/prisma';
 import { getLocale, getT } from '@/lib/i18n-server';
 import { itemListSchema } from '@/lib/structured-data';
 import { BookOpen, Sparkles, ArrowRight, GraduationCap } from 'lucide-react';
-import { SUBJECTS_CONFIG, getSubjectConfig } from '@/lib/subjects.config';
+import { getSubjectConfig } from '@/lib/subjects.config';
 import { SUBJECT_ICONS } from '@/lib/subjects.icons';
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = getLocale();
-  const isAr = locale === "ar";
+  const isAr = locale === 'ar';
   return {
-    title: isAr ? "جميع المواد — دروس، تمارين وإصلاحات" : "Toutes les matières — Cours, exercices et corrigés",
-    description: isAr ? "اكتشف جميع مواد البرنامج المدرسي التونسي: الرياضيات، الفيزياء، علوم الحياة والأرض، الفرنسية، العربية، التاريخ، الفلسفة والمزيد. موارد مجانية لكل مادة." : "Découvrez toutes les matières du programme scolaire tunisien : Mathématiques, Physique, SVT, Français, Arabe, Histoire, Philosophie et plus. Ressources gratuites par matière.",
-    alternates: isAr ? {"canonical":"/matieres"} : {"canonical":"/matieres"},
+    title: isAr
+      ? 'جميع المواد — دروس، تمارين وإصلاحات'
+      : 'Toutes les matières — Cours, exercices et corrigés',
+    description: isAr
+      ? 'اكتشف جميع مواد البرنامج المدرسي التونسي: الرياضيات، الفيزياء، علوم الحياة والأرض، الفرنسية، العربية، التاريخ، الفلسفة والمزيد. موارد مجانية لكل مادة.'
+      : 'Découvrez toutes les matières du programme scolaire tunisien : Mathématiques, Physique, SVT, Français, Arabe, Histoire, Philosophie et plus. Ressources gratuites par matière.',
+    alternates: isAr ? { canonical: '/matieres' } : { canonical: '/matieres' },
     openGraph: {
-      title: isAr ? "جميع مواد البرنامج التونسي" : "Toutes les matières du programme tunisien",
-      description: isAr ? "دروس، تمارين، مواضيع باك وإصلاحات لكل مادة من البرنامج الرسمي التونسي." : "Cours, exercices, sujets de bac et corrigés pour chaque matière du programme officiel tunisien.",
-      url: isAr ? "/matieres" : "/matieres",
-      type: isAr ? "website" : "website",
-      locale: isAr ? "ar_TN" : "fr_TN",
-      images: isAr ? [{"url":"/api/og/page/matieres","width":1200,"height":630,"alt":"إكسامانت — جميع المواد"}] : [{"url":"/api/og/page/matieres","width":1200,"height":630,"alt":"Examanet — Toutes les matières"}],
+      title: isAr ? 'جميع مواد البرنامج التونسي' : 'Toutes les matières du programme tunisien',
+      description: isAr
+        ? 'دروس، تمارين، مواضيع باك وإصلاحات لكل مادة من البرنامج الرسمي التونسي.'
+        : 'Cours, exercices, sujets de bac et corrigés pour chaque matière du programme officiel tunisien.',
+      url: isAr ? '/matieres' : '/matieres',
+      type: isAr ? 'website' : 'website',
+      locale: isAr ? 'ar_TN' : 'fr_TN',
+      images: isAr
+        ? [
+            {
+              url: '/api/og/page/matieres',
+              width: 1200,
+              height: 630,
+              alt: 'إكسامانت — جميع المواد',
+            },
+          ]
+        : [
+            {
+              url: '/api/og/page/matieres',
+              width: 1200,
+              height: 630,
+              alt: 'Examanet — Toutes les matières',
+            },
+          ],
     },
   };
 }
@@ -54,7 +76,9 @@ export default async function SubjectsPage() {
     items: dbSubjects.slice(0, 50).map((s) => ({
       name: s.nameFr,
       url: `${baseUrl}/matieres/${s.slug}`,
-      description: t('subjects.page.richSnippetItem').replace('{count}', String(s._count.resources)).replace('{name}', s.nameFr),
+      description: t('subjects.page.richSnippetItem')
+        .replace('{count}', String(s._count.resources))
+        .replace('{name}', s.nameFr),
     })),
   });
 
@@ -75,7 +99,14 @@ export default async function SubjectsPage() {
             preserveAspectRatio="xMidYMid slice"
           >
             <defs>
-              <pattern id="subjects-dots" x="0" y="0" width="22" height="22" patternUnits="userSpaceOnUse">
+              <pattern
+                id="subjects-dots"
+                x="0"
+                y="0"
+                width="22"
+                height="22"
+                patternUnits="userSpaceOnUse"
+              >
                 <circle cx="2" cy="2" r="1.4" fill="#0EA5E9" opacity="0.12" />
               </pattern>
             </defs>
@@ -155,7 +186,7 @@ export default async function SubjectsPage() {
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 lg:gap-5">
             {dbSubjects.map((s) => {
               const cfg = getSubjectConfig(s.slug);
-              const Icon = cfg ? SUBJECT_ICONS[cfg.design.iconName] ?? BookOpen : BookOpen;
+              const Icon = cfg ? (SUBJECT_ICONS[cfg.design.iconName] ?? BookOpen) : BookOpen;
               const color = cfg?.color ?? s.color ?? '#0EA5E9';
               const emoji = cfg?.design.emoji ?? '📚';
               const gradient = cfg?.design.gradient ?? 'from-slate-100 to-slate-50';
@@ -192,9 +223,7 @@ export default async function SubjectsPage() {
                       strokeWidth={1.8}
                     />
                     {/* Emoji foreground (larger, on top) */}
-                    <span className="relative text-3xl lg:text-4xl drop-shadow-sm">
-                      {emoji}
-                    </span>
+                    <span className="relative text-3xl lg:text-4xl drop-shadow-sm">{emoji}</span>
                   </div>
 
                   {/* Subject name FR */}
@@ -226,7 +255,9 @@ export default async function SubjectsPage() {
                         color: color,
                       }}
                     >
-                      <span className="tabular-nums">{s._count.resources.toLocaleString('fr-FR')}</span>
+                      <span className="tabular-nums">
+                        {s._count.resources.toLocaleString('fr-FR')}
+                      </span>
                       <span className="font-normal opacity-80">ressources</span>
                     </span>
                   </div>
@@ -252,8 +283,8 @@ export default async function SubjectsPage() {
                 Vous ne trouvez pas une matière ?
               </h2>
               <p className="text-slate-300 mb-6 max-w-xl mx-auto">
-                Notre catalogue s'enrichit chaque semaine. Contactez-nous pour suggérer une
-                matière ou un niveau manquant.
+                Notre catalogue s'enrichit chaque semaine. Contactez-nous pour suggérer une matière
+                ou un niveau manquant.
               </p>
               <Link
                 href="/contact"

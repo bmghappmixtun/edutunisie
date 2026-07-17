@@ -59,13 +59,7 @@ export default function AnalyticsWithOptOut() {
   );
 }
 
-function AnalyticsStatusBadge({
-  optedOut,
-  onToggle,
-}: {
-  optedOut: boolean;
-  onToggle: () => void;
-}) {
+function AnalyticsStatusBadge({ optedOut, onToggle }: { optedOut: boolean; onToggle: () => void }) {
   const [show, setShow] = useState(false);
 
   useEffect(() => {
@@ -85,7 +79,11 @@ function AnalyticsStatusBadge({
           ? 'bg-amber-500 text-white hover:bg-amber-600'
           : 'bg-slate-900 text-white hover:bg-slate-800'
       }`}
-      title={optedOut ? 'Analytics désactivé sur ce navigateur' : 'Analytics actif — cliquer pour désactiver'}
+      title={
+        optedOut
+          ? 'Analytics désactivé sur ce navigateur'
+          : 'Analytics actif — cliquer pour désactiver'
+      }
     >
       {optedOut ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
       <span>Analytics {optedOut ? 'OFF' : 'ON'}</span>

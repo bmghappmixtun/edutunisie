@@ -75,7 +75,7 @@ async function main() {
   if (fs.existsSync(OFFICIAL_DIR)) {
     const files = fs.readdirSync(OFFICIAL_DIR).filter((f) => f.endsWith('.pdf'));
     console.log(`\n[OFFICIAL] ${files.length} files from ${OFFICIAL_DIR}`);
-    
+
     for (const f of files) {
       const filepath = path.join(OFFICIAL_DIR, f);
       // f format: {year}-{track}-{subject}.pdf or {year}-{track}-{subject}_c.pdf
@@ -85,9 +85,11 @@ async function main() {
       const year = parts[0];
       const track = parts[1];
       const subject = parts.slice(2).join('-').replace('_c', '');
-      
-      const blobKey = ensure(`concours-9eme/officials/${year}/${track}/${isCorrige ? 'corriges' : 'sujets'}/${subject}${isCorrige ? '_c' : ''}.pdf`);
-      
+
+      const blobKey = ensure(
+        `concours-9eme/officials/${year}/${track}/${isCorrige ? 'corriges' : 'sujets'}/${subject}${isCorrige ? '_c' : ''}.pdf`,
+      );
+
       try {
         const url = await uploadFile(filepath, blobKey);
         const size = fs.statSync(filepath).size;
@@ -125,20 +127,22 @@ async function main() {
     }
     const files = walk(ALT_DIR);
     console.log(`\n[ALT] ${files.length} files from ${ALT_DIR}`);
-    
+
     for (const filepath of files) {
       const relative = path.relative(ALT_DIR, filepath);
       const fname = path.basename(filepath);
-      
+
       // fname format: {year}-{subject}_c.pdf or {year}-{subject}.pdf
       const isCorrige = fname.includes('_c.pdf');
       const base = fname.replace('.pdf', '').replace('_c', '');
       const parts = base.split('-');
       const year = parts[0];
       const subject = parts.slice(1).join('-');
-      
-      const blobKey = ensure(`concours-9eme/alternatifs/${year}/${isCorrige ? 'corriges' : 'sujets'}/${subject}${isCorrige ? '_c' : ''}.pdf`);
-      
+
+      const blobKey = ensure(
+        `concours-9eme/alternatifs/${year}/${isCorrige ? 'corriges' : 'sujets'}/${subject}${isCorrige ? '_c' : ''}.pdf`,
+      );
+
       try {
         const url = await uploadFile(filepath, blobKey);
         const size = fs.statSync(filepath).size;
@@ -163,7 +167,7 @@ async function main() {
 
   // Write manifest
   const manifestPath = path.join('/tmp', 'concours-9eme-manifest.json');
-  fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2, sort=false));
+  fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2, (sort = false)));
   console.log(`\n=== Done ===`);
   console.log(`Total uploaded: ${uploaded}`);
   console.log(`Failed: ${failed}`);

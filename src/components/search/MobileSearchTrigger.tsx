@@ -8,7 +8,9 @@ export default function MobileSearchTrigger() {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Lock body scroll when open
   useEffect(() => {
@@ -22,7 +24,9 @@ export default function MobileSearchTrigger() {
     } else {
       document.body.style.overflow = '';
     }
-    return () => { document.body.style.overflow = ''; };
+    return () => {
+      document.body.style.overflow = '';
+    };
   }, [open]);
 
   // Close on Escape
@@ -34,7 +38,12 @@ export default function MobileSearchTrigger() {
   }, [open]);
 
   const overlay = open ? (
-    <div className="fixed inset-0 z-[100] md:hidden bg-white" role="dialog" aria-modal="true" aria-label="Recherche">
+    <div
+      className="fixed inset-0 z-[100] md:hidden bg-white"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Recherche"
+    >
       {/* Header with back button */}
       <div className="sticky top-0 bg-white border-b border-slate-200 px-4 py-3 flex items-center gap-3 z-10">
         <button
@@ -46,10 +55,7 @@ export default function MobileSearchTrigger() {
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div className="flex-1">
-          <SearchBar
-            size="lg"
-            className="w-full"
-          />
+          <SearchBar size="lg" className="w-full" />
         </div>
       </div>
 
@@ -60,7 +66,16 @@ export default function MobileSearchTrigger() {
         <p>Commence à taper pour voir les résultats, ou choisis un terme populaire ci-dessous.</p>
 
         <div className="mt-6 flex flex-wrap gap-2 justify-center">
-          {['Mathématiques', 'Physique', 'SVT', 'Français', 'Arabe', 'Anglais', 'Bac', 'Concours 9ème'].map(term => (
+          {[
+            'Mathématiques',
+            'Physique',
+            'SVT',
+            'Français',
+            'Arabe',
+            'Anglais',
+            'Bac',
+            'Concours 9ème',
+          ].map((term) => (
             <a
               key={term}
               href={`/recherche?q=${encodeURIComponent(term)}`}

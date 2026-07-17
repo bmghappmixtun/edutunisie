@@ -114,14 +114,14 @@ async function main() {
   const summary = {
     timestamp: new Date().toISOString(),
     totalUrls: allUrls.length,
-    byHost: Object.fromEntries(
-      Object.entries(byHost).map(([h, items]) => [h, items.length])
-    ),
+    byHost: Object.fromEntries(Object.entries(byHost).map(([h, items]) => [h, items.length])),
     sizeInfo: probeSize
       ? {
           totalProbed: allUrls.filter((i) => i.probedSize).length,
           totalBytes: allUrls.reduce((sum, i) => sum + (i.probedSize || 0), 0),
-          totalMB: (allUrls.reduce((sum, i) => sum + (i.probedSize || 0), 0) / 1024 / 1024).toFixed(2),
+          totalMB: (allUrls.reduce((sum, i) => sum + (i.probedSize || 0), 0) / 1024 / 1024).toFixed(
+            2,
+          ),
         }
       : null,
   };
@@ -130,7 +130,9 @@ async function main() {
 
   const duration = ((Date.now() - start) / 1000).toFixed(1);
   console.log(`\n[blob-inventory] DONE in ${duration}s`);
-  console.log(`[blob-inventory] Total: ${allUrls.length} URLs across ${Object.keys(byHost).length} hosts`);
+  console.log(
+    `[blob-inventory] Total: ${allUrls.length} URLs across ${Object.keys(byHost).length} hosts`,
+  );
   console.log(`[blob-inventory] Output: ${fullDir}`);
 }
 

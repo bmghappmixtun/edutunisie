@@ -2,9 +2,21 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  User, Lock, Mail, Bell, Palette, Trash2, Save, Loader2,
-  BookOpen, Layers, GraduationCap, Phone, Globe, MapPin,
-  Briefcase, Camera, Shield, Eye, EyeOff, Check, X
+  User,
+  Lock,
+  Mail,
+  Bell,
+  Palette,
+  Trash2,
+  Save,
+  Loader2,
+  BookOpen,
+  Phone,
+  Globe,
+  Shield,
+  Eye,
+  EyeOff,
+  Check,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -40,29 +52,61 @@ type Options = {
 };
 
 const GOVERNORATES = [
-  'Tunis', 'Ariana', 'Ben Arous', 'Manouba', 'Nabeul', 'Zaghouan', 'Bizerte',
-  'Béja', 'Jendouba', 'Kef', 'Siliana', 'Sousse', 'Monastir', 'Mahdia',
-  'Sfax', 'Kairouan', 'Kasserine', 'Sidi Bouzid', 'Gabès', 'Médenine',
-  'Tataouine', 'Gafsa', 'Tozeur', 'Kebili'
+  'Tunis',
+  'Ariana',
+  'Ben Arous',
+  'Manouba',
+  'Nabeul',
+  'Zaghouan',
+  'Bizerte',
+  'Béja',
+  'Jendouba',
+  'Kef',
+  'Siliana',
+  'Sousse',
+  'Monastir',
+  'Mahdia',
+  'Sfax',
+  'Kairouan',
+  'Kasserine',
+  'Sidi Bouzid',
+  'Gabès',
+  'Médenine',
+  'Tataouine',
+  'Gafsa',
+  'Tozeur',
+  'Kebili',
 ];
 
 const DIPLOMAS = [
-  'Licence', 'Master', 'Doctorat', 'Ingénieur',
-  'Professeur principal', 'Professeur secondaire', 'Agrégé', 'Autres'
+  'Licence',
+  'Master',
+  'Doctorat',
+  'Ingénieur',
+  'Professeur principal',
+  'Professeur secondaire',
+  'Agrégé',
+  'Autres',
 ];
 
 const LANGS = [
   { code: 'fr', label: 'Français' },
-  { code: 'ar', label: 'العربية' }
+  { code: 'ar', label: 'العربية' },
 ];
 
 const THEMES = [
   { code: 'light', label: '☀️ Clair' },
   { code: 'dark', label: '🌙 Sombre' },
-  { code: 'auto', label: '🔄 Auto' }
+  { code: 'auto', label: '🔄 Auto' },
 ];
 
-export default function SettingsClient({ account, options }: { account: Account; options: Options }) {
+export default function SettingsClient({
+  account,
+  options,
+}: {
+  account: Account;
+  options: Options;
+}) {
   const router = useRouter();
   const [section, setSection] = useState<string>('profile');
   const [saving, setSaving] = useState(false);
@@ -82,7 +126,7 @@ export default function SettingsClient({ account, options }: { account: Account;
     notifyEmail: account.notifyEmail,
     notifyInApp: account.notifyInApp ?? true,
     teachingSubjects: account.teachingSubjects ? JSON.parse(account.teachingSubjects) : [],
-    teachingLevels: account.teachingLevels ? JSON.parse(account.teachingLevels) : []
+    teachingLevels: account.teachingLevels ? JSON.parse(account.teachingLevels) : [],
   });
 
   const isTeacher = account.role === 'TEACHER';
@@ -92,9 +136,21 @@ export default function SettingsClient({ account, options }: { account: Account;
   const sections = [
     { id: 'profile', label: 'Profil', icon: User, roles: ['STUDENT', 'TEACHER', 'ADMIN'] },
     { id: 'security', label: 'Sécurité', icon: Lock, roles: ['STUDENT', 'TEACHER', 'ADMIN'] },
-    ...(isTeacher || isAdmin ? [{ id: 'teaching', label: 'Enseignement', icon: BookOpen, roles: ['TEACHER', 'ADMIN'] }] : []),
-    { id: 'notifications', label: 'Notifications', icon: Bell, roles: ['STUDENT', 'TEACHER', 'ADMIN'] },
-    { id: 'preferences', label: 'Préférences', icon: Palette, roles: ['STUDENT', 'TEACHER', 'ADMIN'] },
+    ...(isTeacher || isAdmin
+      ? [{ id: 'teaching', label: 'Enseignement', icon: BookOpen, roles: ['TEACHER', 'ADMIN'] }]
+      : []),
+    {
+      id: 'notifications',
+      label: 'Notifications',
+      icon: Bell,
+      roles: ['STUDENT', 'TEACHER', 'ADMIN'],
+    },
+    {
+      id: 'preferences',
+      label: 'Préférences',
+      icon: Palette,
+      roles: ['STUDENT', 'TEACHER', 'ADMIN'],
+    },
     { id: 'account', label: 'Compte', icon: Shield, roles: ['STUDENT', 'TEACHER', 'ADMIN'] },
     ...(isAdmin ? [{ id: 'admin', label: 'Administration', icon: Shield, roles: ['ADMIN'] }] : []),
   ];
@@ -105,7 +161,7 @@ export default function SettingsClient({ account, options }: { account: Account;
       const res = await fetch('/api/user/account', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form)
+        body: JSON.stringify(form),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -125,13 +181,15 @@ export default function SettingsClient({ account, options }: { account: Account;
     <div className="min-h-screen bg-slate-50 pt-8 pb-12">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="text-3xl font-extrabold mb-2">⚙️ Paramètres</h1>
-        <p className="text-slate-600 mb-6">Gérez votre compte, sécurité, notifications et préférences</p>
+        <p className="text-slate-600 mb-6">
+          Gérez votre compte, sécurité, notifications et préférences
+        </p>
 
         <div className="grid md:grid-cols-[240px_1fr] gap-6">
           {/* Sidebar */}
           <aside className="bg-white rounded-2xl border border-slate-200 p-2 h-fit md:sticky md:top-8">
             <nav className="space-y-1">
-              {sections.map(s => {
+              {sections.map((s) => {
                 const Icon = s.icon;
                 const active = section === s.id;
                 return (
@@ -156,11 +214,19 @@ export default function SettingsClient({ account, options }: { account: Account;
           <main className="space-y-6">
             {/* PROFIL */}
             {section === 'profile' && (
-              <SectionCard title="Profil" description="Informations visibles sur votre profil public" icon={User}>
+              <SectionCard
+                title="Profil"
+                description="Informations visibles sur votre profil public"
+                icon={User}
+              >
                 <div className="flex items-start gap-4">
                   <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary-400 to-primary-600 text-white font-extrabold text-2xl flex items-center justify-center flex-shrink-0 overflow-hidden">
                     {form.avatarUrl ? (
-                      <img src={form.avatarUrl} alt="avatar" className="w-full h-full object-cover" />
+                      <img
+                        src={form.avatarUrl}
+                        alt="avatar"
+                        className="w-full h-full object-cover"
+                      />
                     ) : (
                       `${form.firstName?.[0] || ''}${form.lastName?.[0] || ''}`.toUpperCase() || '?'
                     )}
@@ -170,7 +236,7 @@ export default function SettingsClient({ account, options }: { account: Account;
                       <input
                         type="url"
                         value={form.avatarUrl}
-                        onChange={e => setForm({ ...form, avatarUrl: e.target.value })}
+                        onChange={(e) => setForm({ ...form, avatarUrl: e.target.value })}
                         className="input"
                         placeholder="https://..."
                       />
@@ -183,7 +249,7 @@ export default function SettingsClient({ account, options }: { account: Account;
                     <input
                       type="text"
                       value={form.firstName}
-                      onChange={e => setForm({ ...form, firstName: e.target.value })}
+                      onChange={(e) => setForm({ ...form, firstName: e.target.value })}
                       required
                       className="input"
                     />
@@ -192,7 +258,7 @@ export default function SettingsClient({ account, options }: { account: Account;
                     <input
                       type="text"
                       value={form.lastName}
-                      onChange={e => setForm({ ...form, lastName: e.target.value })}
+                      onChange={(e) => setForm({ ...form, lastName: e.target.value })}
                       required
                       className="input"
                     />
@@ -204,7 +270,7 @@ export default function SettingsClient({ account, options }: { account: Account;
                     <Field label="Bio" hint="Présentation visible par les élèves (max 1000)">
                       <textarea
                         value={form.bio}
-                        onChange={e => setForm({ ...form, bio: e.target.value })}
+                        onChange={(e) => setForm({ ...form, bio: e.target.value })}
                         maxLength={1000}
                         className="input min-h-[120px] resize-none"
                         placeholder="Présentez-vous : parcours, pédagogie, passions..."
@@ -217,7 +283,7 @@ export default function SettingsClient({ account, options }: { account: Account;
                         <input
                           type="text"
                           value={form.schoolName}
-                          onChange={e => setForm({ ...form, schoolName: e.target.value })}
+                          onChange={(e) => setForm({ ...form, schoolName: e.target.value })}
                           className="input"
                           placeholder="Ex: Lycée Bourguiba, Tunis"
                         />
@@ -225,11 +291,15 @@ export default function SettingsClient({ account, options }: { account: Account;
                       <Field label="Gouvernorat">
                         <select
                           value={form.governorate}
-                          onChange={e => setForm({ ...form, governorate: e.target.value })}
+                          onChange={(e) => setForm({ ...form, governorate: e.target.value })}
                           className="input"
                         >
                           <option value="">— Choisir —</option>
-                          {GOVERNORATES.map(g => <option key={g} value={g}>{g}</option>)}
+                          {GOVERNORATES.map((g) => (
+                            <option key={g} value={g}>
+                              {g}
+                            </option>
+                          ))}
                         </select>
                       </Field>
                     </div>
@@ -237,11 +307,15 @@ export default function SettingsClient({ account, options }: { account: Account;
                     <Field label="Diplôme">
                       <select
                         value={form.diploma}
-                        onChange={e => setForm({ ...form, diploma: e.target.value })}
+                        onChange={(e) => setForm({ ...form, diploma: e.target.value })}
                         className="input"
                       >
                         <option value="">— Choisir —</option>
-                        {DIPLOMAS.map(d => <option key={d} value={d}>{d}</option>)}
+                        {DIPLOMAS.map((d) => (
+                          <option key={d} value={d}>
+                            {d}
+                          </option>
+                        ))}
                       </select>
                     </Field>
                   </>
@@ -252,7 +326,7 @@ export default function SettingsClient({ account, options }: { account: Account;
                     <input
                       type="tel"
                       value={form.phone}
-                      onChange={e => setForm({ ...form, phone: e.target.value })}
+                      onChange={(e) => setForm({ ...form, phone: e.target.value })}
                       className="input"
                       placeholder="+216 ..."
                     />
@@ -261,7 +335,7 @@ export default function SettingsClient({ account, options }: { account: Account;
                     <input
                       type="url"
                       value={form.website}
-                      onChange={e => setForm({ ...form, website: e.target.value })}
+                      onChange={(e) => setForm({ ...form, website: e.target.value })}
                       className="input"
                       placeholder="https://..."
                     />
@@ -272,21 +346,30 @@ export default function SettingsClient({ account, options }: { account: Account;
 
             {/* ENSEIGNEMENT (teacher only) */}
             {section === 'teaching' && (isTeacher || isAdmin) && (
-              <SectionCard title="Enseignement" description="Configurez ce que vous enseignez" icon={BookOpen}>
-                <Field label="Matières enseignées" hint={`${form.teachingSubjects.length} sélectionnée(s)`}>
+              <SectionCard
+                title="Enseignement"
+                description="Configurez ce que vous enseignez"
+                icon={BookOpen}
+              >
+                <Field
+                  label="Matières enseignées"
+                  hint={`${form.teachingSubjects.length} sélectionnée(s)`}
+                >
                   <div className="flex flex-wrap gap-2">
-                    {options.subjects.map(s => {
+                    {options.subjects.map((s) => {
                       const selected = form.teachingSubjects.includes(s.slug);
                       return (
                         <button
                           key={s.slug}
                           type="button"
-                          onClick={() => setForm({
-                            ...form,
-                            teachingSubjects: selected
-                              ? form.teachingSubjects.filter((v: string) => v !== s.slug)
-                              : [...form.teachingSubjects, s.slug]
-                          })}
+                          onClick={() =>
+                            setForm({
+                              ...form,
+                              teachingSubjects: selected
+                                ? form.teachingSubjects.filter((v: string) => v !== s.slug)
+                                : [...form.teachingSubjects, s.slug],
+                            })
+                          }
                           className={`px-3 py-1.5 rounded-full text-sm font-semibold transition ${
                             selected
                               ? 'bg-primary-500 text-white'
@@ -303,18 +386,20 @@ export default function SettingsClient({ account, options }: { account: Account;
 
                 <Field label="Niveaux" hint={`${form.teachingLevels.length} sélectionné(s)`}>
                   <div className="flex flex-wrap gap-2">
-                    {options.levels.map(l => {
+                    {options.levels.map((l) => {
                       const selected = form.teachingLevels.includes(l.slug);
                       return (
                         <button
                           key={l.slug}
                           type="button"
-                          onClick={() => setForm({
-                            ...form,
-                            teachingLevels: selected
-                              ? form.teachingLevels.filter((v: string) => v !== l.slug)
-                              : [...form.teachingLevels, l.slug]
-                          })}
+                          onClick={() =>
+                            setForm({
+                              ...form,
+                              teachingLevels: selected
+                                ? form.teachingLevels.filter((v: string) => v !== l.slug)
+                                : [...form.teachingLevels, l.slug],
+                            })
+                          }
                           className={`px-3 py-1.5 rounded-full text-sm font-semibold transition ${
                             selected
                               ? 'bg-emerald-500 text-white'
@@ -345,7 +430,11 @@ export default function SettingsClient({ account, options }: { account: Account;
 
             {/* NOTIFICATIONS */}
             {section === 'notifications' && (
-              <SectionCard title="Notifications" description="Comment vous souhaitez être notifié" icon={Bell}>
+              <SectionCard
+                title="Notifications"
+                description="Comment vous souhaitez être notifié"
+                icon={Bell}
+              >
                 <ToggleRow
                   label="Notifications par email"
                   description="Recevoir les alertes importantes par email"
@@ -369,7 +458,7 @@ export default function SettingsClient({ account, options }: { account: Account;
               <SectionCard title="Préférences" description="Langue et apparence" icon={Palette}>
                 <Field label="Langue de l'interface">
                   <div className="grid grid-cols-2 gap-2">
-                    {LANGS.map(l => (
+                    {LANGS.map((l) => (
                       <button
                         key={l.code}
                         type="button"
@@ -388,7 +477,7 @@ export default function SettingsClient({ account, options }: { account: Account;
 
                 <Field label="Thème">
                   <div className="grid grid-cols-3 gap-2">
-                    {THEMES.map(t => (
+                    {THEMES.map((t) => (
                       <button
                         key={t.code}
                         type="button"
@@ -409,25 +498,40 @@ export default function SettingsClient({ account, options }: { account: Account;
 
             {/* COMPTE */}
             {section === 'account' && (
-              <SectionCard title="Compte" description="Informations techniques du compte" icon={Shield}>
+              <SectionCard
+                title="Compte"
+                description="Informations techniques du compte"
+                icon={Shield}
+              >
                 <div className="space-y-3 text-sm">
                   <InfoRow label="Email actuel" value={account.email} />
                   <InfoRow
                     label="Rôle"
                     value={isAdmin ? '🛡️ Administrateur' : isTeacher ? '👨‍🏫 Enseignant' : '👨‍🎓 Élève'}
                   />
-                  <InfoRow label="Statut" value={account.status === 'ACTIVE' ? '✅ Actif' : '⏸️ ' + account.status} />
+                  <InfoRow
+                    label="Statut"
+                    value={account.status === 'ACTIVE' ? '✅ Actif' : '⏸️ ' + account.status}
+                  />
                   <InfoRow
                     label="Email vérifié"
                     value={account.emailVerifiedAt ? '✅ Oui' : '⚠️ Non vérifié'}
                   />
                   <InfoRow
                     label="Membre depuis"
-                    value={new Date(account.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                    value={new Date(account.createdAt).toLocaleDateString('fr-FR', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric',
+                    })}
                   />
                   <InfoRow
                     label="Dernière connexion"
-                    value={account.lastLoginAt ? new Date(account.lastLoginAt).toLocaleString('fr-FR') : '—'}
+                    value={
+                      account.lastLoginAt
+                        ? new Date(account.lastLoginAt).toLocaleString('fr-FR')
+                        : '—'
+                    }
                   />
                 </div>
 
@@ -435,11 +539,13 @@ export default function SettingsClient({ account, options }: { account: Account;
                   <div className="mt-6 pt-6 border-t border-red-200">
                     <h3 className="font-bold text-red-600 mb-2">⚠️ Zone dangereuse</h3>
                     <p className="text-sm text-slate-600 mb-4">
-                      La suppression de votre compte est définitive. Toutes vos données (ressources, commentaires, favoris) seront perdues.
+                      La suppression de votre compte est définitive. Toutes vos données (ressources,
+                      commentaires, favoris) seront perdues.
                     </p>
                     <button
                       onClick={async () => {
-                        if (!confirm('Êtes-vous absolument sûr ? Cette action est irréversible.')) return;
+                        if (!confirm('Êtes-vous absolument sûr ? Cette action est irréversible.'))
+                          return;
                         if (!confirm('DERNIÈRE CHANCE : vraiment supprimer votre compte ?')) return;
                         const res = await fetch('/api/user/account', { method: 'DELETE' });
                         if (res.ok) {
@@ -461,12 +567,36 @@ export default function SettingsClient({ account, options }: { account: Account;
 
             {/* ADMINISTRATION (admin only) */}
             {section === 'admin' && isAdmin && (
-              <SectionCard title="Administration" description="Outils avancés réservés à l'administrateur" icon={Shield}>
+              <SectionCard
+                title="Administration"
+                description="Outils avancés réservés à l'administrateur"
+                icon={Shield}
+              >
                 <div className="space-y-3">
-                  <AdminLink href="/admin/utilisateurs" title="Gérer les utilisateurs" desc="Activer, suspendre, supprimer, changer le rôle" icon={User} />
-                  <AdminLink href="/admin/approbations" title="Approuver les contenus" desc="Enseignants et ressources en attente" icon={Check} />
-                  <AdminLink href="/admin/ressources" title="Toutes les ressources" desc="Vue d'ensemble et modération" icon={BookOpen} />
-                  <AdminLink href="/admin/moderation" title="Modération" desc="Signalements à traiter" icon={Shield} />
+                  <AdminLink
+                    href="/admin/utilisateurs"
+                    title="Gérer les utilisateurs"
+                    desc="Activer, suspendre, supprimer, changer le rôle"
+                    icon={User}
+                  />
+                  <AdminLink
+                    href="/admin/approbations"
+                    title="Approuver les contenus"
+                    desc="Enseignants et ressources en attente"
+                    icon={Check}
+                  />
+                  <AdminLink
+                    href="/admin/ressources"
+                    title="Toutes les ressources"
+                    desc="Vue d'ensemble et modération"
+                    icon={BookOpen}
+                  />
+                  <AdminLink
+                    href="/admin/moderation"
+                    title="Modération"
+                    desc="Signalements à traiter"
+                    icon={Shield}
+                  />
                 </div>
               </SectionCard>
             )}
@@ -479,7 +609,11 @@ export default function SettingsClient({ account, options }: { account: Account;
                   disabled={saving}
                   className="btn-primary shadow-2xl flex items-center gap-2"
                 >
-                  {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                  {saving ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Save className="w-4 h-4" />
+                  )}
                   Enregistrer les modifications
                 </button>
               </div>
@@ -522,7 +656,17 @@ function Field({ label, hint, required, icon: Icon, children }: any) {
   );
 }
 
-function ToggleRow({ label, description, checked, onChange }: { label: string; description?: string; checked: boolean; onChange: (v: boolean) => void }) {
+function ToggleRow({
+  label,
+  description,
+  checked,
+  onChange,
+}: {
+  label: string;
+  description?: string;
+  checked: boolean;
+  onChange: (v: boolean) => void;
+}) {
   return (
     <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
       <div>
@@ -534,7 +678,9 @@ function ToggleRow({ label, description, checked, onChange }: { label: string; d
         onClick={() => onChange(!checked)}
         className={`relative w-12 h-6 rounded-full transition ${checked ? 'bg-emerald-500' : 'bg-slate-300'}`}
       >
-        <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition ${checked ? 'left-6' : 'left-0.5'}`} />
+        <div
+          className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition ${checked ? 'left-6' : 'left-0.5'}`}
+        />
       </button>
     </div>
   );
@@ -551,7 +697,10 @@ function InfoRow({ label, value }: { label: string; value: string }) {
 
 function AdminLink({ href, title, desc, icon: Icon }: any) {
   return (
-    <a href={href} className="flex items-start gap-3 p-3 hover:bg-slate-50 rounded-xl transition border border-slate-200">
+    <a
+      href={href}
+      className="flex items-start gap-3 p-3 hover:bg-slate-50 rounded-xl transition border border-slate-200"
+    >
       <div className="w-10 h-10 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center flex-shrink-0">
         <Icon className="w-5 h-5" />
       </div>
@@ -585,15 +734,19 @@ function ChangePassword() {
       const res = await fetch('/api/user/change-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ currentPassword: current, newPassword: next })
+        body: JSON.stringify({ currentPassword: current, newPassword: next }),
       });
       const data = await res.json();
       if (!res.ok) {
         toast.error(data.error);
         return;
       }
-      toast.success('Mot de passe changé ✅ — Un email de confirmation vous a été envoyé', { duration: 6000 });
-      setCurrent(''); setNext(''); setConfirm('');
+      toast.success('Mot de passe changé ✅ — Un email de confirmation vous a été envoyé', {
+        duration: 6000,
+      });
+      setCurrent('');
+      setNext('');
+      setConfirm('');
     } catch {
       toast.error('Erreur réseau');
     } finally {
@@ -602,13 +755,17 @@ function ChangePassword() {
   }
 
   return (
-    <SectionCard title="Mot de passe" description="Changez votre mot de passe régulièrement" icon={Lock}>
+    <SectionCard
+      title="Mot de passe"
+      description="Changez votre mot de passe régulièrement"
+      icon={Lock}
+    >
       <Field label="Mot de passe actuel">
         <div className="relative">
           <input
             type={show ? 'text' : 'password'}
             value={current}
-            onChange={e => setCurrent(e.target.value)}
+            onChange={(e) => setCurrent(e.target.value)}
             className="input pr-10"
           />
           <button
@@ -624,7 +781,7 @@ function ChangePassword() {
         <input
           type={show ? 'text' : 'password'}
           value={next}
-          onChange={e => setNext(e.target.value)}
+          onChange={(e) => setNext(e.target.value)}
           className="input"
         />
       </Field>
@@ -632,16 +789,20 @@ function ChangePassword() {
         <input
           type={show ? 'text' : 'password'}
           value={confirm}
-          onChange={e => setConfirm(e.target.value)}
+          onChange={(e) => setConfirm(e.target.value)}
           className="input"
         />
       </Field>
       <div className="bg-sky-50 border border-sky-200 rounded-xl p-3 text-sm text-sky-800 flex items-start gap-2">
         <Shield className="w-4 h-4 flex-shrink-0 mt-0.5" />
         <div>
-          <strong>Notification de sécurité :</strong> un email de confirmation vous sera envoyé après chaque modification,
-          avec l'adresse IP, l'heure et l'appareil utilisé. Si vous n'êtes pas à l'origine de ce changement, contactez-nous
-          immédiatement via <a href="/contact?subject=compromised&motif=password" className="underline font-semibold">notre page de contact</a>.
+          <strong>Notification de sécurité :</strong> un email de confirmation vous sera envoyé
+          après chaque modification, avec l'adresse IP, l'heure et l'appareil utilisé. Si vous
+          n'êtes pas à l'origine de ce changement, contactez-nous immédiatement via{' '}
+          <a href="/contact?subject=compromised&motif=password" className="underline font-semibold">
+            notre page de contact
+          </a>
+          .
         </div>
       </div>
       <button
@@ -671,7 +832,7 @@ function ChangeEmail({ currentEmail }: { currentEmail: string }) {
       const res = await fetch('/api/user/change-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ newEmail, password })
+        body: JSON.stringify({ newEmail, password }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -679,7 +840,7 @@ function ChangeEmail({ currentEmail }: { currentEmail: string }) {
         return;
       }
       toast.success('Email changé ✅ Reconnectez-vous.');
-      setTimeout(() => window.location.href = '/connexion', 1500);
+      setTimeout(() => (window.location.href = '/connexion'), 1500);
     } catch {
       toast.error('Erreur réseau');
     } finally {
@@ -696,7 +857,7 @@ function ChangeEmail({ currentEmail }: { currentEmail: string }) {
         <input
           type="email"
           value={newEmail}
-          onChange={e => setNewEmail(e.target.value)}
+          onChange={(e) => setNewEmail(e.target.value)}
           className="input"
           placeholder="nouveau@email.com"
         />
@@ -705,7 +866,7 @@ function ChangeEmail({ currentEmail }: { currentEmail: string }) {
         <input
           type="password"
           value={password}
-          onChange={e => setPassword(e.target.value)}
+          onChange={(e) => setPassword(e.target.value)}
           className="input"
         />
       </Field>

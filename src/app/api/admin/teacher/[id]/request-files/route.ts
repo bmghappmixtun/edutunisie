@@ -30,9 +30,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const teacher = await prisma.user.findUnique({
     where: { id },
     select: {
-      id: true, email: true, firstName: true, lastName: true,
-      status: true, role: true,
-      invitationStatus: true, lastInvitationId: true,
+      id: true,
+      email: true,
+      firstName: true,
+      lastName: true,
+      status: true,
+      role: true,
+      invitationStatus: true,
+      lastInvitationId: true,
       verificationFilesRequestedAt: true,
     },
   });
@@ -46,29 +51,34 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (isInvited) {
     return NextResponse.json(
       {
-        error: 'Action non applicable : cet enseignant a été invité. Les profs invités sont déjà pré-vérifiés.',
+        error:
+          'Action non applicable : cet enseignant a été invité. Les profs invités sont déjà pré-vérifiés.',
         code: 'INVITED_TEACHER',
       },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
   // Avoid sending duplicate requests within 24h
   if (teacher.verificationFilesRequestedAt) {
-    const hoursSince = (Date.now() - new Date(teacher.verificationFilesRequestedAt).getTime()) / 1000 / 3600;
+    const hoursSince =
+      (Date.now() - new Date(teacher.verificationFilesRequestedAt).getTime()) / 1000 / 3600;
     if (hoursSince < 24) {
       return NextResponse.json(
         {
           error: `Une demande a déjà été envoyée il y a ${Math.floor(hoursSince)}h. Réessayez après 24h.`,
           code: 'ALREADY_REQUESTED',
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
   }
 
   if (!teacher.email || !teacher.firstName || !teacher.lastName) {
-    return NextResponse.json({ error: 'Profil prof incomplet (email/nom manquant)' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Profil prof incomplet (email/nom manquant)' },
+      { status: 400 },
+    );
   }
 
   // Update DB

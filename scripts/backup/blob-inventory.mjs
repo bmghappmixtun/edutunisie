@@ -68,8 +68,8 @@ async function main() {
         contentType: b.contentType,
       })),
       null,
-      2
-    )
+      2,
+    ),
   );
 
   // Save summary
@@ -81,7 +81,7 @@ async function main() {
     byFolder: Object.fromEntries(
       Object.entries(byFolder)
         .sort((a, b) => b[1].size - a[1].size)
-        .map(([k, v]) => [k, { count: v.count, sizeMB: (v.size / 1024 / 1024).toFixed(2) }])
+        .map(([k, v]) => [k, { count: v.count, sizeMB: (v.size / 1024 / 1024).toFixed(2) }]),
     ),
   };
   fs.writeFileSync(path.join(fullDir, 'summary.json'), JSON.stringify(summary, null, 2));
@@ -97,7 +97,9 @@ async function main() {
   Object.entries(summary.byFolder)
     .slice(0, 10)
     .forEach(([folder, info]) => {
-      console.log(`  ${folder.padEnd(50)} ${String(info.count).padStart(6)} files  ${info.sizeMB} MB`);
+      console.log(
+        `  ${folder.padEnd(50)} ${String(info.count).padStart(6)} files  ${info.sizeMB} MB`,
+      );
     });
   console.log(`\n[blob-inventory] Output: ${fullDir}`);
   console.log(`  - inventory.json: full list with metadata`);

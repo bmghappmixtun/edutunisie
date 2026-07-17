@@ -11,7 +11,10 @@ export async function GET() {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
   if (user.role !== 'TEACHER' && user.role !== 'ADMIN') {
-    return NextResponse.json({ canUpload: false, message: 'Réservé aux enseignants' }, { status: 403 });
+    return NextResponse.json(
+      { canUpload: false, message: 'Réservé aux enseignants' },
+      { status: 403 },
+    );
   }
 
   if (user.role === 'ADMIN') {
@@ -29,7 +32,7 @@ export async function GET() {
   if (status === 'PENDING_FILE_VERIFICATION') {
     message = '🔒 Soumettez vos 5 fichiers de vérification pour pouvoir publier des ressources.';
   } else if (status === 'PENDING_APPROVAL') {
-    message = '⏳ Votre compte est en attente d\'approbation par l\'administrateur.';
+    message = "⏳ Votre compte est en attente d'approbation par l'administrateur.";
   } else if (status === 'PENDING_OTP') {
     message = '⏳ Vérifiez votre email avec le code OTP pour activer votre compte.';
   } else if (status === 'SUSPENDED' || status === 'BANNED') {

@@ -13,7 +13,7 @@ export async function GET() {
 
   const subjects = await prisma.subject.findMany({
     orderBy: { nameFr: 'asc' },
-    include: { _count: { select: { resources: true } } }
+    include: { _count: { select: { resources: true } } },
   });
 
   return NextResponse.json({ subjects });
@@ -46,8 +46,8 @@ export async function POST(req: NextRequest) {
         nameAr: nameAr.trim(),
         icon: icon || null,
         color: color || null,
-        order: order ?? 0
-      }
+        order: order ?? 0,
+      },
     });
 
     return NextResponse.json({ success: true, subject });

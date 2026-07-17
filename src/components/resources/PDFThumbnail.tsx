@@ -5,8 +5,8 @@ import { FileText } from 'lucide-react';
 type Props = {
   url: string;
   title?: string;
-  width?: number;   // rendered width in px (default 240)
-  height?: number;  // rendered height in px (default 320)
+  width?: number; // rendered width in px (default 240)
+  height?: number; // rendered height in px (default 320)
   className?: string;
 };
 
@@ -21,7 +21,13 @@ type Props = {
  * - Cached: 7-day TTL in localStorage, key = sha1(url)[:20]
  * - Fallback: shows a generic file icon if rendering fails
  */
-export default function PDFThumbnail({ url, title, width = 240, height = 320, className = '' }: Props) {
+export default function PDFThumbnail({
+  url,
+  title,
+  width = 240,
+  height = 320,
+  className = '',
+}: Props) {
   const [dataUrl, setDataUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -37,12 +43,12 @@ export default function PDFThumbnail({ url, title, width = 240, height = 320, cl
     }
     const obs = new IntersectionObserver(
       (entries) => {
-        if (entries.some(e => e.isIntersecting)) {
+        if (entries.some((e) => e.isIntersecting)) {
           setInView(true);
           obs.disconnect();
         }
       },
-      { rootMargin: '200px' } // start loading slightly before visible
+      { rootMargin: '200px' }, // start loading slightly before visible
     );
     obs.observe(containerRef.current);
     return () => obs.disconnect();
@@ -81,10 +87,13 @@ export default function PDFThumbnail({ url, title, width = 240, height = 320, cl
         try {
           // Only cache small data URLs (< 200KB) to avoid localStorage quota
           if (rendered.length < 200_000) {
-            localStorage.setItem(cacheKey, JSON.stringify({
-              dataUrl: rendered,
-              expires: Date.now() + 7 * 24 * 60 * 60 * 1000
-            }));
+            localStorage.setItem(
+              cacheKey,
+              JSON.stringify({
+                dataUrl: rendered,
+                expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
+              }),
+            );
           }
         } catch {}
       } catch (e) {
@@ -95,7 +104,9 @@ export default function PDFThumbnail({ url, title, width = 240, height = 320, cl
       }
     })();
 
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [inView, url, width, height, dataUrl]);
 
   return (
@@ -134,7 +145,7 @@ async function hashKey(s: string): Promise<string> {
   // Simple hash for cache key
   let h = 0;
   for (let i = 0; i < s.length; i++) {
-    h = ((h << 5) - h) + s.charCodeAt(i);
+    h = (h << 5) - h + s.charCodeAt(i);
     h |= 0;
   }
   return Math.abs(h).toString(36);

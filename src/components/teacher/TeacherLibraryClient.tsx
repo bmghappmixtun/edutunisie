@@ -57,16 +57,40 @@ function formatBytes(bytes: number): string {
 }
 
 function formatDate(d: string): string {
-  return new Date(d).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+  return new Date(d).toLocaleDateString('fr-FR', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  });
 }
 
 function getFormatBadge(format: string) {
   switch (format) {
-    case 'pdf': return { label: 'PDF', className: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300' };
-    case 'docx': return { label: 'DOCX', className: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' };
-    case 'doc': return { label: 'DOC', className: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300' };
-    case 'odt': return { label: 'ODT', className: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300' };
-    default: return { label: format.toUpperCase(), className: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300' };
+    case 'pdf':
+      return {
+        label: 'PDF',
+        className: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300',
+      };
+    case 'docx':
+      return {
+        label: 'DOCX',
+        className: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
+      };
+    case 'doc':
+      return {
+        label: 'DOC',
+        className: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300',
+      };
+    case 'odt':
+      return {
+        label: 'ODT',
+        className: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300',
+      };
+    default:
+      return {
+        label: format.toUpperCase(),
+        className: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300',
+      };
   }
 }
 
@@ -75,7 +99,14 @@ export default function TeacherLibraryClient({
   subjects,
 }: {
   classes: { id: string; nameFr: string; nameAr: string; slug: string }[];
-  subjects: { id: string; nameFr: string; nameAr: string; slug: string; color?: string | null; icon?: string | null }[];
+  subjects: {
+    id: string;
+    nameFr: string;
+    nameAr: string;
+    slug: string;
+    color?: string | null;
+    icon?: string | null;
+  }[];
 }) {
   const [files, setFiles] = useState<TeacherFile[]>([]);
   const [loading, setLoading] = useState(true);
@@ -92,8 +123,8 @@ export default function TeacherLibraryClient({
   // Check if teacher is allowed to upload (status === ACTIVE)
   useEffect(() => {
     fetch('/api/teacher/status')
-      .then(r => r.json())
-      .then(data => {
+      .then((r) => r.json())
+      .then((data) => {
         if (data?.canUpload !== undefined) setCanUpload(data.canUpload);
       })
       .catch(() => setCanUpload(true));
@@ -197,7 +228,9 @@ export default function TeacherLibraryClient({
           >
             <option value="">Toutes les classes</option>
             {classes.map((c) => (
-              <option key={c.id} value={c.id}>{c.nameFr}</option>
+              <option key={c.id} value={c.id}>
+                {c.nameFr}
+              </option>
             ))}
           </select>
           <select
@@ -207,14 +240,17 @@ export default function TeacherLibraryClient({
           >
             <option value="">Tous les types</option>
             {FILE_TYPES.map((t) => (
-              <option key={t.value} value={t.value}>{t.icon} {t.label}</option>
+              <option key={t.value} value={t.value}>
+                {t.icon} {t.label}
+              </option>
             ))}
           </select>
         </div>
 
         <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
           <div className="text-sm text-slate-500 dark:text-slate-400">
-            {files.length} fichier{files.length > 1 ? 's' : ''} • Espace utilisé : {formatBytes(stats.totalSize)}
+            {files.length} fichier{files.length > 1 ? 's' : ''} • Espace utilisé :{' '}
+            {formatBytes(stats.totalSize)}
           </div>
           <div className="flex gap-2">
             <button
@@ -275,7 +311,10 @@ export default function TeacherLibraryClient({
                       <div className="flex items-center gap-3">
                         <span className="text-2xl">{ti.icon}</span>
                         <div className="min-w-0">
-                          <div className="font-medium text-slate-900 dark:text-white truncate max-w-[280px]" title={file.fileName}>
+                          <div
+                            className="font-medium text-slate-900 dark:text-white truncate max-w-[280px]"
+                            title={file.fileName}
+                          >
                             {file.fileName}
                           </div>
                           {file.conversionStatus && (
@@ -289,7 +328,9 @@ export default function TeacherLibraryClient({
                       </div>
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${fb.className}`}>
+                      <span
+                        className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${fb.className}`}
+                      >
                         {fb.label}
                       </span>
                     </td>
@@ -311,7 +352,17 @@ export default function TeacherLibraryClient({
   );
 }
 
-function StatCard({ icon, label, value, color }: { icon: string; label: string; value: number; color: string }) {
+function StatCard({
+  icon,
+  label,
+  value,
+  color,
+}: {
+  icon: string;
+  label: string;
+  value: number;
+  color: string;
+}) {
   const colorMap: Record<string, string> = {
     sky: 'from-sky-500 to-sky-600',
     red: 'from-red-500 to-red-600',
@@ -322,7 +373,9 @@ function StatCard({ icon, label, value, color }: { icon: string; label: string; 
   return (
     <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-4">
       <div className="flex items-center gap-3">
-        <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${colorMap[color]} flex items-center justify-center text-xl shadow-sm`}>
+        <div
+          className={`w-10 h-10 rounded-lg bg-gradient-to-br ${colorMap[color]} flex items-center justify-center text-xl shadow-sm`}
+        >
           {icon}
         </div>
         <div>
@@ -343,10 +396,11 @@ function EmptyState({ canUpload = true }: { canUpload?: boolean }) {
       </h3>
       <p className="text-slate-600 dark:text-slate-400 mb-6 max-w-md mx-auto">
         Quand vous uploadez un fichier Word ou PDF, l'original est automatiquement sauvegardé ici.
-        Vous pourrez le télécharger à tout moment et le réutiliser pour publier de nouvelles ressources.
+        Vous pourrez le télécharger à tout moment et le réutiliser pour publier de nouvelles
+        ressources.
       </p>
       <Link
-        href={canUpload ? "/enseignant/ajouter" : "/enseignant"}
+        href={canUpload ? '/enseignant/ajouter' : '/enseignant'}
         className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium shadow-md hover:shadow-lg transition ${
           canUpload
             ? 'bg-gradient-to-r from-primary to-cyan-500 text-white'
@@ -354,7 +408,7 @@ function EmptyState({ canUpload = true }: { canUpload?: boolean }) {
         }`}
       >
         {canUpload ? <span>📤</span> : <Lock className="w-4 h-4" />}
-        {canUpload ? 'Ajouter une ressource' : 'Soumettre mes fichiers d\'abord'}
+        {canUpload ? 'Ajouter une ressource' : "Soumettre mes fichiers d'abord"}
       </Link>
     </div>
   );
@@ -381,16 +435,15 @@ function FileCard({
             {fb.label}
           </span>
         </div>
-        <h3 className="font-semibold text-slate-900 dark:text-white line-clamp-2 mb-1" title={file.fileName}>
+        <h3
+          className="font-semibold text-slate-900 dark:text-white line-clamp-2 mb-1"
+          title={file.fileName}
+        >
           {file.fileName}
         </h3>
         <div className="text-xs text-slate-500 dark:text-slate-400 space-y-1 mb-3">
-          {file.subject && (
-            <div>📖 {file.subject.nameFr}</div>
-          )}
-          {file.class && (
-            <div>🎓 {file.class.nameFr}</div>
-          )}
+          {file.subject && <div>📖 {file.subject.nameFr}</div>}
+          {file.class && <div>🎓 {file.class.nameFr}</div>}
           <div className="flex items-center gap-2">
             <span>💾 {formatBytes(file.fileSize)}</span>
             <span>•</span>
@@ -431,11 +484,12 @@ function FileCard({
             <span>⏳</span> En attente d'approbation
           </div>
         )}
-        {file.resource && (file.resource.status === 'REJECTED' || file.resource.status === 'DRAFT') && (
-          <div className="mb-3 px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-xs text-slate-600 dark:text-slate-400 flex items-center gap-1">
-            <span>📝</span> Brouillon / Rejeté
-          </div>
-        )}
+        {file.resource &&
+          (file.resource.status === 'REJECTED' || file.resource.status === 'DRAFT') && (
+            <div className="mb-3 px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-xs text-slate-600 dark:text-slate-400 flex items-center gap-1">
+              <span>📝</span> Brouillon / Rejeté
+            </div>
+          )}
 
         {/* Actions */}
         <div className="flex gap-1">
@@ -474,7 +528,13 @@ function FileCard({
   );
 }
 
-function FileActions({ file, onDelete }: { file: TeacherFile; onDelete: (id: string, name: string) => void }) {
+function FileActions({
+  file,
+  onDelete,
+}: {
+  file: TeacherFile;
+  onDelete: (id: string, name: string) => void;
+}) {
   return (
     <div className="flex items-center justify-end gap-1">
       {file.resource?.status === 'PUBLISHED' && file.resource.numericId && file.resource.slug && (

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { GraduationCap, Facebook, Twitter, Instagram, Youtube } from 'lucide-react';
+import { Facebook, Twitter, Instagram, Youtube } from 'lucide-react';
 import { getT } from '@/lib/i18n-server';
 
 export default function Footer() {
@@ -22,12 +22,15 @@ export default function Footer() {
                 priority={false}
               />
             </Link>
-            <p className="text-sm text-slate-400 mb-4 max-w-sm">
-              {t('footer.madeWith')}
-            </p>
+            <p className="text-sm text-slate-400 mb-4 max-w-sm">{t('footer.madeWith')}</p>
             <div className="flex gap-2">
               {[Facebook, Twitter, Instagram, Youtube].map((Icon, i) => (
-                <a key={i} href="#" className="w-9 h-9 rounded-full bg-slate-800 hover:bg-primary-600 flex items-center justify-center transition" aria-label="Réseau social">
+                <a
+                  key={i}
+                  href="#"
+                  className="w-9 h-9 rounded-full bg-slate-800 hover:bg-primary-600 flex items-center justify-center transition"
+                  aria-label="Réseau social"
+                >
                   <Icon className="w-4 h-4" />
                 </a>
               ))}
@@ -36,51 +39,131 @@ export default function Footer() {
 
           {/* Column 1: Navigation */}
           <div>
-            <h4 className="font-bold text-white mb-4 text-sm uppercase tracking-wide">{t('footer.navigation')}</h4>
+            <h4 className="font-bold text-white mb-4 text-sm uppercase tracking-wide">
+              {t('footer.navigation')}
+            </h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/" className="hover:text-primary-400 transition">{t('nav.home')}</Link></li>
-              <li><Link href="/ressources" className="hover:text-primary-400 transition">{t('nav.resources')}</Link></li>
-              <li><Link href="/niveaux" className="hover:text-primary-400 transition">{t('nav.levels')}</Link></li>
-              <li><Link href="/matieres" className="hover:text-primary-400 transition">{t('nav.subjects')}</Link></li>
-              <li><Link href="/professeurs" className="hover:text-primary-400 transition">{t('nav.teachers')}</Link></li>
+              <li>
+                <Link href="/" className="hover:text-primary-400 transition">
+                  {t('nav.home')}
+                </Link>
+              </li>
+              <li>
+                <Link href="/ressources" className="hover:text-primary-400 transition">
+                  {t('nav.resources')}
+                </Link>
+              </li>
+              <li>
+                <Link href="/niveaux" className="hover:text-primary-400 transition">
+                  {t('nav.levels')}
+                </Link>
+              </li>
+              <li>
+                <Link href="/matieres" className="hover:text-primary-400 transition">
+                  {t('nav.subjects')}
+                </Link>
+              </li>
+              <li>
+                <Link href="/professeurs" className="hover:text-primary-400 transition">
+                  {t('nav.teachers')}
+                </Link>
+              </li>
             </ul>
           </div>
 
           {/* Column 2: Parcours (3 main education pathways) */}
           <div>
-            <h4 className="font-bold text-white mb-4 text-sm uppercase tracking-wide">{t('footer.pillars')}</h4>
+            <h4 className="font-bold text-white mb-4 text-sm uppercase tracking-wide">
+              {t('footer.pillars')}
+            </h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/college" className="hover:text-primary-400 transition">{t('nav.college')}</Link></li>
-              <li><Link href="/concours-9eme-tunisie" className="hover:text-primary-400 transition">{t('nav.concours')}</Link></li>
-              <li><Link href="/bac" className="hover:text-primary-400 transition">{t('nav.bac')}</Link></li>
+              <li>
+                <Link href="/college" className="hover:text-primary-400 transition">
+                  {t('nav.college')}
+                </Link>
+              </li>
+              <li>
+                <Link href="/concours-9eme-tunisie" className="hover:text-primary-400 transition">
+                  {t('nav.concours')}
+                </Link>
+              </li>
+              <li>
+                <Link href="/bac" className="hover:text-primary-400 transition">
+                  {t('nav.bac')}
+                </Link>
+              </li>
             </ul>
           </div>
 
           {/* Column 3: Ressources (archives + référence) */}
           <div>
-            <h4 className="font-bold text-white mb-4 text-sm uppercase tracking-wide">{t('footer.tools')}</h4>
+            <h4 className="font-bold text-white mb-4 text-sm uppercase tracking-wide">
+              {t('footer.tools')}
+            </h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/bac/archives" className="hover:text-primary-400 transition">{t('footer.bacSubjects')}</Link></li>
-              <li><Link href="/concours-9eme-tunisie/sujets-passes" className="hover:text-primary-400 transition">{t('footer.concoursSubjects')}</Link></li>
-              <li><Link href="/ressources?type=CORRECTION" className="hover:text-primary-400 transition">{t('footer.corrections')}</Link></li>
-              <li><Link href="/referentiel-national" className="hover:text-primary-400 transition">{t('footer.referentiel')}</Link></li>
-              <li><Link href="/faq" className="hover:text-primary-400 transition">FAQ</Link></li>
+              <li>
+                <Link href="/bac/archives" className="hover:text-primary-400 transition">
+                  {t('footer.bacSubjects')}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/concours-9eme-tunisie/sujets-passes"
+                  className="hover:text-primary-400 transition"
+                >
+                  {t('footer.concoursSubjects')}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/ressources?type=CORRECTION"
+                  className="hover:text-primary-400 transition"
+                >
+                  {t('footer.corrections')}
+                </Link>
+              </li>
+              <li>
+                <Link href="/referentiel-national" className="hover:text-primary-400 transition">
+                  {t('footer.referentiel')}
+                </Link>
+              </li>
+              <li>
+                <Link href="/faq" className="hover:text-primary-400 transition">
+                  FAQ
+                </Link>
+              </li>
             </ul>
           </div>
 
           {/* Column 4: À propos (legal + about) */}
           <div>
-            <h4 className="font-bold text-white mb-4 text-sm uppercase tracking-wide">{t('footer.about')}</h4>
+            <h4 className="font-bold text-white mb-4 text-sm uppercase tracking-wide">
+              {t('footer.about')}
+            </h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/a-propos" className="hover:text-primary-400 transition">{t('nav.about')}</Link></li>
-              <li><Link href="/cgu" className="hover:text-primary-400 transition">CGU</Link></li>
-              <li><Link href="/contact" className="hover:text-primary-400 transition">{t('nav.contact')}</Link></li>
+              <li>
+                <Link href="/a-propos" className="hover:text-primary-400 transition">
+                  {t('nav.about')}
+                </Link>
+              </li>
+              <li>
+                <Link href="/cgu" className="hover:text-primary-400 transition">
+                  CGU
+                </Link>
+              </li>
+              <li>
+                <Link href="/contact" className="hover:text-primary-400 transition">
+                  {t('nav.contact')}
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
 
         <div className="pt-6 border-t border-slate-800 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-          <p className="text-xs text-slate-500">{t('footer.copyright', { year: String(new Date().getFullYear()) })}</p>
+          <p className="text-xs text-slate-500">
+            {t('footer.copyright', { year: String(new Date().getFullYear()) })}
+          </p>
           <p className="text-xs text-slate-500">{t('footer.madeWith')}</p>
         </div>
       </div>

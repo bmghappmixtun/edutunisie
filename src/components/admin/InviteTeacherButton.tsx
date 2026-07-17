@@ -12,7 +12,12 @@ type Props = {
   onComplete?: () => void;
 };
 
-export default function InviteTeacherButton({ teacherIds, teacherCount, variant = 'single', onComplete }: Props) {
+export default function InviteTeacherButton({
+  teacherIds,
+  teacherCount,
+  variant = 'single',
+  onComplete,
+}: Props) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -33,7 +38,7 @@ export default function InviteTeacherButton({ teacherIds, teacherCount, variant 
         body: JSON.stringify({
           teacherIds,
           customMessage: customMessage.trim() || undefined,
-        })
+        }),
       });
       const data = await res.json();
 
@@ -44,7 +49,9 @@ export default function InviteTeacherButton({ teacherIds, teacherCount, variant 
 
       setResults(data);
       if (data.success > 0) {
-        toast.success(`✅ ${data.success} invitation${data.success > 1 ? 's' : ''} envoyée${data.success > 1 ? 's' : ''}`);
+        toast.success(
+          `✅ ${data.success} invitation${data.success > 1 ? 's' : ''} envoyée${data.success > 1 ? 's' : ''}`,
+        );
       }
       if (data.failed > 0) {
         toast(`${data.failed} échec${data.failed > 1 ? 's' : ''}`, { icon: '⚠️' });
@@ -72,10 +79,13 @@ export default function InviteTeacherButton({ teacherIds, teacherCount, variant 
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 animate-in fade-in" onClick={() => !submitting && setOpen(false)}>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 animate-in fade-in"
+      onClick={() => !submitting && setOpen(false)}
+    >
       <div
         className="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto"
-        onClick={e => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="bg-gradient-to-br from-sky-600 to-cyan-700 text-white p-6 rounded-t-2xl">
@@ -83,10 +93,13 @@ export default function InviteTeacherButton({ teacherIds, teacherCount, variant 
             <div>
               <h2 className="text-xl font-extrabold flex items-center gap-2">
                 <Mail className="w-5 h-5" />
-                {variant === 'bulk' ? `Inviter ${teacherCount} professeurs` : 'Inviter ce professeur'}
+                {variant === 'bulk'
+                  ? `Inviter ${teacherCount} professeurs`
+                  : 'Inviter ce professeur'}
               </h2>
               <p className="text-sky-100 text-sm mt-1">
-                Un email d'activation sera envoyé à chaque prof avec un lien unique (valable 10 jours).
+                Un email d'activation sera envoyé à chaque prof avec un lien unique (valable 10
+                jours).
               </p>
             </div>
             <button
@@ -105,15 +118,18 @@ export default function InviteTeacherButton({ teacherIds, teacherCount, variant 
             <>
               {/* Email template preview */}
               <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-5">
-                <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">📧 Aperçu de l'email</div>
+                <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
+                  📧 Aperçu de l'email
+                </div>
                 <div className="text-sm text-slate-700 space-y-2">
                   <div>
-                    <strong>Objet :</strong> <em>Vos [X] fichiers vous attendent sur Examanet 🎓</em>
+                    <strong>Objet :</strong>{' '}
+                    <em>Vos [X] fichiers vous attendent sur Examanet 🎓</em>
                   </div>
                   <div>
-                    <strong>Contenu :</strong> Présentation de la plateforme + vos avantages
-                    (stats, édition, messagerie, visibilité) + lien d'activation personnalisé
-                    avec mot de passe temporaire unique.
+                    <strong>Contenu :</strong> Présentation de la plateforme + vos avantages (stats,
+                    édition, messagerie, visibilité) + lien d'activation personnalisé avec mot de
+                    passe temporaire unique.
                   </div>
                 </div>
               </div>
@@ -126,19 +142,21 @@ export default function InviteTeacherButton({ teacherIds, teacherCount, variant 
                 </label>
                 <textarea
                   value={customMessage}
-                  onChange={e => setCustomMessage(e.target.value)}
+                  onChange={(e) => setCustomMessage(e.target.value)}
                   rows={3}
                   maxLength={500}
                   placeholder="Ex: On a particulièrement aimé vos exercices de maths — hâte de vous avoir parmi nous !"
                   className="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none text-sm resize-none"
                 />
-                <div className="text-xs text-slate-400 mt-1 text-right">{customMessage.length}/500</div>
+                <div className="text-xs text-slate-400 mt-1 text-right">
+                  {customMessage.length}/500
+                </div>
               </div>
 
               {/* Warning */}
               <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-5 text-sm text-amber-800">
-                <strong>⚠️ Action irréversible :</strong> chaque prof recevra un email contenant
-                un mot de passe temporaire unique. Le compte sera verrouillé jusqu'à activation.
+                <strong>⚠️ Action irréversible :</strong> chaque prof recevra un email contenant un
+                mot de passe temporaire unique. Le compte sera verrouillé jusqu'à activation.
               </div>
 
               {/* Actions */}
@@ -163,7 +181,7 @@ export default function InviteTeacherButton({ teacherIds, teacherCount, variant 
                   ) : (
                     <>
                       <Send className="w-4 h-4" />
-                      Envoyer {teacherCount > 1 ? `${teacherCount} invitations` : 'l\'invitation'}
+                      Envoyer {teacherCount > 1 ? `${teacherCount} invitations` : "l'invitation"}
                     </>
                   )}
                 </button>
@@ -175,7 +193,9 @@ export default function InviteTeacherButton({ teacherIds, teacherCount, variant 
               <div className="space-y-3 mb-5">
                 <div className="grid grid-cols-3 gap-2 text-center">
                   <div className="bg-emerald-50 rounded-xl p-3 border border-emerald-200">
-                    <div className="text-2xl font-extrabold text-emerald-600">{results.success}</div>
+                    <div className="text-2xl font-extrabold text-emerald-600">
+                      {results.success}
+                    </div>
                     <div className="text-xs text-emerald-700 font-semibold">Réussis</div>
                   </div>
                   <div className="bg-rose-50 rounded-xl p-3 border border-rose-200">
@@ -191,19 +211,27 @@ export default function InviteTeacherButton({ teacherIds, teacherCount, variant 
                 {results.results && results.results.filter((r: any) => !r.ok).length > 0 && (
                   <details className="bg-rose-50 border border-rose-200 rounded-xl p-3">
                     <summary className="font-semibold text-sm text-rose-800 cursor-pointer">
-                      Voir les {results.results.filter((r: any) => !r.ok).length} échec{results.results.filter((r: any) => !r.ok).length > 1 ? 's' : ''}
+                      Voir les {results.results.filter((r: any) => !r.ok).length} échec
+                      {results.results.filter((r: any) => !r.ok).length > 1 ? 's' : ''}
                     </summary>
                     <div className="mt-2 space-y-1 text-xs text-rose-700 max-h-32 overflow-y-auto">
-                      {results.results.filter((r: any) => !r.ok).map((r: any) => (
-                        <div key={r.teacherId}>• {r.teacherName} ({r.email}): {r.error}</div>
-                      ))}
+                      {results.results
+                        .filter((r: any) => !r.ok)
+                        .map((r: any) => (
+                          <div key={r.teacherId}>
+                            • {r.teacherName} ({r.email}): {r.error}
+                          </div>
+                        ))}
                     </div>
                   </details>
                 )}
               </div>
 
               <button
-                onClick={() => { setOpen(false); setResults(null); }}
+                onClick={() => {
+                  setOpen(false);
+                  setResults(null);
+                }}
                 className="w-full px-4 py-3 bg-sky-600 text-white font-bold rounded-xl hover:bg-sky-700 transition flex items-center justify-center gap-2"
               >
                 <CheckCircle2 className="w-4 h-4" />

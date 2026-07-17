@@ -5,12 +5,30 @@ import Footer from '@/components/layout/Footer';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
-import { Shield, Users, FileText, BarChart3, CheckCircle, Flag, Edit3, BookOpen, Settings, MessageSquare, TrendingUp, Key } from 'lucide-react';
+import {
+  Shield,
+  Users,
+  FileText,
+  BarChart3,
+  CheckCircle,
+  Flag,
+  Edit3,
+  BookOpen,
+  Settings,
+  MessageSquare,
+  TrendingUp,
+  Key,
+} from 'lucide-react';
 
 // Admin pages should never be indexed
 export const metadata: Metadata = {
   title: 'Administration',
-  robots: { index: false, follow: false, nocache: true, googleBot: { index: false, follow: false } },
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+    googleBot: { index: false, follow: false },
+  },
 };
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -23,22 +41,51 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     prisma.resource.count({ where: { status: 'PENDING_APPROVAL' } }),
     prisma.resource.count({ where: { editStatus: 'PENDING_EDIT_APPROVAL' } }),
     prisma.report.count({ where: { status: 'PENDING' } }),
-    prisma.user.count({ where: { role: { in: ['TEACHER', 'STUDENT'] }, createdAt: { gte: new Date(Date.now() - 7 * 86400000) } } }),
+    prisma.user.count({
+      where: {
+        role: { in: ['TEACHER', 'STUDENT'] },
+        createdAt: { gte: new Date(Date.now() - 7 * 86400000) },
+      },
+    }),
   ]);
 
   const navItems: any[] = [
-    { group: 'Vue d\'ensemble' },
+    { group: "Vue d'ensemble" },
     { href: '/admin', icon: BarChart3, label: 'Dashboard' },
     { href: '/admin/analytics', icon: TrendingUp, label: 'Analytics' },
 
     { group: 'Contenu' },
     { href: '/admin/ressources', icon: FileText, label: 'Toutes les ressources' },
-    { href: '/admin/approbations', icon: CheckCircle, label: 'Approbations', badge: pendingApprovals, badgeColor: 'bg-amber-500' },
-    { href: '/admin/ressources/editions', icon: Edit3, label: 'Éditions en attente', badge: pendingEdits, badgeColor: 'bg-blue-500' },
-    { href: '/admin/moderation', icon: Flag, label: 'Modération', badge: pendingReports, badgeColor: 'bg-red-500' },
+    {
+      href: '/admin/approbations',
+      icon: CheckCircle,
+      label: 'Approbations',
+      badge: pendingApprovals,
+      badgeColor: 'bg-amber-500',
+    },
+    {
+      href: '/admin/ressources/editions',
+      icon: Edit3,
+      label: 'Éditions en attente',
+      badge: pendingEdits,
+      badgeColor: 'bg-blue-500',
+    },
+    {
+      href: '/admin/moderation',
+      icon: Flag,
+      label: 'Modération',
+      badge: pendingReports,
+      badgeColor: 'bg-red-500',
+    },
 
     { group: 'Communauté' },
-    { href: '/admin/utilisateurs', icon: Users, label: 'Utilisateurs', badge: newUsers, badgeColor: 'bg-emerald-500' },
+    {
+      href: '/admin/utilisateurs',
+      icon: Users,
+      label: 'Utilisateurs',
+      badge: newUsers,
+      badgeColor: 'bg-emerald-500',
+    },
     { href: '/admin/catalog', icon: BookOpen, label: 'Catalogue (matières/niveaux)' },
     { href: '/admin/messages', icon: MessageSquare, label: 'Messages' },
 
@@ -61,13 +108,16 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                     <Shield className="w-6 h-6" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="font-bold truncate">{user.firstName} {user.lastName}</div>
+                    <div className="font-bold truncate">
+                      {user.firstName} {user.lastName}
+                    </div>
                     <div className="text-xs text-red-100">🛡️ Administrateur</div>
                   </div>
                 </div>
-                {(pendingApprovals + pendingEdits + pendingReports) > 0 && (
+                {pendingApprovals + pendingEdits + pendingReports > 0 && (
                   <div className="mt-3 pt-3 border-t border-white/20 text-xs text-red-100">
-                    {pendingApprovals + pendingEdits + pendingReports} action{pendingApprovals + pendingEdits + pendingReports > 1 ? 's' : ''} en attente
+                    {pendingApprovals + pendingEdits + pendingReports} action
+                    {pendingApprovals + pendingEdits + pendingReports > 1 ? 's' : ''} en attente
                   </div>
                 )}
               </div>
@@ -88,7 +138,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                 if (current) groups.push(current);
 
                 return groups.map((g, gi) => (
-                  <div key={gi} className="bg-white rounded-2xl border border-slate-100 p-2 shadow-sm">
+                  <div
+                    key={gi}
+                    className="bg-white rounded-2xl border border-slate-100 p-2 shadow-sm"
+                  >
                     <div className="px-3 pt-2 pb-1.5 text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
                       {g.name}
                     </div>
@@ -104,7 +157,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                             <Icon className="w-4 h-4 flex-shrink-0" />
                             <span className="flex-1 truncate">{item.label}</span>
                             {item.badge !== undefined && item.badge > 0 && (
-                              <span className={`px-1.5 py-0.5 text-white text-[10px] font-bold rounded-full ${item.badgeColor || 'bg-slate-500'}`}>
+                              <span
+                                className={`px-1.5 py-0.5 text-white text-[10px] font-bold rounded-full ${item.badgeColor || 'bg-slate-500'}`}
+                              >
                                 {item.badge}
                               </span>
                             )}

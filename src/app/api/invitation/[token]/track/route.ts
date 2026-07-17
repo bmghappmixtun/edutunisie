@@ -6,7 +6,10 @@ import { recordInvitationClick } from '@/lib/invitation';
 export async function POST(req: NextRequest, { params }: { params: Promise<{ token: string }> }) {
   try {
     const { token } = await params;
-    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || req.headers.get('x-real-ip') || undefined;
+    const ip =
+      req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+      req.headers.get('x-real-ip') ||
+      undefined;
     const ua = req.headers.get('user-agent') || undefined;
     await recordInvitationClick(token, ip, ua);
     return NextResponse.json({ ok: true });

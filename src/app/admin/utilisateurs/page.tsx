@@ -12,15 +12,18 @@ const ALLOWED_PAGE_SIZES = [10, 25, 50, 100];
 // These MUST use raw SQL because Prisma orderBy doesn't support
 // SUM/AVG on related rows.
 const STATS_SORTS: Record<string, { column: string; nulls: 'first' | 'last' }> = {
-  files:      { column: 'file_count',       nulls: 'last' },
-  views:      { column: 'total_views',      nulls: 'last' },
-  downloads:  { column: 'total_downloads',  nulls: 'last' },
-  favorites:  { column: 'total_favorites',  nulls: 'last' },
-  comments:   { column: 'total_comments',   nulls: 'last' },
-  rating:     { column: 'weighted_rating',  nulls: 'last' },
+  files: { column: 'file_count', nulls: 'last' },
+  views: { column: 'total_views', nulls: 'last' },
+  downloads: { column: 'total_downloads', nulls: 'last' },
+  favorites: { column: 'total_favorites', nulls: 'last' },
+  comments: { column: 'total_comments', nulls: 'last' },
+  rating: { column: 'weighted_rating', nulls: 'last' },
 };
 
-export default async function AdminUsersPage(props: { params: Promise<any>; searchParams: Promise<any> }) {
+export default async function AdminUsersPage(props: {
+  params: Promise<any>;
+  searchParams: Promise<any>;
+}) {
   const sp = await props.searchParams;
   const user = await getCurrentUser();
   if (!user) redirect('/connexion');
@@ -79,7 +82,17 @@ export default async function AdminUsersPage(props: { params: Promise<any>; sear
 }
 
 // Normal Prisma query for non-stats sorts
-async function fetchUsersNormal({ where, sort, skip, pageSize }: { where: any; sort: string; skip: number; pageSize: number }) {
+async function fetchUsersNormal({
+  where,
+  sort,
+  skip,
+  pageSize,
+}: {
+  where: any;
+  sort: string;
+  skip: number;
+  pageSize: number;
+}) {
   let orderBy: any = { createdAt: 'desc' };
   if (sort === 'name_asc') orderBy = [{ lastName: 'asc' }, { firstName: 'asc' }];
   else if (sort === 'name_desc') orderBy = [{ lastName: 'desc' }, { firstName: 'desc' }];
@@ -117,7 +130,19 @@ async function fetchUsersNormal({ where, sort, skip, pageSize }: { where: any; s
 // Aggregates file_count, total_views, total_downloads, total_favorites,
 // total_comments, weighted_rating per teacher, then sorts and paginates
 // the result. Works across ALL teachers, not just the current page.
-async function fetchUsersWithStats({ role, q, sort, skip, pageSize }: { role: string; q: string; sort: string; skip: number; pageSize: number }) {
+async function fetchUsersWithStats({
+  role,
+  q,
+  sort,
+  skip,
+  pageSize,
+}: {
+  role: string;
+  q: string;
+  sort: string;
+  skip: number;
+  pageSize: number;
+}) {
   const { column, nulls } = STATS_SORTS[sort];
   const orderClause = `${column} DESC NULLS ${nulls.toUpperCase()}, u."createdAt" DESC`;
 

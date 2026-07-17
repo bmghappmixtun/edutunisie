@@ -34,9 +34,12 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
 
   const resourceCount = await prisma.resource.count({ where: { classId: id } });
   if (resourceCount > 0) {
-    return NextResponse.json({
-      error: `Impossible : ${resourceCount} ressource(s) utilisent cette classe.`
-    }, { status: 400 });
+    return NextResponse.json(
+      {
+        error: `Impossible : ${resourceCount} ressource(s) utilisent cette classe.`,
+      },
+      { status: 400 },
+    );
   }
 
   // Delete sections first

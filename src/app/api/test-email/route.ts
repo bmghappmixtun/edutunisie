@@ -29,7 +29,10 @@ export async function POST(req: NextRequest) {
     } else if (type === 'resource-approved') {
       await sendResourceApprovedEmail(email, 'Ahmed', 'Devoir de Mathématiques Bac 2024', true);
     }
-    return NextResponse.json({ success: true, message: `Email de type "${type}" envoyé à ${email}` });
+    return NextResponse.json({
+      success: true,
+      message: `Email de type "${type}" envoyé à ${email}`,
+    });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }

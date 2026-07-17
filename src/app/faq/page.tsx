@@ -9,17 +9,21 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = getLocale();
-  const isAr = locale === "ar";
+  const isAr = locale === 'ar';
   return {
-    title: isAr ? "الأسئلة الشائعة — إكسامانت" : "FAQ — Questions fréquentes",
-    description: isAr ? "جميع الإجابات على أسئلتك حول إكسامانت: دروس مجانية، مستويات، مواد، معلمون، تحميل." : "Toutes les réponses à vos questions sur Examanet : cours gratuits, niveaux, matières, enseignants, téléchargement.",
-    alternates: isAr ? {"canonical":"/faq"} : {"canonical":"/faq"},
+    title: isAr ? 'الأسئلة الشائعة — إكسامانت' : 'FAQ — Questions fréquentes',
+    description: isAr
+      ? 'جميع الإجابات على أسئلتك حول إكسامانت: دروس مجانية، مستويات، مواد، معلمون، تحميل.'
+      : 'Toutes les réponses à vos questions sur Examanet : cours gratuits, niveaux, matières, enseignants, téléchargement.',
+    alternates: isAr ? { canonical: '/faq' } : { canonical: '/faq' },
     openGraph: {
-      title: isAr ? "الأسئلة الشائعة إكسامانت" : "FAQ Examanet",
-      description: isAr ? "اعثر بسرعة على إجابات أسئلتك حول إكسامانت." : "Trouvez rapidement les réponses à vos questions sur Examanet.",
-      url: isAr ? "/faq" : "/faq",
-      type: isAr ? "website" : "website",
-      locale: isAr ? "ar_TN" : "fr_TN",
+      title: isAr ? 'الأسئلة الشائعة إكسامانت' : 'FAQ Examanet',
+      description: isAr
+        ? 'اعثر بسرعة على إجابات أسئلتك حول إكسامانت.'
+        : 'Trouvez rapidement les réponses à vos questions sur Examanet.',
+      url: isAr ? '/faq' : '/faq',
+      type: isAr ? 'website' : 'website',
+      locale: isAr ? 'ar_TN' : 'fr_TN',
     },
   };
 }
@@ -27,10 +31,14 @@ export async function generateMetadata(): Promise<Metadata> {
 export default function FAQPage() {
   const t = getT();
   const dict = getDict();
-  const FAQS = (dict.faq?.sections as Array<{ category: string; questions: Array<{ q: string; a: string }> }>) || [];
+  const FAQS =
+    (dict.faq?.sections as Array<{
+      category: string;
+      questions: Array<{ q: string; a: string }>;
+    }>) || [];
 
   // Flatten FAQs for schema
-  const flatFaqs = FAQS.flatMap(c => c.questions).map(f => ({ question: f.q, answer: f.a }));
+  const flatFaqs = FAQS.flatMap((c) => c.questions).map((f) => ({ question: f.q, answer: f.a }));
   const jsonLd = faqSchema(flatFaqs);
   const breadcrumbJsonLd = breadcrumbSchema([
     { name: 'Accueil', url: SITE_URL },
@@ -39,15 +47,26 @@ export default function FAQPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <Header />
 
       <main className="flex-1 pt-20">
         <div className="bg-gradient-to-br from-primary-50 to-sky-50 py-12">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <nav aria-label="Fil d'Ariane" className="flex items-center gap-2 text-sm text-slate-500 mb-4">
-              <Link href="/" className="hover:text-primary-600">{t('common.home')}</Link>
+            <nav
+              aria-label="Fil d'Ariane"
+              className="flex items-center gap-2 text-sm text-slate-500 mb-4"
+            >
+              <Link href="/" className="hover:text-primary-600">
+                {t('common.home')}
+              </Link>
               <span className="text-slate-300">›</span>
               <span className="text-slate-900 font-semibold">FAQ</span>
             </nav>
@@ -68,7 +87,9 @@ export default function FAQPage() {
                   >
                     <summary className="cursor-pointer p-5 font-semibold text-slate-900 flex items-center justify-between gap-3 list-none">
                       <span>{faq.q}</span>
-                      <span className="text-primary-600 text-xl group-open:rotate-45 transition-transform flex-shrink-0">+</span>
+                      <span className="text-primary-600 text-xl group-open:rotate-45 transition-transform flex-shrink-0">
+                        +
+                      </span>
                     </summary>
                     <div className="px-5 pb-5 text-slate-700 leading-relaxed border-t border-slate-100 pt-4">
                       {faq.a}

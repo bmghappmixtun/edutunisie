@@ -31,7 +31,7 @@ function makeAuth(scopes: string[]) {
   if (!fs.existsSync(KEY_PATH)) {
     throw new Error(
       `Missing GSC Service Account key at ${KEY_PATH}. ` +
-        `Place the JSON key there (and ensure /workspace/.secrets/ is gitignored).`
+        `Place the JSON key there (and ensure /workspace/.secrets/ is gitignored).`,
     );
   }
   return new webmastersAuth.GoogleAuth({

@@ -1,14 +1,38 @@
 import Link from 'next/link';
-import { formatNumber, fileSize, timeAgo } from '@/lib/utils';
-import { Calendar, FileText, Tag, Globe, BookOpen, GraduationCap, FolderOpen, Layers, Clock, User, Eye, Download, Star, MessageCircle, Hash, CalendarDays } from 'lucide-react';
+import { fileSize, timeAgo } from '@/lib/utils';
+import {
+  FileText,
+  Tag,
+  Globe,
+  BookOpen,
+  GraduationCap,
+  FolderOpen,
+  Layers,
+  CalendarDays,
+} from 'lucide-react';
 
 const TYPE_LABELS: Record<string, { fr: string; ar: string; icon: string; color: string }> = {
   COURSE: { fr: '📖 Cours', ar: '📖 درس', icon: '📖', color: 'bg-blue-100 text-blue-700' },
   HOMEWORK: { fr: '📝 Devoir', ar: '📝 فرض', icon: '📝', color: 'bg-amber-100 text-amber-700' },
-  EXERCISE: { fr: '✏️ Exercice', ar: '✏️ تمرين', icon: '✏️', color: 'bg-purple-100 text-purple-700' },
+  EXERCISE: {
+    fr: '✏️ Exercice',
+    ar: '✏️ تمرين',
+    icon: '✏️',
+    color: 'bg-purple-100 text-purple-700',
+  },
   SERIES: { fr: '📚 Série', ar: '📚 سلسلة', icon: '📚', color: 'bg-emerald-100 text-emerald-700' },
-  BAC_SUBJECT: { fr: '🎓 Sujet Bac', ar: '🎓 موضوع باكالوريا', icon: '🎓', color: 'bg-red-100 text-red-700' },
-  CORRECTION: { fr: '✅ Corrigé', ar: '✅ تصحيح', icon: '✅', color: 'bg-green-100 text-green-700' },
+  BAC_SUBJECT: {
+    fr: '🎓 Sujet Bac',
+    ar: '🎓 موضوع باكالوريا',
+    icon: '🎓',
+    color: 'bg-red-100 text-red-700',
+  },
+  CORRECTION: {
+    fr: '✅ Corrigé',
+    ar: '✅ تصحيح',
+    icon: '✅',
+    color: 'bg-green-100 text-green-700',
+  },
   SUMMARY: { fr: '📄 Résumé', ar: '📄 ملخص', icon: '📄', color: 'bg-slate-100 text-slate-700' },
   CARD: { fr: '🗂️ Fiche', ar: '🗂️ بطاقة', icon: '🗂️', color: 'bg-pink-100 text-pink-700' },
 };
@@ -27,7 +51,12 @@ const LANGUAGE_LABELS: Record<string, string> = {
 
 export default function ResourceInfoPanel({ resource }: { resource: any }) {
   const typeInfo = TYPE_LABELS[resource.type] || TYPE_LABELS.COURSE;
-  const tags = resource.tags ? resource.tags.split(',').map((t: string) => t.trim()).filter(Boolean) : [];
+  const tags = resource.tags
+    ? resource.tags
+        .split(',')
+        .map((t: string) => t.trim())
+        .filter(Boolean)
+    : [];
 
   return (
     <div className="card p-5">
@@ -38,7 +67,9 @@ export default function ResourceInfoPanel({ resource }: { resource: any }) {
       <dl className="space-y-3 text-sm">
         {/* TYPE */}
         <Row icon={<span className="text-base">{typeInfo.icon}</span>} label="Type">
-          <span className={`inline-block px-2 py-0.5 rounded-md text-xs font-bold ${typeInfo.color}`}>
+          <span
+            className={`inline-block px-2 py-0.5 rounded-md text-xs font-bold ${typeInfo.color}`}
+          >
             {typeInfo.fr}
           </span>
         </Row>
@@ -139,7 +170,15 @@ export default function ResourceInfoPanel({ resource }: { resource: any }) {
   );
 }
 
-function Row({ icon, label, children }: { icon?: React.ReactNode; label: string; children: React.ReactNode }) {
+function Row({
+  icon,
+  label,
+  children,
+}: {
+  icon?: React.ReactNode;
+  label: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="flex items-start gap-2">
       {icon && <span className="text-slate-400 mt-0.5 flex-shrink-0">{icon}</span>}

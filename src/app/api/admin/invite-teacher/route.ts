@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
         role: 'TEACHER',
         email: { not: { contains: 'examanet-import.local' } },
       },
-      select: { id: true, email: true, firstName: true, lastName: true }
+      select: { id: true, email: true, firstName: true, lastName: true },
     });
 
     if (teachers.length === 0) {
@@ -51,8 +51,8 @@ export async function POST(req: NextRequest) {
           where: {
             teacherId: teacher.id,
             status: { in: ['PENDING', 'SENT', 'CLICKED'] },
-            expiresAt: { gt: new Date() }
-          }
+            expiresAt: { gt: new Date() },
+          },
         });
         if (existingActive) {
           results.push({
@@ -65,7 +65,11 @@ export async function POST(req: NextRequest) {
           continue;
         }
 
-        const { invitation, tempPassword } = await createInvitation(teacher.id, me.id, customMessage);
+        const { invitation, tempPassword } = await createInvitation(
+          teacher.id,
+          me.id,
+          customMessage,
+        );
         const sendResult = await sendInvitationEmail(invitation.id, tempPassword);
 
         // Fetch back the temp password from the invitation record (we need it for sendEmail)
@@ -90,8 +94,8 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const success = results.filter(r => r.ok).length;
-    const failed = results.filter(r => !r.ok).length;
+    const success = results.filter((r) => r.ok).length;
+    const failed = results.filter((r) => !r.ok).length;
 
     return NextResponse.json({
       success,

@@ -25,7 +25,8 @@ const ALLOWED_EXTENSIONS = ['docx', 'doc', 'pdf'];
 export async function GET() {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
-  if (user.role !== 'TEACHER') return NextResponse.json({ error: 'Réservé aux enseignants' }, { status: 403 });
+  if (user.role !== 'TEACHER')
+    return NextResponse.json({ error: 'Réservé aux enseignants' }, { status: 403 });
 
   const files = await prisma.teacherVerificationFile.findMany({
     where: { teacherId: user.id },
@@ -69,7 +70,8 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
-  if (user.role !== 'TEACHER') return NextResponse.json({ error: 'Réservé aux enseignants' }, { status: 403 });
+  if (user.role !== 'TEACHER')
+    return NextResponse.json({ error: 'Réservé aux enseignants' }, { status: 403 });
 
   // Check the teacher has been asked for files
   const teacher = await prisma.user.findUnique({
@@ -78,8 +80,8 @@ export async function POST(req: NextRequest) {
   });
   if (teacher?.status !== 'PENDING_FILE_VERIFICATION') {
     return NextResponse.json(
-      { error: 'Vous n\'êtes pas en attente de vérification de fichiers.' },
-      { status: 400 }
+      { error: "Vous n'êtes pas en attente de vérification de fichiers." },
+      { status: 400 },
     );
   }
 
@@ -90,7 +92,7 @@ export async function POST(req: NextRequest) {
   if (existingCount >= MAX_FILES) {
     return NextResponse.json(
       { error: `Vous avez déjà atteint la limite de ${MAX_FILES} fichiers.` },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -98,7 +100,10 @@ export async function POST(req: NextRequest) {
   try {
     formData = await req.formData();
   } catch (e) {
-    return NextResponse.json({ error: 'Format invalide (multipart/form-data requis)' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Format invalide (multipart/form-data requis)' },
+      { status: 400 },
+    );
   }
 
   const file = formData.get('file') as File | null;
@@ -110,7 +115,7 @@ export async function POST(req: NextRequest) {
   if (file.size > MAX_FILE_SIZE) {
     return NextResponse.json(
       { error: `Le fichier dépasse la taille maximale (${MAX_FILE_SIZE / 1024 / 1024} MB).` },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -118,7 +123,7 @@ export async function POST(req: NextRequest) {
   if (!ALLOWED_EXTENSIONS.includes(ext) && !ALLOWED_TYPES.includes(file.type)) {
     return NextResponse.json(
       { error: 'Format non supporté. Formats acceptés : .docx, .doc, .pdf' },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -182,7 +187,7 @@ export async function POST(req: NextRequest) {
           lastName: user.lastName || '',
           email: user.email || '',
         },
-        files: allFiles.map(f => ({
+        files: allFiles.map((f) => ({
           fileName: f.fileName,
           fileSize: f.fileSize,
           fileUrl: f.fileUrl,
@@ -203,9 +208,10 @@ export async function POST(req: NextRequest) {
     success: true,
     file: verificationFile,
     remaining: Math.max(0, MAX_FILES - newCount),
-    message: newCount >= MAX_FILES
-      ? `🎉 Tous vos fichiers sont reçus ! L'équipe va les examiner sous 48h.`
-      : `Fichier ${newCount}/${MAX_FILES} reçu.`,
+    message:
+      newCount >= MAX_FILES
+        ? `🎉 Tous vos fichiers sont reçus ! L'équipe va les examiner sous 48h.`
+        : `Fichier ${newCount}/${MAX_FILES} reçu.`,
   });
 }
 
@@ -225,7 +231,10 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: 'Non trouvé' }, { status: 404 });
   }
   if (file.reviewedByAdmin) {
-    return NextResponse.json({ error: 'Ce fichier a déjà été examiné, suppression impossible.' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Ce fichier a déjà été examiné, suppression impossible.' },
+      { status: 400 },
+    );
   }
 
   await prisma.teacherVerificationFile.delete({ where: { id } });

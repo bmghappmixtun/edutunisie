@@ -14,7 +14,7 @@ export default function MessageTeacherButton({ teacherId }: { teacherId: string 
       const res = await fetch('/api/conversations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ teacherId })
+        body: JSON.stringify({ teacherId }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -40,7 +40,11 @@ export default function MessageTeacherButton({ teacherId }: { teacherId: string 
       disabled={loading}
       className="flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 transition shadow-sm disabled:opacity-50"
     >
-      {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <MessageCircle className="w-4 h-4" />}
+      {loading ? (
+        <Loader2 className="w-4 h-4 animate-spin" />
+      ) : (
+        <MessageCircle className="w-4 h-4" />
+      )}
       Message
     </button>
   );

@@ -24,100 +24,162 @@ const FILES = [
   {
     key: 'concours-9eme/9raya/2001/general/sujets/math.pdf',
     sourceUrl: 'https://9raya.tn/wp-content/uploads/2022/03/دورة-2001.pdf',
-    year: 2001, subject: 'math', voie: 'general', type: 'sujet',
-    source: '9raya.tn', note: 'سنة تاسعة — math 2001',
+    year: 2001,
+    subject: 'math',
+    voie: 'general',
+    type: 'sujet',
+    source: '9raya.tn',
+    note: 'سنة تاسعة — math 2001',
   },
   {
     key: 'concours-9eme/9raya/2002/general/sujets/math.pdf',
     sourceUrl: 'https://9raya.tn/wp-content/uploads/2022/03/دورة-2002.pdf',
-    year: 2002, subject: 'math', voie: 'general', type: 'sujet',
-    source: '9raya.tn', note: 'سنة تاسعة — math 2002',
+    year: 2002,
+    subject: 'math',
+    voie: 'general',
+    type: 'sujet',
+    source: '9raya.tn',
+    note: 'سنة تاسعة — math 2002',
   },
   {
     key: 'concours-9eme/9raya/2003/general/sujets/math.pdf',
     sourceUrl: 'https://9raya.tn/wp-content/uploads/2022/03/دورة-2003.pdf',
-    year: 2003, subject: 'math', voie: 'general', type: 'sujet',
-    source: '9raya.tn', note: 'سنة تاسعة — math 2003',
+    year: 2003,
+    subject: 'math',
+    voie: 'general',
+    type: 'sujet',
+    source: '9raya.tn',
+    note: 'سنة تاسعة — math 2003',
   },
   {
     key: 'concours-9eme/9raya/2005/general/sujets/math.pdf',
     sourceUrl: 'https://9raya.tn/wp-content/uploads/2022/03/دورة-2005.pdf',
-    year: 2005, subject: 'math', voie: 'general', type: 'sujet',
-    source: '9raya.tn', note: 'سنة تاسعة — math 2005',
+    year: 2005,
+    subject: 'math',
+    voie: 'general',
+    type: 'sujet',
+    source: '9raya.tn',
+    note: 'سنة تاسعة — math 2005',
   },
   {
     key: 'concours-9eme/9raya/2006/general/sujets/math.pdf',
     sourceUrl: 'https://9raya.tn/wp-content/uploads/2022/03/دورة-2006.pdf',
-    year: 2006, subject: 'math', voie: 'general', type: 'sujet',
-    source: '9raya.tn', note: 'سنة تاسعة — math 2006',
+    year: 2006,
+    subject: 'math',
+    voie: 'general',
+    type: 'sujet',
+    source: '9raya.tn',
+    note: 'سنة تاسعة — math 2006',
   },
   {
     key: 'concours-9eme/9raya/2007/general/sujets/math.pdf',
     sourceUrl: 'https://9raya.tn/wp-content/uploads/2022/03/دورة-2007.pdf',
-    year: 2007, subject: 'math', voie: 'general', type: 'sujet',
-    source: '9raya.tn', note: 'سنة تاسعة — math 2007',
+    year: 2007,
+    subject: 'math',
+    voie: 'general',
+    type: 'sujet',
+    source: '9raya.tn',
+    note: 'سنة تاسعة — math 2007',
   },
   {
     key: 'concours-9eme/9raya/2008/general/sujets/math.pdf',
     sourceUrl: 'https://9raya.tn/wp-content/uploads/2022/03/دورة-2008.pdf',
-    year: 2008, subject: 'math', voie: 'general', type: 'sujet',
-    source: '9raya.tn', note: 'سنة تاسعة — math 2008',
+    year: 2008,
+    subject: 'math',
+    voie: 'general',
+    type: 'sujet',
+    source: '9raya.tn',
+    note: 'سنة تاسعة — math 2008',
   },
   {
     key: 'concours-9eme/9raya/2009/general/sujets/math.pdf',
     sourceUrl: 'https://9raya.tn/wp-content/uploads/2022/03/دورة-2009.pdf',
-    year: 2009, subject: 'math', voie: 'general', type: 'sujet',
-    source: '9raya.tn', note: 'سنة تاسعة — math 2009',
+    year: 2009,
+    subject: 'math',
+    voie: 'general',
+    type: 'sujet',
+    source: '9raya.tn',
+    note: 'سنة تاسعة — math 2009',
   },
 
   // ========== B) ARABE modèles 2025 (2 fichiers) ==========
   {
     key: 'concours-9eme/9raya/2025/general/sujets/arabe-modele-1.pdf',
     sourceUrl: 'https://9raya.tn/wp-content/uploads/2025/06/مناظرات-عربية-سنة-تاسعة-نموذج1.pdf',
-    year: 2025, subject: 'arabe', voie: 'general', type: 'sujet',
-    source: '9raya.tn', note: 'مناظرة عربية سنة تاسعة نموذج 1',
+    year: 2025,
+    subject: 'arabe',
+    voie: 'general',
+    type: 'sujet',
+    source: '9raya.tn',
+    note: 'مناظرة عربية سنة تاسعة نموذج 1',
   },
   {
     key: 'concours-9eme/9raya/2025/general/sujets/arabe-modele-2.pdf',
     sourceUrl: 'https://9raya.tn/wp-content/uploads/2025/06/مناظرات-عربية-سنة-تاسعة-نموذج2.pdf',
-    year: 2025, subject: 'arabe', voie: 'general', type: 'sujet',
-    source: '9raya.tn', note: 'مناظرة عربية سنة تاسعة نموذج 2',
+    year: 2025,
+    subject: 'arabe',
+    voie: 'general',
+    type: 'sujet',
+    source: '9raya.tn',
+    note: 'مناظرة عربية سنة تاسعة نموذج 2',
   },
 
   // ========== C) SVT (1 sujet 2019 + 1 corrigé 2019 + 1 sujet 2024) ==========
   {
     key: 'concours-9eme/9raya/2019/general/sujets/svt.pdf',
-    sourceUrl: 'https://9raya.tn/wp-content/uploads/2019/06/مناظرة-علوم-الحياة-و-الارض-سنة-تاسعة2.pdf',
-    year: 2019, subject: 'svt', voie: 'general', type: 'sujet',
-    source: '9raya.tn', note: 'مناظرة علوم الحياة والأرض سنة تاسعة',
+    sourceUrl:
+      'https://9raya.tn/wp-content/uploads/2019/06/مناظرة-علوم-الحياة-و-الارض-سنة-تاسعة2.pdf',
+    year: 2019,
+    subject: 'svt',
+    voie: 'general',
+    type: 'sujet',
+    source: '9raya.tn',
+    note: 'مناظرة علوم الحياة والأرض سنة تاسعة',
   },
   {
-    key: 'concours-9eme/9raya/2019/general/corriges/svt.pdf',  // ⭐ CORRIGÉ
-    sourceUrl: 'https://9raya.tn/wp-content/uploads/2019/06/إصلاح-اختبار-علوم-الحياة-والأرض-التاسعة-أساسي-2019.pdf',
-    year: 2019, subject: 'svt', voie: 'general', type: 'corrige',
-    source: '9raya.tn', note: 'إصلاح اختبار علوم الحياة والأرض التاسعة أساسي 2019',
+    key: 'concours-9eme/9raya/2019/general/corriges/svt.pdf', // ⭐ CORRIGÉ
+    sourceUrl:
+      'https://9raya.tn/wp-content/uploads/2019/06/إصلاح-اختبار-علوم-الحياة-والأرض-التاسعة-أساسي-2019.pdf',
+    year: 2019,
+    subject: 'svt',
+    voie: 'general',
+    type: 'corrige',
+    source: '9raya.tn',
+    note: 'إصلاح اختبار علوم الحياة والأرض التاسعة أساسي 2019',
   },
   {
     key: 'concours-9eme/9raya/2024/general/sujets/svt-modele-3.pdf',
-    sourceUrl: 'https://9raya.tn/wp-content/uploads/2024/04/مناظرة-علوم-الحياة-و-الارض-سنة-تاسعة-نموذج-عدد3.pdf',
-    year: 2024, subject: 'svt', voie: 'general', type: 'sujet',
-    source: '9raya.tn', note: 'مناظرة علوم الحياة والأرض سنة تاسعة نموذج 3',
+    sourceUrl:
+      'https://9raya.tn/wp-content/uploads/2024/04/مناظرة-علوم-الحياة-و-الارض-سنة-تاسعة-نموذج-عدد3.pdf',
+    year: 2024,
+    subject: 'svt',
+    voie: 'general',
+    type: 'sujet',
+    source: '9raya.tn',
+    note: 'مناظرة علوم الحياة والأرض سنة تاسعة نموذج 3',
   },
 
   // ========== D) CYCLE 2020 + الإصلاح (Math) combo — ⭐ GOLD CORRIGÉ 2020+ ==========
   {
-    key: 'concours-9eme/9raya/2020/general/sujets+correction/math.pdf',  // ⭐ CORRIGÉ
-    sourceUrl: 'https://9raya.tn/wp-content/uploads/2021/04/إمتحان-شهادة-ختم-التعليم-الأساسي-الإصلاح.pdf',
-    year: 2020, subject: 'math', voie: 'general', type: 'corrige',
+    key: 'concours-9eme/9raya/2020/general/sujets+correction/math.pdf', // ⭐ CORRIGÉ
+    sourceUrl:
+      'https://9raya.tn/wp-content/uploads/2021/04/إمتحان-شهادة-ختم-التعليم-الأساسي-الإصلاح.pdf',
+    year: 2020,
+    subject: 'math',
+    voie: 'general',
+    type: 'corrige',
     source: '9raya.tn',
     note: 'إمتحان شهادة ختم التعليم الأساسي دورة 2020 + الإصلاح — MATH',
   },
 
   // ========== E) FRENCH TRIAL + corrigé ==========
   {
-    key: 'concours-9eme/9raya/2020/general/sujets+correction/francais-trial.pdf',  // ⭐ CORRIGÉ
+    key: 'concours-9eme/9raya/2020/general/sujets+correction/francais-trial.pdf', // ⭐ CORRIGÉ
     sourceUrl: 'https://9raya.tn/wp-content/uploads/2019/06/مناظرة-تجريبية-فرنسية-مع-الإصلاح.pdf',
-    year: 2020, subject: 'francais', voie: 'general', type: 'corrige',
+    year: 2020,
+    subject: 'francais',
+    voie: 'general',
+    type: 'corrige',
     source: '9raya.tn',
     note: 'مناظرة تجريبية فرنسية مع الإصلاح',
   },
@@ -168,18 +230,25 @@ async function main() {
   const fs = await import('node:fs');
   fs.writeFileSync(
     '/workspace/docs/concours-9eme-9raya-upload-result.json',
-    JSON.stringify({
-      generatedAt: new Date().toISOString(),
-      source: '9raya.tn',
-      site: 'examanet.com',
-      total_tasks: FILES.length,
-      total_uploaded: results.uploaded.length,
-      total_failed: results.failed.length,
-      uploaded: results.uploaded,
-      failed: results.failed,
-    }, null, 2),
+    JSON.stringify(
+      {
+        generatedAt: new Date().toISOString(),
+        source: '9raya.tn',
+        site: 'examanet.com',
+        total_tasks: FILES.length,
+        total_uploaded: results.uploaded.length,
+        total_failed: results.failed.length,
+        uploaded: results.uploaded,
+        failed: results.failed,
+      },
+      null,
+      2,
+    ),
   );
   console.log('💾 Saved: /workspace/docs/concours-9eme-9raya-upload-result.json');
 }
 
-main().catch(e => { console.error(e); process.exit(1); });
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});

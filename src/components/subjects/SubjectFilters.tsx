@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useCallback } from 'react';
 import { X, Users, BookOpen, BookText, Filter } from 'lucide-react';
 
@@ -55,7 +55,9 @@ export default function SubjectFilters({
 
   const update = useCallback(
     (key: string, value: string | null) => {
-      const params = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
+      const params = new URLSearchParams(
+        typeof window !== 'undefined' ? window.location.search : '',
+      );
       if (!value) {
         params.delete(key);
       } else {
@@ -64,7 +66,7 @@ export default function SubjectFilters({
       params.delete('page'); // reset pagination
       router.push(`${pathname}?${params.toString()}`, { scroll: false });
     },
-    [router, pathname]
+    [router, pathname],
   );
 
   const resetAll = () => router.push(pathname, { scroll: false });
@@ -180,13 +182,16 @@ export default function SubjectFilters({
             <div className="space-y-1 max-h-64 overflow-y-auto">
               {teachers.slice(0, 12).map((t) => {
                 const active = activeFilters.prof === t.id;
-                const name = [t.firstName, t.lastName].filter(Boolean).join(' ') || t.firstNameAr || 'Prof';
+                const name =
+                  [t.firstName, t.lastName].filter(Boolean).join(' ') || t.firstNameAr || 'Prof';
                 return (
                   <button
                     key={t.id}
                     onClick={() => update('prof', active ? null : t.id)}
                     className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-left text-sm transition ${
-                      active ? 'bg-primary-100 text-primary-900' : 'hover:bg-slate-50 text-slate-700'
+                      active
+                        ? 'bg-primary-100 text-primary-900'
+                        : 'hover:bg-slate-50 text-slate-700'
                     }`}
                   >
                     {t.avatarUrl ? (
@@ -258,14 +263,18 @@ function FilterRow({
     <button
       onClick={onClick}
       className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-left text-sm transition ${
-        active ? 'bg-primary-100 text-primary-900 font-semibold' : 'hover:bg-slate-50 text-slate-700'
+        active
+          ? 'bg-primary-100 text-primary-900 font-semibold'
+          : 'hover:bg-slate-50 text-slate-700'
       }`}
     >
       {emoji && <span className="text-sm">{emoji}</span>}
       <span className="truncate flex-1">{label}</span>
       {sublabel && <span className="text-[10px] text-slate-400">{sublabel}</span>}
       {count !== undefined && count > 0 && (
-        <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${active ? 'bg-primary-200 text-primary-900' : 'bg-slate-100 text-slate-500'}`}>
+        <span
+          className={`text-[10px] px-1.5 py-0.5 rounded-full ${active ? 'bg-primary-200 text-primary-900' : 'bg-slate-100 text-slate-500'}`}
+        >
           {count}
         </span>
       )}

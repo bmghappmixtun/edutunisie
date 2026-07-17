@@ -6,7 +6,8 @@ export function isArabic(text: string | null | undefined): boolean {
   if (!text) return false;
   // Arabic Unicode block U+0600-U+06FF, also includes Arabic Supplement U+0750-U+077F
   // and Arabic Presentation Forms U+FB50-U+FDFF, U+FE70-U+FEFF
-  const arabicChars = (text.match(/[\u0600-\u06FF\u0750-\u077F\uFB50-\uFDFF\uFE70-\uFEFF]/g) || []).length;
+  const arabicChars = (text.match(/[\u0600-\u06FF\u0750-\u077F\uFB50-\uFDFF\uFE70-\uFEFF]/g) || [])
+    .length;
   // If more than 30% of chars are Arabic (after stripping digits/punct), it's Arabic
   const totalChars = (text.match(/[\w\u0600-\u06FF]/g) || []).length;
   if (totalChars === 0) return false;
@@ -25,14 +26,14 @@ export function getDirection(text: string | null | undefined): 'rtl' | 'ltr' {
  */
 export function detectLanguage(text: string | null | undefined): 'ar' | 'fr' | 'en' {
   if (!text) return 'fr';
-  const arabicChars = (text.match(/[\u0600-\u06FF\u0750-\u077F\uFB50-\uFDFF\uFE70-\uFEFF]/g) || []).length;
+  const arabicChars = (text.match(/[\u0600-\u06FF\u0750-\u077F\uFB50-\uFDFF\uFE70-\uFEFF]/g) || [])
+    .length;
   const latinChars = (text.match(/[A-Za-zÀ-ÿ]/g) || []).length;
   if (arabicChars === 0 && latinChars === 0) return 'fr';
   // If at least 30% Arabic → ar
   if (arabicChars / (arabicChars + latinChars) >= 0.3) return 'ar';
   return 'fr';
 }
-
 
 /**
  * Get initials for a name, handling parentheses and special chars.
@@ -44,14 +45,17 @@ export function detectLanguage(text: string | null | undefined): 'ar' | 'fr' | '
  *   getInitials('محمّد', 'بن معلّم') → 'مب' (or 'MB')
  *   getInitials('A', 'B') → 'AB'
  */
-export function getInitials(firstName: string | null | undefined, lastName: string | null | undefined): string {
+export function getInitials(
+  firstName: string | null | undefined,
+  lastName: string | null | undefined,
+): string {
   const getFirstLetter = (s: string | null | undefined): string => {
     if (!s) return '';
     // Find first alphabetic character (Unicode letters)
     const match = s.match(/[\p{L}]/u);
     return match ? match[0] : '';
   };
-  
+
   const f = getFirstLetter(firstName);
   const l = getFirstLetter(lastName);
   return (f + l).toUpperCase();

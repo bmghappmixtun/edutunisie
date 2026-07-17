@@ -1,32 +1,92 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Save, Loader2, User, BookOpen, Layers, MapPin, Briefcase, GraduationCap, Globe, Phone, Image as ImageIcon } from 'lucide-react';
+import {
+  Save,
+  Loader2,
+  User,
+  BookOpen,
+  Layers,
+  MapPin,
+  Briefcase,
+  GraduationCap,
+  Globe,
+  Phone,
+  Image as ImageIcon,
+} from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const GOVERNORATES = [
-  'Tunis', 'Ariana', 'Ben Arous', 'Manouba', 'Nabeul', 'Zaghouan', 'Bizerte',
-  'Béja', 'Jendouba', 'Kef', 'Siliana', 'Sousse', 'Monastir', 'Mahdia',
-  'Sfax', 'Kairouan', 'Kasserine', 'Sidi Bouzid', 'Gabès', 'Médenine',
-  'Tataouine', 'Gafsa', 'Tozeur', 'Kebili'
+  'Tunis',
+  'Ariana',
+  'Ben Arous',
+  'Manouba',
+  'Nabeul',
+  'Zaghouan',
+  'Bizerte',
+  'Béja',
+  'Jendouba',
+  'Kef',
+  'Siliana',
+  'Sousse',
+  'Monastir',
+  'Mahdia',
+  'Sfax',
+  'Kairouan',
+  'Kasserine',
+  'Sidi Bouzid',
+  'Gabès',
+  'Médenine',
+  'Tataouine',
+  'Gafsa',
+  'Tozeur',
+  'Kebili',
 ];
 
 const DIPLOMAS = [
-  'Licence', 'Master', 'Doctorat', 'Ingénieur', 'Professeure principale',
-  'Professeur secondaire', 'Maître de conférences', 'Agrégé', 'Autres'
+  'Licence',
+  'Master',
+  'Doctorat',
+  'Ingénieur',
+  'Professeure principale',
+  'Professeur secondaire',
+  'Maître de conférences',
+  'Agrégé',
+  'Autres',
 ];
 
 const COMMON_SUBJECTS = [
-  'Mathématiques', 'Physique', 'Sciences', 'Arabe', 'Français',
-  'Anglais', 'Histoire', 'Géographie', 'Philosophie', 'Économie',
-  'Gestion', 'Informatique', 'Technologie', 'Sport', 'Musique',
-  'Dessin', 'Biologie', 'Chimie'
+  'Mathématiques',
+  'Physique',
+  'Sciences',
+  'Arabe',
+  'Français',
+  'Anglais',
+  'Histoire',
+  'Géographie',
+  'Philosophie',
+  'Économie',
+  'Gestion',
+  'Informatique',
+  'Technologie',
+  'Sport',
+  'Musique',
+  'Dessin',
+  'Biologie',
+  'Chimie',
 ];
 
 const COMMON_LEVELS = [
-  'Collège', 'Lycée', 'Bac',
-  '7ème année', '8ème année', '9ème année',
-  '1ère année secondaire', '2ème année secondaire', '3ème année secondaire', '4ème année secondaire'
+  'Collège',
+  'Lycée',
+  'Bac',
+  '7ème année',
+  '8ème année',
+  '9ème année',
+  '1ère année secondaire',
+  '2ème année secondaire',
+  '3ème année secondaire',
+  '4ème année secondaire',
 ];
 
 export default function EditProfilePage() {
@@ -37,12 +97,16 @@ export default function EditProfilePage() {
 
   useEffect(() => {
     fetch('/api/teacher/profile')
-      .then(r => r.json())
-      .then(data => {
+      .then((r) => r.json())
+      .then((data) => {
         // Parse JSON arrays for editing
         const parseArr = (val: string | null): string[] => {
           if (!val) return [];
-          try { return JSON.parse(val); } catch { return []; }
+          try {
+            return JSON.parse(val);
+          } catch {
+            return [];
+          }
         };
         setProfile({
           ...data,
@@ -62,7 +126,7 @@ export default function EditProfilePage() {
       ...p,
       [field]: p[field].includes(value)
         ? p[field].filter((v: string) => v !== value)
-        : [...p[field], value]
+        : [...p[field], value],
     }));
   }
 
@@ -73,7 +137,7 @@ export default function EditProfilePage() {
       const res = await fetch('/api/teacher/profile', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(profile)
+        body: JSON.stringify(profile),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -112,55 +176,90 @@ export default function EditProfilePage() {
       <form onSubmit={handleSubmit} className="max-w-3xl space-y-6">
         {/* Avatar & basic */}
         <div className="bg-white rounded-2xl border border-slate-100 p-6 space-y-4">
-          <h2 className="font-bold flex items-center gap-2"><ImageIcon className="w-5 h-5 text-primary-500" /> Apparence</h2>
+          <h2 className="font-bold flex items-center gap-2">
+            <ImageIcon className="w-5 h-5 text-primary-500" /> Apparence
+          </h2>
 
           <div className="flex items-start gap-4">
             <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 text-white font-extrabold text-3xl flex items-center justify-center flex-shrink-0">
-              {profile.firstName?.[0]}{profile.lastName?.[0]}
+              {profile.firstName?.[0]}
+              {profile.lastName?.[0]}
             </div>
             <div className="flex-1">
               <label className="label">URL de l'avatar</label>
               <input
                 type="url"
                 value={profile.avatarUrl || ''}
-                onChange={e => setProfile({ ...profile, avatarUrl: e.target.value })}
+                onChange={(e) => setProfile({ ...profile, avatarUrl: e.target.value })}
                 className="input"
                 placeholder="https://..."
               />
-              <p className="text-xs text-slate-500 mt-1">Colle l'URL d'une image (JPG, PNG, WebP)</p>
+              <p className="text-xs text-slate-500 mt-1">
+                Colle l'URL d'une image (JPG, PNG, WebP)
+              </p>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="label">Prénom (FR)</label>
-              <input type="text" value={profile.firstName || ''} onChange={e => setProfile({ ...profile, firstName: e.target.value })} className="input" />
+              <input
+                type="text"
+                value={profile.firstName || ''}
+                onChange={(e) => setProfile({ ...profile, firstName: e.target.value })}
+                className="input"
+              />
             </div>
             <div>
               <label className="label">Nom (FR)</label>
-              <input type="text" value={profile.lastName || ''} onChange={e => setProfile({ ...profile, lastName: e.target.value })} className="input" />
+              <input
+                type="text"
+                value={profile.lastName || ''}
+                onChange={(e) => setProfile({ ...profile, lastName: e.target.value })}
+                className="input"
+              />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="label" dir="rtl">الاسم (AR)</label>
-              <input type="text" value={profile.firstNameAr || ''} onChange={e => setProfile({ ...profile, firstNameAr: e.target.value })} className="input" dir="rtl" placeholder="الاسم" />
+              <label className="label" dir="rtl">
+                الاسم (AR)
+              </label>
+              <input
+                type="text"
+                value={profile.firstNameAr || ''}
+                onChange={(e) => setProfile({ ...profile, firstNameAr: e.target.value })}
+                className="input"
+                dir="rtl"
+                placeholder="الاسم"
+              />
             </div>
             <div>
-              <label className="label" dir="rtl">اللقب (AR)</label>
-              <input type="text" value={profile.lastNameAr || ''} onChange={e => setProfile({ ...profile, lastNameAr: e.target.value })} className="input" dir="rtl" placeholder="اللقب" />
+              <label className="label" dir="rtl">
+                اللقب (AR)
+              </label>
+              <input
+                type="text"
+                value={profile.lastNameAr || ''}
+                onChange={(e) => setProfile({ ...profile, lastNameAr: e.target.value })}
+                className="input"
+                dir="rtl"
+                placeholder="اللقب"
+              />
             </div>
           </div>
         </div>
 
         {/* Bio */}
         <div className="bg-white rounded-2xl border border-slate-100 p-6 space-y-4">
-          <h2 className="font-bold flex items-center gap-2"><GraduationCap className="w-5 h-5 text-primary-500" /> Présentation</h2>
+          <h2 className="font-bold flex items-center gap-2">
+            <GraduationCap className="w-5 h-5 text-primary-500" /> Présentation
+          </h2>
           <div>
             <label className="label">Bio ({profile.bio?.length || 0}/1000)</label>
             <textarea
               value={profile.bio || ''}
-              onChange={e => setProfile({ ...profile, bio: e.target.value })}
+              onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
               maxLength={1000}
               className="input min-h-[120px] resize-none"
               placeholder="Présentez-vous aux élèves et parents : votre parcours, votre pédagogie, vos passions..."
@@ -170,30 +269,65 @@ export default function EditProfilePage() {
 
         {/* Location & work */}
         <div className="bg-white rounded-2xl border border-slate-100 p-6 space-y-4">
-          <h2 className="font-bold flex items-center gap-2"><Briefcase className="w-5 h-5 text-primary-500" /> Établissement</h2>
+          <h2 className="font-bold flex items-center gap-2">
+            <Briefcase className="w-5 h-5 text-primary-500" /> Établissement
+          </h2>
 
           <div>
             <label className="label">Nom de l'établissement</label>
-            <input type="text" value={profile.schoolName || ''} onChange={e => setProfile({ ...profile, schoolName: e.target.value })} className="input" placeholder="Ex: Lycée Bourguiba, Tunis" />
+            <input
+              type="text"
+              value={profile.schoolName || ''}
+              onChange={(e) => setProfile({ ...profile, schoolName: e.target.value })}
+              className="input"
+              placeholder="Ex: Lycée Bourguiba, Tunis"
+            />
           </div>
           <div>
-            <label className="label" dir="rtl">اسم المؤسسة بالعربية</label>
-            <input type="text" value={profile.schoolNameAr || ''} onChange={e => setProfile({ ...profile, schoolNameAr: e.target.value })} className="input" dir="rtl" placeholder="مثال: المعهد الثانوي بورقيبة" />
+            <label className="label" dir="rtl">
+              اسم المؤسسة بالعربية
+            </label>
+            <input
+              type="text"
+              value={profile.schoolNameAr || ''}
+              onChange={(e) => setProfile({ ...profile, schoolNameAr: e.target.value })}
+              className="input"
+              dir="rtl"
+              placeholder="مثال: المعهد الثانوي بورقيبة"
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="label flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" /> Gouvernorat</label>
-              <select value={profile.governorate || ''} onChange={e => setProfile({ ...profile, governorate: e.target.value })} className="input">
+              <label className="label flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5" /> Gouvernorat
+              </label>
+              <select
+                value={profile.governorate || ''}
+                onChange={(e) => setProfile({ ...profile, governorate: e.target.value })}
+                className="input"
+              >
                 <option value="">— Choisir —</option>
-                {GOVERNORATES.map(g => <option key={g} value={g}>{g}</option>)}
+                {GOVERNORATES.map((g) => (
+                  <option key={g} value={g}>
+                    {g}
+                  </option>
+                ))}
               </select>
             </div>
             <div>
               <label className="label">Diplôme</label>
-              <select value={profile.diploma || ''} onChange={e => setProfile({ ...profile, diploma: e.target.value })} className="input">
+              <select
+                value={profile.diploma || ''}
+                onChange={(e) => setProfile({ ...profile, diploma: e.target.value })}
+                className="input"
+              >
                 <option value="">— Choisir —</option>
-                {DIPLOMAS.map(d => <option key={d} value={d}>{d}</option>)}
+                {DIPLOMAS.map((d) => (
+                  <option key={d} value={d}>
+                    {d}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
@@ -201,12 +335,14 @@ export default function EditProfilePage() {
 
         {/* Teaching subjects & levels */}
         <div className="bg-white rounded-2xl border border-slate-100 p-6 space-y-4">
-          <h2 className="font-bold flex items-center gap-2"><BookOpen className="w-5 h-5 text-primary-500" /> Ce que j'enseigne</h2>
+          <h2 className="font-bold flex items-center gap-2">
+            <BookOpen className="w-5 h-5 text-primary-500" /> Ce que j'enseigne
+          </h2>
 
           <div>
             <label className="label">Matières enseignées ({profile.teachingSubjects.length})</label>
             <div className="flex flex-wrap gap-2">
-              {COMMON_SUBJECTS.map(s => {
+              {COMMON_SUBJECTS.map((s) => {
                 const selected = profile.teachingSubjects.includes(s);
                 return (
                   <button
@@ -227,9 +363,11 @@ export default function EditProfilePage() {
           </div>
 
           <div>
-            <label className="label flex items-center gap-1.5"><Layers className="w-3.5 h-3.5" /> Niveaux ({profile.teachingLevels.length})</label>
+            <label className="label flex items-center gap-1.5">
+              <Layers className="w-3.5 h-3.5" /> Niveaux ({profile.teachingLevels.length})
+            </label>
             <div className="flex flex-wrap gap-2">
-              {COMMON_LEVELS.map(l => {
+              {COMMON_LEVELS.map((l) => {
                 const selected = profile.teachingLevels.includes(l);
                 return (
                   <button
@@ -252,22 +390,44 @@ export default function EditProfilePage() {
 
         {/* Contact */}
         <div className="bg-white rounded-2xl border border-slate-100 p-6 space-y-4">
-          <h2 className="font-bold flex items-center gap-2"><Globe className="w-5 h-5 text-primary-500" /> Contact</h2>
+          <h2 className="font-bold flex items-center gap-2">
+            <Globe className="w-5 h-5 text-primary-500" /> Contact
+          </h2>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="label flex items-center gap-1.5"><Phone className="w-3.5 h-3.5" /> Téléphone</label>
-              <input type="tel" value={profile.phone || ''} onChange={e => setProfile({ ...profile, phone: e.target.value })} className="input" placeholder="+216 ..." />
+              <label className="label flex items-center gap-1.5">
+                <Phone className="w-3.5 h-3.5" /> Téléphone
+              </label>
+              <input
+                type="tel"
+                value={profile.phone || ''}
+                onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
+                className="input"
+                placeholder="+216 ..."
+              />
             </div>
             <div>
-              <label className="label flex items-center gap-1.5"><Globe className="w-3.5 h-3.5" /> Site web</label>
-              <input type="url" value={profile.website || ''} onChange={e => setProfile({ ...profile, website: e.target.value })} className="input" placeholder="https://..." />
+              <label className="label flex items-center gap-1.5">
+                <Globe className="w-3.5 h-3.5" /> Site web
+              </label>
+              <input
+                type="url"
+                value={profile.website || ''}
+                onChange={(e) => setProfile({ ...profile, website: e.target.value })}
+                className="input"
+                placeholder="https://..."
+              />
             </div>
           </div>
         </div>
 
         {/* Submit */}
         <div className="flex justify-end gap-3">
-          <button type="button" onClick={() => router.back()} className="px-6 py-3 border border-slate-200 rounded-xl hover:bg-slate-50 font-semibold">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="px-6 py-3 border border-slate-200 rounded-xl hover:bg-slate-50 font-semibold"
+          >
             Annuler
           </button>
           <button type="submit" disabled={saving} className="btn-primary flex items-center gap-2">

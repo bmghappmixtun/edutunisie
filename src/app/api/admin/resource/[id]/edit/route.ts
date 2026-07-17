@@ -42,7 +42,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
     const newSlug = (pending: any) =>
       pending.title && pending.title !== resource.title
-        ? `${pending.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}-${Date.now().toString(36)}`
+        ? `${pending.title
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-|-$/g, '')}-${Date.now().toString(36)}`
         : resource.slug;
     const resourceUrl = `${siteUrl}/ressources/${resource.numericId}/${resource.slug}`;
 
@@ -57,7 +60,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       // resources). After admin approves this "edit", we must ALSO
       // flip the status to PUBLISHED — otherwise the corrected file
       // stays invisible on the platform.
-      const mustPublish = resource.status === 'REJECTED' || resource.status === 'DRAFT' || resource.status === 'PENDING_APPROVAL';
+      const mustPublish =
+        resource.status === 'REJECTED' ||
+        resource.status === 'DRAFT' ||
+        resource.status === 'PENDING_APPROVAL';
 
       const updateData: any = {
         ...pending,
@@ -84,7 +90,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       revalidatePath('/enseignant/ressources');
       revalidatePath('/admin/ressources/editions');
       revalidatePath('/admin/ressources');
-      if (resource.teacherId && resource.teacher) revalidatePath(`/professeurs/${resource.teacher.numericId}/${resource.teacher.slug}`);
+      if (resource.teacherId && resource.teacher)
+        revalidatePath(`/professeurs/${resource.teacher.numericId}/${resource.teacher.slug}`);
 
       const finalUrl = `${siteUrl}/ressources/${pending.numericId}/${newSlug(pending)}`;
 
@@ -96,8 +103,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
             type: 'edit_approved',
             title: 'Modification approuvée ✅',
             message: `Votre modification sur "${pending.title || resource.title}" a été approuvée et publiée.`,
-            link: `/ressources/${pending.numericId}/${newSlug(pending)}`
-          }
+            link: `/ressources/${pending.numericId}/${newSlug(pending)}`,
+          },
         });
 
         // Send email to teacher
@@ -107,7 +114,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
             teacher.email,
             teacher.firstName,
             pending.title || resource.title,
-            finalUrl
+            finalUrl,
           );
         }
       }
@@ -119,7 +126,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     }
 
     if (action === 'reject') {
-      const finalReason = reason?.trim() || 'Modification refusée par l\'administrateur.';
+      const finalReason = reason?.trim() || "Modification refusée par l'administrateur.";
       await prisma.resource.update({
         where: { id },
         data: {
@@ -128,11 +135,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
           editReviewedAt: new Date(),
           editReviewedById: user.id,
           editRejectionReason: finalReason,
-        }
+        },
       });
       revalidatePath('/admin/ressources/editions');
       revalidatePath('/enseignant/ressources');
-      if (resource.teacherId && resource.teacher) revalidatePath(`/professeurs/${resource.teacher.numericId}/${resource.teacher.slug}`);
+      if (resource.teacherId && resource.teacher)
+        revalidatePath(`/professeurs/${resource.teacher.numericId}/${resource.teacher.slug}`);
 
       // Notify teacher
       if (resource.editRequestedById) {
@@ -142,8 +150,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
             type: 'edit_rejected',
             title: 'Modification refusée ❌',
             message: `Votre modification sur "${resource.title}" a été refusée.${finalReason ? ` Motif : ${finalReason.slice(0, 100)}` : ''}`,
-            link: `/enseignant/ressources`
-          }
+            link: `/enseignant/ressources`,
+          },
         });
 
         // Send email to teacher
@@ -154,7 +162,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
             teacher.firstName,
             resource.title,
             finalReason,
-            resourceUrl
+            resourceUrl,
           );
         }
       }

@@ -15,8 +15,8 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   const conv = await prisma.conversation.findFirst({
     where: {
       id,
-      OR: [{ studentId: user.id }, { teacherId: user.id }]
-    }
+      OR: [{ studentId: user.id }, { teacherId: user.id }],
+    },
   });
   if (!conv) return NextResponse.json({ error: 'Conversation introuvable' }, { status: 404 });
 
@@ -24,19 +24,19 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     where: { conversationId: id },
     orderBy: { createdAt: 'asc' },
     include: {
-      sender: { select: { id: true, firstName: true, lastName: true, avatarUrl: true } }
-    }
+      sender: { select: { id: true, firstName: true, lastName: true, avatarUrl: true } },
+    },
   });
 
   // Mark as read
   await prisma.message.updateMany({
     where: { conversationId: id, senderId: { not: user.id }, isRead: false },
-    data: { isRead: true }
+    data: { isRead: true },
   });
 
   return NextResponse.json({
     messages,
-    conversation: conv
+    conversation: conv,
   });
 }
 
@@ -48,15 +48,17 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const { id } = await params;
   const { content } = await req.json();
 
-  if (!content || !content.trim()) return NextResponse.json({ error: 'Message vide' }, { status: 400 });
-  if (content.length > 2000) return NextResponse.json({ error: 'Message trop long (max 2000)' }, { status: 400 });
+  if (!content || !content.trim())
+    return NextResponse.json({ error: 'Message vide' }, { status: 400 });
+  if (content.length > 2000)
+    return NextResponse.json({ error: 'Message trop long (max 2000)' }, { status: 400 });
 
   // Verify user is part of conversation
   const conv = await prisma.conversation.findFirst({
     where: {
       id,
-      OR: [{ studentId: user.id }, { teacherId: user.id }]
-    }
+      OR: [{ studentId: user.id }, { teacherId: user.id }],
+    },
   });
   if (!conv) return NextResponse.json({ error: 'Conversation introuvable' }, { status: 404 });
 
@@ -64,17 +66,17 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     data: {
       conversationId: id,
       senderId: user.id,
-      content: content.trim()
+      content: content.trim(),
     },
     include: {
-      sender: { select: { id: true, firstName: true, lastName: true, avatarUrl: true } }
-    }
+      sender: { select: { id: true, firstName: true, lastName: true, avatarUrl: true } },
+    },
   });
 
   // Update conversation lastMessageAt
   await prisma.conversation.update({
     where: { id },
-    data: { lastMessageAt: new Date() }
+    data: { lastMessageAt: new Date() },
   });
 
   // Notify the other party
@@ -85,8 +87,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       type: 'new_message',
       title: 'Nouveau message 💬',
       message: `${user.firstName || 'Utilisateur'}: ${content.substring(0, 80)}${content.length > 80 ? '...' : ''}`,
-      link: `/messages/${id}`
-    }
+      link: `/messages/${id}`,
+    },
   });
 
   return NextResponse.json({ message });

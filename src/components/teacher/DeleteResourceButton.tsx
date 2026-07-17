@@ -4,7 +4,13 @@ import { useRouter } from 'next/navigation';
 import { Trash2, X, AlertTriangle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-export default function DeleteResourceButton({ resourceId, resourceTitle }: { resourceId: string; resourceTitle: string }) {
+export default function DeleteResourceButton({
+  resourceId,
+  resourceTitle,
+}: {
+  resourceId: string;
+  resourceTitle: string;
+}) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -50,7 +56,9 @@ export default function DeleteResourceButton({ resourceId, resourceTitle }: { re
               <div className="flex-1">
                 <h3 className="font-bold text-lg">Supprimer cette ressource ?</h3>
                 <p className="text-sm text-slate-500 mt-1">
-                  Cette action est irréversible. La ressource « {resourceTitle} » et toutes ses données associées (commentaires, notes, favoris, statistiques) seront définitivement supprimées.
+                  Cette action est irréversible. La ressource « {resourceTitle} » et toutes ses
+                  données associées (commentaires, notes, favoris, statistiques) seront
+                  définitivement supprimées.
                 </p>
               </div>
               <button onClick={() => setOpen(false)} className="p-1 hover:bg-slate-100 rounded">
@@ -65,7 +73,7 @@ export default function DeleteResourceButton({ resourceId, resourceTitle }: { re
               <input
                 type="text"
                 value={confirmText}
-                onChange={e => setConfirmText(e.target.value)}
+                onChange={(e) => setConfirmText(e.target.value)}
                 className="w-full px-3 py-2 border-2 border-slate-200 rounded-lg focus:border-red-500 outline-none"
                 placeholder="SUPPRIMER"
                 autoFocus
@@ -74,7 +82,10 @@ export default function DeleteResourceButton({ resourceId, resourceTitle }: { re
 
             <div className="flex gap-2">
               <button
-                onClick={() => { setOpen(false); setConfirmText(''); }}
+                onClick={() => {
+                  setOpen(false);
+                  setConfirmText('');
+                }}
                 className="flex-1 px-4 py-2.5 rounded-lg border border-slate-200 font-semibold text-slate-700 hover:bg-slate-50"
               >
                 Annuler

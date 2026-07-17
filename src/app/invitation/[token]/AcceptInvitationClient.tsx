@@ -1,9 +1,21 @@
 'use client';
 
-import { useEffect, useState, use } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { GraduationCap, Lock, Eye, EyeOff, CheckCircle2, AlertTriangle, Loader2, ArrowRight, Sparkles, Mail, Clock } from 'lucide-react';
+import {
+  GraduationCap,
+  Lock,
+  Eye,
+  EyeOff,
+  CheckCircle2,
+  AlertTriangle,
+  Loader2,
+  ArrowRight,
+  Sparkles,
+  Mail,
+  Clock,
+} from 'lucide-react';
 
 type InvitationInfo = {
   valid: boolean;
@@ -29,9 +41,9 @@ export default function AcceptInvitationClient({ token }: { token: string }) {
 
   useEffect(() => {
     fetch(`/api/invitation/${token}`, {
-      headers: { 'x-invitation-token': token }
+      headers: { 'x-invitation-token': token },
     })
-      .then(r => r.json())
+      .then((r) => r.json())
       .then(setInfo)
       .catch(() => setInfo({ valid: false }));
   }, [token]);
@@ -67,7 +79,7 @@ export default function AcceptInvitationClient({ token }: { token: string }) {
       const data = await res.json();
 
       if (!res.ok || !data.success) {
-        setError(data.error || 'Erreur lors de l\'activation');
+        setError(data.error || "Erreur lors de l'activation");
         setSubmitting(false);
         return;
       }
@@ -96,7 +108,11 @@ export default function AcceptInvitationClient({ token }: { token: string }) {
         icon={<AlertTriangle className="w-12 h-12 text-amber-500" />}
         title="Invitation introuvable"
         message="Ce lien d'activation n'existe pas ou a été supprimé."
-        cta={<Link href="/contact" className="text-sky-600 underline">Contacter le support</Link>}
+        cta={
+          <Link href="/contact" className="text-sky-600 underline">
+            Contacter le support
+          </Link>
+        }
       />
     );
   }
@@ -143,7 +159,11 @@ export default function AcceptInvitationClient({ token }: { token: string }) {
         icon={<AlertTriangle className="w-12 h-12 text-rose-500" />}
         title="Invitation annulée"
         message="Cette invitation a été annulée par l'administrateur."
-        cta={<Link href="/contact" className="text-sky-600 underline">Contacter le support</Link>}
+        cta={
+          <Link href="/contact" className="text-sky-600 underline">
+            Contacter le support
+          </Link>
+        }
       />
     );
   }
@@ -151,7 +171,9 @@ export default function AcceptInvitationClient({ token }: { token: string }) {
   // === MAIN FLOW ===
 
   const expiresAt = info.expiresAt ? new Date(info.expiresAt) : null;
-  const daysLeft = expiresAt ? Math.max(0, Math.ceil((expiresAt.getTime() - Date.now()) / (24 * 3600 * 1000))) : 0;
+  const daysLeft = expiresAt
+    ? Math.max(0, Math.ceil((expiresAt.getTime() - Date.now()) / (24 * 3600 * 1000)))
+    : 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-sky-50 via-white to-cyan-50 flex items-center justify-center p-6">
@@ -192,7 +214,9 @@ export default function AcceptInvitationClient({ token }: { token: string }) {
                 <div className="flex items-center gap-3 text-sm mt-2">
                   <Clock className="w-4 h-4 text-amber-500" />
                   <span className="text-slate-600">Expire dans</span>
-                  <span className="font-semibold text-amber-700">{daysLeft} jour{daysLeft > 1 ? 's' : ''}</span>
+                  <span className="font-semibold text-amber-700">
+                    {daysLeft} jour{daysLeft > 1 ? 's' : ''}
+                  </span>
                 </div>
               )}
             </div>
@@ -207,7 +231,7 @@ export default function AcceptInvitationClient({ token }: { token: string }) {
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
-                  onChange={e => setPassword(e.target.value)}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="w-full pl-10 pr-12 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition"
                   placeholder="Min. 8 caractères"
                   autoComplete="new-password"
@@ -236,7 +260,7 @@ export default function AcceptInvitationClient({ token }: { token: string }) {
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={confirm}
-                  onChange={e => setConfirm(e.target.value)}
+                  onChange={(e) => setConfirm(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition"
                   placeholder="Retapez le mot de passe"
                   autoComplete="new-password"
@@ -282,7 +306,15 @@ export default function AcceptInvitationClient({ token }: { token: string }) {
             </button>
 
             <p className="text-xs text-slate-500 text-center mt-4">
-              En activant votre compte, vous acceptez nos <Link href="/cgu" className="underline">CGU</Link> et notre <Link href="/confidentialite" className="underline">politique de confidentialité</Link>.
+              En activant votre compte, vous acceptez nos{' '}
+              <Link href="/cgu" className="underline">
+                CGU
+              </Link>{' '}
+              et notre{' '}
+              <Link href="/confidentialite" className="underline">
+                politique de confidentialité
+              </Link>
+              .
             </p>
           </form>
         </div>
@@ -301,8 +333,12 @@ export default function AcceptInvitationClient({ token }: { token: string }) {
 
 function PasswordRule({ ok, label }: { ok: boolean; label: string }) {
   return (
-    <div className={`text-xs flex items-center gap-2 ${ok ? 'text-emerald-600' : 'text-slate-500'}`}>
-      <div className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-bold ${ok ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-400'}`}>
+    <div
+      className={`text-xs flex items-center gap-2 ${ok ? 'text-emerald-600' : 'text-slate-500'}`}
+    >
+      <div
+        className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-bold ${ok ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-400'}`}
+      >
         {ok ? '✓' : '·'}
       </div>
       {label}
@@ -310,7 +346,17 @@ function PasswordRule({ ok, label }: { ok: boolean; label: string }) {
   );
 }
 
-function CenteredMessage({ icon, title, message, cta }: { icon: React.ReactNode; title: string; message: string; cta?: React.ReactNode }) {
+function CenteredMessage({
+  icon,
+  title,
+  message,
+  cta,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  message: string;
+  cta?: React.ReactNode;
+}) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-sky-50 to-cyan-50 p-6">
       <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-10 max-w-md w-full text-center">

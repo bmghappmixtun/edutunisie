@@ -25,14 +25,21 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
     // Only the owner (or admin) can edit
     if (user.role !== 'ADMIN' && resource.teacherId !== user.id) {
-      return NextResponse.json({ error: 'Vous n\'êtes pas le propriétaire de cette ressource' }, { status: 403 });
+      return NextResponse.json(
+        { error: "Vous n'êtes pas le propriétaire de cette ressource" },
+        { status: 403 },
+      );
     }
 
     // Block if there's already a pending edit
     if (resource.editStatus === 'PENDING_EDIT_APPROVAL') {
-      return NextResponse.json({
-        error: 'Une modification est déjà en attente d\'approbation. Attendez qu\'elle soit traitée.'
-      }, { status: 409 });
+      return NextResponse.json(
+        {
+          error:
+            "Une modification est déjà en attente d'approbation. Attendez qu'elle soit traitée.",
+        },
+        { status: 409 },
+      );
     }
 
     const body = await req.json();
@@ -80,28 +87,65 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     }
 
     // Re-generate smart SEO tags if any tag-relevant field changed
-    const tagRelevantFields = ['title', 'type', 'subjectId', 'classId', 'sectionId', 'year', 'trimester', 'homeworkSubtype', 'homeworkNumber', 'hasCorrection'];
-    const needsRetag = tagRelevantFields.some(f => f in pendingEdit && (pendingEdit as any)[f] !== (resource as any)[f]);
+    const tagRelevantFields = [
+      'title',
+      'type',
+      'subjectId',
+      'classId',
+      'sectionId',
+      'year',
+      'trimester',
+      'homeworkSubtype',
+      'homeworkNumber',
+      'hasCorrection',
+    ];
+    const needsRetag = tagRelevantFields.some(
+      (f) => f in pendingEdit && (pendingEdit as any)[f] !== (resource as any)[f],
+    );
     if (needsRetag && resource.subjectId && resource.classId) {
       const [subjectRec, classRec] = await Promise.all([
-        pendingEdit.subjectId ? prisma.subject.findUnique({ where: { id: pendingEdit.subjectId } }) : prisma.subject.findUnique({ where: { id: resource.subjectId! } }),
-        pendingEdit.classId ? prisma.class.findUnique({ where: { id: pendingEdit.classId } }) : prisma.class.findUnique({ where: { id: resource.classId! } }),
+        pendingEdit.subjectId
+          ? prisma.subject.findUnique({ where: { id: pendingEdit.subjectId } })
+          : prisma.subject.findUnique({ where: { id: resource.subjectId! } }),
+        pendingEdit.classId
+          ? prisma.class.findUnique({ where: { id: pendingEdit.classId } })
+          : prisma.class.findUnique({ where: { id: resource.classId! } }),
       ]);
       if (subjectRec && classRec) {
         const autoTags = autoGenerateTags({
           title: pendingEdit.title || resource.title,
           subjectSlug: subjectRec.slug,
           classSlug: classRec.slug,
-          sectionSlug: pendingEdit.sectionId === undefined ? (resource.sectionId || null) : (pendingEdit.sectionId || null),
+          sectionSlug:
+            pendingEdit.sectionId === undefined
+              ? resource.sectionId || null
+              : pendingEdit.sectionId || null,
           type: pendingEdit.type || resource.type,
           year: pendingEdit.year !== undefined ? pendingEdit.year : resource.year,
-          trimester: pendingEdit.trimester !== undefined ? pendingEdit.trimester : resource.trimester,
-          homeworkSubtype: pendingEdit.homeworkSubtype !== undefined ? pendingEdit.homeworkSubtype : resource.homeworkSubtype,
-          homeworkNumber: pendingEdit.homeworkNumber !== undefined ? pendingEdit.homeworkNumber : resource.homeworkNumber,
-          hasCorrection: pendingEdit.hasCorrection !== undefined ? pendingEdit.hasCorrection : resource.hasCorrection,
+          trimester:
+            pendingEdit.trimester !== undefined ? pendingEdit.trimester : resource.trimester,
+          homeworkSubtype:
+            pendingEdit.homeworkSubtype !== undefined
+              ? pendingEdit.homeworkSubtype
+              : resource.homeworkSubtype,
+          homeworkNumber:
+            pendingEdit.homeworkNumber !== undefined
+              ? pendingEdit.homeworkNumber
+              : resource.homeworkNumber,
+          hasCorrection:
+            pendingEdit.hasCorrection !== undefined
+              ? pendingEdit.hasCorrection
+              : resource.hasCorrection,
         });
-        const userTags = pendingEdit.tags ? String(pendingEdit.tags).split(',').map((t: string) => t.trim()).filter(Boolean) : [];
-        pendingEdit.tags = Array.from(new Set([...userTags, ...autoTags])).slice(0, 15).join(',');
+        const userTags = pendingEdit.tags
+          ? String(pendingEdit.tags)
+              .split(',')
+              .map((t: string) => t.trim())
+              .filter(Boolean)
+          : [];
+        pendingEdit.tags = Array.from(new Set([...userTags, ...autoTags]))
+          .slice(0, 15)
+          .join(',');
       }
     }
 
@@ -116,9 +160,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         changes.push(k);
       }
     }
-    const summary = changes.length
-      ? changes.map(c => c).join(', ')
-      : 'aucun changement détecté';
+    const summary = changes.length ? changes.map((c) => c).join(', ') : 'aucun changement détecté';
 
     // Was this edit previously rejected? If so, surface the reason in the
     // admin notification + email so the admin knows what was fixed.
@@ -132,10 +174,14 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         data: {
           ...pendingEdit,
           // Update slug if title changed
-          slug: pendingEdit.title && pendingEdit.title !== resource.title
-            ? `${pendingEdit.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}-${Date.now().toString(36)}`
-            : resource.slug,
-        }
+          slug:
+            pendingEdit.title && pendingEdit.title !== resource.title
+              ? `${pendingEdit.title
+                  .toLowerCase()
+                  .replace(/[^a-z0-9]+/g, '-')
+                  .replace(/^-|-$/g, '')}-${Date.now().toString(36)}`
+              : resource.slug,
+        },
       });
       return NextResponse.json({
         success: true,
@@ -157,21 +203,22 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         editRejectionReason: null, // clear any previous rejection reason
         editReviewedAt: null,
         editReviewedById: null,
-      }
+      },
     });
 
     // Notify all admins (in-app + email)
-    const admins = await prisma.user.findMany({ where: { role: 'ADMIN' }, select: { id: true, email: true, firstName: true } });
+    const admins = await prisma.user.findMany({
+      where: { role: 'ADMIN' },
+      select: { id: true, email: true, firstName: true },
+    });
     await prisma.notification.createMany({
-      data: admins.map(a => ({
+      data: admins.map((a) => ({
         userId: a.id,
         type: 'edit_pending',
-        title: wasPreviouslyRejected
-          ? 'Modification re-soumise 🔄'
-          : 'Modification en attente ✏️',
-        message: `${user.firstName || ""} ${user.lastName || ""} a ${wasPreviouslyRejected ? 're-soumis une modification sur' : 'modifié'} "${resource.title}" — en attente d'approbation.`,
-        link: `/admin/ressources/editions`
-      }))
+        title: wasPreviouslyRejected ? 'Modification re-soumise 🔄' : 'Modification en attente ✏️',
+        message: `${user.firstName || ''} ${user.lastName || ''} a ${wasPreviouslyRejected ? 're-soumis une modification sur' : 'modifié'} "${resource.title}" — en attente d'approbation.`,
+        link: `/admin/ressources/editions`,
+      })),
     });
 
     // Send email to all admins
@@ -187,7 +234,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
           summary,
           reviewUrl,
           wasPreviouslyRejected,
-          previousRejectionReason
+          previousRejectionReason,
         );
       }
     }
@@ -196,7 +243,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       success: true,
       mode: 'pending',
       summary,
-      message: 'Modification enregistrée. Elle sera publiée après approbation par un administrateur.',
+      message:
+        'Modification enregistrée. Elle sera publiée après approbation par un administrateur.',
     });
   } catch (e: any) {
     console.error('PATCH resource error:', e);
@@ -221,7 +269,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     if (!resource) return NextResponse.json({ error: 'Ressource introuvable' }, { status: 404 });
 
     if (user.role !== 'ADMIN' && resource.teacherId !== user.id) {
-      return NextResponse.json({ error: 'Vous n\'êtes pas le propriétaire' }, { status: 403 });
+      return NextResponse.json({ error: "Vous n'êtes pas le propriétaire" }, { status: 403 });
     }
 
     // Delete related records

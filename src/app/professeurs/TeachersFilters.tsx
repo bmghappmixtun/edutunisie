@@ -54,10 +54,7 @@ export default function TeachersFilters({
 
   return (
     <div className="space-y-6">
-      <FilterGroup
-        icon={CheckCircle2}
-        title="Statut"
-      >
+      <FilterGroup icon={CheckCircle2} title="Statut">
         <label className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 cursor-pointer transition">
           <input
             type="checkbox"
@@ -85,11 +82,16 @@ export default function TeachersFilters({
                     type="button"
                     onClick={() => toggleSubject(s.slug)}
                     className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm transition ${
-                      active ? 'bg-amber-100 text-amber-800 font-semibold' : 'hover:bg-slate-50 text-slate-600'
+                      active
+                        ? 'bg-amber-100 text-amber-800 font-semibold'
+                        : 'hover:bg-slate-50 text-slate-600'
                     }`}
                   >
                     <span className="flex items-center gap-2 truncate">
-                      <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: s.color || '#0EA5E9' }} />
+                      <span
+                        className="w-2 h-2 rounded-full flex-shrink-0"
+                        style={{ background: s.color || '#0EA5E9' }}
+                      />
                       <span className="truncate">{s.nameFr}</span>
                     </span>
                     {active && <span className="text-amber-600 text-xs">✓</span>}
@@ -114,7 +116,9 @@ export default function TeachersFilters({
                     type="button"
                     onClick={() => toggleClass(c.slug)}
                     className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm transition ${
-                      active ? 'bg-amber-100 text-amber-800 font-semibold' : 'hover:bg-slate-50 text-slate-600'
+                      active
+                        ? 'bg-amber-100 text-amber-800 font-semibold'
+                        : 'hover:bg-slate-50 text-slate-600'
                     }`}
                   >
                     <span className="truncate">{c.nameFr}</span>
@@ -160,7 +164,9 @@ function FilterGroup({
           {title}
         </span>
         {badge ? (
-          <span className="bg-amber-100 text-amber-700 text-[10px] font-bold px-1.5 py-0.5 rounded-full">{badge}</span>
+          <span className="bg-amber-100 text-amber-700 text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+            {badge}
+          </span>
         ) : null}
       </h3>
       <div className="space-y-0.5">{children}</div>

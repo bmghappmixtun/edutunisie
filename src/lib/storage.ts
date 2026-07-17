@@ -7,7 +7,7 @@ const IS_VERCEL = process.env.VERCEL === '1';
 export async function uploadFile(
   filename: string,
   data: Buffer | Blob,
-  contentType = 'application/pdf'
+  contentType = 'application/pdf',
 ): Promise<{ url: string; key: string }> {
   // Production: Vercel Blob (uses OIDC auto-detection, no token needed)
   if (IS_VERCEL) {
@@ -32,7 +32,9 @@ export async function uploadFile(
 
 export async function deleteFile(keyOrUrl: string): Promise<void> {
   if (IS_VERCEL && keyOrUrl.startsWith('http')) {
-    try { await del(keyOrUrl); } catch {}
+    try {
+      await del(keyOrUrl);
+    } catch {}
     return;
   }
   // Local delete

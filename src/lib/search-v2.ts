@@ -84,7 +84,10 @@ export interface SearchResponse {
 // ============================================================================
 // Synonym expansion
 // ============================================================================
-function expandQueryWithSynonyms(q: string, synonyms: { term: string; synonyms: string[] }[]): { variants: string[]; applied: string[] } {
+function expandQueryWithSynonyms(
+  q: string,
+  synonyms: { term: string; synonyms: string[] }[],
+): { variants: string[]; applied: string[] } {
   if (!q) return { variants: [], applied: [] };
   const lower = q.toLowerCase().trim();
   const tokens = lower.split(/\s+/);
@@ -94,7 +97,10 @@ function expandQueryWithSynonyms(q: string, synonyms: { term: string; synonyms: 
   for (const token of tokens) {
     variants.add(token);
     for (const syn of synonyms) {
-      const allTerms = [syn.term.toLowerCase(), ...(syn.synonyms || []).map((s: string) => s.toLowerCase())];
+      const allTerms = [
+        syn.term.toLowerCase(),
+        ...(syn.synonyms || []).map((s: string) => s.toLowerCase()),
+      ];
       if (allTerms.includes(token)) {
         for (const t of allTerms) variants.add(t);
         applied.push(`${token} → ${syn.term}`);
@@ -110,7 +116,10 @@ function expandQueryWithSynonyms(q: string, synonyms: { term: string; synonyms: 
 // Build OR'd SQL conditions for variants
 // Params: $1..$N = variants (same set used for FTS and TRGM)
 // ============================================================================
-function buildMatchConditions(variants: string[], originalQ: string): {
+function buildMatchConditions(
+  variants: string[],
+  originalQ: string,
+): {
   ftsSql: string;
   trgmSql: string;
   params: any[];
@@ -171,19 +180,31 @@ export async function searchV2(options: SearchOptions): Promise<SearchResponse> 
   let sectionIds: string[] = [];
 
   if (filters.subject?.length) {
-    const r = await prisma.subject.findMany({ where: { slug: { in: filters.subject } }, select: { id: true } });
-    subjectIds = r.map(s => s.id);
-    if (!subjectIds.length) return emptyResponse({ q, page, limit, sort, filters, t0, expandedQuery });
+    const r = await prisma.subject.findMany({
+      where: { slug: { in: filters.subject } },
+      select: { id: true },
+    });
+    subjectIds = r.map((s) => s.id);
+    if (!subjectIds.length)
+      return emptyResponse({ q, page, limit, sort, filters, t0, expandedQuery });
   }
   if (filters.class?.length) {
-    const r = await prisma.class.findMany({ where: { slug: { in: filters.class } }, select: { id: true } });
-    classIds = r.map(c => c.id);
-    if (!classIds.length) return emptyResponse({ q, page, limit, sort, filters, t0, expandedQuery });
+    const r = await prisma.class.findMany({
+      where: { slug: { in: filters.class } },
+      select: { id: true },
+    });
+    classIds = r.map((c) => c.id);
+    if (!classIds.length)
+      return emptyResponse({ q, page, limit, sort, filters, t0, expandedQuery });
   }
   if (filters.section?.length) {
-    const r = await prisma.section.findMany({ where: { slug: { in: filters.section } }, select: { id: true } });
-    sectionIds = r.map(s => s.id);
-    if (!sectionIds.length) return emptyResponse({ q, page, limit, sort, filters, t0, expandedQuery });
+    const r = await prisma.section.findMany({
+      where: { slug: { in: filters.section } },
+      select: { id: true },
+    });
+    sectionIds = r.map((s) => s.id);
+    if (!sectionIds.length)
+      return emptyResponse({ q, page, limit, sort, filters, t0, expandedQuery });
   }
 
   // 4. Build SQL conditions
@@ -244,10 +265,14 @@ export async function searchV2(options: SearchOptions): Promise<SearchResponse> 
   const allParams = [...match.params, ...filterParams, highlightParam];
 
   // 7. Main search query
-  const orderBy = sort === 'recent' ? 'r."publishedAt" DESC NULLS LAST' :
-    sort === 'popular' ? 'r."viewsCount" DESC NULLS LAST' :
-    sort === 'downloads' ? 'r."downloadsCount" DESC NULLS LAST' :
-    'combined_score DESC';
+  const orderBy =
+    sort === 'recent'
+      ? 'r."publishedAt" DESC NULLS LAST'
+      : sort === 'popular'
+        ? 'r."viewsCount" DESC NULLS LAST'
+        : sort === 'downloads'
+          ? 'r."downloadsCount" DESC NULLS LAST'
+          : 'combined_score DESC';
 
   // $1..$N = variants, $N+1 = trgm q, $N+2+ = filters, $last = highlight
   // The match.ftsSql uses $1..$N internally for variants
@@ -337,7 +362,7 @@ export async function searchV2(options: SearchOptions): Promise<SearchResponse> 
   const total = countResult[0]?.total || 0;
 
   // 11. Hydrate
-  const ids = rawResults.map(r => r.id);
+  const ids = rawResults.map((r) => r.id);
   const full = await prisma.resource.findMany({
     where: { id: { in: ids } },
     select: {
@@ -359,9 +384,9 @@ export async function searchV2(options: SearchOptions): Promise<SearchResponse> 
       teacher: { select: { firstName: true, lastName: true } },
     },
   });
-  const byId = new Map(full.map(r => [r.id, r]));
+  const byId = new Map(full.map((r) => [r.id, r]));
 
-  const results: SearchResult[] = rawResults.map(r => {
+  const results: SearchResult[] = rawResults.map((r) => {
     const f = byId.get(r.id);
     return {
       id: r.id,
@@ -370,7 +395,9 @@ export async function searchV2(options: SearchOptions): Promise<SearchResponse> 
       titleHighlighted: sanitizeHighlightHtml(r.title_highlighted),
       descriptionHighlighted: sanitizeHighlightHtml(r.description_highlighted),
       type: f?.type ?? null,
-      subject: f?.subject ? { nameFr: f.subject.nameFr, slug: f.subject.slug, color: f.subject.color } : null,
+      subject: f?.subject
+        ? { nameFr: f.subject.nameFr, slug: f.subject.slug, color: f.subject.color }
+        : null,
       class: f?.class ? { nameFr: f.class.nameFr, slug: f.class.slug } : null,
       section: f?.section ? { nameFr: f.section.nameFr, slug: f.section.slug } : null,
       teacher: f?.teacher ? { firstName: f.teacher.firstName, lastName: f.teacher.lastName } : null,
@@ -416,18 +443,37 @@ export async function searchV2(options: SearchOptions): Promise<SearchResponse> 
 }
 
 function emptyResponse(opts: {
-  q: string; page: number; limit: number; sort: string;
-  filters: SearchFilters; t0: number;
+  q: string;
+  page: number;
+  limit: number;
+  sort: string;
+  filters: SearchFilters;
+  t0: number;
   expandedQuery: { variants: string[]; applied: string[] };
 }): SearchResponse {
   return {
     query: opts.q,
     variants: opts.expandedQuery.variants,
-    expandedQuery: opts.expandedQuery.variants.length > 1 ? opts.expandedQuery.variants.join(' · ') : undefined,
+    expandedQuery:
+      opts.expandedQuery.variants.length > 1 ? opts.expandedQuery.variants.join(' · ') : undefined,
     synonymsApplied: opts.expandedQuery.applied,
-    page: opts.page, limit: opts.limit, total: 0, totalPages: 0,
-    sort: opts.sort, durationMs: Date.now() - opts.t0, filters: opts.filters,
+    page: opts.page,
+    limit: opts.limit,
+    total: 0,
+    totalPages: 0,
+    sort: opts.sort,
+    durationMs: Date.now() - opts.t0,
+    filters: opts.filters,
     results: [],
-    facets: { type: {}, subjectId: {}, classId: {}, sectionId: {}, year: {}, trimester: {}, language: {}, hasCorrection: 0 },
+    facets: {
+      type: {},
+      subjectId: {},
+      classId: {},
+      sectionId: {},
+      year: {},
+      trimester: {},
+      language: {},
+      hasCorrection: 0,
+    },
   };
 }

@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
   if (userIds.length > MAX_BATCH) {
     return NextResponse.json(
       { error: `Maximum ${MAX_BATCH} utilisateurs par lot (reçu: ${userIds.length})` },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -51,14 +51,22 @@ export async function POST(req: NextRequest) {
   if (!action || !validActions.includes(action)) {
     return NextResponse.json(
       { error: `Action invalide. Attendu: ${validActions.join(', ')}` },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
   // Get the targets and check none are admins
   const targets = await prisma.user.findMany({
     where: { id: { in: userIds } },
-    select: { id: true, role: true, status: true, isVerifiedTeacher: true, email: true, firstName: true, lastName: true },
+    select: {
+      id: true,
+      role: true,
+      status: true,
+      isVerifiedTeacher: true,
+      email: true,
+      firstName: true,
+      lastName: true,
+    },
   });
 
   const foundIds = new Set(targets.map((t) => t.id));
@@ -72,7 +80,7 @@ export async function POST(req: NextRequest) {
         message: `${adminTargets.length} administrateur(s) dans la sélection. Action impossible sur les comptes admin.`,
         adminIds: adminTargets.map((a) => a.id),
       },
-      { status: 403 }
+      { status: 403 },
     );
   }
 
@@ -84,7 +92,12 @@ export async function POST(req: NextRequest) {
     try {
       if (target.id === admin.id) {
         selfIds.push(target.id);
-        results.push({ id: target.id, name: target.email, success: false, error: 'Vous ne pouvez pas vous modifier vous-même' });
+        results.push({
+          id: target.id,
+          name: target.email,
+          success: false,
+          error: 'Vous ne pouvez pas vous modifier vous-même',
+        });
         continue;
       }
       const name = `${target.firstName || ''} ${target.lastName || ''}`.trim() || target.email;
@@ -107,7 +120,10 @@ export async function POST(req: NextRequest) {
           await prisma.user.update({ where: { id: target.id }, data: { isVerifiedTeacher: true } });
           break;
         case 'unverify':
-          await prisma.user.update({ where: { id: target.id }, data: { isVerifiedTeacher: false } });
+          await prisma.user.update({
+            where: { id: target.id },
+            data: { isVerifiedTeacher: false },
+          });
           break;
         case 'ban':
           await prisma.user.update({ where: { id: target.id }, data: { status: 'BANNED' } });
@@ -150,7 +166,10 @@ export async function POST(req: NextRequest) {
 async function deleteUserAndCascade(userId: string) {
   await prisma.$transaction(async (tx) => {
     // 1. Resources (teacher or uploader)
-    const resources = await tx.resource.findMany({ where: { teacherId: userId }, select: { id: true } });
+    const resources = await tx.resource.findMany({
+      where: { teacherId: userId },
+      select: { id: true },
+    });
     const resourceIds = resources.map((r) => r.id);
     if (resourceIds.length > 0) {
       await tx.comment.deleteMany({ where: { resourceId: { in: resourceIds } } });
@@ -179,7 +198,9 @@ async function deleteUserAndCascade(userId: string) {
     await tx.session.deleteMany({ where: { userId } });
     await tx.message.deleteMany({ where: { senderId: userId } });
     // Delete conversations where user is a participant (also covered by cascade)
-    await tx.conversation.deleteMany({ where: { OR: [{ studentId: userId }, { teacherId: userId }] } });
+    await tx.conversation.deleteMany({
+      where: { OR: [{ studentId: userId }, { teacherId: userId }] },
+    });
 
     // 4. ContactMessage has no userId (just name/email of visitor)
     //    No cascade needed - contact messages are anonymous

@@ -13,7 +13,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tok
       return NextResponse.json({ success: false, error: 'Mot de passe requis' }, { status: 400 });
     }
 
-    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || req.headers.get('x-real-ip') || undefined;
+    const ip =
+      req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+      req.headers.get('x-real-ip') ||
+      undefined;
     const ua = req.headers.get('user-agent') || undefined;
 
     const result = await activateInvitation(token, password, ip, ua);
@@ -24,12 +27,18 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tok
     // Fetch the user to create a session
     const inv = await prisma.teacherInvitation.findUnique({ where: { token } });
     if (!inv) {
-      return NextResponse.json({ success: false, error: 'Erreur post-activation' }, { status: 500 });
+      return NextResponse.json(
+        { success: false, error: 'Erreur post-activation' },
+        { status: 500 },
+      );
     }
 
     const user = await prisma.user.findUnique({ where: { id: inv.teacherId } });
     if (!user) {
-      return NextResponse.json({ success: false, error: 'Utilisateur introuvable' }, { status: 500 });
+      return NextResponse.json(
+        { success: false, error: 'Utilisateur introuvable' },
+        { status: 500 },
+      );
     }
 
     // Create session + cookie
@@ -38,7 +47,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tok
 
     await prisma.user.update({
       where: { id: user.id },
-      data: { lastLoginAt: new Date() }
+      data: { lastLoginAt: new Date() },
     });
 
     return NextResponse.json({
@@ -49,7 +58,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tok
         firstName: user.firstName,
         lastName: user.lastName,
         role: user.role,
-      }
+      },
     });
   } catch (e: any) {
     console.error('accept invitation error:', e);

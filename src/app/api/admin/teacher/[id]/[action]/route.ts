@@ -5,9 +5,13 @@ import { sendTeacherApprovalEmail } from '@/lib/email';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
 
-export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string; action: string }> }) {
+export async function POST(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string; action: string }> },
+) {
   const user = await getCurrentUser();
-  if (!user || user.role !== 'ADMIN') return NextResponse.json({ error: 'Non autorisé' }, { status: 403 });
+  if (!user || user.role !== 'ADMIN')
+    return NextResponse.json({ error: 'Non autorisé' }, { status: 403 });
 
   const { id, action } = await params;
   if (action !== 'approve' && action !== 'reject') {
@@ -24,16 +28,22 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (action === 'approve') {
     await prisma.user.update({
       where: { id },
-      data: { status: 'ACTIVE', isVerifiedTeacher: true, approvedAt: new Date(), approvedById: user.id }
+      data: {
+        status: 'ACTIVE',
+        isVerifiedTeacher: true,
+        approvedAt: new Date(),
+        approvedById: user.id,
+      },
     });
     await prisma.notification.create({
       data: {
         userId: id,
         type: 'account_approved',
         title: 'Compte approuvé ! 🎉',
-        message: 'Votre compte enseignant a été approuvé. Vous pouvez maintenant partager vos ressources.',
-        link: '/enseignant'
-      }
+        message:
+          'Votre compte enseignant a été approuvé. Vous pouvez maintenant partager vos ressources.',
+        link: '/enseignant',
+      },
     });
     if (teacher.email && teacher.firstName) {
       // Parse teachingSubjects (stored as JSON string) and level
@@ -59,8 +69,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         userId: id,
         type: 'account_rejected',
         title: 'Compte non approuvé',
-        message: 'Votre demande de compte enseignant n\'a pas été acceptée.',
-      }
+        message: "Votre demande de compte enseignant n'a pas été acceptée.",
+      },
     });
     if (teacher.email && teacher.firstName) {
       await sendTeacherApprovalEmail(teacher.email, teacher.firstName, false, {

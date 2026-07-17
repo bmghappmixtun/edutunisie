@@ -33,7 +33,11 @@ async function callBing(endpoint, method = 'GET', body = null) {
   const res = await fetch(url, opts);
   const text = await res.text();
   let json = null;
-  try { json = JSON.parse(text); } catch { /* not JSON */ }
+  try {
+    json = JSON.parse(text);
+  } catch {
+    /* not JSON */
+  }
   return { status: res.status, ok: res.ok, json, text };
 }
 

@@ -1,7 +1,19 @@
 /* eslint-disable */
 import { Resend } from 'resend';
-import { renderResourceRejectedEmail, renderEditApprovedEmail, renderEditRejectedEmail, renderNewEditPendingEmail } from './email-templates';
-import { renderEmailShell, EMAIL_FONT_STACK, paragraph, muted, ctaButton, infoCard } from './email-shell';
+import {
+  renderResourceRejectedEmail,
+  renderEditApprovedEmail,
+  renderEditRejectedEmail,
+  renderNewEditPendingEmail,
+} from './email-templates';
+import {
+  renderEmailShell,
+  EMAIL_FONT_STACK,
+  paragraph,
+  muted,
+  ctaButton,
+  infoCard,
+} from './email-shell';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 const FROM = process.env.EMAIL_FROM || 'Examanet <noreply@examanet.com>';
@@ -15,11 +27,15 @@ export class EmailResult {
     public success: boolean,
     public id: string,
     public error?: string,
-    public devCode?: string
+    public devCode?: string,
   ) {}
 }
 
-export async function sendOTPEmail(to: string, code: string, firstName?: string): Promise<EmailResult> {
+export async function sendOTPEmail(
+  to: string,
+  code: string,
+  firstName?: string,
+): Promise<EmailResult> {
   // Skip real sending if disabled (tests)
   if (process.env.DISABLE_EMAILS === 'true' || process.env.NODE_ENV === 'test') {
     console.log(`[EMAIL SKIP] OTP for ${to}: ${code}`);
@@ -44,14 +60,23 @@ export async function sendOTPEmail(to: string, code: string, firstName?: string)
       return new EmailResult(false, 'failed', result.error.message, code);
     }
     // Success - still include dev code as fallback in case email goes to spam
-    return new EmailResult(true, result.data?.id || 'sent', undefined, ALWAYS_INCLUDE_DEV_CODE ? code : undefined);
+    return new EmailResult(
+      true,
+      result.data?.id || 'sent',
+      undefined,
+      ALWAYS_INCLUDE_DEV_CODE ? code : undefined,
+    );
   } catch (e: any) {
     console.error('📧 [EMAIL THROW]', to, '→', e?.message);
     return new EmailResult(false, 'threw', e?.message, code);
   }
 }
 
-export async function sendWelcomeEmail(to: string, firstName: string, role: string): Promise<EmailResult> {
+export async function sendWelcomeEmail(
+  to: string,
+  firstName: string,
+  role: string,
+): Promise<EmailResult> {
   if (process.env.DISABLE_EMAILS === 'true' || process.env.NODE_ENV === 'test') {
     console.log(`[EMAIL SKIP] Welcome for ${to}`);
     return new EmailResult(true, 'test-mode');
@@ -81,7 +106,11 @@ export async function sendWelcomeEmail(to: string, firstName: string, role: stri
   }
 }
 
-export async function sendWelcomeConfirmedEmail(to: string, firstName: string, role: string): Promise<EmailResult> {
+export async function sendWelcomeConfirmedEmail(
+  to: string,
+  firstName: string,
+  role: string,
+): Promise<EmailResult> {
   if (process.env.DISABLE_EMAILS === 'true' || process.env.NODE_ENV === 'test') {
     console.log(`[EMAIL SKIP] Welcome confirmed for ${to}`);
     return new EmailResult(true, 'test-mode');
@@ -111,7 +140,12 @@ export async function sendWelcomeConfirmedEmail(to: string, firstName: string, r
   }
 }
 
-export async function sendContactEmail(payload: { name: string; email: string; subject: string; message: string }): Promise<EmailResult> {
+export async function sendContactEmail(payload: {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}): Promise<EmailResult> {
   if (process.env.DISABLE_EMAILS === 'true' || process.env.NODE_ENV === 'test') {
     console.log(`[EMAIL SKIP] Contact from ${payload.email}`);
     return new EmailResult(true, 'test-mode');
@@ -141,7 +175,12 @@ export async function sendContactEmail(payload: { name: string; email: string; s
   }
 }
 
-export async function sendTeacherApprovalEmail(to: string, firstName: string, approved: boolean, opts?: { lastName?: string; dashboardUrl?: string; subjects?: string[]; level?: string; }): Promise<EmailResult> {
+export async function sendTeacherApprovalEmail(
+  to: string,
+  firstName: string,
+  approved: boolean,
+  opts?: { lastName?: string; dashboardUrl?: string; subjects?: string[]; level?: string },
+): Promise<EmailResult> {
   if (process.env.DISABLE_EMAILS === 'true' || process.env.NODE_ENV === 'test') {
     console.log(`[EMAIL SKIP] Teacher approval for ${to} approved=${approved}`);
     return new EmailResult(true, 'test-mode');
@@ -156,7 +195,9 @@ export async function sendTeacherApprovalEmail(to: string, firstName: string, ap
     const result: any = await resend.emails.send({
       from: FROM,
       to: [to],
-      subject: approved ? 'Votre compte enseignant est approuvé ✓' : 'Mise à jour de votre compte enseignant',
+      subject: approved
+        ? 'Votre compte enseignant est approuvé ✓'
+        : 'Mise à jour de votre compte enseignant',
       html,
     });
     if (result.error) {
@@ -215,7 +256,13 @@ export async function sendAdminVerificationFilesEmail(opts: {
   resourceTitle?: string;
   resourceId?: number | string;
   reviewUrl?: string;
-  files?: Array<{ fileName: string; fileSize: number; fileUrl: string; type: string | null; uploadedAt: string }>;
+  files?: Array<{
+    fileName: string;
+    fileSize: number;
+    fileUrl: string;
+    type: string | null;
+    uploadedAt: string;
+  }>;
   count?: number;
   total?: number;
   adminUrl?: string;
@@ -225,7 +272,9 @@ export async function sendAdminVerificationFilesEmail(opts: {
     return new EmailResult(true, 'test-mode');
   }
   // Normalize: support both old flat shape and new nested shape
-  const teacherName = opts.teacherName ?? (opts.teacher ? `${opts.teacher.firstName} ${opts.teacher.lastName}`.trim() : 'Enseignant');
+  const teacherName =
+    opts.teacherName ??
+    (opts.teacher ? `${opts.teacher.firstName} ${opts.teacher.lastName}`.trim() : 'Enseignant');
   const teacherEmail = opts.teacherEmail ?? opts.teacher?.email ?? '';
   const resourceTitle = opts.resourceTitle ?? 'Ressource';
   const reviewUrl = opts.reviewUrl ?? opts.adminUrl ?? 'https://examanet.com/admin/approbations';
@@ -259,7 +308,14 @@ export async function sendAdminVerificationFilesEmail(opts: {
   }
 }
 
-export async function sendResourceApprovedEmail(to: string, firstName: string, resourceTitle: string, approved: boolean, resourceUrl?: string): Promise<EmailResult> {  if (process.env.DISABLE_EMAILS === 'true' || process.env.NODE_ENV === 'test') {
+export async function sendResourceApprovedEmail(
+  to: string,
+  firstName: string,
+  resourceTitle: string,
+  approved: boolean,
+  resourceUrl?: string,
+): Promise<EmailResult> {
+  if (process.env.DISABLE_EMAILS === 'true' || process.env.NODE_ENV === 'test') {
     console.log(`[EMAIL SKIP] Resource approved for ${to} approved=${approved} url=${resourceUrl}`);
     return new EmailResult(true, 'test-mode');
   }
@@ -298,7 +354,7 @@ export function renderOTPEmail(code: string, firstName: string): string {
       <p style="margin:0 0 8px;color:#0F172A;font-size:16px;font-family:${EMAIL_FONT_STACK};">Bonjour <strong style="color:#0F172A;">${firstName || ''}</strong>,</p>
       ${paragraph('Utilisez le code ci-dessous pour confirmer votre adresse email et activer votre compte Examanet.')}
       <div style="background:#0EA5E9;color:white;font-size:36px;font-weight:800;text-align:center;padding:24px;border-radius:12px;letter-spacing:8px;margin:24px 0;font-family:${EMAIL_FONT_STACK};">${code}</div>
-      ${muted('Ce code est valide 30 minutes. Si vous n\'êtes pas à l\'origine de cette demande, vous pouvez ignorer cet email en toute sécurité.')}
+      ${muted("Ce code est valide 30 minutes. Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer cet email en toute sécurité.")}
     `,
   });
 }
@@ -333,7 +389,12 @@ export function renderWelcomeConfirmedEmail(firstName: string, role: string): st
   });
 }
 
-export function renderContactEmail(p: { name: string; email: string; subject: string; message: string }): string {
+export function renderContactEmail(p: {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}): string {
   const safeName = p.name.replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const safeEmail = p.email.replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const safeSubject = p.subject.replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -351,13 +412,22 @@ export function renderContactEmail(p: { name: string; email: string; subject: st
   });
 }
 
-export function renderTeacherApprovalEmail(firstName: string, approved: boolean, opts?: {
-  lastName?: string;
-  dashboardUrl?: string;
-  subjects?: string[];
-  level?: string;
-}): string {
-  const { lastName = '', dashboardUrl = 'https://examanet.com/enseignant', subjects = [], level = '' } = opts || {};
+export function renderTeacherApprovalEmail(
+  firstName: string,
+  approved: boolean,
+  opts?: {
+    lastName?: string;
+    dashboardUrl?: string;
+    subjects?: string[];
+    level?: string;
+  },
+): string {
+  const {
+    lastName = '',
+    dashboardUrl = 'https://examanet.com/enseignant',
+    subjects = [],
+    level = '',
+  } = opts || {};
   const safeFirst = firstName.replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const safeLast = lastName.replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const fullName = `${safeFirst} ${safeLast}`.trim();
@@ -367,7 +437,7 @@ export function renderTeacherApprovalEmail(firstName: string, approved: boolean,
     return renderEmailShell({
       accent: 'violet',
       icon: '🎓',
-      title: 'Bienvenue dans l\'équipe !',
+      title: "Bienvenue dans l'équipe !",
       subtitle: 'Votre compte enseignant est approuvé',
       preheader: 'Compte enseignant approuvé',
       body: `
@@ -393,7 +463,7 @@ export function renderTeacherApprovalEmail(firstName: string, approved: boolean,
           <p style="margin:0 0 4px;color:#94A3B8;font-size:12px;font-family:${F};">ou connectez-vous sur :</p>
           <p style="margin:0;color:#64748B;font-size:13px;word-break:break-all;font-family:${F};">${dashboardUrl}</p>
         </div>
-        ${muted('Si vous avez des questions, n\'hésitez pas à nous contacter via notre page de contact.')}
+        ${muted("Si vous avez des questions, n'hésitez pas à nous contacter via notre page de contact.")}
       `,
     });
   } else {
@@ -401,12 +471,12 @@ export function renderTeacherApprovalEmail(firstName: string, approved: boolean,
       accent: 'red',
       icon: '😔',
       title: 'Demande non retenue',
-      subtitle: 'Votre compte enseignant n\'a pas été approuvé',
+      subtitle: "Votre compte enseignant n'a pas été approuvé",
       preheader: 'Compte enseignant non approuvé',
       body: `
         <p style="margin:0 0 16px;font-size:18px;color:#0F172A;font-weight:700;font-family:${F};">Bonjour <span>${safeFirst}</span>,</p>
         ${paragraph(`Après étude de votre dossier, nous ne sommes pas en mesure d'approuver votre demande d'inscription en tant qu'enseignant sur Examanet pour le moment.`)}
-        ${muted('Pour plus d\'informations, contactez-nous via notre page de contact. Nous serons heureux de vous aider.')}
+        ${muted("Pour plus d'informations, contactez-nous via notre page de contact. Nous serons heureux de vous aider.")}
       `,
     });
   }
@@ -444,7 +514,9 @@ export function renderTeacherFileRequestEmail(opts: {
   uploadUrl?: string;
 }): string {
   const safeFirst = opts.firstName.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  const safeTitle = (opts.resourceTitle ?? 'votre fichier').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const safeTitle = (opts.resourceTitle ?? 'votre fichier')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
   return `<!DOCTYPE html>
 <html><body style="font-family:sans-serif;background:#f8fafc;padding:20px">
 <div style="max-width:600px;margin:0 auto;background:white;border-radius:16px;padding:32px">
@@ -458,12 +530,19 @@ export function renderTeacherFileRequestEmail(opts: {
 </body></html>`;
 }
 
-export function renderResourceApprovedEmail(firstName: string, resourceTitle: string, approved: boolean, resourceUrl?: string): string {
+export function renderResourceApprovedEmail(
+  firstName: string,
+  resourceTitle: string,
+  approved: boolean,
+  resourceUrl?: string,
+): string {
   const safeFirst = firstName.replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const safeTitle = resourceTitle.replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
   const fullResourceUrl = resourceUrl
-    ? (resourceUrl.startsWith('http') ? resourceUrl : `${SITE_URL}${resourceUrl}`)
+    ? resourceUrl.startsWith('http')
+      ? resourceUrl
+      : `${SITE_URL}${resourceUrl}`
     : null;
   const F = EMAIL_FONT_STACK;
   if (approved) {
@@ -486,7 +565,7 @@ export function renderResourceApprovedEmail(firstName: string, resourceTitle: st
     accent: 'red',
     icon: '❌',
     title: 'Ressource non retenue',
-    subtitle: 'Votre soumission n\'a pas été approuvée',
+    subtitle: "Votre soumission n'a pas été approuvée",
     preheader: `Refusée : ${safeTitle.slice(0, 60)}`,
     body: `
       <p style="margin:0 0 16px;font-size:16px;color:#0F172A;font-family:${F};">Bonjour <strong style="color:#0F172A;">${safeFirst}</strong>,</p>
@@ -497,7 +576,13 @@ export function renderResourceApprovedEmail(firstName: string, resourceTitle: st
   });
 }
 
-export async function sendResourceRejectedEmail(to: string, firstName: string, resourceTitle: string, reason: string, resourceUrl?: string): Promise<EmailResult> {
+export async function sendResourceRejectedEmail(
+  to: string,
+  firstName: string,
+  resourceTitle: string,
+  reason: string,
+  resourceUrl?: string,
+): Promise<EmailResult> {
   if (process.env.DISABLE_EMAILS === 'true' || process.env.NODE_ENV === 'test') {
     console.log(`[EMAIL SKIP] Resource rejected for ${to}`);
     return new EmailResult(true, 'test-mode');
@@ -526,7 +611,12 @@ export async function sendResourceRejectedEmail(to: string, firstName: string, r
   }
 }
 
-export async function sendEditApprovedEmail(to: string, firstName: string, resourceTitle: string, resourceUrl?: string): Promise<EmailResult> {
+export async function sendEditApprovedEmail(
+  to: string,
+  firstName: string,
+  resourceTitle: string,
+  resourceUrl?: string,
+): Promise<EmailResult> {
   if (process.env.DISABLE_EMAILS === 'true' || process.env.NODE_ENV === 'test') {
     console.log(`[EMAIL SKIP] Edit approved for ${to}`);
     return new EmailResult(true, 'test-mode');
@@ -555,7 +645,13 @@ export async function sendEditApprovedEmail(to: string, firstName: string, resou
   }
 }
 
-export async function sendEditRejectedEmail(to: string, firstName: string, resourceTitle: string, reason: string, resourceUrl?: string): Promise<EmailResult> {
+export async function sendEditRejectedEmail(
+  to: string,
+  firstName: string,
+  resourceTitle: string,
+  reason: string,
+  resourceUrl?: string,
+): Promise<EmailResult> {
   if (process.env.DISABLE_EMAILS === 'true' || process.env.NODE_ENV === 'test') {
     console.log(`[EMAIL SKIP] Edit rejected for ${to}`);
     return new EmailResult(true, 'test-mode');
@@ -591,13 +687,20 @@ export async function sendNewEditPendingEmail(
   summary: string,
   resourceUrl: string,
   wasPreviouslyRejected?: boolean,
-  previousRejectionReason?: string
+  previousRejectionReason?: string,
 ): Promise<EmailResult> {
   if (process.env.DISABLE_EMAILS === 'true' || process.env.NODE_ENV === 'test') {
     console.log(`[EMAIL SKIP] New edit pending for ${to}`);
     return new EmailResult(true, 'test-mode');
   }
-  const html = renderNewEditPendingEmail(firstName, resourceTitle, summary, resourceUrl, wasPreviouslyRejected ?? false, previousRejectionReason);
+  const html = renderNewEditPendingEmail(
+    firstName,
+    resourceTitle,
+    summary,
+    resourceUrl,
+    wasPreviouslyRejected ?? false,
+    previousRejectionReason,
+  );
   if (!resend) {
     console.log(`\n📧 [EMAIL - DEV] New edit pending for ${to}`);
     return new EmailResult(true, 'dev-mode');
@@ -620,7 +723,6 @@ export async function sendNewEditPendingEmail(
     return new EmailResult(false, 'threw', e?.message);
   }
 }
-
 
 // ============================================================================
 // PASSWORD CHANGED NOTIFICATION

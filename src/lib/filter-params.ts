@@ -4,13 +4,11 @@ import {
   parseAsBoolean,
   parseAsInteger,
   parseAsStringEnum,
-  createParser,
 } from 'nuqs';
 
 // ============== PARSERS ==============
 // Use a special null/empty string handling: empty string means "no value"
-const emptyStringToUndefined = (v: string | null) =>
-  v === null || v === '' ? undefined : v;
+const emptyStringToUndefined = (v: string | null) => (v === null || v === '' ? undefined : v);
 
 export const filterParsers = {
   // Free-text search
@@ -32,13 +30,9 @@ export const filterParsers = {
   teacherId: parseAsString.withDefault(''),
 
   // Sort
-  sort: parseAsStringEnum([
+  sort: parseAsStringEnum(['recent', 'popular', 'downloads', 'rating', 'oldest']).withDefault(
     'recent',
-    'popular',
-    'downloads',
-    'rating',
-    'oldest',
-  ]).withDefault('recent'),
+  ),
 
   // Pagination
   page: parseAsInteger.withDefault(1),

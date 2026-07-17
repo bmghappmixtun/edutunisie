@@ -1,7 +1,17 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import { Upload, FileText, X, CheckCircle, Loader2, AlertCircle, Download, Trash2, FileCheck } from 'lucide-react';
+import { useState, useRef } from 'react';
+import {
+  Upload,
+  FileText,
+  X,
+  CheckCircle,
+  Loader2,
+  AlertCircle,
+  Download,
+  Trash2,
+  FileCheck,
+} from 'lucide-react';
 import toast from 'react-hot-toast';
 
 type VerificationFile = {
@@ -29,7 +39,7 @@ type Props = {
 const FILE_TYPES = [
   { value: 'COURSE', label: '📚 Cours' },
   { value: 'HOMEWORK', label: '📝 Devoir' },
-  { value: 'EXERCISE', label: '✏️ Série d\'exercices' },
+  { value: 'EXERCISE', label: "✏️ Série d'exercices" },
   { value: 'REVISION', label: '🔄 Révision' },
   { value: 'EXAM', label: '📋 Examen / Contrôle' },
   { value: 'BAC_SUBJECT', label: '🎓 Sujet Bac' },
@@ -63,7 +73,9 @@ export default function VerificationFilesUploader({
 
   const totalUploaded = files.length;
   const allUploaded = remaining === 0;
-  const isOld = initialRequestedAt && (Date.now() - new Date(initialRequestedAt).getTime()) / (1000 * 60 * 60 * 24) > 7;
+  const isOld =
+    initialRequestedAt &&
+    (Date.now() - new Date(initialRequestedAt).getTime()) / (1000 * 60 * 60 * 24) > 7;
 
   function handleFileSelect(f: File | null) {
     if (!f) return;
@@ -132,7 +144,10 @@ export default function VerificationFilesUploader({
     try {
       const res = await fetch(`/api/teacher/verification-files?id=${id}`, { method: 'DELETE' });
       const data = await res.json();
-      if (!res.ok) { toast.error(data.error); return; }
+      if (!res.ok) {
+        toast.error(data.error);
+        return;
+      }
       toast.success('Fichier supprimé');
       setFiles(files.filter((f) => f.id !== id));
       setRemaining(data.remaining);
@@ -153,11 +168,17 @@ export default function VerificationFilesUploader({
           <div className="text-3xl font-extrabold text-slate-700">{remaining}</div>
           <div className="text-xs text-slate-500 font-semibold uppercase mt-1">Restants</div>
         </div>
-        <div className={`border rounded-xl p-4 text-center ${allUploaded ? 'bg-emerald-50 border-emerald-200' : 'bg-amber-50 border-amber-200'}`}>
-          <div className={`text-3xl font-extrabold ${allUploaded ? 'text-emerald-700' : 'text-amber-700'}`}>
+        <div
+          className={`border rounded-xl p-4 text-center ${allUploaded ? 'bg-emerald-50 border-emerald-200' : 'bg-amber-50 border-amber-200'}`}
+        >
+          <div
+            className={`text-3xl font-extrabold ${allUploaded ? 'text-emerald-700' : 'text-amber-700'}`}
+          >
             {allUploaded ? '✓' : '⏱️'}
           </div>
-          <div className={`text-xs font-semibold uppercase mt-1 ${allUploaded ? 'text-emerald-600' : 'text-amber-600'}`}>
+          <div
+            className={`text-xs font-semibold uppercase mt-1 ${allUploaded ? 'text-emerald-600' : 'text-amber-600'}`}
+          >
             {allUploaded ? 'Complet' : 'En cours'}
           </div>
         </div>
@@ -179,14 +200,18 @@ export default function VerificationFilesUploader({
             Tous vos fichiers ont été reçus !
           </h3>
           <p className="text-emerald-700">
-            Notre équipe va examiner vos fichiers sous 48h. Vous recevrez un email dès que votre compte sera approuvé.
+            Notre équipe va examiner vos fichiers sous 48h. Vous recevrez un email dès que votre
+            compte sera approuvé.
           </p>
         </div>
       ) : (
         <>
           {/* Drop zone */}
           <div
-            onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+            onDragOver={(e) => {
+              e.preventDefault();
+              setDragOver(true);
+            }}
             onDragLeave={() => setDragOver(false)}
             onDrop={handleDrop}
             onClick={() => fileInputRef.current?.click()}
@@ -204,9 +229,7 @@ export default function VerificationFilesUploader({
               className="hidden"
             />
             <div className="text-5xl mb-3">📁</div>
-            <p className="font-bold text-slate-800 text-lg mb-1">
-              Glissez votre fichier ici
-            </p>
+            <p className="font-bold text-slate-800 text-lg mb-1">Glissez votre fichier ici</p>
             <p className="text-sm text-slate-500">
               ou cliquez pour parcourir — .docx, .doc, .pdf (max 25 MB)
             </p>
@@ -222,11 +245,15 @@ export default function VerificationFilesUploader({
                 <div className="flex-1 min-w-0">
                   <div className="font-bold text-slate-900 truncate">{pendingFile.name}</div>
                   <div className="text-xs text-slate-500">
-                    {formatSize(pendingFile.size)} • {pendingFile.name.split('.').pop()?.toUpperCase()}
+                    {formatSize(pendingFile.size)} •{' '}
+                    {pendingFile.name.split('.').pop()?.toUpperCase()}
                   </div>
                 </div>
                 <button
-                  onClick={() => { setPendingFile(null); if (fileInputRef.current) fileInputRef.current.value = ''; }}
+                  onClick={() => {
+                    setPendingFile(null);
+                    if (fileInputRef.current) fileInputRef.current.value = '';
+                  }}
                   className="p-2 hover:bg-slate-100 rounded-lg"
                 >
                   <X className="w-4 h-4 text-slate-400" />
@@ -241,8 +268,10 @@ export default function VerificationFilesUploader({
                     onChange={(e) => setPendingType(e.target.value)}
                     className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm"
                   >
-                    {FILE_TYPES.map(t => (
-                      <option key={t.value} value={t.value}>{t.label}</option>
+                    {FILE_TYPES.map((t) => (
+                      <option key={t.value} value={t.value}>
+                        {t.label}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -280,9 +309,13 @@ export default function VerificationFilesUploader({
                 className="w-full py-3 bg-gradient-to-r from-violet-500 to-purple-600 text-white font-bold rounded-xl hover:from-violet-600 hover:to-purple-700 transition shadow-md disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {uploading ? (
-                  <><Loader2 className="w-4 h-4 animate-spin" /> Envoi en cours...</>
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" /> Envoi en cours...
+                  </>
                 ) : (
-                  <><Upload className="w-4 h-4" /> Envoyer ce fichier</>
+                  <>
+                    <Upload className="w-4 h-4" /> Envoyer ce fichier
+                  </>
                 )}
               </button>
             </div>
@@ -299,9 +332,12 @@ export default function VerificationFilesUploader({
           </h3>
           <div className="space-y-2">
             {files.map((f) => {
-              const typeInfo = FILE_TYPES.find(t => t.value === f.type);
+              const typeInfo = FILE_TYPES.find((t) => t.value === f.type);
               return (
-                <div key={f.id} className="bg-white border border-slate-200 rounded-xl p-4 flex items-start gap-3">
+                <div
+                  key={f.id}
+                  className="bg-white border border-slate-200 rounded-xl p-4 flex items-start gap-3"
+                >
                   <div className="w-10 h-12 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center flex-shrink-0">
                     <FileText className="w-5 h-5" />
                   </div>
@@ -318,7 +354,12 @@ export default function VerificationFilesUploader({
                       <span>{formatSize(f.fileSize)}</span>
                       <span>•</span>
                       <span>{typeInfo?.label || f.type}</span>
-                      {f.year && (<><span>•</span><span>{f.year}</span></>)}
+                      {f.year && (
+                        <>
+                          <span>•</span>
+                          <span>{f.year}</span>
+                        </>
+                      )}
                       <span>•</span>
                       <span>Envoyé le {new Date(f.uploadedAt).toLocaleDateString('fr-FR')}</span>
                     </div>
@@ -355,15 +396,18 @@ export default function VerificationFilesUploader({
 
       {/* Deadline warning */}
       {initialRequestedAt && !allUploaded && (
-        <div className={`rounded-xl p-4 border ${isOld ? 'bg-red-50 border-red-200' : 'bg-amber-50 border-amber-200'}`}>
+        <div
+          className={`rounded-xl p-4 border ${isOld ? 'bg-red-50 border-red-200' : 'bg-amber-50 border-amber-200'}`}
+        >
           <div className="flex items-start gap-2">
-            <AlertCircle className={`w-5 h-5 flex-shrink-0 mt-0.5 ${isOld ? 'text-red-600' : 'text-amber-600'}`} />
+            <AlertCircle
+              className={`w-5 h-5 flex-shrink-0 mt-0.5 ${isOld ? 'text-red-600' : 'text-amber-600'}`}
+            />
             <div className={`text-sm ${isOld ? 'text-red-800' : 'text-amber-800'}`}>
-              <strong>Date limite : 7 jours après la demande.</strong>
-              {' '}
+              <strong>Date limite : 7 jours après la demande.</strong>{' '}
               {isOld
                 ? '⚠️ Vous avez dépassé le délai. Contactez-nous si vous avez besoin de plus de temps.'
-                : 'Merci d\'envoyer vos fichiers dans les délais pour finaliser la vérification.'}
+                : "Merci d'envoyer vos fichiers dans les délais pour finaliser la vérification."}
             </div>
           </div>
         </div>

@@ -3,12 +3,15 @@ import { ImageResponse } from 'next/og';
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
-const PAGE_CONFIG: Record<string, {
-  title: string;
-  subtitle: string;
-  badge: string;
-  bgGradient: string;
-}> = {
+const PAGE_CONFIG: Record<
+  string,
+  {
+    title: string;
+    subtitle: string;
+    badge: string;
+    bgGradient: string;
+  }
+> = {
   home: {
     title: 'Examanet',
     subtitle: 'Cours, devoirs, exercices et corrigés gratuits',
@@ -65,121 +68,114 @@ const PAGE_CONFIG: Record<string, {
   },
 };
 
-export async function GET(
-  req: Request,
-  { params }: { params: Promise<{ type: string }> }
-) {
+export async function GET(req: Request, { params }: { params: Promise<{ type: string }> }) {
   const { type } = await params;
   const config = PAGE_CONFIG[type] || PAGE_CONFIG.default;
 
   // (Intentionally ignore query params for now — Vercel Edge issue)
 
   return new ImageResponse(
-    (
-      <div
-        style={{
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          background: config.bgGradient,
-          fontFamily: 'sans-serif',
-          color: 'white',
-          padding: 80,
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <div
-            style={{
-              width: 64,
-              height: 64,
-              borderRadius: 16,
-              background: '#FA8C31',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 36,
-              fontWeight: 900,
-              color: '#06264E',
-            }}
-          >
-            E
-          </div>
-          <div style={{ fontSize: 40, fontWeight: 800, letterSpacing: -0.5 }}>
-            Examanet
-          </div>
-        </div>
-
+    <div
+      style={{
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        background: config.bgGradient,
+        fontFamily: 'sans-serif',
+        color: 'white',
+        padding: 80,
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
         <div
           style={{
-            display: 'flex',
-            flexDirection: 'column',
-            flex: 1,
-            justifyContent: 'center',
-          }}
-        >
-          <div
-            style={{
-              fontSize: 96,
-              fontWeight: 900,
-              lineHeight: 1.0,
-              letterSpacing: -3,
-              marginBottom: 32,
-              display: 'flex',
-            }}
-          >
-            {config.title}
-          </div>
-          <div
-            style={{
-              fontSize: 36,
-              fontWeight: 500,
-              lineHeight: 1.3,
-              color: 'rgba(255,255,255,0.85)',
-              maxWidth: 1000,
-              display: 'flex',
-            }}
-          >
-            {config.subtitle}
-          </div>
-        </div>
-
-        <div
-          style={{
+            width: 64,
+            height: 64,
+            borderRadius: 16,
+            background: '#FA8C31',
             display: 'flex',
             alignItems: 'center',
-            gap: 12,
+            justifyContent: 'center',
+            fontSize: 36,
+            fontWeight: 900,
+            color: '#06264E',
           }}
         >
-          <div
-            style={{
-              padding: '14px 28px',
-              borderRadius: 999,
-              background: 'rgba(255,255,255,0.15)',
-              border: '1px solid rgba(255,255,255,0.25)',
-              fontSize: 26,
-              fontWeight: 600,
-              display: 'flex',
-            }}
-          >
-            {config.badge}
-          </div>
-          <div
-            style={{
-              fontSize: 26,
-              fontWeight: 700,
-              color: '#FA8C31',
-              display: 'flex',
-            }}
-          >
-            examanet.com
-          </div>
+          E
+        </div>
+        <div style={{ fontSize: 40, fontWeight: 800, letterSpacing: -0.5 }}>Examanet</div>
+      </div>
+
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          flex: 1,
+          justifyContent: 'center',
+        }}
+      >
+        <div
+          style={{
+            fontSize: 96,
+            fontWeight: 900,
+            lineHeight: 1.0,
+            letterSpacing: -3,
+            marginBottom: 32,
+            display: 'flex',
+          }}
+        >
+          {config.title}
+        </div>
+        <div
+          style={{
+            fontSize: 36,
+            fontWeight: 500,
+            lineHeight: 1.3,
+            color: 'rgba(255,255,255,0.85)',
+            maxWidth: 1000,
+            display: 'flex',
+          }}
+        >
+          {config.subtitle}
         </div>
       </div>
-    ),
+
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 12,
+        }}
+      >
+        <div
+          style={{
+            padding: '14px 28px',
+            borderRadius: 999,
+            background: 'rgba(255,255,255,0.15)',
+            border: '1px solid rgba(255,255,255,0.25)',
+            fontSize: 26,
+            fontWeight: 600,
+            display: 'flex',
+          }}
+        >
+          {config.badge}
+        </div>
+        <div
+          style={{
+            fontSize: 26,
+            fontWeight: 700,
+            color: '#FA8C31',
+            display: 'flex',
+          }}
+        >
+          examanet.com
+        </div>
+      </div>
+    </div>,
     {
       width: 1200,
       height: 630,
-    }
+    },
   );
 }

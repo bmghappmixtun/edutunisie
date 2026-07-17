@@ -28,7 +28,5 @@ export default function ResourcesViewClient({
     });
   };
 
-  return (
-    <ViewToggle mode={currentView} onChange={handleViewChange} />
-  );
+  return <ViewToggle mode={currentView} onChange={handleViewChange} />;
 }

@@ -30,12 +30,27 @@ loadEnv('.env');
 loadEnv('.env.local');
 
 const SECRET_VARS = [
-  { name: 'DATABASE_URL', required: true, pattern: /^postgres(ql)?:\/\//, hint: 'PostgreSQL connection string' },
+  {
+    name: 'DATABASE_URL',
+    required: true,
+    pattern: /^postgres(ql)?:\/\//,
+    hint: 'PostgreSQL connection string',
+  },
   { name: 'NEXTAUTH_URL', required: true, pattern: /^https?:\/\//, hint: 'Public site URL' },
   { name: 'NEXTAUTH_SECRET', required: true, minLength: 32, hint: 'openssl rand -base64 32' },
-  { name: 'BLOB_READ_WRITE_TOKEN', required: false, pattern: /^vercel_blob_/, hint: 'Vercel Blob token' },
+  {
+    name: 'BLOB_READ_WRITE_TOKEN',
+    required: false,
+    pattern: /^vercel_blob_/,
+    hint: 'Vercel Blob token',
+  },
   { name: 'RESEND_API_KEY', required: false, pattern: /^re_/, hint: 'Resend API key' },
-  { name: 'NEXT_PUBLIC_SITE_URL', required: true, pattern: /^https?:\/\//, hint: 'Public site URL' },
+  {
+    name: 'NEXT_PUBLIC_SITE_URL',
+    required: true,
+    pattern: /^https?:\/\//,
+    hint: 'Public site URL',
+  },
   // R2 backup (off-site blob backup)
   { name: 'R2_ACCOUNT_ID', required: false, hint: 'Cloudflare account ID' },
   { name: 'R2_ACCESS_KEY_ID', required: false, hint: 'R2 access key (32 chars)' },
@@ -51,7 +66,7 @@ console.log('══════════════════════�
 
 for (const { name, required, pattern, minLength, hint } of SECRET_VARS) {
   const value = process.env[name];
-  const status = value ? '✅' : (required ? '❌' : '⚠️ ');
+  const status = value ? '✅' : required ? '❌' : '⚠️ ';
   const type = required ? 'required' : 'optional';
 
   let detail = '';

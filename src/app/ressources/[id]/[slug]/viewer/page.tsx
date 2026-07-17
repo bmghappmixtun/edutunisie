@@ -9,7 +9,11 @@ import { ChevronLeft, Download } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
-export default async function ResourceViewerPage({ params }: { params: Promise<{ id: string; slug: string }> }) {
+export default async function ResourceViewerPage({
+  params,
+}: {
+  params: Promise<{ id: string; slug: string }>;
+}) {
   const { id: rawId, slug: rawSlug } = await params;
   const numericId = parseInt(rawId, 10);
   if (isNaN(numericId)) notFound();
@@ -28,7 +32,10 @@ export default async function ResourceViewerPage({ params }: { params: Promise<{
   const ua = headers().get('user-agent');
   if (!isBotOrPlaceholder(ip, ua)) {
     await prisma.view.create({ data: { resourceId: resource.id, ipAddress: ip, userAgent: ua } });
-    await prisma.resource.update({ where: { id: resource.id }, data: { viewsCount: { increment: 1 } } });
+    await prisma.resource.update({
+      where: { id: resource.id },
+      data: { viewsCount: { increment: 1 } },
+    });
   }
 
   async function downloadAction() {
@@ -37,7 +44,10 @@ export default async function ResourceViewerPage({ params }: { params: Promise<{
     const ua = headers().get('user-agent');
     if (isBotOrPlaceholder(ip, ua)) return;
     await prisma.download.create({ data: { resourceId: resource!.id, ipAddress: ip } });
-    await prisma.resource.update({ where: { id: resource!.id }, data: { downloadsCount: { increment: 1 } } });
+    await prisma.resource.update({
+      where: { id: resource!.id },
+      data: { downloadsCount: { increment: 1 } },
+    });
   }
 
   return (
@@ -46,7 +56,10 @@ export default async function ResourceViewerPage({ params }: { params: Promise<{
       <div className="pt-16 lg:pt-20 px-4 py-3 bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
-            <Link href={`/ressources/${numericId}/${slug}`} className="p-2 hover:bg-slate-100 rounded-lg">
+            <Link
+              href={`/ressources/${numericId}/${slug}`}
+              className="p-2 hover:bg-slate-100 rounded-lg"
+            >
               <ChevronLeft className="w-5 h-5" />
             </Link>
             <div className="min-w-0">
@@ -54,10 +67,7 @@ export default async function ResourceViewerPage({ params }: { params: Promise<{
               <p className="text-xs text-slate-500">Mode lecture</p>
             </div>
           </div>
-          <a
-            href={`/api/resources/${resource.id}/download`}
-            className="btn-primary text-sm"
-          >
+          <a href={`/api/resources/${resource.id}/download`} className="btn-primary text-sm">
             <Download className="w-4 h-4" /> Télécharger
           </a>
         </div>

@@ -1,30 +1,17 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { Suspense } from 'react';
 import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import ResourceCard from '@/components/resources/ResourceCard';
 import { prisma } from '@/lib/prisma';
 import { getUserFavorites, decorateWithFavorites } from '@/lib/resource-helpers';
-import {
-  breadcrumbSchema,
-  courseSchema,
-  faqSchema,
-  itemListSchema,
-} from '@/lib/structured-data';
+import { breadcrumbSchema, courseSchema, faqSchema, itemListSchema } from '@/lib/structured-data';
 import { SITE_URL } from '@/lib/structured-data';
-import {
-  SUBJECTS_CONFIG,
-  getSubjectConfig,
-} from '@/lib/subjects.config';
+import { SUBJECTS_CONFIG, getSubjectConfig } from '@/lib/subjects.config';
 import SubjectHero from '@/components/subjects/SubjectHero';
 import SubjectFilters from '@/components/subjects/SubjectFilters';
-import {
-  SlidersHorizontal,
-  Sparkles,
-  ArrowRight,
-} from 'lucide-react';
+import { SlidersHorizontal, Sparkles, ArrowRight } from 'lucide-react';
 
 // ============== TYPES ==============
 interface PageProps {
@@ -46,20 +33,20 @@ export const revalidate = 600; // 10 min cache — pages publiques très SEO
 
 // Pre-generate all subject slugs for static rendering
 export async function generateStaticParams() {
-  const subjects = await prisma.subject.findMany({ select: { slug: true, } });
+  const subjects = await prisma.subject.findMany({ select: { slug: true } });
   return subjects.map((s) => ({ subject: s.slug }));
 }
 
 // Hard-coded filter options
 const RESOURCE_TYPES = [
-  { slug: 'COURSE',      label: 'Cours',        emoji: '📘' },
-  { slug: 'HOMEWORK',    label: 'Devoirs',      emoji: '📝' },
-  { slug: 'EXERCISE',    label: 'Exercices',    emoji: '✏️' },
-  { slug: 'REVISION',    label: 'Révisions',    emoji: '🔁' },
-  { slug: 'BAC_SUBJECT', label: 'Sujets BAC',   emoji: '🎓' },
-  { slug: 'CORRECTION',  label: 'Corrigés',     emoji: '✅' },
-  { slug: 'SUMMARY',     label: 'Résumés',      emoji: '📋' },
-  { slug: 'EXAM',        label: 'Examens',      emoji: '📊' },
+  { slug: 'COURSE', label: 'Cours', emoji: '📘' },
+  { slug: 'HOMEWORK', label: 'Devoirs', emoji: '📝' },
+  { slug: 'EXERCISE', label: 'Exercices', emoji: '✏️' },
+  { slug: 'REVISION', label: 'Révisions', emoji: '🔁' },
+  { slug: 'BAC_SUBJECT', label: 'Sujets BAC', emoji: '🎓' },
+  { slug: 'CORRECTION', label: 'Corrigés', emoji: '✅' },
+  { slug: 'SUMMARY', label: 'Résumés', emoji: '📋' },
+  { slug: 'EXAM', label: 'Examens', emoji: '📊' },
 ];
 
 const TRIMESTERS = [
@@ -82,7 +69,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: seo?.titleFr ?? `${subject.nameFr} — Cours, Devoirs et Exercices`,
-    description: seo?.descriptionFr ?? `Ressources en ${subject.nameFr} pour le système éducatif tunisien.`,
+    description:
+      seo?.descriptionFr ?? `Ressources en ${subject.nameFr} pour le système éducatif tunisien.`,
     keywords: [
       ...(seo?.keywordsFr ?? []),
       subject.nameFr.toLowerCase(),
@@ -119,7 +107,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description: seo?.descriptionFr,
       images: [`${baseUrl}/api/og/subject/${subject.slug}`],
     },
-    robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-image-preview': 'large' } },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: { index: true, follow: true, 'max-image-preview': 'large' },
+    },
   };
 }
 
@@ -145,7 +137,10 @@ export default async function SubjectPage({ params, searchParams }: PageProps) {
     if (klass) where.classId = klass.id;
   }
   if (sp.section) {
-    const sect = await prisma.section.findFirst({ where: { slug: sp.section }, select: { id: true } });
+    const sect = await prisma.section.findFirst({
+      where: { slug: sp.section },
+      select: { id: true },
+    });
     if (sect) where.sectionId = sect.id;
   }
   if (sp.type) where.type = sp.type;
@@ -183,8 +178,13 @@ export default async function SubjectPage({ params, searchParams }: PageProps) {
       select: {
         teacher: {
           select: {
-            id: true, firstName: true, lastName: true, firstNameAr: true, lastNameAr: true,
-            avatarUrl: true, schoolName: true,
+            id: true,
+            firstName: true,
+            lastName: true,
+            firstNameAr: true,
+            lastNameAr: true,
+            avatarUrl: true,
+            schoolName: true,
           },
         },
       },
@@ -198,8 +198,13 @@ export default async function SubjectPage({ params, searchParams }: PageProps) {
         uploadedFiles: { some: { subjectId: subject.id, status: 'PUBLISHED' } },
       },
       select: {
-        id: true, firstName: true, lastName: true, firstNameAr: true, lastNameAr: true,
-        avatarUrl: true, schoolName: true,
+        id: true,
+        firstName: true,
+        lastName: true,
+        firstNameAr: true,
+        lastNameAr: true,
+        avatarUrl: true,
+        schoolName: true,
       },
       take: 30,
     }),
@@ -228,8 +233,13 @@ export default async function SubjectPage({ params, searchParams }: PageProps) {
       section: true,
       teacher: {
         select: {
-          id: true, firstName: true, lastName: true, firstNameAr: true, lastNameAr: true,
-          avatarUrl: true, schoolName: true,
+          id: true,
+          firstName: true,
+          lastName: true,
+          firstNameAr: true,
+          lastNameAr: true,
+          avatarUrl: true,
+          schoolName: true,
         },
       },
     },
@@ -243,7 +253,11 @@ export default async function SubjectPage({ params, searchParams }: PageProps) {
 
   // Unique teachers (dedupe)
   const uniqueTeachers = Array.from(
-    new Map(teachers.filter((t) => (t as any).teacher).map((t) => [(t as any).teacher!.id, (t as any).teacher!])).values()
+    new Map(
+      teachers
+        .filter((t) => (t as any).teacher)
+        .map((t) => [(t as any).teacher!.id, (t as any).teacher!]),
+    ).values(),
   );
 
   // ===== JSON-LD =====
@@ -307,7 +321,7 @@ export default async function SubjectPage({ params, searchParams }: PageProps) {
 
   // Resolve real names for related subjects
   const relatedDBSubjects = await prisma.subject.findMany({
-    where: { slug: { in: (cfg?.seo?.related ?? []) } },
+    where: { slug: { in: cfg?.seo?.related ?? [] } },
     select: { slug: true, nameFr: true, color: true },
   });
   const relatedFinal = relatedDBSubjects.map((s) => {
@@ -385,20 +399,29 @@ export default async function SubjectPage({ params, searchParams }: PageProps) {
               <SubjectFilters
                 subjectSlug={subject.slug}
                 classes={classes}
-                sections={sections.map((s) => ({ id: s.id, name: s.nameFr, slug: s.slug, class: s.class }))}
+                sections={sections.map((s) => ({
+                  id: s.id,
+                  name: s.nameFr,
+                  slug: s.slug,
+                  class: s.class,
+                }))}
                 teachers={uniqueTeachers}
                 resourceTypes={RESOURCE_TYPES}
                 trimesters={TRIMESTERS}
                 facets={{
                   byType: Object.fromEntries(byType.map((b) => [b.type, b._count])),
                   byTrimestre: Object.fromEntries(byTrimestre.map((b) => [b.trimester!, b._count])),
-                  byAnnee: byAnnee.filter((b) => b.class).reduce(
-                    (acc: Record<string, number>, b) => {
-                      if (b.class) acc[b.class.slug ?? b.class.nameFr] = (acc[b.class.slug ?? b.class.nameFr] ?? 0) + 1;
-                      return acc;
-                    },
-                    {} as Record<string, number>
-                  ),
+                  byAnnee: byAnnee
+                    .filter((b) => b.class)
+                    .reduce(
+                      (acc: Record<string, number>, b) => {
+                        if (b.class)
+                          acc[b.class.slug ?? b.class.nameFr] =
+                            (acc[b.class.slug ?? b.class.nameFr] ?? 0) + 1;
+                        return acc;
+                      },
+                      {} as Record<string, number>,
+                    ),
                 }}
                 activeFilters={sp}
                 totalCount={totalCount}
@@ -411,16 +434,20 @@ export default async function SubjectPage({ params, searchParams }: PageProps) {
               <div className="flex items-center justify-between mb-5 bg-white rounded-xl border border-slate-200 px-4 py-3">
                 <div>
                   <div className="text-sm text-slate-600">
-                    <strong className="text-slate-900">{totalCount.toLocaleString()}</strong> ressources
+                    <strong className="text-slate-900">{totalCount.toLocaleString()}</strong>{' '}
+                    ressources
                     {sp.annee || sp.section || sp.type || sp.trimestre || sp.prof ? (
                       <span className="ml-1 text-slate-500">filtrées</span>
                     ) : null}
                   </div>
                   <div className="text-xs text-slate-500 mt-0.5">
-                    {sp.annee && `Classe: ${classes.find((c) => c.slug === sp.annee)?.nameFr ?? sp.annee}`}
-                    {sp.section && ` · Section: ${sections.find((s) => s.slug === sp.section)?.nameFr ?? sp.section}`}
+                    {sp.annee &&
+                      `Classe: ${classes.find((c) => c.slug === sp.annee)?.nameFr ?? sp.annee}`}
+                    {sp.section &&
+                      ` · Section: ${sections.find((s) => s.slug === sp.section)?.nameFr ?? sp.section}`}
                     {sp.trimestre && ` · Trim. ${sp.trimestre}`}
-                    {sp.type && ` · ${RESOURCE_TYPES.find((t) => t.slug === sp.type)?.label ?? sp.type}`}
+                    {sp.type &&
+                      ` · ${RESOURCE_TYPES.find((t) => t.slug === sp.type)?.label ?? sp.type}`}
                   </div>
                 </div>
                 <SortDropdown current={sort} subjectSlug={subject.slug} activeFilters={sp} />
@@ -457,8 +484,8 @@ export default async function SubjectPage({ params, searchParams }: PageProps) {
                 <h2 className="text-2xl font-bold text-slate-900">Matières complémentaires</h2>
               </div>
               <p className="text-slate-600 mb-6 -mt-3">
-                Ces matières sont liées à <strong>{subject.nameFr}</strong> dans le système éducatif tunisien.
-                Explorez-les pour une vision complète de votre parcours scolaire.
+                Ces matières sont liées à <strong>{subject.nameFr}</strong> dans le système éducatif
+                tunisien. Explorez-les pour une vision complète de votre parcours scolaire.
               </p>
               <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {relatedFinal.map((r) => (
@@ -467,7 +494,9 @@ export default async function SubjectPage({ params, searchParams }: PageProps) {
                     href={`/matieres/${r.slug}`}
                     className={`group relative overflow-hidden rounded-2xl bg-gradient-to-br ${r.gradient} border border-slate-200 p-5 hover:shadow-md transition`}
                   >
-                    <div className="text-4xl mb-2 group-hover:scale-110 transition-transform">{r.emoji}</div>
+                    <div className="text-4xl mb-2 group-hover:scale-110 transition-transform">
+                      {r.emoji}
+                    </div>
                     <h3 className="font-bold text-slate-900 mb-1">{r.nameFr}</h3>
                     <p className="text-xs text-slate-600 mb-3">Découvrir →</p>
                     <ArrowRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform" />
@@ -491,7 +520,9 @@ export default async function SubjectPage({ params, searchParams }: PageProps) {
                   >
                     <summary className="cursor-pointer font-semibold text-slate-900 flex items-center justify-between">
                       <span>{f.q}</span>
-                      <span className="text-slate-400 group-open:rotate-45 transition-transform text-2xl leading-none">+</span>
+                      <span className="text-slate-400 group-open:rotate-45 transition-transform text-2xl leading-none">
+                        +
+                      </span>
                     </summary>
                     <p className="text-slate-600 mt-3 leading-relaxed">{f.a}</p>
                   </details>
@@ -528,7 +559,7 @@ function SortDropdown({
       <select
         className="appearance-none bg-slate-50 border border-slate-200 rounded-lg pl-3 pr-9 py-1.5 text-sm font-medium text-slate-700 cursor-pointer hover:bg-slate-100 transition"
         defaultValue={current}
-        onChange={undefined /* URL change handled via Link */ }
+        onChange={undefined /* URL change handled via Link */}
       >
         {options.map((o) => (
           <option key={o.slug} value={o.slug}>
@@ -574,7 +605,10 @@ function Pagination({
   return (
     <nav className="mt-8 flex justify-center gap-2">
       {current > 1 && (
-        <Link href={makeUrl(current - 1)} className="px-4 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-sm">
+        <Link
+          href={makeUrl(current - 1)}
+          className="px-4 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-sm"
+        >
           ← Précédent
         </Link>
       )}
@@ -583,14 +617,19 @@ function Pagination({
           key={p}
           href={makeUrl(p)}
           className={`px-3 py-2 rounded-lg text-sm ${
-            p === current ? 'bg-primary-600 text-white' : 'bg-white border border-slate-200 hover:bg-slate-50'
+            p === current
+              ? 'bg-primary-600 text-white'
+              : 'bg-white border border-slate-200 hover:bg-slate-50'
           }`}
         >
           {p}
         </Link>
       ))}
       {current < total && (
-        <Link href={makeUrl(current + 1)} className="px-4 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-sm">
+        <Link
+          href={makeUrl(current + 1)}
+          className="px-4 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-sm"
+        >
           Suivant →
         </Link>
       )}

@@ -160,7 +160,11 @@ export function courseSchema(opts: {
     '@context': 'https://schema.org',
     '@type': 'Course',
     name: opts.title,
-    description: opts.description.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 500),
+    description: opts.description
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 500),
     url: opts.url,
     inLanguage: opts.language,
     educationalLevel: opts.level,
@@ -171,9 +175,7 @@ export function courseSchema(opts: {
       courseMode: 'online',
       courseWorkload: 'PT1H',
       inLanguage: opts.language,
-      instructor: opts.teacher
-        ? { '@type': 'Person', name: opts.teacher }
-        : undefined,
+      instructor: opts.teacher ? { '@type': 'Person', name: opts.teacher } : undefined,
       offers: {
         '@type': 'Offer',
         price: '0',
@@ -183,10 +185,19 @@ export function courseSchema(opts: {
     },
     about: opts.subject,
     keywords: (() => {
-      const tagList = opts.tags ? opts.tags.split(',').map((t: string) => t.trim()).filter(Boolean) : [];
-      const auto = [opts.subject, opts.level, opts.cycle, opts.type, 'Tunisie', 'examanet'].filter(Boolean) as string[];
+      const tagList = opts.tags
+        ? opts.tags
+            .split(',')
+            .map((t: string) => t.trim())
+            .filter(Boolean)
+        : [];
+      const auto = [opts.subject, opts.level, opts.cycle, opts.type, 'Tunisie', 'examanet'].filter(
+        Boolean,
+      ) as string[];
       // Tags first (most relevant), then auto keywords, dedupe
-      return Array.from(new Set([...tagList, ...auto])).slice(0, 15).join(', ');
+      return Array.from(new Set([...tagList, ...auto]))
+        .slice(0, 15)
+        .join(', ');
     })(),
     datePublished: opts.datePublished,
     dateModified: opts.dateModified,

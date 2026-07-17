@@ -24,7 +24,11 @@ export default async function Header() {
         <div className="flex items-center h-[62px] lg:h-[73px] gap-4">
           {/* LEFT: Logo */}
           <div className="flex-1 flex justify-start min-w-0">
-            <Link href="/" className="flex items-center group shrink-0" aria-label="Examanet - accueil">
+            <Link
+              href="/"
+              className="flex items-center group shrink-0"
+              aria-label="Examanet - accueil"
+            >
               {/* Mobile: icon only */}
               <Image
                 src="/icon-transparent.png"
@@ -48,10 +52,30 @@ export default async function Header() {
 
           {/* CENTER: Main nav (centered between logo and search) */}
           <nav className="hidden lg:flex items-center gap-7 shrink-0">
-            <Link href="/ressources" className="text-sm font-medium text-slate-700 hover:text-primary-600 transition">{t('nav.resources')}</Link>
-            <Link href="/niveaux" className="text-sm font-medium text-slate-700 hover:text-primary-600 transition">{t('nav.levels')}</Link>
-            <Link href="/matieres" className="text-sm font-medium text-slate-700 hover:text-primary-600 transition">{t('nav.subjects')}</Link>
-            <Link href="/professeurs" className="text-sm font-medium text-slate-700 hover:text-primary-600 transition">{t('nav.teachers')}</Link>
+            <Link
+              href="/ressources"
+              className="text-sm font-medium text-slate-700 hover:text-primary-600 transition"
+            >
+              {t('nav.resources')}
+            </Link>
+            <Link
+              href="/niveaux"
+              className="text-sm font-medium text-slate-700 hover:text-primary-600 transition"
+            >
+              {t('nav.levels')}
+            </Link>
+            <Link
+              href="/matieres"
+              className="text-sm font-medium text-slate-700 hover:text-primary-600 transition"
+            >
+              {t('nav.subjects')}
+            </Link>
+            <Link
+              href="/professeurs"
+              className="text-sm font-medium text-slate-700 hover:text-primary-600 transition"
+            >
+              {t('nav.teachers')}
+            </Link>
           </nav>
 
           {/* RIGHT: Search + actions */}
@@ -63,7 +87,10 @@ export default async function Header() {
               <UserMenu user={user} unreadCount={unreadNotifications} />
             ) : (
               <>
-                <Link href="/connexion" className="hidden sm:block text-sm font-semibold text-slate-700 hover:text-primary-600 px-3 py-2 transition">
+                <Link
+                  href="/connexion"
+                  className="hidden sm:block text-sm font-semibold text-slate-700 hover:text-primary-600 px-3 py-2 transition"
+                >
                   {t('nav.login')}
                 </Link>
                 <Link href="/inscription" className="btn-primary text-sm">

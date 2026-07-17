@@ -74,7 +74,7 @@ async function logUsage(
   fileName: string,
   fileSize: number,
   success: boolean,
-  failedStep?: string
+  failedStep?: string,
 ) {
   try {
     const provider = await prisma.apiProvider.findUnique({
@@ -110,7 +110,7 @@ export async function convertDocxToPdf(
     fileName?: string;
     title?: string;
     author?: string;
-  } = {}
+  } = {},
 ): Promise<ConversionResult> {
   const warnings: string[] = [];
   const fileName = options.fileName || 'document.docx';
@@ -132,7 +132,7 @@ export async function convertDocxToPdf(
         fileBuffer,
         fileName,
         iloveConfig.publicKey,
-        iloveConfig.secretKey
+        iloveConfig.secretKey,
       );
       await logUsage('iloveapi', fileName, fileSize, true);
       return {
@@ -165,7 +165,7 @@ export async function convertDocxToPdf(
       const result = await convertOfficeToPdfViaConvertApi(
         fileBuffer,
         fileName,
-        apiconvertConfig.secretKey
+        apiconvertConfig.secretKey,
       );
       await logUsage('apiconvert', fileName, fileSize, true);
       return {
@@ -193,7 +193,7 @@ export async function convertDocxToPdf(
 
   // ============== Aucun provider n'a fonctionné ==============
   warnings.push(
-    'Aucun service de conversion PDF disponible. Le fichier original (.docx) est sauvegardé dans votre bibliothèque. Vous pouvez le re-uploader en PDF manuellement depuis /enseignant/bibliotheque.'
+    'Aucun service de conversion PDF disponible. Le fichier original (.docx) est sauvegardé dans votre bibliothèque. Vous pouvez le re-uploader en PDF manuellement depuis /enseignant/bibliotheque.',
   );
   return { warnings, provider: 'failed' };
 }
@@ -201,7 +201,10 @@ export async function convertDocxToPdf(
 /**
  * Detect file format from name or mime type
  */
-export function detectFormat(filename: string, mimeType?: string): {
+export function detectFormat(
+  filename: string,
+  mimeType?: string,
+): {
   format: 'pdf' | 'docx' | 'doc' | 'odt' | 'rtf' | 'pptx' | 'ppt' | 'xlsx' | 'xls' | 'unknown';
   isConvertible: boolean;
   isPdf: boolean;

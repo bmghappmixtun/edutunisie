@@ -85,7 +85,12 @@ export async function checkVercelUsage(token: string): Promise<VercelUsage> {
           if (service.includes('bandwidth') || service.includes('data transfer')) {
             bandwidth += qty;
             bandwidthUnit = unit;
-          } else if (service.includes('function') || service.includes('compute') || service.includes('execution') || service.includes('invocation')) {
+          } else if (
+            service.includes('function') ||
+            service.includes('compute') ||
+            service.includes('execution') ||
+            service.includes('invocation')
+          ) {
             functionsGbSec += qty;
           } else if (service.includes('build')) {
             builds += qty;
@@ -146,16 +151,22 @@ export async function checkVercelUsage(token: string): Promise<VercelUsage> {
 
 function parseLegacyUsage(data: any): { bandwidth: any; functions: any; builds: any } | null {
   if (Array.isArray(data)) {
-    let bw = 0, bwUnit = 'GB', fn = 0, fnUnit = 'hours', builds = 0;
+    let bw = 0,
+      bwUnit = 'GB',
+      fn = 0,
+      fnUnit = 'hours',
+      builds = 0;
     let found = false;
     for (const item of data) {
       found = true;
       const v = parseFloat(item.usageValue) || 0;
       const u = item.usageUnit || '';
       if (item.resource === 'bandwidth' || item.resource === 'fastDataTransfer') {
-        bw += v; bwUnit = u;
+        bw += v;
+        bwUnit = u;
       } else if (item.resource === 'serverlessFunctionExecution' || item.resource === 'functions') {
-        fn += v; fnUnit = u;
+        fn += v;
+        fnUnit = u;
       } else if (item.resource === 'builds') {
         builds += v;
       }
@@ -171,11 +182,11 @@ function parseLegacyUsage(data: any): { bandwidth: any; functions: any; builds: 
     return {
       bandwidth: normalizeBandwidth(
         parseFloat(data.bandwidth?.usageValue) || 0,
-        data.bandwidth?.usageUnit || 'GB'
+        data.bandwidth?.usageUnit || 'GB',
       ),
       functions: normalizeFunctions(
         parseFloat(data.serverlessFunctionExecution?.usageValue || data.functions?.usageValue) || 0,
-        data.serverlessFunctionExecution?.usageUnit || data.functions?.usageUnit || 'hours'
+        data.serverlessFunctionExecution?.usageUnit || data.functions?.usageUnit || 'hours',
       ),
       builds: {
         used: Math.round(parseFloat(data.builds?.usageValue) || 0),
@@ -193,8 +204,10 @@ function normalizeBandwidth(value: number, unit: string): { used: number; unit: 
   if (u === 'MB' || u === 'MBS') gb = value / 1024;
   else if (u === 'BYTES' || u === 'B') gb = value / (1024 * 1024 * 1024);
   else if (u === 'GB' || u === 'GBS') gb = value;
-  else if (u === 'TB' || u === 'TBS') { gb = value * 1024; normalizedUnit = 'GB'; }
-  else normalizedUnit = unit || 'GB';
+  else if (u === 'TB' || u === 'TBS') {
+    gb = value * 1024;
+    normalizedUnit = 'GB';
+  } else normalizedUnit = unit || 'GB';
   return { used: parseFloat(gb.toFixed(3)), unit: normalizedUnit };
 }
 

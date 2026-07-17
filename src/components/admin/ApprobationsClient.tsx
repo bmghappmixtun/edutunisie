@@ -1,6 +1,18 @@
 'use client';
 import { useState, useMemo } from 'react';
-import { CheckCircle, XCircle, Loader2, CheckSquare, Square, Users, FileText, Filter, FolderOpen, Mail, Shield } from 'lucide-react';
+import {
+  CheckCircle,
+  XCircle,
+  Loader2,
+  CheckSquare,
+  Square,
+  Users,
+  FileText,
+  Filter,
+  FolderOpen,
+  Mail,
+  Shield,
+} from 'lucide-react';
 import TeacherVerificationFilesViewer from '@/components/admin/TeacherVerificationFilesViewer';
 import toast from 'react-hot-toast';
 
@@ -32,13 +44,18 @@ type Resource = {
   fileUrl: string;
   subject: { nameFr: string };
   class: { nameFr: string } | null;
-  teacher: { firstName: string | null; lastName: string | null; email: string; schoolName: string | null } | null;
+  teacher: {
+    firstName: string | null;
+    lastName: string | null;
+    email: string;
+    schoolName: string | null;
+  } | null;
   createdAt: string;
 };
 
 export default function ApprobationsClient({
   initialTeachers,
-  initialResources
+  initialResources,
 }: {
   initialTeachers: Teacher[];
   initialResources: Resource[];
@@ -49,7 +66,11 @@ export default function ApprobationsClient({
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState<string | null>(null);
   const [bulkLoading, setBulkLoading] = useState<'approve' | 'reject' | null>(null);
-  const [rejectModal, setRejectModal] = useState<{ ids: string[]; isBulk: boolean; itemTitle?: string } | null>(null);
+  const [rejectModal, setRejectModal] = useState<{
+    ids: string[];
+    isBulk: boolean;
+    itemTitle?: string;
+  } | null>(null);
   const [rejectReason, setRejectReason] = useState('');
   const [search, setSearch] = useState('');
   const [fileRequestModal, setFileRequestModal] = useState<{ teacher: Teacher } | null>(null);
@@ -59,7 +80,7 @@ export default function ApprobationsClient({
   const filteredList = useMemo(() => {
     if (!search.trim()) return currentList;
     const q = search.toLowerCase();
-    return currentList.filter(item => {
+    return currentList.filter((item) => {
       const str = JSON.stringify(item).toLowerCase();
       return str.includes(q);
     });
@@ -76,13 +97,13 @@ export default function ApprobationsClient({
     if (selected.size === filteredList.length) {
       setSelected(new Set());
     } else {
-      setSelected(new Set(filteredList.map(i => i.id)));
+      setSelected(new Set(filteredList.map((i) => i.id)));
     }
   }
 
   async function handleSingle(id: string, action: 'approve' | 'reject') {
     if (action === 'reject' && tab === 'resources') {
-      const item = resources.find(r => r.id === id);
+      const item = resources.find((r) => r.id === id);
       setRejectModal({ ids: [id], isBulk: false, itemTitle: item?.title });
       setRejectReason('');
       return;
@@ -92,15 +113,22 @@ export default function ApprobationsClient({
       const type = tab === 'teachers' ? 'teacher' : 'resource';
       const res = await fetch(`/api/admin/${type}/${id}/${action}`, { method: 'POST' });
       const data = await res.json();
-      if (!res.ok) { toast.error(data.error || 'Erreur'); return; }
+      if (!res.ok) {
+        toast.error(data.error || 'Erreur');
+        return;
+      }
       toast.success(action === 'approve' ? '✅ Approuvé' : '❌ Rejeté');
       // Remove from list
       if (tab === 'teachers') {
-        setTeachers(ts => ts.filter(t => t.id !== id));
+        setTeachers((ts) => ts.filter((t) => t.id !== id));
       } else {
-        setResources(rs => rs.filter(r => r.id !== id));
+        setResources((rs) => rs.filter((r) => r.id !== id));
       }
-      setSelected(s => { const n = new Set(s); n.delete(id); return n; });
+      setSelected((s) => {
+        const n = new Set(s);
+        n.delete(id);
+        return n;
+      });
     } catch (e) {
       toast.error('Erreur réseau');
     } finally {
@@ -116,26 +144,27 @@ export default function ApprobationsClient({
     }
     setBulkLoading('reject');
     try {
-      const promises = rejectModal.ids.map(id =>
+      const promises = rejectModal.ids.map((id) =>
         fetch(`/api/admin/resource/${id}/reject`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ reason: rejectReason.trim() }),
         })
-          .then(r => r.json())
-          .then(d => ({ id, ok: d.success === true }))
-          .catch(() => ({ id, ok: false }))
+          .then((r) => r.json())
+          .then((d) => ({ id, ok: d.success === true }))
+          .catch(() => ({ id, ok: false })),
       );
       const results = await Promise.all(promises);
-      const success = results.filter(r => r.ok).length;
+      const success = results.filter((r) => r.ok).length;
       const failed = results.length - success;
-      if (success > 0) toast.success(`❌ ${success} rejeté(s)${failed > 0 ? `, ${failed} échec(s)` : ''}`);
+      if (success > 0)
+        toast.success(`❌ ${success} rejeté(s)${failed > 0 ? `, ${failed} échec(s)` : ''}`);
       if (failed > 0) toast.error(`${failed} échec(s)`);
       // Remove rejected items from list
-      setResources(rs => rs.filter(r => !results.find(x => x.id === r.id && x.ok)));
-      setSelected(s => {
+      setResources((rs) => rs.filter((r) => !results.find((x) => x.id === r.id && x.ok)));
+      setSelected((s) => {
         const n = new Set(s);
-        results.filter(x => x.ok).forEach(x => n.delete(x.id));
+        results.filter((x) => x.ok).forEach((x) => n.delete(x.id));
         return n;
       });
       setRejectModal(null);
@@ -149,32 +178,35 @@ export default function ApprobationsClient({
 
   async function handleBulk(action: 'approve' | 'reject') {
     if (selected.size === 0) return;
-    if (!confirm(`${action === 'approve' ? 'Approuver' : 'Rejeter'} ${selected.size} élément(s) ?`)) return;
+    if (!confirm(`${action === 'approve' ? 'Approuver' : 'Rejeter'} ${selected.size} élément(s) ?`))
+      return;
 
     setBulkLoading(action);
     const type = tab === 'teachers' ? 'teacher' : 'resource';
-    const promises = Array.from(selected).map(id =>
+    const promises = Array.from(selected).map((id) =>
       fetch(`/api/admin/${type}/${id}/${action}`, { method: 'POST' })
-        .then(r => r.json())
-        .then(d => ({ id, ok: d.success === true }))
-        .catch(() => ({ id, ok: false }))
+        .then((r) => r.json())
+        .then((d) => ({ id, ok: d.success === true }))
+        .catch(() => ({ id, ok: false })),
     );
 
     const results = await Promise.all(promises);
-    const successIds = results.filter(r => r.ok).map(r => r.id);
+    const successIds = results.filter((r) => r.ok).map((r) => r.id);
     const failCount = results.length - successIds.length;
 
     // Remove successful from list
     if (tab === 'teachers') {
-      setTeachers(ts => ts.filter(t => !successIds.includes(t.id)));
+      setTeachers((ts) => ts.filter((t) => !successIds.includes(t.id)));
     } else {
-      setResources(rs => rs.filter(r => !successIds.includes(r.id)));
+      setResources((rs) => rs.filter((r) => !successIds.includes(r.id)));
     }
     setSelected(new Set());
     setBulkLoading(null);
 
     if (failCount === 0) {
-      toast.success(`✅ ${successIds.length} élément(s) ${action === 'approve' ? 'approuvé(s)' : 'rejeté(s)'} !`);
+      toast.success(
+        `✅ ${successIds.length} élément(s) ${action === 'approve' ? 'approuvé(s)' : 'rejeté(s)'} !`,
+      );
     } else {
       toast.error(`${successIds.length} réussi, ${failCount} échoué(s)`);
     }
@@ -195,10 +227,17 @@ export default function ApprobationsClient({
       }
       toast.success(`📁 Demande envoyée à ${teacher.firstName} ${teacher.lastName}`);
       // Update teacher in list
-      setTeachers(ts => ts.map(t => t.id === teacher.id
-        ? { ...t, status: 'PENDING_FILE_VERIFICATION', verificationFilesRequestedAt: new Date().toISOString() }
-        : t
-      ));
+      setTeachers((ts) =>
+        ts.map((t) =>
+          t.id === teacher.id
+            ? {
+                ...t,
+                status: 'PENDING_FILE_VERIFICATION',
+                verificationFilesRequestedAt: new Date().toISOString(),
+              }
+            : t,
+        ),
+      );
       setFileRequestModal(null);
       setFileRequestNote('');
     } catch (e) {
@@ -223,7 +262,10 @@ export default function ApprobationsClient({
       {/* Tabs */}
       <div className="flex gap-2 mb-6 border-b border-slate-200">
         <button
-          onClick={() => { setTab('resources'); setSelected(new Set()); }}
+          onClick={() => {
+            setTab('resources');
+            setSelected(new Set());
+          }}
           className={`flex items-center gap-2 px-4 py-3 font-semibold border-b-2 transition ${
             tab === 'resources'
               ? 'border-orange-500 text-orange-600'
@@ -234,7 +276,10 @@ export default function ApprobationsClient({
           Ressources ({resources.length})
         </button>
         <button
-          onClick={() => { setTab('teachers'); setSelected(new Set()); }}
+          onClick={() => {
+            setTab('teachers');
+            setSelected(new Set());
+          }}
           className={`flex items-center gap-2 px-4 py-3 font-semibold border-b-2 transition ${
             tab === 'teachers'
               ? 'border-amber-500 text-amber-600'
@@ -253,7 +298,7 @@ export default function ApprobationsClient({
           <input
             type="text"
             value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={(e) => setSearch(e.target.value)}
             placeholder={`Filtrer ${tab === 'teachers' ? 'les enseignants' : 'les ressources'}...`}
             className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
           />
@@ -269,7 +314,11 @@ export default function ApprobationsClient({
               disabled={bulkLoading !== null}
               className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold rounded-xl transition disabled:opacity-50 flex items-center gap-1.5"
             >
-              {bulkLoading === 'approve' ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+              {bulkLoading === 'approve' ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <CheckCircle className="w-4 h-4" />
+              )}
               Tout approuver
             </button>
             <button
@@ -277,7 +326,11 @@ export default function ApprobationsClient({
               disabled={bulkLoading !== null}
               className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-semibold rounded-xl transition disabled:opacity-50 flex items-center gap-1.5"
             >
-              {bulkLoading === 'reject' ? <Loader2 className="w-4 h-4 animate-spin" /> : <XCircle className="w-4 h-4" />}
+              {bulkLoading === 'reject' ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <XCircle className="w-4 h-4" />
+              )}
               Tout rejeter
             </button>
             <button
@@ -296,7 +349,9 @@ export default function ApprobationsClient({
           <CheckCircle className="w-12 h-12 mx-auto mb-3 text-emerald-500" />
           <p className="font-semibold text-emerald-800 text-lg">
             {currentList.length === 0
-              ? (tab === 'teachers' ? 'Aucun enseignant en attente' : 'Aucune ressource en attente')
+              ? tab === 'teachers'
+                ? 'Aucun enseignant en attente'
+                : 'Aucune ressource en attente'
               : 'Aucun résultat pour cette recherche'}
           </p>
           {currentList.length === 0 && (
@@ -321,7 +376,7 @@ export default function ApprobationsClient({
           </div>
 
           <div className="space-y-3">
-            {filteredList.map(item => {
+            {filteredList.map((item) => {
               const isTeacher = tab === 'teachers';
               const t = item as Teacher;
               const r = item as Resource;
@@ -333,16 +388,13 @@ export default function ApprobationsClient({
                     isSelected
                       ? 'border-primary-400 bg-primary-50/30 shadow-md'
                       : isTeacher
-                      ? 'border-amber-200 hover:border-amber-300'
-                      : 'border-orange-200 hover:border-orange-300'
+                        ? 'border-amber-200 hover:border-amber-300'
+                        : 'border-orange-200 hover:border-orange-300'
                   }`}
                 >
                   <div className="flex items-start gap-3">
                     {/* Checkbox */}
-                    <button
-                      onClick={() => toggleSelect(item.id)}
-                      className="mt-1 flex-shrink-0"
-                    >
+                    <button onClick={() => toggleSelect(item.id)} className="mt-1 flex-shrink-0">
                       {isSelected ? (
                         <CheckSquare className="w-5 h-5 text-primary-500" />
                       ) : (
@@ -356,10 +408,13 @@ export default function ApprobationsClient({
                         <>
                           <div className="flex items-center gap-2 mb-2">
                             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 text-white font-bold flex items-center justify-center flex-shrink-0">
-                              {t.firstName?.[0]}{t.lastName?.[0]}
+                              {t.firstName?.[0]}
+                              {t.lastName?.[0]}
                             </div>
                             <div className="min-w-0 flex-1">
-                              <div className="font-bold truncate">{t.firstName} {t.lastName}</div>
+                              <div className="font-bold truncate">
+                                {t.firstName} {t.lastName}
+                              </div>
                               <div className="text-xs text-slate-500 truncate">{t.email}</div>
                             </div>
                             {/* Status badge */}
@@ -378,16 +433,30 @@ export default function ApprobationsClient({
                             )}
                           </div>
                           <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 text-xs">
-                            {t.schoolName && <div className="bg-slate-50 px-2 py-1 rounded">🏫 {t.schoolName}</div>}
-                            {t.governorate && <div className="bg-slate-50 px-2 py-1 rounded">📍 {t.governorate}</div>}
-                            {t.diploma && <div className="bg-slate-50 px-2 py-1 rounded">🎓 {t.diploma}</div>}
-                            {t.teachingSubjects && <div className="bg-slate-50 px-2 py-1 rounded col-span-2 sm:col-span-3">📚 {t.teachingSubjects}</div>}
+                            {t.schoolName && (
+                              <div className="bg-slate-50 px-2 py-1 rounded">🏫 {t.schoolName}</div>
+                            )}
+                            {t.governorate && (
+                              <div className="bg-slate-50 px-2 py-1 rounded">
+                                📍 {t.governorate}
+                              </div>
+                            )}
+                            {t.diploma && (
+                              <div className="bg-slate-50 px-2 py-1 rounded">🎓 {t.diploma}</div>
+                            )}
+                            {t.teachingSubjects && (
+                              <div className="bg-slate-50 px-2 py-1 rounded col-span-2 sm:col-span-3">
+                                📚 {t.teachingSubjects}
+                              </div>
+                            )}
                             <div className="text-slate-400 px-2">⏱️ {formatDate(t.createdAt)}</div>
                             {t.verificationFilesRequestedAt && (
                               <div className="text-violet-600 px-2 col-span-2 sm:col-span-3 flex items-center gap-2 flex-wrap">
                                 <span>
                                   📁 Demande envoyée {formatDate(t.verificationFilesRequestedAt)}
-                                  {t.verificationFilesCount ? ` • ${t.verificationFilesCount} fichier(s) reçu(s)` : ' • en attente'}
+                                  {t.verificationFilesCount
+                                    ? ` • ${t.verificationFilesCount} fichier(s) reçu(s)`
+                                    : ' • en attente'}
                                 </span>
                                 {t.verificationFilesReceivedAt && (
                                   <span className="inline-flex items-center text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200">
@@ -409,12 +478,21 @@ export default function ApprobationsClient({
                             </div>
                             <div className="min-w-0 flex-1">
                               <div className="font-bold truncate">{r.title}</div>
-                              <div className="text-xs text-slate-500 truncate">{r.subject?.nameFr} · {r.class?.nameFr} · {r.type}</div>
+                              <div className="text-xs text-slate-500 truncate">
+                                {r.subject?.nameFr} · {r.class?.nameFr} · {r.type}
+                              </div>
                             </div>
                           </div>
-                          {r.description && <p className="text-sm text-slate-600 mb-2 line-clamp-2" dangerouslySetInnerHTML={{ __html: r.description }} />}
+                          {r.description && (
+                            <p
+                              className="text-sm text-slate-600 mb-2 line-clamp-2"
+                              dangerouslySetInnerHTML={{ __html: r.description }}
+                            />
+                          )}
                           <div className="text-xs text-slate-500 flex flex-wrap gap-x-3">
-                            <span>👤 {r.teacher?.firstName} {r.teacher?.lastName}</span>
+                            <span>
+                              👤 {r.teacher?.firstName} {r.teacher?.lastName}
+                            </span>
                             {r.teacher?.schoolName && <span>🏫 {r.teacher.schoolName}</span>}
                             <span>⏱️ {formatDate(r.createdAt)}</span>
                           </div>
@@ -438,7 +516,11 @@ export default function ApprobationsClient({
                         className="p-2 sm:px-3 sm:py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-xs sm:text-sm font-semibold rounded-lg sm:rounded-xl transition disabled:opacity-50 flex items-center gap-1.5"
                         title="Approuver"
                       >
-                        {loading === `${item.id}-approve` ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+                        {loading === `${item.id}-approve` ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <CheckCircle className="w-4 h-4" />
+                        )}
                         <span className="hidden sm:inline">Approuver</span>
                       </button>
                       <button
@@ -447,18 +529,29 @@ export default function ApprobationsClient({
                         className="p-2 sm:px-3 sm:py-2 bg-red-500 hover:bg-red-600 text-white text-xs sm:text-sm font-semibold rounded-lg sm:rounded-xl transition disabled:opacity-50 flex items-center gap-1.5"
                         title="Rejeter"
                       >
-                        {loading === `${item.id}-reject` ? <Loader2 className="w-4 h-4 animate-spin" /> : <XCircle className="w-4 h-4" />}
+                        {loading === `${item.id}-reject` ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <XCircle className="w-4 h-4" />
+                        )}
                         <span className="hidden sm:inline">Rejeter</span>
                       </button>
                       {/* Request files button — only for non-invited teachers */}
                       {isTeacher && !t.lastInvitationId && !t.invitationStatus && (
                         <button
-                          onClick={() => { setFileRequestModal({ teacher: t }); setFileRequestNote(''); }}
+                          onClick={() => {
+                            setFileRequestModal({ teacher: t });
+                            setFileRequestNote('');
+                          }}
                           disabled={loading !== null}
                           className="p-2 sm:px-3 sm:py-2 bg-violet-500 hover:bg-violet-600 text-white text-xs sm:text-sm font-semibold rounded-lg sm:rounded-xl transition disabled:opacity-50 flex items-center gap-1.5"
                           title="Demander 5 fichiers de vérification"
                         >
-                          {loading === `${item.id}-request-files` ? <Loader2 className="w-4 h-4 animate-spin" /> : <FolderOpen className="w-4 h-4" />}
+                          {loading === `${item.id}-request-files` ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <FolderOpen className="w-4 h-4" />
+                          )}
                           <span className="hidden sm:inline">Fichiers</span>
                         </button>
                       )}
@@ -473,17 +566,28 @@ export default function ApprobationsClient({
 
       {/* Reject reason modal */}
       {rejectModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" onClick={() => setRejectModal(null)}>
-          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden" onClick={e => e.stopPropagation()}>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"
+          onClick={() => setRejectModal(null)}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="bg-gradient-to-br from-red-500 to-red-700 p-6 text-white">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-2xl">
                   ❌
                 </div>
                 <div>
-                  <h2 className="text-xl font-extrabold leading-tight">Rejeter {rejectModal.isBulk ? `${rejectModal.ids.length} ressource(s)` : 'la ressource'}</h2>
+                  <h2 className="text-xl font-extrabold leading-tight">
+                    Rejeter{' '}
+                    {rejectModal.isBulk ? `${rejectModal.ids.length} ressource(s)` : 'la ressource'}
+                  </h2>
                   {rejectModal.itemTitle && !rejectModal.isBulk && (
-                    <p className="text-sm text-red-100 mt-1 line-clamp-1">{rejectModal.itemTitle}</p>
+                    <p className="text-sm text-red-100 mt-1 line-clamp-1">
+                      {rejectModal.itemTitle}
+                    </p>
                   )}
                 </div>
               </div>
@@ -494,21 +598,26 @@ export default function ApprobationsClient({
               </label>
               <textarea
                 value={rejectReason}
-                onChange={e => setRejectReason(e.target.value)}
+                onChange={(e) => setRejectReason(e.target.value)}
                 placeholder="Ex: Le fichier contient des erreurs de mise en page. Veuillez utiliser le format PDF et vérifier l'orthographe avant de re-soumettre."
                 className="w-full border-2 border-slate-200 rounded-xl p-3 text-sm focus:border-red-400 focus:ring-4 focus:ring-red-100 outline-none resize-none"
                 rows={5}
                 autoFocus
                 maxLength={500}
               />
-              <div className="text-xs text-slate-400 mt-1 text-right">{rejectReason.length}/500</div>
+              <div className="text-xs text-slate-400 mt-1 text-right">
+                {rejectReason.length}/500
+              </div>
               <p className="text-xs text-slate-500 mt-3">
                 💡 Le motif sera envoyé par email au prof et affiché dans sa bibliothèque.
               </p>
             </div>
             <div className="bg-slate-50 px-6 py-4 flex gap-2 justify-end border-t border-slate-100">
               <button
-                onClick={() => { setRejectModal(null); setRejectReason(''); }}
+                onClick={() => {
+                  setRejectModal(null);
+                  setRejectReason('');
+                }}
                 className="px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-200 rounded-lg"
                 disabled={bulkLoading === 'reject'}
               >
@@ -520,9 +629,13 @@ export default function ApprobationsClient({
                 className="px-4 py-2 text-sm font-bold text-white bg-gradient-to-r from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed shadow-md flex items-center gap-2"
               >
                 {bulkLoading === 'reject' ? (
-                  <><Loader2 className="w-4 h-4 animate-spin" /> Envoi...</>
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" /> Envoi...
+                  </>
                 ) : (
-                  <><XCircle className="w-4 h-4" /> Confirmer le refus</>
+                  <>
+                    <XCircle className="w-4 h-4" /> Confirmer le refus
+                  </>
                 )}
               </button>
             </div>
@@ -532,15 +645,23 @@ export default function ApprobationsClient({
 
       {/* FILE REQUEST modal — for new non-invited teachers */}
       {fileRequestModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" onClick={() => setFileRequestModal(null)}>
-          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden" onClick={e => e.stopPropagation()}>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"
+          onClick={() => setFileRequestModal(null)}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="bg-gradient-to-br from-violet-500 via-purple-600 to-amber-500 p-6 text-white">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-2xl">
                   📁
                 </div>
                 <div>
-                  <h2 className="text-xl font-extrabold leading-tight">Demander 5 fichiers de vérification</h2>
+                  <h2 className="text-xl font-extrabold leading-tight">
+                    Demander 5 fichiers de vérification
+                  </h2>
                   <p className="text-sm text-violet-100 mt-1">
                     {fileRequestModal.teacher.firstName} {fileRequestModal.teacher.lastName}
                   </p>
@@ -564,31 +685,42 @@ export default function ApprobationsClient({
               </label>
               <textarea
                 value={fileRequestNote}
-                onChange={e => setFileRequestNote(e.target.value)}
+                onChange={(e) => setFileRequestNote(e.target.value)}
                 placeholder="Ex: Bienvenue ! Merci de nous envoyer 5 exemples de vos meilleurs cours/séries en français et en arabe. Mettez votre nom en pied de page de chaque fichier."
                 className="w-full border-2 border-slate-200 rounded-xl p-3 text-sm focus:border-violet-400 focus:ring-4 focus:ring-violet-100 outline-none resize-none"
                 rows={5}
                 maxLength={500}
               />
-              <div className="text-xs text-slate-400 mt-1 text-right">{fileRequestNote.length}/500</div>
+              <div className="text-xs text-slate-400 mt-1 text-right">
+                {fileRequestNote.length}/500
+              </div>
             </div>
             <div className="bg-slate-50 px-6 py-4 flex gap-2 justify-end border-t border-slate-100">
               <button
-                onClick={() => { setFileRequestModal(null); setFileRequestNote(''); }}
+                onClick={() => {
+                  setFileRequestModal(null);
+                  setFileRequestNote('');
+                }}
                 className="px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-200 rounded-lg"
                 disabled={loading?.endsWith('-request-files')}
               >
                 Annuler
               </button>
               <button
-                onClick={() => handleRequestFiles(fileRequestModal.teacher, fileRequestNote.trim() || null)}
+                onClick={() =>
+                  handleRequestFiles(fileRequestModal.teacher, fileRequestNote.trim() || null)
+                }
                 disabled={loading?.endsWith('-request-files')}
                 className="px-4 py-2 text-sm font-bold text-white bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 rounded-lg disabled:opacity-50 shadow-md flex items-center gap-2"
               >
                 {loading?.endsWith('-request-files') ? (
-                  <><Loader2 className="w-4 h-4 animate-spin" /> Envoi...</>
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" /> Envoi...
+                  </>
                 ) : (
-                  <><Mail className="w-4 h-4" /> Envoyer la demande</>
+                  <>
+                    <Mail className="w-4 h-4" /> Envoyer la demande
+                  </>
                 )}
               </button>
             </div>

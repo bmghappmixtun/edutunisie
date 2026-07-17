@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 export default function ShareButton({
   url,
   title,
-  description
+  description,
 }: {
   url: string;
   title: string;
@@ -31,7 +31,7 @@ export default function ShareButton({
     window.open(
       `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweet)}&url=${encodeURIComponent(url)}`,
       '_blank',
-      'width=550,height=420'
+      'width=550,height=420',
     );
   }
 
@@ -39,7 +39,7 @@ export default function ShareButton({
     window.open(
       `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
       '_blank',
-      'width=550,height=420'
+      'width=550,height=420',
     );
   }
 
@@ -71,10 +71,7 @@ export default function ShareButton({
       {open && (
         <>
           {/* Backdrop */}
-          <div
-            className="fixed inset-0 z-[100]"
-            onClick={() => setOpen(false)}
-          />
+          <div className="fixed inset-0 z-[100]" onClick={() => setOpen(false)} />
 
           {/* Dropdown */}
           <div className="absolute right-0 top-full mt-2 bg-white rounded-2xl shadow-2xl border border-slate-200 p-2 z-[101] min-w-[240px]">
@@ -87,9 +84,7 @@ export default function ShareButton({
               ) : (
                 <LinkIcon className="w-4 h-4 text-slate-500" />
               )}
-              <span className="font-semibold text-sm">
-                {copied ? 'Copié !' : 'Copier le lien'}
-              </span>
+              <span className="font-semibold text-sm">{copied ? 'Copié !' : 'Copier le lien'}</span>
             </button>
 
             <div className="h-px bg-slate-100 my-1" />

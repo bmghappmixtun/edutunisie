@@ -2,16 +2,21 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
-import { CheckCircle2, FileText, Clock, AlertCircle } from 'lucide-react';
+import { CheckCircle2, FileText, Clock } from 'lucide-react';
 import { timeAgo } from '@/lib/utils';
 import EditReviewActions from '@/components/admin/EditReviewActions';
 
 export const dynamic = 'force-dynamic';
 
 const TYPE_LABELS: Record<string, string> = {
-  COURSE: '📖 Cours', HOMEWORK: '📝 Devoir', EXERCISE: '✏️ Exercice',
-  SERIES: '📚 Série', BAC_SUBJECT: '🎓 Sujet Bac', CORRECTION: '✅ Corrigé',
-  SUMMARY: '📄 Résumé', CARD: '🗂️ Fiche',
+  COURSE: '📖 Cours',
+  HOMEWORK: '📝 Devoir',
+  EXERCISE: '✏️ Exercice',
+  SERIES: '📚 Série',
+  BAC_SUBJECT: '🎓 Sujet Bac',
+  CORRECTION: '✅ Corrigé',
+  SUMMARY: '📄 Résumé',
+  CARD: '🗂️ Fiche',
 };
 
 const FIELD_LABELS: Record<string, string> = {
@@ -42,7 +47,8 @@ function getFieldLabel(field: string, value: any, currentData: any): string {
     if (sec) return sec.nameFr;
   }
   if (field === 'type') return TYPE_LABELS[value] || value;
-  if (field === 'language') return value === 'ar' ? 'Arabe' : value === 'fr+ar' ? 'FR + AR' : 'Français';
+  if (field === 'language')
+    return value === 'ar' ? 'Arabe' : value === 'fr+ar' ? 'FR + AR' : 'Français';
   if (field === 'trimester') return value ? `T${value}` : '—';
   if (value === null || value === '') return '(vide)';
   return String(value);
@@ -59,7 +65,9 @@ export default async function PendingEditsPage() {
       orderBy: { editRequestedAt: 'desc' },
       include: {
         subject: true,
-        editRequestedBy: { select: { id: true, firstName: true, lastName: true, schoolName: true } },
+        editRequestedBy: {
+          select: { id: true, firstName: true, lastName: true, schoolName: true },
+        },
       },
     }),
     prisma.resource.findMany({
@@ -98,19 +106,27 @@ export default async function PendingEditsPage() {
         </div>
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
           <div className="text-3xl font-extrabold text-amber-700">
-            {pendingEdits.filter(p => {
-              const d = p.editRequestedAt ? (Date.now() - new Date(p.editRequestedAt).getTime()) / 86400000 : 0;
-              return d > 3;
-            }).length}
+            {
+              pendingEdits.filter((p) => {
+                const d = p.editRequestedAt
+                  ? (Date.now() - new Date(p.editRequestedAt).getTime()) / 86400000
+                  : 0;
+                return d > 3;
+              }).length
+            }
           </div>
           <div className="text-sm text-amber-600 font-semibold">&gt; 3 jours</div>
         </div>
         <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
           <div className="text-3xl font-extrabold text-emerald-700">
-            {pendingEdits.filter(p => {
-              const d = p.editRequestedAt ? (Date.now() - new Date(p.editRequestedAt).getTime()) / 86400000 : 0;
-              return d < 1;
-            }).length}
+            {
+              pendingEdits.filter((p) => {
+                const d = p.editRequestedAt
+                  ? (Date.now() - new Date(p.editRequestedAt).getTime()) / 86400000
+                  : 0;
+                return d < 1;
+              }).length
+            }
           </div>
           <div className="text-sm text-emerald-600 font-semibold">Aujourd'hui</div>
         </div>
@@ -125,24 +141,40 @@ export default async function PendingEditsPage() {
         </div>
       ) : (
         <div className="space-y-3">
-          {pendingEdits.map(r => {
+          {pendingEdits.map((r) => {
             const pending = (r.pendingEdit as any) || {};
-            const changes = Object.keys(pending).filter(k => !['fileKey', 'fileUrl'].includes(k));
+            const changes = Object.keys(pending).filter((k) => !['fileKey', 'fileUrl'].includes(k));
             const hasNewFile = !!pending.fileKey;
-            const teacherName = r.editRequestedBy ? `${r.editRequestedBy.firstName} ${r.editRequestedBy.lastName}` : 'Inconnu';
-            const waited = r.editRequestedAt ? Math.floor((Date.now() - new Date(r.editRequestedAt).getTime()) / 3600000) : 0;
+            const teacherName = r.editRequestedBy
+              ? `${r.editRequestedBy.firstName} ${r.editRequestedBy.lastName}`
+              : 'Inconnu';
+            const waited = r.editRequestedAt
+              ? Math.floor((Date.now() - new Date(r.editRequestedAt).getTime()) / 3600000)
+              : 0;
             const isUrgent = waited > 72;
 
             return (
-              <div key={r.id} className={`bg-white rounded-2xl border-2 ${isUrgent ? 'border-amber-300' : 'border-slate-200'} p-5`}>
+              <div
+                key={r.id}
+                className={`bg-white rounded-2xl border-2 ${isUrgent ? 'border-amber-300' : 'border-slate-200'} p-5`}
+              >
                 {/* Compact header */}
                 <div className="flex items-start gap-3 mb-3">
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center text-white font-bold flex-shrink-0">
-                    {teacherName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+                    {teacherName
+                      .split(' ')
+                      .map((n) => n[0])
+                      .join('')
+                      .slice(0, 2)
+                      .toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <Link href={`/ressources/${r.slug}`} target="_blank" className="font-bold text-slate-900 hover:text-primary-600 truncate">
+                      <Link
+                        href={`/ressources/${r.slug}`}
+                        target="_blank"
+                        className="font-bold text-slate-900 hover:text-primary-600 truncate"
+                      >
                         {r.title}
                       </Link>
                       {isUrgent && (
@@ -153,7 +185,9 @@ export default async function PendingEditsPage() {
                     </div>
                     <div className="text-xs text-slate-500 flex items-center gap-2 mt-0.5">
                       <span className="font-semibold text-slate-700">{teacherName}</span>
-                      {r.editRequestedBy?.schoolName && <span>· {r.editRequestedBy.schoolName}</span>}
+                      {r.editRequestedBy?.schoolName && (
+                        <span>· {r.editRequestedBy.schoolName}</span>
+                      )}
                       <span>·</span>
                       <Clock className="w-3 h-3" />
                       {r.editRequestedAt && timeAgo(r.editRequestedAt)}
@@ -169,7 +203,7 @@ export default async function PendingEditsPage() {
                         {changes.length} modification{changes.length > 1 ? 's' : ''} :
                       </div>
                     )}
-                    {changes.map(field => {
+                    {changes.map((field) => {
                       const oldVal = (r as any)[field];
                       const newVal = pending[field];
                       return (
@@ -189,9 +223,16 @@ export default async function PendingEditsPage() {
                     })}
                     {hasNewFile && (
                       <div className="flex items-center gap-2 text-sm pt-1">
-                        <span className="text-[10px] font-bold text-slate-500 uppercase w-20 flex-shrink-0">Fichier</span>
+                        <span className="text-[10px] font-bold text-slate-500 uppercase w-20 flex-shrink-0">
+                          Fichier
+                        </span>
                         <FileText className="w-4 h-4 text-purple-600" />
-                        <a href={pending.fileUrl} target="_blank" rel="noreferrer" className="font-semibold text-purple-700 hover:underline">
+                        <a
+                          href={pending.fileUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="font-semibold text-purple-700 hover:underline"
+                        >
                           📎 Nouveau PDF →
                         </a>
                       </div>
@@ -199,10 +240,7 @@ export default async function PendingEditsPage() {
                   </div>
                 )}
 
-                <EditReviewActions
-                  resourceId={r.id}
-                  resourceTitle={r.title}
-                />
+                <EditReviewActions resourceId={r.id} resourceTitle={r.title} />
               </div>
             );
           })}
@@ -216,7 +254,7 @@ export default async function PendingEditsPage() {
             🕐 Modifications refusées récemment ({recentlyRejected.length})
           </summary>
           <div className="mt-3 space-y-2">
-            {recentlyRejected.map(r => (
+            {recentlyRejected.map((r) => (
               <div key={r.id} className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm">
                 <div className="font-bold">{r.title}</div>
                 <div className="text-xs text-red-700 mt-1">

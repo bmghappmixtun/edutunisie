@@ -4,7 +4,7 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
-import { ArrowLeft, MessageCircle } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import ChatWindow from '@/components/social/ChatWindow';
 
 export const dynamic = 'force-dynamic';
@@ -18,16 +18,38 @@ export default async function ConversationPage({ params }: { params: Promise<{ i
   const conv = await prisma.conversation.findFirst({
     where: {
       id,
-      OR: [{ studentId: user.id }, { teacherId: user.id }]
+      OR: [{ studentId: user.id }, { teacherId: user.id }],
     },
     include: {
-      student: { select: { id: true, numericId: true, slug: true, firstName: true, lastName: true, avatarUrl: true, schoolName: true } },
-      teacher: { select: { id: true, numericId: true, slug: true, firstName: true, lastName: true, avatarUrl: true, schoolName: true } },
+      student: {
+        select: {
+          id: true,
+          numericId: true,
+          slug: true,
+          firstName: true,
+          lastName: true,
+          avatarUrl: true,
+          schoolName: true,
+        },
+      },
+      teacher: {
+        select: {
+          id: true,
+          numericId: true,
+          slug: true,
+          firstName: true,
+          lastName: true,
+          avatarUrl: true,
+          schoolName: true,
+        },
+      },
       messages: {
         orderBy: { createdAt: 'asc' },
-        include: { sender: { select: { id: true, firstName: true, lastName: true, avatarUrl: true } } }
-      }
-    }
+        include: {
+          sender: { select: { id: true, firstName: true, lastName: true, avatarUrl: true } },
+        },
+      },
+    },
   });
 
   if (!conv) notFound();
@@ -44,18 +66,27 @@ export default async function ConversationPage({ params }: { params: Promise<{ i
             <Link href="/messages" className="p-2 hover:bg-slate-100 rounded-lg">
               <ArrowLeft className="w-5 h-5" />
             </Link>
-            <Link href={`/professeurs/${other.numericId}/${other.slug}`} className="flex items-center gap-3 group">
+            <Link
+              href={`/professeurs/${other.numericId}/${other.slug}`}
+              className="flex items-center gap-3 group"
+            >
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 text-white font-bold flex items-center justify-center overflow-hidden">
                 {other.avatarUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={other.avatarUrl} alt={otherName} className="w-full h-full object-cover" />
+                  <img
+                    src={other.avatarUrl}
+                    alt={otherName}
+                    className="w-full h-full object-cover"
+                  />
                 ) : (
                   `${other.firstName?.[0] || ''}${other.lastName?.[0] || ''}`.toUpperCase()
                 )}
               </div>
               <div>
                 <div className="font-bold group-hover:text-primary-600 transition">{otherName}</div>
-                <div className="text-xs text-slate-500">{other.schoolName || (user.id === conv.studentId ? 'Professeur' : 'Élève')}</div>
+                <div className="text-xs text-slate-500">
+                  {other.schoolName || (user.id === conv.studentId ? 'Professeur' : 'Élève')}
+                </div>
               </div>
             </Link>
           </div>
@@ -63,12 +94,12 @@ export default async function ConversationPage({ params }: { params: Promise<{ i
           <ChatWindow
             conversationId={conv.id}
             currentUserId={user.id}
-            initialMessages={conv.messages.map(m => ({
+            initialMessages={conv.messages.map((m) => ({
               id: m.id,
               content: m.content,
               senderId: m.senderId,
               createdAt: m.createdAt.toISOString(),
-              sender: m.sender
+              sender: m.sender,
             }))}
             otherName={otherName}
           />

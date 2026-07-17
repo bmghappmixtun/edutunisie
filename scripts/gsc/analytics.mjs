@@ -29,7 +29,9 @@ async function main() {
   });
   const qrows = (queries.data.rows || []).slice().sort((a, b) => b.clicks - a.clicks);
   for (const q of qrows) {
-    console.log(`  ${String(q.clicks).padStart(5)} clicks | ${String(q.impressions).padStart(5)} imps | ${(q.ctr * 100).toFixed(1).padStart(5)}% | pos ${q.position.toFixed(1).padStart(4)} | "${q.keys[0]}"`);
+    console.log(
+      `  ${String(q.clicks).padStart(5)} clicks | ${String(q.impressions).padStart(5)} imps | ${(q.ctr * 100).toFixed(1).padStart(5)}% | pos ${q.position.toFixed(1).padStart(4)} | "${q.keys[0]}"`,
+    );
   }
 
   // Top pages
@@ -41,7 +43,9 @@ async function main() {
   const prows = (pages.data.rows || []).slice().sort((a, b) => b.clicks - a.clicks);
   for (const p of prows) {
     const url = p.keys[0].replace(SITE_URL, '');
-    console.log(`  ${String(p.clicks).padStart(5)} clicks | ${String(p.impressions).padStart(5)} imps | ${(p.ctr * 100).toFixed(1).padStart(5)}% | pos ${p.position.toFixed(1).padStart(4)} | ${url}`);
+    console.log(
+      `  ${String(p.clicks).padStart(5)} clicks | ${String(p.impressions).padStart(5)} imps | ${(p.ctr * 100).toFixed(1).padStart(5)}% | pos ${p.position.toFixed(1).padStart(4)} | ${url}`,
+    );
   }
 
   // By country

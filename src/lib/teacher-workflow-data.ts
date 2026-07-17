@@ -33,14 +33,14 @@ export interface ClassOption {
 
 export const CLASSES: ClassOption[] = [
   // Collège
-  { slug: '7eme',  name: '7ème année (Collège)',  level: 'college' },
-  { slug: '8eme',  name: '8ème année (Collège)',  level: 'college' },
-  { slug: '9eme',  name: '9ème année (Collège)',  level: 'college' },
+  { slug: '7eme', name: '7ème année (Collège)', level: 'college' },
+  { slug: '8eme', name: '8ème année (Collège)', level: 'college' },
+  { slug: '9eme', name: '9ème année (Collège)', level: 'college' },
   // Lycée
-  { slug: '1ere-annee',                   name: '1ère année (Lycée)',                  level: 'lycee' },
-  { slug: '2eme-annee',                    name: '2ème année (Lycée)',                   level: 'lycee' },
-  { slug: '3eme-annee',                    name: '3ème année (Lycée)',                   level: 'lycee' },
-  { slug: '4eme-annee',                    name: '4ème année — Bac (Lycée)',             level: 'lycee' },
+  { slug: '1ere-annee', name: '1ère année (Lycée)', level: 'lycee' },
+  { slug: '2eme-annee', name: '2ème année (Lycée)', level: 'lycee' },
+  { slug: '3eme-annee', name: '3ème année (Lycée)', level: 'lycee' },
+  { slug: '4eme-annee', name: '4ème année — Bac (Lycée)', level: 'lycee' },
 ];
 
 // ============================================================================
@@ -52,38 +52,38 @@ export const CLASSES: ClassOption[] = [
 // ============================================================================
 export const SECTIONS_BY_CLASS: Record<ClassSlug, { slug: SectionSlug; name: string }[]> = {
   // Collège — tronc commun
-  '7eme':  [],
-  '8eme':  [],
-  '9eme':  [],
+  '7eme': [],
+  '8eme': [],
+  '9eme': [],
   // 1AS — tronc commun
   '1ere-annee': [],
   // 2AS — 5 sections
   '2eme-annee': [
-    { slug: 'sciences',                    name: 'Sciences' },
-    { slug: 'technologies-informatique',   name: 'Technologies de l\'Informatique (TI)' },
-    { slug: 'eco-services',                name: 'Économie et Services' },
-    { slug: 'lettres',                     name: 'Lettres' },
-    { slug: 'sport',                       name: 'Sport' },
+    { slug: 'sciences', name: 'Sciences' },
+    { slug: 'technologies-informatique', name: "Technologies de l'Informatique (TI)" },
+    { slug: 'eco-services', name: 'Économie et Services' },
+    { slug: 'lettres', name: 'Lettres' },
+    { slug: 'sport', name: 'Sport' },
   ],
   // 3AS — 7 sections
   '3eme-annee': [
-    { slug: 'maths',                  name: 'Mathématiques' },
-    { slug: 'sciences',               name: 'Sciences Expérimentales' },
-    { slug: 'technique',              name: 'Sciences Techniques' },
-    { slug: 'sciences-informatique',  name: 'Sciences de l\'Informatique' },
-    { slug: 'eco-gestion',            name: 'Économie et Gestion' },
-    { slug: 'lettres',                name: 'Lettres' },
-    { slug: 'sport',                  name: 'Sport' },
+    { slug: 'maths', name: 'Mathématiques' },
+    { slug: 'sciences', name: 'Sciences Expérimentales' },
+    { slug: 'technique', name: 'Sciences Techniques' },
+    { slug: 'sciences-informatique', name: "Sciences de l'Informatique" },
+    { slug: 'eco-gestion', name: 'Économie et Gestion' },
+    { slug: 'lettres', name: 'Lettres' },
+    { slug: 'sport', name: 'Sport' },
   ],
   // 4AS (Bac) — 7 sections
   '4eme-annee': [
-    { slug: 'maths',                  name: 'Bac Mathématiques' },
-    { slug: 'sciences',               name: 'Bac Sciences Expérimentales' },
-    { slug: 'technique',              name: 'Bac Sciences Techniques' },
-    { slug: 'sciences-informatique',  name: 'Bac Sciences de l\'Informatique' },
-    { slug: 'eco-gestion',            name: 'Bac Économie et Gestion' },
-    { slug: 'lettres',                name: 'Bac Lettres' },
-    { slug: 'sport',                  name: 'Bac Sport' },
+    { slug: 'maths', name: 'Bac Mathématiques' },
+    { slug: 'sciences', name: 'Bac Sciences Expérimentales' },
+    { slug: 'technique', name: 'Bac Sciences Techniques' },
+    { slug: 'sciences-informatique', name: "Bac Sciences de l'Informatique" },
+    { slug: 'eco-gestion', name: 'Bac Économie et Gestion' },
+    { slug: 'lettres', name: 'Bac Lettres' },
+    { slug: 'sport', name: 'Bac Sport' },
   ],
 };
 
@@ -107,180 +107,180 @@ export interface SubjectOption {
 
 // Matières communes — enseignées à TOUS les élèves du cycle
 const COLLEGE_COMMON: SubjectOption[] = [
-  { slug: 'arabe',                name: 'Arabe' },
-  { slug: 'francais',             name: 'Français' },
-  { slug: 'anglais',              name: 'Anglais' },
-  { slug: 'mathematiques',        name: 'Mathématiques' },
-  { slug: 'svt',                  name: 'Sciences de la Vie et de la Terre (SVT)' },
-  { slug: 'physique',             name: 'Sciences Physiques' },
-  { slug: 'histoire-geographie',  name: 'Histoire-Géographie' },
-  { slug: 'education-islamique',  name: 'Éducation Islamique' },
-  { slug: 'education-civique',    name: 'Éducation Civique' },
+  { slug: 'arabe', name: 'Arabe' },
+  { slug: 'francais', name: 'Français' },
+  { slug: 'anglais', name: 'Anglais' },
+  { slug: 'mathematiques', name: 'Mathématiques' },
+  { slug: 'svt', name: 'Sciences de la Vie et de la Terre (SVT)' },
+  { slug: 'physique', name: 'Sciences Physiques' },
+  { slug: 'histoire-geographie', name: 'Histoire-Géographie' },
+  { slug: 'education-islamique', name: 'Éducation Islamique' },
+  { slug: 'education-civique', name: 'Éducation Civique' },
   { slug: 'education-artistique', name: 'Éducation Artistique' },
-  { slug: 'technologie',          name: 'Technologie' },
-  { slug: 'education-musicale',   name: 'Éducation Musicale' },
-  { slug: 'informatique',         name: 'Informatique' },
-  { slug: 'sport',                name: 'Éducation Physique (Sport)' },
+  { slug: 'technologie', name: 'Technologie' },
+  { slug: 'education-musicale', name: 'Éducation Musicale' },
+  { slug: 'informatique', name: 'Informatique' },
+  { slug: 'sport', name: 'Éducation Physique (Sport)' },
 ];
 
 const LYCEE_COMMON: SubjectOption[] = [
-  { slug: 'arabe',                name: 'Arabe' },
-  { slug: 'francais',             name: 'Français' },
-  { slug: 'anglais',              name: 'Anglais' },
-  { slug: 'histoire-geographie',  name: 'Histoire-Géographie' },
-  { slug: 'education-islamique',  name: 'Éducation Islamique' },
-  { slug: 'education-civique',    name: 'Éducation Civique' },
-  { slug: 'philosophie',          name: 'Philosophie' },
-  { slug: 'sport',                name: 'Éducation Physique (Sport)' },
+  { slug: 'arabe', name: 'Arabe' },
+  { slug: 'francais', name: 'Français' },
+  { slug: 'anglais', name: 'Anglais' },
+  { slug: 'histoire-geographie', name: 'Histoire-Géographie' },
+  { slug: 'education-islamique', name: 'Éducation Islamique' },
+  { slug: 'education-civique', name: 'Éducation Civique' },
+  { slug: 'philosophie', name: 'Philosophie' },
+  { slug: 'sport', name: 'Éducation Physique (Sport)' },
 ];
 
 // Matières 1AS (tronc commun lycée)
 const LYCEE_1AS: SubjectOption[] = [
   ...LYCEE_COMMON,
-  { slug: 'mathematiques',        name: 'Mathématiques' },
-  { slug: 'svt',                  name: 'Sciences de la Vie et de la Terre (SVT)' },
-  { slug: 'physique',             name: 'Sciences Physiques' },
-  { slug: 'informatique',         name: 'Informatique' },
-  { slug: 'technologie',          name: 'Technologie' },
-  { slug: 'economie',             name: 'Économie (intro)' },
+  { slug: 'mathematiques', name: 'Mathématiques' },
+  { slug: 'svt', name: 'Sciences de la Vie et de la Terre (SVT)' },
+  { slug: 'physique', name: 'Sciences Physiques' },
+  { slug: 'informatique', name: 'Informatique' },
+  { slug: 'technologie', name: 'Technologie' },
+  { slug: 'economie', name: 'Économie (intro)' },
 ];
 
 // 2AS Sciences — Math/Phy/SVT renforcés + Informatique (2h/sem)
 const LYCEE_2AS_SCIENCES: SubjectOption[] = [
   ...LYCEE_COMMON,
-  { slug: 'mathematiques',        name: 'Mathématiques' },
-  { slug: 'physique',             name: 'Sciences Physiques' },
-  { slug: 'svt',                  name: 'Sciences de la Vie et de la Terre (SVT)' },
-  { slug: 'technologie',          name: 'Technologie' },
-  { slug: 'informatique',         name: 'Informatique' },
+  { slug: 'mathematiques', name: 'Mathématiques' },
+  { slug: 'physique', name: 'Sciences Physiques' },
+  { slug: 'svt', name: 'Sciences de la Vie et de la Terre (SVT)' },
+  { slug: 'technologie', name: 'Technologie' },
+  { slug: 'informatique', name: 'Informatique' },
 ];
 
 // 2AS Technologies de l'Informatique (TI)
 const LYCEE_2AS_TI: SubjectOption[] = [
   ...LYCEE_COMMON,
-  { slug: 'mathematiques',        name: 'Mathématiques' },
-  { slug: 'physique',             name: 'Physique (Techno)' },
-  { slug: 'technologie',          name: 'Technologie (TI)' },
-  { slug: 'informatique',         name: 'Informatique (TI)' },
+  { slug: 'mathematiques', name: 'Mathématiques' },
+  { slug: 'physique', name: 'Physique (Techno)' },
+  { slug: 'technologie', name: 'Technologie (TI)' },
+  { slug: 'informatique', name: 'Informatique (TI)' },
 ];
 
 // 2AS Économie et Services — + Informatique (tableurs, BD, e-commerce)
 const LYCEE_2AS_ECO: SubjectOption[] = [
   ...LYCEE_COMMON,
-  { slug: 'mathematiques',        name: 'Mathématiques (Éco)' },
-  { slug: 'economie',             name: 'Économie' },
-  { slug: 'gestion',              name: 'Gestion' },
-  { slug: 'informatique',         name: 'Informatique' },
+  { slug: 'mathematiques', name: 'Mathématiques (Éco)' },
+  { slug: 'economie', name: 'Économie' },
+  { slug: 'gestion', name: 'Gestion' },
+  { slug: 'informatique', name: 'Informatique' },
 ];
 
 // 2AS Lettres — + Informatique (bureautique, traitement de textes)
 const LYCEE_2AS_LETTRES: SubjectOption[] = [
   ...LYCEE_COMMON,
-  { slug: 'mathematiques',        name: 'Mathématiques (Lettres)' },
-  { slug: 'svt',                  name: 'Sciences de la Vie et de la Terre (Lettres)' },
-  { slug: 'informatique',         name: 'Informatique' },
+  { slug: 'mathematiques', name: 'Mathématiques (Lettres)' },
+  { slug: 'svt', name: 'Sciences de la Vie et de la Terre (Lettres)' },
+  { slug: 'informatique', name: 'Informatique' },
 ];
 
 // 2AS Sport — + Informatique (collecte/analyse données, médias)
 const LYCEE_2AS_SPORT: SubjectOption[] = [
   ...LYCEE_COMMON,
-  { slug: 'mathematiques',        name: 'Mathématiques' },
-  { slug: 'svt',                  name: 'Sciences biologiques' },
-  { slug: 'informatique',         name: 'Informatique' },
+  { slug: 'mathematiques', name: 'Mathématiques' },
+  { slug: 'svt', name: 'Sciences biologiques' },
+  { slug: 'informatique', name: 'Informatique' },
 ];
 
 // 3AS/4AS — Mathématiques — + Informatique (algo, programmation 2h/sem)
 const LYCEE_MATHS: SubjectOption[] = [
   ...LYCEE_COMMON,
-  { slug: 'mathematiques',        name: 'Mathématiques' },
-  { slug: 'physique',             name: 'Sciences Physiques' },
-  { slug: 'svt',                  name: 'Sciences de la Vie et de la Terre (SVT)' },
-  { slug: 'informatique',         name: 'Informatique' },
+  { slug: 'mathematiques', name: 'Mathématiques' },
+  { slug: 'physique', name: 'Sciences Physiques' },
+  { slug: 'svt', name: 'Sciences de la Vie et de la Terre (SVT)' },
+  { slug: 'informatique', name: 'Informatique' },
 ];
 
 // 3AS/4AS — Sciences Expérimentales — + Informatique (algo, programmation 2h/sem)
 const LYCEE_SC_EXP: SubjectOption[] = [
   ...LYCEE_COMMON,
-  { slug: 'mathematiques',        name: 'Mathématiques' },
-  { slug: 'physique',             name: 'Sciences Physiques' },
-  { slug: 'svt',                  name: 'Sciences de la Vie et de la Terre (SVT)' },
-  { slug: 'informatique',         name: 'Informatique' },
+  { slug: 'mathematiques', name: 'Mathématiques' },
+  { slug: 'physique', name: 'Sciences Physiques' },
+  { slug: 'svt', name: 'Sciences de la Vie et de la Terre (SVT)' },
+  { slug: 'informatique', name: 'Informatique' },
 ];
 
 // 3AS/4AS — Sciences Techniques — + Informatique (algo, programmation 2h/sem)
 const LYCEE_TECHNIQUE: SubjectOption[] = [
   ...LYCEE_COMMON,
-  { slug: 'mathematiques',        name: 'Mathématiques' },
-  { slug: 'physique',             name: 'Sciences Physiques' },
-  { slug: 'technologie',          name: 'Technologie (Génie méca/élec)' },
-  { slug: 'informatique',         name: 'Informatique' },
+  { slug: 'mathematiques', name: 'Mathématiques' },
+  { slug: 'physique', name: 'Sciences Physiques' },
+  { slug: 'technologie', name: 'Technologie (Génie méca/élec)' },
+  { slug: 'informatique', name: 'Informatique' },
 ];
 
 // 3AS/4AS — Sciences de l'Informatique
 const LYCEE_SI: SubjectOption[] = [
   ...LYCEE_COMMON,
-  { slug: 'mathematiques',        name: 'Mathématiques' },
-  { slug: 'physique',             name: 'Sciences Physiques' },
-  { slug: 'informatique',         name: 'Informatique' },
-  { slug: 'algo-prog',            name: 'Algorithme et Programmation' },
-  { slug: 'tic',                  name: 'Technologies de l\'Information et de la Communication' },
-  { slug: 'bases-donnees',        name: 'Bases de Données (4AS surtout)' },
-  { slug: 'systeme-exploitation-reseaux', name: 'Système d\'Exploitation et Réseaux' },
+  { slug: 'mathematiques', name: 'Mathématiques' },
+  { slug: 'physique', name: 'Sciences Physiques' },
+  { slug: 'informatique', name: 'Informatique' },
+  { slug: 'algo-prog', name: 'Algorithme et Programmation' },
+  { slug: 'tic', name: "Technologies de l'Information et de la Communication" },
+  { slug: 'bases-donnees', name: 'Bases de Données (4AS surtout)' },
+  { slug: 'systeme-exploitation-reseaux', name: "Système d'Exploitation et Réseaux" },
 ];
 
 // 3AS/4AS — Économie et Gestion — + Informatique (gestion info, tableurs, BD 2h/sem)
 const LYCEE_ECO: SubjectOption[] = [
   ...LYCEE_COMMON,
-  { slug: 'mathematiques',        name: 'Mathématiques' },
-  { slug: 'economie',             name: 'Économie' },
-  { slug: 'gestion',              name: 'Gestion' },
-  { slug: 'informatique',         name: 'Informatique' },
+  { slug: 'mathematiques', name: 'Mathématiques' },
+  { slug: 'economie', name: 'Économie' },
+  { slug: 'gestion', name: 'Gestion' },
+  { slug: 'informatique', name: 'Informatique' },
 ];
 
 // 3AS/4AS — Lettres — + Informatique (bureautique, traitement textes 2h/sem)
 const LYCEE_LETTRES: SubjectOption[] = [
   ...LYCEE_COMMON,
-  { slug: 'informatique',         name: 'Informatique' },
+  { slug: 'informatique', name: 'Informatique' },
 ];
 
 // 3AS/4AS — Sport — + Informatique (collecte données, médias 1h/sem)
 const LYCEE_SPORT: SubjectOption[] = [
   ...LYCEE_COMMON,
-  { slug: 'mathematiques',        name: 'Mathématiques' },
-  { slug: 'svt',                  name: 'Sciences biologiques' },
-  { slug: 'informatique',         name: 'Informatique' },
+  { slug: 'mathematiques', name: 'Mathématiques' },
+  { slug: 'svt', name: 'Sciences biologiques' },
+  { slug: 'informatique', name: 'Informatique' },
 ];
 
 // Index des matières par (classe, section)
 export const SUBJECTS_INDEX: Record<string, SubjectOption[]> = {
   // Collège — toutes les classes ont les mêmes matières (tronc commun)
-  '7eme::':  COLLEGE_COMMON,
-  '8eme::':  COLLEGE_COMMON,
-  '9eme::':  COLLEGE_COMMON,
+  '7eme::': COLLEGE_COMMON,
+  '8eme::': COLLEGE_COMMON,
+  '9eme::': COLLEGE_COMMON,
   // 1AS — tronc commun lycée
   '1ere-annee::': LYCEE_1AS,
   // 2AS — 5 sections
-  '2eme-annee::sciences':                  LYCEE_2AS_SCIENCES,
+  '2eme-annee::sciences': LYCEE_2AS_SCIENCES,
   '2eme-annee::technologies-informatique': LYCEE_2AS_TI,
-  '2eme-annee::eco-services':              LYCEE_2AS_ECO,
-  '2eme-annee::lettres':                   LYCEE_2AS_LETTRES,
-  '2eme-annee::sport':                     LYCEE_2AS_SPORT,
+  '2eme-annee::eco-services': LYCEE_2AS_ECO,
+  '2eme-annee::lettres': LYCEE_2AS_LETTRES,
+  '2eme-annee::sport': LYCEE_2AS_SPORT,
   // 3AS — 7 sections
-  '3eme-annee::maths':                  LYCEE_MATHS,
-  '3eme-annee::sciences':               LYCEE_SC_EXP,
-  '3eme-annee::technique':              LYCEE_TECHNIQUE,
-  '3eme-annee::sciences-informatique':  LYCEE_SI,
-  '3eme-annee::eco-gestion':            LYCEE_ECO,
-  '3eme-annee::lettres':                LYCEE_LETTRES,
-  '3eme-annee::sport':                  LYCEE_SPORT,
+  '3eme-annee::maths': LYCEE_MATHS,
+  '3eme-annee::sciences': LYCEE_SC_EXP,
+  '3eme-annee::technique': LYCEE_TECHNIQUE,
+  '3eme-annee::sciences-informatique': LYCEE_SI,
+  '3eme-annee::eco-gestion': LYCEE_ECO,
+  '3eme-annee::lettres': LYCEE_LETTRES,
+  '3eme-annee::sport': LYCEE_SPORT,
   // 4AS — 7 sections (BAC)
-  '4eme-annee::maths':                  LYCEE_MATHS,
-  '4eme-annee::sciences':               LYCEE_SC_EXP,
-  '4eme-annee::technique':              LYCEE_TECHNIQUE,
-  '4eme-annee::sciences-informatique':  LYCEE_SI,
-  '4eme-annee::eco-gestion':            LYCEE_ECO,
-  '4eme-annee::lettres':                LYCEE_LETTRES,
-  '4eme-annee::sport':                  LYCEE_SPORT,
+  '4eme-annee::maths': LYCEE_MATHS,
+  '4eme-annee::sciences': LYCEE_SC_EXP,
+  '4eme-annee::technique': LYCEE_TECHNIQUE,
+  '4eme-annee::sciences-informatique': LYCEE_SI,
+  '4eme-annee::eco-gestion': LYCEE_ECO,
+  '4eme-annee::lettres': LYCEE_LETTRES,
+  '4eme-annee::sport': LYCEE_SPORT,
 };
 
 /**
@@ -315,18 +315,48 @@ export interface FileTypeOption {
 }
 
 export const FILE_TYPES: FileTypeOption[] = [
-  { key: 'HOMEWORK', label: 'Devoir',                icon: '📝', description: 'Contrôle, synthèse ou maison', color: 'amber' },
-  { key: 'EXERCISE', label: "Série d'exercices",     icon: '✏️', description: 'Avec ou sans corrigé',         color: 'emerald' },
-  { key: 'COURSE',   label: 'Cours',                 icon: '📚', description: 'Leçon, chapitre, fiche',       color: 'violet' },
-  { key: 'REVISION', label: 'Révision',              icon: '🔄', description: 'Bac blanc, rattrapage, fiche',  color: 'sky' },
-  { key: 'OTHER',    label: 'Autres',                icon: '📦', description: 'Vous préciserez le type',      color: 'slate' },
+  {
+    key: 'HOMEWORK',
+    label: 'Devoir',
+    icon: '📝',
+    description: 'Contrôle, synthèse ou maison',
+    color: 'amber',
+  },
+  {
+    key: 'EXERCISE',
+    label: "Série d'exercices",
+    icon: '✏️',
+    description: 'Avec ou sans corrigé',
+    color: 'emerald',
+  },
+  {
+    key: 'COURSE',
+    label: 'Cours',
+    icon: '📚',
+    description: 'Leçon, chapitre, fiche',
+    color: 'violet',
+  },
+  {
+    key: 'REVISION',
+    label: 'Révision',
+    icon: '🔄',
+    description: 'Bac blanc, rattrapage, fiche',
+    color: 'sky',
+  },
+  {
+    key: 'OTHER',
+    label: 'Autres',
+    icon: '📦',
+    description: 'Vous préciserez le type',
+    color: 'slate',
+  },
 ];
 
 // Sous-types pour Devoir
 export const HOMEWORK_SUBTYPES = [
-  { key: 'CONTROL',    label: '📋 Devoir de Contrôle',  color: 'red' },
-  { key: 'SYNTHESIS',  label: '📝 Devoir de Synthèse',  color: 'violet' },
-  { key: 'HOUSEWORK',  label: '🏠 Devoir de Maison',    color: 'orange' },
+  { key: 'CONTROL', label: '📋 Devoir de Contrôle', color: 'red' },
+  { key: 'SYNTHESIS', label: '📝 Devoir de Synthèse', color: 'violet' },
+  { key: 'HOUSEWORK', label: '🏠 Devoir de Maison', color: 'orange' },
 ];
 
 // Numéros de devoir (1 → 6 pour Devoir, 1 → 20 pour Série)
@@ -338,8 +368,32 @@ export const EXERCISE_NUMBERS = Array.from({ length: 20 }, (_, i) => i + 1);
 // ============================================================================
 export type SchoolType = 'PUBLIC' | 'PRIVATE' | 'PILOTE';
 
-export const SCHOOL_TYPES: { key: SchoolType; label: string; icon: string; description: string; color: string }[] = [
-  { key: 'PUBLIC',  label: 'École Publique',    icon: '🏫', description: 'École publique (par défaut)',  color: 'slate' },
-  { key: 'PRIVATE', label: 'École Privée',      icon: '🏛️', description: 'École privée / libre',         color: 'blue' },
-  { key: 'PILOTE',  label: 'École Pilote',      icon: '🎓', description: 'Lycée/Collège Pilote d\'excellence', color: 'amber' },
+export const SCHOOL_TYPES: {
+  key: SchoolType;
+  label: string;
+  icon: string;
+  description: string;
+  color: string;
+}[] = [
+  {
+    key: 'PUBLIC',
+    label: 'École Publique',
+    icon: '🏫',
+    description: 'École publique (par défaut)',
+    color: 'slate',
+  },
+  {
+    key: 'PRIVATE',
+    label: 'École Privée',
+    icon: '🏛️',
+    description: 'École privée / libre',
+    color: 'blue',
+  },
+  {
+    key: 'PILOTE',
+    label: 'École Pilote',
+    icon: '🎓',
+    description: "Lycée/Collège Pilote d'excellence",
+    color: 'amber',
+  },
 ];

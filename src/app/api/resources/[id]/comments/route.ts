@@ -7,7 +7,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   const comments = await prisma.comment.findMany({
     where: { resourceId: id, parentId: null },
     include: { user: { select: { firstName: true, lastName: true } } },
-    orderBy: { createdAt: 'desc' }
+    orderBy: { createdAt: 'desc' },
   });
   return NextResponse.json({ comments });
 }
@@ -27,7 +27,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   const comment = await prisma.comment.create({
     data: { resourceId: id, userId: user.id, content },
-    include: { user: { select: { firstName: true, lastName: true } } }
+    include: { user: { select: { firstName: true, lastName: true } } },
   });
   await prisma.resource.update({ where: { id }, data: { commentsCount: { increment: 1 } } });
 
@@ -38,9 +38,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         userId: resource.teacherId,
         type: 'new_comment',
         title: 'Nouveau commentaire',
-        message: `${user.firstName || ""} ${user.lastName || ""} a commenté votre ressource "${resource.title}"`,
-        link: `/ressources/${resource.numericId}/${resource.slug}`
-      }
+        message: `${user.firstName || ''} ${user.lastName || ''} a commenté votre ressource "${resource.title}"`,
+        link: `/ressources/${resource.numericId}/${resource.slug}`,
+      },
     });
   }
 

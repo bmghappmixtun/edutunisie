@@ -22,9 +22,7 @@ export function generateMetadata({ searchParams }: { searchParams: any }): Metad
       ? 'ابحث في آلاف الموارد التربوية المجانية: دروس، فروض، تمارين، مواضيع باك وإصلاحات. بحث متسامح مع الأخطاء، مرادفات فرنسية/عربية مشمولة.'
       : 'Recherchez parmi des milliers de ressources pédagogiques gratuites : cours, devoirs, exercices, sujets de bac et corrigés. Recherche tolérante aux fautes, synonymes FR/AR inclus.',
     alternates: { canonical: '/recherche' },
-    robots: hasQuery
-      ? { index: false, follow: true }
-      : { index: true, follow: true },
+    robots: hasQuery ? { index: false, follow: true } : { index: true, follow: true },
     openGraph: {
       title: isAr ? 'بحث في إكسامانت' : 'Recherche Examanet',
       description: isAr
@@ -62,28 +60,54 @@ async function getInitialData(searchParams: any): Promise<{
   });
 
   // Load filter options (subjects, classes, etc.) for the UI
-  const [subjects, classes, sections, teachers, types, years, trimestres, languages] = await Promise.all([
-    prisma.subject.findMany({ select: { id: true, nameFr: true, slug: true, color: true, icon: true } }),
-    prisma.class.findMany({ select: { id: true, nameFr: true, slug: true, } }),
-    prisma.section.findMany({ select: { id: true, nameFr: true, slug: true, classId: true } }),
-    prisma.user.findMany({
-      where: { role: 'TEACHER', status: 'ACTIVE' },
-      select: { id: true, firstName: true, lastName: true },
-      take: 30,
-    }),
-    Object.entries(data.facets.type).map(([value, count]) => ({ value, count })),
-    Object.entries(data.facets.year).map(([value, count]) => ({ value, count })).sort((a, b) => b.value.localeCompare(a.value)),
-    Object.entries(data.facets.trimester).map(([value, count]) => ({ value, count })),
-    Object.entries(data.facets.language).map(([value, count]) => ({ value, count })),
-  ]);
+  const [subjects, classes, sections, teachers, types, years, trimestres, languages] =
+    await Promise.all([
+      prisma.subject.findMany({
+        select: { id: true, nameFr: true, slug: true, color: true, icon: true },
+      }),
+      prisma.class.findMany({ select: { id: true, nameFr: true, slug: true } }),
+      prisma.section.findMany({ select: { id: true, nameFr: true, slug: true, classId: true } }),
+      prisma.user.findMany({
+        where: { role: 'TEACHER', status: 'ACTIVE' },
+        select: { id: true, firstName: true, lastName: true },
+        take: 30,
+      }),
+      Object.entries(data.facets.type).map(([value, count]) => ({ value, count })),
+      Object.entries(data.facets.year)
+        .map(([value, count]) => ({ value, count }))
+        .sort((a, b) => b.value.localeCompare(a.value)),
+      Object.entries(data.facets.trimester).map(([value, count]) => ({ value, count })),
+      Object.entries(data.facets.language).map(([value, count]) => ({ value, count })),
+    ]);
 
   return {
     initialData: data,
     options: {
-      subjects: subjects.map(s => ({ id: s.id, nameFr: s.nameFr, slug: s.slug, color: s.color, icon: s.icon, count: data.facets.subjectId[s.id] || 0 })),
-      classes: classes.map(c => ({ id: c.id, nameFr: c.nameFr, slug: c.slug, count: data.facets.classId[c.id] || 0 })),
-      sections: sections.map(s => ({ id: s.id, nameFr: s.nameFr, slug: s.slug, classId: s.classId, count: data.facets.sectionId[s.id] || 0 })),
-      teachers: teachers.map(t => ({ id: t.id, name: `${t.firstName || ''} ${t.lastName || ''}`.trim() })),
+      subjects: subjects.map((s) => ({
+        id: s.id,
+        nameFr: s.nameFr,
+        slug: s.slug,
+        color: s.color,
+        icon: s.icon,
+        count: data.facets.subjectId[s.id] || 0,
+      })),
+      classes: classes.map((c) => ({
+        id: c.id,
+        nameFr: c.nameFr,
+        slug: c.slug,
+        count: data.facets.classId[c.id] || 0,
+      })),
+      sections: sections.map((s) => ({
+        id: s.id,
+        nameFr: s.nameFr,
+        slug: s.slug,
+        classId: s.classId,
+        count: data.facets.sectionId[s.id] || 0,
+      })),
+      teachers: teachers.map((t) => ({
+        id: t.id,
+        name: `${t.firstName || ''} ${t.lastName || ''}`.trim(),
+      })),
       types,
       years,
       trimestres,
@@ -109,11 +133,13 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
       <div className="h-20" />
       <HideOnScrollSearchBar initialQuery={currentQ} />
       <main className="flex-1 mt-6">
-        <Suspense fallback={
-          <div className="flex items-center justify-center py-20">
-            <div className="animate-spin w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full" />
-          </div>
-        }>
+        <Suspense
+          fallback={
+            <div className="flex items-center justify-center py-20">
+              <div className="animate-spin w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full" />
+            </div>
+          }
+        >
           <SearchResultsV2 initialData={initialData} options={options} />
         </Suspense>
       </main>

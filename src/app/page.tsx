@@ -13,9 +13,11 @@ export async function generateMetadata(): Promise<Metadata> {
   const isAr: boolean = await (async () => {
     try {
       const h = await headers();
-      return h.get('x-locale') === 'ar'
-        || (h.get('x-pathname') || '').startsWith('/ar')
-        || (h.get('cookie') || '').includes('locale=ar');
+      return (
+        h.get('x-locale') === 'ar' ||
+        (h.get('x-pathname') || '').startsWith('/ar') ||
+        (h.get('cookie') || '').includes('locale=ar')
+      );
     } catch {
       return false;
     }
@@ -23,13 +25,15 @@ export async function generateMetadata(): Promise<Metadata> {
   if (!isAr) {
     return {
       title: 'Examanet — Cours, devoirs, exercices et corrigés gratuits en Tunisie',
-      description: 'Plateforme pédagogique tunisienne #1 : cours, devoirs, exercices, sujets de bac et corrigés pour le Primaire, Collège et Lycée. 100% gratuit.',
+      description:
+        'Plateforme pédagogique tunisienne #1 : cours, devoirs, exercices, sujets de bac et corrigés pour le Primaire, Collège et Lycée. 100% gratuit.',
       alternates: { canonical: '/' },
     };
   }
   return {
     title: 'إكسامانت — دروس، فروض، تمارين وإصلاحات مجانية في تونس',
-    description: 'المنصة التربوية التونسية #1: دروس، فروض، تمارين، مواضيع باكالوريا وإصلاحات للابتدائي، الإعدادي والثانوي. 100% مجاني.',
+    description:
+      'المنصة التربوية التونسية #1: دروس، فروض، تمارين، مواضيع باكالوريا وإصلاحات للابتدائي، الإعدادي والثانوي. 100% مجاني.',
     alternates: { canonical: '/ar' },
     openGraph: {
       title: 'إكسامانت — المنصة التربوية التونسية #1',
@@ -37,7 +41,14 @@ export async function generateMetadata(): Promise<Metadata> {
       url: '/ar',
       type: 'website',
       locale: 'ar_TN',
-      images: [{ url: '/api/og/page/home', width: 1200, height: 630, alt: 'إكسامانت - المنصة التربوية التونسية' }],
+      images: [
+        {
+          url: '/api/og/page/home',
+          width: 1200,
+          height: 630,
+          alt: 'إكسامانت - المنصة التربوية التونسية',
+        },
+      ],
     },
   };
 }
@@ -45,7 +56,14 @@ export async function generateMetadata(): Promise<Metadata> {
 export const revalidate = 300; // 5 min cache
 
 async function getHomeData() {
-  const allResourceIds = await prisma.resource.findMany({ where: { status: 'PUBLISHED' }, select: { id: true }, take: 16, orderBy: [{ viewsCount: 'desc' }, { publishedAt: 'desc' }] }).then(r => r.map(x => x.id));
+  const allResourceIds = await prisma.resource
+    .findMany({
+      where: { status: 'PUBLISHED' },
+      select: { id: true },
+      take: 16,
+      orderBy: [{ viewsCount: 'desc' }, { publishedAt: 'desc' }],
+    })
+    .then((r) => r.map((x) => x.id));
   const homeFavIds = await getUserFavorites(allResourceIds);
 
   const [popular, recent, statsArr, subjects] = await Promise.all([
@@ -53,13 +71,25 @@ async function getHomeData() {
       where: { status: 'PUBLISHED' },
       take: 8,
       orderBy: [{ viewsCount: 'desc' }, { publishedAt: 'desc' }],
-      include: { subject: true, class: true, teacher: { select: { firstName: true, lastName: true, firstNameAr: true, lastNameAr: true } },}
+      include: {
+        subject: true,
+        class: true,
+        teacher: {
+          select: { firstName: true, lastName: true, firstNameAr: true, lastNameAr: true },
+        },
+      },
     }),
     prisma.resource.findMany({
       where: { status: 'PUBLISHED' },
       take: 8,
       orderBy: { publishedAt: 'desc' },
-      include: { subject: true, class: true, teacher: { select: { firstName: true, lastName: true, firstNameAr: true, lastNameAr: true } },}
+      include: {
+        subject: true,
+        class: true,
+        teacher: {
+          select: { firstName: true, lastName: true, firstNameAr: true, lastNameAr: true },
+        },
+      },
     }),
     Promise.all([
       prisma.resource.count({ where: { status: 'PUBLISHED' } }),
@@ -79,7 +109,7 @@ async function getHomeData() {
       teachers: teacherCount,
       students: studentCount,
       downloads: downloads._sum.downloadsCount || 0,
-    }
+    },
   };
 }
 

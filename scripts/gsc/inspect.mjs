@@ -48,7 +48,8 @@ async function main() {
       console.log('  Last crawl    :', r.indexStatusResult?.lastCrawlTime || 'never');
       console.log('  Coverage      :', r.indexStatusResult?.coverageState || '?');
       console.log('  Robots.txt    :', r.indexStatusResult?.robotsTxtState || '?');
-      if (r.mobileUsabilityResult) console.log('  Mobile        :', r.mobileUsabilityResult.verdict);
+      if (r.mobileUsabilityResult)
+        console.log('  Mobile        :', r.mobileUsabilityResult.verdict);
       if (r.richResultsResult) console.log('  Rich results  :', r.richResultsResult.verdict);
     } catch (e) {
       if (e.code === 404) console.log('not in GSC index');

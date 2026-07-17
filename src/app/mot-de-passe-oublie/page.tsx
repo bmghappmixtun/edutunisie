@@ -2,7 +2,18 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { GraduationCap, Eye, EyeOff, ArrowLeft, Mail, KeyRound, CheckCircle2, Loader2, AlertCircle, RefreshCw } from 'lucide-react';
+import {
+  GraduationCap,
+  Eye,
+  EyeOff,
+  ArrowLeft,
+  Mail,
+  KeyRound,
+  CheckCircle2,
+  Loader2,
+  AlertCircle,
+  RefreshCw,
+} from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useI18n } from '@/lib/i18n';
 
@@ -142,9 +153,12 @@ export default function ForgotPasswordPage() {
               <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-primary-100 flex items-center justify-center">
                 <Mail className="w-7 h-7 text-primary-600" />
               </div>
-              <h1 className="text-2xl font-extrabold">{t('auth.forgotPasswordTitle') || 'Mot de passe oublié ?'}</h1>
+              <h1 className="text-2xl font-extrabold">
+                {t('auth.forgotPasswordTitle') || 'Mot de passe oublié ?'}
+              </h1>
               <p className="text-slate-500 mt-1 text-sm">
-                {t('auth.forgotPasswordSubtitle') || 'Entrez votre email et nous vous enverrons un code pour réinitialiser votre mot de passe.'}
+                {t('auth.forgotPasswordSubtitle') ||
+                  'Entrez votre email et nous vous enverrons un code pour réinitialiser votre mot de passe.'}
               </p>
             </>
           )}
@@ -166,7 +180,9 @@ export default function ForgotPasswordPage() {
               <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-emerald-100 flex items-center justify-center">
                 <CheckCircle2 className="w-7 h-7 text-emerald-600" />
               </div>
-              <h1 className="text-2xl font-extrabold">{t('auth.passwordReset') || 'Mot de passe réinitialisé !'}</h1>
+              <h1 className="text-2xl font-extrabold">
+                {t('auth.passwordReset') || 'Mot de passe réinitialisé !'}
+              </h1>
               <p className="text-slate-500 mt-1 text-sm">
                 {t('auth.redirectingToLogin') || 'Redirection vers la page de connexion...'}
               </p>
@@ -175,7 +191,10 @@ export default function ForgotPasswordPage() {
         </div>
 
         {step === 'email' && (
-          <form onSubmit={requestCode} className="bg-white rounded-2xl p-6 lg:p-8 shadow-xl border border-slate-100">
+          <form
+            onSubmit={requestCode}
+            className="bg-white rounded-2xl p-6 lg:p-8 shadow-xl border border-slate-100"
+          >
             <div className="mb-6">
               <label className="label">{t('auth.email') || 'Email'}</label>
               <input
@@ -188,11 +207,24 @@ export default function ForgotPasswordPage() {
                 placeholder="votre@email.com"
               />
             </div>
-            <button type="submit" disabled={loading || !email} className="btn-primary w-full justify-center py-3 text-base disabled:opacity-50">
-              {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> ...</> : (t('auth.sendCode') || 'Envoyer le code')}
+            <button
+              type="submit"
+              disabled={loading || !email}
+              className="btn-primary w-full justify-center py-3 text-base disabled:opacity-50"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" /> ...
+                </>
+              ) : (
+                t('auth.sendCode') || 'Envoyer le code'
+              )}
             </button>
             <div className="mt-6 text-center text-sm text-slate-500">
-              <Link href="/connexion" className="inline-flex items-center gap-1 text-primary-600 hover:underline font-semibold">
+              <Link
+                href="/connexion"
+                className="inline-flex items-center gap-1 text-primary-600 hover:underline font-semibold"
+              >
                 <ArrowLeft className="w-3 h-3" /> {t('auth.backToLogin') || 'Retour à la connexion'}
               </Link>
             </div>
@@ -200,7 +232,10 @@ export default function ForgotPasswordPage() {
         )}
 
         {step === 'code' && (
-          <form onSubmit={handleReset} className="bg-white rounded-2xl p-6 lg:p-8 shadow-xl border border-slate-100">
+          <form
+            onSubmit={handleReset}
+            className="bg-white rounded-2xl p-6 lg:p-8 shadow-xl border border-slate-100"
+          >
             <div className="mb-4">
               <label className="label">{t('auth.code') || 'Code reçu'}</label>
               <input
@@ -227,7 +262,9 @@ export default function ForgotPasswordPage() {
                 className="mt-2 text-xs text-primary-600 hover:underline disabled:text-slate-400 disabled:no-underline inline-flex items-center gap-1"
               >
                 <RefreshCw className={`w-3 h-3 ${resending ? 'animate-spin' : ''}`} />
-                {cooldown > 0 ? `Renvoyer dans ${cooldown}s` : (t('auth.resendCode') || 'Renvoyer le code')}
+                {cooldown > 0
+                  ? `Renvoyer dans ${cooldown}s`
+                  : t('auth.resendCode') || 'Renvoyer le code'}
               </button>
             </div>
             <div className="mb-4">
@@ -242,13 +279,19 @@ export default function ForgotPasswordPage() {
                   className="input pr-10"
                   placeholder="••••••••"
                 />
-                <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                <button
+                  type="button"
+                  onClick={() => setShowPw(!showPw)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                >
                   {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
             </div>
             <div className="mb-6">
-              <label className="label">{t('auth.confirmPassword') || 'Confirmer le mot de passe'}</label>
+              <label className="label">
+                {t('auth.confirmPassword') || 'Confirmer le mot de passe'}
+              </label>
               <input
                 type={showPw ? 'text' : 'password'}
                 value={confirmPassword}
@@ -259,16 +302,31 @@ export default function ForgotPasswordPage() {
                 placeholder="••••••••"
               />
             </div>
-            <button type="submit" disabled={loading || code.length !== 6 || newPassword.length < 8} className="btn-primary w-full justify-center py-3 text-base disabled:opacity-50">
-              {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> ...</> : (t('auth.resetPassword') || 'Réinitialiser le mot de passe')}
+            <button
+              type="submit"
+              disabled={loading || code.length !== 6 || newPassword.length < 8}
+              className="btn-primary w-full justify-center py-3 text-base disabled:opacity-50"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" /> ...
+                </>
+              ) : (
+                t('auth.resetPassword') || 'Réinitialiser le mot de passe'
+              )}
             </button>
             <div className="mt-4 text-center text-sm text-slate-500">
               <button
                 type="button"
-                onClick={() => { setStep('email'); setCode(''); setNewPassword(''); setConfirmPassword(''); }}
+                onClick={() => {
+                  setStep('email');
+                  setCode('');
+                  setNewPassword('');
+                  setConfirmPassword('');
+                }}
                 className="inline-flex items-center gap-1 text-slate-500 hover:text-slate-700"
               >
-                <ArrowLeft className="w-3 h-3" /> {t('auth.changeEmail') || 'Changer d\'email'}
+                <ArrowLeft className="w-3 h-3" /> {t('auth.changeEmail') || "Changer d'email"}
               </button>
             </div>
           </form>
@@ -276,10 +334,7 @@ export default function ForgotPasswordPage() {
 
         {step === 'done' && (
           <div className="bg-white rounded-2xl p-6 lg:p-8 shadow-xl border border-slate-100 text-center">
-            <Link
-              href="/connexion"
-              className="btn-primary w-full justify-center py-3 text-base"
-            >
+            <Link href="/connexion" className="btn-primary w-full justify-center py-3 text-base">
               {t('auth.loginButton') || 'Se connecter'}
             </Link>
           </div>

@@ -25,13 +25,16 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     if (!resource) return NextResponse.json({ error: 'Ressource introuvable' }, { status: 404 });
 
     if (user.role !== 'ADMIN' && resource.teacherId !== user.id) {
-      return NextResponse.json({ error: 'Vous n\'êtes pas le propriétaire' }, { status: 403 });
+      return NextResponse.json({ error: "Vous n'êtes pas le propriétaire" }, { status: 403 });
     }
 
     if (resource.editStatus === 'PENDING_EDIT_APPROVAL') {
-      return NextResponse.json({
-        error: 'Une modification est déjà en attente d\'approbation.'
-      }, { status: 409 });
+      return NextResponse.json(
+        {
+          error: "Une modification est déjà en attente d'approbation.",
+        },
+        { status: 409 },
+      );
     }
 
     const formData = await req.formData();
@@ -50,7 +53,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const buffer = Buffer.from(await file.arrayBuffer());
     const ext = file.name.split('.').pop() || 'pdf';
     const fileName = `resources/${id}/pending-${Date.now()}.${ext}`;
-    const uploadResult: any = await uploadFile(fileName, buffer, "application/pdf");
+    const uploadResult: any = await uploadFile(fileName, buffer, 'application/pdf');
     const fileUrl = uploadResult.url || uploadResult;
 
     // Get current pendingEdit (or empty object) and merge file info
@@ -70,7 +73,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
           fileKey: uploadResult.key || fileName,
           fileUrl,
           fileSize: file.size,
-        }
+        },
       });
       return NextResponse.json({
         success: true,
@@ -96,19 +99,22 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         editRejectionReason: null,
         editReviewedAt: null,
         editReviewedById: null,
-      }
+      },
     });
 
     // Notify admins (in-app + email)
-    const admins = await prisma.user.findMany({ where: { role: 'ADMIN' }, select: { id: true, email: true, firstName: true } });
+    const admins = await prisma.user.findMany({
+      where: { role: 'ADMIN' },
+      select: { id: true, email: true, firstName: true },
+    });
     await prisma.notification.createMany({
-      data: admins.map(a => ({
+      data: admins.map((a) => ({
         userId: a.id,
         type: 'edit_pending',
         title: wasPreviouslyRejected ? 'Fichier re-soumis 🔄' : 'Fichier remplacé (en attente) ✏️',
-        message: `${user.firstName || ""} ${user.lastName || ""} a ${wasPreviouslyRejected ? 're-soumis le fichier de' : 'remplacé le fichier de'} "${resource.title}" — en attente d'approbation.`,
-        link: `/admin/ressources/editions`
-      }))
+        message: `${user.firstName || ''} ${user.lastName || ''} a ${wasPreviouslyRejected ? 're-soumis le fichier de' : 'remplacé le fichier de'} "${resource.title}" — en attente d'approbation.`,
+        link: `/admin/ressources/editions`,
+      })),
     });
 
     // Send email to all admins
@@ -124,7 +130,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
           fileSummary,
           reviewUrl,
           wasPreviouslyRejected,
-          previousRejectionReason
+          previousRejectionReason,
         );
       }
     }
@@ -132,7 +138,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     return NextResponse.json({
       success: true,
       mode: 'pending',
-      message: 'Nouveau fichier en attente d\'approbation par un administrateur.',
+      message: "Nouveau fichier en attente d'approbation par un administrateur.",
     });
   } catch (e: any) {
     console.error('File upload error:', e);

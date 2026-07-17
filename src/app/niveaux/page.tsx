@@ -6,8 +6,14 @@ import { prisma } from '@/lib/prisma';
 import { itemListSchema } from '@/lib/structured-data';
 import { getLocale, getT } from '@/lib/i18n-server';
 import {
-  BookOpen, ArrowRight, Sparkles, GraduationCap, School,
-  Baby, Library, Atom, Trophy, BookMarked, ChevronRight,
+  BookOpen,
+  ArrowRight,
+  GraduationCap,
+  School,
+  Library,
+  Trophy,
+  BookMarked,
+  ChevronRight,
   type LucideIcon,
 } from 'lucide-react';
 import ClassAccordion from '@/components/niveaux/ClassAccordion';
@@ -24,16 +30,21 @@ export async function generateMetadata(): Promise<Metadata> {
       : 'Ressources gratuites par niveau scolaire tunisien : 7ème à 9ème année (Collège), 1ère à 4ème année (Lycée/Bac). Cours, exercices et corrigés pour chaque classe.',
     alternates: { canonical: '/niveaux' },
     openGraph: {
-      title: isAr
-        ? 'جميع المستويات الدراسية في تونس'
-        : 'Tous les niveaux scolaires en Tunisie',
+      title: isAr ? 'جميع المستويات الدراسية في تونس' : 'Tous les niveaux scolaires en Tunisie',
       description: isAr
         ? 'من الابتدائي إلى الباك: دروس، تمارين وإصلاحات حسب القسم والشعبة.'
         : 'Du Primaire au Bac : cours, exercices et corrigés par classe et section.',
       url: '/niveaux',
       type: 'website',
       locale: isAr ? 'ar_TN' : 'fr_TN',
-      images: [{ url: '/api/og/page/niveaux', width: 1200, height: 630, alt: isAr ? 'إكسامانت — جميع المستويات' : 'Examanet — Tous les niveaux' }],
+      images: [
+        {
+          url: '/api/og/page/niveaux',
+          width: 1200,
+          height: 630,
+          alt: isAr ? 'إكسامانت — جميع المستويات' : 'Examanet — Tous les niveaux',
+        },
+      ],
     },
   };
 }
@@ -41,16 +52,19 @@ export async function generateMetadata(): Promise<Metadata> {
 export const revalidate = 300; // 5 min cache
 
 /** Per-level design tokens (color + icon + gradient) */
-const LEVEL_DESIGN: Record<string, {
-  emoji: string;
-  color: string;
-  gradient: string;       // main hero gradient
-  cardGradient: string;   // section background
-  accent: string;         // small accent color
-  Icon: LucideIcon;
-  badge: string;
-  tagline: string;
-}> = {
+const LEVEL_DESIGN: Record<
+  string,
+  {
+    emoji: string;
+    color: string;
+    gradient: string; // main hero gradient
+    cardGradient: string; // section background
+    accent: string; // small accent color
+    Icon: LucideIcon;
+    badge: string;
+    tagline: string;
+  }
+> = {
   college: {
     emoji: '🏫',
     color: '#10B981',
@@ -75,10 +89,10 @@ const LEVEL_DESIGN: Record<string, {
 
 /** Per-class design: index, short code, color shift */
 const CLASS_STYLES: Record<string, { roman: string; emoji: string; tint: string }> = {
-  '7eme':         { roman: 'VII',  emoji: '📗', tint: '#10B981' },
-  '8eme':         { roman: 'VIII', emoji: '📘', tint: '#059669' },
-  '9eme':         { roman: 'IX',   emoji: '📙', tint: '#0D9488' },
-  '1ere-secondaire': { roman: 'I',  emoji: '📓', tint: '#6366F1' },
+  '7eme': { roman: 'VII', emoji: '📗', tint: '#10B981' },
+  '8eme': { roman: 'VIII', emoji: '📘', tint: '#059669' },
+  '9eme': { roman: 'IX', emoji: '📙', tint: '#0D9488' },
+  '1ere-secondaire': { roman: 'I', emoji: '📓', tint: '#6366F1' },
   '2eme-secondaire': { roman: 'II', emoji: '📔', tint: '#7C3AED' },
   '3eme-secondaire': { roman: 'III', emoji: '📒', tint: '#8B5CF6' },
   '4eme-secondaire': { roman: 'IV', emoji: '🎯', tint: '#A855F7' },
@@ -88,31 +102,27 @@ const CLASS_STYLES: Record<string, { roman: string; emoji: string; tint: string 
 function sectionStyle(classSlug: string, sectionSlug: string): { emoji: string; tint: string } {
   // 2AS sections
   if (classSlug === '2eme-secondaire') {
-    if (sectionSlug === 'sciences')                  return { emoji: '🔬', tint: '#0EA5E9' };
+    if (sectionSlug === 'sciences') return { emoji: '🔬', tint: '#0EA5E9' };
     if (sectionSlug === 'technologies-informatique') return { emoji: '💻', tint: '#2563EB' };
-    if (sectionSlug === 'eco-services')              return { emoji: '📊', tint: '#0891B2' };
-    if (sectionSlug === 'lettres')                   return { emoji: '📚', tint: '#A855F7' };
-    if (sectionSlug === 'sport')                     return { emoji: '⚽', tint: '#EA580C' };
+    if (sectionSlug === 'eco-services') return { emoji: '📊', tint: '#0891B2' };
+    if (sectionSlug === 'lettres') return { emoji: '📚', tint: '#A855F7' };
+    if (sectionSlug === 'sport') return { emoji: '⚽', tint: '#EA580C' };
   }
   // 3AS / 4AS sections
   if (classSlug === '3eme-secondaire' || classSlug === '4eme-secondaire') {
-    if (sectionSlug === 'maths')                    return { emoji: '📐', tint: '#7C3AED' };
-    if (sectionSlug === 'sciences-experimentales')  return { emoji: '🧪', tint: '#059669' };
-    if (sectionSlug === 'technique')                return { emoji: '⚙️', tint: '#475569' };
-    if (sectionSlug === 'sciences-informatique')    return { emoji: '💾', tint: '#1E40AF' };
-    if (sectionSlug === 'eco-gestion')              return { emoji: '💼', tint: '#DC2626' };
-    if (sectionSlug === 'lettres')                  return { emoji: '📚', tint: '#A855F7' };
-    if (sectionSlug === 'sport')                    return { emoji: '⚽', tint: '#EA580C' };
+    if (sectionSlug === 'maths') return { emoji: '📐', tint: '#7C3AED' };
+    if (sectionSlug === 'sciences-experimentales') return { emoji: '🧪', tint: '#059669' };
+    if (sectionSlug === 'technique') return { emoji: '⚙️', tint: '#475569' };
+    if (sectionSlug === 'sciences-informatique') return { emoji: '💾', tint: '#1E40AF' };
+    if (sectionSlug === 'eco-gestion') return { emoji: '💼', tint: '#DC2626' };
+    if (sectionSlug === 'lettres') return { emoji: '📚', tint: '#A855F7' };
+    if (sectionSlug === 'sport') return { emoji: '⚽', tint: '#EA580C' };
   }
   return { emoji: '📖', tint: '#7C3AED' };
 }
 
 /** Classes that have sections (2AS, 3AS, 4AS) — the ones with drill-down */
-const CLASSES_WITH_SECTIONS = new Set([
-  '2eme-secondaire',
-  '3eme-secondaire',
-  '4eme-secondaire',
-]);
+const CLASSES_WITH_SECTIONS = new Set(['2eme-secondaire', '3eme-secondaire', '4eme-secondaire']);
 
 export default async function NiveauxPage() {
   const t = getT();
@@ -160,7 +170,7 @@ export default async function NiveauxPage() {
 
   const totalResources = levels.reduce(
     (s, lvl) => s + lvl.classes.reduce((a, c) => a + c._count.resources, 0),
-    0
+    0,
   );
   const totalClasses = levels.reduce((s, lvl) => s + lvl.classes.length, 0);
 
@@ -171,7 +181,7 @@ export default async function NiveauxPage() {
       name: `${c.nameFr} — ${lvl.nameFr}`,
       url: `${baseUrl}/ressources?class=${c.slug}`,
       description: `${c._count.resources} ressources en ${c.nameFr}`,
-    }))
+    })),
   );
   const niveauxListJsonLd = itemListSchema({
     name: 'Tous les niveaux scolaires — Examanet',
@@ -198,8 +208,21 @@ export default async function NiveauxPage() {
             preserveAspectRatio="xMidYMid slice"
           >
             <defs>
-              <pattern id="niveaux-grid" x="0" y="0" width="32" height="32" patternUnits="userSpaceOnUse">
-                <path d="M 32 0 L 0 0 0 32" fill="none" stroke="#7C3AED" strokeWidth="0.6" opacity="0.18" />
+              <pattern
+                id="niveaux-grid"
+                x="0"
+                y="0"
+                width="32"
+                height="32"
+                patternUnits="userSpaceOnUse"
+              >
+                <path
+                  d="M 32 0 L 0 0 0 32"
+                  fill="none"
+                  stroke="#7C3AED"
+                  strokeWidth="0.6"
+                  opacity="0.18"
+                />
               </pattern>
             </defs>
             <rect width="200" height="200" fill="url(#niveaux-grid)" />
@@ -328,7 +351,7 @@ export default async function NiveauxPage() {
                           className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${design.badge}`}
                         >
                           <LevelIcon className="w-3 h-3" />
-                          {isAr ? (level.nameAr || 'حلقة') : 'Cycle'}
+                          {isAr ? level.nameAr || 'حلقة' : 'Cycle'}
                         </span>
                         <span className="text-xs text-slate-500">{design.tagline}</span>
                       </div>
@@ -336,8 +359,8 @@ export default async function NiveauxPage() {
                         {level.nameFr}
                       </h2>
                       <p className="text-slate-600 mt-1 text-sm lg:text-base">
-                        <strong className="font-bold text-slate-900">{classCount}</strong>{' '}
-                        classe{classCount > 1 ? 's' : ''} ·{' '}
+                        <strong className="font-bold text-slate-900">{classCount}</strong> classe
+                        {classCount > 1 ? 's' : ''} ·{' '}
                         <strong className="font-bold text-slate-900">
                           {resCount.toLocaleString('fr-FR')}
                         </strong>{' '}
@@ -364,7 +387,8 @@ export default async function NiveauxPage() {
                       emoji: '📚',
                       tint: design.color,
                     };
-                    const hasSections = CLASSES_WITH_SECTIONS.has(cls.slug) && cls.sections.length > 0;
+                    const hasSections =
+                      CLASSES_WITH_SECTIONS.has(cls.slug) && cls.sections.length > 0;
                     // Map sections with design tokens
                     const sections = hasSections
                       ? cls.sections.map((s) => {
@@ -479,8 +503,8 @@ export default async function NiveauxPage() {
                 Préparez votre réussite scolaire
               </h2>
               <p className="text-slate-300 mb-6 max-w-xl mx-auto">
-                Toutes les ressources sont conformes au programme officiel tunisien et
-                sélectionnées par nos professeurs partenaires.
+                Toutes les ressources sont conformes au programme officiel tunisien et sélectionnées
+                par nos professeurs partenaires.
               </p>
               <div className="flex flex-wrap justify-center gap-3">
                 <Link

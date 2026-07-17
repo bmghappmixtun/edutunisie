@@ -27,7 +27,10 @@ function sanitizeFilename(name: string): string {
     .substring(0, 200);
 }
 
-function buildFilename(resource: { title: string; originalFileName?: string | null }, original: boolean): string {
+function buildFilename(
+  resource: { title: string; originalFileName?: string | null },
+  original: boolean,
+): string {
   if (original && resource.originalFileName) {
     return resource.originalFileName;
   }
@@ -45,7 +48,11 @@ function buildFilename(resource: { title: string; originalFileName?: string | nu
  * Stream a file from a URL (Vercel Blob) to the client.
  * Sets Content-Disposition so the browser downloads with the right filename.
  */
-async function streamFileToClient(blobUrl: string, filename: string, contentType?: string): Promise<NextResponse> {
+async function streamFileToClient(
+  blobUrl: string,
+  filename: string,
+  contentType?: string,
+): Promise<NextResponse> {
   // Fetch the file from blob storage (server-side, so URL is hidden)
   const upstream = await fetch(blobUrl, {
     headers: { 'User-Agent': 'Examanet-Proxy/1.0' },
@@ -95,7 +102,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     if (!user || (user.role !== 'TEACHER' && user.role !== 'ADMIN')) {
       return NextResponse.json(
         { error: 'Les fichiers originaux Office sont réservés à la communauté des enseignants' },
-        { status: 403 }
+        { status: 403 },
       );
     }
     if (!skipTracking) {
@@ -143,10 +150,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
   if (wantsOriginal) {
     if (!user || (user.role !== 'TEACHER' && user.role !== 'ADMIN')) {
-      return NextResponse.json(
-        { error: 'Réservé aux enseignants' },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: 'Réservé aux enseignants' }, { status: 403 });
     }
     if (!resource.originalFileKey) {
       return NextResponse.json({ error: "Pas d'original" }, { status: 404 });
@@ -164,8 +168,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       const contentType = libFile.fileName?.endsWith('.docx')
         ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
         : libFile.fileName?.endsWith('.odt')
-        ? 'application/vnd.oasis.opendocument.text'
-        : 'application/octet-stream';
+          ? 'application/vnd.oasis.opendocument.text'
+          : 'application/octet-stream';
       return streamFileToClient(libFile.fileUrl, libFile.fileName || 'document', contentType);
     }
     return NextResponse.json({ error: 'Fichier original introuvable' }, { status: 404 });

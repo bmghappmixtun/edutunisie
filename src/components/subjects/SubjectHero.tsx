@@ -26,8 +26,24 @@ interface SubjectHeroProps {
  * - Chiffres clés (ressources / profs)
  * - Tags populaires cliquables
  */
-export default function SubjectHero({ subject, totalResources, totalTeachers, intro }: SubjectHeroProps) {
-  const Icon: LucideIcon = SUBJECT_ICONS[subject.motif === 'circuit' ? 'Cpu' : subject.motif === 'globe' ? 'Globe2' : subject.motif === 'waves' ? 'Music' : subject.motif === 'tree' ? 'Leaf' : 'BookOpen'] ?? 'BookOpen';
+export default function SubjectHero({
+  subject,
+  totalResources,
+  totalTeachers,
+  intro,
+}: SubjectHeroProps) {
+  const Icon: LucideIcon =
+    SUBJECT_ICONS[
+      subject.motif === 'circuit'
+        ? 'Cpu'
+        : subject.motif === 'globe'
+          ? 'Globe2'
+          : subject.motif === 'waves'
+            ? 'Music'
+            : subject.motif === 'tree'
+              ? 'Leaf'
+              : 'BookOpen'
+    ] ?? 'BookOpen';
 
   // Adapt color: HSL-based components for tints
   const lighterColor = hexToRgba(subject.color, 0.15);
@@ -57,9 +73,13 @@ export default function SubjectHero({ subject, totalResources, totalTeachers, in
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-1.5 text-sm text-slate-600 mb-5">
-          <Link href="/" className="hover:text-slate-900 transition">Accueil</Link>
+          <Link href="/" className="hover:text-slate-900 transition">
+            Accueil
+          </Link>
           <ChevronRight className="w-3.5 h-3.5" />
-          <Link href="/matieres" className="hover:text-slate-900 transition">Matières</Link>
+          <Link href="/matieres" className="hover:text-slate-900 transition">
+            Matières
+          </Link>
           <ChevronRight className="w-3.5 h-3.5" />
           <span className="text-slate-900 font-semibold">{subject.nameFr}</span>
         </nav>
@@ -104,12 +124,7 @@ export default function SubjectHero({ subject, totalResources, totalTeachers, in
                 label={`prof${totalTeachers > 1 ? 's' : ''} vérifié${totalTeachers > 1 ? 's' : ''}`}
                 color={subject.color}
               />
-              <PillStat
-                icon={FileText}
-                value="100%"
-                label="gratuit"
-                color={subject.color}
-              />
+              <PillStat icon={FileText} value="100%" label="gratuit" color={subject.color} />
               <PillStat
                 icon={Sparkles}
                 value="Programme"
@@ -215,19 +230,43 @@ function SubjectMotif({
 
   if (motif === 'circuit' || motif === 'globe' || motif === 'lines') {
     return (
-      <svg className="absolute right-0 top-0 h-full w-1/2 opacity-40 pointer-events-none" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid slice">
+      <svg
+        className="absolute right-0 top-0 h-full w-1/2 opacity-40 pointer-events-none"
+        viewBox="0 0 400 400"
+        preserveAspectRatio="xMidYMid slice"
+      >
         <defs>
-          <pattern id={`motif-${motif}`} x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+          <pattern
+            id={`motif-${motif}`}
+            x="0"
+            y="0"
+            width="40"
+            height="40"
+            patternUnits="userSpaceOnUse"
+          >
             {motif === 'circuit' && (
               <>
-                <path d="M 0 20 L 20 20 L 20 0 M 20 20 L 40 20 M 20 20 L 20 40" stroke={fillColor} strokeWidth="1" fill="none" />
+                <path
+                  d="M 0 20 L 20 20 L 20 0 M 20 20 L 40 20 M 20 20 L 20 40"
+                  stroke={fillColor}
+                  strokeWidth="1"
+                  fill="none"
+                />
                 <circle cx="20" cy="20" r="2" fill={fillColor} />
               </>
             )}
             {motif === 'globe' && (
               <>
                 <circle cx="20" cy="20" r="15" stroke={fillColor} strokeWidth="0.8" fill="none" />
-                <ellipse cx="20" cy="20" rx="15" ry="6" stroke={fillColor} strokeWidth="0.8" fill="none" />
+                <ellipse
+                  cx="20"
+                  cy="20"
+                  rx="15"
+                  ry="6"
+                  stroke={fillColor}
+                  strokeWidth="0.8"
+                  fill="none"
+                />
                 <line x1="20" y1="5" x2="20" y2="35" stroke={fillColor} strokeWidth="0.8" />
               </>
             )}
@@ -247,8 +286,16 @@ function SubjectMotif({
 
   if (motif === 'tree') {
     return (
-      <svg className="absolute right-0 top-0 h-full w-1/2 opacity-30 pointer-events-none" viewBox="0 0 200 200">
-        <path d="M 100 50 Q 90 30 80 50 Q 70 30 60 50 Q 50 30 40 50" stroke={fillColor} strokeWidth="2" fill="none" />
+      <svg
+        className="absolute right-0 top-0 h-full w-1/2 opacity-30 pointer-events-none"
+        viewBox="0 0 200 200"
+      >
+        <path
+          d="M 100 50 Q 90 30 80 50 Q 70 30 60 50 Q 50 30 40 50"
+          stroke={fillColor}
+          strokeWidth="2"
+          fill="none"
+        />
         <circle cx="100" cy="50" r="6" fill={fillColor} />
         <circle cx="80" cy="60" r="4" fill={fillColor} />
         <circle cx="60" cy="70" r="4" fill={fillColor} />
@@ -259,7 +306,10 @@ function SubjectMotif({
 
   // dots / sparkles / waves fallback
   return (
-    <svg className="absolute right-0 top-0 h-full w-1/2 opacity-30 pointer-events-none" viewBox="0 0 200 200">
+    <svg
+      className="absolute right-0 top-0 h-full w-1/2 opacity-30 pointer-events-none"
+      viewBox="0 0 200 200"
+    >
       {Array.from({ length: 30 }, (_, i) => (
         <circle
           key={i}

@@ -8,7 +8,10 @@ import { isArabic } from '@/lib/text-utils';
 
 export const dynamic = 'force-dynamic';
 
-export default async function AdminResourcesPage(props: { params: Promise<any>; searchParams: Promise<any> }) {
+export default async function AdminResourcesPage(props: {
+  params: Promise<any>;
+  searchParams: Promise<any>;
+}) {
   const sp = await props.searchParams;
   const user = await getCurrentUser();
   if (!user) redirect('/connexion');
@@ -33,7 +36,7 @@ export default async function AdminResourcesPage(props: { params: Promise<any>; 
     rating: { avgRating: 'desc' },
     comments: { commentsCount: 'desc' },
     title_asc: { title: 'asc' },
-    title_desc: { title: 'desc' }
+    title_desc: { title: 'desc' },
   };
   const orderBy = sortMap[sort] || sortMap.recent;
 
@@ -47,10 +50,10 @@ export default async function AdminResourcesPage(props: { params: Promise<any>; 
         subject: true,
         class: true,
         section: true,
-        teacher: { select: { firstName: true, lastName: true, email: true } }
-      }
+        teacher: { select: { firstName: true, lastName: true, email: true } },
+      },
     }),
-    prisma.resource.count({ where })
+    prisma.resource.count({ where }),
   ]);
 
   const totalPages = Math.ceil(total / perPage);
@@ -60,7 +63,7 @@ export default async function AdminResourcesPage(props: { params: Promise<any>; 
     PENDING_APPROVAL: 'bg-amber-100 text-amber-700',
     REJECTED: 'bg-red-100 text-red-700',
     DRAFT: 'bg-slate-100 text-slate-700',
-    ARCHIVED: 'bg-slate-200 text-slate-700'
+    ARCHIVED: 'bg-slate-200 text-slate-700',
   };
 
   const statusLabels: Record<string, string> = {
@@ -68,7 +71,7 @@ export default async function AdminResourcesPage(props: { params: Promise<any>; 
     PENDING_APPROVAL: '⏳ En attente',
     REJECTED: '✕ Rejeté',
     DRAFT: '📝 Brouillon',
-    ARCHIVED: '📦 Archivé'
+    ARCHIVED: '📦 Archivé',
   };
 
   return (
@@ -79,9 +82,18 @@ export default async function AdminResourcesPage(props: { params: Promise<any>; 
       <form className="bg-white rounded-xl p-3 border border-slate-100 flex flex-wrap gap-2 mb-4">
         <div className="flex-1 min-w-[200px] flex items-center gap-2 px-3">
           <Search className="w-4 h-4 text-slate-400 flex-shrink-0" />
-          <input name="q" defaultValue={q} placeholder="Rechercher par titre..." className="flex-1 min-w-0 bg-transparent outline-none text-sm" />
+          <input
+            name="q"
+            defaultValue={q}
+            placeholder="Rechercher par titre..."
+            className="flex-1 min-w-0 bg-transparent outline-none text-sm"
+          />
         </div>
-        <select name="status" defaultValue={status} className="bg-slate-50 border-0 rounded-lg px-3 py-2 text-sm outline-none flex-shrink-0">
+        <select
+          name="status"
+          defaultValue={status}
+          className="bg-slate-50 border-0 rounded-lg px-3 py-2 text-sm outline-none flex-shrink-0"
+        >
           <option value="ALL">Tous les statuts</option>
           <option value="PUBLISHED">Publiés</option>
           <option value="PENDING_APPROVAL">En attente</option>
@@ -89,7 +101,12 @@ export default async function AdminResourcesPage(props: { params: Promise<any>; 
           <option value="DRAFT">Brouillons</option>
           <option value="ARCHIVED">Archivés</option>
         </select>
-        <select name="sort" defaultValue={sort} className="bg-slate-50 border-0 rounded-lg px-3 py-2 text-sm outline-none flex-shrink-0" title="Trier par">
+        <select
+          name="sort"
+          defaultValue={sort}
+          className="bg-slate-50 border-0 rounded-lg px-3 py-2 text-sm outline-none flex-shrink-0"
+          title="Trier par"
+        >
           <option value="recent">📅 Plus récents</option>
           <option value="oldest">📅 Plus anciens</option>
           <option value="views">👁 Plus vus</option>
@@ -100,12 +117,14 @@ export default async function AdminResourcesPage(props: { params: Promise<any>; 
           <option value="title_asc">🔤 Titre A→Z</option>
           <option value="title_desc">🔤 Titre Z→A</option>
         </select>
-        <button type="submit" className="btn-primary text-sm flex-shrink-0">Filtrer</button>
+        <button type="submit" className="btn-primary text-sm flex-shrink-0">
+          Filtrer
+        </button>
       </form>
 
       {/* Status pills */}
       <div className="flex flex-wrap gap-2 mb-4">
-        {['ALL', 'PUBLISHED', 'PENDING_APPROVAL', 'REJECTED'].map(s => (
+        {['ALL', 'PUBLISHED', 'PENDING_APPROVAL', 'REJECTED'].map((s) => (
           <Link
             key={s}
             href={`/admin/ressources?status=${s}${q ? `&q=${q}` : ''}${sort !== 'recent' ? `&sort=${sort}` : ''}`}
@@ -140,7 +159,11 @@ export default async function AdminResourcesPage(props: { params: Promise<any>; 
                   {/* Main info (stacked vertically) */}
                   <div className="flex-1 min-w-0">
                     <Link
-                      href={r.numericId ? `/ressources/${r.numericId}/${r.slug}` : `/ressources/legacy-${r.id}/${r.slug}`}
+                      href={
+                        r.numericId
+                          ? `/ressources/${r.numericId}/${r.slug}`
+                          : `/ressources/legacy-${r.id}/${r.slug}`
+                      }
                       className={`font-semibold text-sm group-hover:text-primary-600 block ${isArabic(r.title) ? 'text-right' : 'text-left'}`}
                       dir={isArabic(r.title) ? 'rtl' : 'ltr'}
                       lang={isArabic(r.title) ? 'ar' : 'fr'}
@@ -155,7 +178,10 @@ export default async function AdminResourcesPage(props: { params: Promise<any>; 
                     </div>
                     {r.teacher && (
                       <div className="text-xs text-slate-400 mt-0.5">
-                        Par <span className="font-medium text-slate-600">{r.teacher.firstName} {r.teacher.lastName}</span>
+                        Par{' '}
+                        <span className="font-medium text-slate-600">
+                          {r.teacher.firstName} {r.teacher.lastName}
+                        </span>
                       </div>
                     )}
                     {/* Bottom row: stats + status + action */}
@@ -169,11 +195,17 @@ export default async function AdminResourcesPage(props: { params: Promise<any>; 
                       <span className="flex items-center gap-1" title="Note">
                         <Star className="w-3.5 h-3.5 text-amber-500" /> {r.avgRating.toFixed(1)}
                       </span>
-                      <span className={`px-2 py-0.5 text-xs font-bold rounded ${statusColors[r.status] || 'bg-slate-100 text-slate-700'}`}>
+                      <span
+                        className={`px-2 py-0.5 text-xs font-bold rounded ${statusColors[r.status] || 'bg-slate-100 text-slate-700'}`}
+                      >
                         {statusLabels[r.status] || r.status}
                       </span>
                       <Link
-                        href={r.numericId ? `/ressources/${r.numericId}/${r.slug}` : `/ressources/legacy-${r.id}/${r.slug}`}
+                        href={
+                          r.numericId
+                            ? `/ressources/${r.numericId}/${r.slug}`
+                            : `/ressources/legacy-${r.id}/${r.slug}`
+                        }
                         target="_blank"
                         className="ml-auto inline-flex items-center gap-1 px-2 py-1 text-xs text-slate-600 hover:text-primary-600 hover:bg-primary-50 rounded transition"
                         title="Voir la ressource"
@@ -224,7 +256,10 @@ export default async function AdminResourcesPage(props: { params: Promise<any>; 
             }
             return pages.map((p, idx) =>
               p === '…' ? (
-                <span key={`ellipsis-${idx}`} className="px-2 py-1.5 text-sm text-slate-400 select-none">
+                <span
+                  key={`ellipsis-${idx}`}
+                  className="px-2 py-1.5 text-sm text-slate-400 select-none"
+                >
                   …
                 </span>
               ) : (
@@ -235,7 +270,7 @@ export default async function AdminResourcesPage(props: { params: Promise<any>; 
                 >
                   {p}
                 </Link>
-              )
+              ),
             );
           })()}
           {/* Next button */}

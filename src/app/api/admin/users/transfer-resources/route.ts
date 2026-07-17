@@ -27,7 +27,8 @@ export async function POST(req: NextRequest) {
     let fromId = fromUserId;
     if (!fromId && fromUserEmail) {
       const fromUser = await prisma.user.findUnique({ where: { email: fromUserEmail } });
-      if (!fromUser) return NextResponse.json({ error: 'Utilisateur source non trouvé' }, { status: 404 });
+      if (!fromUser)
+        return NextResponse.json({ error: 'Utilisateur source non trouvé' }, { status: 404 });
       fromId = fromUser.id;
     }
     if (!fromId) {
@@ -36,20 +37,24 @@ export async function POST(req: NextRequest) {
 
     // Verify target exists and is a teacher
     const toUser = await prisma.user.findUnique({ where: { id: toUserId } });
-    if (!toUser) return NextResponse.json({ error: 'Utilisateur cible non trouvé' }, { status: 404 });
+    if (!toUser)
+      return NextResponse.json({ error: 'Utilisateur cible non trouvé' }, { status: 404 });
     if (toUser.role !== 'TEACHER' && toUser.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'L\'utilisateur cible doit être prof ou admin' }, { status: 400 });
+      return NextResponse.json(
+        { error: "L'utilisateur cible doit être prof ou admin" },
+        { status: 400 },
+      );
     }
 
     // Get count before
     const beforeCount = await prisma.resource.count({
-      where: { teacherId: fromId }
+      where: { teacherId: fromId },
     });
 
     // Transfer
     const result = await prisma.resource.updateMany({
       where: { teacherId: fromId },
-      data: { teacherId: toUserId }
+      data: { teacherId: toUserId },
     });
 
     return NextResponse.json({
@@ -57,7 +62,7 @@ export async function POST(req: NextRequest) {
       count: result.count,
       fromUser: fromId,
       toUser: toUserId,
-      toUserName: `${toUser.firstName || ''} ${toUser.lastName || ''}`.trim()
+      toUserName: `${toUser.firstName || ''} ${toUser.lastName || ''}`.trim(),
     });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });

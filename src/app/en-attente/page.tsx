@@ -4,14 +4,17 @@ import { Clock, Mail, ArrowLeft, CheckCircle2 } from 'lucide-react';
 export const dynamic = 'force-dynamic';
 export const metadata = {
   robots: { index: false, follow: false },
-  title: 'En attente d\'approbation',
+  title: "En attente d'approbation",
 };
 
 export default function EnAttentePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-orange-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        <Link href="/" className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-6 text-sm font-semibold">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-6 text-sm font-semibold"
+        >
           <ArrowLeft className="w-4 h-4" />
           Retour à l'accueil
         </Link>
@@ -22,9 +25,7 @@ export default function EnAttentePage() {
               <Clock className="w-10 h-10" />
             </div>
             <h1 className="text-2xl font-extrabold mb-2">En attente d'approbation</h1>
-            <p className="text-amber-50 text-sm">
-              Votre email a été vérifié ✓
-            </p>
+            <p className="text-amber-50 text-sm">Votre email a été vérifié ✓</p>
           </div>
 
           <div className="p-8">
@@ -60,7 +61,9 @@ export default function EnAttentePage() {
 
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800 mb-6">
               <p className="font-semibold mb-1">⏱️ Délai habituel : 24-48h</p>
-              <p className="text-xs">Notre équipe vérifie chaque demande pour garantir la qualité de la communauté.</p>
+              <p className="text-xs">
+                Notre équipe vérifie chaque demande pour garantir la qualité de la communauté.
+              </p>
             </div>
 
             <Link href="/" className="btn-primary w-full flex items-center justify-center">

@@ -8,7 +8,6 @@ import {
   getUpcomingCorriges,
   getSubjectMeta,
   groupByYear,
-  CONCOURS_VOIES,
 } from '@/lib/concours-9eme-data';
 import {
   courseSchema,
@@ -19,9 +18,21 @@ import {
 } from '@/lib/structured-data';
 import { getLocale, getT } from '@/lib/i18n-server';
 import {
-  ChevronRight, BookOpen, Sparkles, Award, Clock, Target, CheckCircle,
-  ArrowRight, Calendar, Trophy, FileText, Download, Star, Zap,
-  GraduationCap, AlertCircle, ChevronDown,
+  ChevronRight,
+  Sparkles,
+  Award,
+  Clock,
+  Target,
+  CheckCircle,
+  ArrowRight,
+  Calendar,
+  Trophy,
+  FileText,
+  Download,
+  Star,
+  Zap,
+  AlertCircle,
+  ChevronDown,
 } from 'lucide-react';
 
 export const revalidate = 3600; // ISR: refresh every hour
@@ -40,22 +51,40 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title,
     description: desc,
-    keywords: locale === 'ar' ? [
-      'مناظرة التاسعة تونس', 'مناظرة السنة التاسعة', 'امتحان التاسعة تونس',
-      'مواضيع التاسعة', 'إصلاحات التاسعة تونس', 'مناظرة التاسعة 2027',
-      'brevet tunisie', 'تاسعة أساسي', 'concours noviam', 'مناظرة ختم التعليم الأساسي',
-      'examanet concours',
-    ] : [
-      'concours 9ème tunisie', 'concours 9ème année', 'examen 9ème tunisie',
-      'sujets 9ème année', 'corrigés 9ème tunisie', 'concours 9eme 2027',
-      'brevet tunisie', '9ème année de base', 'concours noviam',
-      'مناظرة التاسعة أساسي تونس', 'إصلاح مناظرة السنة التاسعة', 'examanet concours',
-    ],
+    keywords:
+      locale === 'ar'
+        ? [
+            'مناظرة التاسعة تونس',
+            'مناظرة السنة التاسعة',
+            'امتحان التاسعة تونس',
+            'مواضيع التاسعة',
+            'إصلاحات التاسعة تونس',
+            'مناظرة التاسعة 2027',
+            'brevet tunisie',
+            'تاسعة أساسي',
+            'concours noviam',
+            'مناظرة ختم التعليم الأساسي',
+            'examanet concours',
+          ]
+        : [
+            'concours 9ème tunisie',
+            'concours 9ème année',
+            'examen 9ème tunisie',
+            'sujets 9ème année',
+            'corrigés 9ème tunisie',
+            'concours 9eme 2027',
+            'brevet tunisie',
+            '9ème année de base',
+            'concours noviam',
+            'مناظرة التاسعة أساسي تونس',
+            'إصلاح مناظرة السنة التاسعة',
+            'examanet concours',
+          ],
     alternates: {
       canonical: PAGE_URL,
       languages: {
-        'fr': PAGE_URL,
-        'ar': PAGE_URL,
+        fr: PAGE_URL,
+        ar: PAGE_URL,
         'x-default': PAGE_URL,
       },
     },
@@ -66,12 +95,15 @@ export async function generateMetadata(): Promise<Metadata> {
       siteName: 'Examanet',
       locale: locale === 'ar' ? 'ar_TN' : 'fr_TN',
       type: 'website',
-      images: [{
-        url: '/api/og/page/concours',
-        width: 1200,
-        height: 630,
-        alt: locale === 'ar' ? 'Examanet — مناظرة التاسعة تونس' : 'Examanet — Concours 9ème Tunisie',
-      }],
+      images: [
+        {
+          url: '/api/og/page/concours',
+          width: 1200,
+          height: 630,
+          alt:
+            locale === 'ar' ? 'Examanet — مناظرة التاسعة تونس' : 'Examanet — Concours 9ème Tunisie',
+        },
+      ],
     },
     twitter: {
       card: 'summary_large_image',
@@ -97,12 +129,60 @@ export default function Concours9emePillar() {
   // SUBJECT DATA (i18n-driven)
   // ========================================================================
   const SUBJECTS = [
-    { slug: 'math', nameFr: 'Mathématiques', nameAr: 'الرياضيات', icon: '📐', color: 'text-blue-600', bg: 'bg-blue-100', descFr: 'Algèbre, géométrie, fonctions' },
-    { slug: 'arabe', nameFr: 'Arabe', nameAr: 'العربية', icon: '📚', color: 'text-amber-600', bg: 'bg-amber-100', descFr: 'قواعد، بلاغة، تعبير' },
-    { slug: 'francais', nameFr: 'Français', nameAr: 'الفرنسية', icon: '📖', color: 'text-rose-600', bg: 'bg-rose-100', descFr: 'Grammaire, expression, lecture' },
-    { slug: 'svt', nameFr: 'Sciences de la Vie et de la Terre', nameAr: 'علوم الحياة والأرض', icon: '🧬', color: 'text-emerald-600', bg: 'bg-emerald-100', descFr: 'Biologie, géologie, écologie' },
-    { slug: 'physique', nameFr: 'Physique (technique)', nameAr: 'علوم فيزيائية', icon: '⚛️', color: 'text-purple-600', bg: 'bg-purple-100', descFr: 'Mécanique, électricité, optique' },
-    { slug: 'anglais', nameFr: 'Anglais', nameAr: 'الإنجليزية', icon: '🌍', color: 'text-cyan-600', bg: 'bg-cyan-100', descFr: 'Grammar, vocabulary, comprehension' },
+    {
+      slug: 'math',
+      nameFr: 'Mathématiques',
+      nameAr: 'الرياضيات',
+      icon: '📐',
+      color: 'text-blue-600',
+      bg: 'bg-blue-100',
+      descFr: 'Algèbre, géométrie, fonctions',
+    },
+    {
+      slug: 'arabe',
+      nameFr: 'Arabe',
+      nameAr: 'العربية',
+      icon: '📚',
+      color: 'text-amber-600',
+      bg: 'bg-amber-100',
+      descFr: 'قواعد، بلاغة، تعبير',
+    },
+    {
+      slug: 'francais',
+      nameFr: 'Français',
+      nameAr: 'الفرنسية',
+      icon: '📖',
+      color: 'text-rose-600',
+      bg: 'bg-rose-100',
+      descFr: 'Grammaire, expression, lecture',
+    },
+    {
+      slug: 'svt',
+      nameFr: 'Sciences de la Vie et de la Terre',
+      nameAr: 'علوم الحياة والأرض',
+      icon: '🧬',
+      color: 'text-emerald-600',
+      bg: 'bg-emerald-100',
+      descFr: 'Biologie, géologie, écologie',
+    },
+    {
+      slug: 'physique',
+      nameFr: 'Physique (technique)',
+      nameAr: 'علوم فيزيائية',
+      icon: '⚛️',
+      color: 'text-purple-600',
+      bg: 'bg-purple-100',
+      descFr: 'Mécanique, électricité, optique',
+    },
+    {
+      slug: 'anglais',
+      nameFr: 'Anglais',
+      nameAr: 'الإنجليزية',
+      icon: '🌍',
+      color: 'text-cyan-600',
+      bg: 'bg-cyan-100',
+      descFr: 'Grammar, vocabulary, comprehension',
+    },
   ];
 
   // ========================================================================
@@ -110,8 +190,12 @@ export default function Concours9emePillar() {
   // ========================================================================
   const METHODOLOGIE = [
     {
-      subject: 'math', titleFr: 'Mathématiques', titleAr: 'الرياضيات',
-      icon: '📐', colorClass: 'border-blue-400 bg-blue-50', iconBg: 'bg-blue-100 text-blue-600',
+      subject: 'math',
+      titleFr: 'Mathématiques',
+      titleAr: 'الرياضيات',
+      icon: '📐',
+      colorClass: 'border-blue-400 bg-blue-50',
+      iconBg: 'bg-blue-100 text-blue-600',
       points: [
         'Maîtrise les 4 opérations (fractions, puissances, racines carrées)',
         'Algèbre : équations 1er et 2nd degré, systèmes linéaires',
@@ -120,8 +204,12 @@ export default function Concours9emePillar() {
       ],
     },
     {
-      subject: 'arabe', titleFr: 'Arabe', titleAr: 'العربية',
-      icon: '📚', colorClass: 'border-amber-400 bg-amber-50', iconBg: 'bg-amber-100 text-amber-600',
+      subject: 'arabe',
+      titleFr: 'Arabe',
+      titleAr: 'العربية',
+      icon: '📚',
+      colorClass: 'border-amber-400 bg-amber-50',
+      iconBg: 'bg-amber-100 text-amber-600',
       points: [
         'قراءة نصوص أدبية مع أسئلة الفهم والتحليل',
         'قواعد النحو : الإعراب، المبتدأ والخبر، الفاعل والمفعول',
@@ -130,18 +218,26 @@ export default function Concours9emePillar() {
       ],
     },
     {
-      subject: 'francais', titleFr: 'Français', titleAr: 'الفرنسية',
-      icon: '📖', colorClass: 'border-rose-400 bg-rose-50', iconBg: 'bg-rose-100 text-rose-600',
+      subject: 'francais',
+      titleFr: 'Français',
+      titleAr: 'الفرنسية',
+      icon: '📖',
+      colorClass: 'border-rose-400 bg-rose-50',
+      iconBg: 'bg-rose-100 text-rose-600',
       points: [
-        'Compréhension écrite : identifier les idées principales d\'un texte',
+        "Compréhension écrite : identifier les idées principales d'un texte",
         'Grammaire : analyse logique et grammaticale, classes de mots',
         'Conjugaison : tous les temps du mode indicatif + subjonctif',
         'Expression écrite : dissertation, texte argumentatif, récit',
       ],
     },
     {
-      subject: 'svt', titleFr: 'Sciences de la Vie et de la Terre', titleAr: 'علوم الحياة والأرض',
-      icon: '🧬', colorClass: 'border-emerald-400 bg-emerald-50', iconBg: 'bg-emerald-100 text-emerald-600',
+      subject: 'svt',
+      titleFr: 'Sciences de la Vie et de la Terre',
+      titleAr: 'علوم الحياة والأرض',
+      icon: '🧬',
+      colorClass: 'border-emerald-400 bg-emerald-50',
+      iconBg: 'bg-emerald-100 text-emerald-600',
       points: [
         'Biologie : cellule, ADN, génétique, immunologie',
         'Géologie : séismes, volcans, structure interne de la Terre',
@@ -150,18 +246,26 @@ export default function Concours9emePillar() {
       ],
     },
     {
-      subject: 'physique', titleFr: 'Physique (voie technique)', titleAr: 'علوم فيزيائية',
-      icon: '⚛️', colorClass: 'border-purple-400 bg-purple-50', iconBg: 'bg-purple-100 text-purple-600',
+      subject: 'physique',
+      titleFr: 'Physique (voie technique)',
+      titleAr: 'علوم فيزيائية',
+      icon: '⚛️',
+      colorClass: 'border-purple-400 bg-purple-50',
+      iconBg: 'bg-purple-100 text-purple-600',
       points: [
         'Mécanique : forces, mouvements, équilibre, énergie',
-        'Électricité : circuits, loi d\'Ohm, puissance, énergie électrique',
+        "Électricité : circuits, loi d'Ohm, puissance, énergie électrique",
         'Optique : propagation, lentilles, réflexion, réfraction',
         'Résolution : appliquer la démarche scientifique',
       ],
     },
     {
-      subject: 'anglais', titleFr: 'Anglais', titleAr: 'الإنجليزية',
-      icon: '🌍', colorClass: 'border-cyan-400 bg-cyan-50', iconBg: 'bg-cyan-100 text-cyan-600',
+      subject: 'anglais',
+      titleFr: 'Anglais',
+      titleAr: 'الإنجليزية',
+      icon: '🌍',
+      colorClass: 'border-cyan-400 bg-cyan-50',
+      iconBg: 'bg-cyan-100 text-cyan-600',
       points: [
         'Reading comprehension : repérer les mots-clés et inférer le sens',
         'Grammar : tenses (present/past/future), modals, conditionals',
@@ -179,7 +283,14 @@ export default function Concours9emePillar() {
     { level: 5, key: 'l5', color: 'from-blue-600 to-blue-700', width: 'w-1/3' },
   ];
 
-  const CALENDAR_2027_KEYS = ['inscription', 'announcement', 'revision', 'exam', 'results', 'orientation'];
+  const CALENDAR_2027_KEYS = [
+    'inscription',
+    'announcement',
+    'revision',
+    'exam',
+    'results',
+    'orientation',
+  ];
   const CALENDAR_EMOJI = ['📝', '📅', '📚', '✍️', '🎉', '🏫'];
 
   // ========================================================================
@@ -222,14 +333,22 @@ export default function Concours9emePillar() {
   // FAQS — loaded from i18n
   // ========================================================================
   const faqItems = [
-    t('concours.faq.items.0.q'), t('concours.faq.items.0.a'),
-    t('concours.faq.items.1.q'), t('concours.faq.items.1.a'),
-    t('concours.faq.items.2.q'), t('concours.faq.items.2.a'),
-    t('concours.faq.items.3.q'), t('concours.faq.items.3.a'),
-    t('concours.faq.items.4.q'), t('concours.faq.items.4.a'),
-    t('concours.faq.items.5.q'), t('concours.faq.items.5.a'),
-    t('concours.faq.items.6.q'), t('concours.faq.items.6.a'),
-    t('concours.faq.items.7.q'), t('concours.faq.items.7.a'),
+    t('concours.faq.items.0.q'),
+    t('concours.faq.items.0.a'),
+    t('concours.faq.items.1.q'),
+    t('concours.faq.items.1.a'),
+    t('concours.faq.items.2.q'),
+    t('concours.faq.items.2.a'),
+    t('concours.faq.items.3.q'),
+    t('concours.faq.items.3.a'),
+    t('concours.faq.items.4.q'),
+    t('concours.faq.items.4.a'),
+    t('concours.faq.items.5.q'),
+    t('concours.faq.items.5.a'),
+    t('concours.faq.items.6.q'),
+    t('concours.faq.items.6.a'),
+    t('concours.faq.items.7.q'),
+    t('concours.faq.items.7.a'),
   ];
   const FAQS = [];
   for (let i = 0; i < faqItems.length; i += 2) {
@@ -240,12 +359,36 @@ export default function Concours9emePillar() {
   // FEATURES
   // ========================================================================
   const FEATURES = [
-    { icon: CheckCircle, title: t('concours.about.features.f1t'), desc: t('concours.about.features.f1d') },
-    { icon: Award, title: t('concours.about.features.f2t').replace('{count}', String(stats.totalCorriges)), desc: t('concours.about.features.f2d') },
-    { icon: Target, title: t('concours.about.features.f3t'), desc: t('concours.about.features.f3d') },
-    { icon: Sparkles, title: t('concours.about.features.f4t'), desc: t('concours.about.features.f4d') },
-    { icon: Clock, title: t('concours.about.features.f5t'), desc: t('concours.about.features.f5d') },
-    { icon: Trophy, title: t('concours.about.features.f6t'), desc: t('concours.about.features.f6d') },
+    {
+      icon: CheckCircle,
+      title: t('concours.about.features.f1t'),
+      desc: t('concours.about.features.f1d'),
+    },
+    {
+      icon: Award,
+      title: t('concours.about.features.f2t').replace('{count}', String(stats.totalCorriges)),
+      desc: t('concours.about.features.f2d'),
+    },
+    {
+      icon: Target,
+      title: t('concours.about.features.f3t'),
+      desc: t('concours.about.features.f3d'),
+    },
+    {
+      icon: Sparkles,
+      title: t('concours.about.features.f4t'),
+      desc: t('concours.about.features.f4d'),
+    },
+    {
+      icon: Clock,
+      title: t('concours.about.features.f5t'),
+      desc: t('concours.about.features.f5d'),
+    },
+    {
+      icon: Trophy,
+      title: t('concours.about.features.f6t'),
+      desc: t('concours.about.features.f6d'),
+    },
   ];
 
   // ========================================================================
@@ -267,7 +410,7 @@ export default function Concours9emePillar() {
     aggregateRating: { ratingCount: 1250, ratingValue: 4.7 },
   });
 
-  const faqJsonLd = faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })));
+  const faqJsonLd = faqSchema(FAQS.map((f) => ({ question: f.q, answer: f.a })));
   const breadcrumbJsonLd = breadcrumbSchema([
     { name: 'Accueil', url: SITE_URL },
     { name: 'Collège', url: `${SITE_URL}/college` },
@@ -279,20 +422,23 @@ export default function Concours9emePillar() {
     name: t('concours.meta.title').replace('{total}', String(stats.totalFiles)),
     description: `Liste des sujets et corrigés du concours 9ème année en Tunisie depuis 2001`,
     url: PAGE_URL,
-    items: stats.gold2020Corrige ? [
-      {
-        name: `⭐ Corrigé Math 2020 — Concours 9ème (sujet + correction)`,
-        url: stats.gold2020Corrige.url,
-        description: 'Sujet et corrigé du concours 9ème année 2020 — Mathématiques, voie générale (référence ministère).',
-      },
-      ...yearGroups.slice(0, 49).map((yg) => ({
-        name: `Sujets du concours 9ème ${yg.year}`,
-        url: `${PAGE_URL}/sujets-passes?year=${yg.year}`,
-      })),
-    ] : yearGroups.slice(0, 50).map((yg) => ({
-      name: `Sujets du concours 9ème ${yg.year}`,
-      url: `${PAGE_URL}/sujets-passes?year=${yg.year}`,
-    })),
+    items: stats.gold2020Corrige
+      ? [
+          {
+            name: `⭐ Corrigé Math 2020 — Concours 9ème (sujet + correction)`,
+            url: stats.gold2020Corrige.url,
+            description:
+              'Sujet et corrigé du concours 9ème année 2020 — Mathématiques, voie générale (référence ministère).',
+          },
+          ...yearGroups.slice(0, 49).map((yg) => ({
+            name: `Sujets du concours 9ème ${yg.year}`,
+            url: `${PAGE_URL}/sujets-passes?year=${yg.year}`,
+          })),
+        ]
+      : yearGroups.slice(0, 50).map((yg) => ({
+          name: `Sujets du concours 9ème ${yg.year}`,
+          url: `${PAGE_URL}/sujets-passes?year=${yg.year}`,
+        })),
   });
 
   // ========================================================================
@@ -300,10 +446,22 @@ export default function Concours9emePillar() {
   // ========================================================================
   return (
     <div className="min-h-screen flex flex-col">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(courseJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(courseJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
+      />
 
       <Header />
 
@@ -314,18 +472,29 @@ export default function Concours9emePillar() {
           <div className="absolute top-40 -right-20 w-96 h-96 bg-amber-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30" />
 
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-            <nav aria-label="Fil d'Ariane" className="flex items-center gap-1 text-xs text-slate-500 mb-6 flex-wrap">
-              <Link href="/" className="hover:text-primary-600 transition">{t('nav.home') || 'Accueil'}</Link>
+            <nav
+              aria-label="Fil d'Ariane"
+              className="flex items-center gap-1 text-xs text-slate-500 mb-6 flex-wrap"
+            >
+              <Link href="/" className="hover:text-primary-600 transition">
+                {t('nav.home') || 'Accueil'}
+              </Link>
               <ChevronRight className="w-3 h-3 text-slate-300" />
-              <Link href="/college" className="hover:text-primary-600 transition">Collège</Link>
+              <Link href="/college" className="hover:text-primary-600 transition">
+                Collège
+              </Link>
               <ChevronRight className="w-3 h-3 text-slate-300" />
-              <span className="text-slate-900 font-semibold">{t('concours.breadcrumb.concours9eme')}</span>
+              <span className="text-slate-900 font-semibold">
+                {t('concours.breadcrumb.concours9eme')}
+              </span>
             </nav>
 
             <div className="text-center mb-12">
               <div className="inline-flex items-center gap-2 bg-white border border-amber-200 rounded-full px-4 py-2 mb-6 shadow-sm">
                 <Trophy className="w-4 h-4 text-amber-600" />
-                <span className="text-xs font-semibold text-slate-700">{t('concours.hero.badge')}</span>
+                <span className="text-xs font-semibold text-slate-700">
+                  {t('concours.hero.badge')}
+                </span>
               </div>
 
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-6">
@@ -345,47 +514,73 @@ export default function Concours9emePillar() {
                   return <>{full}</>;
                 })()}
                 <br />
-                <span className="text-2xl sm:text-3xl lg:text-4xl text-slate-700">{t('concours.hero.titleSub')}</span>
+                <span className="text-2xl sm:text-3xl lg:text-4xl text-slate-700">
+                  {t('concours.hero.titleSub')}
+                </span>
               </h1>
 
-              <p className="text-lg lg:text-xl text-slate-600 max-w-3xl mx-auto mb-8" dangerouslySetInnerHTML={{
-                __html: t('concours.hero.description')
-                  .replace('{strong}', '<strong>')
-                  .replace('{strongEnd}', '</strong>')
-                  .replace('{strongHighlight}', '<strong class="text-primary-600">')
-                  .replace('{strongHighlightEnd}', '</strong>')
-                  .replace('{total}', String(stats.totalFiles)),
-              }} />
+              <p
+                className="text-lg lg:text-xl text-slate-600 max-w-3xl mx-auto mb-8"
+                dangerouslySetInnerHTML={{
+                  __html: t('concours.hero.description')
+                    .replace('{strong}', '<strong>')
+                    .replace('{strongEnd}', '</strong>')
+                    .replace('{strongHighlight}', '<strong class="text-primary-600">')
+                    .replace('{strongHighlightEnd}', '</strong>')
+                    .replace('{total}', String(stats.totalFiles)),
+                }}
+              />
 
               <div className="flex flex-wrap items-center justify-center gap-4">
-                <Link href="/concours-9eme-tunisie/sujets-passes" className="btn-primary text-base inline-flex items-center gap-2">
+                <Link
+                  href="/concours-9eme-tunisie/sujets-passes"
+                  className="btn-primary text-base inline-flex items-center gap-2"
+                >
                   <Download className="w-4 h-4" /> {t('concours.hero.ctaSujets')}
                 </Link>
-                <a href="#methodologie" className="btn-secondary text-base">{t('concours.hero.ctaMethodo')}</a>
+                <a href="#methodologie" className="btn-secondary text-base">
+                  {t('concours.hero.ctaMethodo')}
+                </a>
               </div>
             </div>
 
             {/* STATS BAR */}
             <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 max-w-5xl mx-auto">
               <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 text-center">
-                <div className="text-3xl lg:text-4xl font-extrabold text-primary-600 mb-1">{stats.totalFiles}</div>
-                <div className="text-xs text-slate-500 font-semibold uppercase">{t('concours.hero.stats.pdf')}</div>
+                <div className="text-3xl lg:text-4xl font-extrabold text-primary-600 mb-1">
+                  {stats.totalFiles}
+                </div>
+                <div className="text-xs text-slate-500 font-semibold uppercase">
+                  {t('concours.hero.stats.pdf')}
+                </div>
               </div>
               <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 text-center">
-                <div className="text-3xl lg:text-4xl font-extrabold text-emerald-600 mb-1">{stats.yearsAvailable.length}</div>
-                <div className="text-xs text-slate-500 font-semibold uppercase">{t('concours.hero.stats.years')}</div>
+                <div className="text-3xl lg:text-4xl font-extrabold text-emerald-600 mb-1">
+                  {stats.yearsAvailable.length}
+                </div>
+                <div className="text-xs text-slate-500 font-semibold uppercase">
+                  {t('concours.hero.stats.years')}
+                </div>
               </div>
               <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 text-center">
-                <div className="text-3xl lg:text-4xl font-extrabold text-amber-600 mb-1">{stats.totalCorriges}</div>
-                <div className="text-xs text-slate-500 font-semibold uppercase">{t('concours.hero.stats.corriges')}</div>
+                <div className="text-3xl lg:text-4xl font-extrabold text-amber-600 mb-1">
+                  {stats.totalCorriges}
+                </div>
+                <div className="text-xs text-slate-500 font-semibold uppercase">
+                  {t('concours.hero.stats.corriges')}
+                </div>
               </div>
               <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 text-center">
                 <div className="text-3xl lg:text-4xl font-extrabold text-purple-600 mb-1">6</div>
-                <div className="text-xs text-slate-500 font-semibold uppercase">{t('concours.hero.stats.matieres')}</div>
+                <div className="text-xs text-slate-500 font-semibold uppercase">
+                  {t('concours.hero.stats.matieres')}
+                </div>
               </div>
               <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 text-center">
                 <div className="text-3xl lg:text-4xl font-extrabold text-rose-600 mb-1">2</div>
-                <div className="text-xs text-slate-500 font-semibold uppercase">{t('concours.hero.stats.voies')}</div>
+                <div className="text-xs text-slate-500 font-semibold uppercase">
+                  {t('concours.hero.stats.voies')}
+                </div>
               </div>
             </div>
           </div>
@@ -399,23 +594,32 @@ export default function Concours9emePillar() {
                 <h2 className="text-3xl font-extrabold mb-6 text-slate-900">
                   {t('concours.about.title')}
                 </h2>
-                <p className="text-slate-700 leading-relaxed mb-4" dangerouslySetInnerHTML={{
-                  __html: t('concours.about.p1')
-                    .replace(/\{strong\}/g, '<strong>')
-                    .replace(/\{strongEnd\}/g, '</strong>')
-                    .replace(/\{ar\}/g, '<span dir="rtl">')
-                    .replace(/\{arEnd\}/g, '</span>'),
-                }} />
-                <p className="text-slate-700 leading-relaxed mb-4" dangerouslySetInnerHTML={{
-                  __html: t('concours.about.p2')
-                    .replace(/\{strong\}/g, '<strong>')
-                    .replace(/\{strongEnd\}/g, '</strong>'),
-                }} />
-                <p className="text-slate-700 leading-relaxed" dangerouslySetInnerHTML={{
-                  __html: t('concours.about.p3')
-                    .replace(/\{strong\}/g, '<strong>')
-                    .replace(/\{strongEnd\}/g, '</strong>'),
-                }} />
+                <p
+                  className="text-slate-700 leading-relaxed mb-4"
+                  dangerouslySetInnerHTML={{
+                    __html: t('concours.about.p1')
+                      .replace(/\{strong\}/g, '<strong>')
+                      .replace(/\{strongEnd\}/g, '</strong>')
+                      .replace(/\{ar\}/g, '<span dir="rtl">')
+                      .replace(/\{arEnd\}/g, '</span>'),
+                  }}
+                />
+                <p
+                  className="text-slate-700 leading-relaxed mb-4"
+                  dangerouslySetInnerHTML={{
+                    __html: t('concours.about.p2')
+                      .replace(/\{strong\}/g, '<strong>')
+                      .replace(/\{strongEnd\}/g, '</strong>'),
+                  }}
+                />
+                <p
+                  className="text-slate-700 leading-relaxed"
+                  dangerouslySetInnerHTML={{
+                    __html: t('concours.about.p3')
+                      .replace(/\{strong\}/g, '<strong>')
+                      .replace(/\{strongEnd\}/g, '</strong>'),
+                  }}
+                />
               </div>
               <div className="space-y-3">
                 {FEATURES.map((f, i) => (
@@ -435,15 +639,16 @@ export default function Concours9emePillar() {
         </section>
 
         {/* ========== MATIÈRES ========== */}
-        <section id="matieres" className="py-16 bg-gradient-to-br from-slate-50 to-primary-50 scroll-mt-20">
+        <section
+          id="matieres"
+          className="py-16 bg-gradient-to-br from-slate-50 to-primary-50 scroll-mt-20"
+        >
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <h2 className="text-3xl lg:text-4xl font-extrabold mb-3 text-slate-900">
                 {t('concours.subjects.title')}
               </h2>
-              <p className="text-lg text-slate-600">
-                {t('concours.subjects.subtitle')}
-              </p>
+              <p className="text-lg text-slate-600">{t('concours.subjects.subtitle')}</p>
             </div>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -454,20 +659,31 @@ export default function Concours9emePillar() {
                   className="group bg-white rounded-2xl p-5 border border-slate-100 hover:border-primary-300 hover:shadow-lg transition-all"
                 >
                   <div className="flex items-start justify-between mb-3">
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl ${m.bg}`}>
+                    <div
+                      className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl ${m.bg}`}
+                    >
                       {m.icon}
                     </div>
                     <ArrowRight className="w-5 h-5 text-slate-300 group-hover:text-primary-600 group-hover:translate-x-1 transition-all" />
                   </div>
                   {locale === 'ar' ? (
                     <>
-                      <h3 dir="rtl" className="font-bold text-lg mb-1 text-slate-900 group-hover:text-primary-600 transition text-right">{m.nameAr}</h3>
+                      <h3
+                        dir="rtl"
+                        className="font-bold text-lg mb-1 text-slate-900 group-hover:text-primary-600 transition text-right"
+                      >
+                        {m.nameAr}
+                      </h3>
                       <p className="text-sm text-slate-500 mb-2">{m.nameFr}</p>
                     </>
                   ) : (
                     <>
-                      <h3 className="font-bold text-lg mb-1 text-slate-900 group-hover:text-primary-600 transition">{m.nameFr}</h3>
-                      <p dir="rtl" className="text-sm text-slate-500 mb-2">{m.nameAr}</p>
+                      <h3 className="font-bold text-lg mb-1 text-slate-900 group-hover:text-primary-600 transition">
+                        {m.nameFr}
+                      </h3>
+                      <p dir="rtl" className="text-sm text-slate-500 mb-2">
+                        {m.nameAr}
+                      </p>
                     </>
                   )}
                   <p className="text-xs text-slate-500">{m.descFr}</p>
@@ -484,12 +700,17 @@ export default function Concours9emePillar() {
               <h2 className="text-3xl lg:text-4xl font-extrabold mb-3 text-slate-900">
                 {t('concours.methodology.title')}
               </h2>
-              <p className="text-lg text-slate-600 max-w-3xl mx-auto" dangerouslySetInnerHTML={{
-                __html: t('concours.methodology.subtitle')
-                  .replace(/\{strong\}/g, '<strong>')
-                  .replace(/\{strongEnd\}/g, '</strong>'),
-              }} />
-              <p dir="rtl" className="block mt-2 text-slate-500 text-base">{t('concours.methodology.subtitleAr')}</p>
+              <p
+                className="text-lg text-slate-600 max-w-3xl mx-auto"
+                dangerouslySetInnerHTML={{
+                  __html: t('concours.methodology.subtitle')
+                    .replace(/\{strong\}/g, '<strong>')
+                    .replace(/\{strongEnd\}/g, '</strong>'),
+                }}
+              />
+              <p dir="rtl" className="block mt-2 text-slate-500 text-base">
+                {t('concours.methodology.subtitleAr')}
+              </p>
             </div>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -498,12 +719,19 @@ export default function Concours9emePillar() {
                   key={m.subject}
                   className={`bg-white rounded-2xl p-6 ${locale === 'ar' ? 'border-r-4' : 'border-l-4'} ${m.colorClass} shadow-sm hover:shadow-md transition`}
                 >
-                  <div className={`flex items-center gap-3 mb-4 ${locale === 'ar' ? 'flex-row-reverse' : ''}`}>
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl ${m.iconBg}`}>
+                  <div
+                    className={`flex items-center gap-3 mb-4 ${locale === 'ar' ? 'flex-row-reverse' : ''}`}
+                  >
+                    <div
+                      className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl ${m.iconBg}`}
+                    >
                       {m.icon}
                     </div>
                     <div className={`flex-1 ${locale === 'ar' ? 'text-right' : 'text-left'}`}>
-                      <h3 className="font-bold text-lg text-slate-900" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+                      <h3
+                        className="font-bold text-lg text-slate-900"
+                        dir={locale === 'ar' ? 'rtl' : 'ltr'}
+                      >
                         {locale === 'ar' ? m.titleAr : m.titleFr}
                       </h3>
                       <p className="text-xs text-slate-500" dir={locale === 'ar' ? 'ltr' : 'rtl'}>
@@ -543,11 +771,14 @@ export default function Concours9emePillar() {
               <h2 className="text-3xl lg:text-4xl font-extrabold mb-3 text-slate-900">
                 {t('concours.pyramid.title')}
               </h2>
-              <p className="text-lg text-slate-600" dangerouslySetInnerHTML={{
-                __html: t('concours.pyramid.subtitle')
-                  .replace(/\{strong\}/g, '<strong>')
-                  .replace(/\{strongEnd\}/g, '</strong>'),
-              }} />
+              <p
+                className="text-lg text-slate-600"
+                dangerouslySetInnerHTML={{
+                  __html: t('concours.pyramid.subtitle')
+                    .replace(/\{strong\}/g, '<strong>')
+                    .replace(/\{strongEnd\}/g, '</strong>'),
+                }}
+              />
             </div>
 
             <div className="flex flex-col items-center gap-3">
@@ -556,7 +787,9 @@ export default function Concours9emePillar() {
                   key={p.level}
                   className={`${p.width} bg-gradient-to-r ${p.color} text-white font-bold text-center py-4 px-6 rounded-xl shadow-md hover:shadow-lg transition`}
                 >
-                  <span className="text-sm sm:text-base">{t(`concours.pyramid.levels.${p.key}`)}</span>
+                  <span className="text-sm sm:text-base">
+                    {t(`concours.pyramid.levels.${p.key}`)}
+                  </span>
                 </div>
               ))}
             </div>
@@ -565,11 +798,14 @@ export default function Concours9emePillar() {
               <Zap className="w-6 h-6 text-amber-600 flex-shrink-0 mt-1" />
               <div>
                 <h3 className="font-bold text-amber-900 mb-1">{t('concours.pyramid.tipTitle')}</h3>
-                <p className="text-sm text-amber-800" dangerouslySetInnerHTML={{
-                  __html: t('concours.pyramid.tipDesc')
-                    .replace(/\{strong\}/g, '<strong>')
-                    .replace(/\{strongEnd\}/g, '</strong>'),
-                }} />
+                <p
+                  className="text-sm text-amber-800"
+                  dangerouslySetInnerHTML={{
+                    __html: t('concours.pyramid.tipDesc')
+                      .replace(/\{strong\}/g, '<strong>')
+                      .replace(/\{strongEnd\}/g, '</strong>'),
+                  }}
+                />
               </div>
             </div>
           </div>
@@ -586,11 +822,14 @@ export default function Concours9emePillar() {
               <h2 className="text-3xl lg:text-4xl font-extrabold mb-3 text-slate-900">
                 {t('concours.calendar.title')}
               </h2>
-              <p className="text-lg text-slate-600" dangerouslySetInnerHTML={{
-                __html: t('concours.calendar.subtitle')
-                  .replace(/\{strong\}/g, '<strong>')
-                  .replace(/\{strongEnd\}/g, '</strong>'),
-              }} />
+              <p
+                className="text-lg text-slate-600"
+                dangerouslySetInnerHTML={{
+                  __html: t('concours.calendar.subtitle')
+                    .replace(/\{strong\}/g, '<strong>')
+                    .replace(/\{strongEnd\}/g, '</strong>'),
+                }}
+              />
             </div>
 
             <div className="relative">
@@ -602,8 +841,12 @@ export default function Concours9emePillar() {
                       {CALENDAR_EMOJI[i]}
                     </div>
                     <div className="flex-1 bg-slate-50 rounded-2xl p-5 hover:bg-slate-100 transition">
-                      <div className="font-bold text-primary-600 text-sm uppercase mb-1">{t(`concours.calendar.events.${key}.date`)}</div>
-                      <div className="text-slate-900 font-semibold">{t(`concours.calendar.events.${key}.event`)}</div>
+                      <div className="font-bold text-primary-600 text-sm uppercase mb-1">
+                        {t(`concours.calendar.events.${key}.date`)}
+                      </div>
+                      <div className="text-slate-900 font-semibold">
+                        {t(`concours.calendar.events.${key}.event`)}
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -619,11 +862,14 @@ export default function Concours9emePillar() {
               <h2 className="text-3xl lg:text-4xl font-extrabold mb-3 text-slate-900">
                 {t('concours.comparison.title')}
               </h2>
-              <p className="text-lg text-slate-600 max-w-3xl mx-auto" dangerouslySetInnerHTML={{
-                __html: t('concours.comparison.subtitle')
-                  .replace(/\{strong\}/g, '<strong>')
-                  .replace(/\{strongEnd\}/g, '</strong>'),
-              }} />
+              <p
+                className="text-lg text-slate-600 max-w-3xl mx-auto"
+                dangerouslySetInnerHTML={{
+                  __html: t('concours.comparison.subtitle')
+                    .replace(/\{strong\}/g, '<strong>')
+                    .replace(/\{strongEnd\}/g, '</strong>'),
+                }}
+              />
             </div>
 
             <div className="grid md:grid-cols-2 gap-6">
@@ -631,27 +877,45 @@ export default function Concours9emePillar() {
                 <div
                   key={key}
                   className={`bg-white rounded-3xl p-7 shadow-md border-2 ${
-                    key === 'general' ? 'border-indigo-100 hover:border-indigo-300' : 'border-orange-100 hover:border-orange-300'
+                    key === 'general'
+                      ? 'border-indigo-100 hover:border-indigo-300'
+                      : 'border-orange-100 hover:border-orange-300'
                   } transition`}
                 >
                   <div className="flex items-center gap-3 mb-4">
-                    <div className={`w-12 h-12 rounded-xl ${
-                      key === 'general' ? 'bg-indigo-100 text-indigo-600' : 'bg-orange-100 text-orange-600'
-                    } flex items-center justify-center text-2xl`}>{voie.icon}</div>
+                    <div
+                      className={`w-12 h-12 rounded-xl ${
+                        key === 'general'
+                          ? 'bg-indigo-100 text-indigo-600'
+                          : 'bg-orange-100 text-orange-600'
+                      } flex items-center justify-center text-2xl`}
+                    >
+                      {voie.icon}
+                    </div>
                     <div>
                       <h3 className="font-extrabold text-2xl text-slate-900">{voie.title}</h3>
-                      <p dir="rtl" className="text-sm text-slate-500">{voie.subtitle}</p>
+                      <p dir="rtl" className="text-sm text-slate-500">
+                        {voie.subtitle}
+                      </p>
                     </div>
                   </div>
-                  <p className="text-slate-700 mb-4" dangerouslySetInnerHTML={{
-                    __html: voie.desc.replace(/\{strong\}/g, '<strong>').replace(/\{strongEnd\}/g, '</strong>'),
-                  }} />
+                  <p
+                    className="text-slate-700 mb-4"
+                    dangerouslySetInnerHTML={{
+                      __html: voie.desc
+                        .replace(/\{strong\}/g, '<strong>')
+                        .replace(/\{strongEnd\}/g, '</strong>'),
+                    }}
+                  />
                   <div className="space-y-2">
-                    <h4 className="font-bold text-sm text-slate-900 uppercase">{t(`concours.comparison.${key}.epreuvesTitle`)}</h4>
+                    <h4 className="font-bold text-sm text-slate-900 uppercase">
+                      {t(`concours.comparison.${key}.epreuvesTitle`)}
+                    </h4>
                     <ul className="text-sm text-slate-700 space-y-1.5">
                       {voie.epreuves.map((e, i) => (
                         <li key={i} className="flex items-start gap-2">
-                          <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" /> {e.name}
+                          <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />{' '}
+                          {e.name}
                         </li>
                       ))}
                     </ul>
@@ -673,12 +937,17 @@ export default function Concours9emePillar() {
               <h2 className="text-3xl lg:text-4xl font-extrabold mb-3 text-slate-900">
                 {t('concours.gold.title')}
               </h2>
-              <p className="text-lg text-slate-600 max-w-3xl mx-auto" dangerouslySetInnerHTML={{
-                __html: t('concours.gold.subtitle')
-                  .replace(/\{strong\}/g, '<strong>')
-                  .replace(/\{strongEnd\}/g, '</strong>'),
-              }} />
-              <p dir="rtl" className="block mt-2 text-slate-500 text-base">{t('concours.gold.subtitleAr')}</p>
+              <p
+                className="text-lg text-slate-600 max-w-3xl mx-auto"
+                dangerouslySetInnerHTML={{
+                  __html: t('concours.gold.subtitle')
+                    .replace(/\{strong\}/g, '<strong>')
+                    .replace(/\{strongEnd\}/g, '</strong>'),
+                }}
+              />
+              <p dir="rtl" className="block mt-2 text-slate-500 text-base">
+                {t('concours.gold.subtitleAr')}
+              </p>
             </div>
 
             {corriges2020Plus.length > 0 && (
@@ -686,7 +955,10 @@ export default function Concours9emePillar() {
                 {corriges2020Plus.map((f) => {
                   const parts = f.key.split('/');
                   const year = parts[2];
-                  const subject = (parts[5] || '').replace('.pdf', '').replace(/^sujets\+correction\//, '').replace(/-trial$/, '');
+                  const subject = (parts[5] || '')
+                    .replace('.pdf', '')
+                    .replace(/^sujets\+correction\//, '')
+                    .replace(/-trial$/, '');
                   const subjectMeta = getSubjectMeta(subject);
                   return (
                     <a
@@ -698,12 +970,22 @@ export default function Concours9emePillar() {
                     >
                       <div className="flex items-start justify-between mb-3">
                         <div className="text-3xl">{subjectMeta?.icon || '📄'}</div>
-                        <span className="text-xs font-bold text-amber-700 bg-amber-100 rounded-full px-3 py-1">{year}</span>
+                        <span className="text-xs font-bold text-amber-700 bg-amber-100 rounded-full px-3 py-1">
+                          {year}
+                        </span>
                       </div>
                       <h3 className="font-bold text-lg text-slate-900 mb-1 group-hover:text-amber-700 transition">
-                        {t('concours.gold.corrigeLabel').replace('{subject}', (locale === 'ar' ? subjectMeta?.nameAr : subjectMeta?.nameFr) || subject).replace('{year}', year)}
+                        {t('concours.gold.corrigeLabel')
+                          .replace(
+                            '{subject}',
+                            (locale === 'ar' ? subjectMeta?.nameAr : subjectMeta?.nameFr) ||
+                              subject,
+                          )
+                          .replace('{year}', year)}
                       </h3>
-                      <p className="text-xs text-slate-500 mb-3">{f.note || 'Sujet + corrigé combo'}</p>
+                      <p className="text-xs text-slate-500 mb-3">
+                        {f.note || 'Sujet + corrigé combo'}
+                      </p>
                       <div className="flex items-center gap-2 text-sm font-semibold text-amber-700">
                         <Download className="w-4 h-4" /> {t('concours.gold.download')}
                       </div>
@@ -724,13 +1006,21 @@ export default function Concours9emePillar() {
                   {upcoming.map((u, i) => {
                     const meta = getSubjectMeta(u.subject);
                     return (
-                      <div key={i} className="bg-white rounded-lg p-3 border border-slate-200 flex items-center gap-2">
+                      <div
+                        key={i}
+                        className="bg-white rounded-lg p-3 border border-slate-200 flex items-center gap-2"
+                      >
                         <span className="text-xl opacity-50">{meta?.icon || '📄'}</span>
                         <div className="flex-1 min-w-0">
-                          <div className="text-sm font-medium text-slate-700 truncate" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+                          <div
+                            className="text-sm font-medium text-slate-700 truncate"
+                            dir={locale === 'ar' ? 'rtl' : 'ltr'}
+                          >
                             {(locale === 'ar' ? meta?.nameAr : meta?.nameFr) || u.subject} {u.year}
                           </div>
-                          <div className="text-xs text-slate-500">{t('concours.gold.placeholderSoon')}</div>
+                          <div className="text-xs text-slate-500">
+                            {t('concours.gold.placeholderSoon')}
+                          </div>
                         </div>
                         <Clock className="w-4 h-4 text-slate-400" />
                       </div>
@@ -749,31 +1039,48 @@ export default function Concours9emePillar() {
               <h2 className="text-3xl lg:text-4xl font-extrabold mb-3 text-slate-900">
                 {t('concours.list.title')}
               </h2>
-              <p className="text-lg text-slate-600" dangerouslySetInnerHTML={{
-                __html: t('concours.list.subtitle')
-                  .replace(/\{strong\}/g, '<strong>')
-                  .replace(/\{strongEnd\}/g, '</strong>'),
-              }} />
+              <p
+                className="text-lg text-slate-600"
+                dangerouslySetInnerHTML={{
+                  __html: t('concours.list.subtitle')
+                    .replace(/\{strong\}/g, '<strong>')
+                    .replace(/\{strongEnd\}/g, '</strong>'),
+                }}
+              />
             </div>
 
             <div className="space-y-3 mb-8">
               {yearGroups.slice(0, 10).map((yg) => {
-                const yearTotal: number = Object.values(yg.voies).reduce((s: number, v: any) =>
-                  s + Object.values(v).reduce((ss: number, sbj: any) =>
-                    ss + (sbj.sujet ? 1 : 0) + (sbj.corrige ? 1 : 0) + (sbj.sujetPlusCorrige ? 1 : 0),
-                    0,
-                  ),
+                const yearTotal: number = Object.values(yg.voies).reduce(
+                  (s: number, v: any) =>
+                    s +
+                    Object.values(v).reduce(
+                      (ss: number, sbj: any) =>
+                        ss +
+                        (sbj.sujet ? 1 : 0) +
+                        (sbj.corrige ? 1 : 0) +
+                        (sbj.sujetPlusCorrige ? 1 : 0),
+                      0,
+                    ),
                   0,
                 );
                 return (
-                  <details key={yg.year} className="group bg-white rounded-2xl border border-slate-200 hover:border-primary-300 transition shadow-sm">
+                  <details
+                    key={yg.year}
+                    className="group bg-white rounded-2xl border border-slate-200 hover:border-primary-300 transition shadow-sm"
+                  >
                     <summary className="cursor-pointer p-5 flex items-center justify-between gap-3 list-none">
                       <div className="flex items-center gap-3">
                         <div className="w-12 h-12 rounded-xl bg-primary-100 text-primary-600 font-extrabold flex items-center justify-center">
                           {String(yg.year).slice(-2)}
                         </div>
                         <div>
-                          <div className="font-bold text-lg text-slate-900">{t('concours.passes.cards.yearHeader').replace('{year}', String(yg.year))}</div>
+                          <div className="font-bold text-lg text-slate-900">
+                            {t('concours.passes.cards.yearHeader').replace(
+                              '{year}',
+                              String(yg.year),
+                            )}
+                          </div>
                           <div className="text-xs text-slate-500">
                             {t('concours.list.yearFiles').replace('{count}', String(yearTotal))}
                           </div>
@@ -787,30 +1094,58 @@ export default function Concours9emePillar() {
                           Object.entries(subjects).map(([subject, files]) => {
                             const meta = getSubjectMeta(subject);
                             return (
-                              <div key={`${voie}-${subject}`} className="flex flex-col gap-1.5 bg-slate-50 rounded-lg p-3">
-                                <div className="text-xs font-bold text-slate-500 uppercase" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
-                                  {(locale === 'ar' ? meta?.nameAr : meta?.nameFr) || subject} ({voie === 'general' ? t('concours.passes.cards.voieGenerale') : t('concours.passes.cards.voieTechnique')})
+                              <div
+                                key={`${voie}-${subject}`}
+                                className="flex flex-col gap-1.5 bg-slate-50 rounded-lg p-3"
+                              >
+                                <div
+                                  className="text-xs font-bold text-slate-500 uppercase"
+                                  dir={locale === 'ar' ? 'rtl' : 'ltr'}
+                                >
+                                  {(locale === 'ar' ? meta?.nameAr : meta?.nameFr) || subject} (
+                                  {voie === 'general'
+                                    ? t('concours.passes.cards.voieGenerale')
+                                    : t('concours.passes.cards.voieTechnique')}
+                                  )
                                 </div>
                                 <div className="flex flex-wrap gap-2">
                                   {files.sujet && (
-                                    <a href={files.sujet.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs bg-blue-100 text-blue-700 rounded-full px-2.5 py-1 hover:bg-blue-200">
-                                      <FileText className="w-3 h-3" /> {t('concours.passes.cards.sujet')}
+                                    <a
+                                      href={files.sujet.url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="inline-flex items-center gap-1 text-xs bg-blue-100 text-blue-700 rounded-full px-2.5 py-1 hover:bg-blue-200"
+                                    >
+                                      <FileText className="w-3 h-3" />{' '}
+                                      {t('concours.passes.cards.sujet')}
                                     </a>
                                   )}
                                   {files.corrige && (
-                                    <a href={files.corrige.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs bg-emerald-100 text-emerald-700 rounded-full px-2.5 py-1 hover:bg-emerald-200">
-                                      <CheckCircle className="w-3 h-3" /> {t('concours.passes.cards.corrige')}
+                                    <a
+                                      href={files.corrige.url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="inline-flex items-center gap-1 text-xs bg-emerald-100 text-emerald-700 rounded-full px-2.5 py-1 hover:bg-emerald-200"
+                                    >
+                                      <CheckCircle className="w-3 h-3" />{' '}
+                                      {t('concours.passes.cards.corrige')}
                                     </a>
                                   )}
                                   {files.sujetPlusCorrige && (
-                                    <a href={files.sujetPlusCorrige.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs bg-amber-100 text-amber-700 rounded-full px-2.5 py-1 hover:bg-amber-200">
-                                      <Star className="w-3 h-3" /> {t('concours.passes.cards.sujetCorrige')}
+                                    <a
+                                      href={files.sujetPlusCorrige.url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="inline-flex items-center gap-1 text-xs bg-amber-100 text-amber-700 rounded-full px-2.5 py-1 hover:bg-amber-200"
+                                    >
+                                      <Star className="w-3 h-3" />{' '}
+                                      {t('concours.passes.cards.sujetCorrige')}
                                     </a>
                                   )}
                                 </div>
                               </div>
                             );
-                          })
+                          }),
                         )}
                       </div>
                     </div>
@@ -839,10 +1174,15 @@ export default function Concours9emePillar() {
             </h2>
             <div className="space-y-3">
               {FAQS.map((faq, i) => (
-                <details key={i} className="bg-white rounded-xl border border-slate-200 hover:border-primary-300 transition group">
+                <details
+                  key={i}
+                  className="bg-white rounded-xl border border-slate-200 hover:border-primary-300 transition group"
+                >
                   <summary className="cursor-pointer p-5 font-semibold text-slate-900 flex items-center justify-between gap-3 list-none">
                     <span>{faq.q}</span>
-                    <span className="text-primary-600 text-xl group-open:rotate-45 transition-transform flex-shrink-0">+</span>
+                    <span className="text-primary-600 text-xl group-open:rotate-45 transition-transform flex-shrink-0">
+                      +
+                    </span>
                   </summary>
                   <div className="px-5 pb-5 text-slate-700 leading-relaxed border-t border-slate-100 pt-4">
                     {faq.a}
@@ -856,17 +1196,19 @@ export default function Concours9emePillar() {
         {/* ========== CTA ========== */}
         <section className="py-16 bg-gradient-to-br from-primary-600 to-amber-700 text-white">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-3xl lg:text-4xl font-extrabold mb-4">
-              {t('concours.cta.title')}
-            </h2>
-            <p className="text-lg lg:text-xl text-primary-100 mb-8">
-              {t('concours.cta.subtitle')}
-            </p>
+            <h2 className="text-3xl lg:text-4xl font-extrabold mb-4">{t('concours.cta.title')}</h2>
+            <p className="text-lg lg:text-xl text-primary-100 mb-8">{t('concours.cta.subtitle')}</p>
             <div className="flex flex-wrap items-center justify-center gap-4">
-              <Link href="/concours-9eme-tunisie/sujets-passes" className="bg-white text-primary-700 font-bold px-7 py-3 rounded-xl hover:bg-primary-50 transition shadow-lg inline-flex items-center gap-2">
+              <Link
+                href="/concours-9eme-tunisie/sujets-passes"
+                className="bg-white text-primary-700 font-bold px-7 py-3 rounded-xl hover:bg-primary-50 transition shadow-lg inline-flex items-center gap-2"
+              >
                 <Download className="w-4 h-4" /> {t('concours.cta.btn1')}
               </Link>
-              <Link href="/ressources?class=9eme" className="bg-primary-500 text-white font-bold px-7 py-3 rounded-xl hover:bg-primary-400 transition border-2 border-primary-300">
+              <Link
+                href="/ressources?class=9eme"
+                className="bg-primary-500 text-white font-bold px-7 py-3 rounded-xl hover:bg-primary-400 transition border-2 border-primary-300"
+              >
                 {t('concours.cta.btn2')}
               </Link>
             </div>

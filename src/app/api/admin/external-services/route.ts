@@ -16,11 +16,7 @@ import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { encryptSecret, decryptSecret, redactSecret } from '@/lib/provider-keys';
 import { checkVercelUsage } from '@/lib/external-services.vercel';
-import {
-  checkConvertApiUsage,
-  checkIlovepdfUsage,
-  checkNeonUsage,
-} from '@/lib/external-services';
+import { checkConvertApiUsage, checkIlovepdfUsage, checkNeonUsage } from '@/lib/external-services';
 
 export const runtime = 'nodejs';
 
@@ -39,7 +35,7 @@ export async function GET(req: NextRequest) {
   if (!type || !['vercel', 'neon', 'apiconvert', 'iloveapi'].includes(type)) {
     return NextResponse.json(
       { error: 'type doit être "vercel", "neon", "apiconvert" ou "iloveapi"' },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -47,9 +43,23 @@ export async function GET(req: NextRequest) {
   if (!provider || !provider.secretKey) {
     return NextResponse.json({
       configured: false,
-      usage: type === 'vercel'
-        ? { periodStart: '', periodEnd: '', bandwidth: { used: 0, unit: 'GB' }, functions: { used: 0, unit: 'hours' }, builds: { used: 0, unit: 'builds' } }
-        : { periodStart: '', periodEnd: '', storage: { usedMb: 0 }, compute: { usedHours: 0 }, transfer: { usedGb: 0 }, projects: { active: 0 } },
+      usage:
+        type === 'vercel'
+          ? {
+              periodStart: '',
+              periodEnd: '',
+              bandwidth: { used: 0, unit: 'GB' },
+              functions: { used: 0, unit: 'hours' },
+              builds: { used: 0, unit: 'builds' },
+            }
+          : {
+              periodStart: '',
+              periodEnd: '',
+              storage: { usedMb: 0 },
+              compute: { usedHours: 0 },
+              transfer: { usedGb: 0 },
+              projects: { active: 0 },
+            },
       tokenRedacted: '',
     });
   }
@@ -118,15 +128,12 @@ export async function POST(req: NextRequest) {
   if (!['vercel', 'neon', 'apiconvert', 'iloveapi'].includes(type)) {
     return NextResponse.json(
       { error: 'type doit être "vercel", "neon", "apiconvert" ou "iloveapi"' },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
   if (!body.token || body.token.trim().length < 8) {
-    return NextResponse.json(
-      { error: 'token requis (min 8 caractères)' },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: 'token requis (min 8 caractères)' }, { status: 400 });
   }
 
   const data: any = {
@@ -160,7 +167,7 @@ export async function DELETE(req: NextRequest) {
   if (!type || !['vercel', 'neon', 'apiconvert', 'iloveapi'].includes(type)) {
     return NextResponse.json(
       { error: 'type doit être "vercel", "neon", "apiconvert" ou "iloveapi"' },
-      { status: 400 }
+      { status: 400 },
     );
   }
 

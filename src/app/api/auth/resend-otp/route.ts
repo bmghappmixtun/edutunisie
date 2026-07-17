@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
     if (!rl.allowed) {
       return NextResponse.json(
         { error: `Trop de demandes. Réessayez dans ${Math.ceil(rl.resetIn / 60000)} minutes.` },
-        { status: 429, headers: { 'Retry-After': String(Math.ceil(rl.resetIn / 1000)) } }
+        { status: 429, headers: { 'Retry-After': String(Math.ceil(rl.resetIn / 1000)) } },
       );
     }
 
@@ -37,20 +37,20 @@ export async function POST(req: NextRequest) {
       // Rate limit: max 1 resend per 30s per user
       const lastOtp = await prisma.otpCode.findFirst({
         where: { userId: user.id, purpose: 'email_verification' },
-        orderBy: { createdAt: 'desc' }
+        orderBy: { createdAt: 'desc' },
       });
       if (lastOtp && lastOtp.createdAt > new Date(Date.now() - 30 * 1000)) {
         // Don't leak timing — still return success shape
         return NextResponse.json({
           success: true,
-          message: 'Si votre email est valide et non vérifié, un nouveau code a été envoyé.'
+          message: 'Si votre email est valide et non vérifié, un nouveau code a été envoyé.',
         });
       }
 
       // Invalidate previous unconsumed OTPs
       await prisma.otpCode.updateMany({
         where: { userId: user.id, purpose: 'email_verification', consumedAt: null },
-        data: { consumedAt: new Date() }
+        data: { consumedAt: new Date() },
       });
 
       const code = generateOTP();
@@ -60,18 +60,18 @@ export async function POST(req: NextRequest) {
           code,
           purpose: 'email_verification',
           expiresAt: new Date(Date.now() + 30 * 60 * 1000),
-        }
+        },
       });
 
-      await sendOTPEmail(user.email, code, user.firstName ?? undefined).catch(e =>
-        console.error('Resend OTP error:', e)
+      await sendOTPEmail(user.email, code, user.firstName ?? undefined).catch((e) =>
+        console.error('Resend OTP error:', e),
       );
     }
 
     // SECURITY: same response whether user exists or not, with same wording
     return NextResponse.json({
       success: true,
-      message: 'Si votre email est valide et non vérifié, un nouveau code a été envoyé.'
+      message: 'Si votre email est valide et non vérifié, un nouveau code a été envoyé.',
     });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });

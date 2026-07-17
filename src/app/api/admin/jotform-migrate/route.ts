@@ -20,7 +20,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { put } from '@vercel/blob';
-import * as crypto from 'crypto';
 
 export const maxDuration = 60;
 export const runtime = 'nodejs';
@@ -48,7 +47,7 @@ export async function POST(req: NextRequest) {
     const teacher = await prisma.user.findUnique({ where: { id: teacherId } });
     if (!teacher) return NextResponse.json({ error: 'Teacher introuvable' }, { status: 404 });
     if (teacher.role !== 'TEACHER' && teacher.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'User n\'est pas teacher' }, { status: 400 });
+      return NextResponse.json({ error: "User n'est pas teacher" }, { status: 400 });
     }
 
     // Check if already imported (by source URL hash)
@@ -57,7 +56,8 @@ export async function POST(req: NextRequest) {
 
     // Download from JotForm
     const dlRes = await fetch(fileUrl);
-    if (!dlRes.ok) return NextResponse.json({ error: `Download failed: ${dlRes.status}` }, { status: 502 });
+    if (!dlRes.ok)
+      return NextResponse.json({ error: `Download failed: ${dlRes.status}` }, { status: 502 });
     const buffer = Buffer.from(await dlRes.arrayBuffer());
     if (buffer.length === 0) return NextResponse.json({ error: 'Empty file' }, { status: 502 });
 

@@ -61,18 +61,86 @@ export type ConcourSubject = {
 };
 
 export const CONCOURS_SUBJECTS: ConcourSubject[] = [
-  { slug: 'math', nameFr: 'Mathématiques', nameAr: 'الرياضيات', icon: '📐', color: 'text-blue-600', bgColor: 'bg-blue-50', descFr: 'Algèbre, géométrie, fonctions, statistiques' },
-  { slug: 'arabe', nameFr: 'Arabe', nameAr: 'العربية', icon: '📚', color: 'text-amber-600', bgColor: 'bg-amber-50', descFr: 'قواعد، بلاغة، تعبير، قراءة' },
-  { slug: 'francais', nameFr: 'Français', nameAr: 'الفرنسية', icon: '📖', color: 'text-rose-600', bgColor: 'bg-rose-50', descFr: 'Grammaire, conjugaison, rédaction, lecture' },
-  { slug: 'svt', nameFr: 'Sciences de la Vie et de la Terre', nameAr: 'علوم الحياة والأرض', icon: '🧬', color: 'text-emerald-600', bgColor: 'bg-emerald-50', descFr: 'Biologie, géologie, écologie' },
-  { slug: 'physique', nameFr: 'Physique', nameAr: 'علوم فيزيائية', icon: '⚛️', color: 'text-purple-600', bgColor: 'bg-purple-50', descFr: 'Mécanique, électricité, optique' },
-  { slug: 'anglais', nameFr: 'Anglais', nameAr: 'الإنجليزية', icon: '🌍', color: 'text-cyan-600', bgColor: 'bg-cyan-50', descFr: 'Grammar, vocabulary, comprehension' },
-  { slug: 'histoire', nameFr: 'Histoire-Géographie', nameAr: 'التاريخ والجغرافيا', icon: '🏛️', color: 'text-violet-600', bgColor: 'bg-violet-50', descFr: 'Histoire, géographie, éducation civique' },
+  {
+    slug: 'math',
+    nameFr: 'Mathématiques',
+    nameAr: 'الرياضيات',
+    icon: '📐',
+    color: 'text-blue-600',
+    bgColor: 'bg-blue-50',
+    descFr: 'Algèbre, géométrie, fonctions, statistiques',
+  },
+  {
+    slug: 'arabe',
+    nameFr: 'Arabe',
+    nameAr: 'العربية',
+    icon: '📚',
+    color: 'text-amber-600',
+    bgColor: 'bg-amber-50',
+    descFr: 'قواعد، بلاغة، تعبير، قراءة',
+  },
+  {
+    slug: 'francais',
+    nameFr: 'Français',
+    nameAr: 'الفرنسية',
+    icon: '📖',
+    color: 'text-rose-600',
+    bgColor: 'bg-rose-50',
+    descFr: 'Grammaire, conjugaison, rédaction, lecture',
+  },
+  {
+    slug: 'svt',
+    nameFr: 'Sciences de la Vie et de la Terre',
+    nameAr: 'علوم الحياة والأرض',
+    icon: '🧬',
+    color: 'text-emerald-600',
+    bgColor: 'bg-emerald-50',
+    descFr: 'Biologie, géologie, écologie',
+  },
+  {
+    slug: 'physique',
+    nameFr: 'Physique',
+    nameAr: 'علوم فيزيائية',
+    icon: '⚛️',
+    color: 'text-purple-600',
+    bgColor: 'bg-purple-50',
+    descFr: 'Mécanique, électricité, optique',
+  },
+  {
+    slug: 'anglais',
+    nameFr: 'Anglais',
+    nameAr: 'الإنجليزية',
+    icon: '🌍',
+    color: 'text-cyan-600',
+    bgColor: 'bg-cyan-50',
+    descFr: 'Grammar, vocabulary, comprehension',
+  },
+  {
+    slug: 'histoire',
+    nameFr: 'Histoire-Géographie',
+    nameAr: 'التاريخ والجغرافيا',
+    icon: '🏛️',
+    color: 'text-violet-600',
+    bgColor: 'bg-violet-50',
+    descFr: 'Histoire, géographie, éducation civique',
+  },
 ];
 
 export const CONCOURS_VOIES = [
-  { slug: 'general', nameFr: 'Voie Générale', nameAr: 'العام', icon: '🎓', color: 'text-indigo-600' },
-  { slug: 'technique', nameFr: 'Voie Technique', nameAr: 'التقني', icon: '🔧', color: 'text-orange-600' },
+  {
+    slug: 'general',
+    nameFr: 'Voie Générale',
+    nameAr: 'العام',
+    icon: '🎓',
+    color: 'text-indigo-600',
+  },
+  {
+    slug: 'technique',
+    nameFr: 'Voie Technique',
+    nameAr: 'التقني',
+    icon: '🔧',
+    color: 'text-orange-600',
+  },
 ] as const;
 
 let _manifest: any = null;
@@ -170,7 +238,10 @@ export function groupByYear(): YearGroup[] {
     const year = parseInt(parts[2] || '0', 10);
     const voie = parts[3] || 'general';
     const type = parts[4] || 'sujets';
-    const subject = (parts[5] || '').replace('.pdf', '').replace(/-modele-\d+$/, '').replace(/-trial$/, '');
+    const subject = (parts[5] || '')
+      .replace('.pdf', '')
+      .replace(/-modele-\d+$/, '')
+      .replace(/-trial$/, '');
 
     if (!grouped[year]) grouped[year] = { year, voies: {} };
     if (!grouped[year].voies[voie]) grouped[year].voies[voie] = {};

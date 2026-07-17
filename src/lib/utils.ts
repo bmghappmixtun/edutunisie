@@ -35,7 +35,7 @@ export function timeAgo(date: Date | string): string {
       return `il y a ${interval} ${label}${interval > 1 ? 's' : ''}`;
     }
   }
-  return 'à l\'instant';
+  return "à l'instant";
 }
 
 // Re-export the proper slugify from @/lib/slugify for backwards compatibility
@@ -48,27 +48,47 @@ export function fileSize(bytes: number): string {
 }
 
 export const RESOURCE_TYPE_LABELS: Record<string, { fr: string; ar: string; color: string }> = {
-  COURSE:        { fr: 'Cours',           ar: 'درس',           color: 'bg-blue-100 text-blue-700' },
-  HOMEWORK:      { fr: 'Devoir',          ar: 'فرض',           color: 'bg-amber-100 text-amber-700' },
-  EXERCISE:      { fr: 'Série d\'exercices', ar: 'سلسلة تمارين', color: 'bg-green-100 text-green-700' },
-  REVISION:      { fr: 'Révision',        ar: 'مراجعة',        color: 'bg-purple-100 text-purple-700' },
-  EXAM:          { fr: 'Contrôle/Examen', ar: 'اختبار',        color: 'bg-red-100 text-red-700' },
-  BAC_SUBJECT:   { fr: 'Sujet Bac',       ar: 'موضوع باك',     color: 'bg-pink-100 text-pink-700' },
-  CORRECTION:    { fr: 'Corrigé',         ar: 'تصحيح',         color: 'bg-emerald-100 text-emerald-700' },
-  SUMMARY:       { fr: 'Résumé',          ar: 'ملخص',          color: 'bg-indigo-100 text-indigo-700' },
-  OTHER:         { fr: 'Autre',           ar: 'آخر',           color: 'bg-slate-100 text-slate-700' },
+  COURSE: { fr: 'Cours', ar: 'درس', color: 'bg-blue-100 text-blue-700' },
+  HOMEWORK: { fr: 'Devoir', ar: 'فرض', color: 'bg-amber-100 text-amber-700' },
+  EXERCISE: { fr: "Série d'exercices", ar: 'سلسلة تمارين', color: 'bg-green-100 text-green-700' },
+  REVISION: { fr: 'Révision', ar: 'مراجعة', color: 'bg-purple-100 text-purple-700' },
+  EXAM: { fr: 'Contrôle/Examen', ar: 'اختبار', color: 'bg-red-100 text-red-700' },
+  BAC_SUBJECT: { fr: 'Sujet Bac', ar: 'موضوع باك', color: 'bg-pink-100 text-pink-700' },
+  CORRECTION: { fr: 'Corrigé', ar: 'تصحيح', color: 'bg-emerald-100 text-emerald-700' },
+  SUMMARY: { fr: 'Résumé', ar: 'ملخص', color: 'bg-indigo-100 text-indigo-700' },
+  OTHER: { fr: 'Autre', ar: 'آخر', color: 'bg-slate-100 text-slate-700' },
 };
 
 // Homework subtype — only relevant when type=HOMEWORK
 export const HOMEWORK_SUBTYPE_LABELS: Record<string, { fr: string; ar: string; color: string }> = {
-  CONTROL:       { fr: 'Contrôle',        ar: 'فرض مراقبة',     color: 'bg-red-100 text-red-700' },
-  SYNTHESIS:     { fr: 'Synthèse',        ar: 'فرض تأليفي',     color: 'bg-violet-100 text-violet-700' },
-  HOUSEWORK:     { fr: 'Maison',          ar: 'واجب منزلي',     color: 'bg-orange-100 text-orange-700' },
+  CONTROL: { fr: 'Contrôle', ar: 'فرض مراقبة', color: 'bg-red-100 text-red-700' },
+  SYNTHESIS: { fr: 'Synthèse', ar: 'فرض تأليفي', color: 'bg-violet-100 text-violet-700' },
+  HOUSEWORK: { fr: 'Maison', ar: 'واجب منزلي', color: 'bg-orange-100 text-orange-700' },
 };
 
 export const GOVERNORATES = [
-  'Tunis', 'Ariana', 'Ben Arous', 'Manouba', 'Nabeul', 'Zaghouan', 'Bizerte',
-  'Béja', 'Jendouba', 'Kef', 'Siliana', 'Sousse', 'Monastir', 'Mahdia',
-  'Sfax', 'Kairouan', 'Kasserine', 'Sidi Bouzid', 'Gabès', 'Medenine',
-  'Tataouine', 'Gafsa', 'Tozeur', 'Kebili'
+  'Tunis',
+  'Ariana',
+  'Ben Arous',
+  'Manouba',
+  'Nabeul',
+  'Zaghouan',
+  'Bizerte',
+  'Béja',
+  'Jendouba',
+  'Kef',
+  'Siliana',
+  'Sousse',
+  'Monastir',
+  'Mahdia',
+  'Sfax',
+  'Kairouan',
+  'Kasserine',
+  'Sidi Bouzid',
+  'Gabès',
+  'Medenine',
+  'Tataouine',
+  'Gafsa',
+  'Tozeur',
+  'Kebili',
 ];

@@ -77,10 +77,12 @@ async function runPool(urls, parallelism) {
           failures.push({ url, error: e.message });
           return { ok: false, url, error: e.message };
         }
-      })
+      }),
     );
     results.push(...res);
-    process.stdout.write(`  Progress: ${downloaded + failed}/${urls.length} (${downloaded} ok, ${failed} fail)\r`);
+    process.stdout.write(
+      `  Progress: ${downloaded + failed}/${urls.length} (${downloaded} ok, ${failed} fail)\r`,
+    );
   }
   console.log(); // newline
   return results;
@@ -147,7 +149,9 @@ async function main() {
   // List output
   const files = fs.readdirSync(OUT_DIR).filter((f) => f.endsWith('.pdf'));
   console.log(`\nFiles on disk: ${files.length}`);
-  console.log(`Total size: ${(files.reduce((s, f) => s + fs.statSync(path.join(OUT_DIR, f)).size, 0) / 1024 / 1024).toFixed(2)} MB`);
+  console.log(
+    `Total size: ${(files.reduce((s, f) => s + fs.statSync(path.join(OUT_DIR, f)).size, 0) / 1024 / 1024).toFixed(2)} MB`,
+  );
 }
 
 main().catch((e) => {

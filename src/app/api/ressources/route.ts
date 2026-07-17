@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
-import type { Facets, RessourcesResponse } from '@/lib/facets';
+import type { RessourcesResponse } from '@/lib/facets';
 
 export { type Facets, type RessourcesResponse } from '@/lib/facets';
 
@@ -9,7 +9,10 @@ export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 // ============== HELPERS ==============
-function buildWhere(filters: ParsedFilters, exclude: (keyof ParsedFilters)[] = []): Prisma.ResourceWhereInput {
+function buildWhere(
+  filters: ParsedFilters,
+  exclude: (keyof ParsedFilters)[] = [],
+): Prisma.ResourceWhereInput {
   const where: Prisma.ResourceWhereInput = { status: 'PUBLISHED' };
 
   if (!exclude.includes('q') && filters.q) {
@@ -145,73 +148,66 @@ export async function GET(req: NextRequest) {
   // `select: { ... }` + 4 batched lookups.
   // Old approach: ~1000ms for the main findMany (N+1). New: ~180ms + 4× 50ms lookups = 380ms.
   // Net gain: ~620ms per request.
-  const [
-    resourcesRaw,
-    total,
-    byType,
-    byTrimestre,
-    byYear,
-    byLanguage,
-    withCorrectionCount,
-  ] = await Promise.all([
-    prisma.resource.findMany({
-      where,
-      take: pageSize,
-      skip,
-      orderBy,
-      select: {
-        // Resource scalars
-        id: true,
-        slug: true,
-        numericId: true,
-        title: true,
-        description: true,
-        summary: true,
-        type: true,
-        language: true,
-        year: true,
-        trimester: true,
-        publishedAt: true,
-        hasCorrection: true,
-        viewsCount: true,
-        downloadsCount: true,
-        avgRating: true,
-        ratingCount: true,
-        pageCount: true,
-        fileSize: true,
-        // Foreign keys (to batch-lookup related rows below)
-        subjectId: true,
-        classId: true,
-        sectionId: true,
-        teacherId: true,
-        // _count for comments/ratings/favorites (1 extra query, used by display)
-        _count: { select: { comments: true, ratings: true, favorites: true } },
-      },
-    }),
-    prisma.resource.count({ where }),
-    prisma.resource.groupBy({
-      by: ['type'],
-      where,
-      _count: { _all: true },
-    }),
-    prisma.resource.groupBy({
-      by: ['trimester'],
-      where: { ...where, trimester: { not: null } },
-      _count: { _all: true },
-    }),
-    prisma.resource.groupBy({
-      by: ['year'],
-      where: { ...where, year: { not: null } },
-      _count: { _all: true },
-      orderBy: { year: 'desc' },
-    }),
-    prisma.resource.groupBy({
-      by: ['language'],
-      where,
-      _count: { _all: true },
-    }),
-    prisma.resource.count({ where: { ...where, hasCorrection: true } }),
-  ]);
+  const [resourcesRaw, total, byType, byTrimestre, byYear, byLanguage, withCorrectionCount] =
+    await Promise.all([
+      prisma.resource.findMany({
+        where,
+        take: pageSize,
+        skip,
+        orderBy,
+        select: {
+          // Resource scalars
+          id: true,
+          slug: true,
+          numericId: true,
+          title: true,
+          description: true,
+          summary: true,
+          type: true,
+          language: true,
+          year: true,
+          trimester: true,
+          publishedAt: true,
+          hasCorrection: true,
+          viewsCount: true,
+          downloadsCount: true,
+          avgRating: true,
+          ratingCount: true,
+          pageCount: true,
+          fileSize: true,
+          // Foreign keys (to batch-lookup related rows below)
+          subjectId: true,
+          classId: true,
+          sectionId: true,
+          teacherId: true,
+          // _count for comments/ratings/favorites (1 extra query, used by display)
+          _count: { select: { comments: true, ratings: true, favorites: true } },
+        },
+      }),
+      prisma.resource.count({ where }),
+      prisma.resource.groupBy({
+        by: ['type'],
+        where,
+        _count: { _all: true },
+      }),
+      prisma.resource.groupBy({
+        by: ['trimester'],
+        where: { ...where, trimester: { not: null } },
+        _count: { _all: true },
+      }),
+      prisma.resource.groupBy({
+        by: ['year'],
+        where: { ...where, year: { not: null } },
+        _count: { _all: true },
+        orderBy: { year: 'desc' },
+      }),
+      prisma.resource.groupBy({
+        by: ['language'],
+        where,
+        _count: { _all: true },
+      }),
+      prisma.resource.count({ where: { ...where, hasCorrection: true } }),
+    ]);
 
   // Fetch class/section/subject IDs separately (groupBy on nullable strings has TS issues)
   // PERF: use groupBy instead of findMany+JS-count — 3× scans of 13k+ rows became 3 small aggregate queries.
@@ -233,9 +229,9 @@ export async function GET(req: NextRequest) {
       _count: { _all: true },
     }),
   ]);
-  const classRecords = classGroups.map(g => ({ classId: g.classId }));
-  const sectionRecords = sectionGroups.map(g => ({ sectionId: g.sectionId }));
-  const subjectRecords = subjectGroups.map(g => ({ subjectId: g.subjectId }));
+  const classRecords = classGroups.map((g) => ({ classId: g.classId }));
+  const sectionRecords = sectionGroups.map((g) => ({ sectionId: g.sectionId }));
+  const subjectRecords = subjectGroups.map((g) => ({ subjectId: g.subjectId }));
 
   // Format simple facets
   const byTypeMap: Record<string, number> = {};
@@ -245,7 +241,8 @@ export async function GET(req: NextRequest) {
 
   const byTrimestreMap: Record<string, number> = {};
   byTrimestre.forEach((b) => {
-    if (b.trimester && b._count && typeof b._count === 'object') byTrimestreMap[b.trimester] = b._count._all ?? 0;
+    if (b.trimester && b._count && typeof b._count === 'object')
+      byTrimestreMap[b.trimester] = b._count._all ?? 0;
   });
 
   const byYearMap: Record<string, number> = {};
@@ -255,7 +252,8 @@ export async function GET(req: NextRequest) {
 
   const byLanguageMap: Record<string, number> = {};
   byLanguage.forEach((b) => {
-    if (b.language && b._count && typeof b._count === 'object') byLanguageMap[b.language] = b._count._all ?? 0;
+    if (b.language && b._count && typeof b._count === 'object')
+      byLanguageMap[b.language] = b._count._all ?? 0;
   });
 
   // For class/section/subject facets: we now use the groupBy queries above
@@ -265,44 +263,63 @@ export async function GET(req: NextRequest) {
   // (instead of Prisma's N+1 from `include`).
   // These IDs are typically <10 distinct values for 24 resources.
   const teacherIds = [...new Set(resourcesRaw.map((r) => r.teacherId).filter(Boolean))] as string[];
-  const subjectIdsFromResources = [...new Set(resourcesRaw.map((r) => r.subjectId).filter(Boolean))] as string[];
-  const classIdsFromResources = [...new Set(resourcesRaw.map((r) => r.classId).filter(Boolean))] as string[];
-  const sectionIdsFromResources = [...new Set(resourcesRaw.map((r) => r.sectionId).filter(Boolean))] as string[];
+  const subjectIdsFromResources = [
+    ...new Set(resourcesRaw.map((r) => r.subjectId).filter(Boolean)),
+  ] as string[];
+  const classIdsFromResources = [
+    ...new Set(resourcesRaw.map((r) => r.classId).filter(Boolean)),
+  ] as string[];
+  const sectionIdsFromResources = [
+    ...new Set(resourcesRaw.map((r) => r.sectionId).filter(Boolean)),
+  ] as string[];
 
-  const [teachersForResources, subjectsForResources, classesForResources, sectionsForResources] = await Promise.all([
-    teacherIds.length > 0
-      ? prisma.user.findMany({
-          where: { id: { in: teacherIds } },
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            firstNameAr: true,
-            lastNameAr: true,
-            avatarUrl: true,
-            schoolName: true,
-          },
-        })
-      : Promise.resolve([] as Array<{ id: string; firstName: string | null; lastName: string | null; firstNameAr: string | null; lastNameAr: string | null; avatarUrl: string | null; schoolName: string | null }>),
-    subjectIdsFromResources.length > 0
-      ? prisma.subject.findMany({
-          where: { id: { in: subjectIdsFromResources } },
-          select: { id: true, slug: true, nameFr: true, color: true },
-        })
-      : Promise.resolve([] as Array<{ id: string; slug: string; nameFr: string; color: string | null }>),
-    classIdsFromResources.length > 0
-      ? prisma.class.findMany({
-          where: { id: { in: classIdsFromResources } },
-          select: { id: true, slug: true, nameFr: true },
-        })
-      : Promise.resolve([] as Array<{ id: string; slug: string; nameFr: string }>),
-    sectionIdsFromResources.length > 0
-      ? prisma.section.findMany({
-          where: { id: { in: sectionIdsFromResources } },
-          select: { id: true, slug: true, nameFr: true },
-        })
-      : Promise.resolve([] as Array<{ id: string; slug: string; nameFr: string }>),
-  ]);
+  const [teachersForResources, subjectsForResources, classesForResources, sectionsForResources] =
+    await Promise.all([
+      teacherIds.length > 0
+        ? prisma.user.findMany({
+            where: { id: { in: teacherIds } },
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              firstNameAr: true,
+              lastNameAr: true,
+              avatarUrl: true,
+              schoolName: true,
+            },
+          })
+        : Promise.resolve(
+            [] as Array<{
+              id: string;
+              firstName: string | null;
+              lastName: string | null;
+              firstNameAr: string | null;
+              lastNameAr: string | null;
+              avatarUrl: string | null;
+              schoolName: string | null;
+            }>,
+          ),
+      subjectIdsFromResources.length > 0
+        ? prisma.subject.findMany({
+            where: { id: { in: subjectIdsFromResources } },
+            select: { id: true, slug: true, nameFr: true, color: true },
+          })
+        : Promise.resolve(
+            [] as Array<{ id: string; slug: string; nameFr: string; color: string | null }>,
+          ),
+      classIdsFromResources.length > 0
+        ? prisma.class.findMany({
+            where: { id: { in: classIdsFromResources } },
+            select: { id: true, slug: true, nameFr: true },
+          })
+        : Promise.resolve([] as Array<{ id: string; slug: string; nameFr: string }>),
+      sectionIdsFromResources.length > 0
+        ? prisma.section.findMany({
+            where: { id: { in: sectionIdsFromResources } },
+            select: { id: true, slug: true, nameFr: true },
+          })
+        : Promise.resolve([] as Array<{ id: string; slug: string; nameFr: string }>),
+    ]);
 
   // Stitch the relations back onto the resources (in-memory join, ~0ms)
   const teacherById = new Map(teachersForResources.map((t) => [t.id, t]));
@@ -312,10 +329,10 @@ export async function GET(req: NextRequest) {
 
   const resources = resourcesRaw.map((r) => ({
     ...r,
-    subject: subjectById.get(r.subjectId ?? "") ?? null,
-    class: classByResourceId.get(r.classId ?? "") ?? null,
-    section: sectionByResourceId.get(r.sectionId ?? "") ?? null,
-    teacher: r.teacherId ? teacherById.get(r.teacherId) ?? null : null,
+    subject: subjectById.get(r.subjectId ?? '') ?? null,
+    class: classByResourceId.get(r.classId ?? '') ?? null,
+    section: sectionByResourceId.get(r.sectionId ?? '') ?? null,
+    teacher: r.teacherId ? (teacherById.get(r.teacherId) ?? null) : null,
   }));
 
   // Resolve class slugs (for facet lookups, distinct from resource lookups)
@@ -341,7 +358,9 @@ export async function GET(req: NextRequest) {
           where: { id: { in: subjectIds } },
           select: { id: true, slug: true, nameFr: true, color: true },
         })
-      : Promise.resolve([] as Array<{ id: string; slug: string; nameFr: string; color: string | null }>),
+      : Promise.resolve(
+          [] as Array<{ id: string; slug: string; nameFr: string; color: string | null }>,
+        ),
     // Always load ALL classes/sections/subjects for the display name maps
     // (used to display 'Sciences' instead of 'sciences' in the filter)
     prisma.class.findMany({ select: { slug: true, nameFr: true } }),
@@ -384,9 +403,9 @@ export async function GET(req: NextRequest) {
       withCorrection: withCorrectionCount,
     },
     nameMaps: {
-      class: Object.fromEntries(allClasses.map(c => [c.slug, c.nameFr])),
-      section: Object.fromEntries(allSections.map(s => [s.slug, s.nameFr])),
-      subject: Object.fromEntries(allSubjects.map(s => [s.slug, s.nameFr])),
+      class: Object.fromEntries(allClasses.map((c) => [c.slug, c.nameFr])),
+      section: Object.fromEntries(allSections.map((s) => [s.slug, s.nameFr])),
+      subject: Object.fromEntries(allSubjects.map((s) => [s.slug, s.nameFr])),
     },
   };
 

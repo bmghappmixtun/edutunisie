@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
   if (!user) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
   await prisma.notification.updateMany({
     where: { userId: user.id, isRead: false },
-    data: { isRead: true }
+    data: { isRead: true },
   });
   return NextResponse.redirect(new URL('/mon-compte/notifications', getRequestOrigin(req)));
 }

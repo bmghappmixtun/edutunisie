@@ -136,7 +136,7 @@ function signIlovepdfJwt(publicKey: string, secretKey: string): string {
 
 export async function checkIlovepdfUsage(
   publicKey: string,
-  secretKey: string
+  secretKey: string,
 ): Promise<ProviderUsage> {
   if (!publicKey || !secretKey) {
     return { source: 'ilovepdf/info', error: 'iLoveAPI public ou secret key manquant' };
@@ -189,7 +189,10 @@ export async function checkIlovepdfUsage(
     // Plan C: 401 with "used all credits" = 0 remaining (this is success info, not error)
     if (startRes.status === 401) {
       const errText = await startRes.text().catch(() => '');
-      if (errText.toLowerCase().includes('used all') || errText.toLowerCase().includes('no credits')) {
+      if (
+        errText.toLowerCase().includes('used all') ||
+        errText.toLowerCase().includes('no credits')
+      ) {
         return {
           source: 'ilovepdf/start/merge',
           quota: { used: 0, total: 0, remaining: 0, percent: 0 },
@@ -222,10 +225,7 @@ export async function checkIlovepdfUsage(
 
 const NEON_API = 'https://console.neon.tech/api/v2';
 
-export async function checkNeonUsage(
-  apiKey: string,
-  projectId?: string
-): Promise<ProviderUsage> {
+export async function checkNeonUsage(apiKey: string, projectId?: string): Promise<ProviderUsage> {
   if (!apiKey) {
     return { source: 'neon/projects', error: 'No Neon API key configured' };
   }
@@ -287,10 +287,9 @@ export async function checkNeonUsage(
   let activeBranchCount = 0;
   for (const proj of projects) {
     try {
-      const branchesRes = await fetch(
-        `${NEON_API}/projects/${proj.id}/branches`,
-        { headers: { Authorization: `Bearer ${apiKey}` } }
-      );
+      const branchesRes = await fetch(`${NEON_API}/projects/${proj.id}/branches`, {
+        headers: { Authorization: `Bearer ${apiKey}` },
+      });
       if (branchesRes.ok) {
         const data: any = await branchesRes.json();
         activeBranchCount += (data.branches || []).length;
@@ -306,7 +305,13 @@ export async function checkNeonUsage(
   let transferBytes = 0;
   if (orgId) {
     try {
-      const metrics = ['compute_unit_seconds', 'root_branch_bytes_month', 'child_branch_bytes_month', 'public_network_transfer_bytes', 'private_network_transfer_bytes'];
+      const metrics = [
+        'compute_unit_seconds',
+        'root_branch_bytes_month',
+        'child_branch_bytes_month',
+        'public_network_transfer_bytes',
+        'private_network_transfer_bytes',
+      ];
       const url = `${NEON_API}/consumption_history/v2/projects?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&granularity=monthly&metrics=${metrics.join(',')}&org_id=${orgId}`;
       const res = await fetch(url, {
         headers: { Authorization: `Bearer ${apiKey}` },
@@ -320,10 +325,14 @@ export async function checkNeonUsage(
               for (const consumption of period.consumption || []) {
                 for (const m of consumption.metrics || []) {
                   if (m.metric_name === 'compute_unit_seconds') computeSeconds += m.value || 0;
-                  else if (m.metric_name === 'root_branch_bytes_month') storageBytes += m.value || 0;
-                  else if (m.metric_name === 'child_branch_bytes_month') storageBytes += m.value || 0;
-                  else if (m.metric_name === 'public_network_transfer_bytes') transferBytes += m.value || 0;
-                  else if (m.metric_name === 'private_network_transfer_bytes') transferBytes += m.value || 0;
+                  else if (m.metric_name === 'root_branch_bytes_month')
+                    storageBytes += m.value || 0;
+                  else if (m.metric_name === 'child_branch_bytes_month')
+                    storageBytes += m.value || 0;
+                  else if (m.metric_name === 'public_network_transfer_bytes')
+                    transferBytes += m.value || 0;
+                  else if (m.metric_name === 'private_network_transfer_bytes')
+                    transferBytes += m.value || 0;
                 }
               }
             }

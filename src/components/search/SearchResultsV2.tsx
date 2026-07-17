@@ -3,10 +3,25 @@ import { useEffect, useState, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
-  Search, Filter, X, Grid, List, Loader2, Eye, Download, Star, Calendar, User, BookOpen,
-  ChevronRight, ChevronLeft, CheckCircle2, GraduationCap, Languages, FileCheck2, Sparkles
+  Search,
+  Filter,
+  X,
+  Grid,
+  List,
+  Loader2,
+  Eye,
+  Download,
+  Calendar,
+  BookOpen,
+  ChevronRight,
+  ChevronLeft,
+  CheckCircle2,
+  GraduationCap,
+  Languages,
+  FileCheck2,
+  Sparkles,
 } from 'lucide-react';
-import { formatNumber, timeAgo } from '@/lib/utils';
+import { formatNumber } from '@/lib/utils';
 import type { SearchResponse, SearchResult } from '@/lib/search-v2';
 
 const TYPE_LABELS: Record<string, string> = {
@@ -50,7 +65,14 @@ const LANGUAGE_LABELS: Record<string, string> = {
 interface Props {
   initialData: SearchResponse;
   options: {
-    subjects: { id: string; nameFr: string; slug: string; color: string | null; icon: string | null; count: number }[];
+    subjects: {
+      id: string;
+      nameFr: string;
+      slug: string;
+      color: string | null;
+      icon: string | null;
+      count: number;
+    }[];
     classes: { id: string; nameFr: string; slug: string; count: number }[];
     sections: { id: string; nameFr: string; slug: string; classId: string; count: number }[];
     teachers: { id: string; name: string }[];
@@ -85,20 +107,28 @@ export default function SearchResultsV2({ initialData, options }: Props) {
   };
 
   // Update URL
-  const updateUrl = useCallback((updates: Record<string, string | string[] | null | undefined>) => {
-    const params = new URLSearchParams(searchParams.toString());
-    Object.entries(updates).forEach(([key, value]) => {
-      if (value === null || value === undefined || value === '' || (Array.isArray(value) && value.length === 0)) {
-        params.delete(key);
-      } else if (Array.isArray(value)) {
-        params.delete(key);
-        value.forEach(v => params.append(key, v));
-      } else {
-        params.set(key, value);
-      }
-    });
-    router.push(`/recherche?${params.toString()}`);
-  }, [searchParams, router]);
+  const updateUrl = useCallback(
+    (updates: Record<string, string | string[] | null | undefined>) => {
+      const params = new URLSearchParams(searchParams.toString());
+      Object.entries(updates).forEach(([key, value]) => {
+        if (
+          value === null ||
+          value === undefined ||
+          value === '' ||
+          (Array.isArray(value) && value.length === 0)
+        ) {
+          params.delete(key);
+        } else if (Array.isArray(value)) {
+          params.delete(key);
+          value.forEach((v) => params.append(key, v));
+        } else {
+          params.set(key, value);
+        }
+      });
+      router.push(`/recherche?${params.toString()}`);
+    },
+    [searchParams, router],
+  );
 
   const clearAll = () => {
     const p = new URLSearchParams();
@@ -106,9 +136,12 @@ export default function SearchResultsV2({ initialData, options }: Props) {
     router.push(`/recherche${p.toString() ? '?' + p.toString() : ''}`);
   };
 
-  const toggleFilter = (key: 'subject' | 'class' | 'section' | 'type' | 'year' | 'trimester' | 'language', value: string) => {
+  const toggleFilter = (
+    key: 'subject' | 'class' | 'section' | 'type' | 'year' | 'trimester' | 'language',
+    value: string,
+  ) => {
     const current = filters[key];
-    const next = current.includes(value) ? current.filter(v => v !== value) : [...current, value];
+    const next = current.includes(value) ? current.filter((v) => v !== value) : [...current, value];
     updateUrl({ [key]: next, page: null });
   };
 
@@ -124,16 +157,22 @@ export default function SearchResultsV2({ initialData, options }: Props) {
   const searchString = searchParams.toString();
   useEffect(() => {
     // Skip first render (initialData from SSR)
-    if (searchString === new URLSearchParams(window.location.search.slice(1)).toString()
-      && data.query === currentQ) {
+    if (
+      searchString === new URLSearchParams(window.location.search.slice(1)).toString() &&
+      data.query === currentQ
+    ) {
       // Already loaded
     }
     setLoading(true);
     const controller = new AbortController();
     fetch(`/api/search/v2?${searchString}`, { signal: controller.signal })
-      .then(r => r.json())
-      .then(d => { if (!d.error) setData(d); })
-      .catch(e => { if (e.name !== 'AbortError') console.error('Search refetch:', e); })
+      .then((r) => r.json())
+      .then((d) => {
+        if (!d.error) setData(d);
+      })
+      .catch((e) => {
+        if (e.name !== 'AbortError') console.error('Search refetch:', e);
+      })
       .finally(() => setLoading(false));
     return () => controller.abort();
   }, [searchString]);
@@ -145,7 +184,9 @@ export default function SearchResultsV2({ initialData, options }: Props) {
   }, 0);
 
   // Sections for the active class filter
-  const activeSections = options.sections.filter(s => filters.class.length === 0 || filters.class.includes(s.classId));
+  const activeSections = options.sections.filter(
+    (s) => filters.class.length === 0 || filters.class.includes(s.classId),
+  );
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -154,7 +195,9 @@ export default function SearchResultsV2({ initialData, options }: Props) {
         <div>
           <h1 className="text-2xl font-extrabold text-slate-900">
             {currentQ ? (
-              <>Résultats pour <span className="text-primary-600">"{currentQ}"</span></>
+              <>
+                Résultats pour <span className="text-primary-600">"{currentQ}"</span>
+              </>
             ) : (
               <>Toutes les ressources</>
             )}
@@ -165,7 +208,8 @@ export default function SearchResultsV2({ initialData, options }: Props) {
             {data.synonymsApplied?.length ? (
               <span className="ml-2 inline-flex items-center gap-1 text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full text-xs">
                 <Sparkles className="w-3 h-3" />
-                {data.synonymsApplied.length} synonyme{data.synonymsApplied.length > 1 ? 's' : ''} appliqué{data.synonymsApplied.length > 1 ? 's' : ''}
+                {data.synonymsApplied.length} synonyme{data.synonymsApplied.length > 1 ? 's' : ''}{' '}
+                appliqué{data.synonymsApplied.length > 1 ? 's' : ''}
               </span>
             ) : null}
           </p>
@@ -173,17 +217,21 @@ export default function SearchResultsV2({ initialData, options }: Props) {
 
         <div className="flex items-center gap-2">
           <button
-            onClick={() => setShowFilters(s => !s)}
+            onClick={() => setShowFilters((s) => !s)}
             className="lg:hidden flex items-center gap-2 px-3 py-2 border border-slate-200 rounded-lg hover:bg-slate-50 bg-white"
           >
             <Filter className="w-4 h-4" />
             Filtres
-            {activeFiltersCount > 0 && <span className="px-1.5 bg-primary-600 text-white text-xs rounded-full">{activeFiltersCount}</span>}
+            {activeFiltersCount > 0 && (
+              <span className="px-1.5 bg-primary-600 text-white text-xs rounded-full">
+                {activeFiltersCount}
+              </span>
+            )}
           </button>
 
           <select
             value={currentSort}
-            onChange={e => setSort(e.target.value)}
+            onChange={(e) => setSort(e.target.value)}
             className="px-3 py-2 border border-slate-200 rounded-lg text-sm font-semibold bg-white"
           >
             <option value="relevance">Pertinence</option>
@@ -216,7 +264,7 @@ export default function SearchResultsV2({ initialData, options }: Props) {
         <aside className={`${showFilters ? 'block' : 'hidden'} lg:block space-y-4`}>
           {/* Type */}
           <FilterSection title="Type" icon={<BookOpen className="w-4 h-4" />}>
-            {options.types.map(t => (
+            {options.types.map((t) => (
               <FilterChip
                 key={t.value}
                 label={TYPE_LABELS[t.value] || t.value}
@@ -231,46 +279,56 @@ export default function SearchResultsV2({ initialData, options }: Props) {
           {/* Subject */}
           <FilterSection title="Matière" icon={<GraduationCap className="w-4 h-4" />}>
             <div className="space-y-1 max-h-64 overflow-y-auto">
-              {options.subjects.filter(s => s.count > 0).map(s => (
-                <FilterChip
-                  key={s.slug}
-                  label={s.nameFr}
-                  count={s.count}
-                  active={filters.subject.includes(s.slug)}
-                  onClick={() => toggleFilter('subject', s.slug)}
-                  color={s.color ? `bg-[${s.color}]/10 text-[${s.color}]` : 'bg-slate-100 text-slate-700'}
-                  icon={s.icon || undefined}
-                />
-              ))}
+              {options.subjects
+                .filter((s) => s.count > 0)
+                .map((s) => (
+                  <FilterChip
+                    key={s.slug}
+                    label={s.nameFr}
+                    count={s.count}
+                    active={filters.subject.includes(s.slug)}
+                    onClick={() => toggleFilter('subject', s.slug)}
+                    color={
+                      s.color
+                        ? `bg-[${s.color}]/10 text-[${s.color}]`
+                        : 'bg-slate-100 text-slate-700'
+                    }
+                    icon={s.icon || undefined}
+                  />
+                ))}
             </div>
           </FilterSection>
 
           {/* Class */}
           <FilterSection title="Classe" icon={<GraduationCap className="w-4 h-4" />}>
-            {options.classes.filter(c => c.count > 0).map(c => (
-              <FilterChip
-                key={c.slug}
-                label={c.nameFr}
-                count={c.count}
-                active={filters.class.includes(c.slug)}
-                onClick={() => toggleFilter('class', c.slug)}
-              />
-            ))}
+            {options.classes
+              .filter((c) => c.count > 0)
+              .map((c) => (
+                <FilterChip
+                  key={c.slug}
+                  label={c.nameFr}
+                  count={c.count}
+                  active={filters.class.includes(c.slug)}
+                  onClick={() => toggleFilter('class', c.slug)}
+                />
+              ))}
           </FilterSection>
 
           {/* Section (only if class is filtered or all) */}
           {activeSections.length > 0 && (
             <FilterSection title="Section" icon={<Filter className="w-4 h-4" />}>
               <div className="space-y-1 max-h-48 overflow-y-auto">
-                {activeSections.filter(s => s.count > 0).map(s => (
-                  <FilterChip
-                    key={s.slug}
-                    label={s.nameFr}
-                    count={s.count}
-                    active={filters.section.includes(s.slug)}
-                    onClick={() => toggleFilter('section', s.slug)}
-                  />
-                ))}
+                {activeSections
+                  .filter((s) => s.count > 0)
+                  .map((s) => (
+                    <FilterChip
+                      key={s.slug}
+                      label={s.nameFr}
+                      count={s.count}
+                      active={filters.section.includes(s.slug)}
+                      onClick={() => toggleFilter('section', s.slug)}
+                    />
+                  ))}
               </div>
             </FilterSection>
           )}
@@ -279,7 +337,7 @@ export default function SearchResultsV2({ initialData, options }: Props) {
           {options.years.length > 0 && (
             <FilterSection title="Année scolaire" icon={<Calendar className="w-4 h-4" />}>
               <div className="space-y-1 max-h-48 overflow-y-auto">
-                {options.years.slice(0, 15).map(y => (
+                {options.years.slice(0, 15).map((y) => (
                   <FilterChip
                     key={y.value}
                     label={y.value}
@@ -295,7 +353,7 @@ export default function SearchResultsV2({ initialData, options }: Props) {
           {/* Trimestre */}
           {options.trimestres.length > 0 && (
             <FilterSection title="Trimestre" icon={<Calendar className="w-4 h-4" />}>
-              {options.trimestres.map(t => (
+              {options.trimestres.map((t) => (
                 <FilterChip
                   key={t.value}
                   label={TRIMESTER_LABELS[t.value] || t.value}
@@ -310,7 +368,7 @@ export default function SearchResultsV2({ initialData, options }: Props) {
           {/* Language */}
           {options.languages.length > 0 && (
             <FilterSection title="Langue" icon={<Languages className="w-4 h-4" />}>
-              {options.languages.map(l => (
+              {options.languages.map((l) => (
                 <FilterChip
                   key={l.value}
                   label={LANGUAGE_LABELS[l.value] || l.value}
@@ -327,7 +385,9 @@ export default function SearchResultsV2({ initialData, options }: Props) {
             <button
               onClick={() => setHasCorrection(filters.hasCorrection ? undefined : true)}
               className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition ${
-                filters.hasCorrection ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                filters.hasCorrection
+                  ? 'bg-emerald-100 text-emerald-700'
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
               }`}
             >
               <span className="flex items-center gap-2">
@@ -356,26 +416,50 @@ export default function SearchResultsV2({ initialData, options }: Props) {
           {/* Active filter chips */}
           {activeFiltersCount > 0 && (
             <div className="flex flex-wrap gap-2 mb-4">
-              {filters.subject.map(v => (
-                <ActiveChip key={`s-${v}`} label={options.subjects.find(s => s.slug === v)?.nameFr || v} onRemove={() => toggleFilter('subject', v)} />
+              {filters.subject.map((v) => (
+                <ActiveChip
+                  key={`s-${v}`}
+                  label={options.subjects.find((s) => s.slug === v)?.nameFr || v}
+                  onRemove={() => toggleFilter('subject', v)}
+                />
               ))}
-              {filters.class.map(v => (
-                <ActiveChip key={`c-${v}`} label={options.classes.find(c => c.slug === v)?.nameFr || v} onRemove={() => toggleFilter('class', v)} />
+              {filters.class.map((v) => (
+                <ActiveChip
+                  key={`c-${v}`}
+                  label={options.classes.find((c) => c.slug === v)?.nameFr || v}
+                  onRemove={() => toggleFilter('class', v)}
+                />
               ))}
-              {filters.section.map(v => (
-                <ActiveChip key={`sec-${v}`} label={options.sections.find(s => s.slug === v)?.nameFr || v} onRemove={() => toggleFilter('section', v)} />
+              {filters.section.map((v) => (
+                <ActiveChip
+                  key={`sec-${v}`}
+                  label={options.sections.find((s) => s.slug === v)?.nameFr || v}
+                  onRemove={() => toggleFilter('section', v)}
+                />
               ))}
-              {filters.type.map(v => (
-                <ActiveChip key={`t-${v}`} label={TYPE_LABELS[v] || v} onRemove={() => toggleFilter('type', v)} />
+              {filters.type.map((v) => (
+                <ActiveChip
+                  key={`t-${v}`}
+                  label={TYPE_LABELS[v] || v}
+                  onRemove={() => toggleFilter('type', v)}
+                />
               ))}
-              {filters.year.map(v => (
+              {filters.year.map((v) => (
                 <ActiveChip key={`y-${v}`} label={v} onRemove={() => toggleFilter('year', v)} />
               ))}
-              {filters.trimester.map(v => (
-                <ActiveChip key={`tr-${v}`} label={TRIMESTER_LABELS[v] || v} onRemove={() => toggleFilter('trimester', v)} />
+              {filters.trimester.map((v) => (
+                <ActiveChip
+                  key={`tr-${v}`}
+                  label={TRIMESTER_LABELS[v] || v}
+                  onRemove={() => toggleFilter('trimester', v)}
+                />
               ))}
-              {filters.language.map(v => (
-                <ActiveChip key={`l-${v}`} label={LANGUAGE_LABELS[v] || v} onRemove={() => toggleFilter('language', v)} />
+              {filters.language.map((v) => (
+                <ActiveChip
+                  key={`l-${v}`}
+                  label={LANGUAGE_LABELS[v] || v}
+                  onRemove={() => toggleFilter('language', v)}
+                />
               ))}
               {filters.hasCorrection && (
                 <ActiveChip label="Avec corrigé" onRemove={() => setHasCorrection(undefined)} />
@@ -401,8 +485,14 @@ export default function SearchResultsV2({ initialData, options }: Props) {
               )}
             </div>
           ) : (
-            <div className={viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4' : 'space-y-3'}>
-              {data.results.map(r => (
+            <div
+              className={
+                viewMode === 'grid'
+                  ? 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4'
+                  : 'space-y-3'
+              }
+            >
+              {data.results.map((r) => (
                 <ResultCard key={r.id} r={r} viewMode={viewMode} />
               ))}
             </div>
@@ -420,18 +510,22 @@ export default function SearchResultsV2({ initialData, options }: Props) {
               </button>
               {paginationRange(currentPage, data.totalPages).map((p, i) =>
                 p === '…' ? (
-                  <span key={i} className="px-2 text-slate-400">…</span>
+                  <span key={i} className="px-2 text-slate-400">
+                    …
+                  </span>
                 ) : (
                   <button
                     key={p}
                     onClick={() => setPage(p as number)}
                     className={`px-3 py-1.5 rounded-lg text-sm font-medium ${
-                      p === currentPage ? 'bg-primary-600 text-white' : 'border border-slate-200 hover:bg-slate-50'
+                      p === currentPage
+                        ? 'bg-primary-600 text-white'
+                        : 'border border-slate-200 hover:bg-slate-50'
                     }`}
                   >
                     {p}
                   </button>
-                )
+                ),
               )}
               <button
                 onClick={() => setPage(currentPage + 1)}
@@ -452,7 +546,15 @@ export default function SearchResultsV2({ initialData, options }: Props) {
 // Sub-components
 // ============================================================================
 
-function FilterSection({ title, icon, children }: { title: string; icon: React.ReactNode; children: React.ReactNode }) {
+function FilterSection({
+  title,
+  icon,
+  children,
+}: {
+  title: string;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+}) {
   return (
     <div className="bg-white rounded-xl p-4 shadow-sm">
       <h3 className="text-xs font-bold uppercase tracking-wide text-slate-500 mb-2 flex items-center gap-1.5">
@@ -464,9 +566,20 @@ function FilterSection({ title, icon, children }: { title: string; icon: React.R
   );
 }
 
-function FilterChip({ label, count, active, onClick, color, icon }: {
-  label: string; count: number; active: boolean; onClick: () => void;
-  color?: string; icon?: string;
+function FilterChip({
+  label,
+  count,
+  active,
+  onClick,
+  color,
+  icon,
+}: {
+  label: string;
+  count: number;
+  active: boolean;
+  onClick: () => void;
+  color?: string;
+  icon?: string;
 }) {
   return (
     <button
@@ -481,9 +594,11 @@ function FilterChip({ label, count, active, onClick, color, icon }: {
         {icon ? <span>{icon}</span> : null}
         <span className="truncate">{label}</span>
       </span>
-      <span className={`text-[10px] px-1.5 py-0.5 rounded min-w-[24px] text-center ${
-        active ? 'bg-white/50' : 'bg-slate-100 text-slate-500'
-      }`}>
+      <span
+        className={`text-[10px] px-1.5 py-0.5 rounded min-w-[24px] text-center ${
+          active ? 'bg-white/50' : 'bg-slate-100 text-slate-500'
+        }`}
+      >
         {formatNumber(count)}
       </span>
     </button>
@@ -507,9 +622,14 @@ function ResultCard({ r, viewMode }: { r: SearchResult; viewMode: 'grid' | 'list
 
   if (viewMode === 'list') {
     return (
-      <Link href={href} className="block bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition group">
+      <Link
+        href={href}
+        className="block bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition group"
+      >
         <div className="flex items-start gap-4">
-          <div className={`flex-shrink-0 w-12 h-12 rounded-lg ${typeColor} flex items-center justify-center text-xl font-bold`}>
+          <div
+            className={`flex-shrink-0 w-12 h-12 rounded-lg ${typeColor} flex items-center justify-center text-xl font-bold`}
+          >
             {r.type?.[0] || '?'}
           </div>
           <div className="flex-1 min-w-0">
@@ -524,18 +644,46 @@ function ResultCard({ r, viewMode }: { r: SearchResult; viewMode: 'grid' | 'list
               />
             )}
             <div className="flex flex-wrap gap-1.5 mt-2 text-xs">
-              {r.type && <span className={`px-2 py-0.5 rounded ${typeColor}`}>{TYPE_LABELS[r.type] || r.type}</span>}
-              {r.subject && <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-700">{r.subject.nameFr}</span>}
-              {r.class && <span className="px-2 py-0.5 rounded bg-orange-100 text-orange-700">{r.class.nameFr}</span>}
-              {r.section && <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-600">{r.section.nameFr}</span>}
-              {r.year && <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-600">{r.year}</span>}
-              {r.hasCorrection && <span className="px-2 py-0.5 rounded bg-green-100 text-green-700">✓ Corrigé</span>}
-              {r.language && <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-600">{r.language.toUpperCase()}</span>}
+              {r.type && (
+                <span className={`px-2 py-0.5 rounded ${typeColor}`}>
+                  {TYPE_LABELS[r.type] || r.type}
+                </span>
+              )}
+              {r.subject && (
+                <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-700">
+                  {r.subject.nameFr}
+                </span>
+              )}
+              {r.class && (
+                <span className="px-2 py-0.5 rounded bg-orange-100 text-orange-700">
+                  {r.class.nameFr}
+                </span>
+              )}
+              {r.section && (
+                <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-600">
+                  {r.section.nameFr}
+                </span>
+              )}
+              {r.year && (
+                <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-600">{r.year}</span>
+              )}
+              {r.hasCorrection && (
+                <span className="px-2 py-0.5 rounded bg-green-100 text-green-700">✓ Corrigé</span>
+              )}
+              {r.language && (
+                <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-600">
+                  {r.language.toUpperCase()}
+                </span>
+              )}
             </div>
           </div>
           <div className="flex-shrink-0 text-right text-xs text-slate-500">
-            <div className="flex items-center gap-1"><Eye className="w-3 h-3" /> {formatNumber(r.viewsCount || 0)}</div>
-            <div className="flex items-center gap-1 mt-1"><Download className="w-3 h-3" /> {formatNumber(r.downloadsCount || 0)}</div>
+            <div className="flex items-center gap-1">
+              <Eye className="w-3 h-3" /> {formatNumber(r.viewsCount || 0)}
+            </div>
+            <div className="flex items-center gap-1 mt-1">
+              <Download className="w-3 h-3" /> {formatNumber(r.downloadsCount || 0)}
+            </div>
           </div>
         </div>
       </Link>
@@ -543,7 +691,10 @@ function ResultCard({ r, viewMode }: { r: SearchResult; viewMode: 'grid' | 'list
   }
 
   return (
-    <Link href={href} className="block bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition group h-full flex flex-col">
+    <Link
+      href={href}
+      className="block bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition group h-full flex flex-col"
+    >
       <div className="flex items-start justify-between gap-2 mb-2">
         <span className={`px-2 py-0.5 rounded text-xs font-semibold ${typeColor}`}>
           {TYPE_LABELS[r.type || 'OTHER'] || r.type}
@@ -561,8 +712,16 @@ function ResultCard({ r, viewMode }: { r: SearchResult; viewMode: 'grid' | 'list
         />
       )}
       <div className="flex flex-wrap gap-1 text-xs">
-        {r.subject && <span className="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700">{r.subject.nameFr}</span>}
-        {r.class && <span className="px-1.5 py-0.5 rounded bg-orange-100 text-orange-700">{r.class.nameFr}</span>}
+        {r.subject && (
+          <span className="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700">
+            {r.subject.nameFr}
+          </span>
+        )}
+        {r.class && (
+          <span className="px-1.5 py-0.5 rounded bg-orange-100 text-orange-700">
+            {r.class.nameFr}
+          </span>
+        )}
       </div>
       <div className="flex items-center justify-between mt-2 pt-2 border-t text-xs text-slate-500">
         <div className="flex items-center gap-2">

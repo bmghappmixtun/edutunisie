@@ -24,13 +24,13 @@ export async function GET(req: NextRequest) {
 
   const otp = await prisma.otpCode.findFirst({
     where: { userId: user.id, purpose: 'email_verification', consumedAt: null },
-    orderBy: { createdAt: 'desc' }
+    orderBy: { createdAt: 'desc' },
   });
   if (!otp) return NextResponse.json({ error: 'no otp' }, { status: 404 });
 
   return NextResponse.json({
     code: otp.code,
     expiresAt: otp.expiresAt,
-    attempts: otp.attempts
+    attempts: otp.attempts,
   });
 }

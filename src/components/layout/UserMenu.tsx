@@ -2,7 +2,16 @@
 import Link from 'next/link';
 import { getInitials } from '@/lib/text-utils';
 import { useState, useRef, useEffect } from 'react';
-import { User, LogOut, Settings, Heart, Upload, LayoutDashboard, BookOpen, Shield, ChevronDown, Bell } from 'lucide-react';
+import {
+  LogOut,
+  Settings,
+  Heart,
+  Upload,
+  LayoutDashboard,
+  Shield,
+  ChevronDown,
+  Bell,
+} from 'lucide-react';
 
 export default function UserMenu({ user, unreadCount }: { user: any; unreadCount: number }) {
   const [open, setOpen] = useState(false);
@@ -35,7 +44,9 @@ export default function UserMenu({ user, unreadCount }: { user: any; unreadCount
       {open && (
         <div className="absolute right-0 mt-2 w-72 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-50">
           <div className="p-4 border-b border-slate-100 bg-gradient-to-br from-primary-50 to-white">
-            <div className="font-bold text-slate-900">{user.firstName} {user.lastName}</div>
+            <div className="font-bold text-slate-900">
+              {user.firstName} {user.lastName}
+            </div>
             <div className="text-xs text-slate-500 truncate">{user.email}</div>
             <div className="mt-2 inline-block px-2 py-0.5 bg-primary-100 text-primary-700 text-[10px] font-bold rounded">
               {isAdmin ? 'Administrateur' : isTeacher ? 'Enseignant' : 'Élève'}
@@ -43,36 +54,69 @@ export default function UserMenu({ user, unreadCount }: { user: any; unreadCount
           </div>
 
           <div className="py-2">
-            <Link href="/mon-compte" onClick={() => setOpen(false)} className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 text-sm text-slate-700">
+            <Link
+              href="/mon-compte"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 text-sm text-slate-700"
+            >
               <LayoutDashboard className="w-4 h-4" /> Mon tableau de bord
             </Link>
-            <Link href="/mon-compte/favoris" onClick={() => setOpen(false)} className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 text-sm text-slate-700">
+            <Link
+              href="/mon-compte/favoris"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 text-sm text-slate-700"
+            >
               <Heart className="w-4 h-4" /> Mes favoris
             </Link>
-            <Link href="/mon-compte/notifications" onClick={() => setOpen(false)} className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 text-sm text-slate-700 justify-between">
-              <span className="flex items-center gap-3"><Bell className="w-4 h-4" /> Notifications</span>
-              {unreadCount > 0 && <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">{unreadCount}</span>}
+            <Link
+              href="/mon-compte/notifications"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 text-sm text-slate-700 justify-between"
+            >
+              <span className="flex items-center gap-3">
+                <Bell className="w-4 h-4" /> Notifications
+              </span>
+              {unreadCount > 0 && (
+                <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                  {unreadCount}
+                </span>
+              )}
             </Link>
 
             {(isTeacher || isAdmin) && (
-              <Link href="/enseignant" onClick={() => setOpen(false)} className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 text-sm text-slate-700">
+              <Link
+                href="/enseignant"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 text-sm text-slate-700"
+              >
                 <Upload className="w-4 h-4" /> Espace enseignant
               </Link>
             )}
             {isAdmin && (
-              <Link href="/admin" onClick={() => setOpen(false)} className="flex items-center gap-3 px-4 py-2.5 hover:bg-amber-50 text-sm text-amber-700 font-semibold">
+              <Link
+                href="/admin"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-3 px-4 py-2.5 hover:bg-amber-50 text-sm text-amber-700 font-semibold"
+              >
                 <Shield className="w-4 h-4" /> Administration
               </Link>
             )}
 
-            <Link href="/mon-compte/parametres" onClick={() => setOpen(false)} className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 text-sm text-slate-700">
+            <Link
+              href="/mon-compte/parametres"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 text-sm text-slate-700"
+            >
               <Settings className="w-4 h-4" /> Paramètres
             </Link>
           </div>
 
           <div className="border-t border-slate-100 p-2">
             <form action="/api/auth/logout" method="POST">
-              <button type="submit" className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-red-50 text-sm text-red-600 rounded-lg">
+              <button
+                type="submit"
+                className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-red-50 text-sm text-red-600 rounded-lg"
+              >
                 <LogOut className="w-4 h-4" /> Se déconnecter
               </button>
             </form>

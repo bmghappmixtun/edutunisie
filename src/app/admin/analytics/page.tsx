@@ -3,11 +3,22 @@ import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
 import {
-  BarChart3, Eye, Download, Users, FileText, TrendingUp,
-  ArrowUpRight, ExternalLink, Activity, Globe, Calendar, BookOpen,
-  Star, MessageSquare, Award
+  BarChart3,
+  Eye,
+  Download,
+  Users,
+  FileText,
+  TrendingUp,
+  ArrowUpRight,
+  ExternalLink,
+  Activity,
+  Globe,
+  BookOpen,
+  Star,
+  MessageSquare,
+  Award,
 } from 'lucide-react';
-import { formatNumber, timeAgo } from '@/lib/utils';
+import { formatNumber } from '@/lib/utils';
 import OptOutCard from './OptOutCard';
 
 export const dynamic = 'force-dynamic';
@@ -137,7 +148,8 @@ export default async function AdminAnalyticsPage({
     orderBy: { viewsCount: 'desc' },
     select: {
       id: true,
-      slug: true, title: true,
+      slug: true,
+      title: true,
       numericId: true,
       viewsCount: true,
       downloadsCount: true,
@@ -179,7 +191,7 @@ export default async function AdminAnalyticsPage({
     _sum: { viewsCount: true, downloadsCount: true },
   });
   const subjects = await prisma.subject.findMany({
-    select: { id: true, nameFr: true, color: true, slug: true, },
+    select: { id: true, nameFr: true, color: true, slug: true },
   });
   const subjectMap = new Map(subjects.map((s) => [s.id, s]));
   const subjectBreakdown = subjectStats
@@ -219,7 +231,8 @@ export default async function AdminAnalyticsPage({
             Analytics
           </h1>
           <p className="text-slate-500 text-sm">
-            Vue d'ensemble de l'activité de la plateforme sur les <strong>{days}</strong> derniers jours.
+            Vue d'ensemble de l'activité de la plateforme sur les <strong>{days}</strong> derniers
+            jours.
           </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
@@ -305,8 +318,17 @@ export default async function AdminAnalyticsPage({
         </h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4">
           <TotalItem icon={Users} value={totalUsers} label="Utilisateurs" />
-          <TotalItem icon={FileText} value={totalPublished} label="Ressources" sub={`/ ${totalResources} totales`} />
-          <TotalItem icon={Eye} value={totalDownloadsAgg._sum.downloadsCount || 0} label="Téléch. cumulés" />
+          <TotalItem
+            icon={FileText}
+            value={totalPublished}
+            label="Ressources"
+            sub={`/ ${totalResources} totales`}
+          />
+          <TotalItem
+            icon={Eye}
+            value={totalDownloadsAgg._sum.downloadsCount || 0}
+            label="Téléch. cumulés"
+          />
           <TotalItem icon={Star} value={totalRatings} label="Notes" />
           <TotalItem icon={MessageSquare} value={totalComments} label="Commentaires" />
           <TotalItem icon={BookOpen} value={totalFavorites} label="Favoris" />
@@ -327,10 +349,13 @@ export default async function AdminAnalyticsPage({
               <li key={r.id} className="flex items-center gap-3 group">
                 <div
                   className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-extrabold flex-shrink-0 ${
-                    i === 0 ? 'bg-amber-100 text-amber-700' :
-                    i === 1 ? 'bg-slate-200 text-slate-700' :
-                    i === 2 ? 'bg-orange-100 text-orange-700' :
-                    'bg-slate-50 text-slate-500'
+                    i === 0
+                      ? 'bg-amber-100 text-amber-700'
+                      : i === 1
+                        ? 'bg-slate-200 text-slate-700'
+                        : i === 2
+                          ? 'bg-orange-100 text-orange-700'
+                          : 'bg-slate-50 text-slate-500'
                   }`}
                 >
                   {i + 1}
@@ -347,18 +372,28 @@ export default async function AdminAnalyticsPage({
                   <div className="flex items-center gap-2 mt-0.5 text-xs text-slate-500">
                     {r.subject && (
                       <span className="flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full" style={{ background: r.subject.color || '#0EA5E9' }} />
+                        <span
+                          className="w-1.5 h-1.5 rounded-full"
+                          style={{ background: r.subject.color || '#0EA5E9' }}
+                        />
                         {r.subject.nameFr}
                       </span>
                     )}
                     {r.teacher && (
-                      <span>· {r.teacher.firstName} {r.teacher.lastName}</span>
+                      <span>
+                        · {r.teacher.firstName} {r.teacher.lastName}
+                      </span>
                     )}
                   </div>
                 </div>
                 <div className="text-right flex-shrink-0">
-                  <div className="text-sm font-extrabold text-slate-700">{formatNumber(r.viewsCount)} <span className="text-xs text-slate-400 font-normal">vues</span></div>
-                  <div className="text-xs text-slate-400">{formatNumber(r.downloadsCount)} DL · ★ {r.avgRating.toFixed(1)}</div>
+                  <div className="text-sm font-extrabold text-slate-700">
+                    {formatNumber(r.viewsCount)}{' '}
+                    <span className="text-xs text-slate-400 font-normal">vues</span>
+                  </div>
+                  <div className="text-xs text-slate-400">
+                    {formatNumber(r.downloadsCount)} DL · ★ {r.avgRating.toFixed(1)}
+                  </div>
                 </div>
               </li>
             ))}
@@ -415,7 +450,10 @@ export default async function AdminAnalyticsPage({
                   href={`/matieres/${s.subject?.slug}`}
                   className="flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-primary-600 w-48 flex-shrink-0"
                 >
-                  <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: s.subject?.color || '#0EA5E9' }} />
+                  <span
+                    className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                    style={{ background: s.subject?.color || '#0EA5E9' }}
+                  />
                   <span className="truncate">{s.subject?.nameFr}</span>
                 </Link>
                 <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
@@ -427,9 +465,7 @@ export default async function AdminAnalyticsPage({
                     }}
                   />
                 </div>
-                <div className="text-sm font-bold text-slate-600 w-16 text-right">
-                  {pct}%
-                </div>
+                <div className="text-sm font-bold text-slate-600 w-16 text-right">{pct}%</div>
                 <div className="text-xs text-slate-400 w-20 text-right">
                   {formatNumber(Number(s._count._all))} ressources
                 </div>
@@ -448,7 +484,9 @@ export default async function AdminAnalyticsPage({
           <div className="flex-1">
             <h3 className="text-lg font-bold mb-1 flex items-center gap-2">
               Vercel Web Analytics
-              <span className="text-xs font-normal bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full">Actif</span>
+              <span className="text-xs font-normal bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full">
+                Actif
+              </span>
             </h3>
             <p className="text-slate-300 text-sm mb-3">
               Pour les métriques de navigation détaillées (visiteurs uniques, pages vues par URL,
@@ -498,9 +536,11 @@ function KpiCard({
   text: string;
 }) {
   const deltaColor =
-    delta.sign === 'up' ? 'text-emerald-600 bg-emerald-50' :
-    delta.sign === 'down' ? 'text-rose-600 bg-rose-50' :
-    'text-slate-500 bg-slate-50';
+    delta.sign === 'up'
+      ? 'text-emerald-600 bg-emerald-50'
+      : delta.sign === 'down'
+        ? 'text-rose-600 bg-rose-50'
+        : 'text-slate-500 bg-slate-50';
   const arrow = delta.sign === 'up' ? '↑' : delta.sign === 'down' ? '↓' : '→';
 
   return (
@@ -552,11 +592,13 @@ function Sparkline({ data, color }: { data: number[]; color: string }) {
   const range = max - min || 1;
   const w = 200;
   const h = 32;
-  const points = data.map((v, i) => {
-    const x = (i / Math.max(data.length - 1, 1)) * w;
-    const y = h - ((v - min) / range) * h;
-    return `${x},${y}`;
-  }).join(' ');
+  const points = data
+    .map((v, i) => {
+      const x = (i / Math.max(data.length - 1, 1)) * w;
+      const y = h - ((v - min) / range) * h;
+      return `${x},${y}`;
+    })
+    .join(' ');
 
   const gradId = `sg-${color.replace(/\s/g, '')}`;
 
@@ -568,10 +610,7 @@ function Sparkline({ data, color }: { data: number[]; color: string }) {
           <stop offset="100%" stopColor="currentColor" stopOpacity="0" />
         </linearGradient>
       </defs>
-      <polyline
-        points={`0,${h} ${points} ${w},${h}`}
-        fill={`url(#${gradId})`}
-      />
+      <polyline points={`0,${h} ${points} ${w},${h}`} fill={`url(#${gradId})`} />
       <polyline
         points={points}
         fill="none"

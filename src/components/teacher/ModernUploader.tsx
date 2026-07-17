@@ -1,8 +1,18 @@
 'use client';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import {
-  Upload, X, FileText, CheckCircle2, AlertCircle, Loader2,
-  Wifi, WifiOff, Pause, Play, RotateCw, Sparkles, Zap
+  Upload,
+  X,
+  FileText,
+  CheckCircle2,
+  AlertCircle,
+  Loader2,
+  WifiOff,
+  Pause,
+  Play,
+  RotateCw,
+  Sparkles,
+  Zap,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -22,13 +32,13 @@ type Props = {
 };
 
 const STAGE_CONFIG: Record<Stage, { label: string; color: string; icon: any }> = {
-  idle:       { label: 'En attente',        color: 'slate',   icon: Upload },
-  preparing:  { label: 'Préparation...',    color: 'amber',   icon: Loader2 },
-  uploading:  { label: 'Envoi en cours',    color: 'cyan',    icon: Upload },
-  processing: { label: 'Traitement...',     color: 'blue',    icon: Loader2 },
-  success:    { label: 'Envoyé ✓',          color: 'emerald', icon: CheckCircle2 },
-  error:      { label: 'Erreur',            color: 'red',     icon: AlertCircle },
-  paused:     { label: 'En pause',          color: 'amber',   icon: Pause },
+  idle: { label: 'En attente', color: 'slate', icon: Upload },
+  preparing: { label: 'Préparation...', color: 'amber', icon: Loader2 },
+  uploading: { label: 'Envoi en cours', color: 'cyan', icon: Upload },
+  processing: { label: 'Traitement...', color: 'blue', icon: Loader2 },
+  success: { label: 'Envoyé ✓', color: 'emerald', icon: CheckCircle2 },
+  error: { label: 'Erreur', color: 'red', icon: AlertCircle },
+  paused: { label: 'En pause', color: 'amber', icon: Pause },
 };
 
 /**
@@ -65,7 +75,9 @@ export default function ModernUploader({
   const [isOnline, setIsOnline] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
   const [dragOver, setDragOver] = useState(false);
-  const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number; color: string; delay: number }>>([]);
+  const [particles, setParticles] = useState<
+    Array<{ id: number; x: number; y: number; color: string; delay: number }>
+  >([]);
 
   const xhrRef = useRef<XMLHttpRequest | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -78,8 +90,14 @@ export default function ModernUploader({
   useEffect(() => {
     if (typeof navigator !== 'undefined') {
       setIsOnline(navigator.onLine);
-      const onOnline = () => { setIsOnline(true); if (stage === 'uploading' && isPaused) handleResume(); };
-      const onOffline = () => { setIsOnline(false); if (stage === 'uploading') handlePause(); };
+      const onOnline = () => {
+        setIsOnline(true);
+        if (stage === 'uploading' && isPaused) handleResume();
+      };
+      const onOffline = () => {
+        setIsOnline(false);
+        if (stage === 'uploading') handlePause();
+      };
       window.addEventListener('online', onOnline);
       window.addEventListener('offline', onOffline);
       return () => {
@@ -290,7 +308,7 @@ export default function ModernUploader({
       {/* Confetti */}
       {particles.length > 0 && (
         <div className="absolute inset-0 pointer-events-none overflow-hidden z-50">
-          {particles.map(p => (
+          {particles.map((p) => (
             <span
               key={p.id}
               className="confetti-piece"
@@ -309,13 +327,17 @@ export default function ModernUploader({
         // ============== DRAG & DROP ZONE ==============
         <div
           onDrop={handleDrop}
-          onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDragOver(true);
+          }}
           onDragLeave={() => setDragOver(false)}
           onClick={() => inputRef.current?.click()}
           className={`relative overflow-hidden cursor-pointer rounded-2xl border-2 border-dashed transition-all duration-500 p-10 group
-            ${dragOver
-              ? 'border-primary-500 bg-gradient-to-br from-primary-50 to-cyan-50 scale-[1.02]'
-              : 'border-slate-300 bg-gradient-to-br from-slate-50 to-white hover:border-primary-400 hover:bg-gradient-to-br hover:from-primary-50/40 hover:to-cyan-50/40'
+            ${
+              dragOver
+                ? 'border-primary-500 bg-gradient-to-br from-primary-50 to-cyan-50 scale-[1.02]'
+                : 'border-slate-300 bg-gradient-to-br from-slate-50 to-white hover:border-primary-400 hover:bg-gradient-to-br hover:from-primary-50/40 hover:to-cyan-50/40'
             }`}
         >
           {/* Animated background blobs */}
@@ -337,7 +359,9 @@ export default function ModernUploader({
             {/* Animated upload icon with rings */}
             <div className="relative">
               <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary-400 to-cyan-400 opacity-30 blur-xl animate-pulse-slow" />
-              <div className={`relative w-20 h-20 rounded-full bg-gradient-to-br from-primary-500 to-cyan-500 flex items-center justify-center shadow-2xl shadow-primary-500/30 transition-transform duration-500 ${dragOver ? 'scale-110 rotate-12' : 'group-hover:scale-110'}`}>
+              <div
+                className={`relative w-20 h-20 rounded-full bg-gradient-to-br from-primary-500 to-cyan-500 flex items-center justify-center shadow-2xl shadow-primary-500/30 transition-transform duration-500 ${dragOver ? 'scale-110 rotate-12' : 'group-hover:scale-110'}`}
+              >
                 <Upload className="w-10 h-10 text-white" strokeWidth={2.5} />
                 {/* Pulse rings */}
                 <span className="absolute inset-0 rounded-full border-2 border-primary-400 animate-ping" />
@@ -351,7 +375,10 @@ export default function ModernUploader({
                 {dragOver ? '✨ Relâchez pour envoyer !' : 'Glissez-déposez votre fichier'}
               </h3>
               <p className="text-sm text-slate-500 mt-2">
-                ou <span className="text-primary-600 font-bold underline decoration-2 underline-offset-4">cliquez pour parcourir</span>
+                ou{' '}
+                <span className="text-primary-600 font-bold underline decoration-2 underline-offset-4">
+                  cliquez pour parcourir
+                </span>
               </p>
               <div className="flex items-center justify-center gap-2 mt-3 text-xs text-slate-400 flex-wrap">
                 <span className="px-2 py-0.5 bg-red-50 text-red-700 rounded-full">PDF</span>
@@ -359,7 +386,9 @@ export default function ModernUploader({
                 <span className="px-2 py-0.5 bg-slate-100 text-slate-700 rounded-full">DOC</span>
                 <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-full">ODT</span>
                 <span className="text-slate-400">• Max {maxSizeMB} Mo</span>
-                <span className="flex items-center gap-1 text-amber-500"><Zap className="w-3 h-3" /> Word → PDF auto</span>
+                <span className="flex items-center gap-1 text-amber-500">
+                  <Zap className="w-3 h-3" /> Word → PDF auto
+                </span>
               </div>
             </div>
           </div>
@@ -368,12 +397,17 @@ export default function ModernUploader({
         // ============== UPLOAD IN PROGRESS / COMPLETE CARD ==============
         <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
           {/* Top gradient bar - dynamic based on stage */}
-          <div className={`h-1.5 w-full bg-gradient-to-r transition-all duration-700 ${
-            stage === 'success' ? 'from-emerald-400 via-emerald-500 to-teal-500' :
-            stage === 'error' ? 'from-red-400 via-red-500 to-rose-500' :
-            stage === 'paused' ? 'from-amber-400 via-amber-500 to-orange-500' :
-            'from-cyan-400 via-primary-500 to-blue-500'
-          }`} />
+          <div
+            className={`h-1.5 w-full bg-gradient-to-r transition-all duration-700 ${
+              stage === 'success'
+                ? 'from-emerald-400 via-emerald-500 to-teal-500'
+                : stage === 'error'
+                  ? 'from-red-400 via-red-500 to-rose-500'
+                  : stage === 'paused'
+                    ? 'from-amber-400 via-amber-500 to-orange-500'
+                    : 'from-cyan-400 via-primary-500 to-blue-500'
+            }`}
+          />
 
           <div className="p-5">
             {/* File info row */}
@@ -397,8 +431,12 @@ export default function ModernUploader({
                   <circle cx="32" cy="32" r="28" stroke="#E2E8F0" strokeWidth="4" fill="none" />
                   {/* Progress ring */}
                   <circle
-                    cx="32" cy="32" r="28"
-                    stroke="url(#progressGrad)" strokeWidth="4" fill="none"
+                    cx="32"
+                    cy="32"
+                    r="28"
+                    stroke="url(#progressGrad)"
+                    strokeWidth="4"
+                    fill="none"
                     strokeLinecap="round"
                     strokeDasharray={`${2 * Math.PI * 28}`}
                     strokeDashoffset={`${2 * Math.PI * 28 * (1 - pct / 100)}`}
@@ -412,7 +450,9 @@ export default function ModernUploader({
                   ) : stage === 'error' ? (
                     <AlertCircle className="w-8 h-8 text-red-500" />
                   ) : (
-                    <FileText className={`w-7 h-7 text-slate-600 ${stage === 'uploading' ? 'animate-float' : ''}`} />
+                    <FileText
+                      className={`w-7 h-7 text-slate-600 ${stage === 'uploading' ? 'animate-float' : ''}`}
+                    />
                   )}
                 </div>
               </div>
@@ -420,12 +460,21 @@ export default function ModernUploader({
               {/* File details */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide flex items-center gap-1
-                    ${stage === 'success' ? 'bg-emerald-100 text-emerald-700' :
-                      stage === 'error' ? 'bg-red-100 text-red-700' :
-                      stage === 'paused' ? 'bg-amber-100 text-amber-700' :
-                      'bg-primary-100 text-primary-700'}`}>
-                    <StageIcon className={`w-3 h-3 ${(stage === 'preparing' || stage === 'processing' || stage === 'uploading') ? 'animate-spin' : ''}`} />
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide flex items-center gap-1
+                    ${
+                      stage === 'success'
+                        ? 'bg-emerald-100 text-emerald-700'
+                        : stage === 'error'
+                          ? 'bg-red-100 text-red-700'
+                          : stage === 'paused'
+                            ? 'bg-amber-100 text-amber-700'
+                            : 'bg-primary-100 text-primary-700'
+                    }`}
+                  >
+                    <StageIcon
+                      className={`w-3 h-3 ${stage === 'preparing' || stage === 'processing' || stage === 'uploading' ? 'animate-spin' : ''}`}
+                    />
                     {cfg.label}
                   </span>
                   {!isOnline && (
@@ -435,28 +484,54 @@ export default function ModernUploader({
                   )}
                 </div>
                 <div className="font-bold text-slate-900 truncate">{file.name}</div>
-                <div className="text-xs text-slate-500 mt-0.5">{file.type || 'application/pdf'} · {totalSizeStr}</div>
+                <div className="text-xs text-slate-500 mt-0.5">
+                  {file.type || 'application/pdf'} · {totalSizeStr}
+                </div>
               </div>
 
               {/* Action buttons */}
               <div className="flex gap-1 flex-shrink-0">
                 {stage === 'uploading' && (
-                  <button type="button" onClick={handlePause} className="p-2 hover:bg-slate-100 rounded-lg" title="Pause">
+                  <button
+                    type="button"
+                    onClick={handlePause}
+                    className="p-2 hover:bg-slate-100 rounded-lg"
+                    title="Pause"
+                  >
                     <Pause className="w-4 h-4" />
                   </button>
                 )}
                 {stage === 'paused' && (
-                  <button type="button" onClick={handleResume} className="p-2 hover:bg-emerald-50 text-emerald-600 rounded-lg" title="Reprendre">
+                  <button
+                    type="button"
+                    onClick={handleResume}
+                    className="p-2 hover:bg-emerald-50 text-emerald-600 rounded-lg"
+                    title="Reprendre"
+                  >
                     <Play className="w-4 h-4" />
                   </button>
                 )}
                 {stage === 'error' && (
-                  <button type="button" onClick={retry} className="p-2 hover:bg-blue-50 text-blue-600 rounded-lg" title="Réessayer">
+                  <button
+                    type="button"
+                    onClick={retry}
+                    className="p-2 hover:bg-blue-50 text-blue-600 rounded-lg"
+                    title="Réessayer"
+                  >
                     <RotateCw className="w-4 h-4" />
                   </button>
                 )}
-                {(stage !== 'uploading' && stage !== 'processing') && (
-                  <button type="button" onClick={() => { cancelUpload(); setFile(null); setStage('idle'); }} className="p-2 hover:bg-red-50 text-red-500 rounded-lg" title="Retirer">
+                {stage !== 'uploading' && stage !== 'processing' && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      cancelUpload();
+                      setFile(null);
+                      setStage('idle');
+                    }}
+                    className="p-2 hover:bg-red-50 text-red-500 rounded-lg"
+                    title="Retirer"
+                  >
                     <X className="w-4 h-4" />
                   </button>
                 )}
@@ -483,7 +558,9 @@ export default function ModernUploader({
               {/* Percentage in middle (when bar > 10%) */}
               {pct > 10 && pct < 100 && (
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-[10px] font-extrabold text-white drop-shadow-sm">{pct}%</span>
+                  <span className="text-[10px] font-extrabold text-white drop-shadow-sm">
+                    {pct}%
+                  </span>
                 </div>
               )}
             </div>
@@ -491,19 +568,25 @@ export default function ModernUploader({
             {/* Stats grid */}
             <div className="grid grid-cols-3 gap-2 text-xs">
               <div className="bg-slate-50 rounded-lg p-2 text-center">
-                <div className="text-[10px] text-slate-500 uppercase font-bold tracking-wide">Vitesse</div>
+                <div className="text-[10px] text-slate-500 uppercase font-bold tracking-wide">
+                  Vitesse
+                </div>
                 <div className="font-extrabold text-slate-900 mt-0.5 flex items-center justify-center gap-1">
                   {stage === 'uploading' ? speedStr : '—'}
                 </div>
               </div>
               <div className="bg-slate-50 rounded-lg p-2 text-center">
-                <div className="text-[10px] text-slate-500 uppercase font-bold tracking-wide">Restant</div>
+                <div className="text-[10px] text-slate-500 uppercase font-bold tracking-wide">
+                  Restant
+                </div>
                 <div className="font-extrabold text-slate-900 mt-0.5">
                   {stage === 'uploading' ? etaStr : stage === 'success' ? '✓ Terminé' : '—'}
                 </div>
               </div>
               <div className="bg-slate-50 rounded-lg p-2 text-center">
-                <div className="text-[10px] text-slate-500 uppercase font-bold tracking-wide">Transféré</div>
+                <div className="text-[10px] text-slate-500 uppercase font-bold tracking-wide">
+                  Transféré
+                </div>
                 <div className="font-extrabold text-slate-900 mt-0.5">
                   {uploadedStr} / {totalSizeStr}
                 </div>
@@ -525,7 +608,10 @@ export default function ModernUploader({
             {stage === 'success' && (
               <div className="mt-3 p-3 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2 text-sm text-emerald-700 animate-fade-in">
                 <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
-                <div className="flex-1 font-semibold">Fichier uploadé avec succès ! Remplissez les infos et cliquez sur Publier pour soumettre à approbation.</div>
+                <div className="flex-1 font-semibold">
+                  Fichier uploadé avec succès ! Remplissez les infos et cliquez sur Publier pour
+                  soumettre à approbation.
+                </div>
               </div>
             )}
           </div>
