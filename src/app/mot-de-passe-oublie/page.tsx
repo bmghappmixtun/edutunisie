@@ -202,7 +202,6 @@ export default function ForgotPasswordPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                autoFocus
                 className="input"
                 placeholder="votre@email.com"
               />
@@ -246,7 +245,6 @@ export default function ForgotPasswordPage() {
                 value={code}
                 onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
                 required
-                autoFocus
                 className="input text-center text-2xl tracking-[0.5em] font-bold"
                 placeholder="000000"
               />

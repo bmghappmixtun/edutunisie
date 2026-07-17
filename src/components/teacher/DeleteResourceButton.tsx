@@ -76,7 +76,6 @@ export default function DeleteResourceButton({
                 onChange={(e) => setConfirmText(e.target.value)}
                 className="w-full px-3 py-2 border-2 border-slate-200 rounded-lg focus:border-red-500 outline-none"
                 placeholder="SUPPRIMER"
-                autoFocus
               />
             </div>
 

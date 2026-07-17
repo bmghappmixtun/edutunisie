@@ -76,7 +76,7 @@ export async function checkConvertApiUsage(token: string): Promise<ProviderUsage
         error: `APIConvert ${res.status}: ${errText.slice(0, 200)}`,
       };
     }
-    const data: any = await res.json();
+    const data = (await res.json()) as APIConvertUser;
     const total = data.ConversionsTotal || 0;
     const consumed = data.ConversionsConsumed || 0;
     const remaining = Math.max(0, total - consumed);
@@ -88,10 +88,41 @@ export async function checkConvertApiUsage(token: string): Promise<ProviderUsage
       username: data.FullName,
       quota: { used: consumed, total, remaining, percent },
     };
-  } catch (e: any) {
-    return { source: 'convertapi/user', error: `Network: ${e?.message || 'erreur'}` };
+  } catch (e: unknown) {
+    return { source: 'convertapi/user', error: `Network: ${e instanceof Error ? e.message : String(e) || 'erreur'}` };
   }
 }
+
+// APIConvert user endpoint response
+export type APIConvertUser = {
+  ConversionsTotal?: number;
+  ConversionsConsumed?: number;
+  Active?: boolean;
+  Email?: string;
+  FullName?: string;
+  Secret?: string;
+};
+
+// Neon consumption API response
+export type NeonConsumptionResponse = {
+  projects?: Array<{
+    periods?: Array<{
+      consumption?: Array<{
+        metrics?: Array<{
+          metric_name: string;
+          value?: number;
+        }>;
+      }>;
+    }>;
+  }>;
+};
+
+// iLovePDF info / start response
+export type ILovePdfInfo = {
+  remaining_credits?: number;
+  remaining_files?: number;
+  remainingFiles?: number;
+};
 
 // ============================================================================
 // iLOVEPDF
@@ -145,8 +176,8 @@ export async function checkIlovepdfUsage(
   let token: string;
   try {
     token = signIlovepdfJwt(publicKey, secretKey);
-  } catch (e: any) {
-    return { source: 'ilovepdf/info', error: `JWT sign failed: ${e?.message}` };
+  } catch (e: unknown) {
+    return { source: 'ilovepdf/info', error: `JWT sign failed: ${e instanceof Error ? e.message : String(e)}` };
   }
 
   // Per the official @ilovepdf/ilovepdf-js-core SDK source (tasks/Task.js):
@@ -165,7 +196,7 @@ export async function checkIlovepdfUsage(
       headers: { Authorization: `Bearer ${token}` },
     });
     if (infoRes.ok) {
-      const data: any = await infoRes.json();
+      const data = (await infoRes.json()) as ILovePdfInfo;
       const remaining = data.remaining_credits ?? data.remaining_files ?? data.remainingFiles ?? 0;
       return {
         source: 'ilovepdf/info',
@@ -178,7 +209,7 @@ export async function checkIlovepdfUsage(
       headers: { Authorization: `Bearer ${token}` },
     });
     if (startRes.ok) {
-      const data: any = await startRes.json();
+      const data = (await startRes.json()) as ILovePdfInfo;
       const remaining = data.remaining_files ?? data.remainingFiles ?? data.remaining_credits ?? 0;
       return {
         source: 'ilovepdf/start/merge',
@@ -204,8 +235,8 @@ export async function checkIlovepdfUsage(
       source: 'ilovepdf/info',
       error: `iLoveAPI ${infoRes.status}/${startRes.status}: tous endpoints quota ont échoué`,
     };
-  } catch (e: any) {
-    return { source: 'ilovepdf/info', error: `Network: ${e?.message || 'erreur'}` };
+  } catch (e: unknown) {
+    return { source: 'ilovepdf/info', error: `Network: ${e instanceof Error ? e.message : String(e) || 'erreur'}` };
   }
 }
 
@@ -246,7 +277,7 @@ export async function checkNeonUsage(apiKey: string, projectId?: string): Promis
       headers: { Authorization: `Bearer ${apiKey}` },
     });
     if (orgsRes.ok) {
-      const orgsData: any = await orgsRes.json();
+      const orgsData = (await orgsRes.json()) as { orgs?: Array<{ id: string; name: string; plan?: string }> };
       if (orgsData.orgs && orgsData.orgs.length > 0) {
         orgId = orgsData.orgs[0].id;
         plan = orgsData.orgs[0].plan;
@@ -262,21 +293,21 @@ export async function checkNeonUsage(apiKey: string, projectId?: string): Promis
       headers: { Authorization: `Bearer ${apiKey}` },
     });
     if (userRes.ok) {
-      const u: any = await userRes.json();
-      email = u.user?.email || u.email;
+      const u = (await userRes.json()) as { role?: string; email?: string; user?: { email?: string } };
+      email = u.user?.email ?? u.email;
     }
   } catch {
     // ignore
   }
 
   // 3. List projects
-  let projects: any[] = [];
+  let projects: Array<{ id: string; name: string; region?: string }> = [] = [];
   try {
     const projectsRes = await fetch(`${NEON_API}/projects`, {
       headers: { Authorization: `Bearer ${apiKey}` },
     });
     if (projectsRes.ok) {
-      const data: any = await projectsRes.json();
+      const data = (await projectsRes.json()) as { projects?: Array<{ id: string; name: string; region?: string }> };
       projects = data.projects || [];
     }
   } catch {
@@ -291,7 +322,7 @@ export async function checkNeonUsage(apiKey: string, projectId?: string): Promis
         headers: { Authorization: `Bearer ${apiKey}` },
       });
       if (branchesRes.ok) {
-        const data: any = await branchesRes.json();
+        const data = (await branchesRes.json()) as { branches?: unknown[] };
         activeBranchCount += (data.branches || []).length;
       }
     } catch {
@@ -317,7 +348,7 @@ export async function checkNeonUsage(apiKey: string, projectId?: string): Promis
         headers: { Authorization: `Bearer ${apiKey}` },
       });
       if (res.ok) {
-        const data: any = await res.json();
+        const data = (await res.json()) as NeonConsumptionResponse;
         // Sum across all projects
         if (Array.isArray(data.projects)) {
           for (const proj of data.projects) {

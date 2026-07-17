@@ -38,7 +38,12 @@ export default function MobileMenu({ user }: { user: any }) {
 
   const menuContent = open ? (
     <div className="fixed inset-0 z-[100] lg:hidden" role="dialog" aria-modal="true">
-      <div className="absolute inset-0 bg-slate-900/50" onClick={() => setOpen(false)} />
+      <div
+        role="presentation"
+        className="absolute inset-0 bg-slate-900/50"
+        onClick={() => setOpen(false)}
+        onKeyDown={(e) => { if (e.key === "Escape") setOpen(false); }}
+      />
       <div className="absolute right-0 top-0 bottom-0 w-80 max-w-[85vw] bg-white shadow-2xl overflow-y-auto flex flex-col">
         <div className="flex items-center justify-between p-4 border-b border-slate-100 flex-shrink-0">
           <span className="font-extrabold text-lg">{t('nav.menu')}</span>

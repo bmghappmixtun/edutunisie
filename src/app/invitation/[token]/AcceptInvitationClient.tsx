@@ -223,7 +223,7 @@ export default function AcceptInvitationClient({ token }: { token: string }) {
 
             {/* Password field */}
             <div className="mb-4">
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
+              <label htmlFor="newPassword" className="block text-sm font-semibold text-slate-700 mb-2">
                 Nouveau mot de passe
               </label>
               <div className="relative">
@@ -252,7 +252,7 @@ export default function AcceptInvitationClient({ token }: { token: string }) {
 
             {/* Confirm password */}
             <div className="mb-6">
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
+              <label htmlFor="confirmPassword" className="block text-sm font-semibold text-slate-700 mb-2">
                 Confirmer le mot de passe
               </label>
               <div className="relative">

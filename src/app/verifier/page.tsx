@@ -233,8 +233,8 @@ function VerifyOtpForm() {
 
             {/* Email field (editable if not pre-filled) */}
             <div className="mb-6">
-              <label className="label">Votre email</label>
-              <input
+              <label htmlFor="email" className="label">Votre email</label>
+              <input id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -246,11 +246,13 @@ function VerifyOtpForm() {
 
             {/* 6-digit code input */}
             <div className="mb-6">
-              <label className="label">Code de vérification</label>
+              <label htmlFor="code-0" className="label">Code de vérification</label>
               <div className="flex gap-2 justify-between" onPaste={handlePaste}>
                 {code.map((digit, i) => (
                   <input
                     key={i}
+          id={i === 0 ? "code-0" : undefined}
+          aria-label={`Chiffre ${i + 1}`}
                     ref={(el) => {
                       inputRefs.current[i] = el;
                     }}

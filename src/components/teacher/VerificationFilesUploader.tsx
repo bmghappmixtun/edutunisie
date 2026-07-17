@@ -208,6 +208,8 @@ export default function VerificationFilesUploader({
         <>
           {/* Drop zone */}
           <div
+            role="region"
+            aria-label="Zone de dépôt de fichier"
             onDragOver={(e) => {
               e.preventDefault();
               setDragOver(true);
@@ -262,8 +264,8 @@ export default function VerificationFilesUploader({
 
               <div className="grid sm:grid-cols-2 gap-3 mb-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">Type *</label>
-                  <select
+                  <label htmlFor="fileType" className="block text-xs font-semibold text-slate-700 mb-1">Type *</label>
+                  <select id="fileType"
                     value={pendingType}
                     onChange={(e) => setPendingType(e.target.value)}
                     className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm"
@@ -276,7 +278,7 @@ export default function VerificationFilesUploader({
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">Année</label>
+                  <label htmlFor="fileYear" className="block text-xs font-semibold text-slate-700 mb-1">Année</label>
                   <input
                     type="text"
                     value={pendingYear}
@@ -289,10 +291,10 @@ export default function VerificationFilesUploader({
               </div>
 
               <div className="mb-4">
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label htmlFor="fileDesc" className="block text-xs font-semibold text-slate-700 mb-1">
                   Description (optionnel)
                 </label>
-                <textarea
+                <textarea id="fileDesc"
                   value={pendingDesc}
                   onChange={(e) => setPendingDesc(e.target.value)}
                   placeholder="Ex: Cours complet sur les intégrales pour 4ème Math"

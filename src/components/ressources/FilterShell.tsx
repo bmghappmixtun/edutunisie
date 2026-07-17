@@ -329,9 +329,9 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
         <div className="max-h-[calc(100vh-180px)] overflow-y-auto px-5 py-4 space-y-5">
           {/* ----- RECHERCHE ----- */}
           <div>
-            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">
+            <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
               Recherche
-            </label>
+            </div>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
               <input
@@ -471,9 +471,9 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
           {/* ----- AVEC CORRIGÉ ----- */}
           {data.facets.withCorrection > 0 && (
             <div>
-              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">
+              <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
                 Options
-              </label>
+              </div>
               <button
                 onClick={() => update({ hasCorrection: !filters.hasCorrection })}
                 className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg border text-sm transition ${

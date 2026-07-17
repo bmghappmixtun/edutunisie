@@ -186,9 +186,10 @@ export default function EditProfilePage() {
               {profile.lastName?.[0]}
             </div>
             <div className="flex-1">
-              <label className="label">URL de l'avatar</label>
+              <label htmlFor="avatarUrl" className="label">URL de l'avatar</label>
               <input
                 type="url"
+                id="avatarUrl"
                 value={profile.avatarUrl || ''}
                 onChange={(e) => setProfile({ ...profile, avatarUrl: e.target.value })}
                 className="input"
@@ -202,19 +203,19 @@ export default function EditProfilePage() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="label">Prénom (FR)</label>
+              <label htmlFor="firstName" className="label">Prénom (FR)</label>
               <input
                 type="text"
-                value={profile.firstName || ''}
+                id="firstName" value={profile.firstName || ''}
                 onChange={(e) => setProfile({ ...profile, firstName: e.target.value })}
                 className="input"
               />
             </div>
             <div>
-              <label className="label">Nom (FR)</label>
+              <label htmlFor="lastName" className="label">Nom (FR)</label>
               <input
                 type="text"
-                value={profile.lastName || ''}
+                id="lastName" value={profile.lastName || ''}
                 onChange={(e) => setProfile({ ...profile, lastName: e.target.value })}
                 className="input"
               />
@@ -222,7 +223,7 @@ export default function EditProfilePage() {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="label" dir="rtl">
+              <label htmlFor="firstNameAr" className="label" dir="rtl">
                 الاسم (AR)
               </label>
               <input
@@ -235,7 +236,7 @@ export default function EditProfilePage() {
               />
             </div>
             <div>
-              <label className="label" dir="rtl">
+              <label htmlFor="lastNameAr" className="label" dir="rtl">
                 اللقب (AR)
               </label>
               <input
@@ -258,7 +259,7 @@ export default function EditProfilePage() {
           <div>
             <label className="label">Bio ({profile.bio?.length || 0}/1000)</label>
             <textarea
-              value={profile.bio || ''}
+              id="bio" value={profile.bio || ''}
               onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
               maxLength={1000}
               className="input min-h-[120px] resize-none"
@@ -274,17 +275,17 @@ export default function EditProfilePage() {
           </h2>
 
           <div>
-            <label className="label">Nom de l'établissement</label>
+            <label htmlFor="schoolName" className="label">Nom de l'établissement</label>
             <input
               type="text"
-              value={profile.schoolName || ''}
+              id="schoolName" value={profile.schoolName || ''}
               onChange={(e) => setProfile({ ...profile, schoolName: e.target.value })}
               className="input"
               placeholder="Ex: Lycée Bourguiba, Tunis"
             />
           </div>
           <div>
-            <label className="label" dir="rtl">
+            <label htmlFor="schoolNameAr" className="label" dir="rtl">
               اسم المؤسسة بالعربية
             </label>
             <input
@@ -299,7 +300,7 @@ export default function EditProfilePage() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="label flex items-center gap-1.5">
+              <label htmlFor="bio" className="label flex items-center gap-1.5">
                 <MapPin className="w-3.5 h-3.5" /> Gouvernorat
               </label>
               <select
@@ -316,7 +317,7 @@ export default function EditProfilePage() {
               </select>
             </div>
             <div>
-              <label className="label">Diplôme</label>
+              <label htmlFor="diploma" className="label">Diplôme</label>
               <select
                 value={profile.diploma || ''}
                 onChange={(e) => setProfile({ ...profile, diploma: e.target.value })}
@@ -363,7 +364,7 @@ export default function EditProfilePage() {
           </div>
 
           <div>
-            <label className="label flex items-center gap-1.5">
+            <label htmlFor="cvUrl" className="label flex items-center gap-1.5">
               <Layers className="w-3.5 h-3.5" /> Niveaux ({profile.teachingLevels.length})
             </label>
             <div className="flex flex-wrap gap-2">
@@ -395,7 +396,7 @@ export default function EditProfilePage() {
           </h2>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="label flex items-center gap-1.5">
+              <label htmlFor="bioAr" className="label flex items-center gap-1.5">
                 <Phone className="w-3.5 h-3.5" /> Téléphone
               </label>
               <input

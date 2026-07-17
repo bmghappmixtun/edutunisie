@@ -584,7 +584,6 @@ export default function PDFViewer({
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Rechercher dans cette page..."
             className="flex-1 bg-transparent outline-none text-sm placeholder-slate-400"
-            autoFocus
           />
           {searchQuery && (
             <span className="text-xs text-slate-400 font-mono">

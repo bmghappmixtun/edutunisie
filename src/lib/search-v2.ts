@@ -122,7 +122,7 @@ function buildMatchConditions(
 ): {
   ftsSql: string;
   trgmSql: string;
-  params: any[];
+  params: (string | number | boolean | string[])[];
   ftsCombined: string;
 } {
   if (variants.length === 0) {
@@ -132,7 +132,7 @@ function buildMatchConditions(
   // FTS: build OR'd tsqueries using `||` operator (PostgreSQL tsquery OR)
   // Each variant becomes its own tsquery, OR'd together
   const ftsParts: string[] = [];
-  const ftsParams: any[] = [];
+  const ftsParams: (string | number | boolean | string[])[] = [];
   variants.forEach((v, i) => {
     ftsParts.push(`websearch_to_tsquery('french', $${i + 1})`);
     ftsParams.push(v);
@@ -212,7 +212,7 @@ export async function searchV2(options: SearchOptions): Promise<SearchResponse> 
   // match.params = [variant1, variant2, ..., originalQ]
   // In SQL: $1..$N = variants (FTS), $N+1 = original q (TRGM)
   let pIdx = match.params.length + 1;
-  const filterParams: any[] = [];
+  const filterParams: (string | number | boolean | string[])[] = [];
   const filterConditions: string[] = [];
 
   if (subjectIds.length) {

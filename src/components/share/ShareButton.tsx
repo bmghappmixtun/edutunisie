@@ -71,7 +71,12 @@ export default function ShareButton({
       {open && (
         <>
           {/* Backdrop */}
-          <div className="fixed inset-0 z-[100]" onClick={() => setOpen(false)} />
+          <div
+            role="presentation"
+            className="fixed inset-0 z-[100]"
+            onClick={() => setOpen(false)}
+            onKeyDown={(e) => { if (e.key === "Escape") setOpen(false); }}
+          />
 
           {/* Dropdown */}
           <div className="absolute right-0 top-full mt-2 bg-white rounded-2xl shadow-2xl border border-slate-200 p-2 z-[101] min-w-[240px]">

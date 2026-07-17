@@ -81,11 +81,16 @@ export default function InviteTeacherButton({
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 animate-in fade-in"
+          role="presentation"
+          onKeyDown={(e) => { if (e.key === "Escape") (e.currentTarget as HTMLDivElement)?.click(); }}
       onClick={() => !submitting && setOpen(false)}
     >
       <div
         className="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto"
+          role="dialog"
+          aria-modal="true"
         onClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="bg-gradient-to-br from-sky-600 to-cyan-700 text-white p-6 rounded-t-2xl">
@@ -136,11 +141,11 @@ export default function InviteTeacherButton({
 
               {/* Custom message */}
               <div className="mb-5">
-                <label className="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
+                <label htmlFor="customMessage" className="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
                   <MessageSquarePlus className="w-4 h-4 text-sky-500" />
                   Message personnalisé (optionnel)
                 </label>
-                <textarea
+                <textarea id="customMessage"
                   value={customMessage}
                   onChange={(e) => setCustomMessage(e.target.value)}
                   rows={3}
