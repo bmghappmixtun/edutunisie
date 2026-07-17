@@ -14,7 +14,7 @@ function createPrismaClient() {
   // Auto-fill User.slug on create if not provided
   client.$use(async (params, next) => {
     if (params.model === 'User' && (params.action === 'create' || params.action === 'createMany')) {
-      const fillSlug = (data: any) => {
+      const fillSlug = (data: { slug?: string; firstName?: string | null; lastName?: string | null; email?: string }) => {
         if (!data || data.slug) return;
         data.slug = buildTeacherSlug(data.firstName ?? null, data.lastName ?? null, data.email);
       };

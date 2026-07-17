@@ -567,12 +567,17 @@ export default function ApprobationsClient({
       {/* Reject reason modal */}
       {rejectModal && (
         <div
+          role="presentation"
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"
           onClick={() => setRejectModal(null)}
+          onKeyDown={(e) => { if (e.key === 'Escape') setRejectModal(null); }}
         >
           <div
+            role="dialog"
+            aria-modal="true"
             className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden"
             onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
           >
             <div className="bg-gradient-to-br from-red-500 to-red-700 p-6 text-white">
               <div className="flex items-center gap-3">
@@ -593,16 +598,14 @@ export default function ApprobationsClient({
               </div>
             </div>
             <div className="p-6">
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
+              <label htmlFor="rejectReason" className="block text-sm font-semibold text-slate-700 mb-2">
                 Motif du refus <span className="text-red-500">*</span>
               </label>
-              <textarea
-                value={rejectReason}
+              <textarea id="rejectReason" value={rejectReason}
                 onChange={(e) => setRejectReason(e.target.value)}
                 placeholder="Ex: Le fichier contient des erreurs de mise en page. Veuillez utiliser le format PDF et vérifier l'orthographe avant de re-soumettre."
                 className="w-full border-2 border-slate-200 rounded-xl p-3 text-sm focus:border-red-400 focus:ring-4 focus:ring-red-100 outline-none resize-none"
                 rows={5}
-                autoFocus
                 maxLength={500}
               />
               <div className="text-xs text-slate-400 mt-1 text-right">
@@ -646,12 +649,17 @@ export default function ApprobationsClient({
       {/* FILE REQUEST modal — for new non-invited teachers */}
       {fileRequestModal && (
         <div
+          role="presentation"
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"
           onClick={() => setFileRequestModal(null)}
+          onKeyDown={(e) => { if (e.key === 'Escape') setFileRequestModal(null); }}
         >
           <div
+            role="dialog"
+            aria-modal="true"
             className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden"
             onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
           >
             <div className="bg-gradient-to-br from-violet-500 via-purple-600 to-amber-500 p-6 text-white">
               <div className="flex items-center gap-3">
@@ -680,7 +688,7 @@ export default function ApprobationsClient({
                 </span>
               </div>
 
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
+              <label htmlFor="infoMessage" className="block text-sm font-semibold text-slate-700 mb-2">
                 Message personnalisé <span className="text-slate-400 font-normal">(optionnel)</span>
               </label>
               <textarea

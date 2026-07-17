@@ -326,6 +326,8 @@ export default function ModernUploader({
       {!file ? (
         // ============== DRAG & DROP ZONE ==============
         <div
+          role="region"
+          aria-label="Zone de dépôt de fichier"
           onDrop={handleDrop}
           onDragOver={(e) => {
             e.preventDefault();

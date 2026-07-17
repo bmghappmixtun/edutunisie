@@ -68,12 +68,17 @@ export default function DeleteUserButton({
 
       {open && (
         <div
+          role="presentation"
+          onKeyDown={(e) => { if (e.key === "Escape") setOpen(false); }}
           className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/50"
           onClick={() => !loading && setOpen(false)}
         >
           <div
+            role="dialog"
+            aria-modal="true"
             className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
           >
             <div className="flex items-start gap-3 mb-4">
               <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
@@ -105,6 +110,7 @@ export default function DeleteUserButton({
                 <div className="space-y-2">
                   <label
                     className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer border-2 transition ${keepFiles ? 'border-primary-400 bg-primary-50' : 'border-slate-200 hover:border-slate-300'}`}
+                    aria-label={keepFiles ? 'Garder les fichiers' : 'Supprimer les fichiers'}
                   >
                     <input
                       type="radio"
@@ -126,6 +132,7 @@ export default function DeleteUserButton({
 
                   <label
                     className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer border-2 transition ${keepFiles ? 'border-primary-400 bg-primary-50' : 'border-slate-200 hover:border-slate-300'}`}
+                    aria-label={keepFiles ? 'Garder les fichiers' : 'Supprimer les fichiers'}
                   >
                     <input
                       type="radio"

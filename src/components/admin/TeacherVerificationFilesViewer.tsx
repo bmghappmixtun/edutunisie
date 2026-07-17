@@ -124,11 +124,16 @@ export default function TeacherVerificationFilesViewer({ teacherId }: { teacherI
       {open && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"
+          role="presentation"
+          onKeyDown={(e) => { if (e.key === "Escape") (e.currentTarget as HTMLDivElement)?.click(); }}
           onClick={() => setOpen(false)}
         >
           <div
             className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col"
+          role="dialog"
+          aria-modal="true"
             onClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => e.stopPropagation()}
           >
             {/* Header */}
             <div className="bg-gradient-to-br from-violet-500 to-purple-600 p-5 text-white flex-shrink-0">
@@ -315,11 +320,16 @@ export default function TeacherVerificationFilesViewer({ teacherId }: { teacherI
       {previewUrl && (
         <div
           className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm"
+          role="presentation"
+          onKeyDown={(e) => { if (e.key === "Escape") (e.currentTarget as HTMLDivElement)?.click(); }}
           onClick={() => setPreviewUrl(null)}
         >
           <div
             className="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[95vh] overflow-hidden flex flex-col"
+          role="dialog"
+          aria-modal="true"
             onClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => e.stopPropagation()}
           >
             <div className="bg-slate-900 p-3 flex items-center justify-between text-white flex-shrink-0">
               <div className="text-sm font-bold truncate flex-1">{previewName}</div>

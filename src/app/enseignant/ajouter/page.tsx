@@ -842,7 +842,7 @@ export default function AddResourcePage() {
 
         {/* Correction checkbox */}
         <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 space-y-3">
-          <label className="flex items-start gap-3 cursor-pointer">
+          <label className="flex items-start gap-3 cursor-pointer" aria-label="Cette ressource contient un corrigé">
             <input
               type="checkbox"
               checked={hasCorrection}

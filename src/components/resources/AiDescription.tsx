@@ -342,6 +342,7 @@ export default function AiDescription({
             className="relative flex-shrink-0"
             onMouseEnter={() => setTooltipOpen(true)}
             onMouseLeave={() => setTooltipOpen(false)}
+            role="presentation"
           >
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-gradient-to-r from-violet-100 to-indigo-100 border border-violet-200 text-violet-700 cursor-help text-[10px] font-bold uppercase tracking-wide">
               IA

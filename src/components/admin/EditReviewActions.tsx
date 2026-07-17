@@ -88,14 +88,12 @@ export default function EditReviewActions({
         </div>
       ) : (
         <div className="p-3 bg-red-50 border border-red-200 rounded-lg space-y-2">
-          <label className="text-sm font-semibold text-red-900">Raison du refus :</label>
-          <textarea
-            value={reason}
+          <label htmlFor="reason" className="text-sm font-semibold text-red-900">Raison du refus :</label>
+          <textarea id="reason" value={reason}
             onChange={(e) => setReason(e.target.value)}
             placeholder="Expliquez pourquoi la modification est refusée..."
             className="w-full px-3 py-2 border border-red-200 rounded-lg focus:border-red-500 outline-none"
             rows={3}
-            autoFocus
           />
           <div className="flex gap-2">
             <button

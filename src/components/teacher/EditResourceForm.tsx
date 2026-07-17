@@ -377,7 +377,8 @@ export default function EditResourceForm({
           <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 space-y-3">
             <div className="font-bold text-amber-900 text-sm">📝 Détails du devoir</div>
             <div>
-              <label className="label">Type de devoir</label>
+              <fieldset>
+                <legend className="label mb-2">Type de devoir</legend>
               <div className="flex flex-wrap gap-2">
                 {[
                   { value: 'CONTROL', label: '📋 Contrôle', cls: 'red' },
@@ -402,10 +403,11 @@ export default function EditResourceForm({
                   </button>
                 ))}
               </div>
+              </fieldset>
             </div>
             <div>
-              <label className="label">Numéro du devoir</label>
-              <select
+              <label htmlFor="homeworkNumber" className="label">Numéro du devoir</label>
+              <select id="homeworkNumber"
                 value={homeworkNumber}
                 onChange={(e) =>
                   setHomeworkNumber(e.target.value ? parseInt(e.target.value, 10) : '')
@@ -470,7 +472,7 @@ export default function EditResourceForm({
 
         {/* Correction */}
         <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 space-y-3">
-          <label className="flex items-start gap-3 cursor-pointer">
+          <label className="flex items-start gap-3 cursor-pointer" aria-label="Cette ressource contient un corrigé">
             <input
               type="checkbox"
               checked={hasCorrection}

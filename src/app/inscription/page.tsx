@@ -76,21 +76,16 @@ export default function RegisterPage() {
         >
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div>
-              <label className="label">Prénom *</label>
-              <input
-                type="text"
-                required
-                value={form.firstName}
+              <label htmlFor="firstName" className="label">Prénom *</label>
+              <input id="firstName" type="text" required value={form.firstName}
                 onChange={(e) => update('firstName', e.target.value)}
                 className="input"
                 placeholder="Prénom"
               />
             </div>
             <div>
-              <label className="label">Nom *</label>
-              <input
-                type="text"
-                value={form.lastName}
+              <label htmlFor="lastName" className="label">Nom *</label>
+              <input id="lastName" type="text" value={form.lastName}
                 onChange={(e) => update('lastName', e.target.value)}
                 className="input"
                 placeholder="Nom"
@@ -98,8 +93,8 @@ export default function RegisterPage() {
             </div>
           </div>
           <div className="mb-4">
-            <label className="label">Email *</label>
-            <input
+            <label htmlFor="email" className="label">Email *</label>
+            <input id="confirmPassword"
               type="email"
               required
               value={form.email}
@@ -109,9 +104,9 @@ export default function RegisterPage() {
             />
           </div>
           <div className="mb-4">
-            <label className="label">Mot de passe *</label>
+            <label htmlFor="password" className="label">Mot de passe *</label>
             <div className="relative">
-              <input
+              <input id="confirmPassword"
                 type={showPw ? 'text' : 'password'}
                 required
                 value={form.password}
@@ -129,8 +124,9 @@ export default function RegisterPage() {
             </div>
           </div>
           <div className="mb-6">
-            <label className="label">Vous êtes ?</label>
-            <div className="grid grid-cols-2 gap-2">
+            <fieldset className="mb-6">
+              <legend className="label mb-2">Vous êtes ?</legend>
+              <div className="grid grid-cols-2 gap-2">
               {[
                 { value: 'STUDENT', label: 'Élève', icon: '🎓' },
                 { value: 'TEACHER', label: 'Enseignant', icon: '👨‍🏫' },
@@ -150,6 +146,7 @@ export default function RegisterPage() {
                 </button>
               ))}
             </div>
+            </fieldset>
 
             {/* Teacher motivation banner */}
             {form.role === 'TEACHER' && (

@@ -48,8 +48,11 @@ export default function FloatingUploadButton() {
       <div className="fixed bottom-6 right-6 z-40 flex flex-col items-end gap-3 print:hidden">
         {expanded && (
           <div
+            role="button"
+            tabIndex={0}
             className="bg-slate-900 text-white text-sm font-semibold px-4 py-2 rounded-xl shadow-xl animate-in fade-in slide-in-from-bottom-2 duration-200 cursor-pointer"
             onClick={() => (window.location.href = '/enseignant/ajouter')}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') (window.location.href = '/enseignant/ajouter'); }}
           >
             Ajouter une ressource
           </div>
@@ -84,6 +87,8 @@ export default function FloatingUploadButton() {
         </div>
       )}
       <div
+        role="button"
+        tabIndex={-1}
         title={statusMessage}
         onMouseEnter={() => setExpanded(true)}
         onMouseLeave={() => setExpanded(false)}

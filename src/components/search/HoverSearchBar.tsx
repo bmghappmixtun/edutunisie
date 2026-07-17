@@ -35,6 +35,7 @@ export default function HoverSearchBar() {
 
   return (
     <div
+      role="group"
       ref={containerRef}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}

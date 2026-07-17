@@ -575,11 +575,10 @@ function ProviderCard({
             </div>
           ))}
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">
+            <label htmlFor="quota" className="block text-xs font-bold text-slate-700 mb-1">
               Quota mensuel (optionnel)
             </label>
-            <input
-              type="number"
+            <input id="quota" type="number"
               value={monthlyQuota}
               onChange={(e) => setMonthlyQuota(e.target.value)}
               placeholder="ex: 250 pour iLoveAPI gratuit"
@@ -587,11 +586,8 @@ function ProviderCard({
             />
           </div>
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">Notes</label>
-            <input
-              type="text"
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
+            <label htmlFor="notes" className="block text-xs font-bold text-slate-700 mb-1">Notes</label>
+            <input id="notes" type="text" value={notes} onChange={(e) => setNotes(e.target.value)}
               placeholder="ex: compte pro Mehdi"
               className="input text-sm"
             />
@@ -789,8 +785,8 @@ function VercelCard({
       {(!configured || editing) && (
         <div className="space-y-3 mt-2">
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">Vercel API Token</label>
-            <input
+            <label htmlFor="vercelToken" className="block text-xs font-bold text-slate-700 mb-1">Vercel API Token</label>
+            <input id="vercelToken"
               type="password"
               value={token}
               onChange={(e) => setToken(e.target.value)}
@@ -995,8 +991,8 @@ function NeonCard({
       {(!configured || editing) && (
         <div className="space-y-3 mt-2">
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">Neon API Key</label>
-            <input
+            <label htmlFor="neonKey" className="block text-xs font-bold text-slate-700 mb-1">Neon API Key</label>
+            <input id="neonKey"
               type="password"
               value={token}
               onChange={(e) => setToken(e.target.value)}
@@ -1016,12 +1012,10 @@ function NeonCard({
             </p>
           </div>
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">
+            <label htmlFor="projectId" className="block text-xs font-bold text-slate-700 mb-1">
               Project ID (optionnel, défaut = premier projet)
             </label>
-            <input
-              type="text"
-              value={projectId}
+            <input id="projectId" type="text" value={projectId}
               onChange={(e) => setProjectId(e.target.value)}
               placeholder="ep-xxx-xxx"
               className="input text-sm"
