@@ -203,17 +203,17 @@ export async function GET(req: NextRequest) {
   const [classGroups, sectionGroups, subjectGroups] = await Promise.all([
     prisma.resource.groupBy({
       by: ['classId'],
-      where: { ...facetBase, classId: { not: null } },
+      where: { ...facetBase, classId: { not: 'NONE' } },
       _count: { _all: true },
     }),
     prisma.resource.groupBy({
       by: ['sectionId'],
-      where: { ...facetBase, sectionId: { not: null } },
+      where: { ...facetBase, sectionId: { not: 'NONE' } },
       _count: { _all: true },
     }),
     prisma.resource.groupBy({
       by: ['subjectId'],
-      where: { ...facetBase, subjectId: { not: null } },
+      where: { ...facetBase, subjectId: { not: 'NONE' } },
       _count: { _all: true },
     }),
   ]);
@@ -242,28 +242,8 @@ export async function GET(req: NextRequest) {
     if (b.language && b._count && typeof b._count === 'object') byLanguageMap[b.language] = b._count._all ?? 0;
   });
 
-  // For class/section/subject facets: use findMany with select instead of groupBy
-  // (Prisma TS type for `not: null` on nullable strings is awkward; we filter in JS)
-  const classGroups = Object.entries(
-    classRecords.reduce((acc, r) => {
-      if (r.classId) acc[r.classId] = (acc[r.classId] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>)
-  ).map(([classId, count]) => ({ classId, _count: { _all: count } }));
-
-  const sectionGroups = Object.entries(
-    sectionRecords.reduce((acc, r) => {
-      if (r.sectionId) acc[r.sectionId] = (acc[r.sectionId] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>)
-  ).map(([sectionId, count]) => ({ sectionId, _count: { _all: count } }));
-
-  const subjectGroups = Object.entries(
-    subjectRecords.reduce((acc, r) => {
-      if (r.subjectId) acc[r.subjectId] = (acc[r.subjectId] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>)
-  ).map(([subjectId, count]) => ({ subjectId, _count: { _all: count } }));
+  // For class/section/subject facets: we now use the groupBy queries above
+  // (classGroups, sectionGroups, subjectGroups) directly. No JS counting needed.
 
   // Resolve class slugs
   const classIds = classGroups.map((g) => g.classId).filter((id): id is string => !!id);
