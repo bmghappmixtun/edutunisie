@@ -19,12 +19,18 @@ export function getServerLocale(): Locale {
     const xLocale = headerStore.get('x-locale');
     if (xLocale === 'fr' || xLocale === 'ar') return xLocale as Locale;
 
-    // 2. Cookie (set by LanguageSwitcher or middleware)
+    // 2. x-pathname (set by middleware) — fall back to URL prefix detection.
+    // Some serverless runtimes don't propagate x-locale to all RSC contexts
+    // (notably generateMetadata), so we also check the URL.
+    const xPathname = headerStore.get('x-pathname') || headerStore.get('x-invoke-path') || '';
+    if (xPathname.startsWith('/ar') || xPathname.startsWith('/ar/')) return 'ar';
+
+    // 3. Cookie (set by LanguageSwitcher or middleware)
     const cookieStore = cookies();
     const cookieLocale = cookieStore.get('locale')?.value as Locale | undefined;
     if (cookieLocale === 'fr' || cookieLocale === 'ar') return cookieLocale;
 
-    // 3. Accept-Language header (first-time visitors)
+    // 4. Accept-Language header (first-time visitors)
     const accept = headerStore.get('accept-language') || '';
     if (accept.startsWith('ar')) return 'ar';
   } catch {

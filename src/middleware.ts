@@ -48,10 +48,13 @@ export function middleware(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.pathname = newPathname;
 
-    // IMPORTANT: pass x-locale header via request headers (not response)
-    // This makes `headers()` in server components see the locale.
+    // IMPORTANT: pass x-locale + x-pathname headers via request headers (not response)
+    // This makes `headers()` in server components see the locale and pathname.
+    // Some runtimes (e.g. generateMetadata context) don't propagate x-locale,
+    // so we ALSO pass x-pathname so getServerLocale can detect /ar/* from URL.
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set('x-locale', 'ar');
+    requestHeaders.set('x-pathname', pathname);
 
     // Rewrite with the modified request headers
     const response = NextResponse.rewrite(url, {
