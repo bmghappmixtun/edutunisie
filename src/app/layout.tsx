@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { headers } from 'next/headers';
+import { Inter, Cairo, Nunito } from 'next/font/google';
 import './globals.css';
 import { Toaster } from 'react-hot-toast';
 import AnalyticsWithOptOut from '@/components/analytics/AnalyticsWithOptOut';
@@ -9,6 +10,32 @@ import { organizationSchema } from '@/lib/structured-data';
 import { getServerLocale } from '@/lib/i18n-server';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
+
+// PERF: Self-host Google Fonts via next/font — eliminates the render-blocking
+// external CSS request to fonts.googleapis.com (was ~150ms TTFB on cold visits,
+// especially on 3G networks in Tunisia). Also: subset to latin + latin-ext
+// + arabic to avoid downloading unused glyphs (~30% smaller).
+const inter = Inter({
+  subsets: ['latin', 'latin-ext'],
+  display: 'swap',
+  variable: '--font-inter',
+  weight: ['400', '500', '600', '700', '800'],
+  preload: true,
+});
+const cairo = Cairo({
+  subsets: ['arabic', 'latin-ext'],
+  display: 'swap',
+  variable: '--font-cairo',
+  weight: ['400', '600', '700', '800'],
+  preload: true,
+});
+const nunito = Nunito({
+  subsets: ['latin', 'latin-ext'],
+  display: 'swap',
+  variable: '--font-nunito',
+  weight: ['600', '700', '800', '900'],
+  preload: false,
+});
 
 // SEO: per-locale default metadata. The template is added per-locale so
 // children pages never need to worry about i18n.
@@ -140,11 +167,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const dir = locale === 'ar' ? 'rtl' : 'ltr';
 
   return (
-    <html lang={locale} dir={dir} suppressHydrationWarning>
+    <html lang={locale} dir={dir} className={`${inter.variable} ${cairo.variable} ${nunito.variable}`} suppressHydrationWarning>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Cairo:wght@300;400;600;700;900&family=Nunito:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
         {/* Explicit Google site verification meta tag (HTML tag verification) */}
         <meta name="google-site-verification" content="GXE5A9gq9-K7q7IztCatkSHhYrgtWWBbPloJymofPUY" />
         {/* Bing Webmaster Tools verification meta tag (HTML tag verification) */}
@@ -158,7 +182,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <link rel="alternate" hrefLang="ar-TN" href={`${SITE_URL}/ar`} />
         <link rel="alternate" hrefLang="x-default" href={SITE_URL} />
       </head>
-      <body>
+      <body className="font-sans">
         <NuqsAdapter>
           <I18nProviderWrapper initialLocale={(() => { try { const h = headers(); const l = h.get('x-locale'); return l === 'ar' || l === 'fr' ? l : 'fr'; } catch { return 'fr'; } })()}>{children}</I18nProviderWrapper>
         </NuqsAdapter>
