@@ -1,7 +1,16 @@
 /**
- * Client-side error reporter
- * Reports browser errors to /api/errors/log
+ * Client-side error reporter with user-action breadcrumbs
+ * Tracks: clicks, navigations, form submissions → reports to /api/errors/log
  */
+
+interface Breadcrumb {
+  type: 'click' | 'navigation' | 'submit' | 'input' | 'key' | 'error';
+  timestamp: number;
+  data: Record<string, unknown>;
+}
+
+const MAX_BREADCRUMBS = 20;
+let breadcrumbs: Breadcrumb[] = [];
 
 interface ClientErrorReport {
   message: string;
@@ -11,6 +20,7 @@ interface ClientErrorReport {
   action?: string;
   data?: Record<string, unknown>;
   severity?: 'DEBUG' | 'INFO' | 'WARNING' | 'ERROR' | 'CRITICAL';
+  breadcrumbs?: Breadcrumb[];
 }
 
 let reportQueue: ClientErrorReport[] = [];
@@ -30,7 +40,6 @@ async function flushQueue() {
         keepalive: true,
       });
     } catch {
-      // Re-queue on failure (best effort)
       reportQueue.push(report);
       break;
     }
@@ -40,30 +49,162 @@ async function flushQueue() {
 }
 
 /**
+ * Add a breadcrumb to the rolling buffer
+ * Keeps last MAX_BREADCRUMBS events
+ */
+export function trackBreadcrumb(type: Breadcrumb['type'], data: Record<string, unknown>): void {
+  if (typeof window === 'undefined') return;
+  breadcrumbs.push({ type, timestamp: Date.now(), data });
+  if (breadcrumbs.length > MAX_BREADCRUMBS) {
+    breadcrumbs = breadcrumbs.slice(-MAX_BREADCRUMBS);
+  }
+}
+
+/**
+ * Get current breadcrumbs (called by error handlers)
+ */
+export function getBreadcrumbs(): Breadcrumb[] {
+  return [...breadcrumbs];
+}
+
+/**
+ * Clear breadcrumbs (e.g., on successful navigation to a new page)
+ */
+export function clearBreadcrumbs(): void {
+  breadcrumbs = [];
+}
+
+/**
+ * Build a CSS-selector-like path for an element
+ * Used for click events so we can identify which element the user clicked
+ */
+function getElementSelector(el: Element | null): string {
+  if (!el) return 'unknown';
+  if (el.id) return `#${el.id}`;
+
+  const parts: string[] = [];
+  let cur: Element | null = el;
+  let depth = 0;
+  while (cur && depth < 5) {
+    let part = cur.tagName.toLowerCase();
+    if (cur.className && typeof cur.className === 'string') {
+      const cls = cur.className.trim().split(/\s+/).slice(0, 2).join('.');
+      if (cls) part += `.${cls}`;
+    }
+    if (cur.getAttribute('data-testid')) {
+      part = `[data-testid="${cur.getAttribute('data-testid')}"]`;
+    }
+    parts.unshift(part);
+    if (cur.id) {
+      parts.unshift(`#${cur.id}`);
+      break;
+    }
+    cur = cur.parentElement;
+    depth++;
+  }
+  return parts.join(' > ');
+}
+
+/**
+ * Get human-readable text for an element (truncated)
+ */
+function getElementText(el: Element | null): string {
+  if (!el) return '';
+  const text = (el.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 60);
+  return text;
+}
+
+/**
  * Report a client-side error to the server
- * Non-blocking, queued, retries on failure
+ * Automatically attaches breadcrumbs so you can see what the user did before
  */
 export function reportClientError(report: ClientErrorReport): void {
   if (typeof window === 'undefined') return;
 
   reportQueue.push({
     severity: 'ERROR',
+    breadcrumbs: getBreadcrumbs(),
     ...report,
     url: report.url || window.location.href,
   });
 
-  // Flush after a microtask (avoid recursive reporting)
   setTimeout(flushQueue, 0);
 }
 
 /**
- * Install global error handlers
- * Catches: window.onerror, unhandledrejection, console.error
+ * Install global error handlers AND breadcrumb trackers
+ * Catches: window.onerror, unhandledrejection, click/submit/input events
  */
 export function installGlobalErrorHandlers(): void {
   if (typeof window === 'undefined') return;
+  if ((window as unknown as { __examanetHandlersInstalled?: boolean }).__examanetHandlersInstalled) return;
+  (window as unknown as { __examanetHandlersInstalled?: boolean }).__examanetHandlersInstalled = true;
 
-  // 1. Unhandled errors
+  // ===== BREADCRUMBS =====
+
+  // 1. Click events — capture which element the user clicked
+  document.addEventListener('click', (e) => {
+    const target = e.target as Element | null;
+    trackBreadcrumb('click', {
+      selector: getElementSelector(target),
+      text: getElementText(target),
+      tag: target?.tagName?.toLowerCase(),
+      href: (target as HTMLAnchorElement)?.href || null,
+    });
+  }, { capture: true, passive: true });
+
+  // 2. Navigation — track URL changes (SPA-aware)
+  let lastUrl = window.location.href;
+  const observer = new MutationObserver(() => {
+    if (window.location.href !== lastUrl) {
+      const from = lastUrl;
+      lastUrl = window.location.href;
+      trackBreadcrumb('navigation', { from, to: window.location.href });
+    }
+  });
+  observer.observe(document, { subtree: true, childList: true });
+
+  // Also catch popstate and pushState
+  window.addEventListener('popstate', () => {
+    trackBreadcrumb('navigation', { type: 'popstate', to: window.location.href });
+  });
+  const origPush = history.pushState;
+  history.pushState = function (...args) {
+    const result = origPush.apply(this, args);
+    trackBreadcrumb('navigation', { type: 'pushState', to: window.location.href });
+    return result;
+  };
+  const origReplace = history.replaceState;
+  history.replaceState = function (...args) {
+    const result = origReplace.apply(this, args);
+    trackBreadcrumb('navigation', { type: 'replaceState', to: window.location.href });
+    return result;
+  };
+
+  // 3. Form submissions
+  document.addEventListener('submit', (e) => {
+    const form = e.target as HTMLFormElement;
+    trackBreadcrumb('submit', {
+      selector: getElementSelector(form),
+      action: form.action,
+      method: form.method,
+    });
+  }, { capture: true });
+
+  // 4. Keyboard shortcuts (Enter on forms, Esc on modals, etc.)
+  document.addEventListener('keydown', (e) => {
+    // Only track meaningful keys
+    if (['Enter', 'Escape', 'Tab'].includes(e.key)) {
+      const target = e.target as Element | null;
+      trackBreadcrumb('key', {
+        key: e.key,
+        selector: getElementSelector(target),
+      });
+    }
+  }, { capture: true, passive: true });
+
+  // ===== ERROR HANDLERS =====
+
   window.addEventListener('error', (event) => {
     reportClientError({
       message: event.message,
@@ -73,7 +214,6 @@ export function installGlobalErrorHandlers(): void {
     });
   });
 
-  // 2. Unhandled promise rejections
   window.addEventListener('unhandledrejection', (event) => {
     const err = event.reason;
     reportClientError({
@@ -83,7 +223,4 @@ export function installGlobalErrorHandlers(): void {
       action: 'promise',
     });
   });
-
-  // 3. Catch React errors via custom hook (used by error.tsx boundaries)
-  // This is handled separately by error.tsx files
 }

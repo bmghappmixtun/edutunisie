@@ -117,6 +117,42 @@ export default async function AdminErrorsPage() {
                             {err.createdAt.toLocaleString('fr-FR', { timeZone: 'Europe/Paris' })}
                           </span>
                         </div>
+                        {/* Breadcrumbs — show what the user did before the error */}
+                        {(() => {
+                          const ctx = err.context as any;
+                          const crumbs = ctx?.breadcrumbs as Array<{ type: string; timestamp: number; data: Record<string, unknown> }> | undefined;
+                          if (!crumbs || crumbs.length === 0) return null;
+                          return (
+                            <details className="mt-2 text-xs">
+                              <summary className="cursor-pointer text-slate-600 hover:text-slate-900 font-medium">
+                                🐾 Parcours utilisateur ({crumbs.length} actions)
+                              </summary>
+                              <ol className="mt-2 space-y-1 pl-4 border-l-2 border-slate-200">
+                                {crumbs.slice().reverse().map((c, i) => {
+                                  const t = new Date(c.timestamp).toLocaleTimeString('fr-FR', { timeZone: 'Europe/Paris', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                                  const data = c.data || {};
+                                  let label = '';
+                                  if (c.type === 'click') {
+                                    label = `Clic sur ${data.selector}${data.text ? ` "${data.text}"` : ''}${data.href ? ` → ${data.href}` : ''}`;
+                                  } else if (c.type === 'navigation') {
+                                    label = `Navigation → ${data.to}${data.from ? ` (depuis ${String(data.from).slice(0, 50)})` : ''}`;
+                                  } else if (c.type === 'submit') {
+                                    label = `Submit ${data.method || ''} ${data.action || data.selector}`;
+                                  } else if (c.type === 'key') {
+                                    label = `Touche ${data.key} sur ${data.selector}`;
+                                  } else {
+                                    label = `${c.type}: ${JSON.stringify(data).slice(0, 80)}`;
+                                  }
+                                  return (
+                                    <li key={i} className="text-slate-600">
+                                      <span className="text-slate-400">{t}</span> · {label}
+                                    </li>
+                                  );
+                                })}
+                              </ol>
+                            </details>
+                          );
+                        })()}
                       </div>
                     </div>
                   </li>
