@@ -35,6 +35,7 @@ export default async function Header() {
                 alt=""
                 width={62}
                 height={62}
+                sizes="62px"
                 className="sm:hidden w-[62px] h-[62px] group-hover:scale-105 transition"
                 priority
               />
@@ -44,6 +45,7 @@ export default async function Header() {
                 alt="Examanet"
                 width={269}
                 height={73}
+                sizes="(min-width: 1024px) 269px, (min-width: 640px) 200px, 0px"
                 className="hidden sm:block h-[62px] lg:h-[73px] w-auto group-hover:scale-[1.02] transition-transform"
                 priority
               />

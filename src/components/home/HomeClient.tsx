@@ -57,13 +57,13 @@ export default function HomeClient({
     <main className="flex-1 pt-16 lg:pt-20">
       {/* HERO */}
       <section className="relative bg-gradient-to-br from-primary-50 via-white to-sky-50 overflow-hidden">
-        <div className="absolute top-20 -left-20 w-96 h-96 bg-primary-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float" />
+        <div className="absolute top-20 -left-20 w-48 h-48 sm:w-72 sm:h-72 lg:w-96 lg:h-96 bg-primary-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float" />
         <div
-          className="absolute top-40 -right-20 w-96 h-96 bg-amber-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float"
+          className="absolute top-40 -right-20 w-48 h-48 sm:w-72 sm:h-72 lg:w-96 lg:h-96 bg-amber-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float"
           style={{ animationDelay: '2s' }}
         />
         <div
-          className="absolute -bottom-20 left-1/3 w-96 h-96 bg-sky-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float"
+          className="absolute -bottom-20 left-1/3 w-48 h-48 sm:w-72 sm:h-72 lg:w-96 lg:h-96 bg-sky-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float"
           style={{ animationDelay: '4s' }}
         />
 
