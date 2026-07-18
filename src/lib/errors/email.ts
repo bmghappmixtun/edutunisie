@@ -13,6 +13,7 @@ const resend = process.env.RESEND_API_KEY
 
 const AGENT_EMAIL = process.env.AGENT_EMAIL || process.env.OWNER_EMAIL || 'contact@examanet.com';
 const FROM_ADDRESS = process.env.EMAIL_FROM || 'Examanet Alerts <alerts@examanet.com>';
+const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL || '';
 
 interface AgentAlertParams {
   reference: string;
@@ -187,9 +188,74 @@ export async function sendAgentAlert(params: AgentAlertParams): Promise<boolean>
       html,
       replyTo,
     });
+    // Fire-and-forget Discord notification (don't block email on it)
+    sendDiscordAlert(params).catch((e) => console.error('[discord-alert] failed:', e));
     return !!result.data?.id;
   } catch (err) {
     console.error('[agent-alert] Resend error:', err);
+    // Even if email fails, try Discord
+    sendDiscordAlert(params).catch(() => {});
+    return false;
+  }
+}
+
+/**
+ * Discord webhook notification (real-time push to admin)
+ * Uses embeds with severity color. Silent for DEBUG/INFO.
+ */
+async function sendDiscordAlert(params: AgentAlertParams): Promise<boolean> {
+  if (!DISCORD_WEBHOOK_URL) return false;
+
+  // Skip noise — only send WARNING+
+  if (params.severity === 'DEBUG' || params.severity === 'INFO') return false;
+
+  const sev = SEVERITY_COLORS[params.severity] || SEVERITY_COLORS.ERROR;
+  // Convert hex bg color to int for Discord embed
+  const colorInt = parseInt(sev.bg.replace('#', ''), 16);
+
+  const fields: Array<{ name: string; value: string; inline?: boolean }> = [
+    { name: 'Source', value: params.source, inline: true },
+    { name: 'Method', value: params.method || '—', inline: true },
+  ];
+  if (params.url) fields.push({ name: 'URL', value: params.url.length > 200 ? params.url.slice(0, 200) + '…' : params.url, inline: false });
+  if (params.userEmail) fields.push({ name: 'User', value: params.userEmail, inline: true });
+  if (params.region) fields.push({ name: 'Region', value: params.region, inline: true });
+  if (params.requestId) fields.push({ name: 'Req ID', value: params.requestId, inline: true });
+
+  const stackPreview = params.stack
+    ? params.stack.split('\n').slice(0, 3).join('\n').slice(0, 500)
+    : null;
+
+  const embed = {
+    title: `${params.severity === 'CRITICAL' ? '🚨' : params.severity === 'ERROR' ? '⚠️' : '⚡'} ${params.reference}`,
+    description: `\`\`\`${params.message.slice(0, 500)}\`\`\``,
+    color: colorInt,
+    fields,
+    ...(stackPreview && { footer: { text: stackPreview } }),
+    timestamp: new Date().toISOString(),
+    author: { name: 'Examanet Alerts' },
+  };
+
+  const content = params.severity === 'CRITICAL' ? '🔴 **CRITICAL ERROR**' : params.severity === 'ERROR' ? '🟠 Error detected' : '🟡 Warning';
+
+  try {
+    const res = await fetch(DISCORD_WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        content,
+        embeds: [embed],
+        // Suppress @everyone pings; admin only
+        allowed_mentions: { parse: [] },
+      }),
+    });
+    if (!res.ok) {
+      console.error('[discord-alert] HTTP', res.status, await res.text().catch(() => ''));
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error('[discord-alert] fetch error:', err);
     return false;
   }
 }
