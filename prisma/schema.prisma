@@ -747,3 +747,74 @@ model ApiProviderUsage {
   @@index([providerId, year, month])
   @@index([createdAt])
 }
+
+// ===========================================
+// ErrorLog — global error tracking
+// Catches all unhandled errors (client + server)
+// ===========================================
+model ErrorLog {
+  id              String   @id @default(cuid())
+  // Short reference ID shown to user (e.g., "ERR-A1B2C3")
+  reference       String   @unique
+  // Type of error
+  source          ErrorSource
+  // Severity
+  severity        ErrorSeverity @default(ERROR)
+  // Error details
+  message         String
+  // Stack trace (truncated for storage)
+  stack           String?  @db.Text
+  // URL where error occurred (client side: window.location.href, server: req.url)
+  url             String?
+  // HTTP method
+  method          String?
+  // User agent (client) or user identifier
+  userAgent       String?
+  // Authenticated user ID (if any)
+  userId          String?
+  // User email (denormalized for emails without join)
+  userEmail       String?
+  // Vercel region
+  region          String?
+  // Vercel request ID (for log correlation)
+  requestId       String?
+  // Additional context (component, action, etc.)
+  context         Json?
+  // Whether the user was notified by email
+  emailSent       Boolean  @default(false)
+  // When email was sent
+  emailedAt       DateTime?
+  // Whether the agent was notified
+  agentNotified   Boolean  @default(false)
+  // When agent was notified
+  agentNotifiedAt DateTime?
+  // Resolved status
+  resolved        Boolean  @default(false)
+  resolvedAt      DateTime?
+  resolvedBy      String?
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([source, createdAt])
+  @@index([severity, createdAt])
+  @@index([resolved, createdAt])
+  @@index([reference])
+  @@index([userId, createdAt])
+}
+
+enum ErrorSource {
+  CLIENT     // React component / browser
+  SERVER     // API route / server component
+  BUILD      // Build-time error
+  CRON       // Scheduled job
+  EXTERNAL   // Third-party API failure
+}
+
+enum ErrorSeverity {
+  DEBUG
+  INFO
+  WARNING
+  ERROR
+  CRITICAL
+}
