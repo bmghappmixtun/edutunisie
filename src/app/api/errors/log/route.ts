@@ -53,13 +53,12 @@ export async function POST(req: NextRequest) {
         ip: req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || undefined,
         referer: req.headers.get('referer') || undefined,
       },
-      sendEmail: !!userEmail, // Only email if we know who the user is
     });
 
     return NextResponse.json({
       ok: true,
       reference: result.reference,
-      emailSent: result.emailSent,
+      agentAlertSent: result.agentAlertSent,
     });
   } catch (err: any) {
     // Don't let the error reporter itself fail loudly

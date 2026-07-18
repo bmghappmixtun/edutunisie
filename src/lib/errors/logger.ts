@@ -1,16 +1,17 @@
 /**
  * Server-side error logger
- * Logs errors to the database + sends user email + sends agent alert
+ * Logs errors to the database + sends AGENT alert email
+ * NEVER sends email to end users (admin-only policy)
 
 Flow:
 - Always: save to DB
-- If user identified (userId/userEmail in context): send user-friendly email
-- Always: send technical agent alert email
+- Always (ERROR/CRITICAL): send agent alert email (technical, to AGENT_EMAIL)
 - Always: console.error to Vercel logs (for Vercel Anomaly Detection)
+- Never: send email to end users (admin policy: internal only)
  */
 
 import { prisma } from '@/lib/prisma';
-import { sendErrorEmail, sendAgentAlert } from './email';
+import { sendAgentAlert } from './email';
 import { notifyAgent } from './notify';
 import {
   ErrorReport,
@@ -22,7 +23,6 @@ import {
 interface LogResult {
   reference: string;
   errorId: string;
-  emailSent: boolean;
   agentAlertSent: boolean;
   agentNotified: boolean;
 }
@@ -31,17 +31,16 @@ export async function logError(report: ErrorReport): Promise<LogResult> {
   const reference = report.reference || generateErrorReference();
   const severity = report.severity || 'ERROR';
   const source: ErrorSource = report.source;
-  const shouldEmailUser = report.sendEmail !== false && !!report.context?.userEmail;
+  // Agent alert: sent for ERROR/CRITICAL, or if explicitly forced via context.alertAgent
   const shouldAlertAgent = severity === 'ERROR' || severity === 'CRITICAL' || report.context?.alertAgent === true;
 
   let errorId = '';
   let userEmail: string | undefined;
   let userId: string | undefined;
-  let emailSent = false;
   let agentAlertSent = false;
   let agentNotified = false;
 
-  // Extract user info from context
+  // Extract user info from context (for DB tracking, NOT for emailing)
   userEmail = (report.context?.userEmail as string) || undefined;
   userId = (report.context?.userId as string) || undefined;
 
@@ -58,10 +57,9 @@ export async function logError(report: ErrorReport): Promise<LogResult> {
         method: report.method,
         userAgent: report.userAgent,
         userId,
-        userEmail,
+        userEmail, // tracked in DB, not used for email
         context: (report.context || {}) as any,
-        emailSent: shouldEmailUser,
-        emailedAt: shouldEmailUser ? new Date() : null,
+        emailSent: false, // never email users
         agentNotified: shouldAlertAgent,
         agentNotifiedAt: shouldAlertAgent ? new Date() : null,
       },
@@ -74,26 +72,7 @@ export async function logError(report: ErrorReport): Promise<LogResult> {
     });
   }
 
-  // 2. Send USER email (only if user identified AND they want it)
-  if (shouldEmailUser && userEmail) {
-    try {
-      await sendErrorEmail({
-        to: userEmail,
-        reference,
-        message: report.message,
-        url: report.url,
-        severity,
-        source,
-        stack: report.stack,
-        context: report.context,
-      });
-      emailSent = true;
-    } catch (emailErr) {
-      console.error('[error-logger] Failed to send user email:', emailErr);
-    }
-  }
-
-  // 3. Send AGENT alert (technical, for the operator/owner)
+  // 2. Send AGENT alert (admin only — never to end users)
   if (shouldAlertAgent) {
     try {
       await sendAgentAlert({
@@ -104,7 +83,7 @@ export async function logError(report: ErrorReport): Promise<LogResult> {
         method: report.method,
         userAgent: report.userAgent,
         userId,
-        userEmail,
+        userEmail, // included in admin alert for context (which user hit it)
         severity,
         source,
         context: report.context,
@@ -117,7 +96,7 @@ export async function logError(report: ErrorReport): Promise<LogResult> {
     }
   }
 
-  // 4. Always log to console (Vercel will pick this up)
+  // 3. Always log to console (Vercel will pick this up)
   console.error('[ERROR]', {
     reference,
     severity,
@@ -126,11 +105,10 @@ export async function logError(report: ErrorReport): Promise<LogResult> {
     url: report.url,
     userId,
     userEmail,
-    emailSent,
     agentAlertSent,
   });
 
-  // 5. Notify via mavis (future: poll queue)
+  // 4. Notify via mavis (future: poll queue)
   if (shouldAlertAgent) {
     try {
       await notifyAgent({
@@ -147,10 +125,10 @@ export async function logError(report: ErrorReport): Promise<LogResult> {
     }
   }
 
-  return { reference, errorId, emailSent, agentAlertSent, agentNotified };
+  return { reference, errorId, agentAlertSent, agentNotified };
 }
 
-// withErrorHandler wrapper stays the same
+// withErrorHandler wrapper
 export async function withErrorHandler<T>(
   fn: () => Promise<T>,
   context: {
@@ -181,7 +159,6 @@ export async function withErrorHandler<T>(
         userEmail: context.userEmail,
         action: context.action,
       },
-      sendEmail: !!context.userEmail,
     });
 
     return {
