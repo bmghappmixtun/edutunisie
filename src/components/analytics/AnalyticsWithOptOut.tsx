@@ -74,7 +74,7 @@ function AnalyticsStatusBadge({ optedOut, onToggle }: { optedOut: boolean; onTog
   return (
     <button
       onClick={onToggle}
-      className={`fixed bottom-4 right-4 z-50 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold shadow-lg transition ${
+      className={`fixed right-4 safe-bottom-sm z-50 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold shadow-lg transition ${
         optedOut
           ? 'bg-amber-500 text-white hover:bg-amber-600'
           : 'bg-slate-900 text-white hover:bg-slate-800'

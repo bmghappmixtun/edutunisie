@@ -278,3 +278,30 @@
   -webkit-user-select: text;
   user-select: text;
 }
+
+/* ============================================================================
+   iOS SAFE AREA UTILITIES
+   For iPhone X+ and other devices with notches/home indicators.
+   Use these instead of plain bottom-* for elements that should respect the
+   home bar (FloatingUploadButton, AnalyticsWithOptOut, sticky action bars).
+   ============================================================================ */
+@layer utilities {
+  .safe-bottom {
+    bottom: max(1.5rem, env(safe-area-inset-bottom));
+  }
+  .safe-bottom-sm {
+    bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+  .safe-bottom-lg {
+    bottom: max(2rem, env(safe-area-inset-bottom));
+  }
+  .safe-top {
+    padding-top: max(0px, env(safe-area-inset-top));
+  }
+  .safe-bottom-pad {
+    padding-bottom: max(0px, env(safe-area-inset-bottom));
+  }
+  .safe-mobile-menu {
+    height: calc(100vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+  }
+}

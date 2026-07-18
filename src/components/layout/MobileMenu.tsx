@@ -197,7 +197,7 @@ export default function MobileMenu({ user }: { user: any }) {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="lg:hidden p-2 text-slate-700 hover:bg-slate-100 rounded-lg"
+        className="lg:hidden p-2 min-h-[44px] min-w-[44px] text-slate-700 hover:bg-slate-100 rounded-lg"
         aria-label="Open menu"
       >
         <Menu className="w-6 h-6" />

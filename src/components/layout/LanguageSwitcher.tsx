@@ -45,7 +45,7 @@ export default function LanguageSwitcher() {
   return (
     <button
       onClick={switchLocale}
-      className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-600 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition"
+      className="flex items-center gap-1.5 px-3 py-1.5 min-h-[44px] text-sm font-medium text-slate-600 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition"
       title="Changer de langue / تغيير اللغة"
       aria-label={`Switch to ${locale === 'fr' ? 'Arabic' : 'French'}`}
     >
