@@ -18,6 +18,7 @@ import {
   MessageSquare,
   TrendingUp,
   Key,
+  AlertTriangle,
 } from 'lucide-react';
 
 // Admin pages should never be indexed
@@ -37,7 +38,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   if (user.role !== 'ADMIN') redirect('/');
 
   // Get live counts for badges
-  const [pendingApprovals, pendingEdits, pendingReports, newUsers] = await Promise.all([
+  const [pendingApprovals, pendingEdits, pendingReports, newUsers, unseenErrors] = await Promise.all([
     prisma.resource.count({ where: { status: 'PENDING_APPROVAL' } }),
     prisma.resource.count({ where: { editStatus: 'PENDING_EDIT_APPROVAL' } }),
     prisma.report.count({ where: { status: 'PENDING' } }),
@@ -45,6 +46,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       where: {
         role: { in: ['TEACHER', 'STUDENT'] },
         createdAt: { gte: new Date(Date.now() - 7 * 86400000) },
+      },
+    }),
+    prisma.errorLog.count({
+      where: {
+        severity: { in: ['ERROR', 'CRITICAL'] },
+        createdAt: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) },
       },
     }),
   ]);
@@ -88,6 +95,15 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     },
     { href: '/admin/catalog', icon: BookOpen, label: 'Catalogue (matières/niveaux)' },
     { href: '/admin/messages', icon: MessageSquare, label: 'Messages' },
+
+    { group: 'Surveillance' },
+    {
+      href: '/admin/erreurs',
+      icon: AlertTriangle,
+      label: 'Erreurs',
+      badge: unseenErrors,
+      badgeColor: 'bg-red-500',
+    },
 
     { group: 'Configuration' },
     { href: '/admin/parametres', icon: Settings, label: 'Paramètres' },
