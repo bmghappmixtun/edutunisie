@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 /**
  * POST /api/admin/resource-overwrite
  * Overwrite the file for an existing Resource with a new PDF.

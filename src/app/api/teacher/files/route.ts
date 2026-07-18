@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/teacher/files
  *   ?classId=&type=&format=&search=

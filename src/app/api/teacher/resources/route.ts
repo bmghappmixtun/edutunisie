@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { isValidOrigin, isProduction } from '@/lib/security';
 import { getCurrentUser } from '@/lib/auth';

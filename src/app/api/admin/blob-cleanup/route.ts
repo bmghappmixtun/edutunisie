@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 /**
  * POST /api/admin/blob-cleanup
  * Delete blob URLs from Vercel Blob storage.

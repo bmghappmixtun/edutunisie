@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 /**
  * Change Password — from the user's security settings page
  *
