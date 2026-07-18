@@ -407,8 +407,8 @@ export default async function TeacherProfilePage({
                 {teacher.schoolLevel && (
                   <div className="mt-4 flex flex-wrap items-center gap-2">
                     <GraduationCap className="w-4 h-4 text-slate-500" />
-                    <span className="text-xs font-semibold text-slate-500 uppercase">
-                      Enseigne au :
+                    <span className="text-sm font-semibold text-slate-700">
+                      Enseigne au
                     </span>
                     {teacher.schoolLevel.split('+').map((lvl) => (
                       <span
@@ -423,12 +423,12 @@ export default async function TeacherProfilePage({
 
                 {/* Teaching subjects & levels */}
                 {(teachingSubjects.length > 0 || teachingLevels.length > 0) && (
-                  <div className="mt-4 space-y-2">
+                  <div className="mt-3 space-y-2">
                     {teachingSubjects.length > 0 && (
                       <div className="flex flex-wrap items-center gap-2">
                         <BookOpen className="w-4 h-4 text-slate-500" />
-                        <span className="text-xs font-semibold text-slate-500 uppercase">
-                          Matières :
+                        <span className="text-sm font-semibold text-slate-700">
+                          Matières
                         </span>
                         {teachingSubjects.map((s) => (
                           <span
@@ -443,8 +443,8 @@ export default async function TeacherProfilePage({
                     {teachingLevels.length > 0 && (
                       <div className="flex flex-wrap items-center gap-2">
                         <Layers className="w-4 h-4 text-slate-500" />
-                        <span className="text-xs font-semibold text-slate-500 uppercase">
-                          Classes :
+                        <span className="text-sm font-semibold text-slate-700">
+                          Classes
                         </span>
                         {teachingLevels.map((l) => (
                           <span
