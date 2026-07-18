@@ -200,12 +200,91 @@ export default async function TeacherProfilePage({
   );
 
   // Parse teaching data
-  const teachingSubjects = teacher.teachingSubjects
+  const allTeachingSubjects = teacher.teachingSubjects
     ? (JSON.parse(teacher.teachingSubjects) as string[])
     : [];
   const teachingLevels = teacher.teachingLevels
     ? (JSON.parse(teacher.teachingLevels) as string[])
     : [];
+
+  // ===== APPLY TUNISIAN CURRICULUM RULE =====
+  // A teacher normally teaches ONE subject. Exception: the SI section
+  // (Sciences de l'informatique) has multiple sub-subjects (Algo, BD, Système, SI, TIC)
+  // so a SI teacher can teach several. Other teachers with multiple subjects
+  // are almost certainly data noise (misclassified imports).
+  //
+  // Strategy: compute the actual sections each subject appears in.
+  // - If ALL subjects are in SI/TI: show all of them
+  // - If NONE are in SI/TI: show only the most common subject
+  // - If MIXED: show all SI + the dominant non-SI
+  const teacherResources = await prisma.resource.findMany({
+    where: { teacherId: teacher.id, status: 'PUBLISHED' },
+    select: {
+      subjectId: true,
+      subject: { select: { slug: true } },
+      sectionId: true,
+      section: { select: { slug: true } },
+      class: { select: { slug: true } },
+    },
+    take: 2000,
+  });
+
+  // subjectId -> count
+  const subjectCounts = new Map<string, number>();
+  // subjectSlug -> Set of sectionKey (section@class)
+  const subjectToSections = new Map<string, Set<string>>();
+  for (const r of teacherResources) {
+    if (!r.subject || !r.section || !r.class) continue;
+    subjectCounts.set(r.subjectId, (subjectCounts.get(r.subjectId) ?? 0) + 1);
+    const sectionKey = `${r.section.slug}@${r.class.slug}`;
+    const set = subjectToSections.get(r.subject.slug) ?? new Set<string>();
+    set.add(sectionKey);
+    subjectToSections.set(r.subject.slug, set);
+  }
+
+  // subjectId -> slug (for resolving the dominant subject)
+  const subjectSlugById = new Map<string, string>();
+  for (const r of teacherResources) {
+    if (r.subject?.slug) subjectSlugById.set(r.subjectId, r.subject.slug);
+  }
+
+  const isSI = (sec: string) =>
+    sec.startsWith('sciences-informatique') || sec.startsWith('technologies-informatique');
+
+  const subjectsInSI: string[] = [];
+  const subjectsNotInSI: string[] = [];
+  for (const subj of allTeachingSubjects) {
+    const sections = subjectToSections.get(subj) ?? new Set<string>();
+    const anySI = Array.from(sections).some(isSI);
+    if (anySI) subjectsInSI.push(subj);
+    else subjectsNotInSI.push(subj);
+  }
+
+  // Pick the most common non-SI subject (by resource count)
+  const dominantNonSI = subjectsNotInSI.length > 0
+    ? Array.from(subjectCounts.entries())
+        .filter(([id]) => {
+          const slug = subjectSlugById.get(id);
+          return slug && subjectsNotInSI.includes(slug);
+        })
+        .sort((a, b) => b[1] - a[1])[0]
+    : null;
+  const dominantNonSISlug = dominantNonSI ? subjectSlugById.get(dominantNonSI[0]) : null;
+
+  let teachingSubjects: string[];
+  if (subjectsNotInSI.length === 0) {
+    // All SI — show all
+    teachingSubjects = allTeachingSubjects;
+  } else if (subjectsInSI.length === 0) {
+    // No SI at all — show only the dominant non-SI
+    teachingSubjects = dominantNonSISlug ? [dominantNonSISlug] : [];
+  } else {
+    // Mixed — show all SI + dominant non-SI
+    teachingSubjects = [
+      ...subjectsInSI,
+      ...(dominantNonSISlug ? [dominantNonSISlug] : []),
+    ];
+  }
 
   // Resolve slugs → friendly French names (subjects + classes)
   const [subjectsLookup, classesLookup] = await Promise.all([
