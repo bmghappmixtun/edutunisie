@@ -792,6 +792,9 @@ model ErrorLog {
   resolved        Boolean  @default(false)
   resolvedAt      DateTime?
   resolvedBy      String?
+  // Whether Mavis (the agent) has seen this error in a session
+  agentSeen       Boolean  @default(false)
+  agentSeenAt     DateTime?
   // Timestamps
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -801,6 +804,7 @@ model ErrorLog {
   @@index([resolved, createdAt])
   @@index([reference])
   @@index([userId, createdAt])
+  @@index([agentSeen, createdAt])
 }
 
 enum ErrorSource {
