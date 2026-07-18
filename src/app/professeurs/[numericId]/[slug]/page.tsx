@@ -132,6 +132,8 @@ export default async function TeacherProfilePage({
       diploma: true,
       teachingSubjects: true,
       teachingLevels: true,
+      schoolLevel: true,
+      classLevel: true,
       createdAt: true,
       lastLoginAt: true,
     },
@@ -401,6 +403,24 @@ export default async function TeacherProfilePage({
                   <p className="text-slate-700 mt-4 max-w-3xl leading-relaxed">{teacher.bio}</p>
                 )}
 
+                {/* School level (Collège / Lycée / both) — derived from actual files */}
+                {teacher.schoolLevel && (
+                  <div className="mt-4 flex flex-wrap items-center gap-2">
+                    <GraduationCap className="w-4 h-4 text-slate-500" />
+                    <span className="text-xs font-semibold text-slate-500 uppercase">
+                      Enseigne au :
+                    </span>
+                    {teacher.schoolLevel.split('+').map((lvl) => (
+                      <span
+                        key={lvl}
+                        className="text-xs bg-primary-50 text-primary-700 px-2.5 py-1 rounded-full font-semibold capitalize"
+                      >
+                        {lvl === 'college' ? 'Collège' : lvl === 'lycee' ? 'Lycée' : lvl}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
                 {/* Teaching subjects & levels */}
                 {(teachingSubjects.length > 0 || teachingLevels.length > 0) && (
                   <div className="mt-4 space-y-2">
@@ -424,7 +444,7 @@ export default async function TeacherProfilePage({
                       <div className="flex flex-wrap items-center gap-2">
                         <Layers className="w-4 h-4 text-slate-500" />
                         <span className="text-xs font-semibold text-slate-500 uppercase">
-                          Niveaux :
+                          Classes :
                         </span>
                         {teachingLevels.map((l) => (
                           <span
