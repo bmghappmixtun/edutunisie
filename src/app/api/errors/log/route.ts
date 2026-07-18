@@ -14,8 +14,8 @@ export const runtime = 'nodejs';
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json() as Partial<ErrorReport>;
-    const { source, message, stack, url, method, userAgent, context, severity } = body;
+    const body = await req.json() as Partial<ErrorReport> & { breadcrumbs?: Array<{ type: string; timestamp: number; data: Record<string, unknown> }> };
+    const { source, message, stack, url, method, userAgent, context, severity, breadcrumbs } = body;
 
     if (!message) {
       return NextResponse.json({ error: 'message is required' }, { status: 400 });
@@ -52,6 +52,7 @@ export async function POST(req: NextRequest) {
         userEmail,
         ip: req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || undefined,
         referer: req.headers.get('referer') || undefined,
+        breadcrumbs: breadcrumbs || undefined,
       },
     });
 
