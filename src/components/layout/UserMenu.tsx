@@ -33,7 +33,7 @@ export default function UserMenu({ user, unreadCount }: { user: any; unreadCount
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 pl-1 pr-2 py-1 rounded-full hover:bg-slate-100 transition"
+        className="flex items-center gap-2 pl-1 pr-2 py-1 min-h-[44px] rounded-full hover:bg-slate-100 transition"
       >
         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 text-white font-bold text-sm flex items-center justify-center">
           {initials}

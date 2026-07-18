@@ -6,7 +6,9 @@ import Footer from '@/components/layout/Footer';
 import { prisma } from '@/lib/prisma';
 import { getUserFavorites } from '@/lib/resource-helpers';
 import { itemListSchema } from '@/lib/structured-data';
-import FilterShell from '@/components/ressources/FilterShell';
+import nextDynamic from 'next/dynamic';
+const FilterShell = nextDynamic(() => import('@/components/ressources/FilterShell'), { ssr: true });
+
 import type { Facets } from '@/lib/facets';
 import { getCurrentUser } from '@/lib/auth';
 

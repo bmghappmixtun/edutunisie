@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import { headers } from 'next/headers';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
-import HomeClient from '@/components/home/HomeClient';
+import dynamic from 'next/dynamic';
+
 import { prisma } from '@/lib/prisma';
 import { getUserFavorites, decorateWithFavorites } from '@/lib/resource-helpers';
 
@@ -112,6 +113,11 @@ async function getHomeData() {
     },
   };
 }
+
+const HomeClient = dynamic(() => import('@/components/home/HomeClient'), {
+  ssr: true,
+  loading: () => <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-sky-50" />,
+});
 
 export default async function HomePage() {
   const data = await getHomeData();
