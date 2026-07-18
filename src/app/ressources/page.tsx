@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Prisma } from '@prisma/client';
+import { redirect } from 'next/navigation';
 import Header from '@/components/layout/Header';
 import { getLocale } from '@/lib/i18n-server';
 import Footer from '@/components/layout/Footer';
@@ -95,6 +96,32 @@ const toArr = (v: string | string[] | undefined): string[] => {
 
 export default async function ResourcesPage(props: { searchParams: Promise<SearchParams> }) {
   const sp = await props.searchParams;
+
+  // ============== HANDLE LEGACY URLS (migrate from CUID to numericId) ==============
+  // Old shared links used ?teacher=CUID. The current code uses ?teacherId=NUMERIC.
+  // If we detect the old format, look up the teacher's numericId and redirect
+  // to the canonical URL to prevent hydration mismatches.
+  const legacyTeacherCuid = (sp as Record<string, string | string[] | undefined>).teacher;
+  if (legacyTeacherCuid && !sp.teacherId) {
+    const cuid = Array.isArray(legacyTeacherCuid) ? legacyTeacherCuid[0] : legacyTeacherCuid;
+    if (cuid && cuid.startsWith('cm')) {
+      const t = await prisma.user.findUnique({
+        where: { id: cuid },
+        select: { numericId: true },
+      });
+      if (t?.numericId) {
+        // Preserve all other params, swap teacher → teacherId
+        const newSp = new URLSearchParams();
+        for (const [k, v] of Object.entries(sp)) {
+          if (k === 'teacher') continue;
+          if (Array.isArray(v)) v.forEach((vv) => newSp.append(k, vv));
+          else if (v != null) newSp.set(k, v);
+        }
+        newSp.set('teacherId', String(t.numericId));
+        redirect(`/ressources?${newSp.toString()}`);
+      }
+    }
+  }
 
   // ============== Parse URL state ==============
   const q = sp.q || '';
