@@ -68,6 +68,7 @@ interface ParsedFilters {
 
 // ============== HANDLER ==============
 export async function GET(req: NextRequest) {
+  try {
   const { searchParams } = new URL(req.url);
 
   // Parse filters
@@ -410,6 +411,12 @@ export async function GET(req: NextRequest) {
   };
 
   return NextResponse.json(response);
+  } catch (err: any) {
+    console.error('[api/ressources] error:', err?.message || err);
+    return NextResponse.json(
+      { error: 'Internal server error', message: err?.message || 'Unknown', code: err?.code },
+      { status: 500 }
+    );
+  }
 }
-
 // updated Fri Jul 17 00:15:17 UTC 2026
