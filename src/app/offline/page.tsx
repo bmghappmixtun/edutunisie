@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
-import { WifiOff, RefreshCw, Home } from 'lucide-react';
+import { WifiOff, Home } from 'lucide-react';
 import Link from 'next/link';
+import RefreshButton from './RefreshButton';
 
 export const metadata: Metadata = {
   title: 'Hors ligne — Examanet',
@@ -21,13 +22,7 @@ export default function OfflinePage() {
           pour que vous puissiez la consulter même sans réseau.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <button
-            onClick={() => typeof window !== 'undefined' && window.location.reload()}
-            className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-primary-500 text-white font-medium hover:bg-primary-600 transition min-h-[44px]"
-          >
-            <RefreshCw className="w-4 h-4" />
-            Réessayer
-          </button>
+          <RefreshButton />
           <Link
             href="/"
             className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white border border-slate-200 text-slate-700 font-medium hover:bg-slate-50 transition min-h-[44px]"

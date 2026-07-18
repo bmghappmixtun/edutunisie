@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 /**
  * Admin API: list / create / update / delete conversion providers
  *   GET    /api/admin/providers              — list all + usage stats

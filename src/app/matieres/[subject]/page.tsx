@@ -31,10 +31,17 @@ interface PageProps {
 // ============== CONSTS ==============
 export const revalidate = 600; // 10 min cache — pages publiques très SEO
 
-// Pre-generate all subject slugs for static rendering
+// Pre-generate all subject slugs for static rendering.
+// If the DB is unreachable at build time (e.g. local dev), we fall back to
+// dynamic rendering for missing slugs instead of failing the entire build.
 export async function generateStaticParams() {
-  const subjects = await prisma.subject.findMany({ select: { slug: true } });
-  return subjects.map((s) => ({ subject: s.slug }));
+  try {
+    const subjects = await prisma.subject.findMany({ select: { slug: true } });
+    return subjects.map((s) => ({ subject: s.slug }));
+  } catch (err) {
+    console.warn('[matieres] generateStaticParams failed, falling back to dynamic:', err);
+    return [];
+  }
 }
 
 // Hard-coded filter options
