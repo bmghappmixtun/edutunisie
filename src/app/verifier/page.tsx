@@ -236,6 +236,7 @@ function VerifyOtpForm() {
               <label htmlFor="email" className="label">Votre email</label>
               <input id="email"
                 type="email"
+                autoComplete="email" inputMode="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="vous@exemple.com"
@@ -251,8 +252,9 @@ function VerifyOtpForm() {
                 {code.map((digit, i) => (
                   <input
                     key={i}
-          id={i === 0 ? "code-0" : undefined}
-          aria-label={`Chiffre ${i + 1}`}
+                    id={i === 0 ? "code-0" : undefined}
+                    autoComplete="one-time-code"
+                    aria-label={`Chiffre ${i + 1}`}
                     ref={(el) => {
                       inputRefs.current[i] = el;
                     }}

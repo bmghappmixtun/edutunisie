@@ -78,6 +78,7 @@ export default function RegisterPage() {
             <div>
               <label htmlFor="firstName" className="label">Prénom *</label>
               <input id="firstName" type="text" required value={form.firstName}
+                autoComplete="given-name" inputMode="text"
                 onChange={(e) => update('firstName', e.target.value)}
                 className="input"
                 placeholder="Prénom"
@@ -86,6 +87,7 @@ export default function RegisterPage() {
             <div>
               <label htmlFor="lastName" className="label">Nom *</label>
               <input id="lastName" type="text" value={form.lastName}
+                autoComplete="family-name" inputMode="text"
                 onChange={(e) => update('lastName', e.target.value)}
                 className="input"
                 placeholder="Nom"
@@ -110,6 +112,7 @@ export default function RegisterPage() {
                 type={showPw ? 'text' : 'password'}
                 required
                 value={form.password}
+                autoComplete="new-password" inputMode="text"
                 onChange={(e) => update('password', e.target.value)}
                 className="input pr-10"
                 placeholder="Min. 6 caractères"
