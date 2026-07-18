@@ -1,6 +1,11 @@
 /**
  * Test error endpoint — DELETE THIS after testing
- * Triggers different error types to verify error handling
+ * Triggers different error types to verify the admin error pipeline
+ *
+ * - ?type=db       → triggers a database error
+ * - ?type=server   → triggers an unhandled server error
+ * - ?type=critical → triggers a CRITICAL alert (force send to admin)
+ * - ?type=warning  → triggers a WARNING (logged but NO alert)
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -12,40 +17,50 @@ import { prisma } from '@/lib/prisma';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-// ?type=db — triggers a database error
-// ?type=server — triggers a server error
-// ?type=email — triggers an error and sends email
 export const GET = withErrorHandler(async (req: NextRequest) => {
   const type = req.nextUrl.searchParams.get('type') || 'server';
 
   if (type === 'db') {
-    // Simulate DB error
     const result = await prisma.$queryRaw`SELECT * FROM nonexistent_table_${Date.now()}`;
     return NextResponse.json({ result });
   }
 
-  if (type === 'email') {
-    // Trigger an error and email the admin
+  if (type === 'critical') {
+    // Force a CRITICAL alert (admin only)
     await logError({
       reference: generateErrorReference(),
-      source: 'SERVER',
+      source: 'EXTERNAL',
       severity: 'CRITICAL',
-      message: 'TEST: This is a test error from /api/test-error',
+      message: 'TEST: Critical admin alert from /api/test-error',
       stack: 'Test stack trace\n  at test() in route.ts',
       url: req.url,
       context: {
-        userEmail: 'admin@examanet.com', // Test email
-        action: 'test',
+        action: 'test-critical',
+        testRun: true,
       },
-      sendEmail: true,
     });
-    return NextResponse.json({ ok: true, message: 'Test error logged' });
+    return NextResponse.json({ ok: true, message: 'CRITICAL alert sent to admin' });
   }
 
-  if (type === 'unhandled') {
-    // Trigger an unhandled exception
+  if (type === 'warning') {
+    // WARNING — logged to DB but NO email (admin policy: avoid noise)
+    await logError({
+      reference: generateErrorReference(),
+      source: 'EXTERNAL',
+      severity: 'WARNING',
+      message: 'TEST: Warning from /api/test-error (no email, just DB log)',
+      context: { action: 'test-warning' },
+    });
+    return NextResponse.json({ ok: true, message: 'Warning logged (no email)' });
+  }
+
+  if (type === 'unhandled' || type === 'server') {
+    // Throws — caught by withErrorHandler
     throw new Error('TEST: Unhandled server error for error handling verification');
   }
 
-  return NextResponse.json({ ok: true, hint: 'Use ?type=db|server|email|unhandled' });
+  return NextResponse.json({
+    ok: true,
+    hint: 'Use ?type=db|critical|warning|unhandled',
+  });
 }, { action: 'test-error' });
