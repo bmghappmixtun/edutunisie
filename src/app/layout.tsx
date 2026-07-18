@@ -4,6 +4,7 @@ import { Inter, Cairo, Nunito } from 'next/font/google';
 import './globals.css';
 import { Toaster } from 'react-hot-toast';
 import AnalyticsWithOptOut from '@/components/analytics/AnalyticsWithOptOut';
+import ServiceWorkerRegister from '@/components/pwa/ServiceWorkerRegister';
 import I18nProviderWrapper from '@/components/layout/I18nProviderWrapper';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import { organizationSchema } from '@/lib/structured-data';
@@ -247,6 +248,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           />
         ))}
         <AnalyticsWithOptOut />
+        <ServiceWorkerRegister />
       </body>
     </html>
   );
