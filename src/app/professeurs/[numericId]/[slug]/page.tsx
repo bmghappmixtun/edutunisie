@@ -207,6 +207,26 @@ export default async function TeacherProfilePage({
     ? (JSON.parse(teacher.teachingLevels) as string[])
     : [];
 
+  // Resolve slugs → friendly French names (subjects + classes)
+  const [subjectsLookup, classesLookup] = await Promise.all([
+    teachingSubjects.length > 0
+      ? prisma.subject.findMany({
+          where: { slug: { in: teachingSubjects } },
+          select: { slug: true, nameFr: true },
+        })
+      : Promise.resolve([] as Array<{ slug: string; nameFr: string }>),
+    teachingLevels.length > 0
+      ? prisma.class.findMany({
+          where: { slug: { in: teachingLevels } },
+          select: { slug: true, nameFr: true },
+        })
+      : Promise.resolve([] as Array<{ slug: string; nameFr: string }>),
+  ]);
+  const subjectNameBy = new Map(subjectsLookup.map((s) => [s.slug, s.nameFr]));
+  const classNameBy = new Map(classesLookup.map((c) => [c.slug, c.nameFr]));
+  const subjectLabel = (slug: string) => subjectNameBy.get(slug) || slug;
+  const classLabel = (slug: string) => classNameBy.get(slug) || slug;
+
   // Latest resources (top 6)
   const latestResources = resources.slice(0, 6);
 
@@ -435,7 +455,7 @@ export default async function TeacherProfilePage({
                             key={s}
                             className="text-xs bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full font-semibold"
                           >
-                            {s}
+                            {subjectLabel(s)}
                           </span>
                         ))}
                       </div>
@@ -451,7 +471,7 @@ export default async function TeacherProfilePage({
                             key={l}
                             className="text-xs bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full font-semibold"
                           >
-                            {l}
+                            {classLabel(l)}
                           </span>
                         ))}
                       </div>
