@@ -7,10 +7,17 @@ import { generateErrorReference } from '@/lib/errors/types';
 
 /**
  * Root error boundary
- * Catches unhandled errors in any page
- * Renders WITHOUT the main layout (simpler to avoid server-only imports)
+ * Catches unhandled errors in any page.
+ *
+ * IMPORTANT: This renders INSIDE the root layout (which already provides
+ * <html> and <body>). Do NOT return <html>/<body> here — only `global-error.tsx`
+ * renders without the layout, and only it should return the full document.
+ *
+ * Returning <html><body> from this file caused React #419 hydration mismatches
+ * (nested <html>/<body> tags), which is why `notFound()` flows on
+ * `/professeurs/[numericId]/[slug]` were erroring in the browser.
  */
-export default function GlobalError({
+export default function Error({
   error,
   reset,
 }: {
@@ -30,14 +37,10 @@ export default function GlobalError({
   }, [error]);
 
   return (
-    <html lang="fr">
-      <body style={{ margin: 0 }}>
-        <ErrorDisplay
-          reference={reference}
-          title="Une erreur s'est produite"
-          message="La page que vous cherchez a rencontré un problème. Notre équipe a été automatiquement notifiée et travaille à résoudre ce souci."
-        />
-      </body>
-    </html>
+    <ErrorDisplay
+      reference={reference}
+      title="Une erreur s'est produite"
+      message="La page que vous cherchez a rencontré un problème. Notre équipe a été automatiquement notifiée et travaille à résoudre ce souci."
+    />
   );
 }
