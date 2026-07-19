@@ -108,12 +108,19 @@ export default async function TeacherProfilePage({
   const { numericId: numericIdStr, slug } = await params;
   const numericId = parseInt(numericIdStr, 10);
 
+  // Get current user FIRST so admins can preview PENDING/SUSPENDED profiles
+  const currentUser = await getCurrentUser();
+  const isAdmin = currentUser?.role === 'ADMIN';
+
   const teacher = await prisma.user.findFirst({
     where: {
       numericId,
       role: 'TEACHER',
       // Show ACTIVE teachers, or any teacher if admin wants to see
-      OR: [{ status: 'ACTIVE' }, { isVerifiedTeacher: true }],
+      // (admins need to preview PENDING profiles for moderation)
+      ...(isAdmin
+        ? {}
+        : { OR: [{ status: 'ACTIVE' }, { isVerifiedTeacher: true }] }),
     },
     select: {
       id: true,
@@ -141,8 +148,8 @@ export default async function TeacherProfilePage({
 
   if (!teacher) notFound();
 
-  // Get current user for follow/message state
-  const currentUser = await getCurrentUser();
+  // currentUser + isAdmin were already resolved before the teacher query
+  // (so admins can preview PENDING/SUSPENDED profiles).
   let isFollowing = false;
   let followersCount = 0;
   if (currentUser) {
