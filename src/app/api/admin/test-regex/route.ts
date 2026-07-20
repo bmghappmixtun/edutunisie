@@ -51,7 +51,15 @@ export async function GET(req: NextRequest) {
         AND (title ~ '\.pdf$' OR LENGTH(title) < 8 OR title ~ '^[a-z0-9\.\-_]{1,10}$')
     `;
 
-    return NextResponse.json({ test_results: results, stats: stats[0] });
+    return NextResponse.json({
+      test_results: results,
+      stats: {
+        no_type: Number(stats[0]?.no_type || 0),
+        no_subject: Number(stats[0]?.no_subject || 0),
+        no_class: Number(stats[0]?.no_class || 0),
+        missing_one: Number(stats[0]?.missing_one || 0),
+      },
+    });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   } finally {
