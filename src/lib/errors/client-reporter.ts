@@ -12,6 +12,33 @@ interface Breadcrumb {
 const MAX_BREADCRUMBS = 20;
 let breadcrumbs: Breadcrumb[] = [];
 
+/**
+ * Known/handled errors that should NOT be reported to the error log.
+ * These are errors the application already handles gracefully (e.g. the
+ * PDF viewer shows a fallback UI), so reporting them just creates noise
+ * in the nightly digest.
+ *
+ * Each entry is a substring matched against the error message
+ * (case-insensitive). Keep the list short and add only well-understood,
+ * user-visible handled errors.
+ */
+const SUPPRESSED_ERROR_PATTERNS: readonly string[] = [
+  // PDF.js: corrupt/invalid PDF — already handled by DocumentErrorBoundary
+  // (shows "Impossible de charger le PDF" to the user)
+  'Error in input stream',
+  // PDF.js: similar malformed-PDF errors
+  'InvalidPDFException',
+  'MissingPDFException',
+  'UnexpectedResponseException',
+  'PasswordException',
+];
+
+function isSuppressedError(message: string | undefined | null): boolean {
+  if (!message) return false;
+  const lower = message.toLowerCase();
+  return SUPPRESSED_ERROR_PATTERNS.some((pattern) => lower.includes(pattern.toLowerCase()));
+}
+
 interface ClientErrorReport {
   message: string;
   stack?: string;
@@ -120,6 +147,12 @@ function getElementText(el: Element | null): string {
  */
 export function reportClientError(report: ClientErrorReport): void {
   if (typeof window === 'undefined') return;
+
+  // Drop known/handled errors — they would just create noise in the
+  // nightly digest (Discord alerts, agent notifications).
+  if (isSuppressedError(report.message)) {
+    return;
+  }
 
   reportQueue.push({
     severity: 'ERROR',
