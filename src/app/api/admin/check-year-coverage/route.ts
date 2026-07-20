@@ -69,12 +69,24 @@ export async function GET(req: NextRequest) {
         )
     `;
 
+    // Convert BigInts to Numbers
+    const safeNum = (v: any) => typeof v === 'bigint' ? Number(v) : v;
+
     return NextResponse.json({
-      coverage: yearStats[0],
-      year_distribution: yearSamples,
-      regen_candidates: regenableCount[0],
+      coverage: {
+        total_pub: safeNum(yearStats[0]?.total_pub),
+        with_year: safeNum(yearStats[0]?.with_year),
+        without_year: safeNum(yearStats[0]?.without_year),
+        with_header: safeNum(yearStats[0]?.with_header),
+        with_school: safeNum(yearStats[0]?.with_school),
+      },
+      year_distribution: yearSamples.map(y => ({
+        year: y.year,
+        count: safeNum(y.count),
+      })),
+      regen_candidates: { count: safeNum(regenableCount[0]?.count) },
       sample_titles: regenCandidates.map(r => ({
-        id: Number(r.numericId),
+        id: safeNum(r.numericId),
         old_title: r.title,
         type: r.type,
         year: r.year,
