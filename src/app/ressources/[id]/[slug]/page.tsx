@@ -25,6 +25,8 @@ import {
   GraduationCap,
   Wrench,
   Building2,
+  Sparkles,
+  Target,
 } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -147,6 +149,9 @@ export default async function ResourcePage({
         include: { user: { select: { firstName: true, lastName: true, avatarUrl: true } } },
         orderBy: { createdAt: 'desc' },
       },
+      // AI-extracted content (2026-07-20 Mavis pipeline)
+      metadata: true,
+      aiSummary: true,
     },
   });
 
@@ -412,6 +417,96 @@ export default async function ResourcePage({
                       classNameFr={resource.class?.nameFr}
                       classNameAr={resource.class?.nameAr}
                     />
+                  </div>
+                )}
+
+                {/* AI-extracted content (2026-07-20 Mavis pipeline) */}
+                {resource.metadata && (resource.metadata.systemName || resource.metadata.dossierTechnique) && (
+                  <div className="mb-4 p-4 bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200 rounded-xl">
+                    <div className="flex items-start gap-3">
+                      <Wrench className="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" />
+                      <div className="flex-1">
+                        <div className="text-xs font-bold text-orange-700 uppercase tracking-wide mb-1">
+                          ⚙️ Système technique étudié
+                        </div>
+                        {resource.metadata.systemName && (
+                          <div className="text-xl font-extrabold text-orange-900 mb-1">
+                            {resource.metadata.systemName}
+                          </div>
+                        )}
+                        {resource.metadata.dossierTechnique && (
+                          <div className="text-sm text-orange-800">
+                            <span className="font-semibold">Dossier technique :</span> {resource.metadata.dossierTechnique}
+                          </div>
+                        )}
+                      </div>
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-orange-100 text-orange-700 text-[10px] font-bold rounded-full uppercase">
+                        AI
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {/* AI-generated summary */}
+                {resource.aiSummary?.summary && (
+                  <div className="mb-4 p-4 bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200 rounded-xl">
+                    <div className="flex items-start gap-3">
+                      <Sparkles className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                      <div className="flex-1">
+                        <div className="text-xs font-bold text-blue-700 uppercase tracking-wide mb-2">
+                          📝 Résumé intelligent
+                        </div>
+                        <p className="text-sm text-slate-700 leading-relaxed">
+                          {resource.aiSummary.summary}
+                        </p>
+                      </div>
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-bold rounded-full uppercase">
+                        AI
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {/* AI key points */}
+                {resource.metadata?.keyPoints && resource.metadata.keyPoints.length > 0 && (
+                  <div className="mb-4 p-4 bg-white border border-slate-200 rounded-xl">
+                    <div className="text-xs font-bold text-slate-600 uppercase tracking-wide mb-2 flex items-center gap-2">
+                      <Target className="w-4 h-4" /> Points clés
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-bold rounded-full uppercase">
+                        AI
+                      </span>
+                    </div>
+                    <ul className="space-y-1.5">
+                      {resource.metadata.keyPoints.slice(0, 5).map((kp, i) => (
+                        <li key={i} className="text-sm text-slate-700 flex items-start gap-2">
+                          <span className="text-orange-500 mt-1">→</span>
+                          <span>{kp}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* AI topics (clickable tags) */}
+                {resource.metadata?.topics && resource.metadata.topics.length > 0 && (
+                  <div className="mb-4">
+                    <div className="text-xs font-bold text-slate-600 uppercase tracking-wide mb-2 flex items-center gap-2">
+                      🏷️ Sujets abordés
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-bold rounded-full uppercase">
+                        AI
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {resource.metadata.topics.map((topic, i) => (
+                        <Link
+                          key={i}
+                          href={`/recherche?q=${encodeURIComponent(topic)}`}
+                          className="inline-block px-2.5 py-1 bg-amber-50 text-amber-800 border border-amber-200 rounded-full text-xs font-medium hover:bg-amber-100 transition-colors"
+                        >
+                          {topic}
+                        </Link>
+                      ))}
+                    </div>
                   </div>
                 )}
 

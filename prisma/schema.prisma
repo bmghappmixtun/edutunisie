@@ -317,6 +317,11 @@ model Resource {
   shares          Share[]
   reports         Report[]
 
+  // AI-extracted content (created by /workspace/scripts/latest/watermark_remover.py pipeline)
+  metadata        ResourceMetadata?
+  aiSummary       ResourceSummary?  @relation("ResourceAISummary")
+  content         ResourceContent?
+
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
@@ -325,6 +330,69 @@ model Resource {
   @@index([teacherId])
   @@index([type])
   @@index([search_vector], type: Gin)
+}
+
+// ============ AI EXTRACTION (GPT-4o-mini / Tesseract) ============
+// Created 2026-07-20 by Mavis. Schema added after tables already created in DB
+// (edutunisie_app role lacks ALTER permission — tables created via raw SQL).
+
+/// Raw text + page-level extraction. First stage of the AI pipeline.
+model ResourceContent {
+  id                    String   @id @default(cuid())
+  resourceId            String   @unique
+  resource              Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+  fullText              String?  @db.Text
+  pageCount             Int?
+  wordCount             Int?
+  extractionMethod      String?  // "pymupdf" | "tesseract-ocr" | "gpt-4o-vision-ocr"
+  extractionDurationMs  Int?
+  extractionError       String?
+  extractedAt           DateTime @default(now())
+  modelUsed             String?  // "pymupdf+gpt-4o-mini" | etc.
+
+  @@index([resourceId])
+}
+
+/// Structured metadata extracted by AI (GPT-4o-mini) from PDF text.
+model ResourceMetadata {
+  id                    String   @id @default(cuid())
+  resourceId            String   @unique
+  resource              Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+  profNames             String[] // ["Mr. X", "Mme Y"]
+  schoolName            String?
+  year                  String?  // "2025-2026" format
+  type                  String?  // "devoir" | "série" | "cours" | etc.
+  subtype               String?  // "synthèse" | "contrôle" | etc.
+  subject               String?  // objet principal
+  dossierTechnique      String?  // for Technologie/Sciences techniques
+  systemName            String?  // for Technologie/Sciences techniques
+  duration              String?  // "2h" | "1h30"
+  level                 String?  // "standard" | "avancé"
+  keyPoints             String[] // 3-5 points clés
+  topics                String[] // tags sémantiques
+  difficulty            String?  // "facile" | "moyen" | "difficile"
+  estimatedTimeMinutes  Int?
+  prerequisites         String[] // prérequis
+  keyInsights           String[] // insights profonds
+  extractedAt           DateTime @default(now())
+  modelUsed             String?
+
+  @@index([resourceId])
+  @@index([systemName])
+  @@index([dossierTechnique])
+  @@index([topics], type: Gin)
+}
+
+/// AI-generated summary (3-5 phrases du contenu principal).
+model ResourceSummary {
+  id          String   @id @default(cuid())
+  resourceId  String   @unique
+  resource    Resource @relation("ResourceAISummary", fields: [resourceId], references: [id], onDelete: Cascade)
+  summary     String   @db.Text
+  extractedAt DateTime @default(now())
+  modelUsed   String?
+
+  @@index([resourceId])
 }
 
 
