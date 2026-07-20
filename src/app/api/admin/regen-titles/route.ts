@@ -100,11 +100,17 @@ async function loadCandidates(): Promise<Candidate[]> {
       -- Only touch titles that are MISSING at least one of: type, subject, or class in text
       AND (
         -- Missing a recognizable TYPE word
-        r.title !~* 'devoir|examen|test|révision|série|cours|exercice|concours|\bbac\b'
+        r.title !~* 'devoir|examen|test|révision|série|cours|exercice|concours|bac|revision|serie'
         -- Missing a recognizable SUBJECT word
-        OR r.title !~* 'math|maths|mathématique|physique|svt|sciences|arabe|fran[cç]ais|anglais|philo|philosophie|hist|histoire|geo|géo|informatique|techno|technologie|gestion|économie|eco|sport|musiq|islami|tajwid|tarbia'
+        OR r.title !~* 'math|maths|mathématique|physique|svt|sciences|arabe|fran[cç]ais|anglais|philo|philosophie|hist|histoire|geo|géo|informatique|techno|technologie|gestion|économie|eco|sport|musiq|islami|tajwid|tarbia|algorithme|allemand|italien|espagnol'
         -- Missing a recognizable CLASS/LEVEL word
-        OR r.title !~* '\b(7|8|9|[1-4])\s*(e|è|eme|ème|ere|ère)\b|\b(7e|8e|9e|1e|2e|3e|4e)\b|\b(7e|8e|9e|1ere|2eme|3eme|4eme|bac|coll[eè]ge|lyc[eé]e)\b'
+        OR (
+          r.title !~* '(7|8|9|1|2|3|4)[èe]me'
+          AND r.title !~* '(7|8|9|1|2|3|4)(ere|ère|eme|ème)'
+          AND r.title !~* '(7e|8e|9e|1e|2e|3e|4e)'
+          AND r.title !~* '(7ere|7ème|8eme|9ème|1ere|2eme|3eme|4eme)'
+          AND r.title !~* 'bac|coll[èe]ge|lyc[éè]e|primaire|secondaire|ann[ée]e'
+        )
       )
     ORDER BY r."numericId" ASC
   `;
