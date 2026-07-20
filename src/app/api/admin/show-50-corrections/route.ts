@@ -16,6 +16,11 @@ export async function GET(req: NextRequest) {
   }
 
   try {
+    const countResult = await prisma.$queryRaw<any[]>`
+      SELECT COUNT(*)::int as count FROM "ResourceTitleBackup"
+    `;
+    const total = Number(countResult[0]?.count || 0);
+
     const samples = await prisma.$queryRaw<any[]>`
       SELECT b."numericId", b."oldTitle", b."newTitle"
       FROM "ResourceTitleBackup" b
@@ -24,7 +29,7 @@ export async function GET(req: NextRequest) {
     `;
 
     return NextResponse.json({
-      total_backed_up: await prisma.resourceTitleBackup.count(),
+      total,
       samples: samples.map((s: any) => ({
         id: Number(s.numericId),
         before: s.oldTitle,
