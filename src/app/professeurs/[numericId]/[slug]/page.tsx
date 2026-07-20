@@ -169,6 +169,10 @@ export default async function TeacherProfilePage({
       class: { select: { slug: true, nameFr: true } },
       section: { select: { slug: true, nameFr: true } },
       _count: { select: { comments: true, ratings: true } },
+      // AI-extracted data (2026-07-20 Mavis pipeline)
+      metadata: {
+        select: { systemName: true, dossierTechnique: true, topics: true },
+      },
     },
   });
 
@@ -667,6 +671,13 @@ export default async function TeacherProfilePage({
                               {TYPE_LABELS[r.type]}
                             </span>
                           </div>
+                          {/* AI-extracted system name (Technologie) */}
+                          {r.metadata?.systemName && (
+                            <div className="mt-1.5 inline-flex items-center gap-1 px-2 py-0.5 bg-orange-50 text-orange-800 border border-orange-200 rounded text-xs font-medium">
+                              <span>⚙️</span>
+                              <span className="line-clamp-1">{r.metadata.systemName}</span>
+                            </div>
+                          )}
                           {r.description && (
                             <p
                               className="text-sm text-slate-500 mt-1 line-clamp-2"
@@ -752,6 +763,88 @@ export default async function TeacherProfilePage({
                   </div>
                 </div>
               )}
+
+              {/* AI-extracted: Technical systems covered (Technologie) */}
+              {(() => {
+                const bySystem = resources.reduce((acc, r) => {
+                  const sys = r.metadata?.systemName;
+                  if (sys) {
+                    acc[sys] = (acc[sys] || 0) + 1;
+                  }
+                  return acc;
+                }, {} as Record<string, number>);
+                if (Object.keys(bySystem).length === 0) return null;
+                return (
+                  <div className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-2xl border border-orange-200 p-5">
+                    <h3 className="font-bold mb-3 flex items-center gap-2 text-orange-900">
+                      <span className="text-lg">⚙️</span>
+                      Systèmes techniques abordés
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-orange-100 text-orange-700 text-[9px] font-bold rounded-full uppercase ml-auto">
+                        AI
+                      </span>
+                    </h3>
+                    <div className="space-y-1.5">
+                      {Object.entries(bySystem)
+                        .sort((a, b) => b[1] - a[1])
+                        .map(([name, count]) => (
+                          <Link
+                            key={name}
+                            href={`/recherche?q=${encodeURIComponent(name)}&teacherId=${teacher.numericId}`}
+                            className="flex items-center justify-between text-sm p-2 rounded-lg hover:bg-orange-100/50 transition-colors"
+                          >
+                            <span className="text-orange-900 font-medium line-clamp-1">{name}</span>
+                            <span className="text-xs font-bold bg-orange-200 text-orange-800 px-2 py-0.5 rounded flex-shrink-0">
+                              {count}
+                            </span>
+                          </Link>
+                        ))}
+                    </div>
+                    <Link
+                      href={`/recherche?q=technologie&teacherId=${teacher.numericId}`}
+                      className="block text-center text-xs text-orange-700 hover:text-orange-800 font-semibold mt-3 pt-3 border-t border-orange-200"
+                    >
+                      Voir tous ses cours techniques →
+                    </Link>
+                  </div>
+                );
+              })()}
+
+              {/* AI-extracted: Topics (tag cloud) */}
+              {(() => {
+                const topicCounts = resources.reduce((acc, r) => {
+                  (r.metadata?.topics || []).forEach(t => {
+                    acc[t] = (acc[t] || 0) + 1;
+                  });
+                  return acc;
+                }, {} as Record<string, number>);
+                const top = Object.entries(topicCounts).sort((a, b) => b[1] - a[1]).slice(0, 15);
+                if (top.length === 0) return null;
+                return (
+                  <div className="bg-white rounded-2xl border border-slate-200 p-5">
+                    <h3 className="font-bold mb-3 flex items-center gap-2 text-sm">
+                      <span>🏷️</span>
+                      Sujets populaires
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-blue-100 text-blue-700 text-[9px] font-bold rounded-full uppercase ml-auto">
+                        AI
+                      </span>
+                    </h3>
+                    <div className="flex flex-wrap gap-1.5">
+                      {top.map(([topic, count]) => (
+                        <Link
+                          key={topic}
+                          href={`/recherche?q=${encodeURIComponent(topic)}&teacherId=${teacher.numericId}`}
+                          className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-50 text-amber-800 border border-amber-200 rounded-full text-xs font-medium hover:bg-amber-100 transition-colors"
+                        >
+                          <span>{topic}</span>
+                          {count > 1 && (
+                            <span className="text-[10px] font-bold text-amber-600">{count}</span>
+                          )}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
 
               {/* Types distribution */}
               {Object.keys(byType).length > 0 && (
