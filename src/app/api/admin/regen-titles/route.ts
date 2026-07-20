@@ -97,6 +97,12 @@ async function loadCandidates(): Promise<Candidate[]> {
         OR LENGTH(r.title) < 8
         OR r.title ~ '^[a-z0-9\.\-_]{1,10}$'
       )
+      -- Only touch titles that are MISSING at least one of: type, subject, or class in text
+      AND (
+        r.title !~* 'devoir|examen|test|révision|série|cours|exercice|concours|bac'
+        OR r.title !~* 'math|maths|mathématiques|mathematiques|physique|svt|arabe|fran[cç]ais|anglais|philo|histoire|geo|informatique|techno|technologie|gestion|économie|eco|sport|musiq|islami|tajwid|3inaya|eddirasa|algorithme'
+        OR r.title !~* '7e|8e|9e|1e|2e|3e|4e|7eme|8eme|9eme|1ere|2eme|3eme|4ere|bac|coll[eè]ge|lyc[eé]e'
+      )
     ORDER BY r."numericId" ASC
   `;
 
