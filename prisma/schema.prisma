@@ -212,6 +212,8 @@ model Resource {
   slug            String
 
   title           String
+  // Original title from Jotform/file (for rollback after regeneration)
+  originalTitle   String?
   description     String?
   summary         String?     // Short summary (1-2 lines) extracted from description for card display
   type            String
