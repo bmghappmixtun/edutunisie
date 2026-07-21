@@ -209,9 +209,12 @@ export async function searchV2(options: SearchOptions): Promise<SearchResponse> 
 
   // 4. Build SQL conditions
   const match = buildMatchConditions(variants, q);
-  // match.params = [variant1, variant2, ..., originalQ]
+  // match.params = [variant1, variant2, ..., originalQ] (N+1 elements)
   // In SQL: $1..$N = variants (FTS), $N+1 = original q (TRGM)
-  let pIdx = match.params.length + 1;
+  // Filters must follow the match params, so first filter placeholder = $N+2
+  // pIdx starts at N+1 (the last used placeholder for match) and pre-increments
+  // to N+2 for the first filter.
+  let pIdx = match.params.length; // = N+1 (last used for match)
   const filterParams: (string | number | boolean | string[])[] = [];
   const filterConditions: string[] = [];
 
@@ -256,9 +259,10 @@ export async function searchV2(options: SearchOptions): Promise<SearchResponse> 
 
   // 5. Highlight uses the original q (best single match)
   // For highlighting, we need a single tsquery. Use the original q.
+  // highlightIdx is the placeholder position in searchSql's allParams.
+  // pIdx already points to the last used filter placeholder; highlight comes next.
   const highlightParam = q || variants[0] || '';
-  const highlightIdx = pIdx;
-  pIdx++;
+  const highlightIdx = pIdx + 1;
 
   // 6. Build final params
   // Order: $1..$N = variants, $N+1 = trgm q, $N+2+ = filters, $last = highlight
