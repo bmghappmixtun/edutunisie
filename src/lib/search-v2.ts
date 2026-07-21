@@ -251,7 +251,19 @@ export async function searchV2(options: SearchOptions): Promise<SearchResponse> 
     filterParams.push(filters.hasCorrection);
   }
   if (filters.teacherId) {
-    filterConditions.push(`r."teacherId" = $${++pIdx}`);
+    // teacherId can be either the User.id (UUID) or the User.numericId (number)
+    // Detect numeric input and JOIN with User to get the UUID.
+    // For UUID input, compare directly.
+    if (/^\d+$/.test(filters.teacherId)) {
+      // Numeric ID: need to look up the User.id
+      // Use a subquery to filter by User.numericId
+      filterConditions.push(
+        `r."teacherId" = (SELECT id FROM "User" WHERE "numericId"::text = $${++pIdx} LIMIT 1)`,
+      );
+    } else {
+      // UUID: direct comparison
+      filterConditions.push(`r."teacherId" = $${++pIdx}`);
+    }
     filterParams.push(filters.teacherId);
   }
 
@@ -327,6 +339,8 @@ export async function searchV2(options: SearchOptions): Promise<SearchResponse> 
   `;
 
   // 9. Facets query (parallel aggregation, $1=ftsCombined, $2=trgm)
+  // Note: facets apply the same filter conditions as the main search (whereExtras)
+  // so facet counts are consistent with the main result count.
   const facetsSql = `
     WITH matched AS (
       SELECT r.type::text AS type, r."subjectId", r."classId", r."sectionId",
@@ -334,6 +348,7 @@ export async function searchV2(options: SearchOptions): Promise<SearchResponse> 
       FROM "Resource" r
       WHERE r.status = 'PUBLISHED'
         AND (${match.ftsSql} OR ${match.trgmSql})
+        ${whereExtras}
       LIMIT 5000
     ),
     type_f AS (SELECT type, count(*)::int AS c FROM matched WHERE type IS NOT NULL GROUP BY type),
@@ -360,7 +375,7 @@ export async function searchV2(options: SearchOptions): Promise<SearchResponse> 
   const [rawResults, countResult, facetRows] = await Promise.all([
     prisma.$queryRawUnsafe(searchSql, ...allParams) as Promise<any[]>,
     prisma.$queryRawUnsafe(countSql, ...match.params, ...filterParams) as Promise<any[]>,
-    prisma.$queryRawUnsafe(facetsSql, ...match.params) as Promise<any[]>,
+    prisma.$queryRawUnsafe(facetsSql, ...match.params, ...filterParams) as Promise<any[]>,
   ]);
 
   const total = countResult[0]?.total || 0;
