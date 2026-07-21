@@ -618,7 +618,14 @@ function ActiveChip({ label, onRemove }: { label: string; onRemove: () => void }
 
 function ResultCard({ r, viewMode }: { r: SearchResult; viewMode: 'grid' | 'list' }) {
   const typeColor = TYPE_COLORS[r.type || 'OTHER'] || 'bg-slate-100 text-slate-600';
-  const href = r.slug ? `/ressources/${r.numericId}/${r.slug}` : '#';
+  // Build the href with proper URL encoding for slugs with special chars (Arabic, accents, etc.)
+  // The numericId is the stable identifier; the slug is cosmetic.
+  // encodeURIComponent ensures the slug is properly escaped for the URL.
+  // Fallback: use 'no-slug' if empty so the route always matches (handler tolerates it).
+  const slug = r.slug || 'no-slug';
+  const href = r.numericId
+    ? `/ressources/${r.numericId}/${encodeURIComponent(slug)}`
+    : '#';
 
   if (viewMode === 'list') {
     return (

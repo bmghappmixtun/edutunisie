@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
@@ -135,6 +135,12 @@ export default async function ResourcePage({
     slug = decodeURIComponent(rawSlug);
   } catch {
     slug = rawSlug;
+  }
+  // Handle the 'no-slug' fallback used by search results: redirect to the canonical URL
+  if (slug === 'no-slug') {
+    // Defer to the resource lookup below to get the real slug, then redirect.
+    // We can't redirect here because we don't have the resource yet. The lookup below
+    // will use numericId and find the real slug, then we render normally.
   }
   const userSession = await getCurrentUser();
   const resource = await prisma.resource.findUnique({
