@@ -492,19 +492,19 @@ export default async function ResourcePage({
                   >
                     <div className="flex flex-wrap gap-1.5">
                       {resource.metadata.topics.map((topic, i) => {
-                        // Cycle through Digital Synopsis palette #1 for each tag
+                        // Cycle through Digital Synopsis palette #1 — solid colors, white text
                         const palette = [
-                          { bg: 'bg-orange-50', text: 'text-orange-800', border: 'border-orange-200', hover: 'hover:bg-orange-100' },
-                          { bg: 'bg-rose-50', text: 'text-rose-800', border: 'border-rose-200', hover: 'hover:bg-rose-100' },
-                          { bg: 'bg-fuchsia-50', text: 'text-fuchsia-800', border: 'border-fuchsia-200', hover: 'hover:bg-fuchsia-100' },
-                          { bg: 'bg-indigo-50', text: 'text-indigo-800', border: 'border-indigo-200', hover: 'hover:bg-indigo-100' },
+                          { bg: 'bg-[#F8B195]', hover: 'hover:bg-[#E69A7E]' },
+                          { bg: 'bg-[#F67280]', hover: 'hover:bg-[#E55D6B]' },
+                          { bg: 'bg-[#C06C84]', hover: 'hover:bg-[#A85A70]' },
+                          { bg: 'bg-[#6C5B7B]', hover: 'hover:bg-[#5A4A68]' },
                         ];
                         const c = palette[i % 4];
                         return (
                           <Link
                             key={i}
                             href={`/recherche?q=${encodeURIComponent(topic)}`}
-                            className={`inline-block px-2.5 py-1 ${c.bg} ${c.text} ${c.border} border rounded-full text-xs font-medium ${c.hover} transition-colors`}
+                            className={`inline-block px-2.5 py-1 ${c.bg} text-white rounded-full text-xs font-medium ${c.hover} transition-colors shadow-sm`}
                           >
                             {topic}
                           </Link>
