@@ -328,7 +328,7 @@ export async function searchV2(options: SearchOptions): Promise<SearchResponse> 
       SELECT r.type::text AS type, r."subjectId", r."classId", r."sectionId",
              r.year, r."trimester", r.language, r."hasCorrection"
       FROM "Resource" r
-      WHERE r.status = 'PUBLIFIED'
+      WHERE r.status = 'PUBLISHED'
         AND (${match.ftsSql} OR ${match.trgmSql})
       LIMIT 5000
     ),
