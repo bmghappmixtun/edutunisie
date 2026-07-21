@@ -433,7 +433,7 @@ export default async function ResourcePage({
                     title="Système technique étudié"
                     icon={<Wrench className="w-4 h-4" />}
                     variant="system"
-                    defaultOpen={true}
+                    defaultOpen={false}
                   >
                     {resource.metadata.systemName && (
                       <div className="text-xl font-extrabold text-orange-900 mb-1">
@@ -454,7 +454,7 @@ export default async function ResourcePage({
                     title="Résumé intelligent"
                     icon={<Sparkles className="w-4 h-4" />}
                     variant="summary"
-                    defaultOpen={true}
+                    defaultOpen={false}
                   >
                     <p className="text-sm text-slate-700 leading-relaxed">
                       {resource.aiSummary.summary}
@@ -467,7 +467,7 @@ export default async function ResourcePage({
                   <AiContentSection
                     title="Points clés"
                     icon={<Target className="w-4 h-4" />}
-                    defaultOpen={true}
+                    defaultOpen={false}
                   >
                     <ul className="space-y-1.5">
                       {resource.metadata.keyPoints.slice(0, 5).map((kp, i) => (
