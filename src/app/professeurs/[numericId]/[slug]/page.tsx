@@ -829,18 +829,28 @@ export default async function TeacherProfilePage({
                       </span>
                     </h3>
                     <div className="flex flex-wrap gap-1.5">
-                      {top.map(([topic, count]) => (
-                        <Link
-                          key={topic}
-                          href={`/recherche?q=${encodeURIComponent(topic)}&teacherId=${teacher.numericId}`}
-                          className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-50 text-amber-800 border border-amber-200 rounded-full text-xs font-medium hover:bg-amber-100 transition-colors"
-                        >
-                          <span>{topic}</span>
-                          {count > 1 && (
-                            <span className="text-[10px] font-bold text-amber-600">{count}</span>
-                          )}
-                        </Link>
-                      ))}
+                      {top.map(([topic, count], i) => {
+                        // Cycle through Digital Synopsis palette #1
+                        const palette = [
+                          { bg: 'bg-orange-50', text: 'text-orange-800', border: 'border-orange-200', hover: 'hover:bg-orange-100', count: 'text-orange-600' },
+                          { bg: 'bg-rose-50', text: 'text-rose-800', border: 'border-rose-200', hover: 'hover:bg-rose-100', count: 'text-rose-600' },
+                          { bg: 'bg-fuchsia-50', text: 'text-fuchsia-800', border: 'border-fuchsia-200', hover: 'hover:bg-fuchsia-100', count: 'text-fuchsia-600' },
+                          { bg: 'bg-indigo-50', text: 'text-indigo-800', border: 'border-indigo-200', hover: 'hover:bg-indigo-100', count: 'text-indigo-600' },
+                        ];
+                        const c = palette[i % 4];
+                        return (
+                          <Link
+                            key={topic}
+                            href={`/recherche?q=${encodeURIComponent(topic)}&teacherId=${teacher.numericId}`}
+                            className={`inline-flex items-center gap-1 px-2 py-0.5 ${c.bg} ${c.text} ${c.border} border rounded-full text-xs font-medium ${c.hover} transition-colors`}
+                          >
+                            <span>{topic}</span>
+                            {count > 1 && (
+                              <span className={`text-[10px] font-bold ${c.count}`}>{count}</span>
+                            )}
+                          </Link>
+                        );
+                      })}
                     </div>
                   </div>
                 );

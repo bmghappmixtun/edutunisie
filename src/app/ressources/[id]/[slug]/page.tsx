@@ -491,15 +491,25 @@ export default async function ResourcePage({
                     defaultOpen={false}
                   >
                     <div className="flex flex-wrap gap-1.5">
-                      {resource.metadata.topics.map((topic, i) => (
-                        <Link
-                          key={i}
-                          href={`/recherche?q=${encodeURIComponent(topic)}`}
-                          className="inline-block px-2.5 py-1 bg-indigo-50 text-indigo-800 border border-indigo-200 rounded-full text-xs font-medium hover:bg-indigo-100 transition-colors"
-                        >
-                          {topic}
-                        </Link>
-                      ))}
+                      {resource.metadata.topics.map((topic, i) => {
+                        // Cycle through Digital Synopsis palette #1 for each tag
+                        const palette = [
+                          { bg: 'bg-orange-50', text: 'text-orange-800', border: 'border-orange-200', hover: 'hover:bg-orange-100' },
+                          { bg: 'bg-rose-50', text: 'text-rose-800', border: 'border-rose-200', hover: 'hover:bg-rose-100' },
+                          { bg: 'bg-fuchsia-50', text: 'text-fuchsia-800', border: 'border-fuchsia-200', hover: 'hover:bg-fuchsia-100' },
+                          { bg: 'bg-indigo-50', text: 'text-indigo-800', border: 'border-indigo-200', hover: 'hover:bg-indigo-100' },
+                        ];
+                        const c = palette[i % 4];
+                        return (
+                          <Link
+                            key={i}
+                            href={`/recherche?q=${encodeURIComponent(topic)}`}
+                            className={`inline-block px-2.5 py-1 ${c.bg} ${c.text} ${c.border} border rounded-full text-xs font-medium ${c.hover} transition-colors`}
+                          >
+                            {topic}
+                          </Link>
+                        );
+                      })}
                     </div>
                   </AiContentSection>
                 )}
