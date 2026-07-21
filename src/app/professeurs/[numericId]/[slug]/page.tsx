@@ -830,23 +830,23 @@ export default async function TeacherProfilePage({
                     </h3>
                     <div className="flex flex-wrap gap-1.5">
                       {top.map(([topic, count], i) => {
-                        // Cycle through Digital Synopsis palette #1
+                        // Cycle through Digital Synopsis palette #1 — solid colors, white text
                         const palette = [
-                          { bg: 'bg-orange-50', text: 'text-orange-800', border: 'border-orange-200', hover: 'hover:bg-orange-100', count: 'text-orange-600' },
-                          { bg: 'bg-rose-50', text: 'text-rose-800', border: 'border-rose-200', hover: 'hover:bg-rose-100', count: 'text-rose-600' },
-                          { bg: 'bg-fuchsia-50', text: 'text-fuchsia-800', border: 'border-fuchsia-200', hover: 'hover:bg-fuchsia-100', count: 'text-fuchsia-600' },
-                          { bg: 'bg-indigo-50', text: 'text-indigo-800', border: 'border-indigo-200', hover: 'hover:bg-indigo-100', count: 'text-indigo-600' },
+                          { bg: 'bg-[#F8B195]', hover: 'hover:bg-[#E69A7E]' },
+                          { bg: 'bg-[#F67280]', hover: 'hover:bg-[#E55D6B]' },
+                          { bg: 'bg-[#C06C84]', hover: 'hover:bg-[#A85A70]' },
+                          { bg: 'bg-[#6C5B7B]', hover: 'hover:bg-[#5A4A68]' },
                         ];
                         const c = palette[i % 4];
                         return (
                           <Link
                             key={topic}
                             href={`/recherche?q=${encodeURIComponent(topic)}&teacherId=${teacher.numericId}`}
-                            className={`inline-flex items-center gap-1 px-2 py-0.5 ${c.bg} ${c.text} ${c.border} border rounded-full text-xs font-medium ${c.hover} transition-colors`}
+                            className={`inline-flex items-center gap-1 px-2 py-0.5 ${c.bg} text-white rounded-full text-xs font-medium ${c.hover} transition-colors shadow-sm`}
                           >
                             <span>{topic}</span>
                             {count > 1 && (
-                              <span className={`text-[10px] font-bold ${c.count}`}>{count}</span>
+                              <span className="text-[10px] font-bold text-white/80">{count}</span>
                             )}
                           </Link>
                         );
