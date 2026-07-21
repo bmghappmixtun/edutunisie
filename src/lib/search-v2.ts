@@ -390,6 +390,7 @@ export async function searchV2(options: SearchOptions): Promise<SearchResponse> 
     const f = byId.get(r.id);
     return {
       id: r.id,
+      numericId: f?.numericId ?? null,
       slug: f?.slug ?? null,
       title: f?.title ?? null,
       titleHighlighted: sanitizeHighlightHtml(r.title_highlighted),
