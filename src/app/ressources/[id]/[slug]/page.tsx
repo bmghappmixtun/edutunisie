@@ -28,6 +28,7 @@ import {
   Building2,
   Sparkles,
   Target,
+  Hash,
 } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -467,12 +468,13 @@ export default async function ResourcePage({
                   <AiContentSection
                     title="Points clés"
                     icon={<Target className="w-4 h-4" />}
+                    variant="points"
                     defaultOpen={false}
                   >
                     <ul className="space-y-1.5">
                       {resource.metadata.keyPoints.slice(0, 5).map((kp, i) => (
                         <li key={i} className="text-sm text-slate-700 flex items-start gap-2">
-                          <span className="text-orange-500 mt-1">→</span>
+                          <span className="text-fuchsia-500 mt-1">→</span>
                           <span>{kp}</span>
                         </li>
                       ))}
@@ -484,6 +486,8 @@ export default async function ResourcePage({
                 {resource.metadata?.topics && resource.metadata.topics.length > 0 && (
                   <AiContentSection
                     title="Sujets abordés"
+                    icon={<Hash className="w-4 h-4" />}
+                    variant="topics"
                     defaultOpen={false}
                   >
                     <div className="flex flex-wrap gap-1.5">
@@ -491,7 +495,7 @@ export default async function ResourcePage({
                         <Link
                           key={i}
                           href={`/recherche?q=${encodeURIComponent(topic)}`}
-                          className="inline-block px-2.5 py-1 bg-amber-50 text-amber-800 border border-amber-200 rounded-full text-xs font-medium hover:bg-amber-100 transition-colors"
+                          className="inline-block px-2.5 py-1 bg-indigo-50 text-indigo-800 border border-indigo-200 rounded-full text-xs font-medium hover:bg-indigo-100 transition-colors"
                         >
                           {topic}
                         </Link>
