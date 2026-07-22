@@ -3,6 +3,7 @@ import { Star, Eye, Download, CheckCircle2, GraduationCap, MessageCircle } from 
 import { RESOURCE_TYPE_LABELS, HOMEWORK_SUBTYPE_LABELS } from '@/lib/utils';
 import { isArabic } from '@/lib/text-utils';
 import FavoriteButton from './FavoriteButton';
+import ResourceAge from './ResourceAge';
 
 export interface ResourceCardData {
   id: string;
@@ -249,7 +250,10 @@ export default function ResourceCard({ resource }: { resource: ResourceCardData 
               </span>
             </span>
           </div>
-          <span className="text-[10px] text-slate-400">{timeAgo(resource.publishedAt)}</span>
+          <ResourceAge
+            publishedAt={resource.publishedAt}
+            initialLabel={timeAgo(resource.publishedAt)}
+          />
         </div>
       </div>
     </Link>
