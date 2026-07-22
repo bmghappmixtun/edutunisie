@@ -278,6 +278,9 @@ export default async function SubjectPage({ params, searchParams }: PageProps) {
     { name: subject.nameFr || subject.slug, url },
   ]);
 
+  // Stable "now" used for JSON-LD timestamps in this render.
+  const now = new Date();
+
   const courseJsonLd = courseSchema({
     slug: subject.slug,
     title: subject.nameFr,
@@ -290,8 +293,10 @@ export default async function SubjectPage({ params, searchParams }: PageProps) {
     subject: subject.nameFr,
     type: 'COURSE',
     url,
-    datePublished: new Date().toISOString(),
-    dateModified: new Date().toISOString(),
+    // Single timestamp reused for both fields — keeps them consistent and
+    // makes the rendered JSON-LD deterministic for a given request.
+    datePublished: now.toISOString(),
+    dateModified: now.toISOString(),
     aggregateRating: { ratingValue: 4.7, ratingCount: Math.min(totalCount, 500) },
   });
 
