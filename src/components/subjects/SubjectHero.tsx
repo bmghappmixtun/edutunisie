@@ -315,7 +315,7 @@ function SubjectMotif({
           key={i}
           cx={(i % 10) * 20 + 20}
           cy={Math.floor(i / 10) * 60 + 30}
-          r={motif === 'sparkles' ? Math.random() * 3 + 1 : 1.5}
+          r={motif === 'sparkles' ? (1 + ((i * 7 + 3) % 4)) : 1.5}
           fill={fillColor}
         />
       ))}
