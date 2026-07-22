@@ -11,6 +11,7 @@ import { SITE_URL } from '@/lib/structured-data';
 import { SUBJECTS_CONFIG, getSubjectConfig } from '@/lib/subjects.config';
 import SubjectHero from '@/components/subjects/SubjectHero';
 import SubjectFilters from '@/components/subjects/SubjectFilters';
+import SmartPagination from '@/components/ui/SmartPagination';
 import { SlidersHorizontal, Sparkles, ArrowRight } from 'lucide-react';
 
 // ============== TYPES ==============
@@ -473,10 +474,10 @@ export default async function SubjectPage({ params, searchParams }: PageProps) {
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <Pagination
+                <SmartPagination
                   current={page}
                   total={totalPages}
-                  subjectSlug={subject.slug}
+                  basePath={`/matieres/${subject.slug}`}
                   activeFilters={sp}
                 />
               )}
@@ -589,57 +590,4 @@ function EmptyState({ subjectName }: { subjectName: string }) {
   );
 }
 
-function Pagination({
-  current,
-  total,
-  subjectSlug,
-  activeFilters,
-}: {
-  current: number;
-  total: number;
-  subjectSlug: string;
-  activeFilters: Record<string, string | undefined>;
-}) {
-  const makeUrl = (p: number) => {
-    const params = new URLSearchParams();
-    Object.entries(activeFilters).forEach(([k, v]) => {
-      if (v && k !== 'page') params.set(k, v);
-    });
-    if (p > 1) params.set('page', String(p));
-    return `/matieres/${subjectSlug}?${params.toString()}`;
-  };
-
-  return (
-    <nav className="mt-8 flex justify-center gap-2">
-      {current > 1 && (
-        <Link
-          href={makeUrl(current - 1)}
-          className="px-4 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-sm"
-        >
-          ← Précédent
-        </Link>
-      )}
-      {Array.from({ length: Math.min(total, 7) }, (_, i) => i + 1).map((p) => (
-        <Link
-          key={p}
-          href={makeUrl(p)}
-          className={`px-3 py-2 rounded-lg text-sm ${
-            p === current
-              ? 'bg-primary-600 text-white'
-              : 'bg-white border border-slate-200 hover:bg-slate-50'
-          }`}
-        >
-          {p}
-        </Link>
-      ))}
-      {current < total && (
-        <Link
-          href={makeUrl(current + 1)}
-          className="px-4 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-sm"
-        >
-          Suivant →
-        </Link>
-      )}
-    </nav>
-  );
-}
+// (Pagination handled by SmartPagination component)
