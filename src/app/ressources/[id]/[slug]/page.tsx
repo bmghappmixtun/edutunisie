@@ -280,9 +280,6 @@ export default async function ResourcePage({
     { name: resource.title || 'Ressource', url: resourceUrl },
   ]);
 
-  // Per-subject AI palette (physique = lavender, others = default)
-  const aiPalette = getPaletteForSubject(resource.subject?.slug);
-
   return (
     <div className="min-h-screen flex flex-col">
       <script
@@ -438,16 +435,16 @@ export default async function ResourcePage({
                     title="Système technique étudié"
                     icon={<Wrench className="w-4 h-4" />}
                     variant="system"
-                    palette={aiPalette}
+                    subjectSlug={resource.subject?.slug}
                     defaultOpen={false}
                   >
                     {resource.metadata.systemName && (
-                      <div className={`text-xl font-extrabold ${aiPalette.system.strong} mb-1`}>
+                      <div className={`text-xl font-extrabold text-orange-900 mb-1`}>
                         {resource.metadata.systemName}
                       </div>
                     )}
                     {resource.metadata.dossierTechnique && (
-                      <div className={`text-sm ${aiPalette.system.strong}`}>
+                      <div className={`text-sm text-orange-900`}>
                         <span className="font-semibold">Dossier technique :</span> {resource.metadata.dossierTechnique}
                       </div>
                     )}
@@ -460,7 +457,7 @@ export default async function ResourcePage({
                     title="Résumé intelligent"
                     icon={<Sparkles className="w-4 h-4" />}
                     variant="summary"
-                    palette={aiPalette}
+                    subjectSlug={resource.subject?.slug}
                     defaultOpen={false}
                   >
                     <p className="text-sm text-slate-700 leading-relaxed">
@@ -475,13 +472,13 @@ export default async function ResourcePage({
                     title="Points clés"
                     icon={<Target className="w-4 h-4" />}
                     variant="points"
-                    palette={aiPalette}
+                    subjectSlug={resource.subject?.slug}
                     defaultOpen={false}
                   >
                     <ul className="space-y-1.5">
                       {resource.metadata.keyPoints.slice(0, 5).map((kp, i) => (
                         <li key={i} className="text-sm text-slate-700 flex items-start gap-2">
-                          <span className={`${aiPalette.points.accent} mt-1`}>→</span>
+                          <span className={`text-fuchsia-500 mt-1`}>→</span>
                           <span>{kp}</span>
                         </li>
                       ))}
@@ -495,13 +492,13 @@ export default async function ResourcePage({
                     title="Sujets abordés"
                     icon={<Hash className="w-4 h-4" />}
                     variant="topics"
-                    palette={aiPalette}
+                    subjectSlug={resource.subject?.slug}
                     defaultOpen={false}
                   >
                     <div className="flex flex-wrap gap-1.5">
                       {resource.metadata.topics.map((topic, i) => {
                         // Cycle through subject palette accents (already includes bg + hover)
-                        const c = aiPalette.accents[i % aiPalette.accents.length];
+                        const c = ["bg-[#F8B195] hover:bg-[#E69A7E]", "bg-[#F67280] hover:bg-[#E55D6B]", "bg-[#C06C84] hover:bg-[#A85A70]", "bg-[#6C5B7B] hover:bg-[#5A4A68]"][i % 4];
                         return (
                           <Link
                             key={i}
