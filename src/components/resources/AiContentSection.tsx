@@ -2,10 +2,7 @@
 
 import { useState, ReactNode } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import {
-  DEFAULT_PALETTE,
-  type AiPalette,
-} from '@/lib/ai-palettes';
+import { getPaletteForSubject } from '@/lib/ai-palettes';
 
 interface AiContentSectionProps {
   title: string;
@@ -15,20 +12,19 @@ interface AiContentSectionProps {
   children: ReactNode;
   variant?: 'default' | 'summary' | 'system' | 'points' | 'topics';
   /**
-   * Optional palette override. Allows per-subject branding.
-   * If not provided, falls back to the default Digital Synopsis palette #1.
+   * Optional subject slug. The component looks up the palette from
+   * SUBJECT_PALETTES (server-safe module). Falls back to default palette
+   * if not provided or no subject-specific palette exists.
    */
-  palette?: AiPalette;
+  subjectSlug?: string | null;
 }
 
-// Re-export the types so existing imports keep working
+// Re-export for backward compat
 export type { AiPalette, PaletteVariant } from '@/lib/ai-palettes';
-export { DEFAULT_PALETTE, PHYSIQUE_PALETTE, getPaletteForSubject, SUBJECT_PALETTES } from '@/lib/ai-palettes';
+export { getPaletteForSubject, DEFAULT_PALETTE, PHYSIQUE_PALETTE, SUBJECT_PALETTES } from '@/lib/ai-palettes';
 
 /**
- * Collapsible section for AI-extracted content (summary, key points, topics).
- * Used on the resource detail page to keep the page clean — users expand
- * only what they need.
+ * Collapsible section for AI-extracted content.
  */
 export default function AiContentSection({
   title,
@@ -37,15 +33,11 @@ export default function AiContentSection({
   defaultOpen = true,
   children,
   variant = 'default',
-  palette,
+  subjectSlug,
 }: AiContentSectionProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
+  const v = getPaletteForSubject(subjectSlug);
 
-  // Resolve the active palette: explicit prop > default
-  const activePalette = palette ?? DEFAULT_PALETTE;
-  const v = activePalette;
-
-  // Pick the right variant from the active palette
   const containerClass =
     variant === 'system'
       ? `mb-4 p-4 ${v.system.container} border rounded-xl`
