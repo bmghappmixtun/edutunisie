@@ -11,7 +11,7 @@ import RatingSection from '@/components/resources/RatingSection';
 import CommentsSection from '@/components/resources/CommentsSection';
 import ResourceInfoPanel from '@/components/resources/ResourceInfoPanel';
 import AiDescription from '@/components/resources/AiDescription';
-import AiContentSection, { getPaletteForSubject } from '@/components/resources/AiContentSection';
+import AiContentSection from '@/components/resources/AiContentSection';
 import { formatNumber, RESOURCE_TYPE_LABELS, HOMEWORK_SUBTYPE_LABELS } from '@/lib/utils';
 import { isArabic } from '@/lib/text-utils';
 import { courseSchema, breadcrumbSchema } from '@/lib/structured-data';
@@ -428,27 +428,21 @@ export default async function ResourcePage({
                   </div>
                 )}
 
-                {/* Per-subject palette (physique = lavender, others = default) */}
-                {(() => {
-                  const aiPalette = getPaletteForSubject(resource.subject?.slug);
-                  return (
-                    <>
                 {/* AI-extracted content (2026-07-20 Mavis pipeline) */}
                 {resource.metadata && (resource.metadata.systemName || resource.metadata.dossierTechnique) && (
                   <AiContentSection
                     title="Système technique étudié"
                     icon={<Wrench className="w-4 h-4" />}
                     variant="system"
-                    palette={aiPalette}
                     defaultOpen={false}
                   >
                     {resource.metadata.systemName && (
-                      <div className={`text-xl font-extrabold ${aiPalette.system.strong} mb-1`}>
+                      <div className="text-xl font-extrabold text-orange-900 mb-1">
                         {resource.metadata.systemName}
                       </div>
                     )}
                     {resource.metadata.dossierTechnique && (
-                      <div className={`text-sm ${aiPalette.system.strong}`}>
+                      <div className="text-sm text-orange-800">
                         <span className="font-semibold">Dossier technique :</span> {resource.metadata.dossierTechnique}
                       </div>
                     )}
@@ -461,7 +455,6 @@ export default async function ResourcePage({
                     title="Résumé intelligent"
                     icon={<Sparkles className="w-4 h-4" />}
                     variant="summary"
-                    palette={aiPalette}
                     defaultOpen={false}
                   >
                     <p className="text-sm text-slate-700 leading-relaxed">
@@ -476,13 +469,12 @@ export default async function ResourcePage({
                     title="Points clés"
                     icon={<Target className="w-4 h-4" />}
                     variant="points"
-                    palette={aiPalette}
                     defaultOpen={false}
                   >
                     <ul className="space-y-1.5">
                       {resource.metadata.keyPoints.slice(0, 5).map((kp, i) => (
                         <li key={i} className="text-sm text-slate-700 flex items-start gap-2">
-                          <span className={`${aiPalette.points.accent} mt-1`}>→</span>
+                          <span className="text-fuchsia-500 mt-1">→</span>
                           <span>{kp}</span>
                         </li>
                       ))}
@@ -496,17 +488,23 @@ export default async function ResourcePage({
                     title="Sujets abordés"
                     icon={<Hash className="w-4 h-4" />}
                     variant="topics"
-                    palette={aiPalette}
                     defaultOpen={false}
                   >
                     <div className="flex flex-wrap gap-1.5">
                       {resource.metadata.topics.map((topic, i) => {
-                        const c = aiPalette.accents[i % aiPalette.accents.length];
+                        // Cycle through Digital Synopsis palette #1 — solid colors, white text
+                        const palette = [
+                          { bg: 'bg-[#F8B195]', hover: 'hover:bg-[#E69A7E]' },
+                          { bg: 'bg-[#F67280]', hover: 'hover:bg-[#E55D6B]' },
+                          { bg: 'bg-[#C06C84]', hover: 'hover:bg-[#A85A70]' },
+                          { bg: 'bg-[#6C5B7B]', hover: 'hover:bg-[#5A4A68]' },
+                        ];
+                        const c = palette[i % 4];
                         return (
                           <Link
                             key={i}
                             href={`/recherche?q=${encodeURIComponent(topic)}`}
-                            className={`inline-block px-2.5 py-1 ${c} text-white rounded-full text-xs font-medium transition-colors shadow-sm`}
+                            className={`inline-block px-2.5 py-1 ${c.bg} text-white rounded-full text-xs font-medium ${c.hover} transition-colors shadow-sm`}
                           >
                             {topic}
                           </Link>
@@ -515,9 +513,6 @@ export default async function ResourcePage({
                     </div>
                   </AiContentSection>
                 )}
-                    </>
-                  );
-                })()}
 
                 {/* Product (المنتج) — only for technologie + college */}
                 {resource.product &&
