@@ -279,6 +279,9 @@ export default async function ResourcePage({
     { name: resource.title || 'Ressource', url: resourceUrl },
   ]);
 
+  // Per-subject AI palette (physique = lavender, others = default)
+  const aiPalette = getPaletteForSubject(resource.subject?.slug);
+
   return (
     <div className="min-h-screen flex flex-col">
       <script
@@ -428,12 +431,7 @@ export default async function ResourcePage({
                   </div>
                 )}
 
-                {/* Per-subject palette (physique = lavender, others = default) */}
-                {(() => {
-                  const aiPalette = getPaletteForSubject(resource.subject?.slug);
-                  return (
-                    <>
-                {/* AI-extracted content (2026-07-20 Mavis pipeline) */}
+                {/* AI-extracted content (2026-07-20 Mavis pipeline) — uses per-subject palette */}
                 {resource.metadata && (resource.metadata.systemName || resource.metadata.dossierTechnique) && (
                   <AiContentSection
                     title="Système technique étudié"
@@ -515,9 +513,6 @@ export default async function ResourcePage({
                     </div>
                   </AiContentSection>
                 )}
-                    </>
-                  );
-                })()}
 
                 {/* Product (المنتج) — only for technologie + college */}
                 {resource.product &&
