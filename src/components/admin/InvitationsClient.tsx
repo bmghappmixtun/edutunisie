@@ -364,8 +364,8 @@ export default function InvitationsClient({
                     <td className="px-3 py-2.5 text-slate-500 hidden lg:table-cell">
                       {inv.emailSentAt ? (
                         <div>
-                          <div>{timeAgo(inv.emailSentAt)}</div>
-                          <div className="text-xs text-slate-400">
+                          <div suppressHydrationWarning>{timeAgo(inv.emailSentAt)}</div>
+                          <div className="text-xs text-slate-400" suppressHydrationWarning>
                             {new Date(inv.emailSentAt).toLocaleDateString('fr-FR')}
                           </div>
                         </div>
@@ -376,7 +376,7 @@ export default function InvitationsClient({
                     <td className="px-3 py-2.5 text-slate-500 hidden lg:table-cell">
                       {inv.linkClickedAt ? (
                         <div>
-                          <div>{timeAgo(inv.linkClickedAt)}</div>
+                          <div suppressHydrationWarning>{timeAgo(inv.linkClickedAt)}</div>
                           {inv.clickIpAddress && (
                             <div className="text-xs text-slate-400 truncate max-w-[120px]">
                               {inv.clickIpAddress}
@@ -390,7 +390,10 @@ export default function InvitationsClient({
                     <td className="px-3 py-2.5 text-slate-500 hidden lg:table-cell">
                       {inv.activatedAt ? (
                         <div>
-                          <div className="text-emerald-600 font-semibold">
+                          <div
+                            className="text-emerald-600 font-semibold"
+                            suppressHydrationWarning
+                          >
                             {timeAgo(inv.activatedAt)}
                           </div>
                           {inv.activateIpAddress && (

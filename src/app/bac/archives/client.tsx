@@ -319,13 +319,20 @@ export function BacArchivesClient({
             <div className="text-sm text-slate-600">
               {hasActiveFilters ? (
                 <span>
-                  <strong className="text-violet-700">{totalFiltered.toLocaleString()}</strong>{' '}
+                  <strong className="text-violet-700" suppressHydrationWarning>
+                    {totalFiltered.toLocaleString(isAr ? 'ar-EG' : 'fr-FR')}
+                  </strong>{' '}
                   {isAr ? 'ملف يطابق البحث' : 'fichiers trouvés'}
-                  <span className="text-slate-400"> / {totalFiles.toLocaleString()}</span>
+                  <span className="text-slate-400" suppressHydrationWarning>
+                    {' '}
+                    / {totalFiles.toLocaleString(isAr ? 'ar-EG' : 'fr-FR')}
+                  </span>
                 </span>
               ) : (
                 <span>
-                  <strong className="text-violet-700">{totalFiles.toLocaleString()}</strong>{' '}
+                  <strong className="text-violet-700" suppressHydrationWarning>
+                    {totalFiles.toLocaleString(isAr ? 'ar-EG' : 'fr-FR')}
+                  </strong>{' '}
                   {isAr ? 'ملف في' : 'fichiers sur'} <strong>{yearGroups.length}</strong>{' '}
                   {isAr ? 'سنة' : 'ans'}
                 </span>

@@ -692,7 +692,7 @@ export default function UsersManagementClient({
                             <span>{invLabel.icon}</span> {invLabel.label}
                           </span>
                           {u.invitationSentAt && (
-                            <span className="text-xs text-slate-400">
+                            <span className="text-xs text-slate-400" suppressHydrationWarning>
                               Envoyé {timeAgo(u.invitationSentAt)}
                             </span>
                           )}
@@ -701,10 +701,10 @@ export default function UsersManagementClient({
                         <span className="text-xs text-slate-400">—</span>
                       )}
                     </td>
-                    <td className="px-3 py-2.5 text-slate-500 hidden md:table-cell">
+                    <td className="px-3 py-2.5 text-slate-500 hidden md:table-cell" suppressHydrationWarning>
                       {timeAgo(u.createdAt)}
                     </td>
-                    <td className="px-3 py-2.5 text-slate-500 hidden lg:table-cell">
+                    <td className="px-3 py-2.5 text-slate-500 hidden lg:table-cell" suppressHydrationWarning>
                       {u.lastLoginAt ? timeAgo(u.lastLoginAt) : '—'}
                     </td>
                     <td className="px-3 py-2.5">

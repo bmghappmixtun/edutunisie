@@ -13,7 +13,7 @@ import ResourceInfoPanel from '@/components/resources/ResourceInfoPanel';
 import AiDescription from '@/components/resources/AiDescription';
 import AiContentSection from '@/components/resources/AiContentSection';
 import { getPaletteForSubject } from '@/lib/ai-palettes';
-import { formatNumber, RESOURCE_TYPE_LABELS, HOMEWORK_SUBTYPE_LABELS } from '@/lib/utils';
+import { formatNumber, RESOURCE_TYPE_LABELS, HOMEWORK_SUBTYPE_LABELS, timeAgo } from '@/lib/utils';
 import { isArabic } from '@/lib/text-utils';
 import { courseSchema, breadcrumbSchema } from '@/lib/structured-data';
 import {
@@ -613,6 +613,12 @@ export default async function ResourcePage({
                   id: c.id,
                   content: c.content,
                   createdAt: c.createdAt.toISOString(),
+                  // Pre-compute the relative-time label on the server so the
+                  // client component can render byte-for-byte identical HTML
+                  // (timeAgo uses Date.now() — non-deterministic across
+                  // SSR/hydration). CommentsSection re-runs timeAgo in
+                  // useEffect after mount to tick the label forward.
+                  createdAtLabel: timeAgo(c.createdAt),
                   user: c.user,
                 }))}
               />
