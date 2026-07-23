@@ -216,7 +216,9 @@ export default function SubjectFilters({
 
         {/* Total bottom */}
         <div className="pt-3 border-t border-slate-100 text-center">
-          <div className="text-2xl font-bold text-slate-900">{totalCount.toLocaleString()}</div>
+          <div className="text-2xl font-bold text-slate-900" suppressHydrationWarning>
+            {totalCount.toLocaleString('fr-FR')}
+          </div>
           <div className="text-xs text-slate-500">ressources trouvées</div>
         </div>
       </div>
