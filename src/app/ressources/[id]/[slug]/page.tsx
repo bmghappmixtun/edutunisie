@@ -487,7 +487,10 @@ export default async function ResourcePage({
                 )}
 
                 {/* AI topics (clickable tags) */}
-                {resource.metadata?.topics && resource.metadata.topics.length > 0 && (
+                {resource.metadata?.topics && resource.metadata.topics.length > 0 && (() => {
+                  // Per-subject topic tag palette (physique = lavender, others = default)
+                  const topicPalette = getPaletteForSubject(resource.subject?.slug);
+                  return (
                   <AiContentSection
                     title="Sujets abordés"
                     icon={<Hash className="w-4 h-4" />}
@@ -497,8 +500,7 @@ export default async function ResourcePage({
                   >
                     <div className="flex flex-wrap gap-1.5">
                       {resource.metadata.topics.map((topic, i) => {
-                        // Cycle through subject palette accents (already includes bg + hover)
-                        const c = ["bg-[#F8B195] hover:bg-[#E69A7E]", "bg-[#F67280] hover:bg-[#E55D6B]", "bg-[#C06C84] hover:bg-[#A85A70]", "bg-[#6C5B7B] hover:bg-[#5A4A68]"][i % 4];
+                        const c = topicPalette.accents[i % topicPalette.accents.length];
                         return (
                           <Link
                             key={i}
@@ -511,7 +513,8 @@ export default async function ResourcePage({
                       })}
                     </div>
                   </AiContentSection>
-                )}
+                  );
+                })()}
 
                 {/* Product (المنتج) — only for technologie + college */}
                 {resource.product &&
