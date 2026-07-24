@@ -256,3 +256,29 @@ User asked to render these titles in Arabic. Discovered:
 - Add `titleAr` + `descriptionAr` columns to Prisma schema
 - Backfill via GPT-4o-mini for 13,473 resources
 - Update page renderer to use `titleAr` when `locale=ar`
+
+## 4 More Title Fixes (July 24, 2026 - Late Evening)
+
+After 492 fix, found 4 more with "Mathématiques" in title but wrong section:
+- NID 6815, 7193, 13659: "2ème Mathématiques" with section=sciences (contradiction)
+- NID 14725: "4éme Mathématiques" with class=1AS (impossible - 1AS has no section)
+
+All 4 fixed by removing "Mathématiques" and using proper class label.
+
+**Final state**: 0 resources with wrong subject in title position. Remaining 293 with "Mathématiques" all have section=maths (CORRECT - it's the section name).
+
+## Final Recap of Title Cleanup (Full Day)
+
+| Catégorie | # |
+|---|---:|
+| Pensee islamique (16) | 16 |
+| Very short | 17 |
+| .pdf suffix | 9 |
+| OCR-broken | 8 |
+| HTML entities | 2 |
+| Multi-spaces | 24 |
+| Title subject mismatch (492) | 492 |
+| Wrong section reference (4) | 4 |
+| **Total titles fixed** | **572** |
+
+**Total ResourceTitleBackup entries**: 2,233
