@@ -282,3 +282,29 @@ All 4 fixed by removing "Mathématiques" and using proper class label.
 | **Total titles fixed** | **572** |
 
 **Total ResourceTitleBackup entries**: 2,233
+
+## Homework Subtype in Title (July 25, 2026 - 00:05)
+
+**Problem**: 3,801 HOMEWORK titles missing subtype keyword (Contrôle/Synthèse/Révision)
+**Solution**: Insert subtype into title based on DB `homeworkSubtype` field
+
+**Transformations applied** (3,191 total):
+1. `Devoir N°X - Y` → `Devoir de {Contrôle|Synthèse} N°X - Y` (1,138)
+2. `Devoir - Y` → `Devoir de {Contrôle|Synthèse} - Y` (~50)
+3. `Examen - Y` → `Devoir de {Contrôle|Synthèse} - Y` (2,044) - "Examen" in Tunisia = "Devoir" (not BAC exam since type=HOMEWORK)
+4. Subtype also fixed in DB for 1 case (NID 1010: HOUSEWORK→SYNTHESE)
+
+**Result**: 8,682/9,160 HOMEWORK now have subtype in title (94.8%, up from 58.5%)
+
+**Skipped** (478 cases, intentional):
+- Arabic titles (فرض مراقبة, فرض تأليفي) - already in Arabic
+- Short codes (DC1, DS, dev eco, con 2) - not standard format
+- Garbage titles (PHYSIQUkkkk) - need separate cleanup
+- Série d'exercices wrongly typed as HOMEWORK - need type fix
+- Other special cases
+
+**Process**: Two iterations needed
+1. v1 (single-threaded): 1,163 in 15 min, then hung on fetch
+2. v2 (batch with 8 workers): 2,028 in ~10 min, then completed successfully
+
+**Backups**: 3,191 new entries in `ResourceTitleBackup` (fix_subtype_v2 + fix_subtype_batch)
