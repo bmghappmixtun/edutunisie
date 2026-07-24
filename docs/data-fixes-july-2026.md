@@ -226,3 +226,33 @@ All backed up in `ResourceTitleBackup` (UPSERT pattern with regeneratedBy marker
 - 0 with multi-spaces
 - 0 with .pdf suffix
 - 0 with OCR-broken words
+
+## Pensée Islamique Title Fix (July 24, 2026 - Evening)
+
+User reported 16 Pensee Islamique resources had non-conform titles:
+- 6 said "Mathématiques" (wrong subject)
+- 3 missing year
+- 9 had inconsistent format
+- Multiple slug year mismatches
+
+All 16 titles regenerated to use proper format:
+`{Type} N°{HW} - Pensée Islamique - {Class} {Section} ({Year})`
+
+Examples:
+- NID 4625: "Cours - Mathématiques - 4AS Lettres - 2014-2015" → "Cours - Pensée Islamique - 4ème année secondaire (Bac) Lettres (2017-2018)"
+- NID 15366: "Examen - Mathématiques - 2AS Sciences" → "Devoir - Pensée Islamique - 2ème année secondaire Sciences"
+- NID 8057: "Devoir de Contrôle N°2 Avec correction - Pensée Islamique - الزمن والإبداع - Bac Lettres (2016-2017)" → "Devoir N°2 - Pensée Islamique - 4ème année secondaire (Bac) Lettres (2016-2017)"
+
+All backed up in `ResourceTitleBackup` (regeneratedBy: fix_pensee_islamique).
+
+## i18n Discovery (July 24, 2026)
+
+User asked to render these titles in Arabic. Discovered:
+- `Resource` table has NO `titleAr` column
+- Arabic routes (/ar/...) just show French title with `dir="ltr" lang="fr"`
+- `src/messages/{ar,fr}.json` only cover UI labels (not dynamic content)
+
+**Future work (deferred)**: 
+- Add `titleAr` + `descriptionAr` columns to Prisma schema
+- Backfill via GPT-4o-mini for 13,473 resources
+- Update page renderer to use `titleAr` when `locale=ar`
