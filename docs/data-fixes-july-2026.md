@@ -96,3 +96,26 @@ Three waves of subject reclassification based on AI text analysis + Tunisian cur
 All changes backed up to `ResourceSubjectReclassify` table:
 - oldSubjectSlug, newSubjectSlug, changedBy
 - 531 rows (281 + 122 + 124 + 4 unique since 5 are reuse)
+
+## Final: 17 Manual Cases (July 24, 2026 ~18:30 UTC)
+
+After investigation, applied **8 with section fix** + skipped **9**:
+
+### Applied (8 - subject + section fix)
+- NID 11907, 11893: bases-donnees + section sciences-informatique (title: "Bac Informatique")
+- NID 8408, 8527: bases-donnees + section sciences-informatique (4AS, no section)
+- NID 9591: technologie + section technique (3AS, no section)
+- NID 4515: technologie + section technique (4AS, was wrongly svt+sc-exp, content is RDM)
+- NID 9452, 8705: algo-prog + section sciences-informatique (class 4AS/3AS, title wrong says 1AS)
+
+### Skipped (9 - no change, AI wrong or generic slug)
+- NID 8737, 8750, 8744, 8735, 8974: AI detected gestion in 1AS (gestion not in 1AS), keep math
+- NID 9505: title says 4AS eco-gestion, keep informatique (algo taught in eco class)
+- NID 7457: title says Math 4AS maths, keep informatique (algo in maths class)
+- NID 4910: title says Math 4AS eco, keep informatique
+- NID 3974: signal processing is physique, keep physique (AI wrong said technologie)
+
+## Final Totals
+- **Total reclassifications applied**: 539 (4 waves + 17 manual)
+- **Distribution top 5**: math 6099 / physique 3210 / technologie 1085 / svt 822 / anglais 540
+- All backed up in `ResourceSubjectReclassify`
