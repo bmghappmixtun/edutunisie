@@ -332,3 +332,32 @@ All 4 fixed by removing "Mathématiques" and using proper class label.
 - 19 short codes (need OCR or manual)
 - 15 garbage (need separate cleanup)
 - 41 various (Devoir de TP, Devoir de Examen, Série d'exercices wrongly typed, etc)
+
+## Pensee Islamique 3 placeholder titles (July 25, 2026 - 01:10)
+
+**Problem**: 3 Pensee Islamique resources (NID 15366, 15367, 15368) had:
+- Title: "Devoir - Pensée Islamique - 2ème année secondaire Sciences" (placeholder)
+- Subtype: NULL
+- HWN: NULL
+- Year: NULL
+- Trimester: NULL
+
+**Source text analysis** (PDF headers):
+- All 3 contain "1 فرض تأليفي رقم" = "Devoir de Synthèse N°1" (Tunisian Arabic)
+- Date 2012/11/27-29 = 1er trimestre 2012-2013
+- School: معھد نھج الباشا (Lycée Nahj El Bacha)
+- Teacher: Touzri (cmr8wcr46015rstsgbjxvyvzx)
+
+**Fix**:
+- Title → "Devoir de Synthèse N°1 - Pensée Islamique - 2ème année secondaire Sciences - Trim1 - 2012-2013"
+- Subtype: SYNTHESE
+- HWN: 1
+- Year: 2012-2013
+- Trimester: 1
+
+**Result**: 16/16 Pensee Islamique now have complete metadata (year, trimester, subtype).
+
+**Education Islamique** (related subject): 38/45 have year, 0/45 have trimester, 41/45 have subtype
+- 6 missing year: all "8ème année de base" Collège titles (no year in source)
+- 45 missing trimester: need trimester inference from year
+- Action: deferred (not critical, PI was the user's request)
