@@ -141,3 +141,26 @@ For the 8 applied cases + 1 title from earlier (4515), 6 titles were regenerated
 - 9452: `examen-mathematiques-4as-2010-2011` → `examen-algo-prog-4as-2010-2011`
 
 **Backups**: All 6 saved in `ResourceTitleBackup` (UPSERT with regeneratedBy: manual_title_regen_v2 for the 5 + manual_4515 for 4515)
+
+## SUBJECT_MAPPING Extension (July 24, 2026 - End of Day)
+
+Extended `fix_subjects_v2.py` SUBJECT_MAPPING from 75 → 161 entries:
+- Arabic full names (الرياضيات, فيزياء, التاريخ, الجغرافيا, etc.)
+- Long-form French (Sciences de la Vie et de la Terre, TIC, etc.)
+- Compound forms (Sciences Techniques, Génie Mécanique, etc.)
+- Lowercase + uppercase variants
+
+### Final conformity audit
+
+| Stage | Perfect | % of with-AI |
+|---|---:|---:|
+| Start | ~8,084 | ~60% |
+| After 4 waves | 8,715 | 87.7% |
+| **After extended mapping** | **9,826** | **98.8%** |
+| Final remaining | 116 (1.2%) | mostly compound technologie sub-topics |
+
+### Total cumulative impact (full day)
+
+- **872 resources reclassified** in `ResourceSubjectReclassify`
+- **6 titles regenerated** in `ResourceTitleBackup`
+- **Conformity**: 60% → 98.8% (+38.8 pts)
