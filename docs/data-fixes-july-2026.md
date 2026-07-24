@@ -119,3 +119,25 @@ After investigation, applied **8 with section fix** + skipped **9**:
 - **Total reclassifications applied**: 539 (4 waves + 17 manual)
 - **Distribution top 5**: math 6099 / physique 3210 / technologie 1085 / svt 822 / anglais 540
 - All backed up in `ResourceSubjectReclassify`
+
+## Title Regeneration (17 manual cases) - 6 titles updated
+
+For the 8 applied cases + 1 title from earlier (4515), 6 titles were regenerated to match the actual DB subject/section (some titles said "1ère année secondaire" or "Mathématiques" but class/section was different):
+
+| NID | Old Title | New Title | Reason |
+|---|---|---|---|
+| 4515 | Série d'exercices - Mathématiques - 4ème année secondaire (Bac) Bac Sciences Expérimentales | **Série d'exercices - Technologie - 4ème année secondaire (Bac) Technique** | Content is RDM (technologie), was wrongly labeled Math in title |
+| 8408 | Cours - Informatique - 1ère année secondaire | **Cours - Bases de données - 4ème année secondaire (Bac) Sciences de l'informatique** | Class is 4AS, subject is bases-donnees |
+| 8527 | Cours - Informatique - 1ère année secondaire | **Cours - Bases de données - 4ème année secondaire (Bac) Sciences de l'informatique** | Class is 4AS, subject is bases-donnees |
+| 8705 | Cours - Mathématiques - 1ère année secondaire - 2012-2013 | **Cours - Algo-prog - 3ème année secondaire Sciences de l'informatique - 2012-2013** | Class is 3AS, subject is algo-prog |
+| 9452 | Examen - Mathématiques - 1ère année secondaire - Trim1 - 2010-2011 | **Examen - Algo-prog - 4ème année secondaire (Bac) Sciences de l'informatique - Trim1 - 2010-2011** | Class is 4AS, subject is algo-prog |
+| 9591 | Examen - Technologie - 1ère année secondaire - 2013-2014 | **Examen - Technologie - 3ème année secondaire Technique - 2013-2014** | Class is 3AS, section is technique |
+
+**Slugs regenerated** for 5 NIDs (9591 slug was already correct):
+- 4515: `serie-mathematiques-4as` → `serie-technologie-4as-tech`
+- 8408: `cours-informatique-4as` → `cours-bases-donnees-4as-8408`
+- 8527: `cours-informatique-4as` → `cours-bases-donnees-4as-8527` (collision diff with -8408)
+- 8705: `cours-mathematiques-3as-2012-2013` → `cours-algo-prog-3as-2012-2013`
+- 9452: `examen-mathematiques-4as-2010-2011` → `examen-algo-prog-4as-2010-2011`
+
+**Backups**: All 6 saved in `ResourceTitleBackup` (UPSERT with regeneratedBy: manual_title_regen_v2 for the 5 + manual_4515 for 4515)
