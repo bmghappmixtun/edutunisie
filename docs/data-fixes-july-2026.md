@@ -308,3 +308,27 @@ All 4 fixed by removing "Mathématiques" and using proper class label.
 2. v2 (batch with 8 workers): 2,028 in ~10 min, then completed successfully
 
 **Backups**: 3,191 new entries in `ResourceTitleBackup` (fix_subtype_v2 + fix_subtype_batch)
+
+## Subtype v3-v5 fix (July 25, 2026 - 00:30)
+
+**After v2 batch**: 466 HOMEWORK still missing subtype in title.
+
+**Categorization**:
+- 326 Arabic titles (فرض مراقبة, فرض تأليفي) - already in Arabic, leave
+- 19 short codes (DC, DS, syn, dev cont) - too short, OCR-broken
+- 15 garbage titles (PHYSIQUkkkk, "Gymnasium", etc)
+- 106 fixable cases
+
+**v3 (17 cases)**: Handled "Devoir de Maison" with wrong subtype, "Devoir de Examen", typos
+**v4 (skipped)**: 668 cosmetic SYNTHESE→Synthèse changes - too aggressive
+**v5 (171 cases)**: ONLY CONTROLE mismatches (title says Synthèse but DB says Contrôle) - REAL FIXES
+
+**Manual (3 cases)**: NID 1648, 2061, 829 - "Devoir de Syntése" typo with subtype=HOUSEWORK → "Devoir de Maison"
+
+**Result**: 8759/9160 HOMEWORK have subtype indicator (95.6%, up from 94.8%)
+
+**Remaining 401**:
+- 326 Arabic (correct as-is)
+- 19 short codes (need OCR or manual)
+- 15 garbage (need separate cleanup)
+- 41 various (Devoir de TP, Devoir de Examen, Série d'exercices wrongly typed, etc)
