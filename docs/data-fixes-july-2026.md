@@ -189,3 +189,40 @@ Extended `fix_subjects_v2.py` SUBJECT_MAPPING from 75 → 161 entries:
 - `002f10f` - SUBJECT_MAPPING 161 entries
 - `412fbcc` - Final recap
 - `e6455e7` - **SUBJECT_MAPPING 340 entries → 100%**
+
+## Corrupt Title Cleanup (July 24, 2026 - Evening)
+
+After 100% AI conformity, cleaned up corrupt resource titles:
+
+### NID 4939 fixes (3 iterations, user-guided)
+- v1: Résumé Informatique Probabilités → wrong (user said math devoir)
+- v2: Devoir Mathématiques + section maths → wrong section (user said SI)
+- v3 (final): Devoir Mathématiques + section sciences-informatique ✅
+
+### Corrupt title batch fixes
+- **2 HTML entities** (`&amp;` → `&`): NID 15347, 15348 (Géographie 2AS Eco)
+- **24 multi-spaces** (3+ consecutive): all cleaned
+- **17 very short titles** (DS3 4ECO, Rosa Parks, etc.): regenerated from DB fields
+- **9 with `.pdf` suffix**: extension removed
+- **8 OCR-broken** (S rie, R par, etc.): manually corrected
+
+### Total corrupt titles fixed: 35 unique resources
+
+All backed up in `ResourceTitleBackup` (UPSERT pattern with regeneratedBy markers):
+- fix_corrupt_4939
+- fix_corrupt_short
+- fix_corrupt_pdf
+- fix_corrupt_ocr
+- fix_corrupt_amp
+- fix_multi_spaces
+- fix_4939_math_user
+- fix_4939_section_si
+- manual_4515
+- manual_8705_techno_fix
+- manual_title_regen_v2
+
+### Status: All weird chars / corrupt titles cleaned
+- 0 with HTML entities
+- 0 with multi-spaces
+- 0 with .pdf suffix
+- 0 with OCR-broken words
