@@ -10,7 +10,7 @@
  * Version: bumped each release to bust old caches.
  */
 
-const SW_VERSION = 'v1.0.0';
+const SW_VERSION = 'v1.0.1';
 const STATIC_CACHE = `examanet-static-${SW_VERSION}`;
 const PAGES_CACHE = `examanet-pages-${SW_VERSION}`;
 const API_CACHE = `examanet-api-${SW_VERSION}`;
