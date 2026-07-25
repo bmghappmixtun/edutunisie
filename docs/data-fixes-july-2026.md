@@ -765,3 +765,24 @@ Class labels: `1AS`, `2AS`, `3AS`, `4AS` for secondaire; `7ème`, `8ème`, `9èm
 - Type: DEVOIR / Subtype: CONTROLE / Hwn: 1
 
 **Script**: `pdf-test/fix_title_prefixes.py`
+
+## Session 9 (July 25) - Bad suffix cleanup
+
+**Issue**: 37 titles had bad suffixes that polluted the display
+- `-stamped` (15): "Mr GHARBI RIDHA-stamped" → "Mr GHARBI RIDHA"
+- `-stamped-compressed` (5): same pattern
+- Trailing `-` (8): "9ème année de base -" → "9ème année de base"
+- Truncated year (2): "(2022-2023" → "(2022-2023)"
+- Trailing whitespace (7): various
+
+**Strategy**: Regex-strip bad suffixes, also add missing closing parens for truncated years
+
+**Examples fixed**:
+- NID 2487: "Devoir de Synthèse N°2 - Math SYNTHESE N2 - 7ème (2025-2026) Mr GHARBI RIDHA-stamped" → without "-stamped"
+- NID 15020, 15021: "(2022-2023" → "(2022-2023)" (added closing paren)
+- NID 7198: trailing "-" stripped
+
+**Verification**:
+- 0 remaining titles with stamped/compressed/scanned/ocr
+- 0 remaining truncated years
+- All 37 affected URLs still work via Vercel catch-all (slug unchanged)
