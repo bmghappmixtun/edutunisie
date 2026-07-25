@@ -745,3 +745,23 @@ Class labels: `1AS`, `2AS`, `3AS`, `4AS` for secondaire; `7ème`, `8ème`, `9èm
 **After fix**:
 - Year filter starts at `2004-2005` cleanly
 - 23 options: 2004-2005 through 2026-2027
+
+## Session 8 (July 25) - Title prefix cleanup
+
+**Issue**: 259 resources had titles missing type/subtype prefix (like NID 89: "N°1 - Math - 7ème Mr GHARBI RIDHA" with no "Devoir de..." prefix)
+
+**Strategy**: PREPEND type+subtype prefix to title without regenerating the rest
+
+**Patterns fixed**:
+- 6 GHARBI RIDHA: "N°X - Math - Xème" → "Devoir de Contrôle N°X - Math - Xème"
+- 80 titles: "Controle" (no accent) → "Contrôle" (proper accent)
+- 15 hwn extracted from title (NID 8, 83, 16, 90, 55, 63, etc.)
+- 6 duplicate "N°X - N°X" patterns fixed
+- 406 slugs regenerated (was "document-..." default)
+
+**After fix NID 89**:
+- Title: "Devoir de Contrôle N°1 - Math - 7ème Mr GHARBI RIDHA"
+- Slug: devoir-de-controle-n-1-math-7eme-mr-gharbi-ridha-89
+- Type: DEVOIR / Subtype: CONTROLE / Hwn: 1
+
+**Script**: `pdf-test/fix_title_prefixes.py`
