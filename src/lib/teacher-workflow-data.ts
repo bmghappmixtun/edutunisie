@@ -354,9 +354,10 @@ export const FILE_TYPES: FileTypeOption[] = [
 
 // Sous-types pour Devoir
 export const HOMEWORK_SUBTYPES = [
-  { key: 'CONTROL', label: '📋 Devoir de Contrôle', color: 'red' },
-  { key: 'SYNTHESIS', label: '📝 Devoir de Synthèse', color: 'violet' },
-  { key: 'HOUSEWORK', label: '🏠 Devoir de Maison', color: 'orange' },
+  { key: 'CONTROLE', label: '📋 Devoir de Contrôle', color: 'red' },
+  { key: 'SYNTHESE', label: '📝 Devoir de Synthèse', color: 'violet' },
+  { key: 'MAISON', label: '🏠 Devoir de Maison', color: 'orange' },
+  { key: 'REVISION', label: '🔄 Devoir de Révision', color: 'blue' },
 ];
 
 // Numéros de devoir (1 → 6 pour Devoir, 1 → 20 pour Série)

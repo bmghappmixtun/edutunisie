@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
   const toDate = params.get('to');
   const hasFile = params.get('hasFile') === 'true';
   const hasCorrection = params.get('hasCorrection'); // 'true' | 'false' | null
-  const homeworkSubtype = params.get('homeworkSubtype'); // CONTROL | SYNTHESIS | HOUSEWORK
+  const homeworkSubtype = params.get('homeworkSubtype'); // CONTROLE | SYNTHESE | MAISON | REVISION
   const schoolType = params.get('schoolType'); // PUBLIC | PILOTE
 
   // Build filter conditions
@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
   if (year) where.year = year;
   if (hasCorrection === 'true') where.hasCorrection = true;
   if (hasCorrection === 'false') where.hasCorrection = false;
-  if (homeworkSubtype && ['CONTROL', 'SYNTHESIS', 'HOUSEWORK'].includes(homeworkSubtype)) {
+  if (homeworkSubtype && ['CONTROLE', 'SYNTHESE', 'MAISON', 'REVISION'].includes(homeworkSubtype)) {
     where.homeworkSubtype = homeworkSubtype;
   }
   if (schoolType && ['PUBLIC', 'PRIVATE', 'PILOTE'].includes(schoolType)) {
