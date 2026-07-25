@@ -786,3 +786,23 @@ Class labels: `1AS`, `2AS`, `3AS`, `4AS` for secondaire; `7ème`, `8ème`, `9èm
 - 0 remaining titles with stamped/compressed/scanned/ocr
 - 0 remaining truncated years
 - All 37 affected URLs still work via Vercel catch-all (slug unchanged)
+
+## Session 10 (July 25) - 3 corrections
+
+### 1. NID 167 - BAC_SUBJECT misclassified
+- Was: `type=BAC_SUBJECT, title="Devoir de Révision pour le concours (Contrôle n°6 )"`
+- Now: `type=DEVOIR, subtype=CONTROLE, hwn=6, title="Devoir de Contrôle N°6 - Mathématiques - 9ème année de base - (2021-2022)"`
+- Reason: 9ème année "concours" = entrance exam for lycées pilotes, NOT BAC exam
+
+### 2. Duplicate subtype labels in titles
+- 7 titles had "SYNTHESE N 2" or "CONTROLE N 3" appearing TWICE (once in prefix, once redundantly)
+- Example NID 2487: `Devoir de Synthèse N°2 - Math SYNTHESE N2 - 7ème (...)`
+  → `Devoir de Synthèse N°2 - Math - 7ème (...)`
+- Other NIDs fixed: 392, 1830, 2473, 2658, 7367, 7379, 13522, 13523
+
+### 3. "Sujet BAC" filter removed
+- Was 1 BAC_SUBJECT resource (now fixed to DEVOIR)
+- Filter auto-disappears from /ressources (0 resources with this type)
+- Side benefit: cleaner /ressources filter UI
+
+**Script**: `pdf-test/fix_3_issues.py` (saved for future use)
