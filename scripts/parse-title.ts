@@ -81,11 +81,13 @@ function detectSubject(title: string): string | null {
 // Homework subtype detection
 function detectHomeworkSubtype(title: string): string | null {
   // Devoir de Contrôle (FR + typos)
-  if (/contr[oôö]le/i.test(title) || /devoir.*controle/i.test(title)) return 'CONTROL';
+  if (/contr[oôö]le/i.test(title) || /devoir.*controle/i.test(title)) return 'CONTROLE';
   // Devoir de Synthèse
-  if (/synth[eèéê]se|synt[eèéê]se/i.test(title)) return 'SYNTHESIS';
+  if (/synth[eèéê]se|synt[eèéê]se/i.test(title)) return 'SYNTHESE';
+  // Devoir de Révision
+  if (/r[eéè]vision/i.test(title)) return 'REVISION';
   // Devoir de Maison
-  if (/\bmaison\b/i.test(title) || /واجب منزلي/i.test(title)) return 'HOUSEWORK';
+  if (/\bmaison\b/i.test(title) || /واجب منزلي/i.test(title)) return 'MAISON';
   return null;
 }
 
