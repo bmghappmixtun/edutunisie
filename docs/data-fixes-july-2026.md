@@ -806,3 +806,38 @@ Class labels: `1AS`, `2AS`, `3AS`, `4AS` for secondaire; `7ème`, `8ème`, `9èm
 - Side benefit: cleaner /ressources filter UI
 
 **Script**: `pdf-test/fix_3_issues.py` (saved for future use)
+
+## Session 11 (July 25) - SEO Audit + Slug regeneration
+
+**Issue**: After all data cleanups, 14,530 slugs were out of sync with their titles
+
+**Changes accounted for**:
+- 220 section mismatches (Informatique → TI/SI)
+- 584 year cleanups (reversed, same-year, single)
+- 259 title prefix fixes (Devoir de Contrôle added)
+- 37 bad suffix removals (-stamped, -compressed)
+- 6 old year resources (1987, 1999)
+- 3 corrections (NID 167 BAC_SUBJECT, duplicates)
+- Arabic subject split (titles with mixed FR/AR)
+
+**Slug generation**:
+- NID suffix to ensure uniqueness
+- Apostrophes → hyphens
+- Arabic stripped (displayed in UI separately)
+- 80-char limit
+- Trim trailing ' - '
+
+**After fix**:
+- 14,530 slugs updated
+- 0 default 'document-' slugs (only 2 with no proper title)
+- 0 slugs with 'stamped'/'compressed'
+- 0 duplicate slugs
+
+**Vercel catch-all preserves old URLs** (200 OK) while new URLs become canonical.
+
+**Bing/IndexNow**:
+- 90/100 top URLs submitted for re-crawl
+- Sitemap.xml submitted to Bing
+- Will re-crawl in 24-48h
+
+**Script**: `pdf-test/regen_all_slugs.py` (reusable for future regenerations)
