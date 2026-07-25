@@ -479,3 +479,41 @@ Fixed to match their actual content. User can re-test.
 ### Backups
 - ResourceTitleBackup: 4 new entries (fix_misclass_subj_audit)
 - ResourceSubjectReclassify: 4 new entries
+
+## Comprehensive Subject Audit - SVT, Physique, Français, etc (July 25, 2026 - 13:30)
+
+**Audit scope**: All subjects in secondaire (1AS-4AS) AND collège (7-9ème)
+
+**Method**: Smart filter checking title segments - look at position 1 (the SUBJECT position in standard format "Type - Subject - Class - [Trim] - [Year]")
+
+**SECONDAIRE results (9700 resources scanned)**:
+- 7 real subject misclassifications found and fixed
+
+| NID | Old | New | Title (subject segment) |
+|---|---|---|---|
+| 9452 | mathematiques | algo-prog | "Algo-prog" → Algorithmique et Programmation |
+| 11858 | informatique | bases-donnees | "Base de données" → Bases de Données |
+| 6944 | svt | physique | "Sciences physiques" → Physique |
+| 6814 | mathematiques | physique | "Physique" → Physique |
+| 7531 | informatique | bases-donnees | "Base de données" → Bases de Données |
+| 7075 | anglais | physique | "Sciences physiques" → Physique |
+| 11866 | informatique | bases-donnees | "Base de données" → Bases de Données |
+
+**COLLEGE results (3690 resources scanned)**:
+- 33 real subject misclassifications found and fixed
+- Top patterns: math→technologie (12), physique→francais (7), math→physique (3)
+
+**False positives filtered out** (377 cases):
+- "Mathématiques" in title = section name (BAC Math) - not subject
+- "Économie" in title = section name (BAC Économie-Gestion)
+- "Informatique" in title = section name (BAC SI)
+- "Sciences" in title = section name (BAC Sciences)
+
+**Non-standard titles (174)**: OCR-broken, short codes (DC, DS, con, syn) - need separate cleanup
+
+**Spot-check**: All 7 secondaire + 5 college = 200 ✅
+
+**Backups**:
+- ResourceTitleBackup: 4506 entries
+- ResourceSubjectReclassify: 923 entries
+- 43 new reclassifications (3+7+33)
