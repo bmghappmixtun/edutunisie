@@ -446,7 +446,9 @@ export default async function ResourcePage({
                 )}
 
                 {/* AI-extracted content (2026-07-20 Mavis pipeline) */}
-                {resource.metadata && (resource.metadata.systemName || resource.metadata.dossierTechnique) && (
+                {resource.metadata && (resource.metadata.systemName || resource.metadata.dossierTechnique) && (() => {
+                  const systemAr = isArabic(resource.metadata.systemName || '') || isArabic(resource.metadata.dossierTechnique || '');
+                  return (
                   <AiContentSection
                     title="Système technique étudié"
                     icon={<Wrench className="w-4 h-4" />}
@@ -455,20 +457,31 @@ export default async function ResourcePage({
                     defaultOpen={false}
                   >
                     {resource.metadata.systemName && (
-                      <div className={`text-xl font-extrabold text-orange-900 mb-1`}>
+                      <div
+                        className={`text-xl font-extrabold text-orange-900 mb-1 ${systemAr ? 'text-right' : 'text-left'}`}
+                        dir={systemAr ? 'rtl' : 'ltr'}
+                        lang={systemAr ? 'ar' : 'fr'}
+                      >
                         {resource.metadata.systemName}
                       </div>
                     )}
                     {resource.metadata.dossierTechnique && (
-                      <div className={`text-sm text-orange-900`}>
+                      <div
+                        className={`text-sm text-orange-900 ${systemAr ? 'text-right' : 'text-left'}`}
+                        dir={systemAr ? 'rtl' : 'ltr'}
+                        lang={systemAr ? 'ar' : 'fr'}
+                      >
                         <span className="font-semibold">Dossier technique :</span> {resource.metadata.dossierTechnique}
                       </div>
                     )}
                   </AiContentSection>
-                )}
+                  );
+                })()}
 
                 {/* AI-generated summary */}
-                {resource.aiSummary?.summary && (
+                {resource.aiSummary?.summary && (() => {
+                  const summaryAr = isArabic(resource.aiSummary.summary);
+                  return (
                   <AiContentSection
                     title="Résumé intelligent"
                     icon={<Sparkles className="w-4 h-4" />}
@@ -476,14 +489,22 @@ export default async function ResourcePage({
                     subjectSlug={resource.subject?.slug}
                     defaultOpen={false}
                   >
-                    <p className="text-sm text-slate-700 leading-relaxed">
+                    <p
+                      className={`text-sm text-slate-700 leading-relaxed ${summaryAr ? 'text-right' : 'text-left'}`}
+                      dir={summaryAr ? 'rtl' : 'ltr'}
+                      lang={summaryAr ? 'ar' : 'fr'}
+                    >
                       {resource.aiSummary.summary}
                     </p>
                   </AiContentSection>
-                )}
+                  );
+                })()}
 
                 {/* AI key points */}
-                {resource.metadata?.keyPoints && resource.metadata.keyPoints.length > 0 && (
+                {resource.metadata?.keyPoints && resource.metadata.keyPoints.length > 0 && (() => {
+                  // Check if any key point is Arabic — if so, align all right
+                  const anyAr = resource.metadata.keyPoints.some((kp) => isArabic(kp));
+                  return (
                   <AiContentSection
                     title="Points clés"
                     icon={<Target className="w-4 h-4" />}
@@ -492,15 +513,22 @@ export default async function ResourcePage({
                     defaultOpen={false}
                   >
                     <ul className="space-y-1.5">
-                      {resource.metadata.keyPoints.slice(0, 5).map((kp, i) => (
-                        <li key={i} className="text-sm text-slate-700 flex items-start gap-2">
-                          <span className={`text-fuchsia-500 mt-1`}>→</span>
-                          <span>{kp}</span>
+                      {resource.metadata.keyPoints.slice(0, 5).map((kp, i) => {
+                        const kpAr = isArabic(kp);
+                        return (
+                        <li
+                          key={i}
+                          className={`text-sm text-slate-700 flex items-start gap-2 ${kpAr ? 'flex-row-reverse text-right' : ''}`}
+                        >
+                          <span className={`text-fuchsia-500 mt-1`}>{kpAr ? '←' : '→'}</span>
+                          <span dir={kpAr ? 'rtl' : 'ltr'} lang={kpAr ? 'ar' : 'fr'}>{kp}</span>
                         </li>
-                      ))}
+                        );
+                      })}
                     </ul>
                   </AiContentSection>
-                )}
+                  );
+                })()}
 
                 {/* AI topics (clickable tags) */}
                 {resource.metadata?.topics && resource.metadata.topics.length > 0 && (() => {
