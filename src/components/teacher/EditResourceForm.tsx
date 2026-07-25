@@ -381,9 +381,10 @@ export default function EditResourceForm({
                 <legend className="label mb-2">Type de devoir</legend>
               <div className="flex flex-wrap gap-2">
                 {[
-                  { value: 'CONTROL', label: '📋 Contrôle', cls: 'red' },
-                  { value: 'SYNTHESIS', label: '📝 Synthèse', cls: 'violet' },
-                  { value: 'HOUSEWORK', label: '🏠 Maison', cls: 'orange' },
+                  { value: 'CONTROLE', label: '📋 Contrôle', cls: 'red' },
+                  { value: 'SYNTHESE', label: '📝 Synthèse', cls: 'violet' },
+                  { value: 'MAISON', label: '🏠 Maison', cls: 'orange' },
+                  { value: 'REVISION', label: '🔄 Révision', cls: 'blue' },
                 ].map((opt) => (
                   <button
                     key={opt.value}

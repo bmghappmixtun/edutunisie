@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
     let libraryFileId: string | null = null; // <- NEW: link to teacher library file
 
     // Homework & school metadata (NEW)
-    let homeworkSubtype: string | null = null; // CONTROL | SYNTHESIS | HOUSEWORK
+    let homeworkSubtype: string | null = null; // CONTROLE | SYNTHESE | MAISON | REVISION
     let homeworkNumber: number | null = null; // 1, 2, 3, 4, 5+ ...
     let schoolType: string | null = null; // PUBLIC | PILOTE
     let product: string | null = null; // المنتج (Arabic text)
@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
       const rawHasCorrection = formData.get('hasCorrection');
       const rawCorrectionSummary = formData.get('correctionSummary');
       if (rawSubtype && typeof rawSubtype === 'string' && rawSubtype.trim()) {
-        const allowed = ['CONTROL', 'SYNTHESIS', 'HOUSEWORK'];
+        const allowed = ['CONTROLE', 'SYNTHESE', 'MAISON', 'REVISION'];
         if (allowed.includes(rawSubtype)) homeworkSubtype = rawSubtype;
       }
       if (rawNumber) {
@@ -133,7 +133,7 @@ export async function POST(req: NextRequest) {
       fileSize = body.fileSize || 0;
       libraryFileId = body.libraryFileId || null;
       // Homework & school metadata (NEW)
-      const allowedSubtypes = ['CONTROL', 'SYNTHESIS', 'HOUSEWORK'];
+      const allowedSubtypes = ['CONTROLE', 'SYNTHESE', 'MAISON', 'REVISION'];
       if (allowedSubtypes.includes(body.homeworkSubtype)) homeworkSubtype = body.homeworkSubtype;
       if (body.homeworkNumber) {
         const n = parseInt(String(body.homeworkNumber), 10);

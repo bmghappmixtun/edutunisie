@@ -67,7 +67,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
     // Validate enums and ranges
     if (allowed.homeworkSubtype !== undefined) {
-      const ok = ['CONTROL', 'SYNTHESIS', 'HOUSEWORK', null].includes(allowed.homeworkSubtype);
+      const ok = ['CONTROLE', 'SYNTHESE', 'MAISON', 'REVISION', null].includes(allowed.homeworkSubtype);
       if (!ok) delete allowed.homeworkSubtype;
     }
     if (allowed.homeworkNumber !== undefined) {
