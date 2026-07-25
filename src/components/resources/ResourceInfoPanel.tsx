@@ -13,7 +13,7 @@ import {
 
 const TYPE_LABELS: Record<string, { fr: string; ar: string; icon: string; color: string }> = {
   COURSE: { fr: '📖 Cours', ar: '📖 درس', icon: '📖', color: 'bg-blue-100 text-blue-700' },
-  HOMEWORK: { fr: '📝 Devoir', ar: '📝 فرض', icon: '📝', color: 'bg-amber-100 text-amber-700' },
+  DEVOIR: { fr: '📝 Devoir', ar: '📝 فرض', icon: '📝', color: 'bg-amber-100 text-amber-700' },
   EXERCISE: {
     fr: '✏️ Exercice',
     ar: '✏️ تمرين',

@@ -26,7 +26,7 @@ import type { SearchResponse, SearchResult } from '@/lib/search-v2';
 
 const TYPE_LABELS: Record<string, string> = {
   COURSE: 'Cours',
-  HOMEWORK: 'Devoir',
+  DEVOIR: 'Devoir',
   EXERCISE: 'Exercice',
   EXERCISES: 'Exercices',
   SERIES: 'Série',
@@ -39,7 +39,7 @@ const TYPE_LABELS: Record<string, string> = {
 
 const TYPE_COLORS: Record<string, string> = {
   COURSE: 'bg-blue-100 text-blue-700',
-  HOMEWORK: 'bg-amber-100 text-amber-700',
+  DEVOIR: 'bg-amber-100 text-amber-700',
   EXERCISE: 'bg-purple-100 text-purple-700',
   EXERCISES: 'bg-purple-100 text-purple-700',
   SERIES: 'bg-emerald-100 text-emerald-700',

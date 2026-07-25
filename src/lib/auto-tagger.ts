@@ -6,7 +6,7 @@
  *  2. Subject (slug + name)
  *  3. Class (level-based keywords: "bac", "lycee", "college")
  *  4. Section (slug-based keywords: "math", "sc-exp", "si", "eco")
- *  5. Type (HOMEWORK→devoir, COURSE→cours, etc.)
+ *  5. Type (DEVOIR→devoir, COURSE→cours, etc.)
  *  6. School year (formatted as "2024-2025")
  *  7. Trimestre (T1/T2/T3 → "trimestre-1")
  *  8. Homework context (subtype + number)
@@ -202,7 +202,7 @@ const SECTION_KEYWORDS_3AS_4AS: Record<string, string[]> = {
 // TYPE → KEYWORDS MAPPING
 // ============================================================================
 const TYPE_KEYWORDS: Record<string, string[]> = {
-  HOMEWORK: ['devoir', 'homework', 'devoir-surveille', 'controle', 'synthese', 'maison'],
+  DEVOIR: ['devoir', 'homework', 'devoir-surveille', 'controle', 'synthese', 'maison'],
   EXERCISE: ['exercice', 'serie', 'td', 'tp', 'entrainement', 'applications'],
   COURSE: ['cours', 'lecon', 'chapitre', 'fiche-cours'],
   REVISION: ['revision', 'bac-blanc', 'rattrapage', 'synthese'],

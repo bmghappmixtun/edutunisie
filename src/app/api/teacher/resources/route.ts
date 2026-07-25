@@ -295,7 +295,7 @@ export async function POST(req: NextRequest) {
       type,
       year,
       trimester,
-      homeworkSubtype: type === 'HOMEWORK' ? homeworkSubtype : null,
+      homeworkSubtype: type === 'DEVOIR' ? homeworkSubtype : null,
       homeworkNumber,
       hasCorrection,
     });
@@ -333,7 +333,7 @@ export async function POST(req: NextRequest) {
         tags: finalTags,
         pageCount: 10,
         // Homework & school metadata (NEW)
-        homeworkSubtype: type === 'HOMEWORK' ? homeworkSubtype : null,
+        homeworkSubtype: type === 'DEVOIR' ? homeworkSubtype : null,
         homeworkNumber,
         schoolType,
         product,

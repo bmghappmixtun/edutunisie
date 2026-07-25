@@ -110,7 +110,7 @@ export async function POST(req: NextRequest) {
 
     // Detect type
     let resType = 'COURSE';
-    if (/contr[ôo]le|^\s*dc| dc\b/i.test(fnameLower)) resType = 'HOMEWORK';
+    if (/contr[ôo]le|^\s*dc| dc\b/i.test(fnameLower)) resType = 'DEVOIR';
     else if (/synth[èe]se|\bds\b/i.test(fnameLower)) resType = 'EXAM';
     else if (/examen|bac/i.test(fnameLower)) resType = 'EXAM';
     else if (/exercice/i.test(fnameLower)) resType = 'EXERCISE';

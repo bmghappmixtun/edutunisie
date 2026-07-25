@@ -157,8 +157,8 @@ export default function AddResourcePage() {
         type: fileType,
         year: schoolYear,
         trimester: trimester || null,
-        homeworkSubtype: fileType === 'HOMEWORK' ? homeworkSubtype || null : null,
-        homeworkNumber: fileType === 'HOMEWORK' ? homeworkNumber || null : null,
+        homeworkSubtype: fileType === 'DEVOIR' ? homeworkSubtype || null : null,
+        homeworkNumber: fileType === 'DEVOIR' ? homeworkNumber || null : null,
         hasCorrection,
         description,
         summary: description, // Use description as summary
@@ -172,8 +172,8 @@ export default function AddResourcePage() {
       type: fileType,
       year: schoolYear,
       trimester: trimester || null,
-      homeworkSubtype: fileType === 'HOMEWORK' ? homeworkSubtype || null : null,
-      homeworkNumber: fileType === 'HOMEWORK' ? homeworkNumber || null : null,
+      homeworkSubtype: fileType === 'DEVOIR' ? homeworkSubtype || null : null,
+      homeworkNumber: fileType === 'DEVOIR' ? homeworkNumber || null : null,
       hasCorrection,
     });
   }, [
@@ -212,7 +212,7 @@ export default function AddResourcePage() {
     const parts: string[] = [];
 
     // 1) Type + sous-type / N°
-    if (fileType === 'HOMEWORK') {
+    if (fileType === 'DEVOIR') {
       const sub = HOMEWORK_SUBTYPES.find((s) => s.key === homeworkSubtype);
       if (sub) {
         // Strip leading emoji: 📋📝🏠
@@ -289,7 +289,7 @@ export default function AddResourcePage() {
     const errors: string[] = [];
     if (!uploadedFile) errors.push('Uploadez un fichier');
     if (!fileType) errors.push('Choisissez le type de fichier');
-    if (fileType === 'HOMEWORK' && !homeworkSubtype) errors.push('Choisissez le type de devoir');
+    if (fileType === 'DEVOIR' && !homeworkSubtype) errors.push('Choisissez le type de devoir');
     if (fileType === 'EXERCISE' && !customTitle.trim())
       errors.push("Saisissez l'objet de la série");
     if ((fileType === 'COURSE' || fileType === 'REVISION') && !customTitle.trim())
@@ -343,8 +343,8 @@ export default function AddResourcePage() {
           fileUrl: uploadedFile!.fileUrl,
           fileSize: uploadedFile!.fileSize,
           // Homework
-          homeworkSubtype: fileType === 'HOMEWORK' ? homeworkSubtype || null : null,
-          homeworkNumber: fileType === 'HOMEWORK' && homeworkNumber ? Number(homeworkNumber) : null,
+          homeworkSubtype: fileType === 'DEVOIR' ? homeworkSubtype || null : null,
+          homeworkNumber: fileType === 'DEVOIR' && homeworkNumber ? Number(homeworkNumber) : null,
           // School
           schoolType,
           // Correction
@@ -419,7 +419,7 @@ export default function AddResourcePage() {
         </div>
 
         {/* Sub-flow: Devoir */}
-        {fileType === 'HOMEWORK' && (
+        {fileType === 'DEVOIR' && (
           <SubSection title="📝 Détails du devoir" tone="amber">
             <div>
               <Label>

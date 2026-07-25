@@ -48,7 +48,7 @@ export async function generateStaticParams() {
 // Hard-coded filter options
 const RESOURCE_TYPES = [
   { slug: 'COURSE', label: 'Cours', emoji: '📘' },
-  { slug: 'HOMEWORK', label: 'Devoirs', emoji: '📝' },
+  { slug: 'DEVOIR', label: 'Devoirs', emoji: '📝' },
   { slug: 'EXERCISE', label: 'Exercices', emoji: '✏️' },
   { slug: 'REVISION', label: 'Révisions', emoji: '🔁' },
   { slug: 'BAC_SUBJECT', label: 'Sujets BAC', emoji: '🎓' },

@@ -42,7 +42,7 @@ type Filter = {
 
 const FILE_TYPES = [
   { value: 'COURSE', label: 'Cours', icon: '📖', color: 'sky' },
-  { value: 'HOMEWORK', label: 'Devoir', icon: '📝', color: 'amber' },
+  { value: 'DEVOIR', label: 'Devoir', icon: '📝', color: 'amber' },
   { value: 'EXERCISE', label: 'Exercice', icon: '✏️', color: 'emerald' },
   { value: 'SERIES', label: 'Série', icon: '📋', color: 'violet' },
   { value: 'EXAM', label: 'Examen', icon: '📊', color: 'red' },

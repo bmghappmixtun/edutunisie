@@ -49,7 +49,7 @@ export function fileSize(bytes: number): string {
 
 export const RESOURCE_TYPE_LABELS: Record<string, { fr: string; ar: string; color: string }> = {
   COURSE: { fr: 'Cours', ar: 'درس', color: 'bg-blue-100 text-blue-700' },
-  HOMEWORK: { fr: 'Devoir', ar: 'فرض', color: 'bg-amber-100 text-amber-700' },
+  DEVOIR: { fr: 'Devoir', ar: 'فرض', color: 'bg-amber-100 text-amber-700' },
   EXERCISE: { fr: "Série d'exercices", ar: 'سلسلة تمارين', color: 'bg-green-100 text-green-700' },
   REVISION: { fr: 'Révision', ar: 'مراجعة', color: 'bg-purple-100 text-purple-700' },
   EXAM: { fr: 'Contrôle/Examen', ar: 'اختبار', color: 'bg-red-100 text-red-700' },
@@ -59,7 +59,7 @@ export const RESOURCE_TYPE_LABELS: Record<string, { fr: string; ar: string; colo
   OTHER: { fr: 'Autre', ar: 'آخر', color: 'bg-slate-100 text-slate-700' },
 };
 
-// Homework subtype — only relevant when type=HOMEWORK
+// Homework subtype — only relevant when type=DEVOIR
 export const HOMEWORK_SUBTYPE_LABELS: Record<string, { fr: string; ar: string; color: string }> = {
   CONTROL: { fr: 'Contrôle', ar: 'فرض مراقبة', color: 'bg-red-100 text-red-700' },
   SYNTHESIS: { fr: 'Synthèse', ar: 'فرض تأليفي', color: 'bg-violet-100 text-violet-700' },

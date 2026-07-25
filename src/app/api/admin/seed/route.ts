@@ -394,7 +394,7 @@ export async function POST(req: NextRequest) {
       {
         title: 'Devoir de synthèse n°3 — Mathématiques Bac 2024',
         desc: 'Devoir complet couvrant algèbre, analyse et probabilités.',
-        type: 'HOMEWORK',
+        type: 'DEVOIR',
         subject: 'mathematiques',
         class: '4eme-secondaire',
         section: 'sciences',
@@ -546,7 +546,7 @@ export async function POST(req: NextRequest) {
       {
         title: 'Devoir de maison — Physique 3ème',
         desc: "Devoir de maison sur l'optique géométrique.",
-        type: 'HOMEWORK',
+        type: 'DEVOIR',
         subject: 'physique',
         class: '3eme-secondaire',
         section: 'sciences',
