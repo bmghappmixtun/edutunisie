@@ -1,20 +1,26 @@
 /**
  * Split a title into [frenchPart, arabicPart].
- * If the title contains Arabic text at the end (separated by " - " or " -"),
+ * If the title contains Arabic text at the end (after " - " separator or directly after space),
  * returns [frenchPart, arabicPart]. Otherwise returns [title, null].
  *
  * Example:
  *   splitArabicSubject("Cours Collège pilote - Math - 9ème (2017-2018) Mme Tekeri Zeineb مبرهنة طالس")
  *     -> ["Cours Collège pilote - Math - 9ème (2017-2018) Mme Tekeri Zeineb", "مبرهنة طالس"]
+ *   splitArabicSubject("Devoir de Contrôle - الفرض العادي عدد 2")
+ *     -> ["Devoir de Contrôle", "الفرض العادي عدد 2"]
  */
 export function splitArabicSubject(title: string | null | undefined): {
   fr: string;
   ar: string | null;
 } {
   if (!title) return { fr: '', ar: null };
-  // Find the LAST occurrence of an Arabic block at the end
-  // The Arabic block is contiguous Arabic characters (with optional spaces) at the end after " - "
-  const match = title.match(/^(.*?)\s+-\s+([\u0600-\u06FF][\u0600-\u06FF\s،.؟!]*)$/);
+  // First try with " - " separator before Arabic block
+  let match = title.match(/^(.*?)\s+-\s+([\u0600-\u06FF][\u0600-\u06FF\s،.؟!]*)$/);
+  if (match) {
+    return { fr: match[1].trim(), ar: match[2].trim() };
+  }
+  // Then try with just a space before Arabic block at the end
+  match = title.match(/^(.*?\S)\s+([\u0600-\u06FF][\u0600-\u06FF\s،.؟!]{2,})$/);
   if (match) {
     return { fr: match[1].trim(), ar: match[2].trim() };
   }
