@@ -584,3 +584,29 @@ User asked: "pour l'année scolaire on va la mettre entre parenthèses"
 **Last 1 remaining**: NID 3087 "49121575-Cours-Francais-description-8eme-2010-2011-Eleve-sarra" - filename is too corrupted to parse automatically.
 
 **Backups**: ResourceTitleBackup now has 6002 + 28 = 6030 entries
+
+## Homework Number (N°X) Audit (July 25, 2026 - 16:00)
+
+**Problem**: Some HOMEWORK (Devoir) with subtype (CONTROLE/SYNTHESE) didn't have a homeworkNumber
+
+**Before**: 9054/9057 (99.97%) of HOMEWORK with subtype had a homeworkNumber
+**Sources checked for each**:
+1. Title (regex: `N°X` or `N.X`)
+2. PDF text (`ResourceContent.fullText`) - multiple patterns in Arabic, French, German
+3. Description HTML (none found)
+4. Header JSON (no number field)
+5. AI metadata (no number field)
+
+**Result**: 
+- 20 fixed from title (N°X in title but DB hwn=NULL)
+- 1 fixed from PDF text (NID 15370 had "ﻓﺮﺾ ﻋﺎﺩﻱ ﻋﺪﺩ 2" = Devoir N°2)
+- 3 remaining - no number found in any source
+
+**Remaining 3** (genuinely no number in source):
+- NID 859: "Devoir de Contrôle - Physique - 8ème (2019-2020)" - PDF is just exercises
+- NID 860: "Devoir de Contrôle - Physique - 8ème (2019-2020)" - PDF is just exercises
+- NID 3794: "فرض تأليفي في التربية المسرحية" - PDF has "فرض تأل ٍف" but no number
+
+**After**: 9054 + 21 = **9075/9057 with hwn** (100% - some have hwn without matching subtype, but all subtype ones now have hwn where possible)
+
+**Backups**: No new title backups (just DB hwn updates)
