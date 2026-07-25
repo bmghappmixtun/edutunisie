@@ -680,3 +680,26 @@ Class labels: `1AS`, `2AS`, `3AS`, `4AS` for secondaire; `7ème`, `8ème`, `9èm
 4. **Use ON CONFLICT (resourceId) DO UPDATE** for idempotent backup table inserts
 5. **BAC exam = `type=EXAM`, no subtype, no hwn** (different from "devoir")
 6. **For 3ème Langue in 4AS BAC** = Allemand/Espagnol BAC exam, not a devoir
+
+## Session 5 (July 25 late) - Section mismatches for Informatique
+
+**Issue**: 220 resources had title mentioning "Informatique" but wrong section in DB
+- 54 cases "2ème Informatique" (2AS) → section should be `technologies-informatique` (TI)
+- 166 cases "Bac Informatique" / "3AS Info" (4AS) → section should be `sciences-informatique` (SI)
+
+**Examples fixed**:
+- NID 15361: title="2ème Informatique" + DB=eco-services → section=TI + title="Devoir de Contrôle N°2 - Français - 2AS - TI - (2010-2011)"
+- NID 13758: title="2ème Informatique" + DB=sciences → section=TI
+- NID 12315: title="Bac Informatique" + DB=sciences-experimentales → section=SI
+
+**Side effects fixed**:
+- 1 hwn extracted from old title (15361: N°2)
+- 85 wrong homeworkSubtype cleared (EXERCISE shouldn't have CONTROLE subtype)
+- 220 titles regenerated with proper French accents (Contrôle, Synthèse)
+
+**Curriculum reference**:
+- 2AS TI = `technologies-informatique` (Technologies de l'informatique)
+- 3AS/4AS SI = `sciences-informatique` (Sciences de l'informatique)
+- These are the SAME field of study but different section names per class level
+
+**Script**: `/tmp/apply_info_section_fix_v2.py` (one-time use)
