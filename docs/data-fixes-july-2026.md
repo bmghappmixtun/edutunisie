@@ -361,3 +361,34 @@ All 4 fixed by removing "Mathématiques" and using proper class label.
 - 6 missing year: all "8ème année de base" Collège titles (no year in source)
 - 45 missing trimester: need trimester inference from year
 - Action: deferred (not critical, PI was the user's request)
+
+## NID 15369 Pensee Islamique subject reclassification (July 25, 2026 - 10:15)
+
+**Problem**: NID 15369 had:
+- Title: "Examen - Mathématiques - 2ème année secondaire Sciences"
+- DB subject: mathematiques
+- AI subject: Mathématiques
+- Type: HOMEWORK
+- All metadata wrong (no year, no subtype, no hwn)
+
+**Actual content** (PDF header): "1 فرض تأليفي رقم" + "في التّفكير الإسلامي" + 2012/11/28
+- = Devoir de Synthèse N°1 - Pensée Islamique - 1er trimestre 2012-2013
+
+**Same teacher** as 15366, 15367, 15368 (Touzri) - all Pensee Islamique from Lycée Nahj El Bacha
+
+**Root cause**: Bulk import took HTML title from devoirat.net which said "Mathématiques" but actual content is Pensee Islamique (4th resource from this prof with same bug)
+
+**Fix**:
+- Title → "Devoir de Synthèse N°1 - Pensée Islamique - 2AS Sciences - Trim1 - 2012-2013"
+- Subject: mathematiques → pensee-islamique (RECLASSIFIED)
+- Subtype: NULL → SYNTHESE
+- HWN: NULL → 1
+- Year: NULL → 2012-2013
+- Trimester: NULL → 1
+- ResourceMetadata.subject updated to "Pensée Islamique"
+
+**Backups**:
+- ResourceTitleBackup: 1 entry (fix_15369_pensee_islamique)
+- ResourceSubjectReclassify: 1 entry (mathematiques → pensee-islamique)
+
+**Result**: NID 15369 is now correctly classified. 17 Pensee Islamique resources total (was 16, +1 reclassified).
