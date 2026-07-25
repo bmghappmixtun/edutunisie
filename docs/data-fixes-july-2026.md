@@ -440,3 +440,42 @@ All 4 fixed by removing "Mathématiques" and using proper class label.
 **Conclusion**: Pensee Islamique in secondaire is now clean. No other resources need reclassification.
 
 **Related subject (not requested)**: Education Islamique in collège has 6/45 missing year (all 8ème année, no year in source). Not critical.
+
+## Subject Misclassification Audit (July 25, 2026 - 10:40)
+
+**Audit scope**: Education civique, Histoire-Géographie, Théâtre in secondaire (and similar mismatches)
+
+**Result**: 
+
+### Resources with WRONG subject (4 bugs found, all fixed)
+
+| NID | Old subject | New subject | Reason | Status |
+|---|---|---|---|---|
+| 7414 | histoire-geographie | **informatique** | Title: "Informatique - 2ème Informatique (2011-2012)" + section=technologies-informatique | ✅ Fixed |
+| 15355 | svt | **anglais** | Title: "Anglais Global Test 2 - 2ème Sciences" + text in English | ✅ Fixed |
+| 15336 | histoire-geographie | **physique** | Test resource: "Sciences Physiques" title | ✅ Fixed |
+| 15337 | histoire-geographie | **francais** | Test resource: "Français" title | ✅ Fixed |
+
+### Resources reviewed (all OK)
+
+- **Education civique in secondaire**: 0 (only in 7-9ème college)
+- **Histoire in secondaire**: 24 (all correctly classified)
+- **Géographie in secondaire**: 15 (all correctly classified)
+- **Histoire-Géographie (combined subject)**: 4 total (3 are test resources now fixed)
+- **Théâtre in secondaire**: 0 (only in college)
+
+### 24 "false positive" cases investigated
+
+These had "Mathématiques" or "Informatique" in title with section=maths/sciences-informatique:
+- The keyword in title was the **SECTION name** (BAC Math, BAC SI), not the subject
+- E.g., "Devoir - SVT - 4AS Mathématiques" = SVT homework for BAC Math students
+- All correct as-is, no change needed
+
+### Test resources (15335, 15336, 15337)
+
+3 test resources uploaded by user "mehdi test" had random subjects (histoire-geographie).
+Fixed to match their actual content. User can re-test.
+
+### Backups
+- ResourceTitleBackup: 4 new entries (fix_misclass_subj_audit)
+- ResourceSubjectReclassify: 4 new entries
