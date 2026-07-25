@@ -542,3 +542,28 @@ Fixed to match their actual content. User can re-test.
 **Backups**:
 - ResourceTitleBackup: 4755 entries (+249)
 - Total fixed in this session: 4,506+249 = 4,755
+
+## Year Format to Parentheses (July 25, 2026 - 15:00)
+
+**Problem**: 5260 titles had year in format " - YYYY-YYYY" instead of "(YYYY-YYYY)"
+User asked: "pour l'année scolaire on va la mettre entre parenthèses"
+
+**Method**: Regex replacement to convert " - YYYY-YYYY" → " (YYYY-YYYY)" at end of title
+
+**Patterns fixed**:
+- " - 2024-2025" → " (2024-2025)" (standard at end)
+- " - [2024-2025]" → " (2024-2025)" (brackets)
+- " - السنة 2024-2025" → " (2024-2025)" (Arabic)
+- " (2024-2025" → " (2024-2025)" (missing close paren)
+- " - 2024-" → " (2024-2024)" (incomplete year, duplicate)
+- "7ème 2024-2025" → "7ème (2024-2025)" (year after class label)
+- " -2024-2025 " → " (2024-2025) " (no space after dash)
+- " _2024-2025_ " → " (2024-2025) " (underscores)
+
+**Result**: 5147 + 63 + 23 = **5233 titles fixed**, 99.75% coverage
+
+**Remaining 29**: Edge cases like "س2010-2011نة" (Arabic year embedded in word), "(Réparti)" suffix with year in parens
+
+**Spot check**: 3 URLs all 200 ✅
+
+**Backups**: ResourceTitleBackup 5979+23 = 6002 entries
