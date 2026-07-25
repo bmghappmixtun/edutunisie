@@ -78,7 +78,7 @@ export async function generateMetadata({
 
 const TYPE_LABELS: Record<string, string> = {
   COURSE: 'Cours',
-  HOMEWORK: 'Devoir',
+  DEVOIR: 'Devoir',
   EXERCISE: "Série d'exercices",
   REVISION: 'Révision',
   EXAM: 'Contrôle/Examen',
@@ -90,7 +90,7 @@ const TYPE_LABELS: Record<string, string> = {
 
 const TYPE_COLORS: Record<string, string> = {
   COURSE: 'from-blue-500 to-blue-700',
-  HOMEWORK: 'from-purple-500 to-purple-700',
+  DEVOIR: 'from-purple-500 to-purple-700',
   EXERCISE: 'from-emerald-500 to-emerald-700',
   REVISION: 'from-orange-500 to-orange-700',
   EXAM: 'from-red-500 to-red-700',

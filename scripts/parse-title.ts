@@ -2,7 +2,7 @@
  * Title parser for tunisiecollege.net / devoirat.net imports.
  *
  * Detects from the site title:
- *   - type (COURSE / HOMEWORK / EXERCISE / etc.)
+ *   - type (COURSE / DEVOIR / EXERCISE / etc.)
  *   - homeworkSubtype (CONTROL / SYNTHESIS / HOUSEWORK)
  *   - homeworkNumber (1..20)
  *   - trimester (auto-inferred from homeworkNumber)
@@ -13,9 +13,9 @@
  *   - product (المنتج) — free-text Arabic for technologie collège
  */
 export interface ParsedTitle {
-  type: string;           // COURSE | HOMEWORK | EXERCISE | REVISION | EXAM | BAC_SUBJECT | CORRECTION | SUMMARY | OTHER
-  homeworkSubtype?: string; // CONTROL | SYNTHESIS | HOUSEWORK (only when type=HOMEWORK)
-  homeworkNumber?: number;  // 1..20 (only when type=HOMEWORK)
+  type: string;           // COURSE | DEVOIR | EXERCISE | REVISION | EXAM | BAC_SUBJECT | CORRECTION | SUMMARY | OTHER
+  homeworkSubtype?: string; // CONTROL | SYNTHESIS | HOUSEWORK (only when type=DEVOIR)
+  homeworkNumber?: number;  // 1..20 (only when type=DEVOIR)
   trimester?: string;       // T1 | T2 | T3 (auto from homeworkNumber)
   schoolType?: string;      // PUBLIC | PILOTE
   subjectSlug?: string | null;
@@ -127,7 +127,7 @@ function detectType(title: string, hasCorrection: boolean): string {
   if (/concours\b/i.test(title)) return 'BAC_SUBJECT';
   if (/sujet\s*bac|sujets?\s*bac/i.test(title)) return 'BAC_SUBJECT';
   if (/\bexamen\b/i.test(title) && !/contr[oô]le/i.test(title)) return 'EXAM';
-  if (/devoir\b/i.test(title) || /فرض|واجب/i.test(title)) return 'HOMEWORK';
+  if (/devoir\b/i.test(title) || /فرض|واجب/i.test(title)) return 'DEVOIR';
   if (/exercice\b/i.test(title)) return 'EXERCISE';
   return 'OTHER';
 }
@@ -208,8 +208,8 @@ export function parseSiteTitle(rawTitle: string): ParsedTitle {
   const hasArabic = /[\u0600-\u06FF]/.test(title);
   const hasCorrection = detectHasCorrection(title);
   const type = detectType(title, hasCorrection);
-  const subtype = type === 'HOMEWORK' ? detectHomeworkSubtype(title) : undefined;
-  const number = type === 'HOMEWORK' ? detectHomeworkNumber(title) ?? undefined : undefined;
+  const subtype = type === 'DEVOIR' ? detectHomeworkSubtype(title) : undefined;
+  const number = type === 'DEVOIR' ? detectHomeworkNumber(title) ?? undefined : undefined;
   const trimester = number === 1 ? 'T1' : number === 2 ? 'T2' : number && number >= 3 ? 'T3' : undefined;
   const subjectSlug = detectSubject(title);
   const classSlug = detectClass(title);

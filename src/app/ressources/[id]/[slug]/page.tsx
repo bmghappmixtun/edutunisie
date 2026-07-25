@@ -363,8 +363,8 @@ export default async function ResourcePage({
                   >
                     {RESOURCE_TYPE_LABELS[resource.type]?.fr}
                   </span>
-                  {/* Homework subtype badge (only when HOMEWORK) */}
-                  {resource.type === 'HOMEWORK' &&
+                  {/* Homework subtype badge (only when DEVOIR) */}
+                  {resource.type === 'DEVOIR' &&
                     resource.homeworkSubtype &&
                     HOMEWORK_SUBTYPE_LABELS[resource.homeworkSubtype] && (
                       <span

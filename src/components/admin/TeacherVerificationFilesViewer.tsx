@@ -34,7 +34,7 @@ type Teacher = {
 
 const TYPE_LABELS: Record<string, string> = {
   COURSE: '📚 Cours',
-  HOMEWORK: '📝 Devoir',
+  DEVOIR: '📝 Devoir',
   EXERCISE: '✏️ Série',
   REVISION: '🔄 Révision',
   EXAM: '📋 Examen',

@@ -131,7 +131,7 @@ export default function ResourceCard({ resource }: { resource: ResourceCardData 
         </div>
 
         {/* Homework subtype */}
-        {resource.type === 'HOMEWORK' &&
+        {resource.type === 'DEVOIR' &&
           resource.homeworkSubtype &&
           HOMEWORK_SUBTYPE_LABELS[resource.homeworkSubtype] && (
             <div className="mb-2">

@@ -180,7 +180,7 @@ async function searchSections(q: string, limit: number): Promise<SuggestResult[]
 function typeLabel(type: string): string {
   const labels: Record<string, string> = {
     COURSE: 'Cours',
-    HOMEWORK: 'Devoir',
+    DEVOIR: 'Devoir',
     EXERCISE: 'Exercice',
     SERIES: 'Série',
     BAC_SUBJECT: 'Sujet Bac',
@@ -194,7 +194,7 @@ function typeLabel(type: string): string {
 function typeIcon(type: string): string {
   const icons: Record<string, string> = {
     COURSE: '📖',
-    HOMEWORK: '📝',
+    DEVOIR: '📝',
     EXERCISE: '✏️',
     SERIES: '📚',
     BAC_SUBJECT: '🎓',

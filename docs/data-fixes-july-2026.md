@@ -285,22 +285,22 @@ All 4 fixed by removing "Mathématiques" and using proper class label.
 
 ## Homework Subtype in Title (July 25, 2026 - 00:05)
 
-**Problem**: 3,801 HOMEWORK titles missing subtype keyword (Contrôle/Synthèse/Révision)
+**Problem**: 3,801 DEVOIR titles missing subtype keyword (Contrôle/Synthèse/Révision)
 **Solution**: Insert subtype into title based on DB `homeworkSubtype` field
 
 **Transformations applied** (3,191 total):
 1. `Devoir N°X - Y` → `Devoir de {Contrôle|Synthèse} N°X - Y` (1,138)
 2. `Devoir - Y` → `Devoir de {Contrôle|Synthèse} - Y` (~50)
-3. `Examen - Y` → `Devoir de {Contrôle|Synthèse} - Y` (2,044) - "Examen" in Tunisia = "Devoir" (not BAC exam since type=HOMEWORK)
+3. `Examen - Y` → `Devoir de {Contrôle|Synthèse} - Y` (2,044) - "Examen" in Tunisia = "Devoir" (not BAC exam since type=DEVOIR)
 4. Subtype also fixed in DB for 1 case (NID 1010: HOUSEWORK→SYNTHESE)
 
-**Result**: 8,682/9,160 HOMEWORK now have subtype in title (94.8%, up from 58.5%)
+**Result**: 8,682/9,160 DEVOIR now have subtype in title (94.8%, up from 58.5%)
 
 **Skipped** (478 cases, intentional):
 - Arabic titles (فرض مراقبة, فرض تأليفي) - already in Arabic
 - Short codes (DC1, DS, dev eco, con 2) - not standard format
 - Garbage titles (PHYSIQUkkkk) - need separate cleanup
-- Série d'exercices wrongly typed as HOMEWORK - need type fix
+- Série d'exercices wrongly typed as DEVOIR - need type fix
 - Other special cases
 
 **Process**: Two iterations needed
@@ -311,7 +311,7 @@ All 4 fixed by removing "Mathématiques" and using proper class label.
 
 ## Subtype v3-v5 fix (July 25, 2026 - 00:30)
 
-**After v2 batch**: 466 HOMEWORK still missing subtype in title.
+**After v2 batch**: 466 DEVOIR still missing subtype in title.
 
 **Categorization**:
 - 326 Arabic titles (فرض مراقبة, فرض تأليفي) - already in Arabic, leave
@@ -325,7 +325,7 @@ All 4 fixed by removing "Mathématiques" and using proper class label.
 
 **Manual (3 cases)**: NID 1648, 2061, 829 - "Devoir de Syntése" typo with subtype=HOUSEWORK → "Devoir de Maison"
 
-**Result**: 8759/9160 HOMEWORK have subtype indicator (95.6%, up from 94.8%)
+**Result**: 8759/9160 DEVOIR have subtype indicator (95.6%, up from 94.8%)
 
 **Remaining 401**:
 - 326 Arabic (correct as-is)
@@ -368,7 +368,7 @@ All 4 fixed by removing "Mathématiques" and using proper class label.
 - Title: "Examen - Mathématiques - 2ème année secondaire Sciences"
 - DB subject: mathematiques
 - AI subject: Mathématiques
-- Type: HOMEWORK
+- Type: DEVOIR
 - All metadata wrong (no year, no subtype, no hwn)
 
 **Actual content** (PDF header): "1 فرض تأليفي رقم" + "في التّفكير الإسلامي" + 2012/11/28
@@ -407,23 +407,23 @@ All 4 fixed by removing "Mathématiques" and using proper class label.
 
 | NID | Class | Section | Type | Subtype | HWN | Year | Trim |
 |---|---|---|---|---|---|---|---|
-| 8053 | 2AS | Sciences | HOMEWORK | CONTROLE | 3 | 2012-2013 | 1 |
-| 8054 | 2AS | Sciences | HOMEWORK | CONTROLE | 3 | 2012-2013 | 1 |
-| 15366 | 2AS | Sciences | HOMEWORK | SYNTHESE | 1 | 2012-2013 | 1 |
-| 15367 | 2AS | Sciences | HOMEWORK | SYNTHESE | 1 | 2012-2013 | 1 |
-| 15368 | 2AS | Sciences | HOMEWORK | SYNTHESE | 1 | 2012-2013 | 1 |
-| 15369 | 2AS | Sciences | HOMEWORK | SYNTHESE | 1 | 2012-2013 | 1 |  (was Math, now fixed)
-| 8055 | 4AS | Lettres | HOMEWORK | CONTROLE | 3 | 2012-2013 | 1 |
-| 8051 | 1AS | - | HOMEWORK | CONTROLE | 2 | 2016-2017 | 1 |
-| 8052 | 2AS | Sciences | HOMEWORK | CONTROLE | 2 | 2016-2017 | 1 |
-| 8057 | 4AS | Lettres | HOMEWORK | CONTROLE | 2 | 2016-2017 | 1 |
-| 8056 | 4AS | Lettres | HOMEWORK | SYNTHESE | 1 | 2016-2017 | 1 |
-| 14567 | 1AS | - | HOMEWORK | SYNTHESE | 1 | 2017-2018 | 1 |
-| 4628 | 2AS | Lettres | HOMEWORK | CONTROLE | 1 | 2017-2018 | 1 |
-| 4629 | 3AS | Lettres | HOMEWORK | CONTROLE | 1 | 2017-2018 | 1 |
+| 8053 | 2AS | Sciences | DEVOIR | CONTROLE | 3 | 2012-2013 | 1 |
+| 8054 | 2AS | Sciences | DEVOIR | CONTROLE | 3 | 2012-2013 | 1 |
+| 15366 | 2AS | Sciences | DEVOIR | SYNTHESE | 1 | 2012-2013 | 1 |
+| 15367 | 2AS | Sciences | DEVOIR | SYNTHESE | 1 | 2012-2013 | 1 |
+| 15368 | 2AS | Sciences | DEVOIR | SYNTHESE | 1 | 2012-2013 | 1 |
+| 15369 | 2AS | Sciences | DEVOIR | SYNTHESE | 1 | 2012-2013 | 1 |  (was Math, now fixed)
+| 8055 | 4AS | Lettres | DEVOIR | CONTROLE | 3 | 2012-2013 | 1 |
+| 8051 | 1AS | - | DEVOIR | CONTROLE | 2 | 2016-2017 | 1 |
+| 8052 | 2AS | Sciences | DEVOIR | CONTROLE | 2 | 2016-2017 | 1 |
+| 8057 | 4AS | Lettres | DEVOIR | CONTROLE | 2 | 2016-2017 | 1 |
+| 8056 | 4AS | Lettres | DEVOIR | SYNTHESE | 1 | 2016-2017 | 1 |
+| 14567 | 1AS | - | DEVOIR | SYNTHESE | 1 | 2017-2018 | 1 |
+| 4628 | 2AS | Lettres | DEVOIR | CONTROLE | 1 | 2017-2018 | 1 |
+| 4629 | 3AS | Lettres | DEVOIR | CONTROLE | 1 | 2017-2018 | 1 |
 | 4625 | 4AS | Lettres | COURSE | CONTROLE | 1 | 2017-2018 | 1 |
-| 4627 | 4AS | Lettres | HOMEWORK | CONTROLE | 1 | 2017-2018 | 1 |
-| 8058 | 2AS | Sciences | HOMEWORK | CONTROLE | 1 | 2021-2022 | 1 |
+| 4627 | 4AS | Lettres | DEVOIR | CONTROLE | 1 | 2017-2018 | 1 |
+| 8058 | 2AS | Sciences | DEVOIR | CONTROLE | 1 | 2021-2022 | 1 |
 
 **Distribution**:
 - By year: 2012-2013 (7), 2016-2017 (4), 2017-2018 (5), 2021-2022 (1)
@@ -587,9 +587,9 @@ User asked: "pour l'année scolaire on va la mettre entre parenthèses"
 
 ## Homework Number (N°X) Audit (July 25, 2026 - 16:00)
 
-**Problem**: Some HOMEWORK (Devoir) with subtype (CONTROLE/SYNTHESE) didn't have a homeworkNumber
+**Problem**: Some DEVOIR (Devoir) with subtype (CONTROLE/SYNTHESE) didn't have a homeworkNumber
 
-**Before**: 9054/9057 (99.97%) of HOMEWORK with subtype had a homeworkNumber
+**Before**: 9054/9057 (99.97%) of DEVOIR with subtype had a homeworkNumber
 **Sources checked for each**:
 1. Title (regex: `N°X` or `N.X`)
 2. PDF text (`ResourceContent.fullText`) - multiple patterns in Arabic, French, German
@@ -619,7 +619,7 @@ User asked: "pour l'année scolaire on va la mettre entre parenthèses"
 
 ```sql
 SELECT DISTINCT "homeworkSubtype" FROM "Resource" WHERE "homeworkSubtype" IS NOT NULL;
--- 'HOUSEWORK', 'SYNTHESE', 'CONTROL', 'EXAMEN', 'SUMMARY', 'REVISION', 'HOMEWORK', 'SYNTHESIS', 'CONTROLE'
+-- 'HOUSEWORK', 'SYNTHESE', 'CONTROL', 'EXAMEN', 'SUMMARY', 'REVISION', 'DEVOIR', 'SYNTHESIS', 'CONTROLE'
 ```
 
 **3,148 rows had typo'd subtypes from legacy imports:**
@@ -628,9 +628,9 @@ SELECT DISTINCT "homeworkSubtype" FROM "Resource" WHERE "homeworkSubtype" IS NOT
 |---|---|---:|---|
 | `CONTROL` | `CONTROLE` | 1,677 | direct UPDATE |
 | `SYNTHESIS` | `SYNTHESE` | 1,397 | direct UPDATE |
-| `HOUSEWORK` | `HOMEWORK` (then `MAISON`/`REVISION` based on title) | 41 | 2-pass: title check for "Maison"/"Révision" |
+| `HOUSEWORK` | `DEVOIR` (then `MAISON`/`REVISION` based on title) | 41 | 2-pass: title check for "Maison"/"Révision" |
 | `EXAMEN` | `CONTROLE` | 18 | direct UPDATE |
-| `HOMEWORK` | `CONTROLE` | 14 | direct UPDATE |
+| `DEVOIR` | `CONTROLE` | 14 | direct UPDATE |
 | `SUMMARY` | `SYNTHESE` | 1 | direct UPDATE |
 
 ### Title regen for missing N°X (2,510 resources)
@@ -645,7 +645,7 @@ Class labels: `1AS`, `2AS`, `3AS`, `4AS` for secondaire; `7ème`, `8ème`, `9èm
 
 ### New EXAM type (5 resources)
 
-5 BAC exam resources (4AS 3ème Langue Allemand, 4AS Histoire) had `type=HOMEWORK` + `subtype=""` + AI saying `type=EXAM`. Since `type` is TEXT (not enum), created new value `EXAM` with `subtype=NULL`, `homeworkNumber=NULL`, `year=YYYY-YYYY`.
+5 BAC exam resources (4AS 3ème Langue Allemand, 4AS Histoire) had `type=DEVOIR` + `subtype=""` + AI saying `type=EXAM`. Since `type` is TEXT (not enum), created new value `EXAM` with `subtype=NULL`, `homeworkNumber=NULL`, `year=YYYY-YYYY`.
 
 - NID 15370 (3AS Histoire) - actually was 3AS not 4AS, fixed
 - NID 15373, 375, 376, 377 (4AS 3ème Langue)
@@ -663,8 +663,8 @@ Class labels: `1AS`, `2AS`, `3AS`, `4AS` for secondaire; `7ème`, `8ème`, `9èm
 
 | Metric | Before | After |
 |---|---:|---:|
-| HOMEWORK with proper subtype | 9,150 CONTROLE + 2,360 SYNTHESE | 10,859 CONTROLE + 3,758 SYNTHESE + 32 MAISON + 24 REVISION |
-| HOMEWORK title has N°X | 89.6% | **99.52%** |
+| DEVOIR with proper subtype | 9,150 CONTROLE + 2,360 SYNTHESE | 10,859 CONTROLE + 3,758 SYNTHESE + 32 MAISON + 24 REVISION |
+| DEVOIR title has N°X | 89.6% | **99.52%** |
 | EXAM type | 0 | 5 |
 | Total resources | 15,367 | 15,367 (unchanged) |
 

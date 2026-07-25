@@ -53,7 +53,7 @@ type ApiResponse = FilterShellProps['initialData'];
 // ============== RESOURCE TYPE / TRIMESTRE / LANGUAGE / YEAR META ==============
 const TYPE_META: Record<string, { label: string; emoji: string; color: string }> = {
   COURSE: { label: 'Cours', emoji: '📘', color: 'bg-blue-100 text-blue-700 border-blue-200' },
-  HOMEWORK: { label: 'Devoir', emoji: '📝', color: 'bg-amber-100 text-amber-700 border-amber-200' },
+  DEVOIR: { label: 'Devoir', emoji: '📝', color: 'bg-amber-100 text-amber-700 border-amber-200' },
   EXERCISE: {
     label: 'Exercice',
     emoji: '📊',

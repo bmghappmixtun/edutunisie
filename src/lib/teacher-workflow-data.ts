@@ -304,7 +304,7 @@ export function getSubjectsForClassSection(
 // ============================================================================
 // TYPES DE FICHIERS — 5 choix principaux
 // ============================================================================
-export type FileTypeKey = 'HOMEWORK' | 'EXERCISE' | 'COURSE' | 'REVISION' | 'OTHER';
+export type FileTypeKey = 'DEVOIR' | 'EXERCISE' | 'COURSE' | 'REVISION' | 'OTHER';
 
 export interface FileTypeOption {
   key: FileTypeKey;
@@ -316,7 +316,7 @@ export interface FileTypeOption {
 
 export const FILE_TYPES: FileTypeOption[] = [
   {
-    key: 'HOMEWORK',
+    key: 'DEVOIR',
     label: 'Devoir',
     icon: '📝',
     description: 'Contrôle, synthèse ou maison',

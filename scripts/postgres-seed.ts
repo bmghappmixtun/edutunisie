@@ -131,9 +131,9 @@ async function main() {
     }
   })));
 
-  const resourceTypes = ['COURSE', 'HOMEWORK', 'EXERCISE', 'REVISION', 'EXAM', 'BAC_SUBJECT', 'CORRECTION', 'SUMMARY'];
+  const resourceTypes = ['COURSE', 'DEVOIR', 'EXERCISE', 'REVISION', 'EXAM', 'BAC_SUBJECT', 'CORRECTION', 'SUMMARY'];
   const resourcesData = [
-    { title: 'Devoir de synthèse n°3 — Mathématiques Bac 2024', desc: 'Devoir complet couvrant algèbre, analyse et probabilités avec corrigé détaillé.', type: 'HOMEWORK', subject: 'mathematiques', class: '4eme-secondaire', section: 'sciences', teacherIdx: 0, trimester: '3', year: '2023-2024' },
+    { title: 'Devoir de synthèse n°3 — Mathématiques Bac 2024', desc: 'Devoir complet couvrant algèbre, analyse et probabilités avec corrigé détaillé.', type: 'DEVOIR', subject: 'mathematiques', class: '4eme-secondaire', section: 'sciences', teacherIdx: 0, trimester: '3', year: '2023-2024' },
     { title: 'Cours complet — Électricité et Magnétisme', desc: 'Cours détaillé avec illustrations, formules et exemples pour la 3ème année.', type: 'COURSE', subject: 'physique', class: '3eme-secondaire', section: 'sciences', teacherIdx: 1, trimester: '2', year: '2023-2024' },
     { title: 'Corrigé officiel — Bac Sciences 2024', desc: 'Corrigé complet de l\'épreuve de SVT du Baccalauréat 2024 Session Principale.', type: 'CORRECTION', subject: 'svt', class: '4eme-secondaire', section: 'sciences', teacherIdx: 2, trimester: '3', year: '2023-2024' },
     { title: 'Série d\'exercices — Production écrite', desc: '20 sujets de production écrite pour le Bac avec méthodologie complète.', type: 'EXERCISE', subject: 'francais', class: '4eme-secondaire', section: 'lettres', teacherIdx: 3, trimester: '1', year: '2023-2024' },
@@ -147,7 +147,7 @@ async function main() {
     { title: 'Contrôle continu — Arabe 8ème', desc: 'Contrôle de compréhension et d\'expression écrite pour la 8ème année.', type: 'EXAM', subject: 'arabe', class: '8eme', teacherIdx: 3, trimester: '2', year: '2023-2024' },
     { title: 'Histoire — Le monde contemporain', desc: 'Cours complet sur le monde contemporain de 1945 à nos jours.', type: 'COURSE', subject: 'histoire', class: '3eme-secondaire', section: 'lettres', teacherIdx: 5, trimester: '2', year: '2023-2024' },
     { title: 'TD Algorithmique — Les boucles', desc: 'Exercices progressifs sur les structures itératives en algorithmique.', type: 'EXERCISE', subject: 'informatique', class: '1ere-secondaire', section: 'sciences', teacherIdx: 6, trimester: '2', year: '2023-2024' },
-    { title: 'Devoir de maison — Physique 3ème', desc: 'Devoir de maison sur l\'optique géométrique avec exercices corrigés.', type: 'HOMEWORK', subject: 'physique', class: '3eme-secondaire', section: 'sciences', teacherIdx: 1, trimester: '1', year: '2023-2024' },
+    { title: 'Devoir de maison — Physique 3ème', desc: 'Devoir de maison sur l\'optique géométrique avec exercices corrigés.', type: 'DEVOIR', subject: 'physique', class: '3eme-secondaire', section: 'sciences', teacherIdx: 1, trimester: '1', year: '2023-2024' },
     { title: 'Sujets Bac — Maths 2020-2024', desc: 'Compilation des 5 dernières sessions du Bac Maths avec corrigés.', type: 'BAC_SUBJECT', subject: 'mathematiques', class: '4eme-secondaire', section: 'maths', teacherIdx: 0, trimester: '3', year: '2023-2024' },
     { title: 'Économie — Le marché et les prix', desc: 'Cours complet sur le mécanisme du marché avec schémas explicatifs.', type: 'COURSE', subject: 'economie', class: '3eme-secondaire', section: 'eco-gestion', teacherIdx: 5, trimester: '1', year: '2023-2024' },
     { title: 'Anglais — Grammar revision pack', desc: 'Pack de révision grammaticale pour Bac : temps, conditionnel, voix passive.', type: 'REVISION', subject: 'anglais', class: '4eme-secondaire', section: 'sciences', teacherIdx: 4, trimester: '2', year: '2023-2024' },

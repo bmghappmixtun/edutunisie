@@ -226,7 +226,7 @@ export async function POST(req: NextRequest) {
         trimester: parsed.trimester,
         year: parsed.year,
         language: parsed.language || 'fr',
-        homeworkSubtype: parsed.type === 'HOMEWORK' ? parsed.homeworkSubtype : null,
+        homeworkSubtype: parsed.type === 'DEVOIR' ? parsed.homeworkSubtype : null,
         homeworkNumber: parsed.homeworkNumber,
         schoolType: parsed.schoolType,
         hasCorrection: parsed.hasCorrection || false,

@@ -147,7 +147,7 @@ export function courseSchema(opts: {
   level: string; // "9ème année de base" or "2ème année secondaire"
   cycle: string; // "Enseignement de base" or "Enseignement Secondaire"
   subject: string;
-  type: string; // COURSE / HOMEWORK / EXERCISE / etc.
+  type: string; // COURSE / DEVOIR / EXERCISE / etc.
   year?: string | null;
   teacher?: string | null;
   url: string;

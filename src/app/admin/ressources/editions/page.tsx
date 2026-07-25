@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 
 const TYPE_LABELS: Record<string, string> = {
   COURSE: '📖 Cours',
-  HOMEWORK: '📝 Devoir',
+  DEVOIR: '📝 Devoir',
   EXERCISE: '✏️ Exercice',
   SERIES: '📚 Série',
   BAC_SUBJECT: '🎓 Sujet Bac',

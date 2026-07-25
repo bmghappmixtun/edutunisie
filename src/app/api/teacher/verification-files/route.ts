@@ -65,7 +65,7 @@ export async function GET() {
  *
  * Body: multipart/form-data with:
  * - file: the file (docx, doc, pdf)
- * - type: COURSE | HOMEWORK | EXERCISE | REVISION | EXAM | OTHER
+ * - type: COURSE | DEVOIR | EXERCISE | REVISION | EXAM | OTHER
  * - description: optional
  * - year: optional (2024, 2023...)
  */

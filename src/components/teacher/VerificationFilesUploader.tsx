@@ -38,7 +38,7 @@ type Props = {
 
 const FILE_TYPES = [
   { value: 'COURSE', label: '📚 Cours' },
-  { value: 'HOMEWORK', label: '📝 Devoir' },
+  { value: 'DEVOIR', label: '📝 Devoir' },
   { value: 'EXERCISE', label: "✏️ Série d'exercices" },
   { value: 'REVISION', label: '🔄 Révision' },
   { value: 'EXAM', label: '📋 Examen / Contrôle' },

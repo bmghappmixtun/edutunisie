@@ -42,7 +42,7 @@ type Resource = {
 
 const TYPE_LABELS: Record<string, string> = {
   COURSE: 'Cours',
-  HOMEWORK: 'Devoir',
+  DEVOIR: 'Devoir',
   EXERCISE: "Série d'exercices",
   REVISION: 'Révision',
   EXAM: 'Contrôle/Examen',
@@ -95,7 +95,7 @@ export default function ResourceListItem({ resource }: { resource: Resource }) {
               <span className="text-xs text-slate-500">{resource.class.nameFr}</span>
             </>
           )}
-          {resource.type === 'HOMEWORK' &&
+          {resource.type === 'DEVOIR' &&
             resource.homeworkSubtype &&
             HOMEWORK_SUBTYPE_LABELS[resource.homeworkSubtype] && (
               <span

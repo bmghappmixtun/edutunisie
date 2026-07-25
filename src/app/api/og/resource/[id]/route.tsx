@@ -52,7 +52,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
   const teacherName = resource.teacher
     ? `${resource.teacher.firstName || ''} ${resource.teacher.lastName || ''}`.trim()
     : '';
-  const type = resource.type; // HOMEWORK, EXAM, COURSE...
+  const type = resource.type; // DEVOIR, EXAM, COURSE...
   const year = resource.year || '';
   const hasCorrection = resource.hasCorrection;
 

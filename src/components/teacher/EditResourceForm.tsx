@@ -35,7 +35,7 @@ type Option = { id: string; slug?: string; nameFr: string; icon?: string; classI
 
 const TYPES = [
   { v: 'COURSE', l: '📖 Cours' },
-  { v: 'HOMEWORK', l: '📝 Devoir' },
+  { v: 'DEVOIR', l: '📝 Devoir' },
   { v: 'EXERCISE', l: '✏️ Exercice' },
   { v: 'SERIES', l: '📚 Série' },
   { v: 'BAC_SUBJECT', l: '🎓 Sujet Bac' },
@@ -131,8 +131,8 @@ export default function EditResourceForm({
           tags: tags || null,
           language,
           // Homework & school metadata (NEW)
-          homeworkSubtype: type === 'HOMEWORK' && homeworkSubtype ? homeworkSubtype : null,
-          homeworkNumber: type === 'HOMEWORK' && homeworkNumber ? Number(homeworkNumber) : null,
+          homeworkSubtype: type === 'DEVOIR' && homeworkSubtype ? homeworkSubtype : null,
+          homeworkNumber: type === 'DEVOIR' && homeworkNumber ? Number(homeworkNumber) : null,
           schoolType: schoolType || 'PUBLIC',
           product: showProductField && product ? product : null,
           hasCorrection,
@@ -372,8 +372,8 @@ export default function EditResourceForm({
           />
         </Field>
 
-        {/* Homework subtype + number — only when type=HOMEWORK */}
-        {type === 'HOMEWORK' && (
+        {/* Homework subtype + number — only when type=DEVOIR */}
+        {type === 'DEVOIR' && (
           <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 space-y-3">
             <div className="font-bold text-amber-900 text-sm">📝 Détails du devoir</div>
             <div>
