@@ -14,7 +14,7 @@ import AiDescription from '@/components/resources/AiDescription';
 import AiContentSection from '@/components/resources/AiContentSection';
 import { getPaletteForSubject } from '@/lib/ai-palettes';
 import { formatNumber, RESOURCE_TYPE_LABELS, HOMEWORK_SUBTYPE_LABELS, timeAgo } from '@/lib/utils';
-import { isArabic } from '@/lib/text-utils';
+import { isArabic, splitArabicSubject } from '@/lib/text-utils';
 import { courseSchema, breadcrumbSchema } from '@/lib/structured-data';
 import {
   Eye,
@@ -409,13 +409,29 @@ export default async function ResourcePage({
                   )}
                 </div>
 
-                <h1
-                  className={`text-2xl lg:text-3xl font-extrabold text-slate-900 mb-3 leading-tight ${isArabic(resource.title) ? 'text-right' : 'text-left'}`}
-                  dir={isArabic(resource.title) ? 'rtl' : 'ltr'}
-                  lang={isArabic(resource.title) ? 'ar' : 'fr'}
-                >
-                  {resource.title}
-                </h1>
+                {(() => {
+                  const { fr, ar } = splitArabicSubject(resource.title);
+                  return (
+                    <>
+                      <h1
+                        className={`text-2xl lg:text-3xl font-extrabold text-slate-900 ${ar ? 'mb-1' : 'mb-3'} leading-tight ${isArabic(fr) ? 'text-right' : 'text-left'}`}
+                        dir={isArabic(fr) ? 'rtl' : 'ltr'}
+                        lang={isArabic(fr) ? 'ar' : 'fr'}
+                      >
+                        {fr}
+                      </h1>
+                      {ar && (
+                        <div
+                          className="text-lg lg:text-xl font-semibold text-slate-600 mb-3 leading-snug text-right"
+                          dir="rtl"
+                          lang="ar"
+                        >
+                          {ar}
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
                 {resource.description && (
                   <div className="mb-4">
                     <AiDescription
