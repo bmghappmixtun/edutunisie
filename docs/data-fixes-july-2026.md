@@ -392,3 +392,51 @@ All 4 fixed by removing "Mathématiques" and using proper class label.
 - ResourceSubjectReclassify: 1 entry (mathematiques → pensee-islamique)
 
 **Result**: NID 15369 is now correctly classified. 17 Pensee Islamique resources total (was 16, +1 reclassified).
+
+## Pensee Islamique Secondaire Audit (July 25, 2026 - 10:30)
+
+**Audit request**: Verify all PI homework in secondaire to detect the 15369 bug pattern (title says Math but content is PI).
+
+**Method**:
+1. Find all PI in secondaire (1AS-4AS)
+2. For each, verify subject + AI.subject + text content agree
+3. Find resources in secondaire where AI detected PI but DB has different subject (reverse direction)
+4. Find resources in secondaire with PI keywords in text but subject != PI
+
+**Result**: 17/17 PI in secondaire correctly classified.
+
+| NID | Class | Section | Type | Subtype | HWN | Year | Trim |
+|---|---|---|---|---|---|---|---|
+| 8053 | 2AS | Sciences | HOMEWORK | CONTROLE | 3 | 2012-2013 | 1 |
+| 8054 | 2AS | Sciences | HOMEWORK | CONTROLE | 3 | 2012-2013 | 1 |
+| 15366 | 2AS | Sciences | HOMEWORK | SYNTHESE | 1 | 2012-2013 | 1 |
+| 15367 | 2AS | Sciences | HOMEWORK | SYNTHESE | 1 | 2012-2013 | 1 |
+| 15368 | 2AS | Sciences | HOMEWORK | SYNTHESE | 1 | 2012-2013 | 1 |
+| 15369 | 2AS | Sciences | HOMEWORK | SYNTHESE | 1 | 2012-2013 | 1 |  (was Math, now fixed)
+| 8055 | 4AS | Lettres | HOMEWORK | CONTROLE | 3 | 2012-2013 | 1 |
+| 8051 | 1AS | - | HOMEWORK | CONTROLE | 2 | 2016-2017 | 1 |
+| 8052 | 2AS | Sciences | HOMEWORK | CONTROLE | 2 | 2016-2017 | 1 |
+| 8057 | 4AS | Lettres | HOMEWORK | CONTROLE | 2 | 2016-2017 | 1 |
+| 8056 | 4AS | Lettres | HOMEWORK | SYNTHESE | 1 | 2016-2017 | 1 |
+| 14567 | 1AS | - | HOMEWORK | SYNTHESE | 1 | 2017-2018 | 1 |
+| 4628 | 2AS | Lettres | HOMEWORK | CONTROLE | 1 | 2017-2018 | 1 |
+| 4629 | 3AS | Lettres | HOMEWORK | CONTROLE | 1 | 2017-2018 | 1 |
+| 4625 | 4AS | Lettres | COURSE | CONTROLE | 1 | 2017-2018 | 1 |
+| 4627 | 4AS | Lettres | HOMEWORK | CONTROLE | 1 | 2017-2018 | 1 |
+| 8058 | 2AS | Sciences | HOMEWORK | CONTROLE | 1 | 2021-2022 | 1 |
+
+**Distribution**:
+- By year: 2012-2013 (7), 2016-2017 (4), 2017-2018 (5), 2021-2022 (1)
+- By class: 1AS (2), 2AS (8), 3AS (1), 4AS (6)
+- By section: Sciences (8), Lettres (7), none (2)
+- By subtype: CONTROLE (12), SYNTHESE (5), 1 COURSE
+
+**Suspects checked**:
+- 0 in secondaire with title containing "Pensée" but subject != PI
+- 0 in secondaire with AI.subject = PI but DB != PI
+- 1 false positive: NID 7652 (Technologie) had "pensée islamique" in text but as part of teacher list
+- 15369 was the unique bug, now fixed
+
+**Conclusion**: Pensee Islamique in secondaire is now clean. No other resources need reclassification.
+
+**Related subject (not requested)**: Education Islamique in collège has 6/45 missing year (all 8ème année, no year in source). Not critical.
