@@ -517,3 +517,28 @@ Fixed to match their actual content. User can re-test.
 - ResourceTitleBackup: 4506 entries
 - ResourceSubjectReclassify: 923 entries
 - 43 new reclassifications (3+7+33)
+
+## Non-Standard Titles Fix (July 25, 2026 - 13:35)
+
+**Problem**: 274 titles in secondaire/college didn't follow the standard "Type - Subject - Class - [Section] - [Year]" format. Most were OCR-broken, short codes (DC, DS, con, syn), or non-standard separators.
+
+**Method**: 
+1. Categorize by pattern: 147 with no " - " separator, 68 Pattern A (no space around dash), 59 short codes
+2. Analyze each title for: type, subtype (Contrôle/Synthèse), hwn (1-15), year (YYYY-YYYY)
+3. Use DB values for: subject, class, section (when title is unclear)
+4. Build new title in standard format
+
+**Patterns detected**:
+- "Devoir de Controle N°3-Physique-9ème (2023-2024)" → "Devoir de Contrôle N°3 - Physique - 9ème année de base - 2023-2024"
+- "DC1 3eco 2024" → "Devoir de Contrôle - Mathématiques - 3ème année secondaire Économie-Gestion - 2024-2025"
+- "con 2 2 sc 2018" → "Devoir de Contrôle N°2 - Mathématiques - 2AS Sciences - 2018-2019"
+- "DS n3 bac blanc" → SKIPPED (special exam)
+- "Cours Oscillation électrique forcée" → "Devoir de Contrôle - Physique - 4AS Mathématiques - 2017-2018" (treated as Devoir per DB type)
+
+**Result**: 249 fixed, 25 skipped (20 Arabic, 3 bac blanc, 2 with phone numbers).
+
+**Spot check**: 5 URLs all 200 ✅
+
+**Backups**:
+- ResourceTitleBackup: 4755 entries (+249)
+- Total fixed in this session: 4,506+249 = 4,755
