@@ -703,3 +703,24 @@ Class labels: `1AS`, `2AS`, `3AS`, `4AS` for secondaire; `7ème`, `8ème`, `9èm
 - These are the SAME field of study but different section names per class level
 
 **Script**: `/tmp/apply_info_section_fix_v2.py` (one-time use)
+
+## Session 6 (July 25) - Year field cleanups for filter UI
+
+**Issue**: /ressources year filter showed 584 fake/duplicate options
+- 157 reversed years (e.g., "2012-2011" instead of "2011-2012")
+- 402 same-year (e.g., "2007-2007" - school year bug)
+- 25 single year (e.g., "2020" without end year)
+
+**Strategy**: Title is source of truth - extract year pattern from title and use as DB year
+
+**Side effects**:
+- 559 titles also updated (title had wrong year pattern like "(2012-2012)")
+- 1055 slugs updated (slug contained old year like "...2012-2012-9396")
+- 1 outlier fixed (NID 4780: 2013-2015 typo → 2013-2014)
+
+**After fix**:
+- 15,156/15,156 resources have proper `(YYYY-YYYY)` with y1<y2
+- Year filter shows clean options: 2004-2005 through 2026-2027
+- 211 empty (1AS tronc commun where year doesn't apply)
+
+**Script**: `pdf-test/fix_year_typos.py` (saved for future use)
