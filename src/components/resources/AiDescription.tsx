@@ -13,6 +13,7 @@ import {
   ScrollText,
 } from 'lucide-react';
 import { useState } from 'react';
+import { isArabic } from '@/lib/text-utils';
 
 interface HeaderData {
   school?: string | null;
@@ -374,41 +375,55 @@ export default function AiDescription({
           dir={isRtl ? 'rtl' : 'ltr'}
           className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3 mb-3"
         >
-          {fields.map((f, i) => (
+          {fields.map((f, i) => {
+            const valueAr = isArabic(f.value);
+            const labelAr = isArabic(f.label);
+            const cellRtl = valueAr || labelAr;
+            return (
             <div key={i} className="flex items-start gap-2">
               <f.Icon className={`w-4 h-4 mt-1 flex-shrink-0 ${iconColor(f.Icon)}`} />
               <div className="flex-1 min-w-0">
-                <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wide leading-none mb-1">
+                <div
+                  dir={labelAr ? 'rtl' : 'ltr'}
+                  lang={labelAr ? 'ar' : 'fr'}
+                  className={`text-[11px] font-bold text-slate-500 uppercase tracking-wide leading-none mb-1 ${labelAr ? 'text-right' : 'text-left'}`}
+                >
                   {f.label}
                 </div>
                 <div
-                  dir={isRtl ? 'ltr' : 'auto'}
+                  dir={valueAr ? 'rtl' : 'ltr'}
+                  lang={valueAr ? 'ar' : 'fr'}
                   style={{ unicodeBidi: 'isolate' }}
-                  className={`text-sm text-slate-800 font-medium leading-snug break-words ${isRtl ? 'text-right' : 'text-left'}`}
+                  className={`text-sm text-slate-800 font-medium leading-snug break-words ${valueAr ? 'text-right' : 'text-left'}`}
                 >
                   {f.value}
                 </div>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
       {/* Summary block */}
-      {summary && (
-        <div dir={isRtl ? 'rtl' : 'ltr'} className="mt-3 pt-3 border-t border-violet-100">
+      {summary && (() => {
+        const summaryAr = isArabic(summary);
+        return (
+        <div dir={summaryAr ? 'rtl' : 'ltr'} className="mt-3 pt-3 border-t border-violet-100">
           <div className="flex items-start gap-2">
             <ScrollText className="w-4 h-4 mt-1 flex-shrink-0 text-violet-600" />
             <div
-              dir="auto"
+              dir={summaryAr ? 'rtl' : 'ltr'}
+              lang={summaryAr ? 'ar' : 'fr'}
               style={{ unicodeBidi: 'isolate', whiteSpace: 'pre-wrap' }}
-              className={`flex-1 text-sm text-slate-700 leading-relaxed ${isRtl ? 'text-right' : 'text-left'}`}
+              className={`flex-1 text-sm text-slate-700 leading-relaxed ${summaryAr ? 'text-right' : 'text-left'}`}
             >
               {summary}
             </div>
           </div>
         </div>
-      )}
+        );
+      })()}
     </div>
   );
 }
