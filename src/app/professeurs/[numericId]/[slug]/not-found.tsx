@@ -1,5 +1,7 @@
 import Link from 'next/link';
 import { FileQuestion, Home, Search } from 'lucide-react';
+import Header from '@/components/layout/Header';
+import Footer from '@/components/layout/Footer';
 
 /**
  * Per-route not-found page for /professeurs/[numericId]/[slug]
@@ -18,11 +20,21 @@ import { FileQuestion, Home, Search } from 'lucide-react';
  * (no client hooks), Next.js can server-render the actual 404 markup into
  * the initial HTML, replacing the loading.tsx cleanly without a hydration
  * mismatch.
+ *
+ * STRUCTURE MIRROR (fixes 2026-07-25 #419 hydration errors on
+ * /professeurs/293/fendi-): the not-found now mirrors the page.tsx +
+ * loading.tsx outer structure (`<div min-h-screen flex flex-col>` wrapping
+ * Header + main + Footer). The previous version had no Header/Footer
+ * inside its own wrapper, so when the streamed content replaced the
+ * loading.tsx skeleton (which DID have Header/Footer), the DOM structure
+ * changed dramatically and React's hydration check threw #419.
  */
 export default function NotFound() {
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-sky-50 to-indigo-50">
-      <main className="flex-1 flex items-center justify-center px-4 py-12">
+      <Header />
+
+      <main className="flex-1 pt-24 lg:pt-28 flex items-center justify-center px-4 py-12">
         <div className="max-w-lg w-full text-center">
           {/* Animated icon */}
           <div className="relative inline-block mb-6">
@@ -68,6 +80,8 @@ export default function NotFound() {
           </div>
         </div>
       </main>
+
+      <Footer />
     </div>
   );
 }
