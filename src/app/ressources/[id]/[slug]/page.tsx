@@ -534,6 +534,9 @@ export default async function ResourcePage({
                 {resource.metadata?.topics && resource.metadata.topics.length > 0 && (() => {
                   // Per-subject topic tag palette (physique = lavender, others = default)
                   const topicPalette = getPaletteForSubject(resource.subject?.slug);
+                  // Check if majority of topics are Arabic -> reverse order for RTL
+                  const arabicCount = resource.metadata.topics.filter((t) => isArabic(t)).length;
+                  const isRtlTopics = arabicCount > resource.metadata.topics.length / 2;
                   return (
                   <AiContentSection
                     title="Sujets abordés"
@@ -542,14 +545,17 @@ export default async function ResourcePage({
                     subjectSlug={resource.subject?.slug}
                     defaultOpen={false}
                   >
-                    <div className="flex flex-wrap gap-1.5">
+                    <div className={`flex flex-wrap gap-1.5 ${isRtlTopics ? 'justify-end' : ''}`}>
                       {resource.metadata.topics.map((topic, i) => {
                         const c = topicPalette.accents[i % topicPalette.accents.length];
+                        const topicAr = isArabic(topic);
                         return (
                           <Link
                             key={i}
                             href={`/recherche?q=${encodeURIComponent(topic)}`}
-                            className={`inline-block px-2.5 py-1 ${c} text-white rounded-full text-xs font-medium transition-colors shadow-sm`}
+                            dir={topicAr ? 'rtl' : 'ltr'}
+                            lang={topicAr ? 'ar' : 'fr'}
+                            className={`inline-block px-2.5 py-1 ${c} text-white rounded-full text-xs font-medium transition-colors shadow-sm ${topicAr ? 'text-right' : 'text-left'}`}
                           >
                             {topic}
                           </Link>
