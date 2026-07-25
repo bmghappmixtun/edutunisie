@@ -610,3 +610,73 @@ User asked: "pour l'année scolaire on va la mettre entre parenthèses"
 **After**: 9054 + 21 = **9075/9057 with hwn** (100% - some have hwn without matching subtype, but all subtype ones now have hwn where possible)
 
 **Backups**: No new title backups (just DB hwn updates)
+
+---
+
+## 🔧 2026-07-25 — Type/subtype massive cleanup
+
+### Bugs found via DISTINCT query
+
+```sql
+SELECT DISTINCT "homeworkSubtype" FROM "Resource" WHERE "homeworkSubtype" IS NOT NULL;
+-- 'HOUSEWORK', 'SYNTHESE', 'CONTROL', 'EXAMEN', 'SUMMARY', 'REVISION', 'HOMEWORK', 'SYNTHESIS', 'CONTROLE'
+```
+
+**3,148 rows had typo'd subtypes from legacy imports:**
+
+| Wrong | Correct | Count | Fix |
+|---|---|---:|---|
+| `CONTROL` | `CONTROLE` | 1,677 | direct UPDATE |
+| `SYNTHESIS` | `SYNTHESE` | 1,397 | direct UPDATE |
+| `HOUSEWORK` | `HOMEWORK` (then `MAISON`/`REVISION` based on title) | 41 | 2-pass: title check for "Maison"/"Révision" |
+| `EXAMEN` | `CONTROLE` | 18 | direct UPDATE |
+| `HOMEWORK` | `CONTROLE` | 14 | direct UPDATE |
+| `SUMMARY` | `SYNTHESE` | 1 | direct UPDATE |
+
+### Title regen for missing N°X (2,510 resources)
+
+Many imports had `homeworkSubtype` + `homeworkNumber` in DB but the title still said "Devoir de Contrôle - Subject..." without the "N°X" suffix. Regen used template:
+
+```
+Devoir de {Contrôle|Synthèse|Maison|Révision} N°{hwn} - {Subject} - {Class}[ {Section}] - [Trim{N}] - ({YYYY-YYYY})
+```
+
+Class labels: `1AS`, `2AS`, `3AS`, `4AS` for secondaire; `7ème`, `8ème`, `9ème` for collège.
+
+### New EXAM type (5 resources)
+
+5 BAC exam resources (4AS 3ème Langue Allemand, 4AS Histoire) had `type=HOMEWORK` + `subtype=""` + AI saying `type=EXAM`. Since `type` is TEXT (not enum), created new value `EXAM` with `subtype=NULL`, `homeworkNumber=NULL`, `year=YYYY-YYYY`.
+
+- NID 15370 (3AS Histoire) - actually was 3AS not 4AS, fixed
+- NID 15373, 375, 376, 377 (4AS 3ème Langue)
+
+### Files
+
+- `pdf-test/fix_subtype_typos.py` — the 6 typo fixes (3,148 rows)
+- `pdf-test/fix_maison_revision.py` — 41 HOUSEWORK → MAISON/REVISION
+- `pdf-test/regen_titles_nx_v7.py` — bulk regen 2,510 titles
+- `pdf-test/fix_5_remaining.py` — 5 final with year but no N°X
+- `pdf-test/fix_13881.py` — Bac Blanc N°X
+- `pdf-test/update_slugs_for_fixes.py` — 8 slugs
+
+### Final stats
+
+| Metric | Before | After |
+|---|---:|---:|
+| HOMEWORK with proper subtype | 9,150 CONTROLE + 2,360 SYNTHESE | 10,859 CONTROLE + 3,758 SYNTHESE + 32 MAISON + 24 REVISION |
+| HOMEWORK title has N°X | 89.6% | **99.52%** |
+| EXAM type | 0 | 5 |
+| Total resources | 15,367 | 15,367 (unchanged) |
+
+### Commit chain
+
+`8e9451c` → `9e4f4b1` → `2e6eaf8` → `f6602fc`
+
+### Lessons
+
+1. **`type` and `homeworkSubtype` are TEXT, not enums** — typos can creep in via direct SQL
+2. **Always run `SELECT DISTINCT`** on text columns during audits
+3. **Multi-row VALUES + UPDATE FROM VALUES** is ~10x faster than 2 queries per row
+4. **Use ON CONFLICT (resourceId) DO UPDATE** for idempotent backup table inserts
+5. **BAC exam = `type=EXAM`, no subtype, no hwn** (different from "devoir")
+6. **For 3ème Langue in 4AS BAC** = Allemand/Espagnol BAC exam, not a devoir
