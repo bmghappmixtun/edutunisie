@@ -724,3 +724,24 @@ Class labels: `1AS`, `2AS`, `3AS`, `4AS` for secondaire; `7ème`, `8ème`, `9èm
 - 211 empty (1AS tronc commun where year doesn't apply)
 
 **Script**: `pdf-test/fix_year_typos.py` (saved for future use)
+
+## Session 7 (July 25) - Old year cleanup (filter starts at 2004-2005)
+
+**Issue**: 6 resources had year < 2004-2005 polluting the year filter
+- 4 OCR bugs: `0011-0012`, `0013-0014` (should be `2011-2012`, `2013-2014`)
+- 2 real old years: `1987-1988`, `1999-2000` (cleared)
+
+**Strategy**:
+- OCR bugs: prepend `20` to year start/end
+- Real old years: clear year field (set to `''`), title/slug also cleaned
+- Old URL still works via Vercel catch-all
+
+**Resources fixed**:
+- NID 7567: `0011-0012` → `2011-2012` (Technologie cambrage 1AS)
+- NID 7568, 7569, 7571: `0013-0014` → `2013-2014` (Technologie perçage/tronçonnage 1AS)
+- NID 5676: `1987-1988` → cleared (Math 1AS Synthèse - 1987 is too old)
+- NID 10981: `1999-2000` → cleared (Math 4AS Mathématiques - 1999 is too old)
+
+**After fix**:
+- Year filter starts at `2004-2005` cleanly
+- 23 options: 2004-2005 through 2026-2027
