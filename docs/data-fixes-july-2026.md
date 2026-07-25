@@ -567,3 +567,20 @@ User asked: "pour l'année scolaire on va la mettre entre parenthèses"
 **Spot check**: 3 URLs all 200 ✅
 
 **Backups**: ResourceTitleBackup 5979+23 = 6002 entries
+
+## Year Format Edge Cases (July 25, 2026 - 15:40)
+
+**Problem**: 29 edge cases remained after the main year-in-parens fix. Most were Arabic titles with year embedded in Arabic words.
+
+**Method**: Additional patterns for Arabic year markers
+- "س2010-2011نة" (س + year + ن + ة) - 13 cases
+- "سن2009-2010ة" (سن + year + ة) - already worked
+- "السن2009-2010ة" (ال + سن + year + ة) - 1 case
+
+**Result**: 13 + 15 = 28 more fixed (15 in v3, 13 in v4)
+
+**Final state**: 11670/11671 titles with year now use (YYYY-YYYY) format (99.99%)
+
+**Last 1 remaining**: NID 3087 "49121575-Cours-Francais-description-8eme-2010-2011-Eleve-sarra" - filename is too corrupted to parse automatically.
+
+**Backups**: ResourceTitleBackup now has 6002 + 28 = 6030 entries
