@@ -10,7 +10,7 @@
  * Version: bumped each release to bust old caches.
  */
 
-const SW_VERSION = 'v1.0.1';
+const SW_VERSION = 'v1.0.2';
 const STATIC_CACHE = `examanet-static-${SW_VERSION}`;
 const PAGES_CACHE = `examanet-pages-${SW_VERSION}`;
 const API_CACHE = `examanet-api-${SW_VERSION}`;
@@ -198,15 +198,30 @@ async function networkFirstWithTimeout(request, cacheName, timeoutMs) {
   }
 }
 
+// Timeout for page navigation fetches (10s). Vercel cold starts + Neon
+// queries can be slow; we don't want to show /offline for that.
+// If fetch takes >10s, fall back to cache or a slow-loading page.
+const NAV_TIMEOUT_MS = 10000;
+
+function fetchWithTimeout(request, timeoutMs) {
+  return Promise.race([
+    fetch(request),
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('nav-timeout')), timeoutMs)
+    ),
+  ]);
+}
+
 async function networkFirstWithOffline(request, cacheName) {
   const cache = await caches.open(cacheName);
   try {
-    const response = await fetch(request);
+    const response = await fetchWithTimeout(request, NAV_TIMEOUT_MS);
     if (response.ok && response.type === 'basic') {
       cache.put(request, response.clone());
     }
     return response;
   } catch (err) {
+    // Timeout or network error — try cache, then offline
     const cached = await cache.match(request);
     if (cached) return cached;
     // Try the offline page as last resort
