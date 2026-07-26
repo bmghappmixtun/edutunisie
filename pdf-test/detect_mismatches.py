@@ -102,10 +102,10 @@ def detect_subject(text, title, db_subject):
                 'content': MISMATCH_PROMPT.format(
                     db_subject=db_subject,
                     title=title[:200],
-                    text=text[:2000]
+                    text=text[:600]  # Reduced for faster GPT calls
                 )
             }],
-            max_tokens=200,
+            max_tokens=80,  # Reduced for speed
             temperature=0,
             response_format={'type': 'json_object'}
         )
