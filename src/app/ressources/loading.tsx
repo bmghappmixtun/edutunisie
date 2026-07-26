@@ -13,10 +13,20 @@ import Footer from '@/components/layout/Footer';
  *
  * CRITICAL: the loading skeleton must use the SAME element types as the
  * page (e.g. `<h1>` for the title, `<p>` for the subtitle, `<a>` for the
- * resource cards). React's hydration check compares DOM element types
+ * resource cards, `<aside>` for the FilterShell sidebar, plus a
+ * `<script type="application/ld+json">` placeholder when the page renders
+ * its itemList JSON-LD). React's hydration check compares DOM element types
  * against the React tree, so a `<div>` skeleton where the page renders an
- * `<h1>` triggers #418/#422 (mismatch). The previous version had `<div>`
- * skeletons for the title/subtitle — fixed 2026-07-25.
+ * `<aside>` (or a missing script where the page has one) triggers #418/#422
+ * (mismatch).
+ *
+ * History of fixes:
+ *   - 2026-07-25 (commit 695b225): replaced <div> skeletons for title/subtitle
+ *     with <h1>/<p> to match the page's actual element types.
+ *   - 2026-07-26 (this commit): changed sidebar wrapper from <div> to <aside>
+ *     to match FilterShell's actual element type, AND added a JSON-LD script
+ *     placeholder so the wrapper's child count matches the page when the
+ *     page renders the itemList schema (29-resource teacher pages, etc.).
  *
  * The page-level wrappers (`min-h-screen flex flex-col`, Header, main
  * padding, Footer) are mirrored byte-for-byte to keep the Suspense
@@ -25,6 +35,15 @@ import Footer from '@/components/layout/Footer';
 export default function Loading() {
   return (
     <div className="min-h-screen flex flex-col bg-slate-50">
+      {/* Placeholder for the page's itemList JSON-LD script (rendered as the
+          first child of the wrapper when there are resources). React's
+          hydration check sees the same <script type="application/ld+json">
+          element type and key on both sides, regardless of innerHTML. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: '{}' }}
+      />
+
       <Header />
 
       <main className="flex-1 pt-24 lg:pt-28">
@@ -38,13 +57,17 @@ export default function Loading() {
 
           {/* FilterShell skeleton (sidebar + content) */}
           <div className="grid lg:grid-cols-[340px_1fr] gap-6">
-            {/* Sidebar skeleton */}
-            <div className="bg-white rounded-2xl p-5 border border-slate-100 h-fit space-y-3">
-              <h2 className="h-6 bg-slate-200 rounded w-1/2 mb-4 animate-pulse text-[0px] leading-none" />
-              {[...Array(8)].map((_, i) => (
-                <div key={i} className="h-8 bg-slate-100 rounded mb-2 animate-pulse" />
-              ))}
-            </div>
+            {/* Sidebar skeleton — <aside> (NOT <div>) to match FilterShell's
+                actual element type. Using <div> here triggers #422 when the
+                Suspense boundary resolves. */}
+            <aside className="bg-white rounded-2xl border border-slate-100 h-fit space-y-3">
+              <h2 className="h-6 bg-slate-200 rounded w-1/2 mb-4 mx-5 mt-5 animate-pulse text-[0px] leading-none" />
+              <div className="px-5 pb-5 space-y-2">
+                {[...Array(8)].map((_, i) => (
+                  <div key={i} className="h-8 bg-slate-100 rounded animate-pulse" />
+                ))}
+              </div>
+            </aside>
 
             {/* Content skeleton */}
             <div className="space-y-4">
