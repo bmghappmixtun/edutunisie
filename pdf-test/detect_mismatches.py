@@ -159,10 +159,12 @@ def main():
         print('Nothing to do!')
         return
 
-    # CSV writer
-    csv_file = open(OUTPUT_FILE, 'w', newline='')
+    # CSV writer (append mode to preserve previous results)
+    write_header = not os.path.exists(OUTPUT_FILE) or os.path.getsize(OUTPUT_FILE) == 0
+    csv_file = open(OUTPUT_FILE, 'a', newline='')
     writer = csv.writer(csv_file)
-    writer.writerow(['numericId', 'db_subject', 'ai_subject', 'confidence', 'reason', 'title'])
+    if write_header:
+        writer.writerow(['numericId', 'db_subject', 'ai_subject', 'confidence', 'reason', 'title'])
 
     stats = {'checked': 0, 'mismatch_high': 0, 'mismatch_med': 0, 'mismatch_low': 0, 'errors': 0}
     start = time.time()
