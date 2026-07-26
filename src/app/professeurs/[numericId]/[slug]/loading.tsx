@@ -22,24 +22,48 @@ import Footer from '@/components/layout/Footer';
  * wrapper), the structure stays consistent between fallback and streamed
  * content, and React can hydrate cleanly.
  *
- * This is the same pattern as the per-route not-found.tsx added on
- * 2026-07-20 (commit 17d9586), which fixed the notFound() streaming case.
+ * History of fixes:
+ *   - 2026-07-20 (commit 17d9586): added per-route not-found.tsx for the
+ *     notFound() streaming case.
+ *   - 2026-07-25 (commit 695b225): aligned loading.tsx structure with page.
+ *   - 2026-07-26 (this commit): added JSON-LD script placeholders (Person
+ *     + BreadcrumbList) and changed breadcrumb wrapper from <div> to <nav>
+ *     to match the page's actual element types when the page resolves to
+ *     a real teacher profile.
  */
 export default function Loading() {
   return (
     <div className="min-h-screen flex flex-col">
+      {/* Placeholders for the page's Person + BreadcrumbList JSON-LD scripts
+          (rendered as the first two children of the wrapper). React's
+          hydration check sees the same <script type="application/ld+json">
+          element types and keys on both sides, regardless of innerHTML. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: '{}' }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: '{}' }}
+      />
+
       <Header />
 
       <main className="flex-1 pt-20">
-        {/* Breadcrumb skeleton */}
+        {/* Breadcrumb skeleton — <nav> (NOT <div>) to match the page's actual
+            element type. The page renders <nav aria-label="Fil d'Ariane">,
+            so the loading must too. */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-          <div className="flex items-center gap-1 text-xs text-slate-500 flex-wrap">
+          <nav
+            aria-label="Fil d'Ariane"
+            className="flex items-center gap-1 text-xs text-slate-500 flex-wrap"
+          >
             <div className="h-3 w-12 bg-slate-200 rounded animate-pulse" />
             <span className="text-slate-300">›</span>
             <div className="h-3 w-16 bg-slate-200 rounded animate-pulse" />
             <span className="text-slate-300">›</span>
             <div className="h-3 w-24 bg-slate-200 rounded animate-pulse" />
-          </div>
+          </nav>
         </div>
 
         {/* Hero header skeleton */}

@@ -39,8 +39,33 @@ export async function generateMetadata({
 }) {
   const { numericId: numericIdStr, slug } = await params;
   const numericId = parseInt(numericIdStr, 10);
-  const teacher = await prisma.user.findUnique({
-    where: { numericId },
+
+  // CRITICAL: use the SAME filter as the page component below. The previous
+  // version used `findUnique({ where: { numericId } })` with NO role/status
+  // filter, which succeeded for users that the page then rejected (because
+  // the page filters by role=TEACHER + (status=ACTIVE OR isVerifiedTeacher)).
+  // This mismatch caused React #418 hydration errors on 2026-07-26: the
+  // initial HTML had the teacher's name in <title> and the page's full
+  // structure (with loading skeleton for the main), then the page called
+  // notFound() which streamed the not-found.tsx, and React couldn't reconcile
+  // the two structures.
+  //
+  // Now: we use findFirst with the page's exact filter (including the
+  // isAdmin bypass for admins previewing PENDING profiles), so the metadata
+  // and the page agree on whether the teacher exists.
+  const currentUser = await getCurrentUser();
+  const isAdmin = currentUser?.role === 'ADMIN';
+
+  const teacher = await prisma.user.findFirst({
+    where: {
+      numericId,
+      role: 'TEACHER',
+      // Mirror the page's visibility rules exactly (admins can preview
+      // PENDING/SUSPENDED profiles for moderation).
+      ...(isAdmin
+        ? {}
+        : { OR: [{ status: 'ACTIVE' }, { isVerifiedTeacher: true }] }),
+    },
     select: {
       slug: true,
       firstName: true,
