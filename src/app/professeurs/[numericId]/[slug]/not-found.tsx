@@ -28,10 +28,31 @@ import Footer from '@/components/layout/Footer';
  * inside its own wrapper, so when the streamed content replaced the
  * loading.tsx skeleton (which DID have Header/Footer), the DOM structure
  * changed dramatically and React's hydration check threw #419.
+ *
+ * JSON-LD PLACEHOLDERS (fixes 2026-07-26 #418 hydration errors on
+ * /professeurs/833/prof-833): the page.tsx renders 2 JSON-LD scripts
+ * (Person + BreadcrumbList) as the first children of the wrapper, and
+ * the loading.tsx now mirrors that with 2 placeholder scripts. The
+ * not-found.tsx also needs those 2 placeholder scripts so the wrapper's
+ * child count stays at 4 when the not-found boundary replaces the page
+ * (which would otherwise drop from 4 children to 3 and trigger #418).
  */
 export default function NotFound() {
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-sky-50 to-indigo-50">
+      {/* Placeholders for the page's Person + BreadcrumbList JSON-LD scripts
+          (rendered as the first two children of the wrapper). Keeps the
+          wrapper's child count identical to loading.tsx and page.tsx so
+          React's hydration check passes when the not-found boundary resolves. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: '{}' }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: '{}' }}
+      />
+
       <Header />
 
       <main className="flex-1 pt-24 lg:pt-28 flex items-center justify-center px-4 py-12">
