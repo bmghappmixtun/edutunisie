@@ -35,6 +35,9 @@ export async function POST(req: NextRequest) {
     if (!resourceId || !jpegBase64 || !fileKey) {
       return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
     }
+    
+    // Type narrowing for TypeScript
+    const rid: string = String(resourceId);
 
     // Decode base64 JPEG
     const jpegBuffer = Buffer.from(jpegBase64, 'base64');
@@ -51,7 +54,7 @@ export async function POST(req: NextRequest) {
 
     // Update DB
     await prisma.resource.update({
-      where: { id: resourceId },
+      where: { id: rid },
       data: { thumbnailKey: blob.pathname, thumbnailUrl: blob.url },
     });
 
@@ -72,12 +75,13 @@ export async function GET(req: NextRequest) {
   if (token !== INTERNAL_TOKEN) {
     return new NextResponse('Not found', { status: 404 });
   }
-  const total = await prisma.resource.count({
-    where: { thumbnailKey: null, fileKey: { not: null } },
+  // Count without thumbnailKey (null or empty string)
+  const allResources = await prisma.resource.findMany({
+    where: { fileKey: { not: '' } },
+    select: { id: true, thumbnailKey: true },
   });
-  const withThumb = await prisma.resource.count({
-    where: { thumbnailKey: { not: null } },
-  });
+  const total = allResources.filter(r => !r.thumbnailKey).length;
+  const withThumb = allResources.length - total;
   return NextResponse.json({
     without_thumbnail: total,
     with_thumbnail: withThumb,
