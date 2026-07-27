@@ -480,7 +480,9 @@ export default async function ResourcePage({
 
                 {/* AI-generated summary */}
                 {resource.aiSummary?.summary && (() => {
-                  const summaryAr = isArabic(resource.aiSummary.summary);
+                  const summary = resource.aiSummary.summary;
+                  const summaryAr = isArabic(summary);
+                  const isStructuredHtml = /<strong>|<br\s*\/?>|<\/strong>|<ul>|<li>/i.test(summary);
                   return (
                   <AiContentSection
                     title="Résumé intelligent"
@@ -489,13 +491,22 @@ export default async function ResourcePage({
                     subjectSlug={resource.subject?.slug}
                     defaultOpen={false}
                   >
-                    <p
-                      className={`text-sm text-slate-700 leading-relaxed ${summaryAr ? 'text-right' : 'text-left'}`}
-                      dir={summaryAr ? 'rtl' : 'ltr'}
-                      lang={summaryAr ? 'ar' : 'fr'}
-                    >
-                      {resource.aiSummary.summary}
-                    </p>
+                    {isStructuredHtml ? (
+                      <div
+                        className={`text-sm text-slate-700 leading-relaxed space-y-1.5 [&_ul]:list-disc [&_ul]:ps-5 [&_ul]:my-2 [&_li]:my-1 [&_strong]:text-slate-900 [&_strong]:font-semibold ${summaryAr ? 'text-right' : 'text-left'}`}
+                        dir={summaryAr ? 'rtl' : 'ltr'}
+                        lang={summaryAr ? 'ar' : 'fr'}
+                        dangerouslySetInnerHTML={{ __html: summary }}
+                      />
+                    ) : (
+                      <p
+                        className={`text-sm text-slate-700 leading-relaxed whitespace-pre-line ${summaryAr ? 'text-right' : 'text-left'}`}
+                        dir={summaryAr ? 'rtl' : 'ltr'}
+                        lang={summaryAr ? 'ar' : 'fr'}
+                      >
+                        {summary}
+                      </p>
+                    )}
                   </AiContentSection>
                   );
                 })()}
