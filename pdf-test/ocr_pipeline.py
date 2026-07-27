@@ -12,7 +12,7 @@ from pathlib import Path
 sys.path.insert(0, '.')
 from ai_extract import process_pdf, normalize_year
 
-NEON_API_KEY = "***REMOVED***"
+NEON_API_KEY = os.environ.get("NEON_API_KEY", "")
 NEON_PROJECT = "little-silence-94324724"
 NEON_BRANCH = "br-purple-recipe-as2x8yyo"
 NEON_BASE = "https://console.neon.tech/api/v2/projects"
