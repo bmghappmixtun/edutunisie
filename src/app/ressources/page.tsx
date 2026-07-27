@@ -430,12 +430,14 @@ export default async function ResourcesPage(props: { searchParams: Promise<Searc
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50">
-      {jsonLd && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
-      )}
+      {/* Always render the JSON-LD script (matching loading.tsx placeholder)
+          to keep the wrapper child count consistent. React's hydration
+          check compares element counts — if jsonLd is null we render an
+          empty {} placeholder so the structure is identical to loading. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLd ? JSON.stringify(jsonLd) : '{}' }}
+      />
       <Header />
 
       <main className="flex-1 pt-24 lg:pt-28">
