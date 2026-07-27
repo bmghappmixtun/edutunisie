@@ -70,8 +70,18 @@ export default function ReferentielNationalPage() {
   const styleMatch = rawHtml.match(/<style[^>]*>([\s\S]*?)<\/style>/i);
   const css = styleMatch ? styleMatch[1] : '';
 
-  // Extract body content (without <body> tags themselves)
-  const bodyMatch = rawHtml.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+  // Extract <script>...</script> blocks (executed once via React, not innerHTML)
+  const scriptBlocks: string[] = [];
+  const bodySource = rawHtml.replace(
+    /<script\b[^>]*>([\s\S]*?)<\/script>/gi,
+    (_match, code: string) => {
+      scriptBlocks.push(code);
+      return '';
+    }
+  );
+
+  // Extract body content (without <body> tags themselves and without scripts)
+  const bodyMatch = bodySource.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
   const bodyHtml = bodyMatch ? bodyMatch[1] : '';
 
   return (
@@ -86,7 +96,7 @@ export default function ReferentielNationalPage() {
 
       {/* Main content pushed below the fixed Header */}
       <main className="pt-[62px] lg:pt-[73px]">
-        <ReferentielContent html={bodyHtml} />
+        <ReferentielContent html={bodyHtml} scripts={scriptBlocks} />
       </main>
 
       <Footer />
