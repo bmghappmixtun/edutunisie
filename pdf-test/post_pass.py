@@ -14,7 +14,7 @@ from openai import OpenAI
 sys.path.insert(0, '.')
 from ai_extract import normalize_year
 
-NEON_API_KEY = "***REMOVED***"
+NEON_API_KEY = os.environ.get("NEON_API_KEY", "")
 NEON_PROJECT = "little-silence-94324724"
 NEON_BRANCH = "br-purple-recipe-as2x8yyo"
 NEON_BASE = "https://console.neon.tech/api/v2/projects"
