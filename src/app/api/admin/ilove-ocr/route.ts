@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
-import { ILovePDFApi } from '@ilovepdf/ilovepdf-nodejs';
+import ILovePDFApi from '@ilovepdf/ilovepdf-nodejs';
 // @ts-ignore
 import ILovePDFFile from '@ilovepdf/ilovepdf-nodejs/ILovePDFFile';
 import { prisma } from '@/lib/prisma';
@@ -74,12 +74,12 @@ export async function POST(req: NextRequest) {
             month: now.getMonth() + 1,
             fileSize: buffer.length,
             success: true,
-          },
+          } as any,
         });
       }
     } catch {}
 
-    return new NextResponse(result, {
+    return new NextResponse(new Uint8Array(result), {
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',
