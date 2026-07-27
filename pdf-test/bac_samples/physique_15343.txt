@@ -1,0 +1,381 @@
+ 
+1 ANNEE SCOLAIRE 09/10                                                                                                  M.ESSOUFI 
+ 
+COURS : RADIOACTIVITE 
+BAC 
+ 
+I ) L'atome : 
+1)     Modèle de l'atome (rappels) : 
+Un atome est constitué d'un noyau autour duquel gravitent des électrons.  
+Le noyau est constitué de particules appelées nucléons : neutrons et protons. 
+2)     Caractéristiques d'un noyau d'atome :  
+La représentation symbolique du noyau d'un atome est :  A
+Z X  ,  X est le symbole de l'élément chimique. 
+* Z est le nombre de protons, appelé numéro atomique et aussi nombre de charge. 
+*  A est le nombre de nucléons, aussi appelé nombre de masse  
+* N = A - Z est le nombre de neutrons .  
+3) Isotopes : 
+Des noyaux sont appelés isotopes si ils ont le même nombre de protons Z mais un nombre de neutrons N différent ( ou 
+nombre de nucléons A).   Exemple :  35
+17Cl  et 37
+17Cl sont des isotopes du chlore. 
+II ) Stabilité du noyau atomique : 
+1) Forces agissant dans le noyau : (rappels) 
+Dans un noyau atomique, il existe des forces électrostatiques répulsives entre les protons, des forces gravitationnelles 
+attractives entre les nucléons et des forces nucléaires attractives d'interaction forte à courte portée (10-15m) entre les 
+nucléons qui assurent la cohésion de certains noyaux. 
+2) Stabilité du noyau : 
+Sous l'action des différentes forces en présence, certains noyaux sont stables (ils ont une grande durée de vie) et 
+d'autres sont instables (ils se détruisent rapidement). 
+Parmi les 1500 noyaux connus, seuls 260 sont stables. 
+ 
+III ) Radioactivité (découverte par Henri Becquerel en 1896): 
+1) Définition : 
+Un noyau radioactif est un noyau instable dont la désintégration (destruction) provoque l'apparition d'un nouveau noyau, 
+l'émission d'une particule notée α, β- ou β+, et fréquemment l'émission d'un rayonnement électromagnétique noté γ .  
+La radioactivité est une réaction dite nucléaire car elle concerne le noyau de l'atome par opposition aux réactions 
+chimiques qui ne concernent que le cortège électronique sans modifier le noyau. 
+2) Propriétés de la désintégration : 
+La désintégration radioactive est aléatoire, on ne peut pas prévoir quand va se produire la désintégration d'un noyau .  
+Elle est spontanée, elle se produit sans aucune intervention extérieure. Elle ne dépend pas ni de son environnement 
+chimique, de l'espèce chimique qui contient le noyau radioactif ; ni des conditions extérieures ( pression ou température).  
+3) Lois de conservation : 
+Lois de Soddy : Lors d'une désintégration nucléaire, il y a conservation du nombre de charge Z et du nombre de nucléons 
+A 
+La désintégration d'un noyau X (appelé noyau père) conduit à un noyau Y (appelé noyau fils) et à l'expulsion d'une 
+particule P (particule α ou β). 
+L'équation de la désintégration s'écrit : A
+Z X → A1
+Z1Y + A2
+Z2 P  
+Les lois de conservation de Soddy s'écrivent:  
+* Loi de conservation du nombre de masse A :  A = A1 + A2   
+* Loi de conservation du nombre de charges   Z :  Z = Z1 + Z2   
+4)     Radioactivité α : 
+a) Définition : 
+Des noyaux sont dits radioactifs α s'ils émettent des noyaux d'hélium  4
+2 He  . 
+Le noyau de l'atome d'hélium porte deux charges positives. On ne les représente pas. 
+b) Equation de la réaction de désintégration α : 
+D'après les lois de conservation de Soddy, l'équation s'écrit :  A
+Z X →  A-4
+Z-2 Y +  4
+2 He  
+La radioactivité α concernent les noyaux lourds ( A > 200 ) 
+Ex : L'uranium 238 est un noyau radioactif α :  238
+92 U  →  234
+90 Th +  4
+2 He (noyau fils : thorium) 
+c) Caractéristiques de la particule α : 
+Ces particules sont arrêtées par quelques centimètres d'air ou par une feuille de papier, mais elles sont très ionisantes et 
+donc dangereuses. 
+5) Radioactivité β - : 
+a) Définition : 
+Des noyaux sont dits radioactifs β - s'ils émettent des électrons  0
+- 1 e  . 
+b) Equation de la réaction de désintégration. : 
+D'après les lois de conservation de Soddy l'équation s'écrit :  A
+Z X  →  A
+Z+1 Y + 0
+- 1 e  
+Exemple : le cobalt 60 est un noyau radioactif β -.  
+Son équation de désintégration s'écrit :  60
+27 Co  → 60
+28 Ni + 0
+- 1 e  
+Remarque : Il n'y a pas d'électron dans le noyau, mais le noyau peut en émettre en transformant un neutron excédentaire 
+en un électron et un proton suivant le bilan :  
+ 1
+0 n →  1
+1 p + 0
+- 1 e   ,      Z augmente d'une unité et N diminue d'une unité,  A reste constant. 
+c) Caractéristiques de la particule β - : 
+
+ 
+2 ANNEE SCOLAIRE 09/10                                                                                                  M.ESSOUFI 
+ 
+COURS : RADIOACTIVITE 
+BAC 
+Les particules β - sont assez peu pénétrantes. Elles sont arrêtées par quelques millimètres d'aluminium. 
+6) Radioactivité β +  : 
+a) Définition : 
+Des noyaux sont dits radioactifs β + s'ils émettent des positons   0
++1 e  
+Ce sont des particules β+ portant une charge +e. 
+b) Equation de la désintégration : 
+D'après les lois de conservation de Soddy l'équation s'écrit :  A
+Z X →  A
+Z-1Y + 0
++1 e 
+Exemple : le phosphore 30 est un noyau radioactif β + :  30
+15 P → 30
+14 Si + 0
++1 e 
+Remarque : Cette radioactivité ne concerne que des noyaux artificiels, obtenus par des réactions nucléaires, qui 
+possèdent trop de protons. Un proton excédentaire se transforme en un positon et un neutron suivant le bilan :   
+1
+1 p →  1
+0 n + 0
++1 e   ,    N augmente d'une unité et Z diminue d'une unité, A reste constant. 
+c) Caractéristiques de la particule β + : 
+Ces particules ont une durée de vie très courte car lorsqu'elles rencontrent un électron, les deux particules s'annihilent 
+pour donner de l'énergie sous forme d'un rayonnement électromagnétique γsuivant le bilan : 0
+- 1 e +  0
++1 e → γ 
+5) Désexcitation γ : 
+Le noyau fils est en général obtenu dans un état excité (niveau d'énergie élevé), il est noté Y*. Cet état est instable, le 
+noyau se désexcite en évacuant cette énergie excédentaire, en émettant un rayonnement électromagnétique γ ( 
+particules très énergétiques appelées photons ).  
+Equation d'une émission γ : Y*→ Y + γ 
+  
+ 
+1) Nombre de désintégrations pendant une durée Δt :  
+On considère un échantillon contenant N noyaux radioactifs (non désintégrés) à un instant t . 
+Ce nombre est noté N0 à l'instant t0 = 0s pris comme instant initial. 
+Pendant une durée Δt très brève, un certain nombre de noyaux radioactifs se sont désintégrés.  
+Soit  N+ΔN le nombre de noyaux radioactifs non désintégrés à la date t+Δt.  ( ΔN < 0 car N diminue ) 
+Le nombre moyen ( phénomène aléatoire) de noyaux désintégrés pendant la durée Δt est : 
+Nt - Nt+Δt = N - (N + ΔN) = - ΔN > 0 
+On a donc :   - ΔN = λN.Δt      où λ est la constante radioactive, caractéristique d'un radioélément.  
+- ΔN = λN.Δt       ⇒      - ΔN / N = λ.Δt      ;     λ s'exprime en s-1, min-1, h-1, jour-1 ou an-1. 
+2) Décroissance exponentielle : 
+L'évolution du nombre de noyaux radioactifs présents dans un échantillon au cours du temps est donnée par : 
+- ΔN / N = λ.Δt 
+Si Δt tend vers 0, la relation devient  - dN/N =  λ.dt 
+( en prenant l'intégrale, on obtient   
+𝒅𝑵
+𝑵
+𝑵
+𝑵𝟎
+= −𝝀 𝒅𝒕
+𝒕
+𝟎
+  ln(N/N0) = - λ.t  ⇒  N / N0 = e -λ.t   
+⇒ N = N0.e -λ.t    
+La fonction N(t) qui vérifie cette propriété est  : N = N0 e -λt   
+où N0 est le nombre de noyaux radioactifs à l'instant initial et λ est la constante radioactive. 
+D'après cette fonction, la durée de désintégration totale est infinie. 
+N est une fonction décroissante du temps 
+Plus λ est grande, plus la décroissance de N est rapide 
+  
+  3) Demi-vie radioactive : 
+a) Définition : 
+La demi-vie radioactive, notéeT, d'un échantillon de noyaux radioactifs est égale à la durée 
+nécessaire pour que, statistiquement, la moitié des noyaux radioactifs présents dans l'échantillon se désintègrent. 
+      N( t +T) = N(t) / 2 
+b) Calcul de la demi-vieT : 
+N( t +T) = N( t ) / 2   ⇒ N0.e -λ(t+ T)  = N0.e -λ . T / 2    ⇒ e -λ . T = ½ ⇒ - λ.T  = ln ½  = - ln 2    ⇒ T  = ln 2/ λ  
+II ) Activité radioactive : 
+1) Définition : 
+L'activité A radioactive est égale au nombre moyen de désintégrations par seconde . A = Ndésint. / Δt = - ΔN / Δt    ( A > 0)  
+Elle s'exprime en becquerels dont le symbole est Bq ( 1 Bq = 1 désintégration par seconde). 
+ A = - ΔN / Δt = λ.N = λ.N0.e -λ . t = A0.e -λ . t  
+L'activité suit la même loi de décroissance exponentielle que N. 
+ 2) Dangerosité et effet biologique : 
+Plus l'activité d'une source est grande, plus elle est dangereuse.  
+L'action sur les tissus vivants dépend de plusieurs paramètres, du nombre de particules reçues par seconde, qui dépend 
+de l'activité A et de la distance de la source; de l'énergie et de la nature des particules ; du fractionnement de la dose 
+reçue et de la nature des tissus touchés.  
+Cela peut provoquer des réactions chimiques et des modifications de l'ADN . 
+ 
+ 
+
+ 
+3 ANNEE SCOLAIRE 09/10                                                                                                  M.ESSOUFI 
+ 
+COURS : RADIOACTIVITE 
+BAC 
+III ) Datation  : 
+1) Principe : 
+ A = A0.e -λ . t    ⇒  A / A0 = e -λ . t    ⇒ ln(A/A0) = -λ . t   ⇒  t = ln(A0/A) / λ 
+En connaissant un radioélément contenu dans l'objet , on détermine sa constante λ 
+On peut mesurer A,  si l'on connaît l'activité A0 de l'échantillon ,alors on peut connaître la date d'origine t de l'objet. 
+2) Datation au carbone 14 
+La proportion de carbone 14 par rapport à l'isotope 12 abondant est de l'ordre de 10-12 , elle est à peu près constante car 
+il est régénéré dans l'atmosphère. Il en est de même dans le dioxyde de carbone de l'atmosphère. Or tous les 
+organismes vivants échangent du CO2  avec l'atmosphère soit par photosynthèse , soit par l'alimentation. Les tissus 
+fixent l'élément carbone. La proportion de carbone 14 dans les tissus est donc identique à celle de l'atmosphère tant que 
+l'organisme est en vie. A leur mort, la quantité de carbone 14 diminue selon la loi de décroissance radioactive. 
+t1/2 ( 14C) ≈ 5570 ans 
+ 
+I ) Equivalence masse énergie : 
+1) Relation d'Einstein : relation d'équivalence masse-énergie 
+En 1905, en élaborant la théorie de la relativité restreinte, Einstein postule que la masse est une des formes de l'énergie : 
+Un système au repos, de masse m possède une énergie de masse :  
+                                      E : énergie de masse en joules (J) 
+E = m.c2   avec               m : masse en kilogrammes (kg) 
+                                      c : vitesse de la lumière dans le vide ( c = 3,0.108 m.s-1 ) 
+Conséquence : Si le système (au repos) échange de l'énergie avec le milieu extérieur, (par rayonnement ou par transfert 
+thermique par exemple), sa variation d'énergie ΔE et sa variation de masse  Δm  sont liées par la relation :  ΔE = Δm . c2 
+* Si Δm < 0 alors ΔE < 0,  le système cède de l'énergie au milieu extérieur et sa masse diminue. 
+* Si Δm > 0 alors ΔE > 0, le système reçoit de l'énergie du milieu extérieur et sa masse augmente. 
+2) Unités : 
+A l'échelle atomique, l'unité joule est inadaptée , trop grande ; on utilise plutôt l'électron volt , eV :  
+   1 eV= 1,60.10-19 J  et aussi le MeV:    1 MeV = 106 eV = 1,60.10-13 J. 
+  
+Remarque : A cette échelle, l'unité kg est aussi inadaptée, on utilise parfois l'unité de masse atomique notée u .  
+Elle est égale au douzième de la masse d'un atome de carbone 12
+6C .  
+1 u = M( 12
+6C ) / ( 12 NA ) = 12,0.10-3 / (12 x 6,02.1023 ) = 1,67.10-27 kg 
+II ) Energie de liaison du noyau : 
+1) Défaut de masse du noyau : 
+On a constaté en mesurant les masses que la masse du noyau atomique est inférieure à la somme des masses des 
+protons mp et des neutrons mn qui le constituent : mnoyau < Z.mp + (A-Z).mn  
+Cette différence est appelée défaut de masse Δm :   Δm = Z.mp + (A - Z).mn - mnoyau    ( Δm > 0 ) 
+Exemple: Calculer Δm pour un noyau d'hélium :  
+données :  mn=1,67496.10-27 kg , mp = 1,67265.10-27 kg  et m(4
+2He) =6,6447.10-27 kg 
+Δm = 2.mp + 2.mn – m(4
+2He) = (2 x 1,67265+2 x 1,67496 – 6,6447).10-27 = 5,05.10-29 kg 
+2) Energie de liaison du noyau : 
+Définition: On appelle énergie de liaison d'un noyau , 
+notée El , l'énergie que le milieu extérieur doit fournir à un 
+noyau au repos pour le dissocier en nucléons séparés au 
+repos. Lorsque le noyau se dissocie, la masse augmente 
+de Δm et l'énergie de Δm.c2.  
+ L'énergie de liaison d'un noyau a pour expression :   
+                                      El : énergie de liaison du noyau (en J) à convertir en MeV 
+El = Δm.c2    avec           Δm : défaut de masse du noyau (en kg) 
+                                      c : célérité de la lumière dans le vide (en m.s-1) 
+Pour un noyau d'hélium : El = Δm.c2 = 5,05.10-29 x (3,0.108)2 = 4,54.10-12 J = 28,4 MeV 
+ Remarque: Inversement, lorsque le noyau se forme à partir de ses nucléons libres, le milieu extérieur reçoit l'énergie  
+E = |Δm|.c2 (la masse du système diminue et Δm<0). 
+3) Energie de liaison par nucléon : 
+Définition: L'énergie de liaison par nucléon d'un noyau notée EA est le quotient de son énergie de liaison par le nombre de 
+ses nucléons.   
+                                      EA: énergie de liaison par nucléon (en Mev/nucléon) 
+EA = El / A    avec          El: énergie de liaison du noyau (en Mev) 
+                                      A: nombre de nucléons du noyau 
+Remarque: EA permet de comparer la stabilité des noyaux entre eux.  
+Plus l'énergie de liaison par nucléon est grande, plus le noyau est stable. 
+Les noyaux instables peuvent évoluer de 2 façons : 
+* Les noyaux lourds peuvent se casser en 2 noyaux légers appartenant au domaine de stabilité. C'est la fission. 
+* Certains noyaux légers peuvent "fusionner" pour former un noyau plus gros et stable.C'est la fusion. 
+ 
+
+ 
+4 ANNEE SCOLAIRE 09/10                                                                                                  M.ESSOUFI 
+ 
+COURS : RADIOACTIVITE 
+BAC 
+ III ) Fission et fusion nucléaires : 
+1) Réactions nucléaires provoquées : 
+Définition: Une réaction nucléaire est dite provoquée lorsqu'un noyau cible est frappé par un noyau projectile et donne 
+naissance à de nouveaux noyaux.  
+Les lois de conservation de Soddy sont vérifiées. 
+Exemple : Expérience de Rutherford en 1919 : le bombardement de noyaux d'azote avec des particules α provoque la 
+formation de noyaux d'oxygène et de protons. 
+2) La fission nucléaire: réaction en chaîne : 
+Définition: La fission est une réaction nucléaire provoquée au cours de laquelle un noyau lourd "fissile" donne naissance 
+à deux noyaux plus légers. 
+ Exemple: Plusieurs réactions de fission de l'uranium 235 sont possibles: 
+1
+0n + 235
+92U → 94
+38Sr + 140
+54Xe + 2 1
+0n   
+1
+0n + 235
+92U → 91
+36Kr + 142
+56Ba + 3 1
+0n   
+1
+0n + 235
+92U →  94
+37Rb + 141
+55Cs + 1
+0n   
+   
+Les neutrons émis lors de la fission peuvent provoquer la 
+ fission d'autres noyaux. Si le nombre de neutrons émis lors  
+de chaque fission est supérieur à 1, une réaction en chaîne  
+peut se produire et devenir rapidement incontrôlable  
+(bombe à fission : bombe "A" d'Hiroshima).  
+Dans une centrale nucléaire, la réaction en chaîne est  
+contrôlée par des barres mobiles qui plongent dans le réacteur entre les barres de "combustible" pour absorber une 
+partie des neutrons émis. On peut ainsi contrôlé la quantité d'énergie produite par les réactions de fission.  
+Pour amorcer une fission, il faut apporter une quantité minimale d'énergie au système. 
+3) La fusion nucléaire : 
+Définition:  
+La fusion nucléaire est une réunion de deux noyaux légers pour former un noyau plus lourd. 
+   
+Equation : 2
+1H + 3
+1H → 4
+2He + 1
+0n 
+  
+  L'énergie libérée au cours d'une fusion est considérable.  
+La fusion n'est possible que si les deux noyaux possèdent une grande 
+énergie cinétique pour vaincre les forces de répulsion électriques. 
+La fusion se produit naturellement dans les étoiles. Dans une bombe 
+thermonucléaire (appelée bombe H), la fusion nucléaire est incontrôlée et 
+explosive  
+Elle est très intéressante pour produire de l'énergie , mais on ne la maîtrise pas suffisamment pour produire de l'électricité 
+. 
+IV ) Bilan énergétique : 
+1)     Cas général : 
+Equation d'une réaction nucléaire : A1
+Z1X1 + A2
+Z2X2 → A3
+Z3X3 + A4
+Z4X4 
+D'après l'équivalence masse-énergie, la variation d'énergie ΔE de la réaction correspond à la variation de masse Δm :  
+Δm = (m3+m4)-(m1+m2).      ΔE = Δm.c2  
+ΔE = El1+El2 – (El3+El4 )  ( voir définition de El) 
+2)     Réactions nucléaires spontanées : 
+Radioactivité α : A
+ZX → A-4
+Z-2Y + 4
+2He  
+Energie fournie au milieu extérieur : ΔE = [m(A-4
+Z-2Y) + m(4
+2He) - m(A
+ZX)] . c2  
+  
+Désintégration β- : A
+ZX  → A
+Z+1Y +0
+-1e    ΔE = [m(A
+Z+1Y) + m(0
+-1e) - m(A
+ZX )].c2  
+3) Réactions de fission et de fusion provoquées : 
+Pou la fission, étudions la réaction utilisée par une centrale nucléaire : la fission de l'uranium 235.  
+1
+0n + 235
+92U→ 94
+38Sr + 140
+54Xe + 2 1
+0n  
+remarque : La fission d'un noyau d'uranium peut donner d'autres noyaux fils. 
+m(235
+92U) = 234,9935 u ; m(94
+38Sr) = 93,8945 u ; mn = 1,0087 u; m(140
+54Xe) = 139,8920 u 
+ΔE = [m(94
+38Sr) + m(140
+54Xe) + 2.mn - m(235
+92U) - mn ].c2  (Δm = - 0,1983 u) 
+ΔE = (93,8945 + 139,8920 + 1,0087 - 234,9935 ) x 931,5 = - 184,7 MeV 
+Cette énergie est énorme par rapport à la combustion de pétrole . 
+1 kg d'uranium fournit autant d'énergie que 2 000 Tonnes de pétrole. 
+ Pour la fusion, prenons l'exemple de la fusion de 2 noyaux d'hélium 3 
+3
+2He  + 3
+2He → 4
+2He  + 2 1
+1p  
+m(3
+2He ) = 3,0149 u ; m(4
+2He ) = 4,0015 u ; mp = 1,0073 u ; Δm = - 0,00137 u 
+ΔE = [m(4
+2He )+2.mp- 2.m(3
+2He )] . c2 = (4,0015+2 x 1,0073 -2 x 3,0149) x 931,5 = - 12,76 MeV. 
+Remarque : Par nucléon, la fusion libère plus d'énergie que la fission. 
+  
+ 
+

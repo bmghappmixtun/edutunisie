@@ -1,0 +1,200 @@
+ 
+)
+points
+4
+(
+EXERCICE N1
+ 
+Soit la fonction 𝒇 définie sur R dont la courbe représentative 𝑪𝒇  
+ 
+1) Déterminer graphiquement 
+𝒇(𝟎) ; 𝒇′(𝟎) ; 𝐥𝐢𝐦𝒙→+∞𝒇(𝒙) et  
+ 
+𝐥𝐢𝐦
+𝒙→+∞( 𝒇(𝒙) −𝟑𝒙) 
+2) On admet que 
+ 𝒇(𝒙) = 𝟐𝒆−𝒙+ 𝒂𝒙+ 𝒃 
+Ou 𝒂 𝒆𝒕 𝒃 sont deux nombres réels 
+a) Déterminer 𝒇′(𝒙)  
+b) Déterminer les valeurs de 𝒂 𝒆𝒕 𝒃  
+et en déduire l’expression de 𝒇(𝒙) 
+3) Soit 𝒇 définie sur R par : 
+𝒇(𝒙) = 𝟐𝒆−𝒙+ 𝟑𝒙−𝟒 
+a) Calculer 𝐥𝐢𝐦𝒙→+∞𝒇(𝒙)  
+𝒆𝒕 𝐥𝐢𝐦
+𝒙→−∞𝒇(𝒙) 
+b) Démontrer que la droite 
+ ∆: 𝒚= 𝟑𝒙−𝟒 
+est une asymptote à la courbe  
+Représentative 𝑪𝒇 au voisinage de (+∞) 
+c) Dresser le tableau de variations de 𝒇 
+Exercice n°2 (5 points)
+ 
+1) un candidat prépare un examen de 7 matières dont  4 fondamentales et 3 options. 
+Le candidat a révisé 3 matières fondamentales et 2 options .Chaque matière 
+comporte un seul sujet 
+le candidat choisit au hasard et simultanément 3 sujets. 
+Déterminer la probabilité de chacun des événements suivants : 
+A :≪𝒍𝒆 𝒄𝒂𝒏𝒅𝒊𝒅𝒂𝒕 𝒂 𝒄𝒉𝒐𝒊𝒔𝒊 𝒕𝒓𝒐𝒊𝒔 𝒎𝒂𝒕𝒊è𝒓𝒆𝒔 𝒇𝒐𝒏𝒅𝒂𝒎𝒆𝒏𝒕𝒂𝒍𝒆𝒔≫ 
+B :≪𝒍𝒆 𝒄𝒂𝒏𝒅𝒊𝒅𝒂𝒕 𝒂 𝒄𝒉𝒐𝒊𝒔𝒊 𝒅𝒆𝒖𝒙 𝒎𝒂𝒕𝒊è𝒓𝒆𝒔 𝒓é𝒗𝒊𝒔é𝒆𝒔≫ 
+C :≪𝒍𝒆 𝒄𝒂𝒏𝒅𝒊𝒅𝒂𝒕 𝒂 𝒄𝒉𝒐𝒊𝒔𝒊 𝒅𝒆𝒖𝒙 𝒎𝒂𝒕𝒊è𝒓𝒆𝒔  𝒓é𝒗𝒊𝒔é𝒆𝒔 𝒔𝒂𝒄𝒉𝒂𝒏𝒕 𝒒𝒖′𝒊𝒍 𝒂 𝒐𝒃𝒕𝒆𝒏𝒖 
+ 𝒕𝒓𝒐𝒊𝒔 𝒎𝒂𝒕𝒊è𝒓𝒆𝒔 𝒇𝒐𝒏𝒅𝒂𝒎𝒆𝒏𝒕𝒂𝒍𝒆𝒔≫ 
+2) Soit 𝑿 la variable aléatoire prenant pour valeurs le nombre de sujets révisés choisis 
+par le candidat  
+a) Déterminer la loi de probabilité de 𝑿 
+b) Calculer l’espérance et l’écart type de 𝑿        
+3) Une deuxième épreuve sous forme de Q.C.M comporte cinq questions  
+indépendantes concernant les matières non révisées par le candidat. Pour chacune 
+d’entre elles sont proposées quatre repenses dont une seule est exacte. 
+ Lycée echebbi
+ 
+PROF : DK  AHMED
+ 
+Bac blanc 
+ 
+Mathématique
+ 
+Duré 3h 
+ 
+CLASSE4T 
+ 
+1sur3 
+
+Le candidat répond alors au hasard à chaque question  
+Soit 𝒀  la variable aléatoire qui prend pour valeur le nombre de repenses exacte données 
+par le candidat  
+a) Déterminer la loi de probabilité de 𝒀  
+b) Calculer 𝑬(𝒀) ; 𝑽(𝒀) et 𝝈(𝒀) 
+c) Le candidat est déclaré admis s’il répond exactement à au moins trois questions. 
+Calculer la probabilité pour que le candidat soit admis. 
+)
+points
+5
+(
+EXERCICE N3
+ 
+une entreprise de services d’une ville cherche à modéliser la consommation des ménages 
+sur les dernières années 
+ le rang 𝒙𝟏= 𝟏 est donné pour l’année 2000 . la consommation est exprimée en  
+milliers de dinars 
+Année  
+2000 
+2002 
+2003 
+2004 
+2006 
+Rang de l’année 𝒙𝒊 
+1 
+3 
+4 
+5 
+7 
+Consommation en milliers 
+de dinars   𝒚𝒊 
+28,5 
+35 
+52 
+70,5 
+100,5 
+1) Représenter le nuage des  points 𝑴𝒊(𝒙𝒊; 𝒚𝒊) dans un repère orthogonal (on prendra 1 cm 
+comme unité en abscisses et 1cm pour 10000 dinars en ordonnée)  
+2) Déterminer les coordonnées du point moyen 𝑮 de ce nuage ; placer dans le repère 
+précédent 
+3) On réalise un ajustement linéaire de ce nuage par la droite 𝑫: 𝒚= 𝟏𝟐, 𝟓𝒙+ 𝒃  
+a) Justifier l’existence d’un tel ajustement 
+b) Déterminer la valeur 𝒃 puis construire la droite 𝑫 dans le repère précédent 
+4) Déterminer à l’aide de l’ajustement précédent ; la consommation estimée des ménages 
+de cette ville en 2007 
+5) a) Recopier et compléter le tableau suivant sachant que 𝒛= 𝐥𝐧 (𝒚).les résultats 
+seront arrondis au centième. 
+𝒙𝒊 
+1 
+3 
+4 
+5 
+7 
+8 
+𝒚𝒊 
+28,5 
+35 
+52 
+70,5 
+100,5 
+140 
+𝒛𝒊= 𝐥𝐧 (𝒚𝒊) 
+3,35 
+……………. 
+……………… 
+…………….. 
+………….. 
+4,94 
+ 
+b) Déterminer l’équation réduite de la droite de régression de z en 𝒙 obtenue par la 
+méthode de moindres carrées, cette équation est de la forme 𝒛= 𝒄𝒙+ 𝒅  
+(on donnera les arrondis des coefficients 𝒄 𝒆𝒕 𝒅 à 𝟏𝟎−𝟐 prés) 
+c) En déduire que 𝒚= 𝒂𝒆𝟎,𝟐𝟑𝒙 (au a est un coefficient que l’ont déterminera) 
+d) Estimer alors , à l’aide de ce nouvel ajustement , la consommation des ménages de 
+cette ville en 2008 à 100 dinars prés 
+ 
+points)  
+6
+(
+EXERCICE N4
+ 
+I. 
+Soit 𝒇 la fonction définie sur ]𝟏; +∞[ par :𝒇(𝒙) =
+𝒙
+𝒙−𝟏+ 𝐥𝐧 (𝒙−𝟏)         
+2sur3 
+
+1) On note (𝑪𝒇) sa courbe dans le plan rapporté à un repère orthonormé(𝒐; 𝒊⃗; 𝒋⃗)  
+a) Vérifier que 𝒇′(𝒙) =
+𝒙−𝟐
+(𝒙−𝟏)𝟐  
+b) Vérifier que 𝒇(𝒙) =
+𝟏
+𝒙−𝟏[𝒙+ (𝒙−𝟏)𝒍𝒏(𝒙−𝟏)] et en déduire 𝐥𝐢𝐦𝒙→𝟏+ 𝒇(𝒙) 
+c) Etablir le tableau de variation de 𝒇  
+2) Montrer que la courbe (𝑪𝒇) admet un point d’inflexion 𝑰 dont on déterminera les 
+coordonnées 
+3) Ecrire une équation cartésienne de la tangente (𝑻) à (𝑪𝒇) au point d’abscisse 
+𝟑
+𝟐 
+4) a) Montrer que   𝐥𝐢𝐦𝒙→+∞
+𝒇(𝒙)
+𝒙= 𝟎 et interpréter graphiquement le résultat 
+b) tracer  (𝑻) et (𝑪𝒇) dans le repère (𝒐; 𝒊⃗; 𝒋⃗) (unité 1 cm) 
+5) soit 𝜶 un réel strictement supérieure à 2 
+a) par intégration par partie  montrer que 
+ ∫𝐥𝐧(𝒙−𝟏) 𝒅𝒙= 𝜶𝐥𝐧(𝜶−𝟏) −∫
+𝒙
+𝒙−𝟏𝒅𝒙
+𝜶
+𝟐
+ 
+𝜶
+𝟐
+ 
+b) En déduire l’aire 𝓐 de la partie du plan limitée par la courbe (𝑪𝒇) l’axe des 
+abscisses et les deux droites d’équations : 𝒙= 𝟐 𝒆𝒕 𝒙= 𝜶  
+II. 
+Soit 𝒈 la fonction définie sur ]𝟏; +∞[ par 𝒈(𝒙) = 𝒇(𝒙) −𝒙 
+1) a) Calculer  𝐥𝐢𝐦𝒙→+∞𝒈(𝒙) ( on pourra remarquer qu’on peut écrire 
+ 𝒈(𝒙) = 𝒙(
+𝒇(𝒙)
+𝒙−𝟏) ) 
+b) Montrer  que  𝒈 réalise une bijection de  ]𝟏; +∞[ sur R  
+2) Calculer 𝒈(𝟐) et en déduire que pour tout réel 𝒙∈]𝟐; +∞[ on a 𝒇(𝒙) ≤𝒙 
+3) On désigne par 𝒈−𝟏 la fonction réciproque de 𝒈 
+a) Montrer que  𝒈−𝟏 est dérivable en 0 
+b) Calculer ( 𝒈−𝟏)′(𝟎) 
+4) Soit u la suite définie sur N par {
+𝒖𝟎= 𝟑
+𝒖𝒏+𝟏= 𝒇(𝒖𝒏) 
+a) Montrer par récurrence que pour tout entier naturel n on a :𝒖𝒏≥𝟐 
+b) Montrer que la suite u est décroissante 
+c) En déduire que la suite u est convergente et calculer sa limite. 
+ 
+3sur3 
+Bon travail 
+
