@@ -38,3 +38,4 @@ backups/
 build-cache/
 .build-cache/
 .github/
+venv
