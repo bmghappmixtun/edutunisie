@@ -364,6 +364,7 @@ model ResourceMetadata {
   type                  String?  // "devoir" | "série" | "cours" | etc.
   subtype               String?  // "synthèse" | "contrôle" | etc.
   subject               String?  // objet principal
+  generalSubject        String?  // sujet général du document (max 6 mots, FR/AR selon la langue du PDF)
   dossierTechnique      String?  // for Technologie/Sciences techniques
   systemName            String?  // for Technologie/Sciences techniques
   duration              String?  // "2h" | "1h30"
