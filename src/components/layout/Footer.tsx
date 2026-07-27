@@ -6,6 +6,12 @@ import { getT } from '@/lib/i18n-server';
 export default function Footer() {
   const t = getT();
 
+  // Compute the year once on the server to avoid hydration mismatches
+  // when the server timezone differs from the client timezone (e.g., around
+  // midnight on New Year's Eve, the server could be 2026 while the client
+  // is 2027). Also use 'en-US' locale for a stable 4-digit year format.
+  const currentYear = new Date().getFullYear();
+
   return (
     <footer className="bg-slate-900 text-slate-300 pt-16 pb-6 mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -162,7 +168,7 @@ export default function Footer() {
 
         <div className="pt-6 border-t border-slate-800 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
           <p className="text-xs text-slate-500">
-            {t('footer.copyright', { year: String(new Date().getFullYear()) })}
+            {t('footer.copyright', { year: String(currentYear) })}
           </p>
           <p className="text-xs text-slate-500">{t('footer.madeWith')}</p>
         </div>
