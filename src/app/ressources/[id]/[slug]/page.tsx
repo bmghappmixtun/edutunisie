@@ -432,7 +432,7 @@ export default async function ResourcePage({
                     </>
                   );
                 })()}
-                {resource.description && (
+                {resource.description && !resource.aiSummary?.summary && (
                   <div className="mb-4">
                     <AiDescription
                       text={resource.description}
