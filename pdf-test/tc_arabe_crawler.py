@@ -260,7 +260,9 @@ def get_arabe_targets():
         r.id NOT IN (SELECT "resourceId" FROM "ResourceContent" WHERE "resourceId" IS NOT NULL)
         OR LENGTH(COALESCE(rc."fullText", '')) < 200
         OR rc."fullText" ILIKE '%unable to extract%'
-        OR rc."fullText" ILIKE '%sorry%'
+        OR rc."fullText" ILIKE '%sorry, but i can%'
+        OR rc."fullText" ILIKE '%i can''t assist%'
+        OR rc."fullText" ILIKE '%i cannot extract%'
       )
     ORDER BY r."numericId"
     ''')
