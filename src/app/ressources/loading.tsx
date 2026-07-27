@@ -57,19 +57,44 @@ export default function Loading() {
 
           {/* FilterShell skeleton (sidebar + content) */}
           <div className="grid lg:grid-cols-[340px_1fr] gap-6">
-            {/* Sidebar skeleton — <aside> (NOT <div>) to match FilterShell's
-                actual element type. Using <div> here triggers #422 when the
-                Suspense boundary resolves. */}
-            <aside className="bg-white rounded-2xl border border-slate-100 h-fit space-y-3">
-              <h2 className="h-6 bg-slate-200 rounded w-1/2 mb-4 mx-5 mt-5 animate-pulse text-[0px] leading-none" />
-              <div className="px-5 pb-5 space-y-2">
-                {[...Array(8)].map((_, i) => (
-                  <div key={i} className="h-8 bg-slate-100 rounded animate-pulse" />
+            {/* Sidebar skeleton — structure MUST match FilterShell's actual
+                render (see src/components/ressources/FilterShell.tsx ~line 305).
+                The page renders the aside with TWO direct children:
+                  1. <div class="px-5 py-4 border-b ...">  (header with h3 inside)
+                  2. <div class="max-h-[calc(100vh-180px)] overflow-y-auto px-5 py-4 space-y-5">  (scrollable content with filter sections)
+                The previous version had <h2> as the first child (loading) vs
+                <div> as the first child (page) — this element-type mismatch
+                broke the streaming-Suspense patch from loading→page and
+                triggered React #418/#422 hydration errors on /ressources and
+                /ressources?teacherId=* (ERR-AYVRJF, ERR-BW6UCW, ERR-HHXMBP,
+                ERR-RSBVVC — 12 errors total in 2026-07-27 digest). */}
+            <aside className="bg-white rounded-2xl border border-slate-200 shadow-sm h-fit lg:sticky lg:top-24 overflow-hidden">
+              {/* Header skeleton — <div> wrapper with <h3> inside, matching
+                  the page's actual structure. */}
+              <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+                <h3 className="h-4 w-24 bg-slate-200 rounded animate-pulse text-[0px] leading-none" />
+              </div>
+              {/* Content skeleton — same wrapper as the page (max-h + overflow-y
+                  + px-5 py-4 space-y-5) so the Suspense patch lands cleanly. */}
+              <div className="max-h-[calc(100vh-180px)] overflow-y-auto px-5 py-4 space-y-5">
+                {[...Array(5)].map((_, i) => (
+                  <div key={i} className="space-y-2">
+                    <div className="h-3 w-20 bg-slate-200 rounded animate-pulse" />
+                    <div className="flex flex-wrap gap-1.5">
+                      {[...Array(3)].map((__, j) => (
+                        <div
+                          key={j}
+                          className="h-6 w-16 bg-slate-100 rounded-full animate-pulse"
+                        />
+                      ))}
+                    </div>
+                  </div>
                 ))}
               </div>
             </aside>
 
-            {/* Content skeleton */}
+            {/* Content skeleton — <div> wrappers match the page's
+                <FilterShell> render (toolbar div + grid div). */}
             <div className="space-y-4">
               {/* Toolbar skeleton */}
               <div className="h-14 bg-white rounded-xl border border-slate-200 animate-pulse" />
