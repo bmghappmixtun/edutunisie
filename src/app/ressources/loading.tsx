@@ -50,21 +50,14 @@ export default function Loading() {
       <main className="flex-1 pt-24 lg:pt-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Page header skeleton — element types MUST match page.tsx (h1 + p)
-              to avoid React #418/#422 hydration mismatches. */}
+              to avoid React #418/#422 hydration mismatches.
+              The loading hero is placed INSIDE the h1 element to maintain the
+              exact same child structure (h1 + p) as the page. */}
           <div className="mb-6">
-            {/* Loading hero with spinner — user explicitly requested visible loader on /ressources */}
-            <div className="flex flex-col items-center justify-center py-6 mb-4">
-              <div className="relative inline-flex items-center justify-center">
-                <div className="absolute inset-0 bg-primary-200 rounded-full blur-2xl opacity-50 animate-pulse" />
-                <div className="relative flex items-center gap-3">
-                  <BookOpen className="w-8 h-8 text-sky-500 animate-pulse" />
-                  <Loader2 className="w-10 h-10 text-primary-500 animate-spin" />
-                  <BookOpen className="w-8 h-8 text-purple-500 animate-pulse" />
-                </div>
-              </div>
-              <h2 className="text-base font-semibold text-slate-700 mt-3">Chargement en cours…</h2>
-            </div>
-            <h1 className="h-9 w-72 bg-slate-200 rounded animate-pulse text-[0px] leading-none" />
+            <h1 className="text-3xl lg:text-4xl font-extrabold mb-2 leading-tight text-slate-900 flex items-center gap-3">
+              <Loader2 className="w-7 h-7 lg:w-9 lg:h-9 text-primary-500 animate-spin" />
+              <span className="text-slate-700 text-xl lg:text-2xl">Chargement en cours…</span>
+            </h1>
             <p className="h-4 w-96 max-w-full bg-slate-100 rounded animate-pulse text-[0px] leading-none mt-2" />
           </div>
 
