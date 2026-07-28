@@ -54,8 +54,11 @@ export default function Loading() {
               The loading hero is placed INSIDE the h1 element to maintain the
               exact same child structure (h1 + p) as the page. */}
           <div className="mb-6">
-            <h1 className="text-3xl lg:text-4xl font-extrabold mb-2 leading-tight text-slate-900 flex items-center gap-3">
-              <Loader2 className="w-7 h-7 lg:w-9 lg:h-9 text-primary-500 animate-spin" />
+            <h1 className="text-3xl lg:text-4xl font-extrabold mb-2 leading-tight text-slate-900 flex items-center gap-4">
+              <span className="relative inline-flex items-center justify-center">
+                <span className="absolute inset-0 bg-primary-200 rounded-full blur-xl opacity-60 animate-pulse" />
+                <Loader2 className="relative w-10 h-10 lg:w-14 lg:h-14 text-primary-500 animate-spin" />
+              </span>
               <span className="text-slate-700 text-xl lg:text-2xl">Chargement en cours…</span>
             </h1>
             <p className="h-4 w-96 max-w-full bg-slate-100 rounded animate-pulse text-[0px] leading-none mt-2" />
