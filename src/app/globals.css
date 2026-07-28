@@ -68,11 +68,14 @@
     font-family: var(--font-fustat), 'Cairo', 'Inter', system-ui, sans-serif;
     letter-spacing: 0;
   }
-  .font-arabic-title {
+  /* Combined selector: prevents PostCSS/LightningCSS from de-duplicating
+     the shared font-family declaration and accidentally dropping it
+     from one of the two rules. */
+  .font-arabic-title,
+  .font-arabic-summary {
     font-family: var(--font-fustat), 'Cairo', 'Inter', system-ui, sans-serif;
   }
   .font-arabic-summary {
-    font-family: var(--font-fustat), 'Cairo', 'Inter', system-ui, sans-serif;
     line-height: 1.85;
   }
 }
