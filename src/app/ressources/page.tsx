@@ -53,6 +53,11 @@ export async function generateMetadata({
     description,
     alternates: {
       canonical: teacherNumericId ? `/ressources?teacherId=${teacherNumericId}` : '/ressources',
+      languages: {
+        'fr-TN': teacherNumericId ? `/ressources?teacherId=${teacherNumericId}` : '/ressources',
+        'ar-TN': teacherNumericId ? `/ar/ressources?teacherId=${teacherNumericId}` : '/ar/ressources',
+        'x-default': teacherNumericId ? `/ressources?teacherId=${teacherNumericId}` : '/ressources',
+      },
     },
     openGraph: {
       title: isAr ? 'جميع الموارد — إكسامانت' : 'Toutes les ressources — Examanet',
@@ -62,6 +67,15 @@ export async function generateMetadata({
       url: '/ressources',
       type: 'website',
       locale: isAr ? 'ar_TN' : 'fr_TN',
+      images: [`${process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com'}/api/og/page/ressources`],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: isAr ? 'جميع الموارد — إكسامانت' : 'Toutes les ressources — Examanet',
+      description: isAr
+        ? `${totalResources.toLocaleString('ar-TN')} درس, تمرين, موضوع باك وإصلاح للبرنامج التونسي.`
+        : '15 000+ cours, exercices, sujets de bac et corrigés pour le programme tunisien.',
+      images: [`${process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com'}/api/og/page/ressources`],
     },
     robots: {
       index: true,

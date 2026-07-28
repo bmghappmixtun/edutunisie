@@ -6,6 +6,17 @@ import { FileText, Heart, MessageCircle, Star } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
+export const metadata = {
+  title: 'Mon compte',
+  description: 'Mon espace personnel Examanet — favoris, commentaires et historique.',
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+    googleBot: { index: false, follow: false },
+  },
+};
+
 export default async function AccountDashboard() {
   const user = await getCurrentUser();
   if (!user) return null;

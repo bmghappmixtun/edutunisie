@@ -67,6 +67,7 @@ export async function generateMetadata({
         : { OR: [{ status: 'ACTIVE' }, { isVerifiedTeacher: true }] }),
     },
     select: {
+      id: true,
       slug: true,
       firstName: true,
       lastName: true,
@@ -84,19 +85,37 @@ export async function generateMetadata({
   const fullName = `${capitalize(teacher.firstName || '')} ${capitalize(teacher.lastName || '')}`
     .replace(/\s+/g, ' ')
     .trim();
-  const description = teacher.bio
+  // Count published resources for richer meta description
+  const resourceCount = await prisma.resource.count({
+    where: { teacherId: teacher.id, status: 'PUBLISHED' },
+  });
+  const description = teacher.bio && teacher.bio.length > 60
     ? teacher.bio.slice(0, 160)
-    : `${fullName}${teacher.schoolName ? ' — ' + teacher.schoolName : ''} — Enseignant. Cours, devoirs et exercices gratuits.`;
+    : `${fullName}${teacher.schoolName ? ' — ' + teacher.schoolName : ''} — Enseignant sur Examanet${resourceCount > 0 ? ' — ' + resourceCount + ' ressources pédagogiques gratuites' : ''}.`;
   return {
     title: `${fullName} — Enseignant`,
-    description,
-    alternates: { canonical: `${SITE_URL}/professeurs/${numericId}/${teacher.slug || ''}` },
+    description: description.slice(0, 160),
+    alternates: {
+      canonical: `${SITE_URL}/professeurs/${numericId}/${teacher.slug || ''}`,
+      languages: {
+        'fr-TN': `${SITE_URL}/professeurs/${numericId}/${teacher.slug || ''}`,
+        'ar-TN': `${SITE_URL}/ar/professeurs/${numericId}/${teacher.slug || ''}`,
+        'x-default': `${SITE_URL}/professeurs/${numericId}/${teacher.slug || ''}`,
+      },
+    },
     openGraph: {
       title: `${fullName} — Enseignant`,
-      description,
+      description: description.slice(0, 160),
       url: `${SITE_URL}/professeurs/${numericId}/${teacher.slug || ''}`,
       locale: 'fr_TN',
       type: 'profile',
+      images: [`${SITE_URL}/api/og/page/professeurs`],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${fullName} — Enseignant`,
+      description: description.slice(0, 160),
+      images: [`${SITE_URL}/api/og/page/professeurs`],
     },
   };
 }
