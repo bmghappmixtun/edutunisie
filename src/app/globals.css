@@ -59,8 +59,12 @@
      - Use the utility class `.font-arabic-title` or `.font-arabic-summary`
        to force Fustat in LTR contexts (e.g. mixed-direction content).
      ============================================================ */
-  html[dir="rtl"] h1, html[dir="rtl"] h2, html[dir="rtl"] h3,
-  html[dir="rtl"] h4, html[dir="rtl"] h5, html[dir="rtl"] h6 {
+  /* Fustat applies to:
+     1. All h1-h6 when the whole page is RTL (html[dir="rtl"])
+     2. Individual h1-h6 with their own dir="rtl" (mixed-content pages
+        where a single title is in Arabic but the page is in FR mode) */
+  html[dir="rtl"] :is(h1, h2, h3, h4, h5, h6),
+  :is(h1, h2, h3, h4, h5, h6)[dir="rtl"] {
     font-family: var(--font-fustat), 'Cairo', 'Inter', system-ui, sans-serif;
     letter-spacing: 0;
   }

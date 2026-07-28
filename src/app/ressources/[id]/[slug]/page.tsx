@@ -429,7 +429,7 @@ export default async function ResourcePage({
                       </h1>
                       {ar && (
                         <div
-                          className="text-lg lg:text-xl font-semibold text-slate-600 mb-3 leading-snug text-right"
+                          className="text-lg lg:text-xl font-semibold text-slate-600 mb-3 leading-snug text-right font-arabic-title"
                           dir="rtl"
                           lang="ar"
                         >
