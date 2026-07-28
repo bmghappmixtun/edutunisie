@@ -19,6 +19,17 @@ import VerificationFilesUploader from '@/components/teacher/VerificationFilesUpl
 
 export const dynamic = 'force-dynamic';
 
+export const metadata = {
+  title: 'Espace enseignant',
+  description: 'Espace enseignant Examanet — publiez et gérez vos ressources pédagogiques.',
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+    googleBot: { index: false, follow: false },
+  },
+};
+
 export default async function TeacherDashboard(props: {
   params: Promise<any>;
   searchParams: Promise<any>;

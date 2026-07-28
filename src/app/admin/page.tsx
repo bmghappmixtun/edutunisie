@@ -8,6 +8,17 @@ import { isArabic } from '@/lib/text-utils';
 
 export const dynamic = 'force-dynamic';
 
+export const metadata = {
+  title: 'Administration',
+  description: 'Espace administrateur Examanet — gestion de la plateforme pédagogique.',
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+    googleBot: { index: false, follow: false },
+  },
+};
+
 export default async function AdminDashboard() {
   const user = await getCurrentUser();
   if (!user) redirect('/connexion');

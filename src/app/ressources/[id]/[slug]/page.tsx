@@ -59,9 +59,11 @@ export async function generateMetadata({
   if (!resource) return { title: 'Ressource non trouvée' };
 
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
-  const description =
-    resource.description ||
+  // Strip HTML tags from description (AI summaries may contain <strong>/<ul>)
+  const stripHtml = (s: string) => s.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  const rawDescription = resource.description ||
     `${resource.title} — Ressource pédagogique gratuite${resource.subject ? ' en ' + resource.subject.nameFr : ''}${resource.class ? ' pour ' + resource.class.nameFr : ''} sur Examanet Tunisie.`;
+  const description = stripHtml(rawDescription);
 
   return {
     title: resource.title,
@@ -85,6 +87,11 @@ export async function generateMetadata({
     })(),
     alternates: {
       canonical: `${baseUrl}/ressources/${resource.numericId}/${resource.slug}`,
+      languages: {
+        'fr-TN': `${baseUrl}/ressources/${resource.numericId}/${resource.slug}`,
+        'ar-TN': `${baseUrl}/ar/ressources/${resource.numericId}/${resource.slug}`,
+        'x-default': `${baseUrl}/ressources/${resource.numericId}/${resource.slug}`,
+      },
     },
     openGraph: {
       title: resource.title,
