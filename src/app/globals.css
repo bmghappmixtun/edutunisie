@@ -36,14 +36,16 @@
     @apply bg-white text-slate-900 antialiased;
     font-family: 'Inter', system-ui, sans-serif;
   }
-  body.rtl {
+  /* RTL: scope on <html dir="rtl"> (set server-side in layout.tsx),
+     NOT body.rtl (which is never applied). */
+  html[dir="rtl"] body {
     font-family: 'Cairo', 'Inter', system-ui, sans-serif;
   }
-  /* RTL adjustments */
-  body.rtl {
+  html[dir="rtl"] body {
     text-align: right;
   }
-  body.rtl .ltr-only { display: none; }
+  /* .ltr-only is now also scoped to html[dir="rtl"] for consistency. */
+  html[dir="rtl"] .ltr-only { display: none; }
 
   /* ============================================================
      ARABIC TYPOGRAPHY (2026-07-28)
@@ -57,7 +59,8 @@
      - Use the utility class `.font-arabic-title` or `.font-arabic-summary`
        to force Fustat in LTR contexts (e.g. mixed-direction content).
      ============================================================ */
-  body.rtl h1, body.rtl h2, body.rtl h3, body.rtl h4, body.rtl h5, body.rtl h6 {
+  html[dir="rtl"] h1, html[dir="rtl"] h2, html[dir="rtl"] h3,
+  html[dir="rtl"] h4, html[dir="rtl"] h5, html[dir="rtl"] h6 {
     font-family: var(--font-fustat), 'Cairo', 'Inter', system-ui, sans-serif;
     letter-spacing: 0;
   }
