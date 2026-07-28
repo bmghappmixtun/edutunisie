@@ -63,9 +63,10 @@ export function properSlugify(text: string, maxLength = 80): string {
   s = s.replace(/\s*\(\d{4}[-–—]\d{4}\)/g, '');
   s = s.replace(/\s+\d{4}[-–—]\d{4}\s+/g, ' ');
 
-  // 2. Strip teacher name (Arabic 2-4 word name right before the final ":")
-  //    " - فتحي المرسني : موضوع" → " : موضوع"
-  //    Keep the subject (الموضوع العام) which is the SEO gold.
+  // 2. Strip teacher name ONLY when there's a colon (الموضوع العام marker)
+  //    Pattern: " - فتحي المرسني : موضوع" → " : موضوع"
+  //    We don't strip blindly when no colon is present because the last
+  //    segment could be a class/level name like "السابعة أساسي" — false positives.
   if (s.includes(':')) {
     const idx = s.lastIndexOf(':');
     const before = s.substring(0, idx);
