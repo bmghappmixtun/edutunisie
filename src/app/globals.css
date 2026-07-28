@@ -71,15 +71,8 @@
   /* CSS variable + two separate classes. Using a shared variable bypasses
      the PostCSS/LightningCSS "merge rules" optimizer that was dropping
      the duplicated font-family from one of the rules. */
-  :root {
-    --arabic-font-stack: var(--font-fustat), 'Cairo', 'Inter', system-ui, sans-serif;
-  }
   .font-arabic-title {
-    font-family: var(--arabic-font-stack);
-  }
-  .font-arabic-summary {
-    font-family: var(--arabic-font-stack);
-    line-height: 1.85;
+    font-family: var(--font-fustat), 'Cairo', 'Inter', system-ui, sans-serif;
   }
 }
 
