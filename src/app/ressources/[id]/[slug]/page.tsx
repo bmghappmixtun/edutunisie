@@ -27,7 +27,6 @@ import {
   GraduationCap,
   Wrench,
   Building2,
-  Sparkles,
   Target,
   Hash,
 } from 'lucide-react';
@@ -485,29 +484,9 @@ export default async function ResourcePage({
                   );
                 })()}
 
-                {/* General subject (sujet général) */}
-                {resource.metadata?.generalSubject && (() => {
-                  const subjAr = isArabic(resource.metadata.generalSubject);
-                  return (
-                    <AiContentSection
-                      title="Sujet du document"
-                      icon={<FileText className="w-4 h-4" />}
-                      variant="summary"
-                      subjectSlug={resource.subject?.slug}
-                      defaultOpen={true}
-                    >
-                      <div
-                        className={`text-base font-semibold text-slate-800 ${subjAr ? 'text-right' : 'text-left'}`}
-                        dir={subjAr ? 'rtl' : 'ltr'}
-                        lang={subjAr ? 'ar' : 'fr'}
-                      >
-                        {resource.metadata.generalSubject}
-                      </div>
-                    </AiContentSection>
-                  );
-                })()}
-
-                {/* AI-generated summary — render via AiDescription for the structured grid card */}
+                {/* AI-generated summary — render via AiDescription for the structured grid card.
+                    The general subject (الموضوع العام) is integrated inside the card
+                    as a labeled field with a Tag icon. */}
                 {resource.aiSummary?.summary && (() => {
                   const summary = resource.aiSummary.summary;
                   return (
@@ -519,6 +498,7 @@ export default async function ResourcePage({
                         headerData={resource.headerData as any}
                         classNameFr={resource.class?.nameFr}
                         classNameAr={resource.class?.nameAr}
+                        generalSubject={resource.metadata?.generalSubject}
                       />
                     </div>
                   );
