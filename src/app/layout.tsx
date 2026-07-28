@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { headers } from 'next/headers';
 import { Inter, Cairo, Nunito } from 'next/font/google';
+import localFont from 'next/font/local';
 import './globals.css';
 import { Toaster } from 'react-hot-toast';
 import AnalyticsWithOptOut from '@/components/analytics/AnalyticsWithOptOut';
@@ -37,6 +38,20 @@ const nunito = Nunito({
   variable: '--font-nunito',
   weight: ['600', '700', '800', '900'],
   preload: false,
+});
+
+// Fustat: used for ARABIC TITLES and AI SUMMARIES (selected 2026-07-28 after
+// /font-test comparison). Self-hosted from Google Fonts (not in next/font/google).
+// 3 .woff2 files (arabic / latin-ext / latin) downloaded into src/fonts/fustat/.
+const fustat = localFont({
+  src: [
+    { path: '../fonts/fustat/fustat-arabic.woff2', weight: '400 800', style: 'normal' },
+    { path: '../fonts/fustat/fustat-latin-ext.woff2', weight: '400 800', style: 'normal' },
+    { path: '../fonts/fustat/fustat-latin.woff2', weight: '400 800', style: 'normal' },
+  ],
+  display: 'swap',
+  variable: '--font-fustat',
+  preload: true,
 });
 
 // SEO: per-locale default metadata. The template is added per-locale so
@@ -198,7 +213,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html
       lang={locale}
       dir={dir}
-      className={`${inter.variable} ${cairo.variable} ${nunito.variable}`}
+      className={`${inter.variable} ${cairo.variable} ${nunito.variable} ${fustat.variable}`}
       suppressHydrationWarning
     >
       <head>

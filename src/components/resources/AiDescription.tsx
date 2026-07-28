@@ -416,7 +416,7 @@ export default function AiDescription({
               dir={summaryAr ? 'rtl' : 'ltr'}
               lang={summaryAr ? 'ar' : 'fr'}
               style={{ unicodeBidi: 'isolate', whiteSpace: 'pre-wrap' }}
-              className={`flex-1 text-sm text-slate-700 leading-relaxed ${summaryAr ? 'text-right' : 'text-left'}`}
+              className={`flex-1 text-sm text-slate-700 leading-relaxed ${summaryAr ? 'text-right' : 'text-left'} ${summaryAr ? 'font-arabic-summary' : ''}`}
             >
               {summary}
             </div>

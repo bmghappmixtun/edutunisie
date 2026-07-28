@@ -44,6 +44,30 @@
     text-align: right;
   }
   body.rtl .ltr-only { display: none; }
+
+  /* ============================================================
+     ARABIC TYPOGRAPHY (2026-07-28)
+     - Fustat (Google Font, self-hosted via next/font/local) is used
+       for ARABIC TITLES (h1-h6) and AI SUMMARIES because of its
+       strong character and good legibility at large sizes.
+     - Cairo stays as the default AR body font (more rounded, easier
+       at small sizes / body text).
+     - Both fonts are scoped to RTL context only; Latin text keeps
+       Inter.
+     - Use the utility class `.font-arabic-title` or `.font-arabic-summary`
+       to force Fustat in LTR contexts (e.g. mixed-direction content).
+     ============================================================ */
+  body.rtl h1, body.rtl h2, body.rtl h3, body.rtl h4, body.rtl h5, body.rtl h6 {
+    font-family: var(--font-fustat), 'Cairo', 'Inter', system-ui, sans-serif;
+    letter-spacing: 0;
+  }
+  .font-arabic-title {
+    font-family: var(--font-fustat), 'Cairo', 'Inter', system-ui, sans-serif;
+  }
+  .font-arabic-summary {
+    font-family: var(--font-fustat), 'Cairo', 'Inter', system-ui, sans-serif;
+    line-height: 1.85;
+  }
 }
 
 @layer components {
