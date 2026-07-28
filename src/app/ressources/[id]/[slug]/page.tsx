@@ -507,36 +507,20 @@ export default async function ResourcePage({
                   );
                 })()}
 
-                {/* AI-generated summary */}
+                {/* AI-generated summary — render via AiDescription for the structured grid card */}
                 {resource.aiSummary?.summary && (() => {
                   const summary = resource.aiSummary.summary;
-                  const summaryAr = isArabic(summary);
-                  const isStructuredHtml = /<strong>|<br\s*\/?>|<\/strong>|<ul>|<li>/i.test(summary);
                   return (
-                  <AiContentSection
-                    title="Résumé intelligent"
-                    icon={<Sparkles className="w-4 h-4" />}
-                    variant="summary"
-                    subjectSlug={resource.subject?.slug}
-                    defaultOpen={false}
-                  >
-                    {isStructuredHtml ? (
-                      <div
-                        className={`text-sm text-slate-700 leading-relaxed space-y-1.5 [&_ul]:list-disc [&_ul]:ps-5 [&_ul]:my-2 [&_li]:my-1 [&_strong]:text-slate-900 [&_strong]:font-semibold ${summaryAr ? 'text-right' : 'text-left'}`}
-                        dir={summaryAr ? 'rtl' : 'ltr'}
-                        lang={summaryAr ? 'ar' : 'fr'}
-                        dangerouslySetInnerHTML={{ __html: summary }}
+                    <div className="mb-4">
+                      <AiDescription
+                        text={summary}
+                        source={resource.aiSummary.modelUsed || 'gpt-4o-mini-batch-v1'}
+                        language={resource.language}
+                        headerData={resource.headerData as any}
+                        classNameFr={resource.class?.nameFr}
+                        classNameAr={resource.class?.nameAr}
                       />
-                    ) : (
-                      <p
-                        className={`text-sm text-slate-700 leading-relaxed whitespace-pre-line ${summaryAr ? 'text-right' : 'text-left'}`}
-                        dir={summaryAr ? 'rtl' : 'ltr'}
-                        lang={summaryAr ? 'ar' : 'fr'}
-                      >
-                        {summary}
-                      </p>
-                    )}
-                  </AiContentSection>
+                    </div>
                   );
                 })()}
 
