@@ -277,52 +277,37 @@ export default async function ResourcesPage(props: { searchParams: Promise<Searc
     getCurrentUser(),
   ]);
 
-  // Fetch class/section/subject IDs separately (groupBy on nullable strings has TS issues)
+  // Fetch class/section/subject counts via groupBy (much faster than fetching all rows)
   const [classRecords, sectionRecords, subjectRecords] = await Promise.all([
-    prisma.resource.findMany({
-      where: facetBase,
-      select: { classId: true },
+    prisma.resource.groupBy({
+      by: ['classId'],
+      where: { ...facetBase, classId: { not: null } as any },
+      _count: { _all: true },
     }),
-    prisma.resource.findMany({
-      where: facetBase,
-      select: { sectionId: true },
+    prisma.resource.groupBy({
+      by: ['sectionId'],
+      where: { ...facetBase, sectionId: { not: null } as any },
+      _count: { _all: true },
     }),
-    prisma.resource.findMany({
-      where: facetBase,
-      select: { subjectId: true },
+    prisma.resource.groupBy({
+      by: ['subjectId'],
+      where: { ...facetBase, subjectId: { not: null } as any },
+      _count: { _all: true },
     }),
   ]);
 
-  // Group manually
-  const classGroups = Object.entries(
-    classRecords.reduce(
-      (acc, r) => {
-        if (r.classId) acc[r.classId] = (acc[r.classId] || 0) + 1;
-        return acc;
-      },
-      {} as Record<string, number>,
-    ),
-  ).map(([classId, count]) => ({ classId, _count: { _all: count } }));
+  // groupBy already returns grouped counts — no manual aggregation needed
+  const classGroups = classRecords
+    .filter((r: any) => r.classId != null)
+    .map((r: any) => ({ classId: r.classId, _count: { _all: r._count?._all ?? 0 } }));
 
-  const sectionGroups = Object.entries(
-    sectionRecords.reduce(
-      (acc, r) => {
-        if (r.sectionId) acc[r.sectionId] = (acc[r.sectionId] || 0) + 1;
-        return acc;
-      },
-      {} as Record<string, number>,
-    ),
-  ).map(([sectionId, count]) => ({ sectionId, _count: { _all: count } }));
+  const sectionGroups = sectionRecords
+    .filter((r: any) => r.sectionId != null)
+    .map((r: any) => ({ sectionId: r.sectionId, _count: { _all: r._count?._all ?? 0 } }));
 
-  const subjectGroups = Object.entries(
-    subjectRecords.reduce(
-      (acc, r) => {
-        if (r.subjectId) acc[r.subjectId] = (acc[r.subjectId] || 0) + 1;
-        return acc;
-      },
-      {} as Record<string, number>,
-    ),
-  ).map(([subjectId, count]) => ({ subjectId, _count: { _all: count } }));
+  const subjectGroups = subjectRecords
+    .filter((r: any) => r.subjectId != null)
+    .map((r: any) => ({ subjectId: r.subjectId, _count: { _all: r._count?._all ?? 0 } }));
 
   // Resolve class/section/subject names
   const classIds = classGroups.map((g) => g.classId).filter((id): id is string => !!id);
