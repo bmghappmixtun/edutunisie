@@ -153,7 +153,9 @@ function parseFields(
         const m = line.match(re);
         if (m && m[1]) {
           const value = m[1].trim();
-          if (value) {
+          // Skip empty values and placeholder dashes ("-", "—" etc.)
+          // so the grid doesn't show useless rows.
+          if (value && value !== '-' && value !== '—' && value !== '–') {
             // Use the first (canonical) label for display
             const displayLabel = labels[key][0];
             if (key === 'summary') {
@@ -415,8 +417,18 @@ export default function AiDescription({
             <div
               dir={summaryAr ? 'rtl' : 'ltr'}
               lang={summaryAr ? 'ar' : 'fr'}
-              style={{ unicodeBidi: 'isolate', whiteSpace: 'pre-wrap' }}
-              className={`flex-1 text-sm text-slate-700 leading-relaxed ${summaryAr ? 'text-right' : 'text-left'} ${summaryAr ? 'font-arabic-summary' : ''}`}
+              style={{
+                unicodeBidi: 'isolate',
+                whiteSpace: 'pre-wrap',
+                ...(summaryAr
+                  ? {
+                      fontFamily:
+                        'var(--font-fustat), "Cairo", "Inter", system-ui, sans-serif',
+                      lineHeight: 1.85,
+                    }
+                  : {}),
+              }}
+              className={`flex-1 text-sm text-slate-700 leading-relaxed ${summaryAr ? 'text-right' : 'text-left'}`}
             >
               {summary}
             </div>
