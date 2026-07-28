@@ -122,7 +122,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/ressources?type=CORRECTION"
+                  href="/ressources?hasCorrection=1"
                   className="hover:text-primary-400 transition"
                 >
                   {t('footer.corrections')}
