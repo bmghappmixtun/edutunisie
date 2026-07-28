@@ -454,12 +454,25 @@ export default async function ResourcesPage(props: { searchParams: Promise<Searc
 
       <main className="flex-1 pt-24 lg:pt-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Page header */}
-          <div className="mb-6">
-            <h1 className="text-3xl lg:text-4xl font-extrabold mb-2 leading-tight text-slate-900">
-              {pageTitle}
+          {/* Page header — element type + child count MUST match loading.tsx
+              (h1 + p + progress-bar placeholder) to avoid React #418/#422
+              hydration mismatches when the page render fails and the
+              loading skeleton remains in the DOM. The placeholder div takes
+              the same height as the loading's progress bar so the layout
+              doesn't shift when the streaming content replaces the loading. */}
+          <div className="mb-8">
+            <h1 className="text-3xl lg:text-4xl font-extrabold mb-3 leading-tight text-slate-900 flex items-center gap-5">
+              <span>{pageTitle}</span>
             </h1>
             <p className="text-slate-600 text-sm lg:text-base">{pageSubtitle}</p>
+            {/* Placeholder matching the loading.tsx progress bar — same
+                height, same vertical margin, no visual impact (transparent
+                + no children). Keeps the wrapper's child count at 3
+                (h1 + p + progress-bar) so the React tree matches loading. */}
+            <div
+              className="mt-4 w-72 h-1.5 rounded-full overflow-hidden"
+              aria-hidden="true"
+            />
           </div>
 
           {/* FilterShell (client) */}
