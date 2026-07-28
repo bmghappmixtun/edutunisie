@@ -71,6 +71,10 @@
   /* CSS variable + two separate classes. Using a shared variable bypasses
      the PostCSS/LightningCSS "merge rules" optimizer that was dropping
      the duplicated font-family from one of the rules. */
+  /* Fustat for AR titles in LTR contexts (utility class).
+     Note: LightningCSS optimizes duplicate font-family declarations,
+     so .font-arabic-summary is inlined in the React component instead. */
+  /* build: 2026-07-28-v2 */
   .font-arabic-title {
     font-family: var(--font-fustat), 'Cairo', 'Inter', system-ui, sans-serif;
   }
