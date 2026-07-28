@@ -49,7 +49,7 @@ export function decodeHtmlEntities(text: string): string {
   return result;
 }
 
-export function properSlugify(text: string, maxLength = 60): string {
+export function properSlugify(text: string, maxLength = 80): string {
   if (!text) return '';
   let s = decodeHtmlEntities(text);
   // Strip file extensions
@@ -57,6 +57,25 @@ export function properSlugify(text: string, maxLength = 60): string {
     .replace(/\.pdf$/i, '')
     .replace(/\.docx?$/i, '')
     .replace(/\.odt$/i, '');
+
+  // === Arabic-friendly cleanup ===
+  // 1. Strip year patterns: (2024-2025), (2024–2025), 2024-2025 standalone
+  s = s.replace(/\s*\(\d{4}[-–—]\d{4}\)/g, '');
+  s = s.replace(/\s+\d{4}[-–—]\d{4}\s+/g, ' ');
+
+  // 2. Strip teacher name (Arabic 2-4 word name right before the final ":")
+  //    " - فتحي المرسني : موضوع" → " : موضوع"
+  //    Keep the subject (الموضوع العام) which is the SEO gold.
+  if (s.includes(':')) {
+    const idx = s.lastIndexOf(':');
+    const before = s.substring(0, idx);
+    const after = s.substring(idx);
+    // Match " - ARABIC_NAME" at the end of `before` (3-40 Arabic chars)
+    const m = before.match(/\s+-\s+([\u0600-\u06FF][\u0600-\u06FF\s]{2,40})\s*$/);
+    if (m) {
+      s = before.substring(0, m.index).trim() + ' ' + after;
+    }
+  }
 
   s = s.toLowerCase().trim();
   // NFD: decompose accented chars into base + combining diacritic, then strip diacritics
@@ -77,11 +96,18 @@ export function properSlugify(text: string, maxLength = 60): string {
   s = s.replace(/-+/g, '-');
   s = s.replace(/^-+|-+$/g, '');
 
-  // Truncate at word boundary
+  // Drop redundant "عدد N" (e.g., "عدد-3") — the type field already says
+  // "فرض مراقبة N°1", so the Arabic count is noisy in the URL.
+  s = s.replace(/عدد-\d+/g, '');
+  s = s.replace(/-+/g, '-').replace(/^-+|-+$/g, '');
+
+  // Truncate at word boundary (maxLength default raised to 80 to fit full
+  // general subject in the slug — the previous 60-char cap was truncating
+  // the SEO-critical الموضوع العام).
   if (s.length > maxLength) {
     const truncated = s.substring(0, maxLength);
     const lastHyphen = truncated.lastIndexOf('-');
-    if (lastHyphen > 30) {
+    if (lastHyphen > 20) {
       s = truncated.substring(0, lastHyphen);
     } else {
       s = truncated;
