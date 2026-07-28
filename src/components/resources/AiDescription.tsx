@@ -11,6 +11,7 @@ import {
   FileText,
   ListChecks,
   ScrollText,
+  Tag,
 } from 'lucide-react';
 import { useState } from 'react';
 import { isArabic } from '@/lib/text-utils';
@@ -43,6 +44,8 @@ interface AiDescriptionProps {
   classNameFr?: string | null;
   /** Override Classe value with the full Arabic class name. */
   classNameAr?: string | null;
+  /** Optional general subject (الموضوع العام) to display as a labeled field. */
+  generalSubject?: string | null;
 }
 
 type Field = {
@@ -225,6 +228,7 @@ export default function AiDescription({
   headerData,
   classNameFr,
   classNameAr,
+  generalSubject,
 }: AiDescriptionProps) {
   const [tooltipOpen, setTooltipOpen] = useState(false);
   const isAi = !!source && source.startsWith('agent-');
@@ -303,6 +307,19 @@ export default function AiDescription({
     );
     tryAdd('\u0627\u0644\u0645\u0627\u062f\u0629', 'Mati\u00e8re', h.subject, BookOpen);
     tryAdd('\u0627\u0644\u0646\u0648\u0639', 'Type', h.type, FileText);
+  }
+
+  // Add the general subject (الموضوع العام) as a labeled field if provided.
+  // Tag icon for the topic, displayed in the grid.
+  if (generalSubject) {
+    const subjValue = String(generalSubject).trim();
+    if (subjValue && subjValue !== '-' && subjValue !== '—' && subjValue !== '–') {
+      const subjLabel = isRtl ? 'الموضوع العام' : 'Sujet général';
+      if (!existingLabels.has(subjLabel)) {
+        headerFields.push({ Icon: Tag, label: subjLabel, value: subjValue });
+        existingLabels.add(subjLabel);
+      }
+    }
   }
   const fields = [...parsedFields, ...headerFields];
 
@@ -450,6 +467,7 @@ function iconColor(Icon: typeof User): string {
   if (Icon === FileText) return 'text-cyan-600';
   if (Icon === ListChecks) return 'text-amber-600';
   if (Icon === ScrollText) return 'text-violet-600';
+  if (Icon === Tag) return 'text-fuchsia-600';
   return 'text-slate-600';
 }
 
