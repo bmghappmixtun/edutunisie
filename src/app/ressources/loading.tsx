@@ -53,15 +53,20 @@ export default function Loading() {
               to avoid React #418/#422 hydration mismatches.
               The loading hero is placed INSIDE the h1 element to maintain the
               exact same child structure (h1 + p) as the page. */}
-          <div className="mb-6">
-            <h1 className="text-3xl lg:text-4xl font-extrabold mb-2 leading-tight text-slate-900 flex items-center gap-4">
+          <div className="mb-8">
+            <h1 className="text-3xl lg:text-4xl font-extrabold mb-3 leading-tight text-slate-900 flex items-center gap-5">
               <span className="relative inline-flex items-center justify-center">
-                <span className="absolute inset-0 bg-primary-200 rounded-full blur-xl opacity-60 animate-pulse" />
-                <Loader2 className="relative w-10 h-10 lg:w-14 lg:h-14 text-primary-500 animate-spin" />
+                <span className="absolute -inset-4 bg-primary-200 rounded-full blur-2xl opacity-70 animate-pulse scale-150" />
+                <span className="absolute inset-0 bg-primary-300/40 rounded-full animate-ping" />
+                <Loader2 className="relative w-12 h-12 lg:w-20 lg:h-20 text-primary-500 animate-spin" strokeWidth={2.5} />
               </span>
               <span className="text-slate-700 text-xl lg:text-2xl">Chargement en cours…</span>
             </h1>
             <p className="h-4 w-96 max-w-full bg-slate-100 rounded animate-pulse text-[0px] leading-none mt-2" />
+            {/* Progress bar — same pattern as /matieres/[subject]/loading.tsx */}
+            <div className="mt-4 w-72 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+              <div className="h-full bg-gradient-to-r from-sky-400 via-primary-500 to-purple-500 rounded-full animate-pulse w-1/2" />
+            </div>
           </div>
 
           {/* FilterShell skeleton (sidebar + content) */}

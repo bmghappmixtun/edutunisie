@@ -109,6 +109,13 @@ const toArr = (v: string | string[] | undefined): string[] => {
 };
 
 export default async function ResourcesPage(props: { searchParams: Promise<SearchParams> }) {
+  // ============== MIN LOADING TIME (UX) ==============
+  // Force the loading state to be visible for at least 600ms. This prevents
+  // the loading skeleton from flashing so fast that users don't see it.
+  // If data takes longer than 600ms, this doesn't slow anything down.
+  const MIN_LOADING_MS = 600;
+  const minLoadingTimer = new Promise<void>((resolve) => setTimeout(resolve, MIN_LOADING_MS));
+
   const sp = await props.searchParams;
 
   // ============== HANDLE LEGACY URLS (migrate from CUID to numericId) ==============
@@ -391,10 +398,13 @@ export default async function ResourcesPage(props: { searchParams: Promise<Searc
     withCorrection: withCorrectionCount,
   };
 
-  // ============== Favorites (if logged) ==============
-  const favoriteIds = currentUser
-    ? await getUserFavorites(resources.map((r) => r.id))
-    : new Set<string>();
+  // ============== Favorites (if logged) + min loading time ==============
+  const [favoriteIds] = await Promise.all([
+    currentUser
+      ? getUserFavorites(resources.map((r) => r.id))
+      : Promise.resolve(new Set<string>()),
+    minLoadingTimer,  // ensure loading state visible for at least 600ms
+  ]);
 
   // ============== JSON-LD ==============
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
