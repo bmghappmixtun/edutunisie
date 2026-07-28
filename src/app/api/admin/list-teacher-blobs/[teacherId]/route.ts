@@ -3,6 +3,7 @@ import { list } from '@vercel/blob';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
+export const maxDuration = 60;
 
 export async function GET(
   req: NextRequest,
@@ -10,9 +11,12 @@ export async function GET(
 ) {
   const { teacherId } = await params;
   const url = new URL(req.url);
-  const search = url.searchParams.get('search') || '';
+  const search = (url.searchParams.get('search') || '').toLowerCase();
+  const teacherFilter = url.searchParams.get('teacherId') || teacherId;
+  const limit = parseInt(url.searchParams.get('limit') || '50');
 
-  const all: any[] = [];
+  const matches: any[] = [];
+  let scanned = 0;
   let cursor: string | undefined;
   try {
     do {
@@ -22,26 +26,23 @@ export async function GET(
         token: process.env.BLOB_READ_WRITE_TOKEN,
       });
       for (const b of res.blobs) {
-        all.push({ key: b.pathname, url: b.url, size: b.size });
+        scanned++;
+        const keyLower = b.pathname.toLowerCase();
+        const teacherMatch = teacherFilter ? keyLower.includes(teacherFilter.toLowerCase()) : true;
+        const searchMatch = search ? keyLower.includes(search) : true;
+        if (teacherMatch && searchMatch) {
+          matches.push({ key: b.pathname, url: b.url, size: b.size });
+          if (matches.length >= limit) break;
+        }
       }
       cursor = res.cursor;
+      if (matches.length >= limit) break;
     } while (cursor);
 
-    // Filter
-    let filtered = all;
-    if (teacherId) {
-      filtered = filtered.filter((f: any) => f.key.includes(teacherId));
-    }
-    if (search) {
-      const s = search.toLowerCase();
-      filtered = filtered.filter((f: any) => f.key.toLowerCase().includes(s));
-    }
-
     return NextResponse.json({
-      total: all.length,
-      filteredCount: filtered.length,
-      teacherIdMatches: filtered.filter((f: any) => f.key.includes(teacherId)).length,
-      results: filtered.slice(0, 100),
+      scanned,
+      matches: matches.length,
+      results: matches,
     });
   } catch (err: any) {
     return NextResponse.json({ error: err?.message, stack: err?.stack }, { status: 500 });
