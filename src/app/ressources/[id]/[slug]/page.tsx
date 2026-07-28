@@ -447,6 +447,7 @@ export default async function ResourcePage({
                       headerData={resource.headerData as any}
                       classNameFr={resource.class?.nameFr}
                       classNameAr={resource.class?.nameAr}
+                      generalSubject={resource.metadata?.generalSubject}
                     />
                   </div>
                 )}
