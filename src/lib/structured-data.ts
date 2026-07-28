@@ -155,16 +155,24 @@ export function courseSchema(opts: {
   dateModified: string;
   aggregateRating?: { ratingCount: number; ratingValue: number } | null;
   tags?: string | null; // comma-separated tags
+  generalSubject?: string | null; // الموضوع العام — AI-extracted topic, boosts SEO discoverability
 }) {
+  // Build a clean, SEO-optimized description that includes the general subject
+  // and the first paragraph of the AI summary (if any). The subject is one of
+  // the strongest ranking signals for educational queries.
+  const stripHtml = (s: string) => s.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  const cleanDesc = stripHtml(opts.description).slice(0, 460);
+  const gs = opts.generalSubject ? stripHtml(opts.generalSubject).slice(0, 80) : null;
+  // Prefix with general subject when present so it appears early in the snippet
+  // (Google typically displays the first 150-160 chars of the meta description).
+  const seoDescription = gs
+    ? `${gs}. ${cleanDesc}`.slice(0, 500)
+    : cleanDesc;
   const data: Record<string, unknown> = {
     '@context': 'https://schema.org',
     '@type': 'Course',
     name: opts.title,
-    description: opts.description
-      .replace(/<[^>]+>/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim()
-      .slice(0, 500),
+    description: seoDescription,
     url: opts.url,
     inLanguage: opts.language,
     educationalLevel: opts.level,
@@ -191,11 +199,18 @@ export function courseSchema(opts: {
             .map((t: string) => t.trim())
             .filter(Boolean)
         : [];
-      const auto = [opts.subject, opts.level, opts.cycle, opts.type, 'Tunisie', 'examanet'].filter(
-        Boolean,
-      ) as string[];
-      // Tags first (most relevant), then auto keywords, dedupe
-      return Array.from(new Set([...tagList, ...auto]))
+      const auto = [
+        opts.subject,
+        opts.level,
+        opts.cycle,
+        opts.type,
+        'Tunisie',
+        'examanet',
+      ].filter(Boolean) as string[];
+      // Insert the general subject FIRST (most specific / long-tail keyword)
+      // then tags, then auto keywords. Max 15 to stay focused.
+      const head = gs ? [gs] : [];
+      return Array.from(new Set([...head, ...tagList, ...auto]))
         .slice(0, 15)
         .join(', ');
     })(),
@@ -203,6 +218,16 @@ export function courseSchema(opts: {
     dateModified: opts.dateModified,
     isPartOf: { '@id': `${SITE_URL}#website` },
   };
+  // SEO: surface the general subject as a `teaches` field (schema.org/DefinedTerm)
+  // so search engines understand what topic the resource actually covers. Falls
+  // back gracefully when no general subject is set.
+  if (gs) {
+    data.teaches = {
+      '@type': 'DefinedTerm',
+      name: gs,
+      inDefinedTermSet: opts.subject,
+    };
+  }
   // Add AggregateRating only if there are ratings (don't show 0-star in SERPs)
   if (opts.aggregateRating && opts.aggregateRating.ratingCount > 0) {
     data.aggregateRating = {
