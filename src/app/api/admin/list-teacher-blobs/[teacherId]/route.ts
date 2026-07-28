@@ -10,45 +10,40 @@ export async function GET(
 ) {
   const { teacherId } = await params;
   const url = new URL(req.url);
-  const usePrefix = url.searchParams.get('prefix') !== '0';
-  const customPrefix = url.searchParams.get('customPrefix');
+  const search = url.searchParams.get('search') || '';
 
-  const prefixesToTry = customPrefix 
-    ? [customPrefix]
-    : usePrefix 
-      ? [
-          `teacher-library/${teacherId}/`,
-          `teacher-library/${teacherId}`,
-        ]
-      : [''];
+  const all: any[] = [];
+  let cursor: string | undefined;
+  try {
+    do {
+      const res: any = await list({
+        cursor,
+        limit: 1000,
+        token: process.env.BLOB_READ_WRITE_TOKEN,
+      });
+      for (const b of res.blobs) {
+        all.push({ key: b.pathname, url: b.url, size: b.size });
+      }
+      cursor = res.cursor;
+    } while (cursor);
 
-  const result: any = { prefixes: prefixesToTry, results: {} };
-
-  for (const prefix of prefixesToTry) {
-    const all: any[] = [];
-    let cursor: string | undefined;
-    try {
-      do {
-        const res: any = await list({
-          prefix: prefix || undefined,
-          cursor,
-          limit: 1000,
-          token: process.env.BLOB_READ_WRITE_TOKEN,
-        });
-        for (const b of res.blobs) {
-          all.push({
-            key: b.pathname,
-            url: b.url,
-            size: b.size,
-          });
-        }
-        cursor = res.cursor;
-      } while (cursor);
-      result.results[prefix || '(no prefix)'] = { count: all.length, files: all.slice(0, 50) };
-    } catch (err: any) {
-      result.results[prefix || '(no prefix)'] = { error: err?.message };
+    // Filter
+    let filtered = all;
+    if (teacherId) {
+      filtered = filtered.filter((f: any) => f.key.includes(teacherId));
     }
-  }
+    if (search) {
+      const s = search.toLowerCase();
+      filtered = filtered.filter((f: any) => f.key.toLowerCase().includes(s));
+    }
 
-  return NextResponse.json(result);
+    return NextResponse.json({
+      total: all.length,
+      filteredCount: filtered.length,
+      teacherIdMatches: filtered.filter((f: any) => f.key.includes(teacherId)).length,
+      results: filtered.slice(0, 100),
+    });
+  } catch (err: any) {
+    return NextResponse.json({ error: err?.message, stack: err?.stack }, { status: 500 });
+  }
 }
