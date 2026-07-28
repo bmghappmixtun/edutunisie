@@ -408,7 +408,7 @@ export default function AiDescription({
                 <div
                   dir={labelAr ? 'rtl' : 'ltr'}
                   lang={labelAr ? 'ar' : 'fr'}
-                  className={`text-[11px] font-bold text-slate-500 uppercase tracking-wide leading-none mb-1 ${labelAr ? 'text-right' : 'text-left'}`}
+                  className={`text-[11px] font-bold text-slate-500 uppercase tracking-wide leading-none mb-1 ${labelAr ? 'text-right' : 'text-left'} ${labelAr ? 'font-arabic-title' : ''}`}
                 >
                   {f.label}
                 </div>
@@ -416,7 +416,7 @@ export default function AiDescription({
                   dir={cellRtl ? 'rtl' : 'ltr'}
                   lang={valueAr ? 'ar' : 'fr'}
                   style={{ unicodeBidi: 'isolate' }}
-                  className={`text-sm text-slate-800 font-medium leading-snug break-words ${cellRtl ? 'text-right' : 'text-left'}`}
+                  className={`text-sm text-slate-800 font-medium leading-snug break-words ${cellRtl ? 'text-right' : 'text-left'} ${valueAr ? 'font-arabic-title' : ''}`}
                 >
                   {f.value}
                 </div>
