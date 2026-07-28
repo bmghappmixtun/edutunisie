@@ -53,7 +53,7 @@ export async function generateMetadata({
   }
   const resource = await prisma.resource.findUnique({
     where: { numericId },
-    include: { subject: true, class: true, teacher: true },
+    include: { subject: true, class: true, teacher: true, metadata: true },
   });
   if (!resource) return { title: 'Ressource non trouvée' };
 
@@ -63,10 +63,17 @@ export async function generateMetadata({
   const rawDescription = resource.description ||
     `${resource.title} — Ressource pédagogique gratuite${resource.subject ? ' en ' + resource.subject.nameFr : ''}${resource.class ? ' pour ' + resource.class.nameFr : ''} sur Examanet Tunisie.`;
   const description = stripHtml(rawDescription);
+  // The AI-extracted الموضوع العام is one of the strongest long-tail signals
+  // for educational queries — surface it in the meta description so it appears
+  // in the SERP snippet (Google displays the first ~155 chars).
+  const generalSubject = (resource.metadata?.generalSubject || '').trim() || null;
+  const seoDescription = generalSubject
+    ? `${generalSubject}. ${description}`.slice(0, 160)
+    : description.slice(0, 160);
 
   return {
     title: resource.title,
-    description: description.slice(0, 160),
+    description: seoDescription,
     keywords: (() => {
       const tagList = resource.tags
         ? resource.tags
@@ -81,8 +88,10 @@ export async function generateMetadata({
         'Tunisie',
         'examanet',
       ].filter(Boolean) as string[];
-      // Combine tags + auto keywords, dedupe, max 15
-      return Array.from(new Set([...tagList, ...auto])).slice(0, 15);
+      // The general subject is the most specific topic — put it FIRST in the
+      // keyword list so search engines weight it as the primary subject.
+      const head = generalSubject ? [generalSubject] : [];
+      return Array.from(new Set([...head, ...tagList, ...auto])).slice(0, 15);
     })(),
     alternates: {
       canonical: `${baseUrl}/ressources/${resource.numericId}/${resource.slug}`,
@@ -94,7 +103,7 @@ export async function generateMetadata({
     },
     openGraph: {
       title: resource.title,
-      description: description.slice(0, 160),
+      description: seoDescription,
       url: `${baseUrl}/ressources/${resource.numericId}/${resource.slug}`,
       siteName: 'Examanet',
       locale: 'fr_TN',
@@ -120,7 +129,7 @@ export async function generateMetadata({
     twitter: {
       card: 'summary_large_image',
       title: resource.title,
-      description: description.slice(0, 160),
+      description: seoDescription,
       images: [`${baseUrl}/api/og/resource/${resource.numericId}`],
     },
   };
@@ -263,6 +272,7 @@ export default async function ResourcePage({
     dateModified: resource.updatedAt?.toISOString() || resource.createdAt?.toISOString(),
     aggregateRating,
     tags: resource.tags, // SEO: auto-generated tags boost discoverability
+    generalSubject: resource.metadata?.generalSubject || null, // الموضوع العام → JSON-LD teaches + keywords
   });
   const breadcrumbJsonLd = breadcrumbSchema([
     { name: 'Accueil', url: baseUrl },
@@ -417,6 +427,7 @@ export default async function ResourcePage({
 
                 {(() => {
                   const { fr, ar } = splitArabicSubject(resource.title);
+                  const gs = (resource.metadata?.generalSubject || '').trim();
                   return (
                     <>
                       <h1
@@ -434,6 +445,21 @@ export default async function ResourcePage({
                         >
                           {ar}
                         </div>
+                      )}
+                      {/* SEO: surface the AI-extracted general subject as a
+                          semantic <h2> right under the title. This is the
+                          strongest long-tail signal on the page and gives
+                          Google a clear topic anchor (also picked up by
+                          screen readers and voice search). */}
+                      {gs && (
+                        <h2
+                          dir="auto"
+                          lang={isArabic(gs) ? 'ar' : 'fr'}
+                          className={`text-sm lg:text-base font-semibold text-slate-500 ${ar ? 'mb-3' : 'mb-2'} tracking-wide ${isArabic(gs) ? 'text-right font-arabic-title' : 'text-left'}`}
+                        >
+                          {isArabic(gs) ? 'الموضوع العام: ' : 'Sujet : '}
+                          <span className="text-slate-700">{gs}</span>
+                        </h2>
                       )}
                     </>
                   );
