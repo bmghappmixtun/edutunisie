@@ -277,21 +277,24 @@ export default async function ResourcesPage(props: { searchParams: Promise<Searc
     getCurrentUser(),
   ]);
 
-  // Fetch class/section/subject counts via groupBy (much faster than fetching all rows)
+  // Fetch class/section/subject counts via groupBy (much faster than fetching all rows).
+  // NOTE: classId/sectionId are nullable in the schema. Prisma's groupBy
+  // rejects `not: null` filters; we instead filter out null groups in JS.
+  // subjectId is non-nullable, so no null filter is needed.
   const [classRecords, sectionRecords, subjectRecords] = await Promise.all([
     prisma.resource.groupBy({
       by: ['classId'],
-      where: { ...facetBase, classId: { not: null } as any },
+      where: facetBase,
       _count: { _all: true },
     }),
     prisma.resource.groupBy({
       by: ['sectionId'],
-      where: { ...facetBase, sectionId: { not: null } as any },
+      where: facetBase,
       _count: { _all: true },
     }),
     prisma.resource.groupBy({
       by: ['subjectId'],
-      where: { ...facetBase, subjectId: { not: null } as any },
+      where: facetBase,
       _count: { _all: true },
     }),
   ]);
