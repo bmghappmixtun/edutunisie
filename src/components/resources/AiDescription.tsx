@@ -397,7 +397,10 @@ export default function AiDescription({
           {fields.map((f, i) => {
             const valueAr = isArabic(f.value);
             const labelAr = isArabic(f.label);
-            const cellRtl = valueAr || labelAr;
+            // Cell direction follows the LABEL (not the value). This keeps
+            // neutral content (digits, dates, punctuation) aligned with its
+            // label instead of breaking to the opposite side in RTL grids.
+            const cellRtl = labelAr;
             return (
             <div key={i} className="flex items-start gap-2">
               <f.Icon className={`w-4 h-4 mt-1 flex-shrink-0 ${iconColor(f.Icon)}`} />
@@ -410,10 +413,10 @@ export default function AiDescription({
                   {f.label}
                 </div>
                 <div
-                  dir={valueAr ? 'rtl' : 'ltr'}
+                  dir={cellRtl ? 'rtl' : 'ltr'}
                   lang={valueAr ? 'ar' : 'fr'}
                   style={{ unicodeBidi: 'isolate' }}
-                  className={`text-sm text-slate-800 font-medium leading-snug break-words ${valueAr ? 'text-right' : 'text-left'}`}
+                  className={`text-sm text-slate-800 font-medium leading-snug break-words ${cellRtl ? 'text-right' : 'text-left'}`}
                 >
                   {f.value}
                 </div>
