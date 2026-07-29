@@ -49,6 +49,10 @@ function buildWhere(
   if (!exclude.includes('teacherId') && filters.teacherId) {
     where.teacherId = filters.teacherId;
   }
+  if (!exclude.includes('pilote') && filters.pilote) {
+    // Filter to only show files from collège/lycée pilote
+    where.schoolType = 'PILOTE';
+  }
 
   return where;
 }
@@ -64,6 +68,7 @@ interface ParsedFilters {
   language: string[];
   hasCorrection: boolean;
   teacherId: string;
+  pilote: boolean;
 }
 
 // ============== HANDLER ==============
@@ -83,6 +88,7 @@ export async function GET(req: NextRequest) {
     language: searchParams.getAll('language'),
     hasCorrection: searchParams.get('hasCorrection') === '1',
     teacherId: searchParams.get('teacherId') || '',
+    pilote: searchParams.get('pilote') === '1',
   };
 
   const sort = searchParams.get('sort') || 'recent';
@@ -131,6 +137,7 @@ export async function GET(req: NextRequest) {
   if (filters.year.length > 0) facetBase.year = { in: filters.year };
   if (filters.language.length > 0) facetBase.language = { in: filters.language };
   if (filters.hasCorrection) facetBase.hasCorrection = true;
+  if (filters.pilote) facetBase.schoolType = 'PILOTE';
   if (filters.teacherId) {
     // Reuse the converted cuid from the main where clause
     facetBase.teacherId = where.teacherId as string;
@@ -149,7 +156,7 @@ export async function GET(req: NextRequest) {
   // `select: { ... }` + 4 batched lookups.
   // Old approach: ~1000ms for the main findMany (N+1). New: ~180ms + 4× 50ms lookups = 380ms.
   // Net gain: ~620ms per request.
-  const [resourcesRaw, total, byType, byTrimestre, byYear, byLanguage, withCorrectionCount] =
+  const [resourcesRaw, total, byType, byTrimestre, byYear, byLanguage, withCorrectionCount, piloteCount] =
     await Promise.all([
       prisma.resource.findMany({
         where,
@@ -208,6 +215,7 @@ export async function GET(req: NextRequest) {
         _count: { _all: true },
       }),
       prisma.resource.count({ where: { ...where, hasCorrection: true } }),
+      prisma.resource.count({ where: { ...where, schoolType: 'PILOTE' } }),
     ]);
 
   // Fetch class/section/subject IDs separately (groupBy on nullable strings has TS issues)
@@ -402,6 +410,7 @@ export async function GET(req: NextRequest) {
       bySection: bySectionMap,
       bySubject: bySubjectMap,
       withCorrection: withCorrectionCount,
+      pilote: piloteCount,
     },
     nameMaps: {
       class: Object.fromEntries(allClasses.map((c) => [c.slug, c.nameFr])),

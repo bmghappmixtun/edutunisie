@@ -11,6 +11,7 @@ export interface Facets {
   bySection: Record<string, number>;
   bySubject: Record<string, number>;
   withCorrection: number;
+  pilote: number;
 }
 
 export interface RessourcesResponse {

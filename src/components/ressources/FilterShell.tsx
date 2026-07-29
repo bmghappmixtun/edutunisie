@@ -123,6 +123,7 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
     year: parseAsArrayOf(parseAsString).withDefault([]),
     language: parseAsArrayOf(parseAsString).withDefault([]),
     hasCorrection: parseAsBoolean.withDefault(false),
+    pilote: parseAsBoolean.withDefault(false),
     teacherId: parseAsString.withDefault(''),
     sort: parseAsStringEnum(['recent', 'popular', 'downloads', 'rating', 'oldest']).withDefault(
       'recent',
@@ -150,6 +151,7 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
         year: [...filters.year].sort(),
         language: [...filters.language].sort(),
         hasCorrection: filters.hasCorrection,
+        pilote: filters.pilote,
         teacherId: filters.teacherId,
         sort: filters.sort,
         page: filters.page,
@@ -199,6 +201,7 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
         filters.year.forEach((v) => params.append('year', v));
         filters.language.forEach((v) => params.append('language', v));
         if (filters.hasCorrection) params.set('hasCorrection', '1');
+        if (filters.pilote) params.set('pilote', '1');
         if (filters.teacherId) params.set('teacherId', filters.teacherId);
         params.set('sort', filters.sort);
         params.set('page', String(filters.page));
@@ -247,6 +250,7 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
         year: [],
         language: [],
         hasCorrection: false,
+        pilote: false,
         teacherId: '',
         sort: 'recent',
         page: 1,
@@ -273,7 +277,8 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
     filters.trimestre.length +
     filters.year.length +
     filters.language.length +
-    (filters.hasCorrection ? 1 : 0);
+    (filters.hasCorrection ? 1 : 0) +
+    (filters.pilote ? 1 : 0);
 
   // ============== FACET OPTIONS (only those with count > 0) ==============
   const yearOptions = useMemo(
@@ -498,6 +503,38 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
               </button>
               <div className="text-[11px] text-slate-500 mt-1.5 ml-1">
                 {data.facets.withCorrection.toLocaleString('fr-FR')} ressources avec corrigé
+              </div>
+            </div>
+          )}
+
+          {/* ----- COLLÈGE/LYCÉE PILOTE ----- */}
+          {data.facets.pilote > 0 && (
+            <div className="mt-3">
+              <button
+                onClick={() => update({ pilote: !filters.pilote })}
+                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg border text-sm transition ${
+                  filters.pilote
+                    ? 'bg-fuchsia-50 border-fuchsia-200 text-fuchsia-700'
+                    : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-300'
+                }`}
+                aria-label="Filtrer par collège ou lycée pilote"
+              >
+                <span className="flex items-center gap-2">
+                  <GraduationCap className="w-4 h-4" />
+                  Collège / Lycée pilote
+                </span>
+                <Switch.Root
+                  checked={filters.pilote}
+                  onCheckedChange={(c) => update({ pilote: c })}
+                  className={`w-9 h-5 rounded-full relative transition ${
+                    filters.pilote ? 'bg-fuchsia-500' : 'bg-slate-300'
+                  }`}
+                >
+                  <Switch.Thumb className="block w-4 h-4 bg-white rounded-full shadow transition-transform translate-x-0.5 data-[state=checked]:translate-x-[18px]" />
+                </Switch.Root>
+              </button>
+              <div className="text-[11px] text-slate-500 mt-1.5 ml-1">
+                {data.facets.pilote.toLocaleString('fr-FR')} ressources de collège/lycée pilote
               </div>
             </div>
           )}
@@ -851,6 +888,14 @@ function ActiveFilterChips({
       label: 'Avec corrigé',
       onRemove: () => onRemove({ hasCorrection: false }),
       color: 'bg-emerald-100 text-emerald-700',
+    });
+  }
+  if (filters.pilote) {
+    chips.push({
+      key: 'pilote',
+      label: 'Collège / Lycée pilote',
+      onRemove: () => onRemove({ pilote: false }),
+      color: 'bg-fuchsia-100 text-fuchsia-700',
     });
   }
 
