@@ -27,7 +27,14 @@ const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL || '';
 export async function POST(req: NextRequest) {
   const auth = req.headers.get('authorization');
   const expected = `Bearer ${process.env.CRON_SECRET}`;
-  if (!auth || auth !== expected) {
+  // Mavis (the agent) can also authenticate with a dedicated token so it
+  // can post the nightly fix report from a local env that doesn't have
+  // CRON_SECRET. The token is set in Vercel as AGENT_REPORT_TOKEN and
+  // can be rotated independently from the cron secret.
+  const expectedAgent = process.env.AGENT_REPORT_TOKEN
+    ? `Bearer ${process.env.AGENT_REPORT_TOKEN}`
+    : null;
+  if (!auth || (auth !== expected && (!expectedAgent || auth !== expectedAgent))) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }
 
