@@ -23,6 +23,19 @@ const nextConfig = {
     serverActions: { bodySizeLimit: '50mb' },
     optimizePackageImports: ['lucide-react', 'date-fns'],
   },
+  // 2026-07-29: numericId 19 was a corrupted "Faouzi El Gharbi" (with AR name
+  // جهاد قفشين) whose 23 resources actually belong to the real Faouzi at
+  // numericId 228 (AR name فوزي الغربي). User deleted, 23 resources migrated.
+  // Permanent 308 redirect preserves SEO for any old external links.
+  async redirects() {
+    return [
+      {
+        source: '/professeurs/19/:slug*',
+        destination: '/professeurs/228/faouzi-el-gharbi',
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       // Cache static assets aggressively
