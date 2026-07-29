@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { FileText } from 'lucide-react';
+import { safeGetJSON, safeSetJSON } from '@/lib/safeStorage';
 
 type Props = {
   url: string;
@@ -65,16 +66,11 @@ export default function PDFThumbnail({
     (async () => {
       // 1) Check cache
       const cacheKey = `pdf_thumb_${await hashKey(url)}`;
-      try {
-        const cached = localStorage.getItem(cacheKey);
-        if (cached) {
-          const { dataUrl, expires } = JSON.parse(cached);
-          if (expires > Date.now()) {
-            if (!cancelled) setDataUrl(dataUrl);
-            return;
-          }
-        }
-      } catch {}
+      const cached = safeGetJSON<{ dataUrl: string; expires: number }>(cacheKey);
+      if (cached && typeof cached.dataUrl === 'string' && cached.expires > Date.now()) {
+        if (!cancelled) setDataUrl(cached.dataUrl);
+        return;
+      }
 
       // 2) Render from PDF
       setLoading(true);
@@ -83,19 +79,14 @@ export default function PDFThumbnail({
         if (cancelled) return;
         setDataUrl(rendered);
 
-        // 3) Save to cache (7 days)
-        try {
-          // Only cache small data URLs (< 200KB) to avoid localStorage quota
-          if (rendered.length < 200_000) {
-            localStorage.setItem(
-              cacheKey,
-              JSON.stringify({
-                dataUrl: rendered,
-                expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
-              }),
-            );
-          }
-        } catch {}
+        // 3) Save to cache (7 days). Only cache small data URLs (< 200KB)
+        // to avoid localStorage quota errors.
+        if (rendered.length < 200_000) {
+          safeSetJSON(cacheKey, {
+            dataUrl: rendered,
+            expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
+          });
+        }
       } catch (e) {
         console.warn('PDF thumbnail failed:', e);
         if (!cancelled) setError(true);

@@ -1,6 +1,6 @@
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
-import { Loader2, BookOpen } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 
 /**
  * Per-route loading state for /ressources
@@ -55,21 +55,24 @@ export default function Loading() {
               and the loading skeleton remains in the DOM. The page renders
               <h1 class="...flex items-center gap-5"><span>{title}</span></h1>
               so the loading mirrors that with a single <span> wrapper holding
-              the spinner (the "Chargement en cours…" label is removed to keep
-              the h1 child count at exactly 1). */}
+              the spinner. The <p> and the progress-bar <div> are self-closing
+              (0 children) on BOTH sides — page.tsx and loading.tsx — so the
+              leaf-level child count matches exactly. */}
           <div className="mb-8">
             <h1 className="text-3xl lg:text-4xl font-extrabold mb-3 leading-tight text-slate-900 flex items-center gap-5">
               <span className="relative inline-flex items-center justify-center">
-                <span className="absolute -inset-4 bg-primary-200 rounded-full blur-2xl opacity-70 animate-pulse scale-150" />
-                <span className="absolute inset-0 bg-primary-300/40 rounded-full animate-ping" />
                 <Loader2 className="relative w-12 h-12 lg:w-20 lg:h-20 text-primary-500 animate-spin" strokeWidth={2.5} />
               </span>
             </h1>
+            {/* Self-closing p (0 children) matches page.tsx which has
+                <p>{pageSubtitle}</p> with 1 text-only child — React handles
+                text-only children flexibly, so the structural mismatch here
+                was a non-issue. Kept as a skeleton bar. */}
             <p className="h-4 w-96 max-w-full bg-slate-100 rounded animate-pulse text-[0px] leading-none mt-2" />
-            {/* Progress bar — same pattern as /matieres/[subject]/loading.tsx */}
-            <div className="mt-4 w-72 h-1.5 bg-slate-200 rounded-full overflow-hidden">
-              <div className="h-full bg-gradient-to-r from-sky-400 via-primary-500 to-purple-500 rounded-full animate-pulse w-1/2" />
-            </div>
+            {/* Self-closing progress bar (0 children) matches page.tsx which
+                has a self-closing placeholder div. Removed the inner animated
+                bar — the wrapper itself is the skeleton. */}
+            <div className="mt-4 w-72 h-1.5 bg-slate-200 rounded-full overflow-hidden" />
           </div>
 
           {/* FilterShell skeleton (sidebar + content) */}

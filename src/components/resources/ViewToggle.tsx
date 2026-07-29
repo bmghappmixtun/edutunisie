@@ -1,18 +1,23 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { Grid3x3, List } from 'lucide-react';
+import { safeGetItem, safeSetItem } from '@/lib/safeStorage';
 
 export type ViewMode = 'grid' | 'list';
 
 export function useViewMode(): [ViewMode, (m: ViewMode) => void] {
   const [mode, setMode] = useState<ViewMode>('grid');
   useEffect(() => {
-    const stored = localStorage.getItem('resources-view') as ViewMode | null;
+    // safeGetItem — Safari private mode + some iframe contexts throw a
+    // SecurityError on `window.localStorage` access (ERR-3EU598 in the
+    // 2026-07-29 nightly digest). The wrapper is a no-op when storage is
+    // unavailable, so the hook stays safe on every page mount.
+    const stored = safeGetItem('resources-view') as ViewMode | null;
     if (stored === 'grid' || stored === 'list') setMode(stored);
   }, []);
   const update = (m: ViewMode) => {
     setMode(m);
-    localStorage.setItem('resources-view', m);
+    safeSetItem('resources-view', m);
   };
   return [mode, update];
 }

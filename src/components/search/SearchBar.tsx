@@ -16,6 +16,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { useI18n } from '@/lib/i18n';
+import { safeGetJSON, safeSetJSON, safeRemoveItem } from '@/lib/safeStorage';
 
 type SuggestResult = {
   type: 'resource' | 'teacher' | 'subject' | 'class' | 'section';
@@ -79,10 +80,10 @@ export default function SearchBar({
 
   // Load recent searches
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(RECENT_KEY);
-      if (stored) setRecent(JSON.parse(stored));
-    } catch {}
+    // safeGetItem — Safari private mode + some iframe contexts throw on
+    // `window.localStorage` access. safeGetJSON parses safely.
+    const parsed = safeGetJSON<string[]>(RECENT_KEY);
+    if (parsed && Array.isArray(parsed)) setRecent(parsed);
   }, []);
 
   // Sync query when initialQuery changes (e.g., URL param changes via filter)
@@ -95,9 +96,7 @@ export default function SearchBar({
     if (!q.trim()) return;
     setRecent((prev) => {
       const updated = [q, ...prev.filter((x) => x !== q)].slice(0, MAX_RECENT);
-      try {
-        localStorage.setItem(RECENT_KEY, JSON.stringify(updated));
-      } catch {}
+      safeSetJSON(RECENT_KEY, updated);
       return updated;
     });
   }, []);
@@ -163,9 +162,7 @@ export default function SearchBar({
 
   const clearRecent = () => {
     setRecent([]);
-    try {
-      localStorage.removeItem(RECENT_KEY);
-    } catch {}
+    safeRemoveItem(RECENT_KEY);
   };
 
   const clearQuery = () => {

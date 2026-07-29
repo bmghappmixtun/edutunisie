@@ -2,6 +2,7 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTransition } from 'react';
 import ViewToggle, { ViewMode } from './ViewToggle';
+import { safeSetItem } from '@/lib/safeStorage';
 
 export default function ResourcesViewClient({
   currentView,
@@ -15,10 +16,10 @@ export default function ResourcesViewClient({
   const [isPending, startTransition] = useTransition();
 
   const handleViewChange = (mode: ViewMode) => {
-    // Update localStorage
-    try {
-      localStorage.setItem('resources-view', mode);
-    } catch {}
+    // safeSetItem is a no-op when localStorage is unavailable (Safari private
+    // mode, third-party iframe contexts) — keeps the toggle responsive
+    // without throwing ERR-3EU598.
+    safeSetItem('resources-view', mode);
     // Update URL
     const params = new URLSearchParams(searchParams);
     if (mode === 'grid') params.delete('view');

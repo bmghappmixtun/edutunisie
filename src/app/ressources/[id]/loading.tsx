@@ -16,6 +16,16 @@ import { Loader2, BookOpen, FileText, Star, Eye, Download } from 'lucide-react';
 export default function Loading() {
   return (
     <div className="min-h-screen flex flex-col">
+      {/* JSON-LD placeholders matching the 2 scripts in the page (course + breadcrumb).
+          The page renders them as the FIRST children of the wrapper (before
+          <Header />), so the loading must too — placing them inside <main>
+          (the previous version) produced a structural mismatch when the
+          Suspense fallback was replaced by the streamed content, triggering
+          React #418/#422 hydration errors (ERR-3EU598, ERR-..., in the
+          2026-07-29 nightly digest on single-resource URLs). */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: '{}' }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: '{}' }} />
+
       <Header />
       <main className="flex-1 pt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -112,11 +122,6 @@ export default function Loading() {
             </aside>
           </div>
         </div>
-
-        {/* JSON-LD placeholders matching the 2 scripts in the page (course + breadcrumb).
-            Required to keep wrapper's child count consistent (avoids React #418 hydration mismatch). */}
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: '{}' }} />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: '{}' }} />
       </main>
       <Footer />
     </div>

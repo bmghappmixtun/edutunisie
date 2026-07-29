@@ -2,6 +2,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import fr from '@/messages/fr.json';
 import ar from '@/messages/ar.json';
+import { safeGetItem, safeSetItem } from '@/lib/safeStorage';
 
 type Locale = 'fr' | 'ar';
 type Messages = typeof fr;
@@ -33,7 +34,10 @@ export function I18nProvider({
   // Load saved locale (from localStorage OR cookie)
   useEffect(() => {
     // Priority: localStorage > cookie > default 'fr'
-    const saved = localStorage.getItem('locale') as Locale | null;
+    // Use safeGetItem — Safari private mode + some iframe contexts throw a
+    // SecurityError on `window.localStorage` access itself (not just .getItem).
+    // Wrapping in safeGetItem keeps the provider safe on every page mount.
+    const saved = safeGetItem('locale') as Locale | null;
     if (saved && (saved === 'fr' || saved === 'ar')) {
       setLocaleState(saved);
       return;
@@ -61,7 +65,9 @@ export function I18nProvider({
 
   function setLocale(l: Locale) {
     setLocaleState(l);
-    localStorage.setItem('locale', l);
+    // safeSetItem is a no-op when storage is unavailable (Safari private mode,
+    // disabled cookies, etc.) — keeps the UI responsive without throwing.
+    safeSetItem('locale', l);
   }
 
   function t(key: string, vars?: Record<string, string>): string {
