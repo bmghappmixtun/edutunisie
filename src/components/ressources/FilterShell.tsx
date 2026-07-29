@@ -123,7 +123,7 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
     year: parseAsArrayOf(parseAsString).withDefault([]),
     language: parseAsArrayOf(parseAsString).withDefault([]),
     hasCorrection: parseAsBoolean.withDefault(false),
-    pilote: parseAsBoolean.withDefault(false),
+    category: parseAsStringEnum(['all', 'college-pilote', 'college-ordinaire', 'lycee-pilote', 'lycee-ordinaire']).withDefault('all'),
     teacherId: parseAsString.withDefault(''),
     sort: parseAsStringEnum(['recent', 'popular', 'downloads', 'rating', 'oldest']).withDefault(
       'recent',
@@ -151,7 +151,7 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
         year: [...filters.year].sort(),
         language: [...filters.language].sort(),
         hasCorrection: filters.hasCorrection,
-        pilote: filters.pilote,
+        category: filters.category,
         teacherId: filters.teacherId,
         sort: filters.sort,
         page: filters.page,
@@ -201,7 +201,7 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
         filters.year.forEach((v) => params.append('year', v));
         filters.language.forEach((v) => params.append('language', v));
         if (filters.hasCorrection) params.set('hasCorrection', '1');
-        if (filters.pilote) params.set('pilote', '1');
+        if (filters.category && filters.category !== 'all') params.set('category', filters.category);
         if (filters.teacherId) params.set('teacherId', filters.teacherId);
         params.set('sort', filters.sort);
         params.set('page', String(filters.page));
@@ -250,7 +250,7 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
         year: [],
         language: [],
         hasCorrection: false,
-        pilote: false,
+        category: 'all',
         teacherId: '',
         sort: 'recent',
         page: 1,
@@ -278,7 +278,7 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
     filters.year.length +
     filters.language.length +
     (filters.hasCorrection ? 1 : 0) +
-    (filters.pilote ? 1 : 0);
+    (filters.category !== 'all' ? 1 : 0);
 
   // ============== FACET OPTIONS (only those with count > 0) ==============
   const yearOptions = useMemo(
@@ -507,37 +507,58 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
             </div>
           )}
 
-          {/* ----- COLLÈGE/LYCÉE PILOTE ----- */}
-          {data.facets.pilote > 0 && (
-            <div className="mt-3">
-              <button
-                onClick={() => update({ pilote: !filters.pilote })}
-                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg border text-sm transition ${
-                  filters.pilote
-                    ? 'bg-fuchsia-50 border-fuchsia-200 text-fuchsia-700'
-                    : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-300'
-                }`}
-                aria-label="Filtrer par collège ou lycée pilote"
-              >
-                <span className="flex items-center gap-2">
-                  <GraduationCap className="w-4 h-4" />
-                  Collège / Lycée pilote
-                </span>
-                <Switch.Root
-                  checked={filters.pilote}
-                  onCheckedChange={(c) => update({ pilote: c })}
-                  className={`w-9 h-5 rounded-full relative transition ${
-                    filters.pilote ? 'bg-fuchsia-500' : 'bg-slate-300'
-                  }`}
-                >
-                  <Switch.Thumb className="block w-4 h-4 bg-white rounded-full shadow transition-transform translate-x-0.5 data-[state=checked]:translate-x-[18px]" />
-                </Switch.Root>
-              </button>
-              <div className="text-[11px] text-slate-500 mt-1.5 ml-1">
-                {data.facets.pilote.toLocaleString('fr-FR')} ressources de collège/lycée pilote
-              </div>
+          {/* ----- CATÉGORIE (collège/lycée × pilote/ordinaire) ----- */}
+          <div className="mt-3">
+            <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+              Catégorie
             </div>
-          )}
+            <div className="space-y-1.5">
+              <CategoryOption
+                icon="🎓"
+                label="Collège pilote"
+                sub="7-9ème année · école pilote"
+                count={data.facets.collegePilote}
+                active={filters.category === 'college-pilote'}
+                color="fuchsia"
+                onClick={() =>
+                  update({ category: filters.category === 'college-pilote' ? 'all' : 'college-pilote' })
+                }
+              />
+              <CategoryOption
+                icon="🏫"
+                label="Collège ordinaire"
+                sub="7-9ème année · école standard"
+                count={data.facets.collegeOrdinaire}
+                active={filters.category === 'college-ordinaire'}
+                color="emerald"
+                onClick={() =>
+                  update({ category: filters.category === 'college-ordinaire' ? 'all' : 'college-ordinaire' })
+                }
+              />
+              <CategoryOption
+                icon="🎓"
+                label="Lycée pilote"
+                sub="1-4ème année · école pilote"
+                count={data.facets.lyceePilote}
+                active={filters.category === 'lycee-pilote'}
+                color="fuchsia"
+                onClick={() =>
+                  update({ category: filters.category === 'lycee-pilote' ? 'all' : 'lycee-pilote' })
+                }
+              />
+              <CategoryOption
+                icon="🏫"
+                label="Lycée ordinaire"
+                sub="1-4ème année · école standard"
+                count={data.facets.lyceeOrdinaire}
+                active={filters.category === 'lycee-ordinaire'}
+                color="emerald"
+                onClick={() =>
+                  update({ category: filters.category === 'lycee-ordinaire' ? 'all' : 'lycee-ordinaire' })
+                }
+              />
+            </div>
+          </div>
         </div>
       </aside>
 
@@ -683,6 +704,49 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
         )}
       </div>
     </div>
+  );
+}
+
+// ============== CATEGORY OPTION (single-select) ==============
+function CategoryOption({
+  icon,
+  label,
+  sub,
+  count,
+  active,
+  color,
+  onClick,
+}: {
+  icon: string;
+  label: string;
+  sub: string;
+  count: number;
+  active: boolean;
+  color: 'fuchsia' | 'emerald';
+  onClick: () => void;
+}) {
+  const activeClasses = color === 'fuchsia'
+    ? 'bg-fuchsia-50 border-fuchsia-300 ring-1 ring-fuchsia-200'
+    : 'bg-emerald-50 border-emerald-300 ring-1 ring-emerald-200';
+  const inactiveClasses = 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50';
+  const activeText = color === 'fuchsia' ? 'text-fuchsia-700' : 'text-emerald-700';
+  return (
+    <button
+      onClick={onClick}
+      className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg border text-sm transition ${active ? activeClasses : inactiveClasses}`}
+      aria-pressed={active}
+    >
+      <span className="flex items-center gap-2 min-w-0">
+        <span className="text-base shrink-0">{icon}</span>
+        <span className="min-w-0 text-left">
+          <span className={`block font-semibold ${active ? activeText : 'text-slate-700'}`}>{label}</span>
+          <span className="block text-[10px] text-slate-500 truncate">{sub}</span>
+        </span>
+      </span>
+      <span className={`text-[11px] tabular-nums shrink-0 ml-2 ${active ? activeText : 'text-slate-500'}`}>
+        {count.toLocaleString('fr-FR')}
+      </span>
+    </button>
   );
 }
 
@@ -890,12 +954,24 @@ function ActiveFilterChips({
       color: 'bg-emerald-100 text-emerald-700',
     });
   }
-  if (filters.pilote) {
+  if (filters.category !== 'all') {
+    const labels: Record<string, string> = {
+      'college-pilote': 'Collège pilote',
+      'college-ordinaire': 'Collège ordinaire',
+      'lycee-pilote': 'Lycée pilote',
+      'lycee-ordinaire': 'Lycée ordinaire',
+    };
+    const colors: Record<string, string> = {
+      'college-pilote': 'bg-fuchsia-100 text-fuchsia-700',
+      'college-ordinaire': 'bg-emerald-100 text-emerald-700',
+      'lycee-pilote': 'bg-fuchsia-100 text-fuchsia-700',
+      'lycee-ordinaire': 'bg-emerald-100 text-emerald-700',
+    };
     chips.push({
-      key: 'pilote',
-      label: 'Collège / Lycée pilote',
-      onRemove: () => onRemove({ pilote: false }),
-      color: 'bg-fuchsia-100 text-fuchsia-700',
+      key: 'category',
+      label: labels[filters.category] || filters.category,
+      onRemove: () => onRemove({ category: 'all' }),
+      color: colors[filters.category] || 'bg-slate-100 text-slate-700',
     });
   }
 

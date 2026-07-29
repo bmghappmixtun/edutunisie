@@ -11,7 +11,10 @@ export interface Facets {
   bySection: Record<string, number>;
   bySubject: Record<string, number>;
   withCorrection: number;
-  pilote: number;
+  collegePilote: number;
+  collegeOrdinaire: number;
+  lyceePilote: number;
+  lyceeOrdinaire: number;
 }
 
 export interface RessourcesResponse {

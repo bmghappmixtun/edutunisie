@@ -49,9 +49,19 @@ function buildWhere(
   if (!exclude.includes('teacherId') && filters.teacherId) {
     where.teacherId = filters.teacherId;
   }
-  if (!exclude.includes('pilote') && filters.pilote) {
-    // Filter to only show files from collège/lycée pilote
-    where.schoolType = 'PILOTE';
+  if (!exclude.includes('category') && filters.category && filters.category !== 'all') {
+    // 4 categories: college-pilote, college-ordinaire, lycee-pilote, lycee-ordinaire
+    const [level, schoolType] = filters.category.split('-');
+    if (level === 'college') {
+      where.class = { level: { slug: 'college' } };
+    } else if (level === 'lycee') {
+      where.class = { level: { slug: 'lycee' } };
+    }
+    if (schoolType === 'pilote') {
+      where.schoolType = 'PILOTE';
+    } else if (schoolType === 'ordinaire') {
+      where.schoolType = { not: 'PILOTE' };
+    }
   }
 
   return where;
@@ -68,7 +78,7 @@ interface ParsedFilters {
   language: string[];
   hasCorrection: boolean;
   teacherId: string;
-  pilote: boolean;
+  category: 'all' | 'college-pilote' | 'college-ordinaire' | 'lycee-pilote' | 'lycee-ordinaire';
 }
 
 // ============== HANDLER ==============
@@ -88,7 +98,7 @@ export async function GET(req: NextRequest) {
     language: searchParams.getAll('language'),
     hasCorrection: searchParams.get('hasCorrection') === '1',
     teacherId: searchParams.get('teacherId') || '',
-    pilote: searchParams.get('pilote') === '1',
+    category: (searchParams.get('category') || 'all') as ParsedFilters['category'],
   };
 
   const sort = searchParams.get('sort') || 'recent';
@@ -137,7 +147,19 @@ export async function GET(req: NextRequest) {
   if (filters.year.length > 0) facetBase.year = { in: filters.year };
   if (filters.language.length > 0) facetBase.language = { in: filters.language };
   if (filters.hasCorrection) facetBase.hasCorrection = true;
-  if (filters.pilote) facetBase.schoolType = 'PILOTE';
+  if (filters.category && filters.category !== 'all') {
+    const [level, schoolType] = filters.category.split('-');
+    if (level === 'college') {
+      facetBase.class = { level: { slug: 'college' } };
+    } else if (level === 'lycee') {
+      facetBase.class = { level: { slug: 'lycee' } };
+    }
+    if (schoolType === 'pilote') {
+      facetBase.schoolType = 'PILOTE';
+    } else if (schoolType === 'ordinaire') {
+      facetBase.schoolType = { not: 'PILOTE' };
+    }
+  }
   if (filters.teacherId) {
     // Reuse the converted cuid from the main where clause
     facetBase.teacherId = where.teacherId as string;
@@ -156,7 +178,7 @@ export async function GET(req: NextRequest) {
   // `select: { ... }` + 4 batched lookups.
   // Old approach: ~1000ms for the main findMany (N+1). New: ~180ms + 4× 50ms lookups = 380ms.
   // Net gain: ~620ms per request.
-  const [resourcesRaw, total, byType, byTrimestre, byYear, byLanguage, withCorrectionCount, piloteCount] =
+  const [resourcesRaw, total, byType, byTrimestre, byYear, byLanguage, withCorrectionCount, collegePiloteCount, collegeOrdinaireCount, lyceePiloteCount, lyceeOrdinaireCount] =
     await Promise.all([
       prisma.resource.findMany({
         where,
@@ -215,7 +237,10 @@ export async function GET(req: NextRequest) {
         _count: { _all: true },
       }),
       prisma.resource.count({ where: { ...where, hasCorrection: true } }),
-      prisma.resource.count({ where: { ...where, schoolType: 'PILOTE' } }),
+      prisma.resource.count({ where: { ...where, class: { level: { slug: 'college' } }, schoolType: 'PILOTE' } }),
+      prisma.resource.count({ where: { ...where, class: { level: { slug: 'college' } }, schoolType: { not: 'PILOTE' } } }),
+      prisma.resource.count({ where: { ...where, class: { level: { slug: 'lycee' } }, schoolType: 'PILOTE' } }),
+      prisma.resource.count({ where: { ...where, class: { level: { slug: 'lycee' } }, schoolType: { not: 'PILOTE' } } }),
     ]);
 
   // Fetch class/section/subject IDs separately (groupBy on nullable strings has TS issues)
@@ -410,7 +435,10 @@ export async function GET(req: NextRequest) {
       bySection: bySectionMap,
       bySubject: bySubjectMap,
       withCorrection: withCorrectionCount,
-      pilote: piloteCount,
+      collegePilote: collegePiloteCount,
+      collegeOrdinaire: collegeOrdinaireCount,
+      lyceePilote: lyceePiloteCount,
+      lyceeOrdinaire: lyceeOrdinaireCount,
     },
     nameMaps: {
       class: Object.fromEntries(allClasses.map((c) => [c.slug, c.nameFr])),
