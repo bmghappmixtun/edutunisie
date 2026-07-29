@@ -14,3 +14,13 @@ WHERE "schoolType" != 'PILOTE'
     OR title LIKE '%college pilote%'
     OR title LIKE '%lycee pilote%'
   );
+
+-- Backfill NULL schoolType: mark collège resources as PUBLIC, lycée as LYCEE
+-- (no pilot marker in title → standard school). Affected 1580 rows (1542 college + 38 lycée).
+UPDATE "Resource" r
+SET "schoolType" = CASE WHEN l.slug = 'college' THEN 'PUBLIC' ELSE 'LYCEE' END
+FROM "Class" c, "Level" l
+WHERE c.id = r."classId"
+  AND l.id = c."levelId"
+  AND r."schoolType" IS NULL
+  AND r.status = 'PUBLISHED';
