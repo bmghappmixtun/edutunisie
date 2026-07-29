@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { getInitials } from '@/lib/text-utils';
 import Link from 'next/link';
 import Header from '@/components/layout/Header';
@@ -78,7 +78,13 @@ export async function generateMetadata({
       schoolNameAr: true,
     },
   });
-  if (!teacher) return { title: 'Enseignant non trouvé' };
+  if (!teacher) {
+    // 2026-07-29: numericId 19 (corrupted) was merged into 228 (real Faouzi).
+    if (numericId === 19) {
+      return { title: 'Faouzi El Gharbi — Enseignant sur Examanet' };
+    }
+    return { title: 'Enseignant non trouvé' };
+  }
   // Capitalize first letters of name parts ("chaabane mounir" -> "Chaabane Mounir").
   // Source data is sometimes stored lowercase; SEO displays look better capitalized.
   const capitalize = (s: string) => (s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : s);
@@ -190,7 +196,15 @@ export default async function TeacherProfilePage({
     },
   });
 
-  if (!teacher) notFound();
+  if (!teacher) {
+    // 2026-07-29: numericId 19 (corrupted "Faouzi El Gharbi" / جهاد قفشين) was
+    // merged into numericId 228 (the real Faouzi El Gharbi / فوزي الغربي).
+    // Old URL kept for SEO continuity.
+    if (numericId === 19) {
+      redirect('/professeurs/228/faouzi-el-gharbi');
+    }
+    notFound();
+  }
 
   // currentUser + isAdmin were already resolved before the teacher query
   // (so admins can preview PENDING/SUSPENDED profiles).
