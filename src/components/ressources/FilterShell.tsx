@@ -123,7 +123,10 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
     year: parseAsArrayOf(parseAsString).withDefault([]),
     language: parseAsArrayOf(parseAsString).withDefault([]),
     hasCorrection: parseAsBoolean.withDefault(false),
-    category: parseAsStringEnum(['all', 'college-pilote', 'college-ordinaire', 'lycee-pilote', 'lycee-ordinaire']).withDefault('all'),
+    collegePilote: parseAsBoolean.withDefault(false),
+    collegeOrdinaire: parseAsBoolean.withDefault(false),
+    lyceePilote: parseAsBoolean.withDefault(false),
+    lyceeOrdinaire: parseAsBoolean.withDefault(false),
     teacherId: parseAsString.withDefault(''),
     sort: parseAsStringEnum(['recent', 'popular', 'downloads', 'rating', 'oldest']).withDefault(
       'recent',
@@ -151,7 +154,10 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
         year: [...filters.year].sort(),
         language: [...filters.language].sort(),
         hasCorrection: filters.hasCorrection,
-        category: filters.category,
+        collegePilote: filters.collegePilote,
+        collegeOrdinaire: filters.collegeOrdinaire,
+        lyceePilote: filters.lyceePilote,
+        lyceeOrdinaire: filters.lyceeOrdinaire,
         teacherId: filters.teacherId,
         sort: filters.sort,
         page: filters.page,
@@ -201,7 +207,10 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
         filters.year.forEach((v) => params.append('year', v));
         filters.language.forEach((v) => params.append('language', v));
         if (filters.hasCorrection) params.set('hasCorrection', '1');
-        if (filters.category && filters.category !== 'all') params.set('category', filters.category);
+        if (filters.collegePilote) params.set('collegePilote', '1');
+        if (filters.collegeOrdinaire) params.set('collegeOrdinaire', '1');
+        if (filters.lyceePilote) params.set('lyceePilote', '1');
+        if (filters.lyceeOrdinaire) params.set('lyceeOrdinaire', '1');
         if (filters.teacherId) params.set('teacherId', filters.teacherId);
         params.set('sort', filters.sort);
         params.set('page', String(filters.page));
@@ -250,7 +259,10 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
         year: [],
         language: [],
         hasCorrection: false,
-        category: 'all',
+        collegePilote: false,
+        collegeOrdinaire: false,
+        lyceePilote: false,
+        lyceeOrdinaire: false,
         teacherId: '',
         sort: 'recent',
         page: 1,
@@ -278,7 +290,10 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
     filters.year.length +
     filters.language.length +
     (filters.hasCorrection ? 1 : 0) +
-    (filters.category !== 'all' ? 1 : 0);
+    (filters.collegePilote ? 1 : 0) +
+    (filters.collegeOrdinaire ? 1 : 0) +
+    (filters.lyceePilote ? 1 : 0) +
+    (filters.lyceeOrdinaire ? 1 : 0);
 
   // ============== FACET OPTIONS (only those with count > 0) ==============
   const yearOptions = useMemo(
@@ -507,57 +522,59 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
             </div>
           )}
 
-          {/* ----- CATÉGORIE (collège/lycée × pilote/ordinaire) ----- */}
-          <div className="mt-3">
+          {/* ----- CATÉGORIE (collège/lycée × pilote/ordinaire) — 4 Switches combinables ----- */}
+          <div className="mt-4 pt-3 border-t border-slate-200">
             <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
               Catégorie
             </div>
-            <div className="space-y-1.5">
-              <CategoryOption
+            <div className="space-y-2">
+              <CategorySwitch
                 icon="🎓"
                 label="Collège pilote"
-                sub="7-9ème année · école pilote"
                 count={data.facets.collegePilote}
-                active={filters.category === 'college-pilote'}
+                active={filters.collegePilote}
                 color="fuchsia"
-                onClick={() =>
-                  update({ category: filters.category === 'college-pilote' ? 'all' : 'college-pilote' })
-                }
+                onToggle={() => update({ collegePilote: !filters.collegePilote })}
               />
-              <CategoryOption
+              <CategorySwitch
                 icon="🏫"
                 label="Collège ordinaire"
-                sub="7-9ème année · école standard"
                 count={data.facets.collegeOrdinaire}
-                active={filters.category === 'college-ordinaire'}
+                active={filters.collegeOrdinaire}
                 color="emerald"
-                onClick={() =>
-                  update({ category: filters.category === 'college-ordinaire' ? 'all' : 'college-ordinaire' })
-                }
+                onToggle={() => update({ collegeOrdinaire: !filters.collegeOrdinaire })}
               />
-              <CategoryOption
+              <CategorySwitch
                 icon="🎓"
                 label="Lycée pilote"
-                sub="1-4ème année · école pilote"
                 count={data.facets.lyceePilote}
-                active={filters.category === 'lycee-pilote'}
+                active={filters.lyceePilote}
                 color="fuchsia"
-                onClick={() =>
-                  update({ category: filters.category === 'lycee-pilote' ? 'all' : 'lycee-pilote' })
-                }
+                onToggle={() => update({ lyceePilote: !filters.lyceePilote })}
               />
-              <CategoryOption
+              <CategorySwitch
                 icon="🏫"
                 label="Lycée ordinaire"
-                sub="1-4ème année · école standard"
                 count={data.facets.lyceeOrdinaire}
-                active={filters.category === 'lycee-ordinaire'}
+                active={filters.lyceeOrdinaire}
                 color="emerald"
-                onClick={() =>
-                  update({ category: filters.category === 'lycee-ordinaire' ? 'all' : 'lycee-ordinaire' })
-                }
+                onToggle={() => update({ lyceeOrdinaire: !filters.lyceeOrdinaire })}
               />
             </div>
+            {(filters.collegePilote ||
+              filters.collegeOrdinaire ||
+              filters.lyceePilote ||
+              filters.lyceeOrdinaire) && (
+              <div className="text-[11px] text-slate-500 mt-2 ml-1">
+                {(
+                  (filters.collegePilote ? data.facets.collegePilote : 0) +
+                  (filters.collegeOrdinaire ? data.facets.collegeOrdinaire : 0) +
+                  (filters.lyceePilote ? data.facets.lyceePilote : 0) +
+                  (filters.lyceeOrdinaire ? data.facets.lyceeOrdinaire : 0)
+                ).toLocaleString('fr-FR')}{' '}
+                ressources dans les catégories sélectionnées
+              </div>
+            )}
           </div>
         </div>
       </aside>
@@ -707,45 +724,44 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
   );
 }
 
-// ============== CATEGORY OPTION (single-select) ==============
-function CategoryOption({
+// ============== CATEGORY SWITCH (multi-select, like hasCorrection) ==============
+function CategorySwitch({
   icon,
   label,
-  sub,
   count,
   active,
   color,
-  onClick,
+  onToggle,
 }: {
   icon: string;
   label: string;
-  sub: string;
   count: number;
   active: boolean;
   color: 'fuchsia' | 'emerald';
-  onClick: () => void;
+  onToggle: () => void;
 }) {
   const activeClasses = color === 'fuchsia'
-    ? 'bg-fuchsia-50 border-fuchsia-300 ring-1 ring-fuchsia-200'
-    : 'bg-emerald-50 border-emerald-300 ring-1 ring-emerald-200';
-  const inactiveClasses = 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50';
-  const activeText = color === 'fuchsia' ? 'text-fuchsia-700' : 'text-emerald-700';
+    ? 'bg-fuchsia-50 border-fuchsia-200 text-fuchsia-700'
+    : 'bg-emerald-50 border-emerald-200 text-emerald-700';
+  const inactiveClasses = 'bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-300';
+  const switchActive = color === 'fuchsia' ? 'bg-fuchsia-500' : 'bg-emerald-500';
   return (
     <button
-      onClick={onClick}
-      className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg border text-sm transition ${active ? activeClasses : inactiveClasses}`}
+      onClick={onToggle}
+      className={`w-full flex items-center justify-between px-3 py-2 rounded-lg border text-sm transition ${active ? activeClasses : inactiveClasses}`}
       aria-pressed={active}
     >
       <span className="flex items-center gap-2 min-w-0">
         <span className="text-base shrink-0">{icon}</span>
-        <span className="min-w-0 text-left">
-          <span className={`block font-semibold ${active ? activeText : 'text-slate-700'}`}>{label}</span>
-          <span className="block text-[10px] text-slate-500 truncate">{sub}</span>
-        </span>
+        <span className="font-semibold truncate">{label}</span>
       </span>
-      <span className={`text-[11px] tabular-nums shrink-0 ml-2 ${active ? activeText : 'text-slate-500'}`}>
-        {count.toLocaleString('fr-FR')}
-      </span>
+      <Switch.Root
+        checked={active}
+        onCheckedChange={onToggle}
+        className={`w-9 h-5 rounded-full relative transition ${active ? switchActive : 'bg-slate-300'}`}
+      >
+        <Switch.Thumb className="block w-4 h-4 bg-white rounded-full shadow transition-transform translate-x-0.5 data-[state=checked]:translate-x-[18px]" />
+      </Switch.Root>
     </button>
   );
 }
@@ -954,24 +970,36 @@ function ActiveFilterChips({
       color: 'bg-emerald-100 text-emerald-700',
     });
   }
-  if (filters.category !== 'all') {
-    const labels: Record<string, string> = {
-      'college-pilote': 'Collège pilote',
-      'college-ordinaire': 'Collège ordinaire',
-      'lycee-pilote': 'Lycée pilote',
-      'lycee-ordinaire': 'Lycée ordinaire',
-    };
-    const colors: Record<string, string> = {
-      'college-pilote': 'bg-fuchsia-100 text-fuchsia-700',
-      'college-ordinaire': 'bg-emerald-100 text-emerald-700',
-      'lycee-pilote': 'bg-fuchsia-100 text-fuchsia-700',
-      'lycee-ordinaire': 'bg-emerald-100 text-emerald-700',
-    };
+  if (filters.collegePilote) {
     chips.push({
-      key: 'category',
-      label: labels[filters.category] || filters.category,
-      onRemove: () => onRemove({ category: 'all' }),
-      color: colors[filters.category] || 'bg-slate-100 text-slate-700',
+      key: 'collegePilote',
+      label: 'Collège pilote',
+      onRemove: () => onRemove({ collegePilote: false }),
+      color: 'bg-fuchsia-100 text-fuchsia-700',
+    });
+  }
+  if (filters.collegeOrdinaire) {
+    chips.push({
+      key: 'collegeOrdinaire',
+      label: 'Collège ordinaire',
+      onRemove: () => onRemove({ collegeOrdinaire: false }),
+      color: 'bg-emerald-100 text-emerald-700',
+    });
+  }
+  if (filters.lyceePilote) {
+    chips.push({
+      key: 'lyceePilote',
+      label: 'Lycée pilote',
+      onRemove: () => onRemove({ lyceePilote: false }),
+      color: 'bg-fuchsia-100 text-fuchsia-700',
+    });
+  }
+  if (filters.lyceeOrdinaire) {
+    chips.push({
+      key: 'lyceeOrdinaire',
+      label: 'Lycée ordinaire',
+      onRemove: () => onRemove({ lyceeOrdinaire: false }),
+      color: 'bg-emerald-100 text-emerald-700',
     });
   }
 
