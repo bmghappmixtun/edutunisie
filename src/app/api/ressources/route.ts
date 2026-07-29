@@ -49,34 +49,22 @@ function buildWhere(
   if (!exclude.includes('teacherId') && filters.teacherId) {
     where.teacherId = filters.teacherId;
   }
-  // 4 boolean filters — combinable (e.g. collegePilote + lyceePilote = all pilote)
+  // 4 boolean category filters — combinable via OR (e.g. collegePilote+lyceePilote = all pilote)
+  const categoryConditions: any[] = [];
   if (!exclude.includes('collegePilote') && filters.collegePilote) {
-    where.AND = where.AND || [];
-    (where.AND as any[]).push({
-      class: { level: { slug: 'college' } },
-      schoolType: 'PILOTE',
-    });
+    categoryConditions.push({ class: { level: { slug: 'college' } }, schoolType: 'PILOTE' });
   }
   if (!exclude.includes('collegeOrdinaire') && filters.collegeOrdinaire) {
-    where.AND = where.AND || [];
-    (where.AND as any[]).push({
-      class: { level: { slug: 'college' } },
-      schoolType: { not: 'PILOTE' },
-    });
+    categoryConditions.push({ class: { level: { slug: 'college' } }, NOT: { schoolType: 'PILOTE' } });
   }
   if (!exclude.includes('lyceePilote') && filters.lyceePilote) {
-    where.AND = where.AND || [];
-    (where.AND as any[]).push({
-      class: { level: { slug: 'lycee' } },
-      schoolType: 'PILOTE',
-    });
+    categoryConditions.push({ class: { level: { slug: 'lycee' } }, schoolType: 'PILOTE' });
   }
   if (!exclude.includes('lyceeOrdinaire') && filters.lyceeOrdinaire) {
-    where.AND = where.AND || [];
-    (where.AND as any[]).push({
-      class: { level: { slug: 'lycee' } },
-      schoolType: { not: 'PILOTE' },
-    });
+    categoryConditions.push({ class: { level: { slug: 'lycee' } }, NOT: { schoolType: 'PILOTE' } });
+  }
+  if (categoryConditions.length > 0) {
+    where.OR = categoryConditions;
   }
 
   return where;
@@ -169,33 +157,21 @@ export async function GET(req: NextRequest) {
   if (filters.year.length > 0) facetBase.year = { in: filters.year };
   if (filters.language.length > 0) facetBase.language = { in: filters.language };
   if (filters.hasCorrection) facetBase.hasCorrection = true;
+  const facetCategoryConditions: any[] = [];
   if (filters.collegePilote) {
-    facetBase.AND = facetBase.AND || [];
-    (facetBase.AND as any[]).push({
-      class: { level: { slug: 'college' } },
-      schoolType: 'PILOTE',
-    });
+    facetCategoryConditions.push({ class: { level: { slug: 'college' } }, schoolType: 'PILOTE' });
   }
   if (filters.collegeOrdinaire) {
-    facetBase.AND = facetBase.AND || [];
-    (facetBase.AND as any[]).push({
-      class: { level: { slug: 'college' } },
-      schoolType: { not: 'PILOTE' },
-    });
+    facetCategoryConditions.push({ class: { level: { slug: 'college' } }, NOT: { schoolType: 'PILOTE' } });
   }
   if (filters.lyceePilote) {
-    facetBase.AND = facetBase.AND || [];
-    (facetBase.AND as any[]).push({
-      class: { level: { slug: 'lycee' } },
-      schoolType: 'PILOTE',
-    });
+    facetCategoryConditions.push({ class: { level: { slug: 'lycee' } }, schoolType: 'PILOTE' });
   }
   if (filters.lyceeOrdinaire) {
-    facetBase.AND = facetBase.AND || [];
-    (facetBase.AND as any[]).push({
-      class: { level: { slug: 'lycee' } },
-      schoolType: { not: 'PILOTE' },
-    });
+    facetCategoryConditions.push({ class: { level: { slug: 'lycee' } }, NOT: { schoolType: 'PILOTE' } });
+  }
+  if (facetCategoryConditions.length > 0) {
+    facetBase.OR = facetCategoryConditions;
   }
   if (filters.teacherId) {
     // Reuse the converted cuid from the main where clause

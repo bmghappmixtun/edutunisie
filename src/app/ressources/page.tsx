@@ -183,33 +183,22 @@ export default async function ResourcesPage(props: { searchParams: Promise<Searc
   if (year.length > 0) where.year = { in: year };
   if (language.length > 0) where.language = { in: language };
   if (hasCorrection) where.hasCorrection = true;
+  // 4 boolean category filters — combinable via OR
+  const categoryConditions: any[] = [];
   if (collegePilote) {
-    where.AND = (where.AND as any[]) || [];
-    (where.AND as any[]).push({
-      class: { level: { slug: 'college' } },
-      schoolType: 'PILOTE',
-    });
+    categoryConditions.push({ class: { level: { slug: 'college' } }, schoolType: 'PILOTE' });
   }
   if (collegeOrdinaire) {
-    where.AND = (where.AND as any[]) || [];
-    (where.AND as any[]).push({
-      class: { level: { slug: 'college' } },
-      schoolType: { not: 'PILOTE' },
-    });
+    categoryConditions.push({ class: { level: { slug: 'college' } }, NOT: { schoolType: 'PILOTE' } });
   }
   if (lyceePilote) {
-    where.AND = (where.AND as any[]) || [];
-    (where.AND as any[]).push({
-      class: { level: { slug: 'lycee' } },
-      schoolType: 'PILOTE',
-    });
+    categoryConditions.push({ class: { level: { slug: 'lycee' } }, schoolType: 'PILOTE' });
   }
   if (lyceeOrdinaire) {
-    where.AND = (where.AND as any[]) || [];
-    (where.AND as any[]).push({
-      class: { level: { slug: 'lycee' } },
-      schoolType: { not: 'PILOTE' },
-    });
+    categoryConditions.push({ class: { level: { slug: 'lycee' } }, NOT: { schoolType: 'PILOTE' } });
+  }
+  if (categoryConditions.length > 0) {
+    where.OR = categoryConditions;
   }
 
   // Look up teacher for filter + title
@@ -251,33 +240,21 @@ export default async function ResourcesPage(props: { searchParams: Promise<Searc
   if (year.length > 0) facetBase.year = { in: year };
   if (language.length > 0) facetBase.language = { in: language };
   if (hasCorrection) facetBase.hasCorrection = true;
+  const facetCategoryConditions: any[] = [];
   if (collegePilote) {
-    facetBase.AND = (facetBase.AND as any[]) || [];
-    (facetBase.AND as any[]).push({
-      class: { level: { slug: 'college' } },
-      schoolType: 'PILOTE',
-    });
+    facetCategoryConditions.push({ class: { level: { slug: 'college' } }, schoolType: 'PILOTE' });
   }
   if (collegeOrdinaire) {
-    facetBase.AND = (facetBase.AND as any[]) || [];
-    (facetBase.AND as any[]).push({
-      class: { level: { slug: 'college' } },
-      schoolType: { not: 'PILOTE' },
-    });
+    facetCategoryConditions.push({ class: { level: { slug: 'college' } }, NOT: { schoolType: 'PILOTE' } });
   }
   if (lyceePilote) {
-    facetBase.AND = (facetBase.AND as any[]) || [];
-    (facetBase.AND as any[]).push({
-      class: { level: { slug: 'lycee' } },
-      schoolType: 'PILOTE',
-    });
+    facetCategoryConditions.push({ class: { level: { slug: 'lycee' } }, schoolType: 'PILOTE' });
   }
   if (lyceeOrdinaire) {
-    facetBase.AND = (facetBase.AND as any[]) || [];
-    (facetBase.AND as any[]).push({
-      class: { level: { slug: 'lycee' } },
-      schoolType: { not: 'PILOTE' },
-    });
+    facetCategoryConditions.push({ class: { level: { slug: 'lycee' } }, NOT: { schoolType: 'PILOTE' } });
+  }
+  if (facetCategoryConditions.length > 0) {
+    facetBase.OR = facetCategoryConditions;
   }
   if (teacherNumericId) {
     const teacher = await prisma.user.findUnique({
