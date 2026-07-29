@@ -27,11 +27,43 @@ const nextConfig = {
   // جهاد قفشين) whose 23 resources actually belong to the real Faouzi at
   // numericId 228 (AR name فوزي الغربي). User deleted, 23 resources migrated.
   // Permanent 308 redirect preserves SEO for any old external links.
+  //
+  // 2026-07-29 (audit prof 434): 5 resources for Amara Hichem had
+  // schoolType=PILOTE wrongly. PDF content shows the school is "م. الهادي
+  // العامري" (or variants — regular college in Kalaa Sghira, not النموذجية).
+  // schoolType set to PUBLIC + title cleaned to remove "Collège pilote".
+  // Slug changed accordingly. Old slugs redirected to the new canonical URL.
   async redirects() {
     return [
       {
         source: '/professeurs/19/:slug*',
         destination: '/professeurs/228/faouzi-el-gharbi',
+        permanent: true,
+      },
+      // 5 resources schoolType PILOTE → PUBLIC: preserve old slug for SEO
+      {
+        source: '/ressources/1348/devoir-de-synthese-n-2-college-pilote-physique-8eme',
+        destination: '/ressources/1348/devoir-de-synthese-n-2-physique-8eme',
+        permanent: true,
+      },
+      {
+        source: '/ressources/1351/devoir-de-synthese-n-2-college-pilote-physique-8eme',
+        destination: '/ressources/1351/devoir-de-synthese-n-2-physique-8eme',
+        permanent: true,
+      },
+      {
+        source: '/ressources/1353/devoir-de-synthese-n-2-college-pilote-physique-9eme',
+        destination: '/ressources/1353/devoir-de-synthese-n-2-physique-9eme',
+        permanent: true,
+      },
+      {
+        source: '/ressources/1876/devoir-de-synthese-n-1-college-pilote-physique-8eme',
+        destination: '/ressources/1876/devoir-de-synthese-n-1-physique-8eme',
+        permanent: true,
+      },
+      {
+        source: '/ressources/3038/devoir-de-synthese-n-1-college-pilote-physique-9eme',
+        destination: '/ressources/3038/devoir-de-synthese-n-1-physique-9eme',
         permanent: true,
       },
     ];
