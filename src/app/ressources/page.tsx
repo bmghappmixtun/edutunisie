@@ -97,6 +97,7 @@ interface SearchParams {
   year?: string | string[];
   language?: string | string[];
   hasCorrection?: string;
+  category?: string;
   teacherId?: string;
   sort?: string;
   page?: string;
@@ -154,6 +155,12 @@ export default async function ResourcesPage(props: { searchParams: Promise<Searc
   const year = toArr(sp.year);
   const language = toArr(sp.language);
   const hasCorrection = sp.hasCorrection === '1';
+  const category = (sp.category || 'all') as
+    | 'all'
+    | 'college-pilote'
+    | 'college-ordinaire'
+    | 'lycee-pilote'
+    | 'lycee-ordinaire';
   const teacherNumericId = sp.teacherId ? parseInt(sp.teacherId, 10) : null;
   const sort = sp.sort || 'recent';
   const page = Math.max(1, parseInt(sp.page || '1'));
@@ -175,6 +182,19 @@ export default async function ResourcesPage(props: { searchParams: Promise<Searc
   if (year.length > 0) where.year = { in: year };
   if (language.length > 0) where.language = { in: language };
   if (hasCorrection) where.hasCorrection = true;
+  if (category && category !== 'all') {
+    const [level, schoolType] = category.split('-');
+    if (level === 'college') {
+      where.class = { level: { slug: 'college' } };
+    } else if (level === 'lycee') {
+      where.class = { level: { slug: 'lycee' } };
+    }
+    if (schoolType === 'pilote') {
+      where.schoolType = 'PILOTE';
+    } else if (schoolType === 'ordinaire') {
+      where.schoolType = { not: 'PILOTE' };
+    }
+  }
 
   // Look up teacher for filter + title
   let teacherInfo: { firstName: string | null; lastName: string | null; numericId: number } | null =
@@ -215,6 +235,19 @@ export default async function ResourcesPage(props: { searchParams: Promise<Searc
   if (year.length > 0) facetBase.year = { in: year };
   if (language.length > 0) facetBase.language = { in: language };
   if (hasCorrection) facetBase.hasCorrection = true;
+  if (category && category !== 'all') {
+    const [level, schoolType] = category.split('-');
+    if (level === 'college') {
+      facetBase.class = { level: { slug: 'college' } };
+    } else if (level === 'lycee') {
+      facetBase.class = { level: { slug: 'lycee' } };
+    }
+    if (schoolType === 'pilote') {
+      facetBase.schoolType = 'PILOTE';
+    } else if (schoolType === 'ordinaire') {
+      facetBase.schoolType = { not: 'PILOTE' };
+    }
+  }
   if (teacherNumericId) {
     const teacher = await prisma.user.findUnique({
       where: { numericId: teacherNumericId },
@@ -233,6 +266,10 @@ export default async function ResourcesPage(props: { searchParams: Promise<Searc
     byYear,
     byLanguage,
     withCorrectionCount,
+    collegePiloteCount,
+    collegeOrdinaireCount,
+    lyceePiloteCount,
+    lyceeOrdinaireCount,
     currentUser,
   ] = await Promise.all([
     prisma.resource.findMany({
@@ -281,6 +318,10 @@ export default async function ResourcesPage(props: { searchParams: Promise<Searc
       _count: { _all: true },
     }),
     prisma.resource.count({ where: { ...where, hasCorrection: true } }),
+    prisma.resource.count({ where: { ...where, class: { level: { slug: 'college' } }, schoolType: 'PILOTE' } }),
+    prisma.resource.count({ where: { ...where, class: { level: { slug: 'college' } }, schoolType: { not: 'PILOTE' } } }),
+    prisma.resource.count({ where: { ...where, class: { level: { slug: 'lycee' } }, schoolType: 'PILOTE' } }),
+    prisma.resource.count({ where: { ...where, class: { level: { slug: 'lycee' } }, schoolType: { not: 'PILOTE' } } }),
     getCurrentUser(),
   ]);
 
@@ -396,6 +437,10 @@ export default async function ResourcesPage(props: { searchParams: Promise<Searc
     bySection: bySectionMap,
     bySubject: bySubjectMap,
     withCorrection: withCorrectionCount,
+    collegePilote: collegePiloteCount,
+    collegeOrdinaire: collegeOrdinaireCount,
+    lyceePilote: lyceePiloteCount,
+    lyceeOrdinaire: lyceeOrdinaireCount,
   };
 
   // ============== Favorites (if logged) + min loading time ==============
