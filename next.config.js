@@ -30,13 +30,6 @@ const nextConfig = {
       '@radix-ui/react-switch',
       '@radix-ui/react-toggle-group',
     ],
-    // 2026-07-30: Enable filesystem cache for both dev and build.
-    // Saves Turbopack/SWC state between builds. Requires Next.js 14.0+,
-    // fully stable in 14.2+. Cuts incremental rebuild time.
-    turbopackFileSystemCacheForDev: true,
-    // 2026-07-30: Turbopack FS cache for production builds (when Turbopack
-    // is enabled). For Webpack builds (current), SWC cache is the equivalent.
-    turbopackFileSystemCacheForBuild: true,
   },
   // 2026-07-29: numericId 19 was a corrupted "Faouzi El Gharbi" (with AR name
   // جهاد قفشين) whose 23 resources actually belong to the real Faouzi at

@@ -149,7 +149,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
             </div>
           }
         >
-          {/* @ts-expect-error Async server component */}
+          {/* Async server component — Next.js 14 streaming pattern */}
           <SearchResultsAsync params={params} />
         </Suspense>
       </main>
