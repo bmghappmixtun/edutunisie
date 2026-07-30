@@ -462,12 +462,12 @@ export default async function ResourcePage({
                         <div
                           dir={sysAr ? 'rtl' : 'ltr'}
                           lang="ar"
-                          className={`flex ${sysAr ? 'justify-end' : 'justify-start'} mb-4`}
+                          className="mb-4 flex"
                         >
                           <span
                             dir={sysAr ? 'rtl' : 'ltr'}
                             lang="ar"
-                            className={`inline-block px-3 py-1.5 rounded-lg border-2 border-emerald-400 bg-emerald-50 text-sm font-semibold text-emerald-900 font-arabic-title ${sysAr ? 'text-right' : 'text-left'}`}
+                            className={`ml-auto inline-block px-3 py-1.5 rounded-lg border-2 border-emerald-400 bg-emerald-50 text-sm font-semibold text-emerald-900 font-arabic-title ${sysAr ? 'text-right' : 'text-left'}`}
                           >
                             <span className="text-emerald-700">اسم المنتج: </span>
                             <span className="font-bold">{sys}</span>
