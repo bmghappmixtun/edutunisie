@@ -5,8 +5,11 @@ import { getCurrentUser } from '@/lib/auth';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import ResourceActions from '@/components/resources/ResourceActions';
-import nextDynamic from 'next/dynamic';
-const PDFViewer = nextDynamic(() => import('@/components/resources/PDFViewer'), { ssr: false });
+// PDFViewer is lazy-loaded via LazyPDFViewer (~90 KB gzipped saved on initial
+// load). The full react-pdf + pdfjs-dist bundle was the biggest chunk on the
+// resource page (2026-07-30 audit). See src/components/resources/LazyPDFViewer.tsx
+// for rationale.
+import LazyPDFViewer from '@/components/resources/LazyPDFViewer';
 import RatingSection from '@/components/resources/RatingSection';
 import CommentsSection from '@/components/resources/CommentsSection';
 import ResourceInfoPanel from '@/components/resources/ResourceInfoPanel';
@@ -16,6 +19,14 @@ import { getPaletteForSubject } from '@/lib/ai-palettes';
 import { formatNumber, RESOURCE_TYPE_LABELS, HOMEWORK_SUBTYPE_LABELS, timeAgo } from '@/lib/utils';
 import { isArabic, splitArabicSubject } from '@/lib/text-utils';
 import { courseSchema, breadcrumbSchema } from '@/lib/structured-data';
+
+// Tiny helper for the PDF viewer placeholder file-size label.
+function humanFileSize(bytes: number): string {
+  if (!bytes || bytes < 0) return '';
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+  return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+}
 import {
   Eye,
   Download,
@@ -733,9 +744,11 @@ export default async function ResourcePage({
                   </Link>
                 </div>
                 <div className="p-0">
-                  <PDFViewer
+                  <LazyPDFViewer
                     url={`/api/resources/${resource.id}/download`}
                     fileName={`${resource.title}.pdf`}
+                    pageCount={resource.pageCount ?? null}
+                    fileSize={resource.fileSize ? humanFileSize(resource.fileSize) : null}
                   />
                 </div>
               </div>
