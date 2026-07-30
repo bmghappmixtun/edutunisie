@@ -69,9 +69,12 @@ export default function AiContentSection({
         aria-expanded={isOpen}
         aria-label={`${isOpen ? 'Réduire' : 'Développer'} ${title}`}
       >
-        <div className={`text-xs font-bold ${titleColor} uppercase tracking-wide flex items-center gap-2`}>
+        <div
+          className={`text-xs font-bold ${titleColor} uppercase tracking-wide flex items-center gap-2 font-arabic-title`}
+          dir="auto"
+        >
           {icon}
-          <span>{title}</span>
+          <span className="text-inherit">{title}</span>
           {badge && (
             <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-slate-800 text-white text-[10px] font-bold rounded-full uppercase">
               {badge}

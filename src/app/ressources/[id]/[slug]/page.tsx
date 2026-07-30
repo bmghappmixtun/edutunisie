@@ -599,15 +599,23 @@ export default async function ResourcePage({
                       {resource.metadata.keyPoints.slice(0, 5).map((kp, i) => {
                         const kpAr = isArabic(kp);
                         const colorClass = palette[i % palette.length];
+                        // Per user rule (2026-07-30): make key points clickable,
+                        // they trigger a search query for the same concept.
+                        // Use the resource's subject/class to narrow results.
+                        const searchQuery = kpAr
+                          ? encodeURIComponent(kp)
+                          : encodeURIComponent(kp);
+                        const searchHref = `/recherche?q=${searchQuery}`;
                         return (
-                        <span
+                        <Link
                           key={i}
+                          href={searchHref}
                           dir={kpAr ? 'rtl' : 'ltr'}
                           lang={kpAr ? 'ar' : 'fr'}
-                          className={`inline-block px-3 py-1.5 rounded-full text-sm font-semibold border font-arabic-title ${kpAr ? 'text-right' : 'text-left'} ${colorClass}`}
+                          className={`inline-block px-3 py-1.5 rounded-full text-sm font-semibold border font-arabic-title ${kpAr ? 'text-right' : 'text-left'} ${colorClass} hover:brightness-110 hover:shadow-sm hover:scale-[1.03] transition-all cursor-pointer`}
                         >
                           {kp}
-                        </span>
+                        </Link>
                         );
                       })}
                     </div>
