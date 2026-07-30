@@ -232,6 +232,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <link rel="alternate" hrefLang="fr-TN" href={SITE_URL} />
         <link rel="alternate" hrefLang="ar-TN" href={`${SITE_URL}/ar`} />
         <link rel="alternate" hrefLang="x-default" href={SITE_URL} />
+        {/* 2026-07-30: preconnect to Vercel Blob storage (PDFs) so the TCP
+            + TLS handshake happens in parallel with HTML/CSS/JS parsing.
+            Saves ~100-200ms on first PDF download / preview thumbnail. */}
+        <link rel="preconnect" href="https://kmy1h6us8l7bg7bg.public.blob.vercel-storage.com" crossOrigin="anonymous" />
+        {/* 2026-07-30: preconnect to Google Analytics to avoid late DNS/TLS
+            on first interaction (improves INP by ~30-50ms). */}
+        <link rel="preconnect" href="https://www.google-analytics.com" />
+        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
       </head>
       <body className="font-sans">
         <NuqsAdapter>
