@@ -161,18 +161,22 @@ Return ONLY a JSON array of strings (no other text, no markdown):
 
 
 def update_keypoints(rid: str, new_points: list[str]) -> bool:
-    """Update ResourceMetadata.keyPoints via Neon HTTP (PostgreSQL array)."""
+    """Update ResourceMetadata.keyPoints via Neon HTTP (PostgreSQL text[])."""
     # PostgreSQL text array literal: '{"a", "b", "c"}'
+    # The whole array is wrapped in single quotes; inner strings are double-quoted.
+    # Escape backslashes and double-quotes inside each string.
     def escape(s: str) -> str:
-        return s.replace('\\', '\\\\').replace('"', '\\"')
-    arr = '"{' + ', '.join(f'"{escape(p)}"' for p in new_points) + '}"'
+        return s.replace('\\', '\\\\').replace('"', '\\"').replace("'", "\\'")
+    inner = ', '.join(f'"{escape(p)}"' for p in new_points)
+    arr_lit = f"'{{{inner}}}'"  # '{"a", "b", "c"}'
     sql = f'''UPDATE "ResourceMetadata"
-              SET "keyPoints" = {arr}::text[],
+              SET "keyPoints" = {arr_lit}::text[],
                   "extractedAt" = NOW()
-              WHERE "resourceId" = \'{rid}\''''
+              WHERE "resourceId" = '{rid}\''''
     r = m.neon_query(sql)
     # Check for errors
     if isinstance(r, dict) and r.get('error'):
+        print(f"  DB err: {r.get('error')[:200]}")
         return False
     return True
 
