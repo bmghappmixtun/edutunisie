@@ -452,12 +452,18 @@ export default async function ResourcesPage(props: { searchParams: Promise<Searc
   };
 
   // ============== Favorites (if logged) + min loading time ==============
+  // Convert the favorites Set to a plain string[] before passing across the
+  // RSC boundary to <FilterShell> (a client component). Sets serialize
+  // unreliably across RSC and can deserialise as `{}` on the client, which
+  // breaks `favorites.has(r.id)` and triggers React #418 / #422 hydration
+  // errors. Arrays are safe to serialize.
   const [favoriteIds] = await Promise.all([
     currentUser
       ? getUserFavorites(resources.map((r) => r.id))
       : Promise.resolve(new Set<string>()),
     minLoadingTimer,  // ensure loading state visible for at least 600ms
   ]);
+  const favoriteIdsArray = Array.from(favoriteIds);
 
   // ============== JSON-LD ==============
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
@@ -543,7 +549,7 @@ export default async function ResourcesPage(props: { searchParams: Promise<Searc
               },
             }}
             userId={currentUser?.id ?? null}
-            initialFavorites={favoriteIds}
+            initialFavorites={favoriteIdsArray}
           />
         </div>
       </main>

@@ -45,7 +45,26 @@ export type { Facets } from '@/lib/facets';
 interface FilterShellProps {
   initialData: RessourcesResponse;
   userId: string | null;
-  initialFavorites: Set<string>;
+  /**
+   * Array (NOT Set) of resource IDs the current user has favorited.
+   *
+   * Why string[] instead of Set<string>:
+   *   The previous version took a `Set<string>` directly. The set was built
+   *   on the server (`getUserFavorites()`) and passed across the RSC
+   *   boundary into this client component. While the RSC payload format
+   *   supports `Set` in theory, in practice the deserialized value on
+   *   the client could be a plain `{}` object for empty sets, which made
+   *   `favorites.has(r.id)` throw `TypeError: favorites.has is not a function`
+   *   during the first client render. That error fired inside the resource
+   *   list render and surfaced as React #418 / #422 (Minified React errors
+   *   for hydration mismatch) on /ressources and /ar/ressources?teacherId=*
+   *   (ERR-FDLWSW, ERR-9NC4YW, ERR-PMURPC, ERR-VSZUDD in the 2026-07-30
+   *   nightly digest — 12 events).
+   *
+   *   Arrays serialize trivially over RSC. We convert to a Set on the
+   *   client for O(1) `has()` lookups in the resources list.
+   */
+  initialFavorites: string[];
 }
 
 type ApiResponse = FilterShellProps['initialData'];
@@ -137,7 +156,10 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
 
   // ============== DATA (server initial → client-refetched) ==============
   const [data, setData] = useState<ApiResponse>(initialData);
-  const [favorites] = useState<Set<string>>(initialFavorites);
+  // Convert the array prop to a Set once on mount for O(1) `has()` lookups.
+  // We keep the source-of-truth as the array prop (safe across RSC) and
+  // memoize the Set so it doesn't rebuild on every render.
+  const favorites = useMemo(() => new Set(initialFavorites), [initialFavorites]);
   const [isFetching, setIsFetching] = useState(false);
   const lastFetchKey = useRef<string>('');
 
