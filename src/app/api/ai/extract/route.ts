@@ -16,6 +16,7 @@ import { tmpdir } from 'os';
 
 const execAsync = promisify(exec);
 
+export const runtime = 'nodejs'; // Required for child_process, fs
 export const maxDuration = 60; // Vercel max for hobby plan
 
 const PROXY_BASE = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
