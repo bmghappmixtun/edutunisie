@@ -428,6 +428,13 @@ export default async function ResourcePage({
                 {(() => {
                   const { fr, ar } = splitArabicSubject(resource.title);
                   const gs = (resource.metadata?.generalSubject || '').trim();
+                  // Per user rule (2026-07-30): the green cadre used to show
+                  // "الموضوع العام: X" but that's already in the title. Now it
+                  // shows the AI-extracted system name with the new AR label
+                  // "اسم المنتج" (Product Name) — the old standalone "Système
+                  // étudié" card was deleted; its content moved here.
+                  const sys = (resource.metadata?.systemName || '').trim();
+                  const sysAr = isArabic(sys);
                   return (
                     <>
                       <h1
@@ -446,12 +453,21 @@ export default async function ResourcePage({
                           {ar}
                         </div>
                       )}
-                      {/* SEO: surface the AI-extracted general subject as a
-                          semantic <h2> right under the title. This is the
-                          strongest long-tail signal on the page and gives
-                          Google a clear topic anchor (also picked up by
-                          screen readers and voice search). */}
-                      {gs && (
+                      {/* Green cadre: shows the AI-extracted system name with
+                          the new AR label "اسم المنتج" (Product Name) for
+                          Technologie. Falls back to general subject display
+                          for backward compatibility (e.g. when systemName is
+                          not yet populated). */}
+                      {sys ? (
+                        <div
+                          dir={sysAr ? 'rtl' : 'ltr'}
+                          lang="ar"
+                          className={`inline-block px-3 py-1.5 rounded-lg border-2 border-emerald-400 bg-emerald-50 text-sm font-semibold text-emerald-900 ${sysAr ? 'text-right' : 'text-left'}`}
+                        >
+                          <span className="text-emerald-700">اسم المنتج: </span>
+                          <span className="font-bold">{sys}</span>
+                        </div>
+                      ) : gs ? (
                         <h2
                           dir="auto"
                           lang={isArabic(gs) ? 'ar' : 'fr'}
@@ -460,7 +476,7 @@ export default async function ResourcePage({
                           {isArabic(gs) ? 'الموضوع العام: ' : 'Sujet : '}
                           <span className="text-slate-700">{gs}</span>
                         </h2>
-                      )}
+                      ) : null}
                     </>
                   );
                 })()}
@@ -478,40 +494,34 @@ export default async function ResourcePage({
                   </div>
                 )}
 
-                {/* AI-extracted content (2026-07-20 Mavis pipeline) */}
-                {resource.metadata && (resource.metadata.systemName || resource.metadata.dossierTechnique) && (() => {
-                  const systemAr = isArabic(resource.metadata.systemName || '') || isArabic(resource.metadata.dossierTechnique || '');
+                {/* AI-extracted content (2026-07-20 Mavis pipeline)
+                    Per user rule (2026-07-30): the standalone "Système étudié" card
+                    was DELETED. The system name now lives in the green cadre at
+                    the top with the new AR label "اسم المنتج" (Product Name).
+                    Keeping the dossierTechnique here as a separate section
+                    because it's a different piece of info. */}
+                {resource.metadata?.dossierTechnique && (() => {
+                  const dtAr = isArabic(resource.metadata.dossierTechnique || '');
                   return (
                   <AiContentSection
-                    title="Système étudié"
+                    title="Dossier technique"
                     icon={<Wrench className="w-4 h-4" />}
                     variant="system"
                     subjectSlug={resource.subject?.slug}
                     defaultOpen={false}
                   >
-                    {resource.metadata.systemName && (
-                      <div
-                        className={`text-xl font-extrabold text-orange-900 mb-1 ${systemAr ? 'text-right' : 'text-left'}`}
-                        dir={systemAr ? 'rtl' : 'ltr'}
-                        lang={systemAr ? 'ar' : 'fr'}
-                      >
-                        {resource.metadata.systemName}
-                      </div>
-                    )}
-                    {resource.metadata.dossierTechnique && (
-                      <div
-                        className={`text-sm text-orange-900 ${systemAr ? 'text-right' : 'text-left'}`}
-                        dir={systemAr ? 'rtl' : 'ltr'}
-                        lang={systemAr ? 'ar' : 'fr'}
-                      >
-                        <span className="font-semibold">Dossier technique :</span> {resource.metadata.dossierTechnique}
-                      </div>
-                    )}
+                    <div
+                      className={`text-sm text-orange-900 ${dtAr ? 'text-right' : 'text-left'}`}
+                      dir={dtAr ? 'rtl' : 'ltr'}
+                      lang={dtAr ? 'ar' : 'fr'}
+                    >
+                      <span className="font-semibold">Dossier technique :</span> {resource.metadata.dossierTechnique}
+                    </div>
                   </AiContentSection>
                   );
                 })()}
 
-                {/* AI-generated summary — render via AiDescription for the structured grid card.
+                                {/* AI-generated summary — render via AiDescription for the structured grid card.
                     The general subject (الموضوع العام) is integrated inside the card
                     as a labeled field with a Tag icon. */}
                 {resource.aiSummary?.summary && (() => {
@@ -555,32 +565,46 @@ export default async function ResourcePage({
                   );
                 })()}
 
-                {/* AI key points */}
+                {/* AI key points — Per user rule (2026-07-30):
+                    - Title: "النقاط الرئيسية" (was "Points clés" in FR)
+                    - Display: multi-color rounded bubbles instead of a bullet list
+                    - Per-subject palette: rose/fuchsia/teal/amber/violet
+                    - Auto-detect AR for RTL alignment */}
                 {resource.metadata?.keyPoints && resource.metadata.keyPoints.length > 0 && (() => {
                   // Check if any key point is Arabic — if so, align all right
                   const anyAr = resource.metadata.keyPoints.some((kp) => isArabic(kp));
+                  // Multi-color palette for bubbles (5 colors cycle)
+                  const palette = [
+                    'bg-rose-100 text-rose-800 border-rose-300',
+                    'bg-fuchsia-100 text-fuchsia-800 border-fuchsia-300',
+                    'bg-teal-100 text-teal-800 border-teal-300',
+                    'bg-amber-100 text-amber-800 border-amber-300',
+                    'bg-violet-100 text-violet-800 border-violet-300',
+                  ];
                   return (
                   <AiContentSection
-                    title="Points clés"
+                    title="النقاط الرئيسية"
                     icon={<Target className="w-4 h-4" />}
                     variant="points"
                     subjectSlug={resource.subject?.slug}
                     defaultOpen={false}
                   >
-                    <ul className="space-y-1.5">
+                    <div className={`flex flex-wrap gap-2 ${anyAr ? 'justify-end' : 'justify-start'}`}>
                       {resource.metadata.keyPoints.slice(0, 5).map((kp, i) => {
                         const kpAr = isArabic(kp);
+                        const colorClass = palette[i % palette.length];
                         return (
-                        <li
+                        <span
                           key={i}
-                          className={`text-sm text-slate-700 flex items-start gap-2 ${kpAr ? 'flex-row-reverse text-right' : ''}`}
+                          dir={kpAr ? 'rtl' : 'ltr'}
+                          lang={kpAr ? 'ar' : 'fr'}
+                          className={`inline-block px-3 py-1.5 rounded-full text-sm font-semibold border ${colorClass}`}
                         >
-                          <span className={`text-fuchsia-500 mt-1`}>{kpAr ? '←' : '→'}</span>
-                          <span dir={kpAr ? 'rtl' : 'ltr'} lang={kpAr ? 'ar' : 'fr'}>{kp}</span>
-                        </li>
+                          {kp}
+                        </span>
                         );
                       })}
-                    </ul>
+                    </div>
                   </AiContentSection>
                   );
                 })()}
