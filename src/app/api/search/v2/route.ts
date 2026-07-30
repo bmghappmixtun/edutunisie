@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { searchV2 } from '@/lib/search-v2';
+import { cachedSearchV2 } from '@/lib/search-v2';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -7,7 +7,8 @@ export const runtime = 'nodejs';
 export async function GET(req: NextRequest) {
   const p = req.nextUrl.searchParams;
   try {
-    const data = await searchV2({
+    // 2026-07-30: use cachedSearchV2 to share results across users (60s TTL)
+    const data = await cachedSearchV2({
       q: p.get('q') || '',
       page: parseInt(p.get('page') || '1'),
       limit: parseInt(p.get('limit') || '20'),

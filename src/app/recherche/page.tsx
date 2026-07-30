@@ -4,7 +4,7 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import HideOnScrollSearchBar from '@/components/search/HideOnScrollSearchBar';
 import SearchResultsV2 from '@/components/search/SearchResultsV2';
-import { searchV2, SearchResponse } from '@/lib/search-v2';
+import { searchV2, SearchResponse, cachedSearchV2 } from '@/lib/search-v2';
 import { prisma } from '@/lib/prisma';
 import { getLocale } from '@/lib/i18n-server';
 
@@ -51,7 +51,9 @@ async function getInitialData(searchParams: any): Promise<{
     teacherId: searchParams.teacherId || undefined,
   };
 
-  const data = await searchV2({
+  // 2026-07-30: use cachedSearchV2 to share results across users with the same
+  // query. 60s TTL via Vercel Data Cache → repeat searches 1-2s → 10-30ms.
+  const data = await cachedSearchV2({
     q: searchParams.q || '',
     page: parseInt(searchParams.page || '1'),
     limit: 12,

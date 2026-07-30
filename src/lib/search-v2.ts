@@ -497,3 +497,61 @@ function emptyResponse(opts: {
     },
   };
 }
+
+// ============================================================================
+// Cached wrapper — 2026-07-30 page speed audit
+// ============================================================================
+// The raw searchV2 takes 1.2-2.1s for any non-empty query (FTS + TRGM +
+// facets + hydration). Caching by (q, page, limit, sort, filters) with
+// a 60s TTL drops repeat requests to ~10-30ms (Data Cache hit).
+//
+// Trade-offs:
+//   - 60s stale window: acceptable for search (data doesn't change that fast)
+//   - Per-region cache (Vercel Data Cache): users in same region share cache
+//   - No cache for empty queries (would just return emptyResponse anyway)
+import { unstable_cache } from 'next/cache';
+
+const CACHE_TTL_SECONDS = 60;
+
+/**
+ * Stable cache key for a search call. Includes all inputs that change the result.
+ * Different queries get different cache slots automatically.
+ */
+function searchKey(options: SearchOptions): string {
+  const f = options.filters || {};
+  return JSON.stringify({
+    q: (options.q || '').toLowerCase().trim(),
+    page: options.page || 1,
+    limit: options.limit || 20,
+    sort: options.sort || 'relevance',
+    subject: f.subject || [],
+    class: f.class || [],
+    section: f.section || [],
+    type: f.type || [],
+    year: f.year || [],
+    trimester: f.trimester || [],
+    language: f.language || [],
+    hasCorrection: f.hasCorrection || false,
+    teacherId: f.teacherId || '',
+  });
+}
+
+/**
+ * Cached search. Use this in page server components and API routes.
+ * Wraps the raw searchV2 with a 60s TTL keyed on all query inputs.
+ *
+ * @example
+ *   const data = await cachedSearchV2({ q: 'physique', page: 1, limit: 12, ... });
+ */
+export async function cachedSearchV2(options: SearchOptions): Promise<SearchResponse> {
+  // Empty queries return empty instantly — no need to cache
+  if (!options.q || !options.q.trim()) {
+    return searchV2(options);
+  }
+  // Use the cache: key by all inputs, revalidate after 60s
+  return unstable_cache(
+    () => searchV2(options),
+    ['search-v2', searchKey(options)],
+    { revalidate: CACHE_TTL_SECONDS, tags: ['search'] }
+  )();
+}
