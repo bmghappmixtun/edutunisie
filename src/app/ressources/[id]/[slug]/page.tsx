@@ -483,7 +483,7 @@ export default async function ResourcePage({
                   const systemAr = isArabic(resource.metadata.systemName || '') || isArabic(resource.metadata.dossierTechnique || '');
                   return (
                   <AiContentSection
-                    title="Système technique étudié"
+                    title="Système étudié"
                     icon={<Wrench className="w-4 h-4" />}
                     variant="system"
                     subjectSlug={resource.subject?.slug}
