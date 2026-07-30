@@ -1,5 +1,9 @@
 // Vercel force rebuild - real change for Vercel to detect
-'use client';
+// 2026-07-30: removed 'use client' — was forcing the entire 653-line card
+// to ship as client JS. The only client state was a hover tooltip, which
+// has been extracted to AiBadge.tsx (a 25-line client island using pure
+// CSS :hover instead of useState). This saves ~40 KB gz from the
+// resource page bundle.
 
 import {
   Sparkles,
@@ -14,8 +18,8 @@ import {
   Tag,
   Wrench,
 } from 'lucide-react';
-import { useState } from 'react';
 import { isArabic } from '@/lib/text-utils';
+import AiBadge from './AiBadge';
 
 interface HeaderData {
   school?: string | null;
@@ -264,7 +268,6 @@ export default function AiDescription({
   aiSchoolName,
   aiProfNames,
 }: AiDescriptionProps) {
-  const [tooltipOpen, setTooltipOpen] = useState(false);
   const isAi = !!source && source.startsWith('agent-');
 
   // Auto-detect language from content: count Arabic vs Latin characters.
@@ -531,35 +534,7 @@ export default function AiDescription({
           {isRtl ? 'ملخص ذكي' : 'Résumé intelligent'}
         </span>
 
-        {isAi && (
-          <div
-            className="relative flex-shrink-0"
-            onMouseEnter={() => setTooltipOpen(true)}
-            onMouseLeave={() => setTooltipOpen(false)}
-            role="presentation"
-          >
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-gradient-to-r from-violet-100 to-indigo-100 border border-violet-200 text-violet-700 cursor-help text-[10px] font-bold uppercase tracking-wide">
-              IA
-            </span>
-            {tooltipOpen && (
-              <span
-                className={`absolute z-50 top-full mt-1.5 w-56 px-3 py-2 rounded-lg bg-slate-900 text-white text-xs leading-relaxed shadow-xl pointer-events-none ${isRtl ? 'left-0' : 'right-0'}`}
-              >
-                <span className="block font-semibold mb-0.5">
-                  {isRtl ? '✨ ملخص مُولَّد بالذكاء الاصطناعي' : '✨ Résumé généré par IA'}
-                </span>
-                <span className="block text-slate-300">
-                  {isRtl
-                    ? 'ملخص تلقائي لمحتوى الـ PDF لمساعدتك في إيجاد المورد المناسب.'
-                    : 'Résumé automatique du contenu du PDF pour vous aider à trouver la bonne ressource.'}
-                </span>
-                <span
-                  className={`absolute -top-1 w-2 h-2 bg-slate-900 rotate-45 ${isRtl ? 'left-3' : 'right-3'}`}
-                />
-              </span>
-            )}
-          </div>
-        )}
+        {isAi && <AiBadge isRtl={isRtl} />}
       </div>
 
       {/* Info grid — natural RTL flow via dir="rtl" */}
