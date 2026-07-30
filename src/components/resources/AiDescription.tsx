@@ -337,7 +337,7 @@ export default function AiDescription({
       );
     }
     tryAdd(
-      '\u0627\u0644\u0633\u0646\u0629 \u0627\u0644\u062f\u0631\u0627\u0633\xd9\x8a\u0629',
+      '\u0627\u0644\u0633\u0646\u0629 \u0627\u0644\u062f\u0631\u0627\u0633\u064a\u0629',
       'Ann\u00e9e scolaire',
       h.year,
       CalendarDays,
