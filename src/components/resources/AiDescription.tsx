@@ -406,9 +406,13 @@ export default function AiDescription({
     const fr = clean(dbFr);
     const aiar = clean(aiAr);
     const aifr = clean(aiFr);
-    if (d && isArabic(d)) return d; // already in AR → keep
-    if (ar) return ar;
-    if (aiar && isArabic(aiar)) return aiar;
+    // Each AR-tagged value must actually contain Arabic chars to be eligible
+    // as the AR preferred value — some DB rows have Latin chars in *Ar fields
+    // (corrupted at import). Falling through to the next option in that case.
+    const isAr = (v: string | null) => !!v && isArabic(v);
+    if (isAr(d)) return d; // already in AR → keep
+    if (isAr(ar)) return ar;
+    if (isAr(aiar)) return aiar;
     if (d) return d;
     if (fr) return fr;
     if (aifr) return aifr;
