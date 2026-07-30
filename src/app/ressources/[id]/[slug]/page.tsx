@@ -462,10 +462,16 @@ export default async function ResourcePage({
                         <div
                           dir={sysAr ? 'rtl' : 'ltr'}
                           lang="ar"
-                          className={`inline-block px-3 py-1.5 rounded-lg border-2 border-emerald-400 bg-emerald-50 text-sm font-semibold text-emerald-900 ${sysAr ? 'text-right' : 'text-left'}`}
+                          className={`flex ${sysAr ? 'justify-end' : 'justify-start'} mb-4`}
                         >
-                          <span className="text-emerald-700">اسم المنتج: </span>
-                          <span className="font-bold">{sys}</span>
+                          <span
+                            dir={sysAr ? 'rtl' : 'ltr'}
+                            lang="ar"
+                            className={`inline-block px-3 py-1.5 rounded-lg border-2 border-emerald-400 bg-emerald-50 text-sm font-semibold text-emerald-900 font-arabic-title ${sysAr ? 'text-right' : 'text-left'}`}
+                          >
+                            <span className="text-emerald-700">اسم المنتج: </span>
+                            <span className="font-bold">{sys}</span>
+                          </span>
                         </div>
                       ) : gs ? (
                         <h2
@@ -598,7 +604,7 @@ export default async function ResourcePage({
                           key={i}
                           dir={kpAr ? 'rtl' : 'ltr'}
                           lang={kpAr ? 'ar' : 'fr'}
-                          className={`inline-block px-3 py-1.5 rounded-full text-sm font-semibold border ${colorClass}`}
+                          className={`inline-block px-3 py-1.5 rounded-full text-sm font-semibold border font-arabic-title ${kpAr ? 'text-right' : 'text-left'} ${colorClass}`}
                         >
                           {kp}
                         </span>
