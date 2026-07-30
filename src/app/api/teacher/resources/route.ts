@@ -362,7 +362,9 @@ export async function POST(req: NextRequest) {
 
     // Fire-and-forget AI extraction (text + GPT attributes)
     // Runs in background so the upload response is not blocked
-    const subjectSlug = subjectRec.slug;
+    // NOTE: outer `subjectSlug` (let) already exists in this scope — use a different name here
+    // to avoid the "cannot redeclare block-scoped variable" / "cannot reassign const" error.
+    const extractionSubjectSlug = subjectRec.slug;
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
     const agentToken = process.env.AGENT_REPORT_TOKEN || 'devmanet-bulk-2026';
     fetch(`${baseUrl}/api/ai/extract`, {
@@ -374,7 +376,7 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify({
         resourceId: resource.id,
         fileKey: resource.fileKey,
-        subjectSlug,
+        subjectSlug: extractionSubjectSlug,
         language: resource.language,
       }),
     }).catch((e) => console.error('[ai/extract trigger]', e));
