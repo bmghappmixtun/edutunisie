@@ -120,3 +120,23 @@ Version 1.61.0/
 *.bak
 *.swp
 *.swo
+
+# Local debug artifacts
+*.log
+pdf-test/*.log
+pdf-test/*.pyc
+pdf-test/__pycache__/
+__pycache__/
+.gitignore.backup
+.env.local.backup-*
+.env.backup
+# Page debug screenshots
+page-*.png
+h1-*.png
+lang-*.png
+slug-*.png
+r*-fixed.png
+r15348-*.png
+r301-*.png
+r3802-*.png
+url-render.png

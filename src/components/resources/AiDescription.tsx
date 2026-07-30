@@ -53,6 +53,20 @@ interface AiDescriptionProps {
   systemName?: string | null;
   /** Optional subject display name override (e.g. "التربية التكنولوجية" for Technologie). */
   subjectLabelOverride?: string | null;
+  /** If true, hide the Type and Niveau/Cycle fields (always the same for college). */
+  isCollege?: boolean | null;
+  /** School name (FR/Latin) from the DB resource. */
+  dbSchoolNameFr?: string | null;
+  /** School name (Arabic) from the DB resource. */
+  dbSchoolNameAr?: string | null;
+  /** Teacher name (FR/Latin) — full name as `${firstName} ${lastName}`. */
+  dbTeacherNameFr?: string | null;
+  /** Teacher name (Arabic) — full name as `${firstNameAr} ${lastNameAr}`. */
+  dbTeacherNameAr?: string | null;
+  /** AI-extracted school name from PDF header (ResourceMetadata.schoolName). */
+  aiSchoolName?: string | null;
+  /** AI-extracted teacher names (ResourceMetadata.profNames[0]). */
+  aiProfNames?: string[] | null;
 }
 
 type Field = {
@@ -242,6 +256,13 @@ export default function AiDescription({
   subjectSlug,
   systemName,
   subjectLabelOverride,
+  isCollege = false,
+  dbSchoolNameFr,
+  dbSchoolNameAr,
+  dbTeacherNameFr,
+  dbTeacherNameAr,
+  aiSchoolName,
+  aiProfNames,
 }: AiDescriptionProps) {
   const [tooltipOpen, setTooltipOpen] = useState(false);
   const isAi = !!source && source.startsWith('agent-');
@@ -305,21 +326,27 @@ export default function AiDescription({
     tryAdd('\u0627\u0644\u0645\u062f\u0631\u0633\u0629', '\u00c9tablissement', h.school, Building2);
     tryAdd('\u0627\u0644\u0623\u0633\u062a\u0627\u0630', 'Enseignant', h.teacher, User);
     // Override 'المستوى'/'Niveau' with the authoritative cycle from headerData
-    // (AI description sometimes uses the class name as level, but they are different)
-    tryOverride(
-      '\u0627\u0644\u0645\u0633\u062a\u0648\u0649',
-      'Niveau',
-      isRtl ? h.cycleAr || h.cycle : h.cycle,
-      GraduationCap,
-    );
+    // (AI description sometimes uses the class name as level, but they are different).
+    // SKIP for college: cycle is always "Enseignement de base" → no informative value.
+    if (!isCollege) {
+      tryOverride(
+        '\u0627\u0644\u0645\u0633\u062a\u0648\u0649',
+        'Niveau',
+        isRtl ? h.cycleAr || h.cycle : h.cycle,
+        GraduationCap,
+      );
+    }
     tryAdd(
-      '\u0627\u0644\u0633\u0646\u0629 \u0627\u0644\u062f\u0631\u0627\u0633\u064a\u0629',
+      '\u0627\u0644\u0633\u0646\u0629 \u0627\u0644\u062f\u0631\u0627\u0633\xd9\x8a\u0629',
       'Ann\u00e9e scolaire',
       h.year,
       CalendarDays,
     );
     tryAdd('\u0627\u0644\u0645\u0627\u062f\u0629', 'Mati\u00e8re', h.subject, BookOpen);
-    tryAdd('\u0627\u0644\u0646\u0648\u0639', 'Type', h.type, FileText);
+    // SKIP for college: the type is already shown in the page header (Devoir/Exercice/Cours).
+    if (!isCollege) {
+      tryAdd('\u0627\u0644\u0646\u0648\u0639', 'Type', h.type, FileText);
+    }
   }
 
   // Add the general subject (الموضوع العام) as a labeled field if provided.
@@ -347,7 +374,114 @@ export default function AiDescription({
       }
     }
   }
-  const fields = [...parsedFields, ...headerFields];
+
+  // ===== School (المدرسة) and Teacher (الأستاذ) =====
+  // Per user rule (2026-07-30):
+  //   "si l'attribut affiché est en Ar sinon on prend l'attribut extrait avec l'ia"
+  //   + "ajouter 'nom de l'ecole' et 'le nom du prof' s'ils sont disponibles ou s'ils sonnt extraits par l'ia"
+  //   → if the displayed value is already in AR, keep it; otherwise (FR) prefer the AI-extracted version.
+  // Priority chain (per field):
+  //   1. Parser-extracted value IF it is already in AR
+  //   2. DB AR field  (resource.schoolNameAr / teacher.firstNameAr + lastNameAr)
+  //   3. AI-extracted AR value (ResourceMetadata.schoolName / profNames[0]) if Arabic
+  //   4. DB FR field  (resource.schoolName / teacher.firstName + lastName)
+  //   5. AI-extracted FR value (if no AR anywhere)
+  const schoolLabel = isRtl ? 'المدرسة' : 'Établissement';
+  const teacherLabel = isRtl ? 'الأستاذ' : 'Enseignant';
+  const pickPreferringAr = (
+    displayed: string | null | undefined,
+    dbAr: string | null | undefined,
+    dbFr: string | null | undefined,
+    aiAr: string | null | undefined,
+    aiFr: string | null | undefined,
+  ): string | null => {
+    const clean = (v: string | null | undefined) => {
+      if (!v) return null;
+      const t = String(v).trim();
+      if (!t || t === '-' || t === '—' || t === '–' || t === 'null' || t === 'None') return null;
+      return t;
+    };
+    const d = clean(displayed);
+    const ar = clean(dbAr);
+    const fr = clean(dbFr);
+    const aiar = clean(aiAr);
+    const aifr = clean(aiFr);
+    if (d && isArabic(d)) return d; // already in AR → keep
+    if (ar) return ar;
+    if (aiar && isArabic(aiar)) return aiar;
+    if (d) return d;
+    if (fr) return fr;
+    if (aifr) return aifr;
+    return null;
+  };
+  // Build school value
+  const schoolDisplayed =
+    parsedFields.find((f) => f.label === schoolLabel)?.value ??
+    headerFields.find((f) => f.label === schoolLabel)?.value ??
+    (headerData?.school ?? null);
+  const schoolValue = pickPreferringAr(
+    schoolDisplayed,
+    dbSchoolNameAr,
+    dbSchoolNameFr,
+    aiSchoolName,
+    headerData?.school ?? null,
+  );
+  if (schoolValue) {
+    const idx = parsedFields.findIndex((f) => f.label === schoolLabel);
+    if (idx >= 0) {
+      parsedFields[idx] = { ...parsedFields[idx], value: schoolValue };
+    } else {
+      const hfIdx = headerFields.findIndex((f) => f.label === schoolLabel);
+      if (hfIdx >= 0) {
+        headerFields[hfIdx] = { ...headerFields[hfIdx], value: schoolValue };
+      } else {
+        headerFields.push({ Icon: Building2, label: schoolLabel, value: schoolValue });
+      }
+    }
+  }
+  // Build teacher value
+  const teacherDisplayed =
+    parsedFields.find((f) => f.label === teacherLabel)?.value ??
+    headerFields.find((f) => f.label === teacherLabel)?.value ??
+    (headerData?.teacher ?? null);
+  const teacherAiFirst =
+    aiProfNames && aiProfNames.length > 0 ? aiProfNames[0] : null;
+  const teacherValue = pickPreferringAr(
+    teacherDisplayed,
+    dbTeacherNameAr,
+    dbTeacherNameFr,
+    teacherAiFirst,
+    headerData?.teacher ?? null,
+  );
+  if (teacherValue) {
+    const idx = parsedFields.findIndex((f) => f.label === teacherLabel);
+    if (idx >= 0) {
+      parsedFields[idx] = { ...parsedFields[idx], value: teacherValue };
+    } else {
+      const hfIdx = headerFields.findIndex((f) => f.label === teacherLabel);
+      if (hfIdx >= 0) {
+        headerFields[hfIdx] = { ...headerFields[hfIdx], value: teacherValue };
+      } else {
+        headerFields.push({ Icon: User, label: teacherLabel, value: teacherValue });
+      }
+    }
+  }
+
+  // ===== College-only filter (2026-07-30) =====
+  // For college, remove the Type (النوع) and Niveau/Cycle (المستوى) fields.
+  // These are always the same for all college resources, so they add no value.
+  let filteredParsed = parsedFields;
+  let filteredHeader = headerFields;
+  if (isCollege) {
+    const collegeSkipLabels = new Set([
+      isRtl ? 'النوع' : 'Type',
+      isRtl ? 'المستوى' : 'Niveau',
+    ]);
+    filteredParsed = parsedFields.filter((f) => !collegeSkipLabels.has(f.label));
+    filteredHeader = headerFields.filter((f) => !collegeSkipLabels.has(f.label));
+  }
+
+  const fields = [...filteredParsed, ...filteredHeader];
 
   // Subject override: for Technologie, the "matière" field should display
   // "التربية التكنولوجية" (educational technology) instead of "التكنولوجيا" (technology).

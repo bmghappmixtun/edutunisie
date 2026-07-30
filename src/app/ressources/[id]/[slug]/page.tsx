@@ -516,6 +516,20 @@ export default async function ResourcePage({
                     as a labeled field with a Tag icon. */}
                 {resource.aiSummary?.summary && (() => {
                   const summary = resource.aiSummary.summary;
+                  // Per user rule (2026-07-30): for college, hide Type (النوع) and
+                  // Niveau (المستوى) from the AI card — they're always the same.
+                  const isCollege = resource.class?.level?.slug === 'college';
+                  // Teacher full name (FR + AR) — prefer teacher record over AI summary.
+                  const teacherFr = resource.teacher
+                    ? `${resource.teacher.firstName || ''} ${resource.teacher.lastName || ''}`
+                        .replace(/\s+/g, ' ')
+                        .trim() || null
+                    : null;
+                  const teacherAr = resource.teacher
+                    ? `${resource.teacher.firstNameAr || ''} ${resource.teacher.lastNameAr || ''}`
+                        .replace(/\s+/g, ' ')
+                        .trim() || null
+                    : null;
                   return (
                     <div className="mb-4">
                       <AiDescription
@@ -529,6 +543,13 @@ export default async function ResourcePage({
                         subjectSlug={resource.subject?.slug}
                         systemName={resource.metadata?.systemName}
                         subjectLabelOverride={resource.subject?.slug === 'technologie' ? 'التربية التكنولوجية' : null}
+                        isCollege={isCollege}
+                        dbSchoolNameFr={resource.schoolName}
+                        dbSchoolNameAr={null}
+                        dbTeacherNameFr={teacherFr}
+                        dbTeacherNameAr={teacherAr}
+                        aiSchoolName={resource.metadata?.schoolName ?? null}
+                        aiProfNames={resource.metadata?.profNames ?? null}
                       />
                     </div>
                   );
