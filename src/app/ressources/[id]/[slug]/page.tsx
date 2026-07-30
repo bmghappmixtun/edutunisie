@@ -526,6 +526,9 @@ export default async function ResourcePage({
                         classNameFr={resource.class?.nameFr}
                         classNameAr={resource.class?.nameAr}
                         generalSubject={resource.metadata?.generalSubject}
+                        subjectSlug={resource.subject?.slug}
+                        systemName={resource.metadata?.systemName}
+                        subjectLabelOverride={resource.subject?.slug === 'technologie' ? 'التربية التكنولوجية' : null}
                       />
                     </div>
                   );

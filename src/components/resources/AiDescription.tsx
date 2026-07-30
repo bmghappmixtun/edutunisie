@@ -12,6 +12,7 @@ import {
   ListChecks,
   ScrollText,
   Tag,
+  Wrench,
 } from 'lucide-react';
 import { useState } from 'react';
 import { isArabic } from '@/lib/text-utils';
@@ -46,6 +47,12 @@ interface AiDescriptionProps {
   classNameAr?: string | null;
   /** Optional general subject (الموضوع العام) to display as a labeled field. */
   generalSubject?: string | null;
+  /** Optional subject slug (e.g. "technologie", "mathematiques") — used for subject-specific UI overrides. */
+  subjectSlug?: string | null;
+  /** Optional system/product name (اسم النظام / اسم المنتج) — for Technologie. */
+  systemName?: string | null;
+  /** Optional subject display name override (e.g. "التربية التكنولوجية" for Technologie). */
+  subjectLabelOverride?: string | null;
 }
 
 type Field = {
@@ -232,6 +239,9 @@ export default function AiDescription({
   classNameFr,
   classNameAr,
   generalSubject,
+  subjectSlug,
+  systemName,
+  subjectLabelOverride,
 }: AiDescriptionProps) {
   const [tooltipOpen, setTooltipOpen] = useState(false);
   const isAi = !!source && source.startsWith('agent-');
@@ -324,7 +334,30 @@ export default function AiDescription({
       }
     }
   }
+
+  // Add the system/product name (اسم النظام المدروس) — for Technologie only.
+  // Wrench icon distinguishes the "system" from the "general subject".
+  if (systemName && subjectSlug === 'technologie') {
+    const sysValue = String(systemName).trim();
+    if (sysValue && sysValue !== '-' && sysValue !== '—' && sysValue !== '–') {
+      const sysLabel = isRtl ? 'النظام المدروس' : 'Système étudié';
+      if (!existingLabels.has(sysLabel)) {
+        headerFields.push({ Icon: Wrench, label: sysLabel, value: sysValue });
+        existingLabels.add(sysLabel);
+      }
+    }
+  }
   const fields = [...parsedFields, ...headerFields];
+
+  // Subject override: for Technologie, the "matière" field should display
+  // "التربية التكنولوجية" (educational technology) instead of "التكنولوجيا" (technology).
+  if (subjectLabelOverride && subjectSlug === 'technologie') {
+    const subjLabel = isRtl ? 'المادة' : 'Matière';
+    const idx = fields.findIndex((f) => f.label === subjLabel);
+    if (idx >= 0) {
+      fields[idx] = { ...fields[idx], value: subjectLabelOverride };
+    }
+  }
 
   // Override Classe value with full class name from props (e.g. "9ème année de base")
   // Some AI-generated descriptions have truncated values like "9ème année" — use the

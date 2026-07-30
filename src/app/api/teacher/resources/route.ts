@@ -360,6 +360,25 @@ export async function POST(req: NextRequest) {
       console.error('Admin notify error:', e),
     );
 
+    // Fire-and-forget AI extraction (text + GPT attributes)
+    // Runs in background so the upload response is not blocked
+    const subjectSlug = subjectRec.slug;
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
+    const agentToken = process.env.AGENT_REPORT_TOKEN || 'devmanet-bulk-2026';
+    fetch(`${baseUrl}/api/ai/extract`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${agentToken}`,
+      },
+      body: JSON.stringify({
+        resourceId: resource.id,
+        fileKey: resource.fileKey,
+        subjectSlug,
+        language: resource.language,
+      }),
+    }).catch((e) => console.error('[ai/extract trigger]', e));
+
     return NextResponse.json({ success: true, resource });
   } catch (e: any) {
     console.error('[teacher/resources] POST', e);
