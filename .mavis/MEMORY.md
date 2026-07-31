@@ -81,3 +81,57 @@
 - Adds \u200e RTL marks that need cleanup
 
 **Next**: bulk run on all 18%+ degraded Math collège (~600 files), then re-run orchestrator_v4 on the new text.
+
+### 🔄 Staging Tables + Bulk Re-OCR + Orchestrator v4 (2026-07-31, IN PROGRESS)
+
+**Goal**: Re-OCR degraded files + extract AI metadata, **staging ONLY** (no live DB/UI changes until user confirms).
+
+**Staging tables created**:
+- `ResourceContentStaging` (nouveau texte Tesseract, originalMethod, degradationScore, isApplied)
+- `ResourceMetadataStaging` (AI metadata: subject, keyPoints, prof, school, type, year, duration, confidence)
+
+**Pipeline**:
+1. `pdf-test/bulk_reocr_to_staging.py --college-only --limit 3335 --apply --workers 4`
+   - Filters: Technologie skipped, Lycée skipped (per user), Collège only
+   - Detects degradation (Greek noise, presentation forms, control chars, no header markers)
+   - Tesseract re-OCR (ara+fra+eng, 200dpi, max 3 pages)
+   - Cleans \\u200e, \\u200f, \\u200b-d, \\ufeff, \\u2060 RTL marks
+   - Saves to ResourceContentStaging (isApplied=FALSE)
+2. `pdf-test/orchestrator_v4_staging.py --ids X,Y,Z --apply`
+   - Reads Tesseract text from ResourceContentStaging
+   - Runs orchestrator v4 (pre-extract + 3 agents: subject, keyPoints, metadata)
+   - Saves to ResourceMetadataStaging (isApplied=FALSE)
+3. `isApplied=FALSE` partout → **live DB untouched** until user reviews and applies
+
+**Files**:
+- `pdf-test/bulk_reocr_to_staging.py` (re-OCR + save to staging)
+- `pdf-test/orchestrator_v4_staging.py` (v4 reads from staging)
+- `pdf-test/detect_ocr_degradation.py` (reusable detection)
+- `pdf-test/test_10_math_college.py` (reusable test)
+
+**Progress (snapshot 2026-07-31)**:
+- 192/3335 files OCR'd in staging (~20% degradation rate)
+- 70/192 metadata extracted (100% prof, 100% school, 100% subject)
+- Bulk re-OCR running in background, ETA ~2-3 hours
+
+**Fix made to orchestrator_v4**: duration regex IndexError when pattern has 1 group (m.group(2) raises) → added try/except with `m.lastindex and m.lastindex >= 2 and m.group(2) else ""`
+
+**Tesseract gotcha**: `ara.traineddata` can disappear from `/usr/share/tesseract-ocr/5/tessdata/`. Re-download:
+```bash
+cd /usr/share/tesseract-ocr/5/tessdata/
+curl -fsSL "https://github.com/tesseract-ocr/tessdata_fast/raw/main/ara.traineddata" -o ara.traineddata
+curl -fsSL "https://github.com/tesseract-ocr/tessdata_fast/raw/main/fra.traineddata" -o fra.traineddata
+```
+
+**Apply to live (when user confirms)**:
+```sql
+-- ResourceContentStaging → ResourceContent (text)
+UPDATE "ResourceContent" rc
+SET "fullText" = rcs."stagingText",
+    "extractionMethod" = rcs."stagingMethod",
+    "extractedAt" = rcs."extractedAt"
+FROM "ResourceContentStaging" rcs
+WHERE rc."resourceId" = rcs."resourceId"
+  AND rcs."isApplied" = FALSE;
+-- Then mark isApplied=TRUE
+```

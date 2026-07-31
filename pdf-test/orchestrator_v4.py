@@ -141,7 +141,13 @@ def pre_extract_metadata(text: str, title: str = '') -> dict:
     for pat in duration_patterns:
         m = re.search(pat, text)
         if m:
-            num, unit = m.group(1), m.group(2) or ''
+            try:
+                num = m.group(1)
+                unit = m.group(2) if m.lastindex and m.lastindex >= 2 and m.group(2) else ""
+            except (IndexError, AttributeError):
+                continue
+            if not num:
+                continue
             unit = unit.lower() if unit else ''
             if unit.startswith('ساعة') or unit.startswith('h'):
                 hints['duration'] = f"{num} heure{'s' if int(num) > 1 else ''}"
