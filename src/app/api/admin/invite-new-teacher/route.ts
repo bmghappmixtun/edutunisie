@@ -114,11 +114,19 @@ export async function POST(req: NextRequest) {
     }
   } else {
     // Create the new user (with PENDING_INVITATION status, no password yet)
+    // Slug is required by the User model (even though it's cosmetic / non-unique)
+    const baseSlug = `${firstName}-${lastName}`
+      .toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // remove accents
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .substring(0, 80) || 'teacher';
     user = await prisma.user.create({
       data: {
         email: normalizedEmail,
         firstName,
         lastName,
+        slug: baseSlug,
         role: 'TEACHER',
         status: USER_INV_STATUS.PENDING_INVITATION,
         // We don't set a password — the teacher will set it during activation
