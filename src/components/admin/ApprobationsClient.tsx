@@ -12,6 +12,8 @@ import {
   FolderOpen,
   Mail,
   Shield,
+  EyeOff,
+  Eye,
 } from 'lucide-react';
 import TeacherVerificationFilesViewer from '@/components/admin/TeacherVerificationFilesViewer';
 import toast from 'react-hot-toast';
@@ -77,15 +79,66 @@ export default function ApprobationsClient({
   const [fileRequestModal, setFileRequestModal] = useState<{ teacher: Teacher } | null>(null);
   const [fileRequestNote, setFileRequestNote] = useState('');
 
+  // Status filters — which categories of pending profs to show
+  // Default: all checked (all shown). Untick to hide.
+  const [statusFilters, setStatusFilters] = useState({
+    pendingOtp: true,        // Email non vérifié
+    pendingApproval: true,   // Non validé
+    pendingFiles: true,      // Fichiers demandés
+  });
+
+  // Track which profs the admin has dismissed (hidden from approbations) — UI-only state
+  const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
+  const [showDismissed, setShowDismissed] = useState(false);
+
   const currentList = tab === 'teachers' ? teachers : resources;
-  const filteredList = useMemo(() => {
-    if (!search.trim()) return currentList;
-    const q = search.toLowerCase();
-    return currentList.filter((item) => {
-      const str = JSON.stringify(item).toLowerCase();
-      return str.includes(q);
-    });
-  }, [currentList, search]);
+  const filteredList = useMemo((): (Teacher | Resource)[] => {
+    // For teachers: apply status filters + dismissed hiding
+    // For resources: just the search filter (existing behavior)
+    let list: (Teacher | Resource)[] = currentList;
+    if (tab === 'teachers') {
+      // Hide dismissed by default (unless showDismissed is on)
+      if (!showDismissed) {
+        list = list.filter((t: any) => !dismissedIds.has(t.id));
+      }
+      // Apply status filters
+      list = list.filter((t: any) => {
+        if (t.status === 'PENDING_OTP' && !t.emailVerifiedAt) {
+          return statusFilters.pendingOtp;
+        }
+        if (t.status === 'PENDING_APPROVAL') {
+          return statusFilters.pendingApproval;
+        }
+        if (t.status === 'PENDING_FILE_VERIFICATION') {
+          return statusFilters.pendingFiles;
+        }
+        // Other statuses (e.g., fallback) — always show
+        return true;
+      });
+    }
+    // Apply search
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      list = list.filter((item) => {
+        const str = JSON.stringify(item).toLowerCase();
+        return str.includes(q);
+      });
+    }
+    return list;
+  }, [currentList, search, tab, statusFilters, dismissedIds, showDismissed]);
+
+  // Count of profs in each status (for the filter UI)
+  const statusCounts = useMemo(() => {
+    if (tab !== 'teachers') return null;
+    const counts = { pendingOtp: 0, pendingApproval: 0, pendingFiles: 0, dismissed: 0 };
+    for (const t of teachers as any[]) {
+      if (dismissedIds.has(t.id)) counts.dismissed++;
+      else if (t.status === 'PENDING_OTP' && !t.emailVerifiedAt) counts.pendingOtp++;
+      else if (t.status === 'PENDING_APPROVAL') counts.pendingApproval++;
+      else if (t.status === 'PENDING_FILE_VERIFICATION') counts.pendingFiles++;
+    }
+    return counts;
+  }, [teachers, dismissedIds, tab]);
 
   function toggleSelect(id: string) {
     const next = new Set(selected);
@@ -304,6 +357,72 @@ export default function ApprobationsClient({
             className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
           />
         </div>
+
+        {/* Status filters (only for teachers tab) */}
+        {tab === 'teachers' && statusCounts && (
+          <div className="flex flex-wrap items-center gap-2 px-2">
+            <span className="text-xs font-semibold text-slate-500">Filtrer :</span>
+            <label
+              className={`flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1.5 rounded-lg cursor-pointer transition ${
+                statusFilters.pendingOtp
+                  ? 'bg-orange-100 text-orange-700 border border-orange-200'
+                  : 'bg-slate-100 text-slate-400 border border-slate-200'
+              }`}
+            >
+              <input
+                type="checkbox"
+                checked={statusFilters.pendingOtp}
+                onChange={(e) => setStatusFilters((f) => ({ ...f, pendingOtp: e.target.checked }))}
+                className="w-3 h-3"
+              />
+              ✉️ Email non vérifié ({statusCounts.pendingOtp})
+            </label>
+            <label
+              className={`flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1.5 rounded-lg cursor-pointer transition ${
+                statusFilters.pendingApproval
+                  ? 'bg-amber-100 text-amber-700 border border-amber-200'
+                  : 'bg-slate-100 text-slate-400 border border-slate-200'
+              }`}
+            >
+              <input
+                type="checkbox"
+                checked={statusFilters.pendingApproval}
+                onChange={(e) => setStatusFilters((f) => ({ ...f, pendingApproval: e.target.checked }))}
+                className="w-3 h-3"
+              />
+              ⏳ Non validé ({statusCounts.pendingApproval})
+            </label>
+            <label
+              className={`flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1.5 rounded-lg cursor-pointer transition ${
+                statusFilters.pendingFiles
+                  ? 'bg-violet-100 text-violet-700 border border-violet-200'
+                  : 'bg-slate-100 text-slate-400 border border-slate-200'
+              }`}
+            >
+              <input
+                type="checkbox"
+                checked={statusFilters.pendingFiles}
+                onChange={(e) => setStatusFilters((f) => ({ ...f, pendingFiles: e.target.checked }))}
+                className="w-3 h-3"
+              />
+              📁 Fichiers ({statusCounts.pendingFiles})
+            </label>
+            {statusCounts.dismissed > 0 && (
+              <button
+                onClick={() => setShowDismissed((s) => !s)}
+                className={`flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1.5 rounded-lg transition ${
+                  showDismissed
+                    ? 'bg-slate-700 text-white'
+                    : 'bg-slate-100 text-slate-600 border border-slate-200'
+                }`}
+                title="Afficher/masquer les profs ignorés"
+              >
+                {showDismissed ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
+                {showDismissed ? 'Masquer' : 'Afficher'} ignorés ({statusCounts.dismissed})
+              </button>
+            )}
+          </div>
+        )}
 
         {selected.size > 0 && (
           <div className="flex gap-2 animate-in fade-in slide-in-from-right-2">
@@ -588,6 +707,32 @@ export default function ApprobationsClient({
                         )}
                         <span className="hidden sm:inline">Rejeter</span>
                       </button>
+                      {/* "Ignorer ce prof" — cache de l'affichage, préserve les fichiers */}
+                      {isTeacher && (
+                        <button
+                          onClick={() => {
+                            const fileCount = (t as any)._count?.uploadedFiles ?? 0;
+                            const resourceCount = (t as any)._count?.approvedFiles ?? 0;
+                            const totalFiles = fileCount + resourceCount;
+                            const msg = totalFiles > 0
+                              ? `Ce prof a ${totalFiles} fichier(s) sur la plateforme.\n\n⚠️ "Ignorer" le cache UNIQUEMENT de cet espace admin — ses fichiers restent intacts et les élèves peuvent toujours y accéder.\n\nContinuer ?`
+                              : `Ce prof n'a aucun fichier.\n\n"Ignorer" le cache de cet espace admin (peut être ré-affiché plus tard).`;
+                            if (!confirm(msg)) return;
+                            setDismissedIds((prev) => {
+                              const next = new Set(prev);
+                              next.add(item.id);
+                              return next;
+                            });
+                            toast.success(`Prof ignoré (${totalFiles > 0 ? `${totalFiles} fichier(s) préservé(s)` : 'aucun fichier'})`);
+                          }}
+                          disabled={loading !== null}
+                          className="p-2 sm:px-3 sm:py-2 bg-slate-500 hover:bg-slate-600 text-white text-xs sm:text-sm font-semibold rounded-lg sm:rounded-xl transition disabled:opacity-50 flex items-center gap-1.5"
+                          title="Cacher de l'affichage (les fichiers restent intacts)"
+                        >
+                          <EyeOff className="w-4 h-4" />
+                          <span className="hidden sm:inline">Ignorer</span>
+                        </button>
+                      )}
                       {/* Request files button — only for non-invited teachers */}
                       {isTeacher && !t.lastInvitationId && !t.invitationStatus && (
                         <button
