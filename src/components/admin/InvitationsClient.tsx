@@ -20,8 +20,12 @@ import {
   AlertTriangle,
   Search,
   X,
+  UserPlus,
+  Globe,
+  Loader2,
 } from 'lucide-react';
 import { timeAgo } from '@/lib/utils';
+import InviteNewProfModal from './InviteNewProfModal';
 
 type Invitation = {
   id: string;
@@ -99,6 +103,7 @@ export default function InvitationsClient({
   const [filterStatus, setFilterStatus] = useState<string>('');
   const [search, setSearch] = useState('');
   const [loadingId, setLoadingId] = useState<string | null>(null);
+  const [showInviteModal, setShowInviteModal] = useState(false);
 
   const filtered = useMemo(() => {
     let result = invitations;
@@ -193,8 +198,28 @@ export default function InvitationsClient({
               Suivi des invitations envoyées aux profs importés de devoirat.net et JotForm
             </p>
           </div>
+          <button
+            onClick={() => setShowInviteModal(true)}
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white px-5 py-2.5 rounded-xl font-semibold shadow-lg shadow-violet-500/20 hover:shadow-xl hover:scale-[1.02] transition-all"
+          >
+            <UserPlus className="w-4 h-4" />
+            Inviter un nouveau prof
+          </button>
         </div>
       </div>
+
+      {/* Invite new prof modal */}
+      <InviteNewProfModal
+        open={showInviteModal}
+        onClose={() => setShowInviteModal(false)}
+        onSuccess={(inv) => {
+          setInvitations((prev) => [inv as Invitation, ...prev]);
+          setShowInviteModal(false);
+          toast.success(`Invitation envoyée à ${inv.email}`);
+          // Refresh stats
+          fetchStats();
+        }}
+      />
 
       {/* Stats cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">

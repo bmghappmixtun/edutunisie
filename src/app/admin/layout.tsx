@@ -93,6 +93,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       badge: newUsers,
       badgeColor: 'bg-emerald-500',
     },
+    { href: '/admin/invitations', icon: Mail, label: 'Invitations profs' },
     { href: '/admin/catalog', icon: BookOpen, label: 'Catalogue (matières/niveaux)' },
     { href: '/admin/messages', icon: MessageSquare, label: 'Messages' },
 
