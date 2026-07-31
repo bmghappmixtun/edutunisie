@@ -105,6 +105,18 @@ export default function InvitationsClient({
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [showInviteModal, setShowInviteModal] = useState(false);
 
+  const refreshStats = async () => {
+    try {
+      const res = await fetch('/api/admin/invitations');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.stats) setStats(data.stats);
+      }
+    } catch (e) {
+      // silent
+    }
+  };
+
   const filtered = useMemo(() => {
     let result = invitations;
     if (filterStatus) {
@@ -217,7 +229,7 @@ export default function InvitationsClient({
           setShowInviteModal(false);
           toast.success(`Invitation envoyée à ${inv.email}`);
           // Refresh stats
-          fetchStats();
+          refreshStats();
         }}
       />
 
