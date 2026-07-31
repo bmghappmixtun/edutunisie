@@ -19,6 +19,7 @@ import {
   TrendingUp,
   Key,
   AlertTriangle,
+  Mail,
 } from 'lucide-react';
 
 // Admin pages should never be indexed
