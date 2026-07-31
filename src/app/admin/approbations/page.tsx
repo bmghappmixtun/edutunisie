@@ -63,6 +63,7 @@ export default async function AdminApprovationsPage() {
           initialTeachers={pendingTeachers.map((t) => ({
             ...t,
             createdAt: t.createdAt.toISOString(),
+            emailVerifiedAt: t.emailVerifiedAt?.toISOString() || null,
             verificationFilesRequestedAt: t.verificationFilesRequestedAt?.toISOString() || null,
             verificationFilesReceivedAt: t.verificationFilesReceivedAt?.toISOString() || null,
           }))}
