@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { X, Mail, User, Globe, MessageSquare, Loader2, Check, Send } from 'lucide-react';
+import { X, Mail, User, Globe, MessageSquare, Loader2, Check, Send, UserPlus } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 type Site = 'devoirat' | 'tunisiecollege';
