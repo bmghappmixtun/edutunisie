@@ -41,6 +41,7 @@ const SITE_CONFIG: Record<
     benefits: { emoji: string; title: string; text: string }[];
     studentsHook: string;
     contextLine: string;
+    contextLine2: string;
     platformHook: string;
   }
 > = {
