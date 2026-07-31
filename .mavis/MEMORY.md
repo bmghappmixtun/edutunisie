@@ -42,3 +42,42 @@
 **Decision**: **v4 is the new standard**. v3 stays for backward compat.
 
 **Files**: `pdf-test/orchestrator_v4.py` (676 lines, ready for production).
+
+### 🔍 OCR Degradation Detection + Tesseract Re-OCR (DONE 2026-07-31)
+
+**Goal**: auto-detect files where existing OCR is broken, re-OCR with Tesseract (ara+fra+eng).
+
+**Detection heuristics** (`pdf-test/detect_ocr_degradation.py`):
+1. Greek/Latin char ratio in Arabic text (high = degraded) — biggest signal
+2. Arabic presentation form ratio (very high = OCR ligated)
+3. Control characters (\x00-\x1f)
+4. Missing school/prof header markers
+5. Very short text (< 200 chars = image-based)
+6. High Latin ratio in Arabic text
+7. Replacement chars (\ufffd, ???, □)
+
+**Score 0-100**: 0-30 clean, 30-60 moderate (re-OCR), 60-100 severe (must re-OCR).
+
+**Tesseract re-OCR**:
+- lang=`ara+fra+eng`, dpi=200, psm=6, max 3 pages
+- Saves with method='tesseract', model='tesseract-5.3.0-ara+fra+eng'
+
+**Test on 10 Math collège files** (3 known degraded + 7 random):
+| ID | Before | After | Prof recovered |
+|---|---|---|---|
+| #2755 | pres_forms 75% (score 40) | pres_forms 0% (score 20) | no (no prof in PDF) |
+| #3282 | pres_forms 74% (score 40) | clean (score 0) | no (no prof in PDF) |
+| #1338 | greek_noise 28% (score 50) | **clean (score 0)** | **YES "الأستاذ سامي الشلي"** |
+
+**3/10 (30%) were degraded, 3/3 (100%) improved**. The 30% rate holds on larger samples (15/50, 18/100).
+
+**Files**:
+- `pdf-test/detect_ocr_degradation.py` (detection + re-OCR pipeline)
+- `pdf-test/test_10_math_college.py` (test suite for 10 examples)
+
+**Known Tesseract limitations**:
+- "بنابل" vs "بنبل" (similar Arabic chars confused)
+- May lose some school name parts (e.g. "ضفاف البحيرة" got truncated to "النموذجية")
+- Adds \u200e RTL marks that need cleanup
+
+**Next**: bulk run on all 18%+ degraded Math collège (~600 files), then re-run orchestrator_v4 on the new text.
