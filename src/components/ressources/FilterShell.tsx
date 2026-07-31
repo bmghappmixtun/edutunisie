@@ -350,22 +350,38 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
         <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
           <h3 className="font-extrabold text-sm flex items-center gap-2 text-slate-900">
             <SlidersHorizontal className="w-4 h-4 text-primary-600" />
-            Filtres
-            {activeCount > 0 && (
-              <span className="ml-1 inline-flex items-center justify-center w-5 h-5 rounded-full bg-primary-600 text-white text-[10px] font-bold">
-                {activeCount}
-              </span>
-            )}
-          </h3>
-          {activeCount > 0 && (
-            <button
-              onClick={reset}
-              className="text-xs text-slate-500 hover:text-red-600 font-semibold flex items-center gap-1 transition"
+            <span>Filtres</span>
+            {/*
+             * Always render the activeCount badge, even when 0. The badge is
+             * hidden via CSS when activeCount === 0 (display: none) so the
+             * DOM structure stays identical between server and client, which
+             * prevents React #418/#422 hydration mismatches when the Suspense
+             * fallback (loading.tsx) is patched against the streamed page.
+             * The activeCount itself is derived from useQueryStates (URL-based)
+             * and is stable between server and client, so hiding the badge
+             * with CSS rather than conditionally rendering it is safe.
+             */}
+            <span
+              className={`ml-1 inline-flex items-center justify-center w-5 h-5 rounded-full bg-primary-600 text-white text-[10px] font-bold ${activeCount > 0 ? '' : 'hidden'}`}
+              aria-hidden={activeCount === 0}
             >
-              <RotateCcw className="w-3 h-3" />
-              Reset
-            </button>
-          )}
+              {activeCount}
+            </span>
+          </h3>
+          {/*
+           * Always render the Reset button. Hidden via CSS when activeCount === 0
+           * so the parent div's child count stays constant.
+           */}
+          <button
+            type="button"
+            onClick={reset}
+            className={`text-xs text-slate-500 hover:text-red-600 font-semibold flex items-center gap-1 transition ${activeCount > 0 ? '' : 'hidden'}`}
+            aria-hidden={activeCount === 0}
+            tabIndex={activeCount > 0 ? 0 : -1}
+          >
+            <RotateCcw className="w-3 h-3" />
+            Reset
+          </button>
         </div>
 
         <div className="max-h-[calc(100vh-180px)] overflow-y-auto px-5 py-4 space-y-5">
@@ -686,15 +702,21 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
           </div>
         </div>
 
-        {/* ----- Active filter chips ----- */}
-        {activeCount > 0 && (
-          <ActiveFilterChips
-            filters={filters}
-            onRemove={(patch) => update(patch)}
-            onReset={reset}
-            nameMaps={initialData.nameMaps}
-          />
-        )}
+        {/* ----- Active filter chips -----
+         * Always render the wrapper, but hide it via CSS when activeCount === 0.
+         * This keeps the parent's child count stable so the Suspense fallback
+         * (loading.tsx) can be patched against the streamed page without
+         * triggering React #418/#422 hydration mismatches. */}
+        <div className={activeCount > 0 ? '' : 'hidden'} aria-hidden={activeCount === 0}>
+          {activeCount > 0 && (
+            <ActiveFilterChips
+              filters={filters}
+              onRemove={(patch) => update(patch)}
+              onReset={reset}
+              nameMaps={initialData.nameMaps}
+            />
+          )}
+        </div>
 
         {/* ----- Results ----- */}
         {data.resources.length === 0 ? (

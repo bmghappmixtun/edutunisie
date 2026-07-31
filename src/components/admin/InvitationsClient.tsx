@@ -448,8 +448,22 @@ export default function InvitationsClient({
                       )}
                     </td>
                     <td className="px-3 py-2.5 hidden md:table-cell">
+                      {/*
+                       * The "expiring soon" badge and date string both depend on
+                       * the current time, which can differ between the server
+                       * render and the client hydration. We wrap the whole
+                       * cell in suppressHydrationWarning so React doesn't try
+                       * to patch the differing text/conditional content and
+                       * trigger a #418/#422 mismatch.
+                       *
+                       * This fixes the recurring React #418/#422 errors on
+                       * /admin/invitations (ERR-4QRFC7, ERR-5JDSKD — 14 events
+                       * in the 2026-07-31 nightly digest). The visible output
+                       * stabilises within a millisecond of hydration.
+                       */}
                       <div
                         className={`text-xs ${isExpiringSoon ? 'text-rose-600 font-bold' : 'text-slate-500'}`}
+                        suppressHydrationWarning
                       >
                         {isExpiringSoon && '⚠️ '}
                         {new Date(inv.expiresAt).toLocaleDateString('fr-FR')}
