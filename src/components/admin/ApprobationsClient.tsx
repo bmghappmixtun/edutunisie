@@ -14,6 +14,7 @@ import {
   Shield,
   EyeOff,
   Eye,
+  Trash2,
 } from 'lucide-react';
 import TeacherVerificationFilesViewer from '@/components/admin/TeacherVerificationFilesViewer';
 import toast from 'react-hot-toast';
@@ -36,6 +37,11 @@ type Teacher = {
   verificationFilesRequestedAt?: string | null;
   verificationFilesCount?: number;
   verificationFilesReceivedAt?: string | null;
+  _count?: {
+    uploadedFiles?: number;
+    library?: number;
+    verificationFiles?: number;
+  };
 };
 
 type Resource = {
@@ -425,10 +431,79 @@ export default function ApprobationsClient({
         )}
 
         {selected.size > 0 && (
-          <div className="flex gap-2 animate-in fade-in slide-in-from-right-2">
+          <div className="flex gap-2 animate-in fade-in slide-in-from-right-2 flex-wrap">
             <span className="px-3 py-2 bg-primary-100 text-primary-700 rounded-xl text-sm font-semibold flex items-center">
               {selected.size} sélectionné{selected.size > 1 ? 's' : ''}
             </span>
+            {tab === 'teachers' && (
+              <button
+                onClick={async () => {
+                  // Compute file count for the confirmation
+                  const teachersToDelete = teachers.filter(
+                    (t) => selected.has(t.id) && (t as any).role !== 'ADMIN',
+                  );
+                  const totalResources = teachersToDelete.reduce(
+                    (sum, t: any) => sum + (t._count?.uploadedFiles || 0),
+                    0,
+                  );
+                  const totalLibrary = teachersToDelete.reduce(
+                    (sum, t: any) => sum + (t._count?.library || 0),
+                    0,
+                  );
+                  const msg =
+                    `🗑️ SUPPRESSION DÉFINITIVE\n\n` +
+                    `Tu vas supprimer DÉFINITIVEMENT ${teachersToDelete.length} prof(s) :\n` +
+                    teachersToDelete
+                      .slice(0, 10)
+                      .map((t) => `  • ${t.firstName || ''} ${t.lastName || ''} (${t.email})`)
+                      .join('\n') +
+                    (teachersToDelete.length > 10
+                      ? `\n  ... et ${teachersToDelete.length - 10} autres`
+                      : '') +
+                    `\n\n📁 ${totalResources} ressource(s) uploadée(s) → seront TRANSFÉRÉES à ton compte admin (conservées)\n` +
+                    `📚 ${totalLibrary} fichier(s) dans la library → seront supprimés avec le prof\n\n` +
+                    `⚠️ Cette action est IRRÉVERSIBLE.\n\n` +
+                    `Continuer ?`;
+                  if (!confirm(msg)) return;
+
+                  setBulkLoading('reject'); // reuse loading state
+                  try {
+                    const res = await fetch('/api/admin/teachers/bulk-delete', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ ids: Array.from(selected), keepFiles: true }),
+                    });
+                    const data = await res.json();
+                    if (!res.ok || !data.ok) {
+                      toast.error(data.error || 'Erreur lors de la suppression');
+                      return;
+                    }
+                    toast.success(
+                      `🗑️ ${data.totalDeleted} prof(s) supprimé(s) — ${data.totalResourcesTransferred} ressource(s) transférée(s)` +
+                        (data.totalSkipped > 0 ? `, ${data.totalSkipped} ignoré(s)` : ''),
+                    );
+                    // Remove deleted teachers from local state
+                    setTeachers((ts) => ts.filter((t) => !selected.has(t.id)));
+                    setDismissedIds((prev) => {
+                      const next = new Set(prev);
+                      for (const id of selected) next.add(id);
+                      return next;
+                    });
+                    setSelected(new Set());
+                  } catch (e) {
+                    toast.error('Erreur réseau');
+                  } finally {
+                    setBulkLoading(null);
+                  }
+                }}
+                disabled={bulkLoading !== null}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-bold rounded-xl transition disabled:opacity-50 flex items-center gap-1.5 border-2 border-red-700"
+                title="Supprimer définitivement (les fichiers sont transférés à ton compte admin)"
+              >
+                <Trash2 className="w-4 h-4" />
+                Supprimer {selected.size} prof{selected.size > 1 ? 's' : ''}
+              </button>
+            )}
             <button
               onClick={() => handleBulk('approve')}
               disabled={bulkLoading !== null}

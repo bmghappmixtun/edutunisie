@@ -32,6 +32,9 @@ export default async function AdminApprovationsPage() {
         verificationFilesRequestedAt: true,
         verificationFilesCount: true,
         verificationFilesReceivedAt: true,
+        _count: {
+          select: { uploadedFiles: true, library: true, verificationFiles: true },
+        },
       },
     }),
     prisma.resource.findMany({
