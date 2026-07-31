@@ -12,7 +12,7 @@ export default async function AdminApprovationsPage() {
 
   const [pendingTeachers, pendingResources] = await Promise.all([
     prisma.user.findMany({
-      where: { role: 'TEACHER', status: { in: ['PENDING_APPROVAL', 'PENDING_FILE_VERIFICATION'] } },
+      where: { role: 'TEACHER', status: { in: ['PENDING_APPROVAL', 'PENDING_FILE_VERIFICATION', 'PENDING_OTP'] } },
       orderBy: { createdAt: 'desc' },
       select: {
         id: true,
@@ -26,6 +26,7 @@ export default async function AdminApprovationsPage() {
         teachingLevels: true,
         createdAt: true,
         status: true,
+        emailVerifiedAt: true,
         invitationStatus: true,
         lastInvitationId: true,
         verificationFilesRequestedAt: true,

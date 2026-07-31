@@ -28,6 +28,7 @@ type Teacher = {
   teachingLevels: string | null;
   createdAt: string;
   status: string;
+  emailVerifiedAt?: string | null;
   invitationStatus?: string | null;
   lastInvitationId?: string | null;
   verificationFilesRequestedAt?: string | null;
@@ -418,7 +419,14 @@ export default function ApprobationsClient({
                               <div className="text-xs text-slate-500 truncate">{t.email}</div>
                             </div>
                             {/* Status badge */}
-                            {t.lastInvitationId || t.invitationStatus ? (
+                            {t.status === 'PENDING_OTP' && !t.emailVerifiedAt ? (
+                              <span
+                                className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 border border-orange-200 flex-shrink-0"
+                                title="Le prof n'a pas encore vérifié son email"
+                              >
+                                ✉️ Email non vérifié
+                              </span>
+                            ) : t.lastInvitationId || t.invitationStatus ? (
                               <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 border border-indigo-200 flex-shrink-0">
                                 <Mail className="w-3 h-3" /> Invité
                               </span>
@@ -511,7 +519,19 @@ export default function ApprobationsClient({
                     {/* Actions */}
                     <div className="flex sm:flex-col gap-2 flex-shrink-0">
                       <button
-                        onClick={() => handleSingle(item.id, 'approve')}
+                        onClick={() => {
+                          // Warn admin if prof hasn't verified their email yet
+                          if (t.status === 'PENDING_OTP' && !t.emailVerifiedAt) {
+                            const ok = confirm(
+                              `⚠️ Le prof n'a pas encore vérifié son email.\n\n` +
+                              `Si tu l'approuves maintenant, il pourra se connecter sans avoir vérifié son email (risque sécurité).\n\n` +
+                              `Recommandé : clique "Renvoyer l'email" ci-dessous et attends qu'il vérifie.\n\n` +
+                              `Approuver quand même ?`,
+                            );
+                            if (!ok) return;
+                          }
+                          handleSingle(item.id, 'approve');
+                        }}
                         disabled={loading !== null}
                         className="p-2 sm:px-3 sm:py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-xs sm:text-sm font-semibold rounded-lg sm:rounded-xl transition disabled:opacity-50 flex items-center gap-1.5"
                         title="Approuver"
@@ -523,6 +543,38 @@ export default function ApprobationsClient({
                         )}
                         <span className="hidden sm:inline">Approuver</span>
                       </button>
+                      {/* Resend verification email button — only for PENDING_OTP teachers */}
+                      {isTeacher && t.status === 'PENDING_OTP' && !t.emailVerifiedAt && (
+                        <button
+                          onClick={async () => {
+                            const ok = confirm(
+                              `Renvoyer l'email de vérification à ${t.email} ?`,
+                            );
+                            if (!ok) return;
+                            try {
+                              const res = await fetch('/api/auth/resend-otp', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ email: t.email }),
+                              });
+                              const data = await res.json();
+                              if (res.ok) {
+                                toast.success(`📧 Email de vérification renvoyé à ${t.email}`);
+                              } else {
+                                toast.error(data.error || 'Erreur');
+                              }
+                            } catch (e) {
+                              toast.error('Erreur réseau');
+                            }
+                          }}
+                          disabled={loading !== null}
+                          className="p-2 sm:px-3 sm:py-2 bg-orange-500 hover:bg-orange-600 text-white text-xs sm:text-sm font-semibold rounded-lg sm:rounded-xl transition disabled:opacity-50 flex items-center gap-1.5"
+                          title="Renvoyer l'email de vérification"
+                        >
+                          <Mail className="w-4 h-4" />
+                          <span className="hidden sm:inline">Renvoyer</span>
+                        </button>
+                      )}
                       <button
                         onClick={() => handleSingle(item.id, 'reject')}
                         disabled={loading !== null}
