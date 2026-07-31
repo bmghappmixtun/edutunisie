@@ -18,38 +18,64 @@
  *   { ok: true, invitationId, userId, tempPassword, acceptUrl }
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
 import {
   createInvitation,
-  sendInvitationEmail,
   USER_INV_STATUS,
 } from '@/lib/invitation';
 import { renderJotformInvitationEmail, type SourceSite } from '@/lib/email-templates/jotform-invitation';
 import { Resend } from 'resend';
-import crypto from 'crypto';
+
+const VALID_SITES: SourceSite[] = ['devoirat', 'tunisiecollege'];
+
+function validateBody(body: any): { ok: true; data: {
+  firstName: string;
+  lastName: string;
+  email: string;
+  site: SourceSite;
+  customMessage?: string;
+} } | { ok: false; error: string } {
+  if (!body || typeof body !== 'object') {
+    return { ok: false, error: 'Body must be a JSON object' };
+  }
+  const { firstName, lastName, email, site, customMessage } = body;
+  if (typeof firstName !== 'string' || firstName.trim().length === 0 || firstName.length > 100) {
+    return { ok: false, error: 'firstName is required (1-100 chars)' };
+  }
+  if (typeof lastName !== 'string' || lastName.trim().length === 0 || lastName.length > 100) {
+    return { ok: false, error: 'lastName is required (1-100 chars)' };
+  }
+  if (typeof email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 200) {
+    return { ok: false, error: 'email is required and must be valid' };
+  }
+  if (!VALID_SITES.includes(site)) {
+    return { ok: false, error: `site must be one of: ${VALID_SITES.join(', ')}` };
+  }
+  if (customMessage !== undefined && (typeof customMessage !== 'string' || customMessage.length > 1000)) {
+    return { ok: false, error: 'customMessage is optional but must be a string (max 1000 chars)' };
+  }
+  return {
+    ok: true,
+    data: {
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
+      email: email.toLowerCase().trim(),
+      site,
+      customMessage: customMessage?.trim() || undefined,
+    },
+  };
+}
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 const FROM = process.env.EMAIL_FROM || 'Examanet <noreply@examanet.com>';
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
 
-const BodySchema = z.object({
-  firstName: z.string().min(1).max(100),
-  lastName: z.string().min(1).max(100),
-  email: z.string().email().max(200),
-  site: z.enum(['devoirat', 'tunisiecollege']),
-  customMessage: z.string().max(1000).optional(),
-});
-
-function generateTempPassword(): string {
-  // 10 chars, alphanumeric, no ambiguous chars
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
-  const arr = crypto.randomBytes(10);
-  let s = '';
-  for (let i = 0; i < 10; i++) s += chars[arr[i] % chars.length];
-  return s;
-}
+// Subject lines (kept in sync with the email template)
+const SITE_CONFIG: Record<SourceSite, { subject: string }> = {
+  devoirat: { subject: '🎁 Une plateforme 100% gratuite attend vos ressources — examenet.com' },
+  tunisiecollege: { subject: 'Vos ressources méritent d\'être vues — rejoignez examanet.com 🎓' },
+};
 
 export async function POST(req: NextRequest) {
   // Auth: admin only
@@ -65,15 +91,12 @@ export async function POST(req: NextRequest) {
   } catch {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
   }
-  const parsed = BodySchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json(
-      { error: 'Invalid input', details: parsed.error.flatten() },
-      { status: 400 },
-    );
+  const parsed = validateBody(body);
+  if (!parsed.ok) {
+    return NextResponse.json({ error: parsed.error }, { status: 400 });
   }
   const { firstName, lastName, email, site, customMessage } = parsed.data;
-  const normalizedEmail = email.toLowerCase().trim();
+  const normalizedEmail = email; // already lowercased + trimmed in validateBody
 
   // Check if user already exists
   let user = await prisma.user.findUnique({
@@ -182,9 +205,3 @@ export async function POST(req: NextRequest) {
     emailError,
   });
 }
-
-// Subject lines (kept in sync with the email template)
-const SITE_CONFIG: Record<SourceSite, { subject: string }> = {
-  devoirat: { subject: '🎁 Une plateforme 100% gratuite attend vos ressources — examenet.com' },
-  tunisiecollege: { subject: 'Vos ressources méritent d\'être vues — rejoignez examanet.com 🎓' },
-};
