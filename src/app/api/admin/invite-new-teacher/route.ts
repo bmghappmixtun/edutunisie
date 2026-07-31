@@ -78,6 +78,7 @@ const SITE_CONFIG: Record<SourceSite, { subject: string }> = {
 };
 
 export async function POST(req: NextRequest) {
+  try {
   // Auth: admin only
   const me = await getCurrentUser();
   if (!me || me.role !== 'ADMIN') {
@@ -212,4 +213,15 @@ export async function POST(req: NextRequest) {
     emailSent: emailOk,
     emailError,
   });
+  } catch (err: any) {
+    console.error('❌ [JOTFORM INVITATION - UNCAUGHT]', err);
+    return NextResponse.json(
+      {
+        error: 'Erreur serveur inattendue',
+        details: err?.message || String(err),
+        stack: err?.stack?.split('\n').slice(0, 5).join('\n') || null,
+      },
+      { status: 500 },
+    );
+  }
 }
