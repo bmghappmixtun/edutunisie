@@ -47,8 +47,8 @@ const SITE_CONFIG: Record<
 > = {
   devoirat: {
     displayName: 'devoirat.net',
-    greeting: 'Une plateforme 100% gratuite attend vos ressources — examenet.com',
-    subject: '🎁 Une plateforme 100% gratuite attend vos ressources — examenet.com',
+    greeting: 'Une plateforme 100% gratuite attend vos ressources — examanet.com',
+    subject: 'Une plateforme 100% gratuite attend vos ressources — examanet.com',
     intro:
       "Je suis B.Mehdi, fondateur et administrateur de devoirat.net — la plateforme qui, grâce à des profs comme vous, a déjà accompagné des milliers d'élèves tunisiens.",
     hook:
