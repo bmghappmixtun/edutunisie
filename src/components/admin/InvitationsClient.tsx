@@ -225,9 +225,13 @@ export default function InvitationsClient({
         open={showInviteModal}
         onClose={() => setShowInviteModal(false)}
         onSuccess={(inv) => {
-          setInvitations((prev) => [inv as Invitation, ...prev]);
+          // We don't add the new invitation to the local list because the API
+          // response doesn't include the full `teacher` object. The table list
+          // would crash when trying to read `inv.teacher.firstName[0]`.
+          // Instead, we show a success message and let the user refresh the page
+          // to see the new invitation in the list.
           setShowInviteModal(false);
-          toast.success(`Invitation envoyée à ${inv.email}`);
+          toast.success(`Invitation envoyée à ${inv.email} — recharge la page pour la voir`);
           // Refresh stats
           refreshStats();
         }}
