@@ -248,6 +248,10 @@ model Resource {
   // Header data extracted from PDF text (school, teacher, level, year, type, etc.)
   headerData         Json?         // Structured fields from PDF header via text extraction
   schoolName         String?       // School name extracted from PDF header
+  /// Teacher name in Arabic (الأستاذ), extracted from PDF header.
+  /// NOT a relation to the User table — this is display/SEO info for the resource
+  /// page and search engines. The User relation is the uploader, not the named prof.
+  teacherNameAr      String?
 
   // Homework subtype: only when type=HOMEWORK
   // CONTROL = Devoir de Contrôle, SYNTHESIS = Devoir de Synthèse, HOUSEWORK = Devoir de Maison

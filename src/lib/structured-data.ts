@@ -150,6 +150,8 @@ export function courseSchema(opts: {
   type: string; // COURSE / DEVOIR / EXERCISE / etc.
   year?: string | null;
   teacher?: string | null;
+  /** Teacher name in Arabic (الأستاذ) — for SEO/display. NOT a User FK. */
+  teacherAr?: string | null;
   url: string;
   datePublished: string;
   dateModified: string;
@@ -183,7 +185,15 @@ export function courseSchema(opts: {
       courseMode: 'online',
       courseWorkload: 'PT1H',
       inLanguage: opts.language,
-      instructor: opts.teacher ? { '@type': 'Person', name: opts.teacher } : undefined,
+      instructor: opts.teacher
+        ? {
+            '@type': 'Person',
+            name: opts.teacher,
+            // Add the AR name (alternateName) when available — helps multilingual SEO
+            // and gives search engines an extra signal about the resource creator.
+            ...(opts.teacherAr ? { alternateName: opts.teacherAr } : {}),
+          }
+        : undefined,
       offers: {
         '@type': 'Offer',
         price: '0',

@@ -278,6 +278,7 @@ export default async function ResourcePage({
           .replace(/\s+/g, ' ')
           .trim() || null
       : null,
+    teacherAr: resource.teacherNameAr || null,
     url: resourceUrl,
     datePublished: resource.publishedAt?.toISOString() || resource.createdAt?.toISOString(),
     dateModified: resource.updatedAt?.toISOString() || resource.createdAt?.toISOString(),
@@ -546,17 +547,29 @@ export default async function ResourcePage({
                   // Per user rule (2026-07-30): for college, hide Type (النوع) and
                   // Niveau (المستوى) from the AI card — they're always the same.
                   const isCollege = resource.class?.level?.slug === 'college';
-                  // Teacher full name (FR + AR) — prefer teacher record over AI summary.
+                  // Teacher full name (FR + AR) — prefer the resource.teacherNameAr
+                  // (text field, no relation) for AR. Fall back to the User record.
+                  // Per user rule: "teacherNameAr est juste une info pour l'utilisateur
+                  // du site et les moteurs de recherche" — display/SEO only.
                   const teacherFr = resource.teacher
                     ? `${resource.teacher.firstName || ''} ${resource.teacher.lastName || ''}`
                         .replace(/\s+/g, ' ')
                         .trim() || null
                     : null;
-                  const teacherAr = resource.teacher
-                    ? `${resource.teacher.firstNameAr || ''} ${resource.teacher.lastNameAr || ''}`
+                  const teacherAr = (() => {
+                    // 1. Prefer the resource-level teacherNameAr (text, no FK)
+                    if (resource.teacherNameAr && resource.teacherNameAr.trim()) {
+                      return resource.teacherNameAr.trim();
+                    }
+                    // 2. Fall back to the User record's firstNameAr + lastNameAr
+                    if (resource.teacher) {
+                      const v = `${resource.teacher.firstNameAr || ''} ${resource.teacher.lastNameAr || ''}`
                         .replace(/\s+/g, ' ')
-                        .trim() || null
-                    : null;
+                        .trim();
+                      return v || null;
+                    }
+                    return null;
+                  })();
                   return (
                     <div className="mb-4">
                       <AiDescription
