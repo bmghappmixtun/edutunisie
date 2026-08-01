@@ -2,6 +2,7 @@ import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { prisma } from './prisma';
 import { Resend } from 'resend';
+import { notifyAdminsInvitedTeacherActivated } from './admin-notify';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 const FROM = process.env.EMAIL_FROM || 'Examanet <noreply@examanet.com>';
@@ -275,6 +276,14 @@ export async function activateInvitation(
       },
     }),
   ]);
+
+  // Notify admin(s) that an invited teacher has activated their account
+  // and is now ACTIVE (bypassed PENDING_APPROVAL by design — admin already
+  // pre-approved by clicking the "Invite new teacher" button).
+  // Fire-and-forget: don't block activation if email fails.
+  notifyAdminsInvitedTeacherActivated(inv.teacherId).catch((e) =>
+    console.error('Invited teacher activation admin notify error:', e),
+  );
 
   return { ok: true };
 }

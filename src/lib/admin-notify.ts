@@ -121,6 +121,69 @@ export async function notifyAdminsTeacherActivated(teacherId: string) {
 }
 
 /**
+ * Notify all admins that an INVITED teacher has activated their account
+ * (PENDING_INVITATION → ACTIVE) by setting their password on the invite link.
+ *
+ * Distinct from notifyAdminsTeacherActivated (which fires when a teacher
+ * verifies their OTP after self-registration). Invited teachers skip the
+ * PENDING_APPROVAL step by design — the admin already pre-approved them
+ * by clicking the "Invite new teacher" button — but the admin still needs
+ * to know the invite was actually accepted (vs bounced / unopened).
+ */
+export async function notifyAdminsInvitedTeacherActivated(teacherId: string) {
+  const teacher = await prisma.user.findUnique({ where: { id: teacherId } });
+  if (!teacher || teacher.role !== 'TEACHER') return;
+
+  const admins = await prisma.user.findMany({ where: { role: 'ADMIN' } });
+  if (admins.length === 0) return;
+
+  // In-app notifications
+  for (const admin of admins) {
+    await prisma.notification.create({
+      data: {
+        userId: admin.id,
+        type: 'invited_teacher_activated',
+        title: '🎉 Prof invité a activé son compte',
+        message: `${teacher.firstName || ''} ${teacher.lastName || ''} (${teacher.email}) a rejoint Examanet via votre invitation.`,
+        link: `/profs/${teacher.numericId || teacher.id}/${teacher.slug || 'prof'}`,
+      },
+    });
+  }
+
+  // Email notifications
+  const adminEmails = getAdminEmailsFromConfig();
+  if (!resend) {
+    console.log(
+      `\n📧 [ADMIN EMAIL - DEV] Invited teacher activated: ${teacher.firstName || ''} ${teacher.lastName || ''} (${teacher.email}) → ${adminEmails.join(', ')}\n`,
+    );
+    return;
+  }
+
+  try {
+    const html = renderTeacherActivatedEmail(
+      teacher.firstName || '',
+      teacher.lastName || '',
+      teacher.email,
+      teacher.schoolName,
+    );
+    // Send to BOTH DB admins + hardcoded fallback
+    const recipients = new Set<string>(adminEmails);
+    for (const admin of admins) {
+      if (admin.email) recipients.add(admin.email);
+    }
+    if (recipients.size === 0) return;
+    await resend.emails.send({
+      from: FROM,
+      to: Array.from(recipients),
+      subject: `🎉 ${teacher.firstName || ''} ${teacher.lastName || ''} a rejoint Examanet via votre invitation`,
+      html,
+    });
+  } catch (e) {
+    console.error('Failed to notify admins of invited teacher activation:', e);
+  }
+}
+
+/**
  * Notify all admins that a new resource was uploaded and awaits approval.
  */
 export async function notifyAdminsNewResource(resourceId: string) {
