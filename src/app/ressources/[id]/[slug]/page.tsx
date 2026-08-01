@@ -620,7 +620,7 @@ export default async function ResourcePage({
                     defaultOpen={false}
                   >
                     <div className={`flex flex-wrap gap-2 ${anyAr ? 'justify-end' : 'justify-start'}`}>
-                      {resource.metadata.keyPoints.slice(0, 5).map((kp, i) => {
+                      {resource.metadata.keyPoints.slice(0, 10).map((kp, i) => {
                         const kpAr = isArabic(kp);
                         const colorClass = palette[i % palette.length];
                         // Per user rule (2026-07-30): make key points clickable,

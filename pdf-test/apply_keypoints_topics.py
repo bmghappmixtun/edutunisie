@@ -94,26 +94,59 @@ def main():
 
         updates = {}
 
-        # 1. keyPoints: fill if empty (prudent) or always (force)
+        # Normalize for dedup (lowercase + strip whitespace)
+        def normalize(s):
+            return re.sub(r'\s+', ' ', s.lower().strip()) if s else ''
+
+        # 1. keyPoints: MERGE old + new (dedup, preserve order: old first then new)
+        # Per user rule (2026-08-01): "on garde les anciens aussi, on affiche les
+        # anciens + les nouveaux" — both old and new key points are useful
+        # (old = generic, new = specific, complementary).
         staging_kp_list = parse_pg_array(staging_kp) if staging_kp else []
         live_kp_list = parse_pg_array(live_kp) if live_kp else []
-        if staging_kp_list and (args.force or not live_kp_list):
-            if not args.force and live_kp_list:
-                skipped_kp += 1
-            else:
-                updates['keyPoints'] = staging_kp_list
-        elif staging_kp_list and live_kp_list and not args.force:
-            skipped_kp += 1
 
-        # 2. topics: staging.subject is the lesson topic → copy to live.topics
+        if staging_kp_list or live_kp_list:
+            seen = set()
+            merged = []
+            # Old first (in their original order)
+            for kp in live_kp_list:
+                k = normalize(kp)
+                if k and k not in seen:
+                    seen.add(k)
+                    merged.append(kp)
+            # Then new (skip duplicates of old)
+            for kp in staging_kp_list:
+                k = normalize(kp)
+                if k and k not in seen:
+                    seen.add(k)
+                    merged.append(kp)
+            # Only update if the merged list is different from current live
+            if merged != live_kp_list:
+                updates['keyPoints'] = merged
+            else:
+                skipped_kp += 1
+        elif staging_kp_list and not live_kp_list:
+            updates['keyPoints'] = staging_kp_list
+
+        # 2. topics: MERGE old topics + new staging.subject (dedup)
         if staging_subject and staging_subject.strip():
             staging_topic = staging_subject.strip()
             live_topics_list = parse_pg_array(live_topics) if live_topics else []
-            if args.force or not live_topics_list:
-                if not args.force and live_topics_list:
-                    skipped_topics += 1
-                else:
-                    updates['topics'] = [staging_topic]
+            seen = set()
+            merged_topics = []
+            for t in live_topics_list:
+                k = normalize(t)
+                if k and k not in seen:
+                    seen.add(k)
+                    merged_topics.append(t)
+            k = normalize(staging_topic)
+            if k and k not in seen:
+                seen.add(k)
+                merged_topics.append(staging_topic)
+            if merged_topics != live_topics_list:
+                updates['topics'] = merged_topics
+            elif merged_topics:
+                skipped_topics += 1
 
         # Display
         print(f'━━━ #{nid} ({class_slug}) ━━━')
