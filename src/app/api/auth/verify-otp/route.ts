@@ -3,6 +3,7 @@ import { isValidOrigin, isProduction } from '@/lib/security';
 import { prisma } from '@/lib/prisma';
 import { createSession, setSessionCookie } from '@/lib/auth';
 import { sendWelcomeConfirmedEmail } from '@/lib/email';
+import { notifyAdminsTeacherActivated } from '@/lib/admin-notify';
 
 export async function POST(req: NextRequest) {
   // SECURITY: CSRF origin check (production only)
@@ -77,6 +78,13 @@ export async function POST(req: NextRequest) {
     await sendWelcomeConfirmedEmail(updated.email, updated.firstName ?? '', updated.role).catch(
       (e) => console.error('Confirmation email error:', e),
     );
+
+    // For TEACHER: notify admins that the prof has activated their account (PENDING_OTP → PENDING_APPROVAL)
+    if (updated.role === 'TEACHER' && newStatus === 'PENDING_APPROVAL') {
+      await notifyAdminsTeacherActivated(updated.id).catch((e) =>
+        console.error('Teacher activation admin notify error:', e),
+      );
+    }
 
     // Auto-login for students
     if (updated.status === 'ACTIVE') {

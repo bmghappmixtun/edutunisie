@@ -40,6 +40,42 @@ export function renderNewTeacherEmail(
   });
 }
 
+/**
+ * Email sent to admin when a teacher verifies their email (PENDING_OTP → PENDING_APPROVAL).
+ * Distinct from `renderNewTeacherEmail` (which is sent at signup when the prof is PENDING_OTP).
+ * This confirms the prof has indeed activated their account and the email is valid.
+ */
+export function renderTeacherActivatedEmail(
+  firstName: string,
+  lastName: string,
+  email: string,
+  school: string | null,
+): string {
+  const safeSchool = school ? school.replace(/</g, '&lt;').replace(/>/g, '&gt;') : null;
+  return renderEmailShell({
+    accent: 'green',
+    icon: '✉️',
+    title: 'Professeur a activé son compte',
+    subtitle: 'Email vérifié — prêt à être approuvé',
+    preheader: `${firstName} ${lastName} a vérifié son email`,
+    body: `
+      <p style="margin:0 0 16px;font-size:16px;color:#0F172A;font-family:${F};">Bonjour Admin,</p>
+      ${paragraph(
+        `L'enseignant <strong style="color:#0F172A;">${firstName} ${lastName}</strong> a vérifié son adresse email et son compte est maintenant en attente d'approbation.`,
+      )}
+      <div style="background:#D1FAE5;border-left:4px solid #10B981;border-radius:8px;padding:16px;margin:20px 0;font-family:${F};">
+        <p style="margin:0 0 8px;color:#065F46;font-weight:bold;">✅ Email confirmé</p>
+        <p style="margin:4px 0;color:#064E3B;font-size:14px;"><strong>Nom :</strong> ${firstName} ${lastName}</p>
+        <p style="margin:4px 0;color:#064E3B;font-size:14px;"><strong>Email :</strong> <a href="mailto:${email}" style="color:#0369A1;">${email}</a></p>
+        ${safeSchool ? `<p style="margin:4px 0;color:#064E3B;font-size:14px;"><strong>Établissement :</strong> ${safeSchool}</p>` : ''}
+      </div>
+      ${muted("Le prof a confirmé son adresse email — vous pouvez maintenant examiner et approuver son compte.")}
+      ${ctaButton(`${SITE_URL}/admin/approbations`, 'Approuver le professeur', 'green')}
+    `,
+    footer: `<p style="margin:0;color:#94A3B8;font-size:12px;text-align:center;font-family:${F};">Examanet · Système de notification admin</p>`,
+  });
+}
+
 export function renderNewResourceEmail(
   teacherName: string,
   title: string,

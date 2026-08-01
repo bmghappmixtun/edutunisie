@@ -1,5 +1,5 @@
 import { Resend } from 'resend';
-import { renderNewTeacherEmail, renderNewResourceEmail } from './email-templates';
+import { renderNewTeacherEmail, renderNewResourceEmail, renderTeacherActivatedEmail } from './email-templates';
 import { prisma } from './prisma';
 import { getAdminEmailsFromConfig } from './admin-config';
 
@@ -59,6 +59,64 @@ export async function notifyAdminsNewTeacher(teacherId: string) {
     });
   } catch (e) {
     console.error('Failed to notify admins of new teacher:', e);
+  }
+}
+
+/**
+ * Notify all admins that a teacher has verified their email and is now PENDING_APPROVAL.
+ * Called from /api/auth/verify-otp when a TEACHER transitions PENDING_OTP → PENDING_APPROVAL.
+ * Distinct from notifyAdminsNewTeacher (which fires at signup, before email verification).
+ */
+export async function notifyAdminsTeacherActivated(teacherId: string) {
+  const teacher = await prisma.user.findUnique({ where: { id: teacherId } });
+  if (!teacher || teacher.role !== 'TEACHER') return;
+
+  const admins = await prisma.user.findMany({ where: { role: 'ADMIN' } });
+  if (admins.length === 0) return;
+
+  // In-app notifications
+  for (const admin of admins) {
+    await prisma.notification.create({
+      data: {
+        userId: admin.id,
+        type: 'teacher_activated',
+        title: '✉️ Professeur a activé son compte',
+        message: `${teacher.firstName || ''} ${teacher.lastName || ''} (${teacher.email}) a vérifié son email. Compte prêt à être approuvé.`,
+        link: '/admin/approbations',
+      },
+    });
+  }
+
+  // Email notifications
+  const adminEmails = getAdminEmailsFromConfig();
+  if (!resend) {
+    console.log(
+      `\n📧 [ADMIN EMAIL - DEV] Teacher activated: ${teacher.firstName || ''} ${teacher.lastName || ''} (${teacher.email}) → ${adminEmails.join(', ')}\n`,
+    );
+    return;
+  }
+
+  try {
+    const html = renderTeacherActivatedEmail(
+      teacher.firstName || '',
+      teacher.lastName || '',
+      teacher.email,
+      teacher.schoolName,
+    );
+    // Send to BOTH DB admins + hardcoded fallback
+    const recipients = new Set<string>(adminEmails);
+    for (const admin of admins) {
+      if (admin.email) recipients.add(admin.email);
+    }
+    if (recipients.size === 0) return;
+    await resend.emails.send({
+      from: FROM,
+      to: Array.from(recipients),
+      subject: `✉️ ${teacher.firstName || ''} ${teacher.lastName || ''} a activé son compte`,
+      html,
+    });
+  } catch (e) {
+    console.error('Failed to notify admins of teacher activation:', e);
   }
 }
 
