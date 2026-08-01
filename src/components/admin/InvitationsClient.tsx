@@ -451,21 +451,32 @@ export default function InvitationsClient({
                       {/*
                        * The "expiring soon" badge and date string both depend on
                        * the current time, which can differ between the server
-                       * render and the client hydration. We wrap the whole
-                       * cell in suppressHydrationWarning so React doesn't try
-                       * to patch the differing text/conditional content and
-                       * trigger a #418/#422 mismatch.
+                       * render and the client hydration.
                        *
-                       * This fixes the recurring React #418/#422 errors on
-                       * /admin/invitations (ERR-4QRFC7, ERR-5JDSKD — 14 events
-                       * in the 2026-07-31 nightly digest). The visible output
-                       * stabilises within a millisecond of hydration.
+                       * Structural-stability fix (2026-08-01 nightly): we used
+                       * to render `{isExpiringSoon && '⚠️ '}` as a separate
+                       * child before the date. When the flag flipped between
+                       * SSR and hydration, the child count of the wrapping
+                       * <div> changed (1 child on one side, 2 on the other) —
+                       * even with suppressHydrationWarning, the structural
+                       * difference triggered React #418/#422 (ERR-3Y8NUN,
+                       * ERR-SEHQAP — 4 events in 2026-08-01 nightly digest).
+                       *
+                       * Now the warning emoji is a single always-rendered
+                       * <span>, hidden via CSS when isExpiringSoon is false.
+                       * The text content of the <div> is a single string
+                       * (className + date), so the React tree is identical
+                       * between server and client. Only the visible styling
+                       * (text-rose vs text-slate) and the ⚠️ visibility differ,
+                       * both of which suppressHydrationWarning handles cleanly.
                        */}
                       <div
                         className={`text-xs ${isExpiringSoon ? 'text-rose-600 font-bold' : 'text-slate-500'}`}
                         suppressHydrationWarning
                       >
-                        {isExpiringSoon && '⚠️ '}
+                        <span className={isExpiringSoon ? '' : 'hidden'} aria-hidden={!isExpiringSoon}>
+                          ⚠️{' '}
+                        </span>
                         {new Date(inv.expiresAt).toLocaleDateString('fr-FR')}
                       </div>
                     </td>

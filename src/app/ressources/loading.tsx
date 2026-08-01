@@ -111,6 +111,14 @@ export default function Loading() {
                   </div>
                 ))}
               </div>
+              {/* Active-filter-chips wrapper placeholder.
+               * The page (FilterShell.tsx ~line 710) ALWAYS renders this 3rd
+               * child of <aside>, hidden via CSS when activeCount === 0.
+               * Without this placeholder, the aside has 2 children in the
+               * skeleton but 3 children in the streamed page → React #418/#422
+               * hydration mismatch on /ressources?teacherId=* (ERR-YH74LU
+               * 12 events, ERR-BX5EQZ 10 events in 2026-08-01 nightly digest). */}
+              <div className="hidden" aria-hidden="true" />
             </aside>
 
             {/* Content skeleton — <div> wrappers match the page's
