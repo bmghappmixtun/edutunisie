@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { Facebook, Twitter, Instagram, Youtube } from 'lucide-react';
+import { Facebook, Twitter, Instagram, Youtube, GraduationCap } from 'lucide-react';
 import { getT } from '@/lib/i18n-server';
 
 export default function Footer() {
@@ -150,6 +150,12 @@ export default function Footer() {
               <li>
                 <Link href="/a-propos" className="hover:text-primary-400 transition">
                   {t('nav.about')}
+                </Link>
+              </li>
+              <li>
+                <Link href="/enseignants/rejoindre" className="hover:text-primary-400 transition flex items-center gap-1.5">
+                  <GraduationCap className="w-3.5 h-3.5 flex-shrink-0" />
+                  <span>{t('footer.joinAsTeacher')}</span>
                 </Link>
               </li>
               <li>

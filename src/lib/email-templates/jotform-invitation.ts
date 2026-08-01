@@ -288,6 +288,13 @@ export function renderJotformInvitationEmail(args: {
       <div style="margin-top:12px;font-size:13px;color:#64748b">Gratuit · 2 minutes · Aucun engagement</div>
     </div>
 
+    <!-- Secondary CTA: discover all benefits -->
+    <div style="text-align:center;margin:16px 0 0">
+      <a href="${SITE_URL}/enseignants/rejoindre" style="display:inline-block;background:transparent;color:#7c3aed;text-decoration:none;padding:12px 24px;border-radius:10px;font-size:14px;font-weight:700;border:2px solid #e9d5ff">
+        Découvrir tous les avantages pour les enseignants →
+      </a>
+    </div>
+
     <p style="margin:24px 0 0;font-size:14px;line-height:1.6;color:#64748b;text-align:center;font-style:italic">
       Vous gardez votre historique ${safeSiteName}.<br>
       Vous choisissez ce que vous voulez rendre public. Et c'est tout.
