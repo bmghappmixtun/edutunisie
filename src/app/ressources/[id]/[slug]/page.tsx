@@ -603,15 +603,14 @@ export default async function ResourcePage({
                     - Title: "النقاط الرئيسية" (was "Points clés" in FR)
                     - Display: multi-color rounded bubbles instead of a bullet list
                     - Per-subject palette: rose/fuchsia/teal/amber/violet
-                    - Auto-detect AR for RTL alignment */}
+                    - Per user rule (2026-08-02): align bubbles RIGHT for AR docs,
+                      LEFT for FR docs — based on document language, not keyPoint lang */}
                 {resource.metadata?.keyPoints && resource.metadata.keyPoints.length > 0 && (() => {
-                  // Check if any key point is Arabic — if so, align all right
-                  const anyAr = resource.metadata.keyPoints.some((kp) => isArabic(kp));
-                  // Per user rule (2026-08-02): align title to the right when
-                  // BOTH the file language is AR AND the keyPoints are in AR.
-                  // Otherwise the AR title + LTR button would put "النقاط الرئيسية"
-                  // on the left and the chevron on the right (visually wrong).
-                  const titleAlignRight = resource.language === 'ar' && anyAr;
+                  // Per user rule (2026-08-02): align RIGHT for AR docs, LEFT for FR docs.
+                  // Use the document language as the source of truth (not anyAr).
+                  const isArDoc = resource.language === 'ar';
+                  // Title align right for AR docs (regardless of keyPoint content).
+                  const titleAlignRight = isArDoc;
                   // Multi-color palette for bubbles (5 colors cycle)
                   const palette = [
                     'bg-rose-100 text-rose-800 border-rose-300',
@@ -629,7 +628,7 @@ export default async function ResourcePage({
                     defaultOpen={false}
                     alignRight={titleAlignRight}
                   >
-                    <div className={`flex flex-wrap gap-2 ${anyAr ? 'justify-end' : 'justify-start'}`}>
+                    <div className={`flex flex-wrap gap-2 ${isArDoc ? 'justify-end' : 'justify-start'}`}>
                       {resource.metadata.keyPoints.slice(0, 10).map((kp, i) => {
                         const kpAr = isArabic(kp);
                         const colorClass = palette[i % palette.length];
