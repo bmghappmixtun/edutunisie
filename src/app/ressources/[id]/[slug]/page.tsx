@@ -603,6 +603,11 @@ export default async function ResourcePage({
                 {resource.metadata?.keyPoints && resource.metadata.keyPoints.length > 0 && (() => {
                   // Check if any key point is Arabic — if so, align all right
                   const anyAr = resource.metadata.keyPoints.some((kp) => isArabic(kp));
+                  // Per user rule (2026-08-02): align title to the right when
+                  // BOTH the file language is AR AND the keyPoints are in AR.
+                  // Otherwise the AR title + LTR button would put "النقاط الرئيسية"
+                  // on the left and the chevron on the right (visually wrong).
+                  const titleAlignRight = resource.language === 'ar' && anyAr;
                   // Multi-color palette for bubbles (5 colors cycle)
                   const palette = [
                     'bg-rose-100 text-rose-800 border-rose-300',
@@ -618,6 +623,7 @@ export default async function ResourcePage({
                     variant="points"
                     subjectSlug={resource.subject?.slug}
                     defaultOpen={false}
+                    alignRight={titleAlignRight}
                   >
                     <div className={`flex flex-wrap gap-2 ${anyAr ? 'justify-end' : 'justify-start'}`}>
                       {resource.metadata.keyPoints.slice(0, 10).map((kp, i) => {

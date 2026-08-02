@@ -17,6 +17,12 @@ interface AiContentSectionProps {
    * if not provided or no subject-specific palette exists.
    */
   subjectSlug?: string | null;
+  /**
+   * When true, the title + chevron are flipped: title goes to the right
+   * and chevron to the left. Use when the content + resource language are
+   * both Arabic (e.g. AR keyPoints in an AR file).
+   */
+  alignRight?: boolean;
 }
 
 // Re-export for backward compat
@@ -34,6 +40,7 @@ export default function AiContentSection({
   children,
   variant = 'default',
   subjectSlug,
+  alignRight = false,
 }: AiContentSectionProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const v = getPaletteForSubject(subjectSlug);
@@ -66,6 +73,7 @@ export default function AiContentSection({
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex items-center justify-between gap-3 group"
+        dir={alignRight ? 'rtl' : 'ltr'}
         aria-expanded={isOpen}
         aria-label={`${isOpen ? 'Réduire' : 'Développer'} ${title}`}
       >
