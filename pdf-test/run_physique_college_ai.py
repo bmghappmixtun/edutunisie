@@ -197,10 +197,23 @@ def call_ai(prompt, max_tokens=200):
 
 
 def detect_real_lang(text):
-    """FR if Latin ratio >= 0.8, else AR (per user rule)."""
+    """FR if Latin ratio >= 0.8, else AR (per user rule).
+
+    IMPORTANT: Cover ALL Arabic Unicode blocks:
+    - U+0600-U+06FF: Arabic
+    - U+0750-U+077F: Arabic Supplement
+    - U+08A0-U+08FF: Arabic Extended-A
+    - U+FB50-U+FDFF: Arabic Presentation Forms-A
+    - U+FE70-U+FEFF: Arabic Presentation Forms-B
+    Without these, OCR text with Arabic Presentation Forms (which is what
+    PyMuPDF + Tesseract usually produce) is incorrectly detected as Latin.
+    """
     if not text:
         return "ar"
-    ar = len(re.findall(r"[\u0600-\u06FF]", text))
+    # Arabic: U+0600-U+06FF + U+0750-U+077F + U+08A0-U+08FF + U+FB50-U+FDFF + U+FE70-U+FEFF
+    ar_pattern = r"[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]"
+    ar = len(re.findall(ar_pattern, text))
+    # Latin: ASCII A-Z/a-z + Latin Extended (for accented French chars)
     lat = len(re.findall(r"[A-Za-z\u00C0-\u024F]", text))
     total = ar + lat
     if total == 0:
