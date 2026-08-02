@@ -600,17 +600,27 @@ export default async function ResourcePage({
                 })()}
 
                 {/* AI key points — Per user rule (2026-07-30):
-                    - Title: "النقاط الرئيسية" (was "Points clés" in FR)
+                    - Title: "النقاط الرئيسية" (AR) or "Points clés" (FR)
                     - Display: multi-color rounded bubbles instead of a bullet list
                     - Per-subject palette: rose/fuchsia/teal/amber/violet
                     - Per user rule (2026-08-02): align bubbles RIGHT for AR docs,
-                      LEFT for FR docs — based on document language, not keyPoint lang */}
+                      LEFT for FR docs — based on document language, not keyPoint lang
+                    - Per user rule (2026-08-03): PILOTE collège Physique is FR (JORT 2019-063),
+                      so its card title stays in French ("Points clés") even if resource.lang === 'ar' */}
                 {resource.metadata?.keyPoints && resource.metadata.keyPoints.length > 0 && (() => {
                   // Per user rule (2026-08-02): align RIGHT for AR docs, LEFT for FR docs.
                   // Use the document language as the source of truth (not anyAr).
-                  const isArDoc = resource.language === 'ar';
+                  // Per user rule (2026-08-03): PILOTE Physique collège is FR by curriculum.
+                  const isPilotePhysiqueCollege =
+                    resource.schoolType === 'PILOTE' &&
+                    resource.subject?.slug === 'physique' &&
+                    resource.class &&
+                    ['7eme', '8eme', '9eme'].includes(resource.class.slug);
+                  const isArDoc = resource.language === 'ar' && !isPilotePhysiqueCollege;
                   // Title align right for AR docs (regardless of keyPoint content).
                   const titleAlignRight = isArDoc;
+                  // Title text: FR for FR docs (or PILOTE physique collège), AR otherwise.
+                  const keyPointsTitle = isArDoc ? 'النقاط الرئيسية' : 'Points clés';
                   // Multi-color palette for bubbles (5 colors cycle)
                   const palette = [
                     'bg-rose-100 text-rose-800 border-rose-300',
@@ -621,7 +631,7 @@ export default async function ResourcePage({
                   ];
                   return (
                   <AiContentSection
-                    title="النقاط الرئيسية"
+                    title={keyPointsTitle}
                     icon={<Target className="w-4 h-4" />}
                     variant="points"
                     subjectSlug={resource.subject?.slug}
