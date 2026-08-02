@@ -120,6 +120,73 @@ const LABELS_FR: Record<string, string[]> = {
 };
 
 /**
+ * Translate common Latin/FR values to their Arabic equivalents.
+ * Used when a cell is RTL (label is Arabic) but the value is in Latin.
+ * Per user rule (2026-08-02): "physique" should appear as "الفيزياء" in an
+ * Arabic card so the visual flow stays uniform.
+ *
+ * Only well-known FIXED terms are translated — arbitrary text (school names,
+ * teacher names, summaries, year strings) is returned as null (= no change).
+ */
+function translateValueToArabic(value: string): string | null {
+  if (!value) return null;
+  const v = value.trim();
+  if (!v) return null;
+  // Skip if already Arabic
+  if (/[\u0600-\u06FF]/.test(v)) return null;
+  // Skip if contains digits/years (e.g., "2017-2018")
+  if (/\d/.test(v) && v.length < 15) return null;
+
+  // Subject mapping
+  const subjectMap: Record<string, string> = {
+    'physique': 'الفيزياء',
+    'physiques': 'الفيزياء',
+    'mathématiques': 'الرياضيات',
+    'mathematiques': 'الرياضيات',
+    'français': 'الفرنسية',
+    'francais': 'الفرنسية',
+    'arabe': 'العربية',
+    'anglais': 'الإنجليزية',
+    'informatique': 'الإعلامية',
+    'technologie': 'التكنولوجيا',
+    'svt': 'علوم الحياة والأرض',
+    'sciences de la vie et de la terre': 'علوم الحياة والأرض',
+    'histoire-géographie': 'التاريخ-الجغرافيا',
+    'histoire': 'التاريخ',
+    'géographie': 'الجغرافيا',
+    'philosophie': 'الفلسفة',
+    'économie': 'الاقتصاد',
+    'gestion': 'التسيير',
+    'sport': 'الرياضة',
+    'éducation islamique': 'التربية الإسلامية',
+  };
+
+  const lower = v.toLowerCase();
+  if (subjectMap[lower]) return subjectMap[lower];
+
+  // Type mapping
+  const typeMap: Record<string, string> = {
+    'devoir': 'فرض',
+    'devoir de contrôle': 'فرض مراقبة',
+    'devoir de synthèse': 'فرض تأليفي',
+    'série d\'exercices': 'سلسلة تمارين',
+    'serie d exercices': 'سلسلة تمارين',
+    'cours': 'درس',
+    'résumé': 'ملخص',
+    'resume': 'ملخص',
+    'exercices': 'تمارين',
+    'exercice': 'تمرين',
+    'examen': 'امتحان',
+    'évaluation': 'تقييم',
+    'interrogation': 'استجواب',
+    'test': 'اختبار',
+  };
+  if (typeMap[lower]) return typeMap[lower];
+
+  return null;
+}
+
+/**
  * Parse the AI-generated description into structured fields.
  * Each field has a label (in AR or FR) and a value.
  */
@@ -553,8 +620,18 @@ export default function AiDescription({
             // neutral content (digits, dates, punctuation) aligned with its
             // label instead of breaking to the opposite side in RTL grids.
             const cellRtl = labelAr;
-            // Per user rule (2026-08-02): show "Pilote" badge next to school name
-            // when schoolType === 'PILOTE'. Building2 icon = school field.
+            // Per user rule (2026-08-02): when the cell is RTL but the VALUE
+            // is in Latin (e.g. "physique", "mathématiques"), translate the
+            // value to its Arabic equivalent so the card looks uniform.
+            // We only translate well-known fixed terms; arbitrary text
+            // (school names, teacher names, summaries) is left as-is.
+            let displayValue = f.value;
+            if (cellRtl && !valueAr) {
+              const translated = translateValueToArabic(f.value);
+              if (translated) displayValue = translated;
+            }
+            // Per user rule (2026-08-02): show "Pilote" badge next to school
+            // name when schoolType === 'PILOTE'. Building2 icon = school field.
             const isSchoolField = f.Icon === Building2;
             const showPiloteBadge = isSchoolField && schoolType === 'PILOTE';
             return (
@@ -582,9 +659,9 @@ export default function AiDescription({
                   dir={cellRtl ? 'rtl' : 'ltr'}
                   lang={valueAr ? 'ar' : 'fr'}
                   style={{ unicodeBidi: 'isolate' }}
-                  className={`text-sm text-slate-800 font-medium leading-snug break-words ${cellRtl ? 'text-right' : 'text-left'} ${valueAr ? 'font-arabic-title' : ''}`}
+                  className={`text-sm text-slate-800 font-medium leading-snug break-words ${cellRtl ? 'text-right' : 'text-left'} ${(valueAr || (cellRtl && !valueAr && displayValue !== f.value)) ? 'font-arabic-title' : ''}`}
                 >
-                  {f.value}
+                  {displayValue}
                 </div>
               </div>
             </div>
