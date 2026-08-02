@@ -10,15 +10,7 @@ Title pattern (typical):
 NO OpenAI. Pure rule-based mapping.
 """
 import re
-import json
-import urllib.request
-import os
 import sys
-
-NEON_API_KEY = os.environ.get(
-    "NEON_API_KEY",
-    "NEON_API_KEY_REDACTED",
-)
 
 # ─────────────────────────────────────────────────────────────────
 # MAPPING TABLES

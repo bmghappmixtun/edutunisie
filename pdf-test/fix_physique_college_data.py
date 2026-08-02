@@ -23,10 +23,10 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from translate_titles_rules import translate_title as fr_to_ar
 from translate_titles_ar_to_fr import translate_title as ar_to_fr
 
-NEON_API_KEY = os.environ.get(
-    "NEON_API_KEY",
-    "NEON_API_KEY_REDACTED",
-)
+# SECURITY: Neon API key must be in env var, NEVER hardcoded (was leaked 2026-08-02)
+NEON_API_KEY = os.environ.get("NEON_API_KEY")
+if not NEON_API_KEY:
+    sys.exit("❌ NEON_API_KEY env var is required. Set it in .env.local and export before running.")
 BRANCH_ID = "br-purple-recipe-as2x8yyo"
 PROJECT_ID = "little-silence-94324724"
 
