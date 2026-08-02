@@ -755,14 +755,27 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
           </div>
         )}
 
-        {/* ----- Pagination ----- */}
-        {data.totalPages > 1 && (
-          <Pagination
-            current={data.currentPage}
-            total={data.totalPages}
-            onChange={(p) => update({ page: p })}
-          />
-        )}
+        {/* ----- Pagination -----
+         * Always render the wrapper, hidden via CSS when there's only 1 page
+         * (or zero results). Mirrors the pattern used for the active-filter
+         * chips wrapper above: keeping the parent's child count stable
+         * (3 children: toolbar + chips wrapper + results) so the Suspense
+         * fallback in loading.tsx can be patched against the streamed page
+         * without React #418/#422 hydration mismatches. The wrapper uses
+         * `hidden` (CSS) rather than conditional rendering so the DOM element
+         * is always present, matching the loading.tsx placeholder. */}
+        <div
+          className={data.totalPages > 1 ? 'mt-8' : 'hidden'}
+          aria-hidden={data.totalPages <= 1}
+        >
+          {data.totalPages > 1 && (
+            <Pagination
+              current={data.currentPage}
+              total={data.totalPages}
+              onChange={(p) => update({ page: p })}
+            />
+          )}
+        </div>
       </div>
     </div>
   );

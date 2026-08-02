@@ -111,21 +111,26 @@ export default function Loading() {
                   </div>
                 ))}
               </div>
-              {/* Active-filter-chips wrapper placeholder.
-               * The page (FilterShell.tsx ~line 710) ALWAYS renders this 3rd
-               * child of <aside>, hidden via CSS when activeCount === 0.
-               * Without this placeholder, the aside has 2 children in the
-               * skeleton but 3 children in the streamed page → React #418/#422
-               * hydration mismatch on /ressources?teacherId=* (ERR-YH74LU
-               * 12 events, ERR-BX5EQZ 10 events in 2026-08-01 nightly digest). */}
-              <div className="hidden" aria-hidden="true" />
             </aside>
 
             {/* Content skeleton — <div> wrappers match the page's
-                <FilterShell> render (toolbar div + grid div). */}
+                <FilterShell> render (main div contains: toolbar + chips wrapper
+                + results grid + pagination). The chips wrapper and pagination
+                are always rendered on the page (with `hidden` when inactive),
+                so we mirror them here as zero-height placeholders to keep the
+                child count stable between the Suspense fallback and the
+                streamed page — preventing React #418/#422 hydration mismatches
+                on /ressources and /ar/ressources?teacherId=*
+                (ERR-S7BZMN 11x #418, ERR-386KSC 10x #422, ERR-EZ9NCC 1x #418,
+                ERR-F5AYFT 1x #422 in 2026-08-02 nightly digest). */}
             <div className="space-y-4">
               {/* Toolbar skeleton */}
               <div className="h-14 bg-white rounded-xl border border-slate-200 animate-pulse" />
+              {/* Active-filter-chips wrapper placeholder.
+               * The page (FilterShell.tsx ~line 710) ALWAYS renders this 2nd
+               * child of the main <div>, hidden via CSS when activeCount === 0
+               * (so the teacherId-only page also renders it). */}
+              <div className="hidden" aria-hidden="true" />
               {/* Grid of cards skeleton — each card uses <a> wrapper to match
                   the page's <Link> render (Link also renders as <a>). */}
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -143,6 +148,14 @@ export default function Loading() {
                   </a>
                 ))}
               </div>
+              {/* Pagination placeholder.
+               * The page (FilterShell.tsx ~line 759) renders <Pagination> as
+               * the 4th child of the main <div> when totalPages > 1, which is
+               * true for the vast majority of /ressources pages (e.g. 560 pages
+               * for 13k+ resources at 24/page). Without this placeholder, the
+               * main <div> has 3 children in the skeleton but 4 in the streamed
+               * page, triggering the same #418/#422 mismatch. */}
+              <div className="hidden" aria-hidden="true" />
             </div>
           </div>
         </div>
