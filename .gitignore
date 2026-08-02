@@ -140,3 +140,6 @@ r15348-*.png
 r301-*.png
 r3802-*.png
 url-render.png
+
+# Runtime / ephemeral files
+--psm.txt
