@@ -641,7 +641,7 @@ export default function AiDescription({
                 <div
                   dir={labelAr ? 'rtl' : 'ltr'}
                   lang={labelAr ? 'ar' : 'fr'}
-                  className={`text-[11px] font-bold text-slate-500 uppercase tracking-wide leading-none mb-1 flex items-center gap-1.5 ${labelAr ? 'flex-row-reverse' : ''} ${labelAr ? 'text-right' : 'text-left'} ${labelAr ? 'font-arabic-title' : ''}`}
+                  className={`text-[11px] font-bold text-slate-500 uppercase tracking-wide leading-none mb-1 flex items-center gap-1.5 justify-between ${labelAr ? 'text-right' : 'text-left'} ${labelAr ? 'font-arabic-title' : ''}`}
                 >
                   <span>{f.label}</span>
                   {showPiloteBadge && (
