@@ -510,6 +510,7 @@ export default async function ResourcePage({
                       classNameFr={resource.class?.nameFr}
                       classNameAr={resource.class?.nameAr}
                       generalSubject={resource.metadata?.generalSubject}
+                      schoolType={resource.schoolType}
                     />
                   </div>
                 )}
@@ -592,6 +593,7 @@ export default async function ResourcePage({
                         dbTeacherNameAr={teacherAr}
                         aiSchoolName={resource.metadata?.schoolName ?? null}
                         aiProfNames={resource.metadata?.profNames ?? null}
+                        schoolType={resource.schoolType}
                       />
                     </div>
                   );

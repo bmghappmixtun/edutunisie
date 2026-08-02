@@ -71,6 +71,8 @@ interface AiDescriptionProps {
   aiSchoolName?: string | null;
   /** AI-extracted teacher names (ResourceMetadata.profNames[0]). */
   aiProfNames?: string[] | null;
+  /** Resource schoolType ('PILOTE' | 'PUBLIC' | null). When 'PILOTE', show "Pilote" badge next to school name. */
+  schoolType?: string | null;
 }
 
 type Field = {
@@ -267,6 +269,7 @@ export default function AiDescription({
   dbTeacherNameAr,
   aiSchoolName,
   aiProfNames,
+  schoolType,
 }: AiDescriptionProps) {
   const isAi = !!source && source.startsWith('agent-');
 
@@ -550,6 +553,10 @@ export default function AiDescription({
             // neutral content (digits, dates, punctuation) aligned with its
             // label instead of breaking to the opposite side in RTL grids.
             const cellRtl = labelAr;
+            // Per user rule (2026-08-02): show "Pilote" badge next to school name
+            // when schoolType === 'PILOTE'. Building2 icon = school field.
+            const isSchoolField = f.Icon === Building2;
+            const showPiloteBadge = isSchoolField && schoolType === 'PILOTE';
             return (
             <div key={i} className="flex items-start gap-2">
               <f.Icon className={`w-4 h-4 mt-1 flex-shrink-0 ${iconColor(f.Icon)}`} />
@@ -557,9 +564,19 @@ export default function AiDescription({
                 <div
                   dir={labelAr ? 'rtl' : 'ltr'}
                   lang={labelAr ? 'ar' : 'fr'}
-                  className={`text-[11px] font-bold text-slate-500 uppercase tracking-wide leading-none mb-1 ${labelAr ? 'text-right' : 'text-left'} ${labelAr ? 'font-arabic-title' : ''}`}
+                  className={`text-[11px] font-bold text-slate-500 uppercase tracking-wide leading-none mb-1 flex items-center gap-1.5 ${labelAr ? 'flex-row-reverse' : ''} ${labelAr ? 'text-right' : 'text-left'} ${labelAr ? 'font-arabic-title' : ''}`}
                 >
-                  {f.label}
+                  <span>{f.label}</span>
+                  {showPiloteBadge && (
+                    <span
+                      dir="ltr"
+                      className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-amber-100 text-amber-800 border border-amber-300 uppercase"
+                      title="Établissement pilote"
+                    >
+                      <GraduationCap className="w-2.5 h-2.5" />
+                      Pilote
+                    </span>
+                  )}
                 </div>
                 <div
                   dir={cellRtl ? 'rtl' : 'ltr'}
