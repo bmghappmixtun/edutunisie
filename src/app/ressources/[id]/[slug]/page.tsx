@@ -16,6 +16,9 @@ import ResourceInfoPanel from '@/components/resources/ResourceInfoPanel';
 import AiDescription from '@/components/resources/AiDescription';
 import AiContentSection from '@/components/resources/AiContentSection';
 import { getPaletteForSubject } from '@/lib/ai-palettes';
+// NOTE: getPaletteForSubject is kept for future use but currently no consumer
+// in this file (the "Sujets abordés" section was removed 2026-08-02 since
+// "Sujet général" replaced it).
 import { formatNumber, RESOURCE_TYPE_LABELS, HOMEWORK_SUBTYPE_LABELS, timeAgo } from '@/lib/utils';
 import { isArabic, splitArabicSubject } from '@/lib/text-utils';
 import { courseSchema, breadcrumbSchema } from '@/lib/structured-data';
@@ -39,7 +42,6 @@ import {
   Wrench,
   Building2,
   Target,
-  Hash,
 } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -646,42 +648,6 @@ export default async function ResourcePage({
                         >
                           {kp}
                         </Link>
-                        );
-                      })}
-                    </div>
-                  </AiContentSection>
-                  );
-                })()}
-
-                {/* AI topics (clickable tags) */}
-                {resource.metadata?.topics && resource.metadata.topics.length > 0 && (() => {
-                  // Per-subject topic tag palette (physique = lavender, others = default)
-                  const topicPalette = getPaletteForSubject(resource.subject?.slug);
-                  // Check if majority of topics are Arabic -> reverse order for RTL
-                  const arabicCount = resource.metadata.topics.filter((t) => isArabic(t)).length;
-                  const isRtlTopics = arabicCount > resource.metadata.topics.length / 2;
-                  return (
-                  <AiContentSection
-                    title="Sujets abordés"
-                    icon={<Hash className="w-4 h-4" />}
-                    variant="topics"
-                    subjectSlug={resource.subject?.slug}
-                    defaultOpen={false}
-                  >
-                    <div className={`flex flex-wrap gap-1.5 ${isRtlTopics ? 'justify-end' : ''}`}>
-                      {resource.metadata.topics.map((topic, i) => {
-                        const c = topicPalette.accents[i % topicPalette.accents.length];
-                        const topicAr = isArabic(topic);
-                        return (
-                          <Link
-                            key={i}
-                            href={`/recherche?q=${encodeURIComponent(topic)}`}
-                            dir={topicAr ? 'rtl' : 'ltr'}
-                            lang={topicAr ? 'ar' : 'fr'}
-                            className={`inline-block px-2.5 py-1 ${c} text-white rounded-full text-xs font-medium transition-colors shadow-sm ${topicAr ? 'text-right' : 'text-left'}`}
-                          >
-                            {topic}
-                          </Link>
                         );
                       })}
                     </div>
