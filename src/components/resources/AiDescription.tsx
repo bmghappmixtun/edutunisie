@@ -530,7 +530,7 @@ export default function AiDescription({
         <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 text-white shadow-sm flex-shrink-0">
           <Sparkles className="w-3.5 h-3.5" />
         </span>
-        <span className="font-bold text-sm text-slate-800 flex-1">
+        <span className={`font-bold text-sm text-slate-800 flex-1 ${isRtl ? 'font-arabic-title' : ''}`}>
           {isRtl ? 'ملخص ذكي' : 'Résumé intelligent'}
         </span>
 
