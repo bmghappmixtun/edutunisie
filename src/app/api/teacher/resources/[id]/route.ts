@@ -275,6 +275,10 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     }
 
     // Delete related records
+    // Per fix (2026-08-02): also clean up AI-extracted tables (metadata/content/summary)
+    // — they are 1:1 with Resource but Prisma does not auto-cascade on Resource delete.
+    // Without these, deleting a resource left orphan rows in ResourceMetadata /
+    // ResourceContent / ResourceSummary (storage + visible in admin joins).
     await prisma.$transaction([
       prisma.comment.deleteMany({ where: { resourceId: id } }),
       prisma.rating.deleteMany({ where: { resourceId: id } }),
@@ -282,6 +286,9 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
       prisma.view.deleteMany({ where: { resourceId: id } }),
       prisma.download.deleteMany({ where: { resourceId: id } }),
       prisma.report.deleteMany({ where: { resourceId: id } }),
+      prisma.resourceMetadata.deleteMany({ where: { resourceId: id } }),
+      prisma.resourceContent.deleteMany({ where: { resourceId: id } }),
+      prisma.resourceSummary.deleteMany({ where: { resourceId: id } }),
       prisma.resource.delete({ where: { id } }),
     ]);
 
