@@ -635,7 +635,11 @@ export default function AiDescription({
             const isSchoolField = f.Icon === Building2;
             const showPiloteBadge = isSchoolField && schoolType === 'PILOTE';
             return (
-            <div key={i} className="flex items-start gap-2">
+            <div
+              key={i}
+              dir={cellRtl ? 'rtl' : 'ltr'}
+              className="flex items-start gap-2"
+            >
               <f.Icon className={`w-4 h-4 mt-1 flex-shrink-0 ${iconColor(f.Icon)}`} />
               <div className="flex-1 min-w-0">
                 <div
