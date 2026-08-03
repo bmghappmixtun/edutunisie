@@ -75,6 +75,6 @@
     "tailwindcss": "^3.4.6",
     "tsx": "^4.16.2",
     "typescript": "^5.5.3"
-  }
+  },
+  "// build-version": "2026-08-03-08-40"
 }
-
