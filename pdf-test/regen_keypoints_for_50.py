@@ -218,14 +218,14 @@ def save_to_staging(rid, nid, key_points, subject, model_name):
     elements = []
     for k in key_points:
         if k is None: continue
-        k_safe = str(k).replace('\\', '\\\\').replace('"', '\\"')
+        k_safe = str(k).replace("\\", "\\\\").replace('"', '\\"').replace("'", "''")
         elements.append(f'"{k_safe}"')
     kp_array = '{' + ','.join(elements) + '}'
 
     # Update or insert into staging
     sql = f"""
     UPDATE "ResourceMetadataStaging"
-    SET "keyPoints" = $${kp_array}$$::text[],
+    SET "keyPoints" = '{kp_array}'::text[],
         "subject" = '{subject.replace(chr(39), chr(39)+chr(39)) if subject else ""}',
         "modelUsed" = '{model_name}',
         "extractedAt" = NOW(),
