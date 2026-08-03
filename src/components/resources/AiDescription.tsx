@@ -528,7 +528,7 @@ export default function AiDescription({
     aiProfNames && aiProfNames.length > 0 ? aiProfNames[0] : null;
   // Compute preferred value based on the FILE's language (not on the displayed text)
   let teacherValue: string | null = null;
-  if (language === 'ar') {
+  if (language === "ar") { throw new Error("MY_NEW_CODE_RAN")
     // AR file → prefer AR (dbTeacherNameAr), then AI AR (profNames), then displayed, then FR fallback
     teacherValue = pickPreferringAr(
       null,                              // skip displayed FR — prefer AR explicitly
