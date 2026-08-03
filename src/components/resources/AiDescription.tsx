@@ -737,3 +737,5 @@ function iconColor(Icon: typeof User): string {
 
 // Build marker 2026-06-30-12:40
 // last deployed: Mon Aug  3 08:06:17 UTC 2026
+
+// MARKER: USE_AR_FOR_AR_DOCS_2026_08_03
