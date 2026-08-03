@@ -66,8 +66,15 @@ export default function Loading() {
           </nav>
         </div>
 
-        {/* Hero header skeleton */}
+        {/* Hero header skeleton — MUST mirror the page's structure exactly.
+            The page renders the hero wrapper with TWO children: the radial-gradient
+            overlay div + the inner relative content div. A child-count mismatch
+            (1 vs 2) here triggered React #418/#422 hydration errors on
+            /professeurs/[numericId]/[slug] (ERR-XXHYG9, ERR-RNYTCQ, 2026-08-03
+            nightly digest, 12 errors total). */}
         <div className="relative bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 overflow-hidden">
+          {/* Radial-gradient overlay (mirrors page.tsx line 424) */}
+          <div className="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_30%_50%,rgba(245,158,11,0.15),transparent_50%)]" />
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <div className="flex flex-col md:flex-row gap-6 items-start">
               {/* Avatar skeleton */}
