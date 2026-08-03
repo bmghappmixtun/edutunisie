@@ -151,15 +151,16 @@ export async function sendContactEmail(payload: {
     return new EmailResult(true, 'test-mode');
   }
   const html = renderContactEmail(payload);
+  const CONTACT_RECIPIENT = process.env.CONTACT_EMAIL || 'boutiti.mehdi@gmail.com';
   if (!resend) {
-    console.log(`\n📧 [EMAIL - DEV] Contact from ${payload.email}`);
+    console.log(`\n📧 [EMAIL - DEV] Contact from ${payload.email} -> ${CONTACT_RECIPIENT}`);
     return new EmailResult(true, 'dev-mode');
   }
 
   try {
     const result: any = await resend.emails.send({
       from: FROM,
-      to: ['contact@examanet.com'],
+      to: [CONTACT_RECIPIENT],
       replyTo: payload.email,
       subject: `[Contact] ${payload.subject}`,
       html,
