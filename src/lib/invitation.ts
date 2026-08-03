@@ -148,6 +148,7 @@ export async function sendInvitationEmail(
   }
 
   try {
+    // Cast to any: open_tracking/click_tracking exist in Resend API but not in old SDK types
     const result: any = await resend.emails.send({
       from: FROM,
       to: [inv.email],
@@ -156,7 +157,7 @@ export async function sendInvitationEmail(
       // Enable open + click tracking (invisible pixel + link tracking)
       open_tracking: true,
       click_tracking: true,
-    });
+    } as any);
 
     if (result.error) {
       console.error('📧 [INVITATION ERROR]', inv.email, '→', result.error.message);
@@ -198,6 +199,8 @@ export async function sendInvitationEmail(
 export async function syncInvitationDeliveryStatus(invitationId: string): Promise<{
   ok: boolean;
   status?: string;
+  opened?: boolean;
+  openCount?: number;
   error?: string;
 }> {
   if (!resend) {
