@@ -23,6 +23,7 @@ import {
   UserPlus,
   Globe,
   Loader2,
+  MousePointer,
 } from 'lucide-react';
 import { timeAgo } from '@/lib/utils';
 import InviteNewProfModal from './InviteNewProfModal';
@@ -46,6 +47,8 @@ type Invitation = {
   deliveryStatus: string | null;
   deliverySyncedAt: string | null;
   deliveryDetail: string | null;
+  openedAt: string | null;
+  openCount: number;
   teacher: {
     id: string;
     firstName: string | null;
@@ -74,6 +77,18 @@ const DELIVERY_META: Record<string, { label: string; color: string; icon: React.
     icon: <CheckCircle2 className="w-3 h-3" />,
     tooltip: 'Email bien reçu par le serveur du destinataire (Gmail, Yahoo, etc.)',
   },
+  opened: {
+    label: 'Ouvert 👁',
+    color: 'bg-violet-100 text-violet-700',
+    icon: <Eye className="w-3 h-3" />,
+    tooltip: "Le destinataire a ouvert l'email (pixel de tracking Resend)",
+  },
+  clicked: {
+    label: 'Cliqué 👆',
+    color: 'bg-indigo-100 text-indigo-700',
+    icon: <MousePointer className="w-3 h-3" />,
+    tooltip: 'Le destinataire a cliqué sur un lien dans le tracking Resend',
+  },
   bounced: {
     label: 'Rebond ✗',
     color: 'bg-rose-100 text-rose-700',
@@ -91,6 +106,12 @@ const DELIVERY_META: Record<string, { label: string; color: string; icon: React.
     color: 'bg-rose-100 text-rose-700',
     icon: <XCircle className="w-3 h-3" />,
     tooltip: "Échec d'envoi permanent",
+  },
+  suppressed: {
+    label: 'Supprimé 🚫',
+    color: 'bg-rose-100 text-rose-700',
+    icon: <Ban className="w-3 h-3" />,
+    tooltip: 'Resend a bloqué cet envoi (historique bounce/spam)',
   },
 };
 
@@ -479,6 +500,14 @@ export default function InvitationsClient({
                               {DELIVERY_META[inv.deliveryStatus].icon}
                               {DELIVERY_META[inv.deliveryStatus].label}
                             </span>
+                          )}
+                          {inv.openedAt && (
+                            <div className="text-[10px] text-violet-600 font-semibold">
+                              👁 Ouvert {inv.openCount > 1 ? `${inv.openCount}×` : ''} le{' '}
+                              <span suppressHydrationWarning>
+                                {new Date(inv.openedAt).toLocaleDateString('fr-FR')}
+                              </span>
+                            </div>
                           )}
                         </div>
                       ) : (

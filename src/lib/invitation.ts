@@ -153,6 +153,9 @@ export async function sendInvitationEmail(
       to: [inv.email],
       subject,
       html,
+      // Enable open + click tracking (invisible pixel + link tracking)
+      open_tracking: true,
+      click_tracking: true,
     });
 
     if (result.error) {
@@ -212,10 +215,15 @@ export async function syncInvitationDeliveryStatus(invitationId: string): Promis
     }
     const data = result.data;
     const lastEvent = data?.last_event || 'sent';
-    // Resend events: sent, delivered, bounced, complained, failed
+    // Resend events: sent, delivered, bounced, complained, failed, opened, clicked
     let detail: string | null = null;
     if (data?.bounce) detail = `Bounce: ${data.bounce.message || data.bounce.type || 'unknown'}`;
     if (data?.complaint) detail = `Complaint: ${data.complaint.message || 'unknown'}`;
+
+    // Track opens: last_event="opened" or "clicked" means the email was opened
+    const isOpened = lastEvent === 'opened' || lastEvent === 'clicked';
+    const openedAt = isOpened && !inv.openedAt ? new Date() : inv.openedAt;
+    const openCount = isOpened ? (inv.openCount || 0) + 1 : (inv.openCount || 0);
 
     await prisma.teacherInvitation.update({
       where: { id: invitationId },
@@ -223,10 +231,12 @@ export async function syncInvitationDeliveryStatus(invitationId: string): Promis
         deliveryStatus: lastEvent,
         deliveryDetail: detail,
         deliverySyncedAt: new Date(),
+        openedAt,
+        openCount,
       },
     });
 
-    return { ok: true, status: lastEvent };
+    return { ok: true, status: lastEvent, opened: isOpened, openCount };
   } catch (e: any) {
     return { ok: false, error: e?.message };
   }

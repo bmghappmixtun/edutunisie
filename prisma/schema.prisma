@@ -668,6 +668,10 @@ model TeacherInvitation {
   deliverySyncedAt   DateTime? // Last time we checked Resend for delivery status
   deliveryDetail     String?   // bounce/complaint reason if any
 
+  // Open tracking (Resend tracking pixel)
+  openedAt           DateTime? // First time the email was opened
+  openCount          Int       @default(0) // Total opens (per Resend)
+
   updatedAt       DateTime @updatedAt
 
   @@index([teacherId])
