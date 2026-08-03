@@ -862,3 +862,5 @@ export default async function ResourcePage({
     </div>
   );
 }
+
+// FORCED REBUILD MARKER 2026-08-03-08:05
