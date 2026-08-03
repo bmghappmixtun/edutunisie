@@ -516,20 +516,32 @@ export default function AiDescription({
       }
     }
   }
-  // Build teacher value
+  // Build teacher value — Per user rule (2026-08-03):
+  //   If the file is in AR → display the AR prof name (if not null)
+  //   If the file is in FR → display the FR prof name (if not null)
+  //   Fallback chain: language-appropriate DB field → AI profNames → headerData.teacher
   const teacherDisplayed =
     parsedFields.find((f) => f.label === teacherLabel)?.value ??
     headerFields.find((f) => f.label === teacherLabel)?.value ??
     (headerData?.teacher ?? null);
   const teacherAiFirst =
     aiProfNames && aiProfNames.length > 0 ? aiProfNames[0] : null;
-  const teacherValue = pickPreferringAr(
-    teacherDisplayed,
-    dbTeacherNameAr,
-    dbTeacherNameFr,
-    teacherAiFirst,
-    headerData?.teacher ?? null,
-  );
+  // Compute preferred value based on the FILE's language (not on the displayed text)
+  let teacherValue: string | null = null;
+  if (language === 'ar') {
+    // AR file → prefer AR (dbTeacherNameAr), then AI AR (profNames), then displayed, then FR fallback
+    teacherValue = pickPreferringAr(
+      null,                              // skip displayed FR — prefer AR explicitly
+      dbTeacherNameAr,
+      dbTeacherNameFr,
+      teacherAiFirst,
+      teacherDisplayed,                  // FR fallback (only if no AR anywhere)
+    );
+  } else {
+    // FR file → prefer FR (dbTeacherNameFr), then displayed, then headerData.teacher
+    const frValue = dbTeacherNameFr || teacherDisplayed || (headerData?.teacher ?? null);
+    teacherValue = frValue || dbTeacherNameAr || teacherAiFirst || null;
+  }
   if (teacherValue) {
     const idx = parsedFields.findIndex((f) => f.label === teacherLabel);
     if (idx >= 0) {
