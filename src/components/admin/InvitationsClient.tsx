@@ -42,6 +42,10 @@ type Invitation = {
   clickIpAddress: string | null;
   activateIpAddress: string | null;
   customMessage: string | null;
+  resendMessageId: string | null;
+  deliveryStatus: string | null;
+  deliverySyncedAt: string | null;
+  deliveryDetail: string | null;
   teacher: {
     id: string;
     firstName: string | null;
@@ -55,6 +59,39 @@ type Invitation = {
     lastName: string | null;
     email: string;
   } | null;
+};
+
+const DELIVERY_META: Record<string, { label: string; color: string; icon: React.ReactNode; tooltip: string }> = {
+  sent: {
+    label: 'En transit',
+    color: 'bg-slate-100 text-slate-600',
+    icon: <Send className="w-3 h-3" />,
+    tooltip: 'Email envoyé, en attente de confirmation du serveur destinataire',
+  },
+  delivered: {
+    label: 'Délivré ✓',
+    color: 'bg-emerald-100 text-emerald-700',
+    icon: <CheckCircle2 className="w-3 h-3" />,
+    tooltip: 'Email bien reçu par le serveur du destinataire (Gmail, Yahoo, etc.)',
+  },
+  bounced: {
+    label: 'Rebond ✗',
+    color: 'bg-rose-100 text-rose-700',
+    icon: <XCircle className="w-3 h-3" />,
+    tooltip: "Email rejeté par le serveur destinataire (adresse invalide ou boîte pleine)",
+  },
+  complained: {
+    label: 'Plainte ⚠',
+    color: 'bg-amber-100 text-amber-700',
+    icon: <AlertTriangle className="w-3 h-3" />,
+    tooltip: "Le destinataire a marqué l'email comme spam",
+  },
+  failed: {
+    label: 'Échec ✗',
+    color: 'bg-rose-100 text-rose-700',
+    icon: <XCircle className="w-3 h-3" />,
+    tooltip: "Échec d'envoi permanent",
+  },
 };
 
 const STATUS_META: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
@@ -303,6 +340,29 @@ export default function InvitationsClient({
             ))}
           </select>
         </div>
+        <button
+          onClick={async () => {
+            if (!confirm('Synchroniser le statut de livraison Resend pour toutes les invitations envoyées (jusqu\'à 50) ?')) return;
+            toast.loading('Synchronisation Resend...', { id: 'sync-resend' });
+            try {
+              const res = await fetch('/api/admin/invitations/sync-delivery', { method: 'POST' });
+              const data = await res.json();
+              if (data.synced !== undefined) {
+                toast.success(`${data.synced} invitations synchronisées`, { id: 'sync-resend' });
+                router.refresh();
+              } else {
+                toast.error(data.error || 'Erreur de sync', { id: 'sync-resend' });
+              }
+            } catch (e: any) {
+              toast.error(e.message || 'Erreur', { id: 'sync-resend' });
+            }
+          }}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-sky-50 text-sky-700 border border-sky-200 hover:bg-sky-100 transition"
+          title="Synchroniser le statut de livraison depuis Resend"
+        >
+          <Activity className="w-3.5 h-3.5" />
+          Sync Resend
+        </button>
       </div>
 
       {/* Status filter chips (visual) */}
@@ -404,11 +464,22 @@ export default function InvitationsClient({
                     </td>
                     <td className="px-3 py-2.5 text-slate-500 hidden lg:table-cell">
                       {inv.emailSentAt ? (
-                        <div>
+                        <div className="space-y-1">
                           <div suppressHydrationWarning>{timeAgo(inv.emailSentAt)}</div>
                           <div className="text-xs text-slate-400" suppressHydrationWarning>
                             {new Date(inv.emailSentAt).toLocaleDateString('fr-FR')}
                           </div>
+                          {inv.deliveryStatus && DELIVERY_META[inv.deliveryStatus] && (
+                            <span
+                              className={`inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-bold rounded ${
+                                DELIVERY_META[inv.deliveryStatus].color
+                              }`}
+                              title={DELIVERY_META[inv.deliveryStatus].tooltip}
+                            >
+                              {DELIVERY_META[inv.deliveryStatus].icon}
+                              {DELIVERY_META[inv.deliveryStatus].label}
+                            </span>
+                          )}
                         </div>
                       ) : (
                         <span className="text-slate-300">—</span>

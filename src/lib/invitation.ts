@@ -160,11 +160,17 @@ export async function sendInvitationEmail(
       return { ok: false, error: result.error.message };
     }
 
+    // Resend returns the message ID for later delivery tracking
+    const resendMessageId = result.data?.id || null;
+
     await prisma.teacherInvitation.update({
       where: { id: invitationId },
       data: {
         status: INV_STATUS.SENT,
         emailSentAt: new Date(),
+        resendMessageId,
+        deliveryStatus: 'sent',
+        deliverySyncedAt: new Date(),
       },
     });
 
@@ -179,6 +185,49 @@ export async function sendInvitationEmail(
     return { ok: true };
   } catch (e: any) {
     console.error('📧 [INVITATION THROW]', inv.email, '→', e?.message);
+    return { ok: false, error: e?.message };
+  }
+}
+
+/**
+ * Sync delivery status from Resend for a single invitation
+ */
+export async function syncInvitationDeliveryStatus(invitationId: string): Promise<{
+  ok: boolean;
+  status?: string;
+  error?: string;
+}> {
+  if (!resend) {
+    return { ok: false, error: 'Resend not configured' };
+  }
+
+  const inv = await prisma.teacherInvitation.findUnique({ where: { id: invitationId } });
+  if (!inv) return { ok: false, error: 'Invitation not found' };
+  if (!inv.resendMessageId) return { ok: false, error: 'No Resend message ID' };
+
+  try {
+    const result: any = await resend.emails.get(inv.resendMessageId);
+    if (result.error) {
+      return { ok: false, error: result.error.message };
+    }
+    const data = result.data;
+    const lastEvent = data?.last_event || 'sent';
+    // Resend events: sent, delivered, bounced, complained, failed
+    let detail: string | null = null;
+    if (data?.bounce) detail = `Bounce: ${data.bounce.message || data.bounce.type || 'unknown'}`;
+    if (data?.complaint) detail = `Complaint: ${data.complaint.message || 'unknown'}`;
+
+    await prisma.teacherInvitation.update({
+      where: { id: invitationId },
+      data: {
+        deliveryStatus: lastEvent,
+        deliveryDetail: detail,
+        deliverySyncedAt: new Date(),
+      },
+    });
+
+    return { ok: true, status: lastEvent };
+  } catch (e: any) {
     return { ok: false, error: e?.message };
   }
 }

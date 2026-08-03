@@ -662,6 +662,12 @@ model TeacherInvitation {
   // Optional message from admin included in the email
   customMessage   String?
 
+  // Resend email tracking (delivery status from Resend API)
+  resendMessageId    String?   // Resend email ID for status sync
+  deliveryStatus     String?   // sent, delivered, bounced, complained, failed
+  deliverySyncedAt   DateTime? // Last time we checked Resend for delivery status
+  deliveryDetail     String?   // bounce/complaint reason if any
+
   updatedAt       DateTime @updatedAt
 
   @@index([teacherId])
@@ -669,6 +675,8 @@ model TeacherInvitation {
   @@index([status])
   @@index([expiresAt])
   @@index([email])
+  @@index([resendMessageId])
+  @@index([deliveryStatus])
 }
 
 // ============ SETTINGS ============
