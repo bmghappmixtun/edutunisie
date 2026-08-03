@@ -318,6 +318,8 @@ function mergeBilingualLabels(
  * No flex-row-reverse needed — the dir attribute handles it correctly.
  */
 export default function AiDescription({
+
+// CACHE_BUST_V2_2026_08_03_1115_BUILD_AR_FOR_AR_DOCS
   text,
   source,
   language,
