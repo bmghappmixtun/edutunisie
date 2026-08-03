@@ -89,10 +89,32 @@ export default function Loading() {
                 /ressources?teacherId=* (ERR-AYVRJF, ERR-BW6UCW, ERR-HHXMBP,
                 ERR-RSBVVC — 12 errors total in 2026-07-27 digest). */}
             <aside className="bg-white rounded-2xl border border-slate-200 shadow-sm h-fit lg:sticky lg:top-24 overflow-hidden">
-              {/* Header skeleton — <div> wrapper with <h3> inside, matching
-                  the page's actual structure. */}
+              {/* Header skeleton — MUST mirror the page's actual structure.
+                  The page (FilterShell.tsx ~line 349) renders this <div> with
+                  TWO children: <h3> (icon + label + always-rendered activeCount
+                  badge) + <button> (always-rendered Reset, hidden via CSS when
+                  activeCount === 0). The previous version had only the <h3>,
+                  so the wrapper had 1 child in the loading but 2 in the page,
+                  triggering React #418/#422 hydration mismatches on
+                  /ressources and /ar/ressources (ERR-FMJA5L, ERR-ABLXX4,
+                  2026-08-03 nightly digest, 6 errors). The h3 itself also
+                  needs 3 children to match the page (icon + label span +
+                  activeCount span). */}
               <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
-                <h3 className="h-4 w-24 bg-slate-200 rounded animate-pulse text-[0px] leading-none" />
+                <h3 className="font-extrabold text-sm flex items-center gap-2 text-slate-900">
+                  <span className="w-4 h-4 rounded bg-slate-200 animate-pulse" />
+                  <span className="h-3 w-12 bg-slate-200 rounded animate-pulse" />
+                  {/* Always-rendered activeCount badge (hidden via CSS — see
+                      FilterShell.tsx comment for the rationale). */}
+                  <span className="ml-1 hidden w-5 h-5 rounded-full bg-slate-200 animate-pulse" aria-hidden="true" />
+                </h3>
+                {/* Always-rendered Reset button skeleton (hidden via CSS). */}
+                <button
+                  type="button"
+                  className="hidden w-12 h-6 rounded bg-slate-100 animate-pulse"
+                  aria-hidden="true"
+                  tabIndex={-1}
+                />
               </div>
               {/* Content skeleton — same wrapper as the page (max-h + overflow-y
                   + px-5 py-4 space-y-5) so the Suspense patch lands cleanly. */}
