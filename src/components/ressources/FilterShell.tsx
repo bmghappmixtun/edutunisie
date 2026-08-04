@@ -703,19 +703,36 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
         </div>
 
         {/* ----- Active filter chips -----
-         * Always render the wrapper, but hide it via CSS when activeCount === 0.
-         * This keeps the parent's child count stable so the Suspense fallback
-         * (loading.tsx) can be patched against the streamed page without
-         * triggering React #418/#422 hydration mismatches. */}
-        <div className={activeCount > 0 ? '' : 'hidden'} aria-hidden={activeCount === 0}>
-          {activeCount > 0 && (
-            <ActiveFilterChips
-              filters={filters}
-              onRemove={(patch) => update(patch)}
-              onReset={reset}
-              nameMaps={initialData.nameMaps}
-            />
-          )}
+         * Always render the wrapper AND its single child (the inner chips
+         * div) with a stable DOM structure. The wrapper's className toggles
+         * `hidden` to hide it when activeCount === 0 — className changes are
+         * attribute updates, NOT structural, so React's hydration check
+         * stays happy. The inner <ActiveFilterChips> now also always renders
+         * its own div (with stable structure), and toggles its inner contents
+         * (chips + reset button) via CSS visibility.
+         *
+         * History:
+         *   - 2026-08-04 (this fix): the previous version (commit 7c4a68b)
+         *     only "always-rendered" the outer wrapper but still
+         *     conditionally rendered <ActiveFilterChips> inside it (and
+         *     ActiveFilterChips itself returned `null` when chips.length ===
+         *     0). That meant the wrapper's CHILD COUNT was 0 when no
+         *     filters and 1 when filters were active, AND the inner
+         *     chips div's child count varied with the chip count. Both of
+         *     these triggered React #418/#422 hydration mismatches when
+         *     the streamed page replaced the loading.tsx skeleton
+         *     (ERR-UJT75R 5x #422, ERR-572C9N 5x #418, ERR-HKCF93 1x #418,
+         *     ERR-TEU2DB 1x #422 — 12 events in 2026-08-04 digest). */}
+        <div
+          className={`flex flex-wrap gap-1.5 mb-4 ${activeCount > 0 ? '' : 'hidden'}`}
+          aria-hidden={activeCount === 0}
+        >
+          <ActiveFilterChips
+            filters={filters}
+            onRemove={(patch) => update(patch)}
+            onReset={reset}
+            nameMaps={initialData.nameMaps}
+          />
         </div>
 
         {/* ----- Results ----- */}
@@ -1060,7 +1077,22 @@ function ActiveFilterChips({
     });
   }
 
-  if (chips.length === 0) return null;
+  if (chips.length === 0) {
+    // Always render the wrapper div with a stable structure (the wrapper
+    // itself is the parent of <ActiveFilterChips>'s caller in FilterShell).
+    // The chips + reset button are hidden via CSS, so the React tree
+    // stays identical to the loading.tsx skeleton (which also renders an
+    // empty div with `hidden`). This is the "always render, hide via CSS"
+    // pattern from examanet-hydration-patterns — eliminates React
+    // #418/#422 hydration mismatches when the streamed page replaces the
+    // Suspense fallback.
+    return (
+      <div
+        className="flex flex-wrap gap-1.5 mb-4 hidden"
+        aria-hidden="true"
+      />
+    );
+  }
 
   return (
     <div className="flex flex-wrap gap-1.5 mb-4">

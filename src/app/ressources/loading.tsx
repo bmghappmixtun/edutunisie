@@ -150,9 +150,19 @@ export default function Loading() {
               <div className="h-14 bg-white rounded-xl border border-slate-200 animate-pulse" />
               {/* Active-filter-chips wrapper placeholder.
                * The page (FilterShell.tsx ~line 710) ALWAYS renders this 2nd
-               * child of the main <div>, hidden via CSS when activeCount === 0
-               * (so the teacherId-only page also renders it). */}
-              <div className="hidden" aria-hidden="true" />
+               * child of the main <div> as a 2-level wrapper:
+               *   <div className="flex flex-wrap gap-1.5 mb-4 hidden" aria-hidden>
+               *     <ActiveFilterChips />  ← also always rendered; returns an
+               *                                empty <div hidden> when no chips
+               *   </div>
+               * We mirror that exact 2-level structure so the streaming patch
+               * from loading→page does not see a child-count change at any
+               * wrapper, which is what triggers React #418/#422 hydration
+               * mismatches (2026-08-04: ERR-UJT75R 5x #422, ERR-572C9N 5x
+               * #418, ERR-HKCF93 1x, ERR-TEU2DB 1x — 12 events). */}
+              <div className="flex flex-wrap gap-1.5 mb-4 hidden" aria-hidden="true">
+                <div className="flex flex-wrap gap-1.5 mb-4 hidden" aria-hidden="true" />
+              </div>
               {/* Grid of cards skeleton — each card uses <a> wrapper to match
                   the page's <Link> render (Link also renders as <a>). */}
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
