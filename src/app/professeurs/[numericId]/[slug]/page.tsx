@@ -488,14 +488,17 @@ export default async function TeacherProfilePage({
                                 ? `${teacher.firstNameAr || ''} ${teacher.lastNameAr || ''}`.trim()
                                 : 'Enseignant'}
                           </h1>
-                          {/* AR name: always render, hidden via CSS when no AR name */}
+                          {/* AR name: always render, hidden via CSS when no AR name
+                           * AND when there's no FR name (otherwise h2 would
+                           * duplicate h1 — the original pre-fix code only
+                           * showed h2 when BOTH hasFr AND hasAr were true). */}
                           <h2
-                            className={`text-xl md:text-2xl font-bold text-slate-600 mb-2 ${hasAr ? '' : 'hidden'}`}
+                            className={`text-xl md:text-2xl font-bold text-slate-600 mb-2 ${hasFr && hasAr ? '' : 'hidden'}`}
                             dir="rtl"
                             lang="ar"
-                            aria-hidden={!hasAr}
+                            aria-hidden={!(hasFr && hasAr)}
                           >
-                            {hasAr
+                            {hasFr && hasAr
                               ? `${teacher.firstNameAr || ''} ${teacher.lastNameAr || ''}`.trim()
                               : '\u00A0'}
                           </h2>
