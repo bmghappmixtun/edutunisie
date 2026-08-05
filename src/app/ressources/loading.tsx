@@ -28,6 +28,19 @@ import { Loader2 } from 'lucide-react';
  *     to match FilterShell's actual element type, AND added a JSON-LD script
  *     placeholder so the wrapper's child count matches the page when the
  *     page renders the itemList schema (29-resource teacher pages, etc.).
+ *   - 2026-08-04 (commit afbcf79): always-rendered the active-filter chips
+ *     wrapper to fix React #418/#422 hydration mismatches when chips were
+ *     absent vs present.
+ *   - 2026-08-05 (this commit): the sidebar previously had 5 fixed skeleton
+ *     filter sections, but the page renders up to 8 conditional sections
+ *     (Type, Matière, Classe, Section, Année, Trimestre, Langue, Options).
+ *     A child-count mismatch at the sidebar level (5 vs N) was triggering
+ *     React #418/#422 on /ressources?subject=anglais&... (ERR-SGFVDH 5x,
+ *     ERR-XCZNW4 5x, 2026-08-05 nightly digest). The page now also always
+ *     renders both the results grid AND the empty state as siblings
+ *     (hidden via CSS), so the main <div> has 5 children: toolbar, chips
+ *     wrapper, grid, empty state, pagination wrapper. We mirror that
+ *     exactly here.
  *
  * The page-level wrappers (`min-h-screen flex flex-col`, Header, main
  * padding, Footer) are mirrored byte-for-byte to keep the Suspense
@@ -117,9 +130,26 @@ export default function Loading() {
                 />
               </div>
               {/* Content skeleton — same wrapper as the page (max-h + overflow-y
-                  + px-5 py-4 space-y-5) so the Suspense patch lands cleanly. */}
+                  + px-5 py-4 space-y-5) so the Suspense patch lands cleanly.
+                  IMPORTANT (2026-08-05): the page renders up to 9 top-level
+                  filter sections (Recherche, Type, Matière, Classe, Section,
+                  Année, Trimestre, Langue, Options, then the always-rendered
+                  Catégorie wrapper). We render 9 skeleton sections here so
+                  the sidebar's child count matches in all cases — the page
+                  wraps each section in <div className="hidden"> when the
+                  corresponding facet is empty, so on hydrate the React
+                  walker sees the same number of children here as it saw on
+                  the SSR pass. The previous version rendered only 5 sections,
+                  which mismatched the page's 9 on most filtered views
+                  (ERR-SGFVDH 5x #422, ERR-XCZNW4 5x #418, 2026-08-05 digest). */}
               <div className="max-h-[calc(100vh-180px)] overflow-y-auto px-5 py-4 space-y-5">
-                {[...Array(5)].map((_, i) => (
+                {/* 1. Recherche — input skeleton (no chips, just a label + input) */}
+                <div className="space-y-2">
+                  <div className="h-3 w-20 bg-slate-200 rounded animate-pulse" />
+                  <div className="h-9 w-full bg-slate-50 rounded-lg animate-pulse" />
+                </div>
+                {/* 2-9. Filter chip groups (Type, Matière, Classe, Section, Année, Trimestre, Langue, Options) */}
+                {[...Array(8)].map((_, i) => (
                   <div key={i} className="space-y-2">
                     <div className="h-3 w-20 bg-slate-200 rounded animate-pulse" />
                     <div className="flex flex-wrap gap-1.5">
@@ -136,20 +166,22 @@ export default function Loading() {
             </aside>
 
             {/* Content skeleton — <div> wrappers match the page's
-                <FilterShell> render (main div contains: toolbar + chips wrapper
-                + results grid + pagination). The chips wrapper and pagination
-                are always rendered on the page (with `hidden` when inactive),
-                so we mirror them here as zero-height placeholders to keep the
+                <FilterShell> render (main div now contains 5 children:
+                toolbar + chips wrapper + results-grid + empty-state + pagination).
+                The chips wrapper, empty state, and pagination are always
+                rendered on the page (with `hidden` when inactive), so we
+                mirror them here as zero-height placeholders to keep the
                 child count stable between the Suspense fallback and the
-                streamed page — preventing React #418/#422 hydration mismatches
-                on /ressources and /ar/ressources?teacherId=*
+                streamed page — preventing React #418/#422 hydration
+                mismatches on /ressources and /ar/ressources?teacherId=*.
                 (ERR-S7BZMN 11x #418, ERR-386KSC 10x #422, ERR-EZ9NCC 1x #418,
-                ERR-F5AYFT 1x #422 in 2026-08-02 nightly digest). */}
+                ERR-F5AYFT 1x #422 in 2026-08-02 nightly digest;
+                ERR-SGFVDH 5x + ERR-XCZNW4 5x + ERR-Y87HMD 4x in 2026-08-05). */}
             <div className="space-y-4">
               {/* Toolbar skeleton */}
               <div className="h-14 bg-white rounded-xl border border-slate-200 animate-pulse" />
               {/* Active-filter-chips wrapper placeholder.
-               * The page (FilterShell.tsx ~line 710) ALWAYS renders this 2nd
+               * The page (FilterShell.tsx ~line 740) ALWAYS renders this 2nd
                * child of the main <div> as a 2-level wrapper:
                *   <div className="flex flex-wrap gap-1.5 mb-4 hidden" aria-hidden>
                *     <ActiveFilterChips />  ← also always rendered; returns an
@@ -180,12 +212,24 @@ export default function Loading() {
                   </a>
                 ))}
               </div>
+              {/* Empty-state placeholder.
+               * The page (FilterShell.tsx ~line 766) ALWAYS renders a sibling
+               * empty-state <div> next to the grid, hidden via CSS when there
+               * are results. We mirror that here as a zero-height placeholder
+               * so the main <div>'s child count is 5 in BOTH the skeleton and
+               * the streamed page. Without this, when the page renders 0
+               * results (e.g. /ressources?class=7eme&subject=svt&type=HOMEWORK),
+               * the streamed HTML has the empty-state div (4 children) at
+               * position 3, but the skeleton has the grid (6 <a> children) at
+               * position 3 — a #418/#422 child-count and child-type mismatch.
+               * 2026-08-05: ERR-Y87HMD (4x #418). */}
+              <div className="bg-white rounded-2xl border border-slate-200 p-12 hidden" aria-hidden="true" />
               {/* Pagination placeholder.
-               * The page (FilterShell.tsx ~line 759) renders <Pagination> as
-               * the 4th child of the main <div> when totalPages > 1, which is
+               * The page (FilterShell.tsx ~line 800) renders <Pagination> as
+               * the 5th child of the main <div> when totalPages > 1, which is
                * true for the vast majority of /ressources pages (e.g. 560 pages
                * for 13k+ resources at 24/page). Without this placeholder, the
-               * main <div> has 3 children in the skeleton but 4 in the streamed
+               * main <div> has 4 children in the skeleton but 5 in the streamed
                * page, triggering the same #418/#422 mismatch. */}
               <div className="hidden" aria-hidden="true" />
             </div>

@@ -463,39 +463,43 @@ export default async function TeacherProfilePage({
                     {(() => {
                       const hasFr = !!(teacher.firstName || teacher.lastName);
                       const hasAr = !!(teacher.firstNameAr || teacher.lastNameAr);
-                      if (hasFr) {
-                        return (
-                          <>
-                            <h1 className="text-3xl md:text-5xl font-extrabold text-slate-900 mb-2">
-                              {(teacher.firstName || '') + ' ' + (teacher.lastName || '')}
-                            </h1>
-                            {hasAr && (
-                              <h2
-                                className="text-xl md:text-2xl font-bold text-slate-600 mb-2"
-                                dir="rtl"
-                                lang="ar"
-                              >
-                                {(teacher.firstNameAr || '') + ' ' + (teacher.lastNameAr || '')}
-                              </h2>
-                            )}
-                          </>
-                        );
-                      }
-                      if (hasAr) {
-                        return (
+                      // 2026-08-05 fix: ALWAYS render BOTH the <h1> and the <h2>
+                      // as siblings, hidden via CSS when not applicable.
+                      // Previously this IIFE returned either 1 element (h1 only)
+                      // or 2 elements (h1 + h2) based on hasFr/hasAr, which
+                      // caused a child-count mismatch at the name position
+                      // between the loading.tsx skeleton (1 h1 placeholder) and
+                      // the streamed page (2 elements when AR name is set,
+                      // 1 element otherwise). Mirrors the "always render, hide
+                      // via CSS" pattern used in FilterShell.tsx and loading.tsx.
+                      // Fixes: ERR-FCUG5X (3x #422 on /professeurs/757/...,
+                      // 2026-08-05 nightly digest).
+                      return (
+                        <>
                           <h1
-                            className="text-3xl md:text-5xl font-extrabold text-slate-900 mb-2"
+                            className={`text-3xl md:text-5xl font-extrabold text-slate-900 mb-2 ${hasFr || hasAr ? '' : 'hidden'}`}
+                            dir={hasAr && !hasFr ? 'rtl' : 'ltr'}
+                            lang={hasAr && !hasFr ? 'ar' : 'fr'}
+                            aria-hidden={!hasFr && !hasAr}
+                          >
+                            {hasFr
+                              ? `${teacher.firstName || ''} ${teacher.lastName || ''}`.trim()
+                              : hasAr
+                                ? `${teacher.firstNameAr || ''} ${teacher.lastNameAr || ''}`.trim()
+                                : 'Enseignant'}
+                          </h1>
+                          {/* AR name: always render, hidden via CSS when no AR name */}
+                          <h2
+                            className={`text-xl md:text-2xl font-bold text-slate-600 mb-2 ${hasAr ? '' : 'hidden'}`}
                             dir="rtl"
                             lang="ar"
+                            aria-hidden={!hasAr}
                           >
-                            {teacher.firstNameAr} {teacher.lastNameAr}
-                          </h1>
-                        );
-                      }
-                      return (
-                        <h1 className="text-3xl md:text-5xl font-extrabold text-slate-900 mb-2">
-                          Enseignant
-                        </h1>
+                            {hasAr
+                              ? `${teacher.firstNameAr || ''} ${teacher.lastNameAr || ''}`.trim()
+                              : '\u00A0'}
+                          </h2>
+                        </>
                       );
                     })()}
 
@@ -661,105 +665,133 @@ export default async function TeacherProfilePage({
         {/* Content */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
           <div className="grid lg:grid-cols-3 gap-8">
-            {/* Main: Resources */}
+            {/* Main: Resources
+             * 2026-08-05 fix: keep the structure stable so the loading.tsx
+             * skeleton can be patched against the streamed page without
+             * React #418/#422 hydration mismatches:
+             *   - Always render the header div with BOTH the h2 and the
+             *     "Tout voir" link, hiding the link via CSS when there are
+             *     ≤ 6 resources (so the header's child count is stable).
+             *   - Always render BOTH the resources list AND the empty state
+             *     as siblings, hiding one via CSS based on resources.length.
+             * Previously the header had 1 child (h2) when ≤ 6 and 2 children
+             * (h2 + Link) when > 6, and the main column had 1 child (empty
+             * state) when 0 resources and 1 child (resources list) when > 0
+             * — but the loading.tsx skeleton always had 1 h2 placeholder + 3
+             * skeleton resource cards, a 4-vs-1/2 mismatch. */}
             <div className="lg:col-span-2">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-extrabold flex items-center gap-2">
                   <BookOpen className="w-6 h-6 text-primary-500" />
                   Ressources ({resources.length})
                 </h2>
-                {resources.length > 6 && (
-                  <Link
-                    href={`/ressources?teacherId=${teacher.numericId}`}
-                    className="text-sm text-primary-600 hover:text-primary-700 font-semibold"
-                  >
-                    Tout voir →
-                  </Link>
-                )}
+                {/* "Tout voir" link — always render, hidden via CSS when ≤ 6 */}
+                <Link
+                  href={`/ressources?teacherId=${teacher.numericId}`}
+                  className={`text-sm text-primary-600 hover:text-primary-700 font-semibold ${resources.length > 6 ? '' : 'hidden'}`}
+                  aria-hidden={resources.length <= 6}
+                  tabIndex={resources.length > 6 ? 0 : -1}
+                >
+                  Tout voir →
+                </Link>
               </div>
 
-              {resources.length === 0 ? (
-                <div className="bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl p-12 text-center">
-                  <FileText className="w-12 h-12 mx-auto mb-3 text-slate-300" />
-                  <p className="font-semibold text-slate-600">
-                    Aucune ressource publiée pour l'instant
-                  </p>
-                  <p className="text-sm text-slate-500 mt-1">
-                    Ce professeur n'a pas encore partagé de contenu.
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {latestResources.map((r) => (
-                    <Link
-                      key={r.id}
-                      href={`/ressources/${r.numericId}/${r.slug}`}
-                      className="block bg-white rounded-2xl border border-slate-200 hover:border-primary-300 hover:shadow-md transition p-4 group"
-                    >
-                      <div className="flex items-start gap-3">
-                        <div
-                          className={`w-12 h-14 rounded-lg bg-gradient-to-br ${TYPE_COLORS[r.type] || TYPE_COLORS.OTHER} flex items-center justify-center flex-shrink-0`}
-                        >
-                          <FileText className="w-5 h-5 text-white" />
+              {/* Resources list — always render, hidden when 0 resources */}
+              <div
+                className={`space-y-3 ${resources.length === 0 ? 'hidden' : ''}`}
+                aria-hidden={resources.length === 0}
+              >
+                {latestResources.map((r) => (
+                  <Link
+                    key={r.id}
+                    href={`/ressources/${r.numericId}/${r.slug}`}
+                    className="block bg-white rounded-2xl border border-slate-200 hover:border-primary-300 hover:shadow-md transition p-4 group"
+                  >
+                    <div className="flex items-start gap-3">
+                      <div
+                        className={`w-12 h-14 rounded-lg bg-gradient-to-br ${TYPE_COLORS[r.type] || TYPE_COLORS.OTHER} flex items-center justify-center flex-shrink-0`}
+                      >
+                        <FileText className="w-5 h-5 text-white" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2">
+                          <h3
+                            className={`font-bold text-slate-900 group-hover:text-primary-600 transition line-clamp-1 ${isArabic(r.title) ? 'text-right' : 'text-left'}`}
+                            dir={isArabic(r.title) ? 'rtl' : 'ltr'}
+                            lang={isArabic(r.title) ? 'ar' : 'fr'}
+                          >
+                            {r.title}
+                          </h3>
+                          <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-semibold flex-shrink-0">
+                            {TYPE_LABELS[r.type]}
+                          </span>
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between gap-2">
-                            <h3
-                              className={`font-bold text-slate-900 group-hover:text-primary-600 transition line-clamp-1 ${isArabic(r.title) ? 'text-right' : 'text-left'}`}
-                              dir={isArabic(r.title) ? 'rtl' : 'ltr'}
-                              lang={isArabic(r.title) ? 'ar' : 'fr'}
-                            >
-                              {r.title}
-                            </h3>
-                            <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-semibold flex-shrink-0">
-                              {TYPE_LABELS[r.type]}
-                            </span>
+                        {/* AI-extracted system name (Technologie) */}
+                        {r.metadata?.systemName && (
+                          <div className="mt-1.5 inline-flex items-center gap-1 px-2 py-0.5 bg-orange-50 text-orange-800 border border-orange-200 rounded text-xs font-medium">
+                            <span>⚙️</span>
+                            <span className="line-clamp-1">{r.metadata.systemName}</span>
                           </div>
-                          {/* AI-extracted system name (Technologie) */}
-                          {r.metadata?.systemName && (
-                            <div className="mt-1.5 inline-flex items-center gap-1 px-2 py-0.5 bg-orange-50 text-orange-800 border border-orange-200 rounded text-xs font-medium">
-                              <span>⚙️</span>
-                              <span className="line-clamp-1">{r.metadata.systemName}</span>
-                            </div>
-                          )}
-                          {r.description && (
-                            <p
-                              className="text-sm text-slate-500 mt-1 line-clamp-2"
-                              dangerouslySetInnerHTML={{ __html: r.description }}
-                            />
-                          )}
-                          <div className="flex items-center gap-4 mt-2 text-xs text-slate-500">
-                            {r.subject && (
-                              <span className="flex items-center gap-1">
-                                {r.subject.icon && <span>{r.subject.icon}</span>}
-                                {r.subject.nameFr}
-                              </span>
-                            )}
-                            {r.class && <span>📚 {r.class.nameFr}</span>}
-                            {r.section && <span>🎓 {r.section.nameFr}</span>}
+                        )}
+                        {r.description && (
+                          <p
+                            className="text-sm text-slate-500 mt-1 line-clamp-2"
+                            dangerouslySetInnerHTML={{ __html: r.description }}
+                          />
+                        )}
+                        <div className="flex items-center gap-4 mt-2 text-xs text-slate-500">
+                          {r.subject && (
                             <span className="flex items-center gap-1">
-                              <Eye className="w-3 h-3" /> {r.viewsCount}
+                              {r.subject.icon && <span>{r.subject.icon}</span>}
+                              {r.subject.nameFr}
                             </span>
-                            <span className="flex items-center gap-1">
-                              <Download className="w-3 h-3" /> {r.downloadsCount}
+                          )}
+                          {r.class && <span>📚 {r.class.nameFr}</span>}
+                          {r.section && <span>🎓 {r.section.nameFr}</span>}
+                          <span className="flex items-center gap-1">
+                            <Eye className="w-3 h-3" /> {r.viewsCount}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Download className="w-3 h-3" /> {r.downloadsCount}
+                          </span>
+                          {r.avgRating > 0 && (
+                            <span className="flex items-center gap-0.5 text-amber-500 font-semibold">
+                              <Star className="w-3 h-3 fill-current" /> {r.avgRating.toFixed(1)}
                             </span>
-                            {r.avgRating > 0 && (
-                              <span className="flex items-center gap-0.5 text-amber-500 font-semibold">
-                                <Star className="w-3 h-3 fill-current" /> {r.avgRating.toFixed(1)}
-                              </span>
-                            )}
-                          </div>
+                          )}
                         </div>
                       </div>
-                    </Link>
-                  ))}
-                </div>
-              )}
+                    </div>
+                  </Link>
+                ))}
+              </div>
+              {/* Empty state — always render, hidden when > 0 resources */}
+              <div
+                className={`bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl p-12 text-center ${resources.length === 0 ? '' : 'hidden'}`}
+                aria-hidden={resources.length > 0}
+              >
+                <FileText className="w-12 h-12 mx-auto mb-3 text-slate-300" />
+                <p className="font-semibold text-slate-600">
+                  Aucune ressource publiée pour l'instant
+                </p>
+                <p className="text-sm text-slate-500 mt-1">
+                  Ce professeur n'a pas encore partagé de contenu.
+                </p>
+              </div>
             </div>
 
-            {/* Sidebar */}
+            {/* Sidebar
+             * 2026-08-05 fix: ALWAYS render all 5 possible sidebar cards as
+             * siblings, hidden via CSS when the corresponding data is absent.
+             * Previously the conditional `{Object.keys(bySubject).length > 0 &&
+             * (...)}` etc. caused the sidebar's child count to vary between
+             * 1 and 5 depending on the teacher's data, while the loading.tsx
+             * skeleton always renders 2 skeleton cards. The mismatch (1-5 vs
+             * 2) triggered React #418/#422 on /professeurs/[id]/[slug].
+             * (Fixes: ERR-FCUG5X 3x #422 on /professeurs/757/..., 2026-08-05
+             * nightly digest.) */}
             <aside className="space-y-6">
-              {/* Contact card */}
+              {/* Contact card — ALWAYS rendered */}
               <div className="bg-white rounded-2xl border border-slate-200 p-5">
                 <h3 className="font-bold mb-3 flex items-center gap-2">
                   <MessageSquare className="w-5 h-5 text-primary-500" />
@@ -777,38 +809,40 @@ export default async function TeacherProfilePage({
                 </Link>
               </div>
 
-              {/* Subjects distribution */}
-              {Object.keys(bySubject).length > 0 && (
-                <div className="bg-white rounded-2xl border border-slate-200 p-5">
-                  <h3 className="font-bold mb-3 flex items-center gap-2">
-                    <BookOpen className="w-5 h-5 text-primary-500" />
-                    Répartition par matière
-                  </h3>
-                  <div className="space-y-2">
-                    {Object.entries(bySubject)
-                      .sort((a, b) => b[1] - a[1])
-                      .map(([name, count]) => {
-                        const pct = Math.round((count / resources.length) * 100);
-                        return (
-                          <div key={name}>
-                            <div className="flex items-center justify-between text-sm mb-1">
-                              <span className="text-slate-700">{name}</span>
-                              <span className="text-xs font-semibold text-slate-500">{count}</span>
-                            </div>
-                            <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                              <div
-                                className="h-full bg-gradient-to-r from-primary-400 to-primary-600 rounded-full transition-all"
-                                style={{ width: `${pct}%` }}
-                              />
-                            </div>
+              {/* Subjects distribution — always render, hidden when no subjects */}
+              <div
+                className={`bg-white rounded-2xl border border-slate-200 p-5 ${Object.keys(bySubject).length > 0 ? '' : 'hidden'}`}
+                aria-hidden={Object.keys(bySubject).length === 0}
+              >
+                <h3 className="font-bold mb-3 flex items-center gap-2">
+                  <BookOpen className="w-5 h-5 text-primary-500" />
+                  Répartition par matière
+                </h3>
+                <div className="space-y-2">
+                  {Object.entries(bySubject)
+                    .sort((a, b) => b[1] - a[1])
+                    .map(([name, count]) => {
+                      const pct = Math.round((count / resources.length) * 100);
+                      return (
+                        <div key={name}>
+                          <div className="flex items-center justify-between text-sm mb-1">
+                            <span className="text-slate-700">{name}</span>
+                            <span className="text-xs font-semibold text-slate-500">{count}</span>
                           </div>
-                        );
-                      })}
-                  </div>
+                          <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-gradient-to-r from-primary-400 to-primary-600 rounded-full transition-all"
+                              style={{ width: `${pct}%` }}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
                 </div>
-              )}
+              </div>
 
-              {/* AI-extracted: Technical systems covered (Technologie) */}
+              {/* AI-extracted: Technical systems covered (Technologie)
+               * Always render the wrapper; conditionally fill inner content. */}
               {(() => {
                 const bySystem = resources.reduce((acc, r) => {
                   const sys = r.metadata?.systemName;
@@ -817,9 +851,12 @@ export default async function TeacherProfilePage({
                   }
                   return acc;
                 }, {} as Record<string, number>);
-                if (Object.keys(bySystem).length === 0) return null;
+                const hasSystem = Object.keys(bySystem).length > 0;
                 return (
-                  <div className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-2xl border border-orange-200 p-5">
+                  <div
+                    className={`bg-gradient-to-br from-orange-50 to-amber-50 rounded-2xl border border-orange-200 p-5 ${hasSystem ? '' : 'hidden'}`}
+                    aria-hidden={!hasSystem}
+                  >
                     <h3 className="font-bold mb-3 flex items-center gap-2 text-orange-900">
                       <span className="text-lg">⚙️</span>
                       Systèmes techniques abordés
@@ -853,7 +890,7 @@ export default async function TeacherProfilePage({
                 );
               })()}
 
-              {/* AI-extracted: Topics (tag cloud) */}
+              {/* AI-extracted: Topics (tag cloud) — always render */}
               {(() => {
                 const topicCounts = resources.reduce((acc, r) => {
                   (r.metadata?.topics || []).forEach(t => {
@@ -862,9 +899,12 @@ export default async function TeacherProfilePage({
                   return acc;
                 }, {} as Record<string, number>);
                 const top = Object.entries(topicCounts).sort((a, b) => b[1] - a[1]).slice(0, 15);
-                if (top.length === 0) return null;
+                const hasTopics = top.length > 0;
                 return (
-                  <div className="bg-white rounded-2xl border border-slate-200 p-5">
+                  <div
+                    className={`bg-white rounded-2xl border border-slate-200 p-5 ${hasTopics ? '' : 'hidden'}`}
+                    aria-hidden={!hasTopics}
+                  >
                     <h3 className="font-bold mb-3 flex items-center gap-2 text-sm">
                       <span>🏷️</span>
                       Sujets populaires
@@ -900,27 +940,28 @@ export default async function TeacherProfilePage({
                 );
               })()}
 
-              {/* Types distribution */}
-              {Object.keys(byType).length > 0 && (
-                <div className="bg-white rounded-2xl border border-slate-200 p-5">
-                  <h3 className="font-bold mb-3 flex items-center gap-2">
-                    <FileText className="w-5 h-5 text-primary-500" />
-                    Types de contenu
-                  </h3>
-                  <div className="space-y-1.5">
-                    {Object.entries(byType)
-                      .sort((a, b) => b[1] - a[1])
-                      .map(([type, count]) => (
-                        <div key={type} className="flex items-center justify-between text-sm">
-                          <span className="text-slate-700">{TYPE_LABELS[type] || type}</span>
-                          <span className="text-xs font-bold bg-slate-100 text-slate-700 px-2 py-0.5 rounded">
-                            {count}
-                          </span>
-                        </div>
-                      ))}
-                  </div>
+              {/* Types distribution — always render, hidden when no types */}
+              <div
+                className={`bg-white rounded-2xl border border-slate-200 p-5 ${Object.keys(byType).length > 0 ? '' : 'hidden'}`}
+                aria-hidden={Object.keys(byType).length === 0}
+              >
+                <h3 className="font-bold mb-3 flex items-center gap-2">
+                  <FileText className="w-5 h-5 text-primary-500" />
+                  Types de contenu
+                </h3>
+                <div className="space-y-1.5">
+                  {Object.entries(byType)
+                    .sort((a, b) => b[1] - a[1])
+                    .map(([type, count]) => (
+                      <div key={type} className="flex items-center justify-between text-sm">
+                        <span className="text-slate-700">{TYPE_LABELS[type] || type}</span>
+                        <span className="text-xs font-bold bg-slate-100 text-slate-700 px-2 py-0.5 rounded">
+                          {count}
+                        </span>
+                      </div>
+                    ))}
                 </div>
-              )}
+              </div>
             </aside>
           </div>
         </div>

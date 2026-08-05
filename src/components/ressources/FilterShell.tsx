@@ -411,8 +411,17 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
             </div>
           </div>
 
-          {/* ----- TYPE ----- */}
-          {Object.keys(data.facets.byType).length > 0 && (
+          {/* ----- TYPE -----
+           * Always render the section, hide via CSS when there are no options.
+           * Mirrors the "always render, hide via CSS" pattern used elsewhere
+           * in this file (chips wrapper, results, pagination) — keeps the
+           * sidebar's child count stable between the loading.tsx skeleton
+           * and the streamed page, preventing React #418/#422 hydration
+           * mismatches when filter sections appear/disappear based on the
+           * current facet data (e.g. ?subject=anglais shows all 8 sections,
+           * but ?type=HOMEWORK (0 results) might show only 2).
+           * (2026-08-05: ERR-SGFVDH 5x, ERR-XCZNW4 5x on /ressources?subject=anglais&...) */}
+          <div className={Object.keys(data.facets.byType).length > 0 ? '' : 'hidden'} aria-hidden={Object.keys(data.facets.byType).length === 0}>
             <MultiSelectChips
               label="Type de ressource"
               icon={FileText}
@@ -428,10 +437,10 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
               selected={filters.type}
               onToggle={(v) => toggleMulti('type', v)}
             />
-          )}
+          </div>
 
           {/* ----- MATIÈRE ----- */}
-          {subjectOptions.length > 0 && (
+          <div className={subjectOptions.length > 0 ? '' : 'hidden'} aria-hidden={subjectOptions.length === 0}>
             <MultiSelectChips
               label="Matière"
               icon={BookOpen}
@@ -443,10 +452,10 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
               selected={filters.subject}
               onToggle={(v) => toggleMulti('subject', v)}
             />
-          )}
+          </div>
 
           {/* ----- CLASSE ----- */}
-          {classOptions.length > 0 && (
+          <div className={classOptions.length > 0 ? '' : 'hidden'} aria-hidden={classOptions.length === 0}>
             <MultiSelectChips
               label="Classe"
               icon={GraduationCap}
@@ -458,10 +467,10 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
               selected={filters.class}
               onToggle={(v) => toggleMulti('class', v)}
             />
-          )}
+          </div>
 
           {/* ----- SECTION (only if classes selected OR sections exist) ----- */}
-          {availableSections.length > 0 && (
+          <div className={availableSections.length > 0 ? '' : 'hidden'} aria-hidden={availableSections.length === 0}>
             <MultiSelectChips
               label="Section"
               icon={FilterIcon}
@@ -473,10 +482,10 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
               selected={filters.section}
               onToggle={(v) => toggleMulti('section', v)}
             />
-          )}
+          </div>
 
           {/* ----- ANNÉE SCOLAIRE ----- */}
-          {yearOptions.length > 0 && (
+          <div className={yearOptions.length > 0 ? '' : 'hidden'} aria-hidden={yearOptions.length === 0}>
             <MultiSelectChips
               label="Année scolaire"
               icon={Calendar}
@@ -488,10 +497,10 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
               selected={filters.year}
               onToggle={(v) => toggleMulti('year', v)}
             />
-          )}
+          </div>
 
           {/* ----- TRIMESTRE ----- */}
-          {Object.keys(data.facets.byTrimestre).length > 0 && (
+          <div className={Object.keys(data.facets.byTrimestre).length > 0 ? '' : 'hidden'} aria-hidden={Object.keys(data.facets.byTrimestre).length === 0}>
             <MultiSelectChips
               label="Trimestre"
               icon={Sparkles}
@@ -506,10 +515,10 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
               selected={filters.trimestre}
               onToggle={(v) => toggleMulti('trimestre', v)}
             />
-          )}
+          </div>
 
           {/* ----- LANGUE ----- */}
-          {Object.keys(data.facets.byLanguage).length > 1 && (
+          <div className={Object.keys(data.facets.byLanguage).length > 1 ? '' : 'hidden'} aria-hidden={Object.keys(data.facets.byLanguage).length <= 1}>
             <MultiSelectChips
               label="Langue"
               icon={Languages}
@@ -524,43 +533,44 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
               selected={filters.language}
               onToggle={(v) => toggleMulti('language', v)}
             />
-          )}
+          </div>
 
           {/* ----- AVEC CORRIGÉ ----- */}
-          {data.facets.withCorrection > 0 && (
-            <div>
-              <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-                Options
-              </div>
-              <button
-                onClick={() => update({ hasCorrection: !filters.hasCorrection })}
-                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg border text-sm transition ${
-                  filters.hasCorrection
-                    ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
-                    : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-300'
+          <div className={data.facets.withCorrection > 0 ? '' : 'hidden'} aria-hidden={data.facets.withCorrection === 0}>
+            <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+              Options
+            </div>
+            <button
+              onClick={() => update({ hasCorrection: !filters.hasCorrection })}
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg border text-sm transition ${
+                filters.hasCorrection
+                  ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                  : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-300'
+              }`}
+            >
+              <span className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4" />
+                Avec corrigé seulement
+              </span>
+              <Switch.Root
+                checked={filters.hasCorrection}
+                onCheckedChange={(c) => update({ hasCorrection: c })}
+                className={`w-9 h-5 rounded-full relative transition ${
+                  filters.hasCorrection ? 'bg-emerald-500' : 'bg-slate-300'
                 }`}
               >
-                <span className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4" />
-                  Avec corrigé seulement
-                </span>
-                <Switch.Root
-                  checked={filters.hasCorrection}
-                  onCheckedChange={(c) => update({ hasCorrection: c })}
-                  className={`w-9 h-5 rounded-full relative transition ${
-                    filters.hasCorrection ? 'bg-emerald-500' : 'bg-slate-300'
-                  }`}
-                >
-                  <Switch.Thumb className="block w-4 h-4 bg-white rounded-full shadow transition-transform translate-x-0.5 data-[state=checked]:translate-x-[18px]" />
-                </Switch.Root>
-              </button>
-              <div className="text-[11px] text-slate-500 mt-1.5 ml-1">
-                {data.facets.withCorrection.toLocaleString('fr-FR')} ressources avec corrigé
-              </div>
+                <Switch.Thumb className="block w-4 h-4 bg-white rounded-full shadow transition-transform translate-x-0.5 data-[state=checked]:translate-x-[18px]" />
+              </Switch.Root>
+            </button>
+            <div className="text-[11px] text-slate-500 mt-1.5 ml-1">
+              {data.facets.withCorrection.toLocaleString('fr-FR')} ressources avec corrigé
             </div>
-          )}
+          </div>
 
-          {/* ----- CATÉGORIE (collège/lycée × pilote/ordinaire) — 4 Switches combinables ----- */}
+          {/* ----- CATÉGORIE (collège/lycée × pilote/ordinaire) — 4 Switches combinables -----
+           * This wrapper is ALWAYS rendered (no conditional). The "ressources
+           * dans les catégories sélectionnées" line below is the only conditional
+           * child. */}
           <div className="mt-4 pt-3 border-t border-slate-200">
             <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
               Catégorie
@@ -602,7 +612,7 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
             {(filters.collegePilote ||
               filters.collegeOrdinaire ||
               filters.lyceePilote ||
-              filters.lyceeOrdinaire) && (
+              filters.lyceeOrdinaire) ? (
               <div className="text-[11px] text-slate-500 mt-2 ml-1">
                 {(
                   (filters.collegePilote ? data.facets.collegePilote : 0) +
@@ -612,6 +622,13 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
                 ).toLocaleString('fr-FR')}{' '}
                 ressources dans les catégories sélectionnées
               </div>
+            ) : (
+              /* Always render a sibling placeholder so the Catégorie wrapper's
+               * child count stays stable (3 children: label + switches + this
+               * div, regardless of whether any category filter is active).
+               * 2026-08-05: prevents React #418/#422 when toggling category
+               * filters on /ressources. */
+              <div className="text-[11px] text-slate-500 mt-2 ml-1 hidden" aria-hidden="true" />
             )}
           </div>
         </div>
@@ -735,52 +752,76 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
           />
         </div>
 
-        {/* ----- Results ----- */}
-        {data.resources.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
-            <div className="text-6xl mb-3">🔍</div>
-            <h3 className="font-bold text-xl mb-2">Aucun résultat</h3>
-            <p className="text-slate-500 mb-5 text-sm">
-              Essayez d'élargir vos critères ou supprimez quelques filtres.
-            </p>
-            <button onClick={reset} className="btn-primary inline-flex items-center gap-2">
-              <RotateCcw className="w-4 h-4" />
-              Réinitialiser tous les filtres
-            </button>
-          </div>
-        ) : (
-          <div
-            className={
-              filters.view === 'grid'
-                ? 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5'
-                : 'space-y-2'
-            }
-          >
-            {data.resources.map((r) =>
-              filters.view === 'list' ? (
-                <ResourceListItem
-                  key={r.id}
-                  resource={{ ...r, isFavorited: favorites.has(r.id) }}
-                />
-              ) : (
-                <ResourceCard
-                  key={r.id}
-                  resource={{ ...r, isFavorited: favorites.has(r.id) } as any}
-                />
-              ),
-            )}
-          </div>
-        )}
+        {/* ----- Results -----
+         * ALWAYS render BOTH the grid AND the empty state as siblings,
+         * hiding one via CSS based on data.resources.length. This keeps the
+         * main content wrapper's child count stable (5 children: toolbar +
+         * chips wrapper + results-grid + empty-state + pagination wrapper)
+         * so the loading.tsx skeleton can be patched against the streamed
+         * page without React #418/#422 hydration mismatches.
+         *
+         * The previous version (pre-2026-08-05) used a ternary
+         * `{data.resources.length === 0 ? <EmptyState/> : <Grid/>}`, which
+         * meant the DOM had either the empty-state div (4 children: div+h3+
+         * p+button) OR the grid (N <a> children) — but never both. The
+         * loading.tsx skeleton always renders 6 <a> skeleton cards inside
+         * the grid, so when the page rendered 0 results (e.g.
+         * /ressources?class=7eme&subject=svt&type=HOMEWORK), the empty-state
+         * branch's child count (4) didn't match the skeleton's (6),
+         * triggering #418/#422.
+         *
+         * 2026-08-05 fixes: ERR-Y87HMD (4x #418 on /ressources?class=7eme&subject=svt&type=HOMEWORK).
+         * History of this pattern: see commit afbcf79 (chips wrapper) and
+         * the wider examanet-hydration-patterns topic. */}
+        <div
+          className={
+            filters.view === 'grid'
+              ? `grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 ${data.resources.length === 0 ? 'hidden' : ''}`
+              : `space-y-2 ${data.resources.length === 0 ? 'hidden' : ''}`
+          }
+          aria-hidden={data.resources.length === 0}
+        >
+          {data.resources.map((r) =>
+            filters.view === 'list' ? (
+              <ResourceListItem
+                key={r.id}
+                resource={{ ...r, isFavorited: favorites.has(r.id) }}
+              />
+            ) : (
+              <ResourceCard
+                key={r.id}
+                resource={{ ...r, isFavorited: favorites.has(r.id) } as any}
+              />
+            ),
+          )}
+        </div>
+        {/* Empty state — ALWAYS rendered as a sibling of the grid above.
+         * Hidden via CSS when there are results. */}
+        <div
+          className={`bg-white rounded-2xl border border-slate-200 p-12 text-center ${data.resources.length === 0 ? '' : 'hidden'}`}
+          aria-hidden={data.resources.length > 0}
+        >
+          <div className="text-6xl mb-3">🔍</div>
+          <h3 className="font-bold text-xl mb-2">Aucun résultat</h3>
+          <p className="text-slate-500 mb-5 text-sm">
+            Essayez d'élargir vos critères ou supprimez quelques filtres.
+          </p>
+          <button onClick={reset} className="btn-primary inline-flex items-center gap-2">
+            <RotateCcw className="w-4 h-4" />
+            Réinitialiser tous les filtres
+          </button>
+        </div>
 
         {/* ----- Pagination -----
          * Always render the wrapper, hidden via CSS when there's only 1 page
          * (or zero results). Mirrors the pattern used for the active-filter
          * chips wrapper above: keeping the parent's child count stable
-         * (3 children: toolbar + chips wrapper + results) so the Suspense
-         * fallback in loading.tsx can be patched against the streamed page
-         * without React #418/#422 hydration mismatches. The wrapper uses
-         * `hidden` (CSS) rather than conditional rendering so the DOM element
-         * is always present, matching the loading.tsx placeholder. */}
+         * (5 children: toolbar + chips wrapper + results-grid + empty-state +
+         * pagination wrapper) so the Suspense fallback in loading.tsx can be
+         * patched against the streamed page without React #418/#422 hydration
+         * mismatches. The wrapper uses `hidden` (CSS) rather than conditional
+         * rendering so the DOM element is always present, matching the
+         * loading.tsx placeholder. */}
         <div
           className={data.totalPages > 1 ? 'mt-8' : 'hidden'}
           aria-hidden={data.totalPages <= 1}

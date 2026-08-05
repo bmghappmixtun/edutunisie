@@ -30,6 +30,13 @@ import Footer from '@/components/layout/Footer';
  *     + BreadcrumbList) and changed breadcrumb wrapper from <div> to <nav>
  *     to match the page's actual element types when the page resolves to
  *     a real teacher profile.
+ *   - 2026-08-05 (this commit): the page now ALWAYS renders the FR <h1> +
+ *     AR <h2> name pair (hidden via CSS when not applicable) and the
+ *     resources-list + empty-state as siblings (hidden via CSS based on
+ *     resources.length). The sidebar also always renders 5 cards
+ *     (Contact + Répartition + Systèmes + Sujets + Types), hidden via
+ *     CSS. Mirroring that here to prevent React #418/#422 hydration
+ *     mismatches (ERR-FCUG5X 3x #422, 2026-08-05 nightly digest).
  */
 export default function Loading() {
   return (
@@ -81,9 +88,12 @@ export default function Loading() {
               <div className="w-32 h-32 md:w-40 md:h-40 rounded-3xl bg-slate-200 animate-pulse flex-shrink-0" />
 
               <div className="flex-1 min-w-0 w-full space-y-3">
-                {/* Name skeleton */}
+                {/* Name skeleton — TWO placeholders to match the page's
+                 * always-rendered <h1> + <h2> pair. The page conditionally
+                 * shows one or both based on hasFr/hasAr (FR/AR name).
+                 * 2026-08-05 fix (ERR-FCUG5X 3x #422). */}
                 <div className="h-8 w-64 bg-slate-200 rounded animate-pulse" />
-                <div className="h-4 w-40 bg-slate-200 rounded animate-pulse" />
+                <div className="h-6 w-56 bg-slate-200 rounded animate-pulse" />
                 {/* Meta skeleton */}
                 <div className="flex flex-wrap gap-2 mt-2">
                   <div className="h-6 w-20 bg-slate-200 rounded-full animate-pulse" />
@@ -115,34 +125,64 @@ export default function Loading() {
         {/* Content skeleton */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
           <div className="grid lg:grid-cols-3 gap-8">
-            {/* Main column: resources skeleton */}
-            <div className="lg:col-span-2 space-y-3">
-              <div className="h-6 w-48 bg-slate-200 rounded animate-pulse mb-6" />
-              {[...Array(3)].map((_, i) => (
-                <div
-                  key={i}
-                  className="block bg-white rounded-2xl border border-slate-200 p-4"
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="w-12 h-14 rounded-lg bg-slate-200 animate-pulse flex-shrink-0" />
-                    <div className="flex-1 min-w-0 space-y-2">
-                      <div className="h-4 w-3/4 bg-slate-200 rounded animate-pulse" />
-                      <div className="h-3 w-full bg-slate-100 rounded animate-pulse" />
-                      <div className="h-3 w-1/2 bg-slate-100 rounded animate-pulse" />
+            {/* Main column: resources skeleton.
+             * 2026-08-05 fix: the page now ALWAYS renders the resources-list
+             * AND the empty-state as siblings (hidden via CSS), so the
+             * lg:col-span-2 <div> has 2 children in both states. The header
+             * div has 2 children (h2 + always-rendered "Tout voir" link,
+             * hidden when ≤ 6). Mirroring that here exactly. */}
+            <div className="lg:col-span-2">
+              {/* Header: h2 + "Tout voir" link (always-rendered, hidden when ≤ 6) */}
+              <div className="flex items-center justify-between mb-6">
+                <div className="h-6 w-48 bg-slate-200 rounded animate-pulse" />
+                <div className="h-5 w-20 bg-slate-200 rounded animate-pulse" />
+              </div>
+              {/* Resources list skeleton (hidden when 0) */}
+              <div className="space-y-3">
+                {[...Array(3)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="block bg-white rounded-2xl border border-slate-200 p-4"
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="w-12 h-14 rounded-lg bg-slate-200 animate-pulse flex-shrink-0" />
+                      <div className="flex-1 min-w-0 space-y-2">
+                        <div className="h-4 w-3/4 bg-slate-200 rounded animate-pulse" />
+                        <div className="h-3 w-full bg-slate-100 rounded animate-pulse" />
+                        <div className="h-3 w-1/2 bg-slate-100 rounded animate-pulse" />
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
+              {/* Empty-state placeholder (hidden when > 0). Mirrors the page's
+               * always-rendered empty-state div so the lg:col-span-2 wrapper
+               * has 2 children in both states. */}
+              <div
+                className="bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl p-12 hidden"
+                aria-hidden="true"
+              >
+                <div className="w-12 h-12 mx-auto mb-3 bg-slate-200 rounded animate-pulse" />
+                <div className="h-4 w-72 mx-auto bg-slate-200 rounded animate-pulse" />
+                <div className="h-3 w-56 mx-auto mt-2 bg-slate-100 rounded animate-pulse" />
+              </div>
             </div>
 
-            {/* Sidebar skeleton */}
+            {/* Sidebar skeleton — 5 cards to match the page's
+             * always-rendered Contact + Répartition + Systèmes + Sujets +
+             * Types cards (each hidden via CSS in the page when the
+             * corresponding data is empty). Mirroring that here to keep
+             * the sidebar's child count stable (5 vs 5).
+             * 2026-08-05 fix (ERR-FCUG5X 3x #422). */}
             <aside className="space-y-6">
+              {/* 1. Contact card (always rendered) */}
               <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-3">
                 <div className="h-5 w-24 bg-slate-200 rounded animate-pulse" />
                 <div className="h-3 w-full bg-slate-100 rounded animate-pulse" />
                 <div className="h-3 w-2/3 bg-slate-100 rounded animate-pulse" />
                 <div className="h-9 w-full bg-slate-200 rounded-xl animate-pulse" />
               </div>
+              {/* 2. Répartition par matière (hidden when bySubject empty) */}
               <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-3">
                 <div className="h-5 w-32 bg-slate-200 rounded animate-pulse" />
                 {[...Array(3)].map((_, i) => (
@@ -150,6 +190,29 @@ export default function Loading() {
                     <div className="h-3 w-full bg-slate-100 rounded animate-pulse" />
                     <div className="h-2 bg-slate-100 rounded-full animate-pulse" />
                   </div>
+                ))}
+              </div>
+              {/* 3. Systèmes techniques (hidden when bySystem empty) */}
+              <div className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-2xl border border-orange-200 p-5 space-y-3">
+                <div className="h-5 w-40 bg-orange-200 rounded animate-pulse" />
+                {[...Array(2)].map((_, i) => (
+                  <div key={i} className="h-3 w-full bg-orange-100 rounded animate-pulse" />
+                ))}
+              </div>
+              {/* 4. Sujets populaires (hidden when topics empty) */}
+              <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-3">
+                <div className="h-5 w-32 bg-slate-200 rounded animate-pulse" />
+                <div className="flex flex-wrap gap-1.5">
+                  {[...Array(6)].map((_, i) => (
+                    <div key={i} className="h-5 w-16 bg-slate-100 rounded-full animate-pulse" />
+                  ))}
+                </div>
+              </div>
+              {/* 5. Types de contenu (hidden when byType empty) */}
+              <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-3">
+                <div className="h-5 w-32 bg-slate-200 rounded animate-pulse" />
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="h-3 w-full bg-slate-100 rounded animate-pulse" />
                 ))}
               </div>
             </aside>
