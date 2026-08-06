@@ -732,11 +732,14 @@ export default function AiDescription({
         </div>
       )}
 
-      {/* Summary block */}
+      {/* Summary block — no top border/extra padding because the header
+          already has `border-b border-violet-100` and `pb-2`. When the info
+          grid is empty (e.g. math lycée with all 3 fields hidden), keeping
+          a second border would stack two lines under "Résumé intelligent". */}
       {summary && (() => {
         const summaryAr = isArabic(summary);
         return (
-        <div dir={summaryAr ? 'rtl' : 'ltr'} className="mt-3 pt-3 border-t border-violet-100">
+        <div dir={summaryAr ? 'rtl' : 'ltr'} className="mt-3">
           <div className="flex items-start gap-2">
             <ScrollText className="w-4 h-4 mt-1 flex-shrink-0 text-violet-600" />
             <div
