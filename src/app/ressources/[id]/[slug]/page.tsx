@@ -551,7 +551,6 @@ export default async function ResourcePage({
                       generalSubject={resource.metadata?.generalSubject}
                       schoolType={resource.schoolType}
                       hideFields={
-                        resource.subject?.slug === 'mathematiques' &&
                         resource.class?.level?.slug === 'lycee'
                           ? ['Sujet général', 'Enseignant', 'Classe']
                           : null
@@ -595,13 +594,13 @@ export default async function ResourcePage({
                   // Per user rule (2026-07-30): for college, hide Type (النوع) and
                   // Niveau (المستوى) from the AI card — they're always the same.
                   const isCollege = resource.class?.level?.slug === 'college';
-                  // Per user rule (2026-08-06): for math lycée, hide Sujet général /
-                  // Enseignant / Classe — these are already shown in the page
-                  // header (h1, sidebar) and the AI card would just be redundant.
-                  const isMathLycee =
-                    resource.subject?.slug === 'mathematiques' &&
-                    resource.class?.level?.slug === 'lycee';
-                  const hideFields = isMathLycee
+                  // Per user rule (2026-08-06): for all lycée files (any subject),
+                  // hide Sujet général / Enseignant / Classe — these are already
+                  // shown in the page header (h1), the right sidebar (Enseignant +
+                  // Classe) and the title format "BASE (year) : GeneralSubject",
+                  // so the AI card would just be redundant.
+                  const isLycee = resource.class?.level?.slug === 'lycee';
+                  const hideFields = isLycee
                     ? ['Sujet général', 'Enseignant', 'Classe']
                     : null;
                   // Teacher full name (FR + AR) — prefer the resource.teacherNameAr
@@ -926,8 +925,14 @@ export default async function ResourcePage({
                 </div>
               )}
 
-              {/* COMPLETE Info Panel */}
-              <ResourceInfoPanel resource={resource} />
+              {/* COMPLETE Info Panel — for lycée files we hide the "Classe" row
+                  because the AI summary card already shows it AND the title
+                  format encodes it ("... - 1AS (year)"). Other info (Type,
+                  Matière, Section, Trimestre, Année, Langue) stays. */}
+              <ResourceInfoPanel
+                resource={resource}
+                hideClasse={resource.class?.level?.slug === 'lycee'}
+              />
             </aside>
           </div>
         </div>

@@ -49,7 +49,7 @@ const LANGUAGE_LABELS: Record<string, string> = {
   'fr+ar': '🇫🇷 + 🇹🇳 Bilingue',
 };
 
-export default function ResourceInfoPanel({ resource }: { resource: any }) {
+export default function ResourceInfoPanel({ resource, hideClasse = false }: { resource: any; hideClasse?: boolean }) {
   const typeInfo = TYPE_LABELS[resource.type] || TYPE_LABELS.COURSE;
   // Parse PostgreSQL array literal: {a,b,"c d","e f"} → ['a','b','c d','e f']
   // Also handles malformed inputs: {a,b (no closing }) or a,b (no braces)
@@ -111,7 +111,7 @@ export default function ResourceInfoPanel({ resource }: { resource: any }) {
         )}
 
         {/* CLASSE */}
-        {resource.class && (
+        {resource.class && !hideClasse && (
           <Row icon={<GraduationCap className="w-4 h-4" />} label="Classe">
             <span className="font-semibold text-slate-900">{resource.class.nameFr}</span>
           </Row>
