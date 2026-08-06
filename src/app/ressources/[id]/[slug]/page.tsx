@@ -550,6 +550,12 @@ export default async function ResourcePage({
                       classNameAr={resource.class?.nameAr}
                       generalSubject={resource.metadata?.generalSubject}
                       schoolType={resource.schoolType}
+                      hideFields={
+                        resource.subject?.slug === 'mathematiques' &&
+                        resource.class?.level?.slug === 'lycee'
+                          ? ['Sujet général', 'Enseignant', 'Classe']
+                          : null
+                      }
                     />
                   </div>
                 )}
@@ -589,6 +595,15 @@ export default async function ResourcePage({
                   // Per user rule (2026-07-30): for college, hide Type (النوع) and
                   // Niveau (المستوى) from the AI card — they're always the same.
                   const isCollege = resource.class?.level?.slug === 'college';
+                  // Per user rule (2026-08-06): for math lycée, hide Sujet général /
+                  // Enseignant / Classe — these are already shown in the page
+                  // header (h1, sidebar) and the AI card would just be redundant.
+                  const isMathLycee =
+                    resource.subject?.slug === 'mathematiques' &&
+                    resource.class?.level?.slug === 'lycee';
+                  const hideFields = isMathLycee
+                    ? ['Sujet général', 'Enseignant', 'Classe']
+                    : null;
                   // Teacher full name (FR + AR) — prefer the resource.teacherNameAr
                   // (text field, no relation) for AR. Fall back to the User record.
                   // Per user rule: "teacherNameAr est juste une info pour l'utilisateur
@@ -633,6 +648,7 @@ export default async function ResourcePage({
                         aiSchoolName={resource.metadata?.schoolName ?? null}
                         aiProfNames={resource.metadata?.profNames ?? null}
                         schoolType={resource.schoolType}
+                        hideFields={hideFields}
                       />
                     </div>
                   );

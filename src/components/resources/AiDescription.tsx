@@ -73,7 +73,26 @@ interface AiDescriptionProps {
   aiProfNames?: string[] | null;
   /** Resource schoolType ('PILOTE' | 'PUBLIC' | null). When 'PILOTE', show "Pilote" badge next to school name. */
   schoolType?: string | null;
+  /** Hide specific field labels in the card grid. Used to drop redundant
+   *  attributes (e.g. Sujet général / Enseignant / Classe) for some subjects
+   *  where they're already shown in the page header / sidebar. */
+  hideFields?: string[] | null;
 }
+
+/** Map of FR label → matching AR label. Lets callers pass FR-only labels
+ *  (e.g. ['Sujet général']) and have the AR equivalent ('الموضوع العام')
+ *  hidden too. */
+const HIDE_LABEL_TRANSLATIONS: Record<string, string[]> = {
+  'Sujet général': ['الموضوع العام'],
+  'Enseignant': ['الأستاذ', 'الأستا ذ', 'المعلم'],
+  'Classe': ['الصف', 'السنة الدراسية', 'الفصل'],
+  'Type': ['النوع'],
+  'Niveau': ['المستوى'],
+  'Matière': ['المادة'],
+  'Établissement': ['المدرسة', 'المؤسسة'],
+  'Année scolaire': ['السنة الدراسية'],
+  'Système': ['الظام', 'المنظومة'],
+};
 
 type Field = {
   /** Icon component from lucide-react */
@@ -339,6 +358,7 @@ export default function AiDescription({
   aiSchoolName,
   aiProfNames,
   schoolType,
+  hideFields,
 }: AiDescriptionProps) {
   const isAi = !!source && source.startsWith('agent-');
 
@@ -570,6 +590,26 @@ export default function AiDescription({
     ]);
     filteredParsed = parsedFields.filter((f) => !collegeSkipLabels.has(f.label));
     filteredHeader = headerFields.filter((f) => !collegeSkipLabels.has(f.label));
+  }
+
+  // ===== Per-subject custom field hiding (2026-08-06) =====
+  // Some subjects want specific fields dropped from the card (they're already
+  // in the page header / sidebar). Caller passes `hideFields` with the label
+  // strings to suppress. Both LTR (FR) and RTL (AR) labels are checked via
+  // HIDE_LABEL_TRANSLATIONS so callers can pass FR-only labels and have
+  // their AR equivalents (e.g. 'الموضوع العام') also removed.
+  if (hideFields && hideFields.length > 0) {
+    const hideSet = new Set<string>();
+    for (const label of hideFields) {
+      hideSet.add(label);
+      hideSet.add(label.toLowerCase());
+      const arAliases = HIDE_LABEL_TRANSLATIONS[label];
+      if (arAliases) {
+        for (const ar of arAliases) hideSet.add(ar);
+      }
+    }
+    filteredParsed = filteredParsed.filter((f) => !hideSet.has(f.label));
+    filteredHeader = filteredHeader.filter((f) => !hideSet.has(f.label));
   }
 
   const fields = [...filteredParsed, ...filteredHeader];
