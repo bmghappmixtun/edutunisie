@@ -77,15 +77,11 @@ export default function ResourceInfoPanel({ resource, hideClasse = false }: { re
           </Row>
         )}
 
-        {/* Technical info */}
+        {/* Technical info — per user rule (2026-08-06): Pages is removed from
+            the sidebar. The PDF viewer in the main column already shows the
+            page count + navigation controls, so duplicating it in the
+            sidebar was redundant. */}
         <div className="pt-3 border-t border-slate-100 space-y-2">
-          {resource.pageCount && (
-            <div className="flex justify-between text-xs">
-              <dt className="text-slate-500">Pages</dt>
-              <dd className="font-semibold text-slate-900">{resource.pageCount}</dd>
-            </div>
-          )}
-
           {/* TAGS — just before file size, clickable for SEO + UX */}
           {tags.length > 0 && (
             <div className="pt-2">
