@@ -162,6 +162,33 @@ export default function Loading() {
                     </div>
                   </div>
                 ))}
+                {/* 10. Catégorie (4 category switches — always rendered in the page
+                 *  via the "always render, hide via CSS" pattern). The Catégorie
+                 *  wrapper itself is always present in FilterShell.tsx (~line 574),
+                 *  so we MUST mirror it here — otherwise the sidebar's content
+                 *  div has 9 children in the skeleton but 10 in the streamed page,
+                 *  a structural mismatch that triggers React #418/#422 on
+                 *  /ressources and /ar/ressources?teacherId=* (60 events in the
+                 *  2026-08-06 digest: ERR-477B47 18x #422, ERR-5U9VEJ 18x #418,
+                 *  ERR-8V4H58 12x #418, ERR-G4CV55 12x #422).
+                 *  Inner structure mirrors the page exactly: top border + label +
+                 *  4 switch rows + 1 hidden count-line placeholder (so the wrapper
+                 *  has 3 children: label + switches + count-placeholder, matching
+                 *  FilterShell.tsx ~line 574-633). */}
+                <div className="mt-4 pt-3 border-t border-slate-200 space-y-2">
+                  <div className="h-3 w-20 bg-slate-200 rounded animate-pulse" />
+                  {[...Array(4)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="h-9 w-full bg-slate-50 rounded-lg border border-slate-100 animate-pulse"
+                    />
+                  ))}
+                  {/* Hidden count-line placeholder — mirrors the page's
+                   *  always-rendered <div ... hidden /> at FilterShell.tsx
+                   *  ~line 631. Keeps the wrapper's child count at 3 in both
+                   *  states (filter active or not). */}
+                  <div className="h-3 w-48 bg-slate-100 rounded animate-pulse hidden" aria-hidden="true" />
+                </div>
               </div>
             </aside>
 
