@@ -662,7 +662,8 @@ export default async function ResourcePage({
                     - Per user rule (2026-08-03): PILOTE collège Physique is FR (JORT 2019-063),
                       so its card title stays in French ("Points clés") even if resource.lang === 'ar'
                     - Per user rule (2026-08-06): merge long (keyPoints) + short (shortKeyPoints) KP
-                      in alternation, max 10 bubbles total. Short KP = lighter shade. */}
+                      in alternation, max 10 bubbles total. Short KP = lighter shade
+                      but SAME font size/padding as long KP (2026-08-06 update). */}
                 {(() => {
                   const longKps = resource.metadata?.keyPoints || [];
                   const shortKps = (resource.metadata as any)?.shortKeyPoints || [];
@@ -720,7 +721,13 @@ export default async function ResourcePage({
                           href={searchHref}
                           dir={kpAr ? 'rtl' : 'ltr'}
                           lang={kpAr ? 'ar' : 'fr'}
-                          className={`inline-block ${kp.isShort ? 'px-2.5 py-1 text-xs' : 'px-3 py-1.5 text-sm'} rounded-full font-semibold border font-arabic-title ${kpAr ? 'text-right' : 'text-left'} ${colorClass} hover:brightness-110 hover:shadow-sm hover:scale-[1.03] transition-all cursor-pointer`}
+                          // Per user rule (2026-08-06): short KP now uses the same
+                          // font size + padding as long KP. They were text-xs px-2.5
+                          // before, which made them look like a different species.
+                          // Now both use text-sm px-3 py-1.5; the only differentiator
+                          // is the color shade (shortPalette = lighter, longPalette
+                          // = full intensity).
+                          className={`inline-block px-3 py-1.5 text-sm rounded-full font-semibold border font-arabic-title ${kpAr ? 'text-right' : 'text-left'} ${colorClass} hover:brightness-110 hover:shadow-sm hover:scale-[1.03] transition-all cursor-pointer`}
                         >
                           {kp.text}
                         </Link>
