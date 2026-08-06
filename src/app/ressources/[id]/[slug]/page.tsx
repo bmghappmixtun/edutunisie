@@ -203,24 +203,32 @@ export default async function ResourcePage({
         }
       : null;
   if (!resource) notFound();
-  // Only PUBLISHED resources are public.
-  // Owner (teacher) and admins can see their own DRAFT/PENDING/REJECTED resources.
-  if (resource.status !== 'PUBLISHED') {
+  // PUBLISHED resources are fully public. ARCHIVED ones still load (so users
+  // following old links / SEO see a friendly message instead of a 404), but
+  // we skip the body (no PDF, no view tracking) below. DRAFT/PENDING/REJECTED
+  // stay private — only owner/admin can view.
+  if (resource.status !== 'PUBLISHED' && resource.status !== 'ARCHIVED') {
     if (!userSession || (userSession.id !== resource.teacherId && userSession.role !== 'ADMIN')) {
       notFound();
     }
   }
 
-  // Replace the blob URL with our proxy URL so the file is always served from examanet.com
-  // (the user never sees the Vercel Blob URL).
-  resource.fileUrl = `/api/resources/${resource.id}/download`;
+  const isArchived = resource.status === 'ARCHIVED';
+  const canViewBody = !isArchived || (userSession && (userSession.id === resource.teacherId || userSession.role === 'ADMIN'));
 
-  // Track view
-  await prisma.view.create({ data: { resourceId: resource.id, ipAddress: 'visitor' } });
-  await prisma.resource.update({
-    where: { id: resource.id },
-    data: { viewsCount: { increment: 1 } },
-  });
+  // Replace the blob URL with our proxy URL so the file is always served from examanet.com
+  // (the user never sees the Vercel Blob URL). Skipped for archived resources
+  // because we don't want bots/casual visitors tracking views on dead links.
+  if (canViewBody) {
+    resource.fileUrl = `/api/resources/${resource.id}/download`;
+
+    // Track view
+    await prisma.view.create({ data: { resourceId: resource.id, ipAddress: 'visitor' } });
+    await prisma.resource.update({
+      where: { id: resource.id },
+      data: { viewsCount: { increment: 1 } },
+    });
+  }
 
   // Similar resources
   const similar = await prisma.resource.findMany({
@@ -362,6 +370,37 @@ export default async function ResourcePage({
           <div className="grid lg:grid-cols-[1fr_360px] gap-6">
             {/* MAIN */}
             <div>
+              {/* ARCHIVED banner — shown to non-owners when the resource is no longer public */}
+              {isArchived && (
+                <div className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-5 mb-4">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-amber-200 flex items-center justify-center text-amber-700 font-bold text-lg">
+                      !
+                    </div>
+                    <div className="flex-1">
+                      <h2 className="font-bold text-amber-900 mb-1">
+                        Cette ressource n'est plus disponible
+                      </h2>
+                      <p className="text-sm text-amber-800">
+                        Ce document a été archivé et n'est plus accessible au public.
+                        {resource.subject && resource.class && (
+                          <>
+                            {' '}Vous pouvez explorer d'autres ressources de{' '}
+                            <Link
+                              href={`/matieres/${resource.subject.slug}/${resource.class.slug}`}
+                              className="font-semibold underline hover:text-amber-900"
+                            >
+                              {resource.subject.nameFr} — {resource.class.nameFr}
+                            </Link>
+                            .
+                          </>
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* PROMINENT correction banner — students search corrected homeworks */}
               {resource.hasCorrection && (
                 <div className="bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 text-white rounded-2xl p-5 mb-4 shadow-lg border-2 border-emerald-400/50">
@@ -712,6 +751,7 @@ export default async function ResourcePage({
                   </div>
                 </div>
 
+                {canViewBody && (
                 <ResourceActions
                   resourceId={resource.id}
                   numericId={resource.numericId}
@@ -724,9 +764,11 @@ export default async function ResourcePage({
                   isTeacher={userSession?.role === 'TEACHER' || userSession?.role === 'ADMIN'}
                   isOwner={userSession?.id === resource.teacherId}
                 />
+                )}
               </div>
 
-              {/* Aperçu PDF */}
+              {/* Aperçu PDF — hidden for archived resources (non-owners) */}
+              {canViewBody && (
               <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden mb-4">
                 <div className="px-6 lg:px-8 py-4 border-b border-slate-100 flex items-center justify-between">
                   <h2 className="font-bold text-lg flex items-center gap-2">
@@ -748,8 +790,10 @@ export default async function ResourcePage({
                   />
                 </div>
               </div>
+              )}
 
-              {/* Notation */}
+              {/* Notation — hidden for archived resources (non-owners) */}
+              {canViewBody && (
               <RatingSection
                 resourceId={resource.id}
                 avgRating={resource.avgRating}
@@ -757,8 +801,10 @@ export default async function ResourcePage({
                 distribution={dist}
                 maxCount={maxCount}
               />
+              )}
 
-              {/* Commentaires */}
+              {/* Commentaires — hidden for archived resources (non-owners) */}
+              {canViewBody && (
               <CommentsSection
                 resourceId={resource.id}
                 initialComments={resource.comments.map((c) => ({
@@ -774,6 +820,7 @@ export default async function ResourcePage({
                   user: c.user,
                 }))}
               />
+              )}
 
               {/* Similaires */}
               {similar.length > 0 && (

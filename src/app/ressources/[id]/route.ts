@@ -29,9 +29,11 @@ export async function GET(
     return new NextResponse('Invalid ID', { status: 400 });
   }
 
-  // Only published resources are public (the full page also enforces this)
+  // Allow both PUBLISHED and ARCHIVED — the full page will show a friendly
+  // "this file has been archived" page instead of a hard 404. Only true
+  // missing/invalid IDs (no row at all) return 404.
   const resource = await prisma.resource.findFirst({
-    where: { numericId, status: 'PUBLISHED' },
+    where: { numericId, status: { in: ['PUBLISHED', 'ARCHIVED'] } },
     select: { slug: true },
   });
   if (!resource) {

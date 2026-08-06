@@ -373,7 +373,8 @@ model ResourceMetadata {
   systemName            String?  // for Technologie/Sciences techniques
   duration              String?  // "2h" | "1h30"
   level                 String?  // "standard" | "avancé"
-  keyPoints             String[] // 3-5 points clés
+  keyPoints             String[] // 3-5 points clés (longs, depuis l'extraction initiale)
+  shortKeyPoints        String[] // 2-5 mots chacun, générés pour affichage compact (card IA)
   topics                String[] // tags sémantiques
   difficulty            String?  // "facile" | "moyen" | "difficile"
   estimatedTimeMinutes  Int?
