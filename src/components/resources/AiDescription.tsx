@@ -595,23 +595,9 @@ export default function AiDescription({
   // ===== Per-subject custom field hiding (2026-08-06) =====
   // Some subjects want specific fields dropped from the card (they're already
   // in the page header / sidebar). Caller passes `hideFields` with the label
-  // strings to suppress. Both LTR (FR) and RTL (AR) labels are checked via
-  // HIDE_LABEL_TRANSLATIONS so callers can pass FR-only labels and have
-  // their AR equivalents (e.g. 'الموضوع العام') also removed.
-  if (hideFields && hideFields.length > 0) {
-    const hideSet = new Set<string>();
-    for (const label of hideFields) {
-      hideSet.add(label);
-      hideSet.add(label.toLowerCase());
-      const arAliases = HIDE_LABEL_TRANSLATIONS[label];
-      if (arAliases) {
-        for (const ar of arAliases) hideSet.add(ar);
-      }
-    }
-    filteredParsed = filteredParsed.filter((f) => !hideSet.has(f.label));
-    filteredHeader = filteredHeader.filter((f) => !hideSet.has(f.label));
-  }
-
+  // strings to suppress. The actual filter is applied later to the final
+  // `fields` array (see "Final hideFields pass" below) so it catches fields
+  // that get re-added by overrides like the Classe override.
   const fields = [...filteredParsed, ...filteredHeader];
 
   // Subject override: for Technologie, the "matière" field should display
@@ -640,6 +626,24 @@ export default function AiDescription({
     }
   }
 
+  // ===== Final hideFields pass (2026-08-06) =====
+  // Re-apply the hide filter to the final `fields` array because the
+  // Classe override above may have re-added a "Classe" field after our
+  // earlier filter. This is the single source of truth for what to render.
+  let displayFields = fields;
+  if (hideFields && hideFields.length > 0) {
+    const hideSet = new Set<string>();
+    for (const label of hideFields) {
+      hideSet.add(label);
+      hideSet.add(label.toLowerCase());
+      const arAliases = HIDE_LABEL_TRANSLATIONS[label];
+      if (arAliases) {
+        for (const ar of arAliases) hideSet.add(ar);
+      }
+    }
+    displayFields = fields.filter((f) => !hideSet.has(f.label));
+  }
+
   return (
     <div
       dir={isRtl ? 'rtl' : 'ltr'}
@@ -662,12 +666,12 @@ export default function AiDescription({
       </div>
 
       {/* Info grid — natural RTL flow via dir="rtl" */}
-      {fields.length > 0 && (
+      {displayFields.length > 0 && (
         <div
           dir={isRtl ? 'rtl' : 'ltr'}
           className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3 mb-3"
         >
-          {fields.map((f, i) => {
+          {displayFields.map((f, i) => {
             const valueAr = isArabic(f.value);
             const labelAr = isArabic(f.label);
             // Cell direction follows the LABEL (not the value). This keeps
