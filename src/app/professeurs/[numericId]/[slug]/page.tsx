@@ -932,9 +932,22 @@ export default async function TeacherProfilePage({
                             className={`inline-flex items-center gap-1 px-2 py-0.5 ${c.bg} text-white rounded-full text-xs font-medium ${c.hover} transition-colors shadow-sm`}
                           >
                             <span>{topic}</span>
-                            {count > 1 && (
-                              <span className="text-[10px] font-bold text-white/80">{count}</span>
-                            )}
+                            {/* Always-rendered count badge (hidden via CSS when
+                             *  count === 1) so each <Link> has the same number
+                             *  of children in the DOM regardless of count. This
+                             *  keeps the topic-tags wrapper's child structure
+                             *  stable between the loading.tsx skeleton and the
+                             *  streamed page — preventing React #418/#422
+                             *  hydration mismatches (ERR-ZWWM8B 1x #419,
+                             *  ERR-F8NFRY 1x #419 in 2026-08-05 nightly digest,
+                             *  /professeurs/[id]/[slug]). The hidden badge
+                             *  takes 0 visible space (display: none). */}
+                            <span
+                              className={`text-[10px] font-bold text-white/80 ${count > 1 ? '' : 'hidden'}`}
+                              aria-hidden={count <= 1}
+                            >
+                              {count > 1 ? count : ''}
+                            </span>
                           </Link>
                         );
                       })}

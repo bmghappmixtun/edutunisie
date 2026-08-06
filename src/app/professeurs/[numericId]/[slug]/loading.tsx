@@ -59,17 +59,33 @@ export default function Loading() {
       <main className="flex-1 pt-20">
         {/* Breadcrumb skeleton — <nav> (NOT <div>) to match the page's actual
             element type. The page renders <nav aria-label="Fil d'Ariane">,
-            so the loading must too. */}
+            so the loading must too.
+            Element types MUST match the page: <a> for next/link (Accueil +
+            Professeurs) and <span> for the separator + the active teacher
+            name. The previous version used <div> for the two links, which
+            mismatched the page's <a> element type and could trigger
+            React #418/#422. (ERR-ZWWM8B 1x #419, ERR-F8NFRY 1x #419 in
+            2026-08-05 nightly digest, /professeurs/[id]/[slug].) */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
           <nav
             aria-label="Fil d'Ariane"
             className="flex items-center gap-1 text-xs text-slate-500 flex-wrap"
           >
-            <div className="h-3 w-12 bg-slate-200 rounded animate-pulse" />
+            <a
+              href="/"
+              aria-hidden="true"
+              tabIndex={-1}
+              className="h-3 w-12 bg-slate-200 rounded animate-pulse block"
+            />
             <span className="text-slate-300">›</span>
-            <div className="h-3 w-16 bg-slate-200 rounded animate-pulse" />
+            <a
+              href="/professeurs"
+              aria-hidden="true"
+              tabIndex={-1}
+              className="h-3 w-16 bg-slate-200 rounded animate-pulse block"
+            />
             <span className="text-slate-300">›</span>
-            <div className="h-3 w-24 bg-slate-200 rounded animate-pulse" />
+            <span className="h-3 w-24 bg-slate-200 rounded animate-pulse block" />
           </nav>
         </div>
 
@@ -88,12 +104,21 @@ export default function Loading() {
               <div className="w-32 h-32 md:w-40 md:h-40 rounded-3xl bg-slate-200 animate-pulse flex-shrink-0" />
 
               <div className="flex-1 min-w-0 w-full space-y-3">
-                {/* Name skeleton — TWO placeholders to match the page's
+                {/* Name skeleton — TWO placeholders matching the page's
                  * always-rendered <h1> + <h2> pair. The page conditionally
                  * shows one or both based on hasFr/hasAr (FR/AR name).
+                 * Element types MUST be <h1> and <h2> to match the page
+                 * — a <div> would trigger an element-type mismatch in
+                 * React's hydration check.
                  * 2026-08-05 fix (ERR-FCUG5X 3x #422). */}
-                <div className="h-8 w-64 bg-slate-200 rounded animate-pulse" />
-                <div className="h-6 w-56 bg-slate-200 rounded animate-pulse" />
+                <h1
+                  aria-hidden="true"
+                  className="h-8 w-64 bg-slate-200 rounded animate-pulse text-[0px] leading-none"
+                />
+                <h2
+                  aria-hidden="true"
+                  className="h-6 w-56 bg-slate-200 rounded animate-pulse text-[0px] leading-none"
+                />
                 {/* Meta skeleton */}
                 <div className="flex flex-wrap gap-2 mt-2">
                   <div className="h-6 w-20 bg-slate-200 rounded-full animate-pulse" />
@@ -173,18 +198,30 @@ export default function Loading() {
              * Types cards (each hidden via CSS in the page when the
              * corresponding data is empty). Mirroring that here to keep
              * the sidebar's child count stable (5 vs 5).
-             * 2026-08-05 fix (ERR-FCUG5X 3x #422). */}
+             * Each card title uses <h3> (NOT <div>) to match the page's
+             * <h3 className="font-bold mb-3 flex items-center gap-2 ...">
+             * element type. A <div> title would trigger an element-type
+             * mismatch in React's hydration check.
+             * 2026-08-05 fix (ERR-FCUG5X 3x #422).
+             * 2026-08-06 fix: changed card title <div> → <h3> (ERR-ZWWM8B
+             * 1x #419, ERR-F8NFRY 1x #419 in 2026-08-05 nightly digest). */}
             <aside className="space-y-6">
               {/* 1. Contact card (always rendered) */}
               <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-3">
-                <div className="h-5 w-24 bg-slate-200 rounded animate-pulse" />
+                <h3
+                  aria-hidden="true"
+                  className="h-5 w-24 bg-slate-200 rounded animate-pulse text-[0px] leading-none"
+                />
                 <div className="h-3 w-full bg-slate-100 rounded animate-pulse" />
                 <div className="h-3 w-2/3 bg-slate-100 rounded animate-pulse" />
                 <div className="h-9 w-full bg-slate-200 rounded-xl animate-pulse" />
               </div>
               {/* 2. Répartition par matière (hidden when bySubject empty) */}
               <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-3">
-                <div className="h-5 w-32 bg-slate-200 rounded animate-pulse" />
+                <h3
+                  aria-hidden="true"
+                  className="h-5 w-32 bg-slate-200 rounded animate-pulse text-[0px] leading-none"
+                />
                 {[...Array(3)].map((_, i) => (
                   <div key={i} className="space-y-1">
                     <div className="h-3 w-full bg-slate-100 rounded animate-pulse" />
@@ -194,14 +231,20 @@ export default function Loading() {
               </div>
               {/* 3. Systèmes techniques (hidden when bySystem empty) */}
               <div className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-2xl border border-orange-200 p-5 space-y-3">
-                <div className="h-5 w-40 bg-orange-200 rounded animate-pulse" />
+                <h3
+                  aria-hidden="true"
+                  className="h-5 w-40 bg-orange-200 rounded animate-pulse text-[0px] leading-none"
+                />
                 {[...Array(2)].map((_, i) => (
                   <div key={i} className="h-3 w-full bg-orange-100 rounded animate-pulse" />
                 ))}
               </div>
               {/* 4. Sujets populaires (hidden when topics empty) */}
               <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-3">
-                <div className="h-5 w-32 bg-slate-200 rounded animate-pulse" />
+                <h3
+                  aria-hidden="true"
+                  className="h-5 w-32 bg-slate-200 rounded animate-pulse text-[0px] leading-none"
+                />
                 <div className="flex flex-wrap gap-1.5">
                   {[...Array(6)].map((_, i) => (
                     <div key={i} className="h-5 w-16 bg-slate-100 rounded-full animate-pulse" />
@@ -210,7 +253,10 @@ export default function Loading() {
               </div>
               {/* 5. Types de contenu (hidden when byType empty) */}
               <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-3">
-                <div className="h-5 w-32 bg-slate-200 rounded animate-pulse" />
+                <h3
+                  aria-hidden="true"
+                  className="h-5 w-32 bg-slate-200 rounded animate-pulse text-[0px] leading-none"
+                />
                 {[...Array(3)].map((_, i) => (
                   <div key={i} className="h-3 w-full bg-slate-100 rounded animate-pulse" />
                 ))}
