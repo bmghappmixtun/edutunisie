@@ -4,44 +4,8 @@ import {
   FileText,
   Tag,
   Globe,
-  BookOpen,
   GraduationCap,
-  FolderOpen,
-  Layers,
-  CalendarDays,
 } from 'lucide-react';
-
-const TYPE_LABELS: Record<string, { fr: string; ar: string; icon: string; color: string }> = {
-  COURSE: { fr: '📖 Cours', ar: '📖 درس', icon: '📖', color: 'bg-blue-100 text-blue-700' },
-  DEVOIR: { fr: '📝 Devoir', ar: '📝 فرض', icon: '📝', color: 'bg-amber-100 text-amber-700' },
-  EXERCISE: {
-    fr: '✏️ Exercice',
-    ar: '✏️ تمرين',
-    icon: '✏️',
-    color: 'bg-purple-100 text-purple-700',
-  },
-  SERIES: { fr: '📚 Série', ar: '📚 سلسلة', icon: '📚', color: 'bg-emerald-100 text-emerald-700' },
-  BAC_SUBJECT: {
-    fr: '🎓 Sujet Bac',
-    ar: '🎓 موضوع باكالوريا',
-    icon: '🎓',
-    color: 'bg-red-100 text-red-700',
-  },
-  CORRECTION: {
-    fr: '✅ Corrigé',
-    ar: '✅ تصحيح',
-    icon: '✅',
-    color: 'bg-green-100 text-green-700',
-  },
-  SUMMARY: { fr: '📄 Résumé', ar: '📄 ملخص', icon: '📄', color: 'bg-slate-100 text-slate-700' },
-  CARD: { fr: '🗂️ Fiche', ar: '🗂️ بطاقة', icon: '🗂️', color: 'bg-pink-100 text-pink-700' },
-};
-
-const TRIMESTER_LABELS: Record<string, string> = {
-  T1: '1er trimestre',
-  T2: '2ème trimestre',
-  T3: '3ème trimestre',
-};
 
 const LANGUAGE_LABELS: Record<string, string> = {
   fr: '🇫🇷 Français',
@@ -50,7 +14,6 @@ const LANGUAGE_LABELS: Record<string, string> = {
 };
 
 export default function ResourceInfoPanel({ resource, hideClasse = false }: { resource: any; hideClasse?: boolean }) {
-  const typeInfo = TYPE_LABELS[resource.type] || TYPE_LABELS.COURSE;
   // Parse PostgreSQL array literal: {a,b,"c d","e f"} → ['a','b','c d','e f']
   // Also handles malformed inputs: {a,b (no closing }) or a,b (no braces)
   const parsePgArray = (s: string): string[] => {
@@ -89,54 +52,19 @@ export default function ResourceInfoPanel({ resource, hideClasse = false }: { re
       </h3>
 
       <dl className="space-y-3 text-sm">
-        {/* TYPE */}
-        <Row icon={<span className="text-base">{typeInfo.icon}</span>} label="Type">
-          <span
-            className={`inline-block px-2 py-0.5 rounded-md text-xs font-bold ${typeInfo.color}`}
-          >
-            {typeInfo.fr}
-          </span>
-        </Row>
-
-        {/* MATIÈRE */}
-        {resource.subject && (
-          <Row icon={<BookOpen className="w-4 h-4" />} label="Matière">
-            <span
-              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-bold text-white"
-              style={{ background: resource.subject.color || '#0EA5E9' }}
-            >
-              {resource.subject.icon} {resource.subject.nameFr}
-            </span>
-          </Row>
-        )}
+        {/* Per user rule (2026-08-06): the sidebar "Informations" panel is now
+            a META panel (file facts only) — not a classification panel. The
+            classification attributes (Type, Matière, Section, Trimestre,
+            Année) are already encoded in the page header / breadcrumb / title
+            format "BASE (year) : GeneralSubject", so showing them again here
+            would be redundant. Classe can be kept (and hidden for lycée via
+            `hideClasse` prop) because it's the primary navigation axis users
+            scan for. What remains: Langue, Pages, Taille, Publié, Tags. */}
 
         {/* CLASSE */}
         {resource.class && !hideClasse && (
           <Row icon={<GraduationCap className="w-4 h-4" />} label="Classe">
             <span className="font-semibold text-slate-900">{resource.class.nameFr}</span>
-          </Row>
-        )}
-
-        {/* SECTION */}
-        {resource.section && (
-          <Row icon={<FolderOpen className="w-4 h-4" />} label="Section">
-            <span className="font-semibold text-slate-900">{resource.section.nameFr}</span>
-          </Row>
-        )}
-
-        {/* TRIMESTRE */}
-        {resource.trimester && (
-          <Row icon={<Layers className="w-4 h-4" />} label="Trimestre">
-            <span className="font-semibold text-slate-900">
-              {TRIMESTER_LABELS[resource.trimester] || resource.trimester}
-            </span>
-          </Row>
-        )}
-
-        {/* ANNÉE */}
-        {resource.year && (
-          <Row icon={<CalendarDays className="w-4 h-4" />} label="Année">
-            <span className="font-semibold text-slate-900">{resource.year}</span>
           </Row>
         )}
 
