@@ -645,28 +645,43 @@ export default async function ResourcePage({
                     - Per user rule (2026-08-02): align bubbles RIGHT for AR docs,
                       LEFT for FR docs — based on document language, not keyPoint lang
                     - Per user rule (2026-08-03): PILOTE collège Physique is FR (JORT 2019-063),
-                      so its card title stays in French ("Points clés") even if resource.lang === 'ar' */}
-                {resource.metadata?.keyPoints && resource.metadata.keyPoints.length > 0 && (() => {
+                      so its card title stays in French ("Points clés") even if resource.lang === 'ar'
+                    - Per user rule (2026-08-06): merge long (keyPoints) + short (shortKeyPoints) KP
+                      in alternation, max 10 bubbles total. Short KP = lighter shade. */}
+                {(() => {
+                  const longKps = resource.metadata?.keyPoints || [];
+                  const shortKps = (resource.metadata as any)?.shortKeyPoints || [];
+                  if (longKps.length === 0 && shortKps.length === 0) return null;
+                  // Merge: alternate short + long for visual rhythm, max 10 total
+                  const merged: { text: string; isShort: boolean }[] = [];
+                  const maxLen = Math.max(longKps.length, shortKps.length);
+                  for (let i = 0; i < maxLen && merged.length < 10; i++) {
+                    if (i < shortKps.length) merged.push({ text: shortKps[i], isShort: true });
+                    if (i < longKps.length && merged.length < 10) merged.push({ text: longKps[i], isShort: false });
+                  }
                   // Per user rule (2026-08-02): align RIGHT for AR docs, LEFT for FR docs.
-                  // Use the document language as the source of truth (not anyAr).
-                  // Per user rule (2026-08-03): PILOTE Physique collège is FR by curriculum.
                   const isPilotePhysiqueCollege =
                     resource.schoolType === 'PILOTE' &&
                     resource.subject?.slug === 'physique' &&
                     resource.class &&
                     ['7eme', '8eme', '9eme'].includes(resource.class.slug);
                   const isArDoc = resource.language === 'ar' && !isPilotePhysiqueCollege;
-                  // Title align right for AR docs (regardless of keyPoint content).
                   const titleAlignRight = isArDoc;
-                  // Title text: FR for FR docs (or PILOTE physique collège), AR otherwise.
                   const keyPointsTitle = isArDoc ? 'النقاط الرئيسية' : 'Points clés';
-                  // Multi-color palette for bubbles (5 colors cycle)
-                  const palette = [
+                  // Long KP: full color palette. Short KP: lighter shades
+                  const longPalette = [
                     'bg-rose-100 text-rose-800 border-rose-300',
                     'bg-fuchsia-100 text-fuchsia-800 border-fuchsia-300',
                     'bg-teal-100 text-teal-800 border-teal-300',
                     'bg-amber-100 text-amber-800 border-amber-300',
                     'bg-violet-100 text-violet-800 border-violet-300',
+                  ];
+                  const shortPalette = [
+                    'bg-rose-50 text-rose-700 border-rose-200',
+                    'bg-fuchsia-50 text-fuchsia-700 border-fuchsia-200',
+                    'bg-teal-50 text-teal-700 border-teal-200',
+                    'bg-amber-50 text-amber-700 border-amber-200',
+                    'bg-violet-50 text-violet-700 border-violet-200',
                   ];
                   return (
                   <AiContentSection
@@ -678,25 +693,21 @@ export default async function ResourcePage({
                     alignRight={titleAlignRight}
                   >
                     <div className={`flex flex-wrap gap-2 ${isArDoc ? 'justify-end' : 'justify-start'}`}>
-                      {resource.metadata.keyPoints.slice(0, 10).map((kp, i) => {
-                        const kpAr = isArabic(kp);
+                      {merged.map((kp, i) => {
+                        const kpAr = isArabic(kp.text);
+                        const palette = kp.isShort ? shortPalette : longPalette;
                         const colorClass = palette[i % palette.length];
-                        // Per user rule (2026-07-30): make key points clickable,
-                        // they trigger a search query for the same concept.
-                        // Use the resource's subject/class to narrow results.
-                        const searchQuery = kpAr
-                          ? encodeURIComponent(kp)
-                          : encodeURIComponent(kp);
+                        const searchQuery = encodeURIComponent(kp.text);
                         const searchHref = `/recherche?q=${searchQuery}`;
                         return (
                         <Link
-                          key={i}
+                          key={`${kp.isShort ? 's' : 'l'}-${i}`}
                           href={searchHref}
                           dir={kpAr ? 'rtl' : 'ltr'}
                           lang={kpAr ? 'ar' : 'fr'}
-                          className={`inline-block px-3 py-1.5 rounded-full text-sm font-semibold border font-arabic-title ${kpAr ? 'text-right' : 'text-left'} ${colorClass} hover:brightness-110 hover:shadow-sm hover:scale-[1.03] transition-all cursor-pointer`}
+                          className={`inline-block ${kp.isShort ? 'px-2.5 py-1 text-xs' : 'px-3 py-1.5 text-sm'} rounded-full font-semibold border font-arabic-title ${kpAr ? 'text-right' : 'text-left'} ${colorClass} hover:brightness-110 hover:shadow-sm hover:scale-[1.03] transition-all cursor-pointer`}
                         >
-                          {kp}
+                          {kp.text}
                         </Link>
                         );
                       })}
