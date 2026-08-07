@@ -146,7 +146,7 @@ type Match = {
 export async function POST(req: NextRequest) {
   try {
     // Auth: ADMIN role OR SEED_TOKEN (for scripts/automation)
-    const seedToken = req.nextUrl.searchParams.get('seedToken') ||
+    const seedToken = req.nextUrl.searchParams.get('seedToken') || req.nextUrl.searchParams.get('token') ||
       req.headers.get('x-seed-token') ||
       req.cookies.get('seed-token')?.value;
     const user = await getCurrentUser();
