@@ -145,9 +145,17 @@ type Match = {
 
 export async function POST(req: NextRequest) {
   try {
+    // Auth: ADMIN role OR SEED_TOKEN (for scripts/automation)
+    const seedToken = req.nextUrl.searchParams.get('seedToken') ||
+      req.headers.get('x-seed-token') ||
+      req.cookies.get('seed-token')?.value;
     const user = await getCurrentUser();
-    if (!user) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
-    if (user.role !== 'ADMIN') return NextResponse.json({ error: 'Admin requis' }, { status: 403 });
+    const isAdmin = user && user.role === 'ADMIN';
+    const isSeed = seedToken && seedToken === process.env.SEED_TOKEN;
+    if (!isAdmin && !isSeed) {
+      if (!user) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
+      return NextResponse.json({ error: 'Admin requis' }, { status: 403 });
+    }
 
     const body = await req.json();
     const matches: Match[] = body.matches || [];
