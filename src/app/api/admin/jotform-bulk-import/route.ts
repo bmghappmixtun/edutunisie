@@ -314,13 +314,30 @@ async function processFile(
     if (!classObj) {
       console.warn(`[jotform-bulk] Class not found for slug: ${classSlug} (from "${sub.classe}")`);
     }
-    if (!subjectObj) {
-      console.warn(`[jotform-bulk] Subject not found for slug: ${subjectSlug} (from "${sub.matiere}") — falling back to mathematiques`);
+
+    // Auto-create subject if missing (schema requires non-null subjectId)
+    let finalSubject = subjectObj;
+    if (!finalSubject) {
+      console.log(`[jotform-bulk] Subject "${subjectSlug}" not in DB, auto-creating...`);
+      const cleanSlug = subjectSlug.replace(/[^a-z0-9-]/g, '').slice(0, 40) || 'imported';
+      const safeName = subjectSlug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()).slice(0, 60);
+      try {
+        finalSubject = await prisma.subject.create({
+          data: {
+            slug: cleanSlug,
+            nameFr: safeName,
+            nameAr: safeName,
+            order: 999,
+          },
+        });
+        subjectBySlug.set(subjectSlug, finalSubject);
+        console.log(`[jotform-bulk] Created subject: ${finalSubject.slug} (${finalSubject.id})`);
+      } catch (e: any) {
+        // If slug collision, try with suffix
+        console.warn(`[jotform-bulk] Subject create failed: ${e.message} — falling back to mathematiques`);
+        finalSubject = subjectBySlug.get('mathematiques') || subjects[0];
+      }
     }
-    // Fallback to mathematiques if subject is missing — schema requires
-    // a non-null subjectId. The 'Document' placeholder in the title
-    // signals the import to the admin that the subject is generic.
-    const finalSubject = subjectObj || subjectBySlug.get('mathematiques');
 
     // Build title
     const baseTypeFr: Record<string, string> = {
