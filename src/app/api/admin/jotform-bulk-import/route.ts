@@ -62,14 +62,14 @@ function isOfficeFormat(format: string): boolean {
 function mapClassSlug(jotformClasse: string | null | undefined): string {
   if (!jotformClasse) return 'autre';
   const c = jotformClasse.toLowerCase().trim();
-  if (c.includes('1ère') || c.includes('1ere') || c.includes('1as')) return '1ere-annee';
-  if (c.includes('2ème') || c.includes('2eme') || c.includes('2as')) return '2eme-annee';
-  if (c.includes('3ème') || c.includes('3eme') || c.includes('3as')) return '3eme-annee';
-  if (c.includes('bac') || c.includes('4ème') || c.includes('4eme') || c.includes('4as')) return '4eme-annee';
-  if (c.includes('9ème') || c.includes('9eme') || c.includes('9e')) return '9eme-annee';
-  if (c.includes('8ème') || c.includes('8eme') || c.includes('8e')) return '8eme-annee';
-  if (c.includes('7ème') || c.includes('7eme') || c.includes('7e')) return '7eme-annee';
-  if (c.includes('6ème') || c.includes('6eme') || c.includes('6e')) return '6eme-annee';
+  if (c.includes('1ère') || c.includes('1ere') || c.includes('1as') || c.includes('1er')) return '1ere-secondaire';
+  if (c.includes('2ème') || c.includes('2eme') || c.includes('2as')) return '2eme-secondaire';
+  if (c.includes('3ème') || c.includes('3eme') || c.includes('3as')) return '3eme-secondaire';
+  if (c.includes('bac') || c.includes('4ème') || c.includes('4eme') || c.includes('4as')) return '4eme-secondaire';
+  if (c.includes('9ème') || c.includes('9eme') || c.includes('9e')) return '9eme';
+  if (c.includes('8ème') || c.includes('8eme') || c.includes('8e')) return '8eme';
+  if (c.includes('7ème') || c.includes('7eme') || c.includes('7e')) return '7eme';
+  if (c.includes('6ème') || c.includes('6eme') || c.includes('6e')) return '6eme';
   return 'autre';
 }
 
