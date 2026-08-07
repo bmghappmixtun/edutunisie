@@ -19,7 +19,14 @@ export async function GET(req: NextRequest) {
     const skip = (page - 1) * pageSize;
 
     const where: any = {};
-    if (status) where.status = status;
+    // Per user rule (2026-08-07): the CLICKED filter matches invitations
+    // where the teacher clicked at least once, regardless of current
+    // status. This is the same heuristic used in the admin page UI.
+    if (status === 'CLICKED') {
+      where.clickCount = { gt: 0 };
+    } else if (status) {
+      where.status = status;
+    }
     if (teacherId) where.teacherId = teacherId;
 
     const [invitations, total] = await Promise.all([

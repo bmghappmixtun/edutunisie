@@ -131,6 +131,11 @@ const STATUS_META: Record<string, { label: string; color: string; icon: React.Re
     color: 'bg-amber-100 text-amber-700',
     icon: <Eye className="w-3.5 h-3.5" />,
   },
+  // Per user rule (2026-08-07): the CLICKED filter now matches any
+  // invitation with clickCount > 0 (regardless of activation). The
+  // status field itself can be SENT, CLICKED, or ACTIVATED — the
+  // filter logic checks clickCount, not status. See the filtered
+  // useMemo and the /api/admin/invitations route.
   ACTIVATED: {
     label: '✅ Activée',
     color: 'bg-emerald-100 text-emerald-700',
@@ -181,7 +186,17 @@ export default function InvitationsClient({
   const filtered = useMemo(() => {
     let result = invitations;
     if (filterStatus) {
-      result = result.filter((inv) => inv.status === filterStatus);
+      // Per user rule (2026-08-07): the CLICKED filter should match
+      // invitations where the teacher clicked the link, REGARDLESS of
+      // current status. The old filter matched `status === 'CLICKED'`
+      // but that's always 0 because any teacher who clicked eventually
+      // activated and moved to ACTIVATED. So for CLICKED we use the
+      // clickCount > 0 heuristic instead.
+      if (filterStatus === 'CLICKED') {
+        result = result.filter((inv) => (inv.clickCount || 0) > 0);
+      } else {
+        result = result.filter((inv) => inv.status === filterStatus);
+      }
     }
     if (search.trim()) {
       const q = search.trim().toLowerCase();
