@@ -330,12 +330,12 @@ async function processFile(
             order: 999,
           },
         });
-        subjectBySlug.set(subjectSlug, finalSubject);
+        ctx.subjectBySlug.set(subjectSlug, finalSubject);
         console.log(`[jotform-bulk] Created subject: ${finalSubject.slug} (${finalSubject.id})`);
       } catch (e: any) {
         // If slug collision, try with suffix
         console.warn(`[jotform-bulk] Subject create failed: ${e.message} — falling back to mathematiques`);
-        finalSubject = subjectBySlug.get('mathematiques') || subjects[0];
+        finalSubject = ctx.subjectBySlug.get('mathematiques') || subjects[0];
       }
     }
 
