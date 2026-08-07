@@ -335,7 +335,10 @@ async function processFile(
       } catch (e: any) {
         // If slug collision, try with suffix
         console.warn(`[jotform-bulk] Subject create failed: ${e.message} — falling back to mathematiques`);
-        finalSubject = ctx.subjectBySlug.get('mathematiques') || subjects[0];
+        finalSubject = ctx.subjectBySlug.get('mathematiques');
+        if (!finalSubject) {
+          throw new Error('Mathematiques subject not in DB — cannot fallback');
+        }
       }
     }
 
