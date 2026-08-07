@@ -180,6 +180,16 @@ export async function POST(req: NextRequest) {
     const skipped: any[] = [];
     const errors: any[] = [];
 
+    // Resolve admin user ID (could be null if using SEED_TOKEN)
+    let adminId: string | null = user?.id || null;
+    if (!adminId) {
+      const admin = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
+      adminId = admin?.id || null;
+    }
+    if (!adminId) {
+      return NextResponse.json({ error: 'Admin user not found' }, { status: 500 });
+    }
+
     // Flatten all files (each match can have multiple files)
     const allFiles: { match: Match; fileUrl: string; fileName: string }[] = [];
     for (const m of matches) {
@@ -196,7 +206,7 @@ export async function POST(req: NextRequest) {
       const batch = allFiles.slice(i, i + batchSize);
       await Promise.all(batch.map((f) => processFile(f, {
         subjectBySlug, classBySlug, generateAiMetadata, imported, skipped, errors,
-        adminId: user.id,
+        adminId,
       })));
     }
 
