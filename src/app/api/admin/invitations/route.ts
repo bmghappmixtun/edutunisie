@@ -44,16 +44,30 @@ export async function GET(req: NextRequest) {
       prisma.teacherInvitation.count({ where }),
     ]);
 
-    // Stats by status
-    const stats = await prisma.teacherInvitation.groupBy({
-      by: ['status'],
-      _count: { status: true },
-    });
+    // Stats by status — per user rule (2026-08-07): the CLICKED stat counts
+    // unique teachers who clicked at least once, not the count of
+    // invitations currently in the CLICKED state. (Old behavior was always
+    // 0 because any teacher who clicked eventually activated and moved to
+    // ACTIVATED.) We also expose the total click events separately.
+    const [stats, clickedCount, totalClicksAgg] = await Promise.all([
+      prisma.teacherInvitation.groupBy({
+        by: ['status'],
+        _count: { status: true },
+      }),
+      prisma.teacherInvitation.count({
+        where: { clickCount: { gt: 0 } },
+      }),
+      prisma.teacherInvitation.aggregate({
+        _sum: { clickCount: true },
+      }),
+    ]);
 
     const statsMap: Record<string, number> = {};
     stats.forEach((s: any) => {
       statsMap[s.status] = s._count.status;
     });
+    // Override CLICKED with the unique-click count
+    statsMap.CLICKED = clickedCount;
 
     return NextResponse.json({
       invitations: invitations.map((inv) => ({
@@ -78,6 +92,7 @@ export async function GET(req: NextRequest) {
       page,
       pageSize,
       stats: statsMap,
+      totalClickEvents: totalClicksAgg._sum.clickCount || 0,
     });
   } catch (e: any) {
     console.error('invitations GET error:', e);

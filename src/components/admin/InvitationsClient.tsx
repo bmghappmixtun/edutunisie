@@ -151,13 +151,16 @@ const STATUS_META: Record<string, { label: string; color: string; icon: React.Re
 export default function InvitationsClient({
   initialInvitations,
   initialStats,
+  totalClickEvents = 0,
 }: {
   initialInvitations: Invitation[];
   initialStats: Record<string, number>;
+  totalClickEvents?: number;
 }) {
   const router = useRouter();
   const [invitations, setInvitations] = useState<Invitation[]>(initialInvitations);
   const [stats, setStats] = useState(initialStats);
+  const [totalClicks, setTotalClicks] = useState<number>(totalClickEvents);
   const [filterStatus, setFilterStatus] = useState<string>('');
   const [search, setSearch] = useState('');
   const [loadingId, setLoadingId] = useState<string | null>(null);
@@ -211,6 +214,9 @@ export default function InvitationsClient({
     if (res.ok) {
       setInvitations(data.invitations);
       setStats(data.stats);
+      if (typeof data.totalClickEvents === 'number') {
+        setTotalClicks(data.totalClickEvents);
+      }
     }
   }
 
@@ -391,10 +397,19 @@ export default function InvitationsClient({
         {Object.entries(STATUS_META).map(([key, m]) => {
           const count = stats[key] || 0;
           const isActive = filterStatus === key;
+          // Per user rule (2026-08-07): the CLICKED chip shows the number of
+          // unique teachers who clicked at least once (not "currently in
+          // CLICKED state"). The tooltip also shows the total click events
+          // (e.g. 14 clicks across 3 teachers).
+          const tooltip =
+            key === 'CLICKED' && totalClicks > 0
+              ? `${count} prof${count > 1 ? 's' : ''} unique${totalClicks > count ? `, ${totalClicks} clics au total` : ''}`
+              : undefined;
           return (
             <button
               key={key}
               onClick={() => setFilterStatus(isActive ? '' : key)}
+              title={tooltip}
               className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition ${
                 isActive ? 'bg-sky-600 text-white shadow-md' : `${m.color} hover:opacity-80`
               }`}
