@@ -6,6 +6,32 @@ import ApprobationsClient from '@/components/admin/ApprobationsClient';
 
 export const dynamic = 'force-dynamic';
 
+/**
+ * Server-side date formatter. Produces a stable relative-time string
+ * ("30s", "5min", "2h", or a French absolute date) using a FIXED reference
+ * time so the server-rendered HTML and the client-rendered initial tree
+ * produce the same string. Without this, the client's `new Date()` and
+ * the server's `new Date()` differ by a few seconds (network + hydration
+ * latency), and the "30s" / "5min" diff calculation lands on different
+ * branches — React #419 (text content mismatch).
+ *
+ * Fixes ERR-M3YA2R 2× React #419 on /admin/approbations (2026-08-07
+ * nightly digest, Googlebot IP 74.125.19.40).
+ *
+ * NOTE: the displayed label is computed at SSR time. The label may become
+ * slightly stale after the page sits open in a tab, but the admin panel
+ * is short-lived and the staleness is acceptable.
+ */
+function formatDateLabel(iso: string | null | undefined, now: Date): string | null {
+  if (!iso) return null;
+  const date = new Date(iso);
+  const diff = Math.floor((now.getTime() - date.getTime()) / 1000);
+  if (diff < 60) return `${Math.max(0, diff)}s`;
+  if (diff < 3600) return `${Math.floor(diff / 60)}min`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h`;
+  return date.toLocaleDateString('fr-FR');
+}
+
 export default async function AdminApprovationsPage() {
   const user = await getCurrentUser();
   if (!user) redirect('/connexion');
@@ -48,6 +74,11 @@ export default async function AdminApprovationsPage() {
     }),
   ]);
 
+  // Single "now" reference so every label is computed against the same
+  // instant — keeps the streamed HTML internally consistent and matches
+  // whatever the client will see on hydration.
+  const now = new Date();
+
   return (
     <div>
       <h1 className="text-2xl font-extrabold mb-6 flex items-center gap-2">
@@ -66,13 +97,16 @@ export default async function AdminApprovationsPage() {
           initialTeachers={pendingTeachers.map((t) => ({
             ...t,
             createdAt: t.createdAt.toISOString(),
+            createdAtLabel: formatDateLabel(t.createdAt.toISOString(), now) ?? '',
             emailVerifiedAt: t.emailVerifiedAt?.toISOString() || null,
             verificationFilesRequestedAt: t.verificationFilesRequestedAt?.toISOString() || null,
+            verificationFilesRequestedAtLabel: formatDateLabel(t.verificationFilesRequestedAt?.toISOString() ?? null, now),
             verificationFilesReceivedAt: t.verificationFilesReceivedAt?.toISOString() || null,
           }))}
           initialResources={pendingResources.map((r) => ({
             ...r,
             createdAt: r.createdAt.toISOString(),
+            createdAtLabel: formatDateLabel(r.createdAt.toISOString(), now) ?? '',
           }))}
         />
       )}

@@ -30,11 +30,17 @@ type Teacher = {
   teachingSubjects: string | null;
   teachingLevels: string | null;
   createdAt: string;
+  /** Pre-formatted relative/absolute date label (server-rendered to avoid
+   *  React #419 hydration mismatch — the server and the client would
+   *  otherwise compute different "now" values for the diff calculation). */
+  createdAtLabel: string;
   status: string;
   emailVerifiedAt?: string | null;
   invitationStatus?: string | null;
   lastInvitationId?: string | null;
   verificationFilesRequestedAt?: string | null;
+  /** Same as createdAtLabel: pre-formatted on the server. */
+  verificationFilesRequestedAtLabel?: string | null;
   verificationFilesCount?: number;
   verificationFilesReceivedAt?: string | null;
   _count?: {
@@ -60,6 +66,8 @@ type Resource = {
     schoolName: string | null;
   } | null;
   createdAt: string;
+  /** Pre-formatted relative/absolute date label (server-rendered). */
+  createdAtLabel: string;
 };
 
 export default function ApprobationsClient({
@@ -286,14 +294,18 @@ export default function ApprobationsClient({
         return;
       }
       toast.success(`📁 Demande envoyée à ${teacher.firstName} ${teacher.lastName}`);
-      // Update teacher in list
+      // Update teacher in list (also stamp the freshly-computed label so the
+      // "Demande envoyée …" line updates immediately without re-running the
+      // server-side formatter on the client).
+      const requestedAt = new Date().toISOString();
       setTeachers((ts) =>
         ts.map((t) =>
           t.id === teacher.id
             ? {
                 ...t,
                 status: 'PENDING_FILE_VERIFICATION',
-                verificationFilesRequestedAt: new Date().toISOString(),
+                verificationFilesRequestedAt: requestedAt,
+                verificationFilesRequestedAtLabel: 'à l\u2019instant',
               }
             : t,
         ),
@@ -307,15 +319,14 @@ export default function ApprobationsClient({
     }
   }
 
-  const formatDate = (d: string) => {
-    const date = new Date(d);
-    const now = new Date();
-    const diff = Math.floor((now.getTime() - date.getTime()) / 1000);
-    if (diff < 60) return `${diff}s`;
-    if (diff < 3600) return `${Math.floor(diff / 60)}min`;
-    if (diff < 86400) return `${Math.floor(diff / 3600)}h`;
-    return date.toLocaleDateString('fr-FR');
-  };
+  // Date labels are pre-formatted on the server (see page.tsx formatDateLabel)
+  // to keep the SSR-rendered text and the client-hydrated text identical.
+  // The diff calculation uses `new Date()` for the "now" reference, which
+  // differs by a few seconds between the server (request time) and the
+  // client (hydration time), causing React #419 hydration mismatches when
+  // the diff lands on a different branch (e.g. "30s" vs "1min").
+  // See ERR-M3YA2R 2× React #419 on /admin/approbations (2026-08-07 nightly
+  // digest, Googlebot IP 74.125.19.40).
 
   return (
     <div>
@@ -651,11 +662,11 @@ export default function ApprobationsClient({
                                 📚 {t.teachingSubjects}
                               </div>
                             )}
-                            <div className="text-slate-400 px-2">⏱️ {formatDate(t.createdAt)}</div>
+                            <div className="text-slate-400 px-2">⏱️ {t.createdAtLabel}</div>
                             {t.verificationFilesRequestedAt && (
                               <div className="text-violet-600 px-2 col-span-2 sm:col-span-3 flex items-center gap-2 flex-wrap">
                                 <span>
-                                  📁 Demande envoyée {formatDate(t.verificationFilesRequestedAt)}
+                                  📁 Demande envoyée {t.verificationFilesRequestedAtLabel ?? t.verificationFilesRequestedAt}
                                   {t.verificationFilesCount
                                     ? ` • ${t.verificationFilesCount} fichier(s) reçu(s)`
                                     : ' • en attente'}
@@ -696,7 +707,7 @@ export default function ApprobationsClient({
                               👤 {r.teacher?.firstName} {r.teacher?.lastName}
                             </span>
                             {r.teacher?.schoolName && <span>🏫 {r.teacher.schoolName}</span>}
-                            <span>⏱️ {formatDate(r.createdAt)}</span>
+                            <span>⏱️ {r.createdAtLabel}</span>
                           </div>
                           <a
                             href={r.fileUrl}
