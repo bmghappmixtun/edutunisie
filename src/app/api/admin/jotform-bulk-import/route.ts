@@ -270,17 +270,17 @@ async function processFile(
     const submissionId = sub.submission_id || 'unknown';
     const safeBase = baseName.slice(0, 60);
 
-    // Upload original
-    const originalKey = `teacher-library/${teacher.id}/jotform/${submissionId}-${safeBase}.${format}`;
+    // Upload original (always with random suffix to avoid collisions on retry)
+    const originalKey = `teacher-library/${teacher.id}/jotform/${submissionId}-${safeBase}-orig.${format}`;
     const originalBlob = await put(originalKey, originalBuffer, {
       access: 'public',
-      addRandomSuffix: false,
+      addRandomSuffix: true,
     });
 
     // Upload PDF (either original was PDF, or we converted it)
     const pdfKey = `teacher-library/${teacher.id}/jotform/${submissionId}-${safeBase}.pdf`;
     const pdfBlob: { url: string; pathname: string; size: number } | null = pdfBuffer
-      ? await put(pdfKey, pdfBuffer, { access: 'public', addRandomSuffix: false }).then((b) => ({
+      ? await put(pdfKey, pdfBuffer, { access: 'public', addRandomSuffix: true }).then((b) => ({
           url: b.url, pathname: b.pathname, size: pdfBuffer!.length,
         }))
       : format === 'pdf'
