@@ -40,6 +40,18 @@ export async function generateMetadata({
   const { numericId: numericIdStr, slug } = await params;
   const numericId = parseInt(numericIdStr, 10);
 
+  // Guard against malformed URLs like /professeurs/undefined/undefined or
+  // /professeurs/abc/. parseInt('undefined', 10) === NaN, which Prisma
+  // rejects (or matches nothing) and the page eventually calls notFound()
+  // on — but the route only "discovers" that via a DB call. Bail out early
+  // with the same 404 title the page would have produced, so the streamed
+  // <head> matches what the not-found boundary expects (fixes
+  // ERR-7QG2FM 1× React #419 on /professeurs/undefined/undefined,
+  // 2026-08-07 nightly digest).
+  if (!numericIdStr || numericIdStr === 'undefined' || Number.isNaN(numericId)) {
+    return { title: 'Enseignant non trouvé' };
+  }
+
   // CRITICAL: use the SAME filter as the page component below. The previous
   // version used `findUnique({ where: { numericId } })` with NO role/status
   // filter, which succeeded for users that the page then rejected (because
@@ -151,6 +163,16 @@ export default async function TeacherProfilePage({
 }) {
   const { numericId: numericIdStr, slug } = await params;
   const numericId = parseInt(numericIdStr, 10);
+
+  // Guard against malformed URLs like /professeurs/undefined/undefined
+  // (parseInt('undefined', 10) === NaN, which Prisma can't query). Bail
+  // out to the not-found boundary before any DB call so the streamed
+  // not-found.tsx lines up with the metadata's "Enseignant non trouvé"
+  // title — prevents a React #419 hydration mismatch (ERR-7QG2FM 1×,
+  // 2026-08-07 nightly digest, /professeurs/undefined/undefined).
+  if (!numericIdStr || numericIdStr === 'undefined' || Number.isNaN(numericId)) {
+    notFound();
+  }
 
   // Get current user FIRST so admins can preview PENDING/SUSPENDED profiles
   const currentUser = await getCurrentUser();
