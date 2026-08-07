@@ -315,8 +315,12 @@ async function processFile(
       console.warn(`[jotform-bulk] Class not found for slug: ${classSlug} (from "${sub.classe}")`);
     }
     if (!subjectObj) {
-      console.warn(`[jotform-bulk] Subject not found for slug: ${subjectSlug} (from "${sub.matiere}")`);
+      console.warn(`[jotform-bulk] Subject not found for slug: ${subjectSlug} (from "${sub.matiere}") — falling back to mathematiques`);
     }
+    // Fallback to mathematiques if subject is missing — schema requires
+    // a non-null subjectId. The 'Document' placeholder in the title
+    // signals the import to the admin that the subject is generic.
+    const finalSubject = subjectObj || subjectBySlug.get('mathematiques');
 
     // Build title
     const baseTypeFr: Record<string, string> = {
@@ -333,7 +337,7 @@ async function processFile(
     const baseClasse = classObj?.nameFr || sub.classe || 'Classe';
     const baseSection = sub.section || null;
     const baseYear = sub.annee || '2025-2026';
-    const baseSujet = subjectObj?.nameFr || 'Document';
+    const baseSujet = finalSubject?.nameFr || 'Document';
 
     // For now, use filename as generalSubject placeholder (Step 5 will generate real GS via AI)
     const initialGs = sub.sujet || null;
@@ -365,7 +369,7 @@ async function processFile(
         originalFileSize: originalBuffer.length,
         libraryFileId: teacherFile.id,
         teacherId: teacher.id,
-        subjectId: subjectObj?.id || null,
+        subjectId: finalSubject?.id || null,
         classId: classObj?.id || null,
         trimester: null,
         year: baseYear,
