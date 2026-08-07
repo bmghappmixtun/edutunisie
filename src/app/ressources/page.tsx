@@ -7,8 +7,17 @@ import Footer from '@/components/layout/Footer';
 import { prisma } from '@/lib/prisma';
 import { getUserFavorites } from '@/lib/resource-helpers';
 import { itemListSchema } from '@/lib/structured-data';
-import nextDynamic from 'next/dynamic';
-const FilterShell = nextDynamic(() => import('@/components/ressources/FilterShell'), { ssr: true });
+// 2026-08-07 nightly fix: import FilterShell directly instead of via
+// `next/dynamic({ ssr: true })`. The dynamic wrapper placed the component
+// in its own Suspense boundary, which caused the streamed HTML to contain
+// both the loading.tsx fallback AND the real FilterShell content side by
+// side — when the browser's React runtime replaced the fallback with the
+// streamed content, the resulting DOM no longer matched the loading
+// skeleton, triggering React #418/#422 hydration mismatches
+// (ERR-Q82BHG 5× and ERR-XBCTZD 5× in 2026-08-07 nightly digest).
+// Direct import keeps the FilterShell in the main page render so the
+// SSR'd HTML is the single source of truth for hydration.
+import FilterShell from '@/components/ressources/FilterShell';
 
 import type { Facets } from '@/lib/facets';
 import { getCurrentUser } from '@/lib/auth';
