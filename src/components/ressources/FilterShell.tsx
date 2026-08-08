@@ -112,6 +112,9 @@ const LANGUAGE_META: Record<string, { label: string; flag: string }> = {
   fr: { label: 'Français', flag: '🇫🇷' },
   ar: { label: 'Arabe', flag: '🇹🇳' },
   en: { label: 'Anglais', flag: '🇬🇧' },
+  it: { label: 'Italien', flag: '🇮🇹' },
+  de: { label: 'Allemand', flag: '🇩🇪' },
+  es: { label: 'Espagnol', flag: '🇪🇸' },
 };
 
 const SORT_META: Record<string, string> = {

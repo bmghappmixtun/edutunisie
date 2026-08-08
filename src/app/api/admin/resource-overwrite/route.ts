@@ -67,14 +67,109 @@ export async function POST(req: NextRequest) {
       addRandomSuffix: false,
     });
 
-    // Update resource with new key
+    // ============================================================
+    // AUTO-DETECT if the new file contains a correction
+    // Heuristic:
+    //   1. Get new page count (pdf-lib)
+    //   2. OCR last 1-2 pages (pdf-parse) - look for "corrig", "barème", "solution"
+    //   3. If detected, set hasCorrection=true + pageCount + correctionSummary
+    //   4. Fallback: if newSize > oldSize * 1.3, assume correction added
+    // ============================================================
+    const updateData: any = {
+      fileKey: blob.pathname,
+      fileUrl: blob.url,
+      fileSize: pdfBuffer.length,
+    };
+
+    let newPageCount: number | null = null;
+    let detectedHasCorrection: boolean | null = null;
+    let detectionMethod: string = 'none';
+    let lastPageText: string = '';
+
+    try {
+      const { PDFDocument } = await import('pdf-lib');
+      const pdfDoc = await PDFDocument.load(pdfBuffer);
+      newPageCount = pdfDoc.getPageCount();
+      updateData.pageCount = newPageCount;
+    } catch (e) {
+      console.warn('[resource-overwrite] pdf-lib failed to read page count:', (e as Error).message);
+    }
+
+    // OCR last 2 pages for correction keywords
+    try {
+      const pdfParseModule = await import('pdf-parse');
+      const PDFParseClass = (pdfParseModule as any).PDFParse;
+      if (PDFParseClass) {
+        const parser = new PDFParseClass({ data: pdfBuffer });
+        const parsed = await parser.getText();
+        const pages = parsed.pages || [];
+        if (pages.length > 0) {
+          // Get text from last 2 pages
+          const lastPages = pages.slice(-Math.min(2, pages.length));
+          lastPageText = lastPages.map((p: any) => (p.text || '').toLowerCase()).join(' ');
+        }
+      }
+    } catch (e) {
+      console.warn('[resource-overwrite] pdf-parse failed to extract text:', (e as Error).message);
+    }
+
+    // Keyword detection
+    const correctionKeywords = [
+      'corrig',         // corrigé, correction
+      'réponse',
+      'barème',
+      'barème',
+      'note:',
+      'note :',
+      'solution',       // ex: "Solution exercice 1"
+      '/ points',       // ex: "2/4 points"
+      'points)',
+    ];
+
+    const keywordsFound = correctionKeywords.filter((kw) => lastPageText.includes(kw));
+
+    if (keywordsFound.length >= 2) {
+      // Strong signal: multiple keywords → has correction
+      detectedHasCorrection = true;
+      detectionMethod = `ocr_keywords:${keywordsFound.join(',')}`;
+    } else if (keywordsFound.length === 1 && lastPageText.length > 100) {
+      // Single keyword but reasonable text → likely has correction
+      detectedHasCorrection = true;
+      detectionMethod = `ocr_keyword_single:${keywordsFound[0]}`;
+    } else {
+      // Fallback: size heuristic
+      const oldSize = resource.fileSize || 0;
+      if (oldSize > 0 && pdfBuffer.length > oldSize * 1.3) {
+        detectedHasCorrection = true;
+        detectionMethod = `size_heuristic:new=${pdfBuffer.length},old=${oldSize}`;
+      } else {
+        // No strong signal: trust existing value (don't override)
+        detectedHasCorrection = null;
+      }
+    }
+
+    if (detectedHasCorrection === true) {
+      updateData.hasCorrection = true;
+      // Only set correctionSummary if not already set or generic
+      if (!resource.correctionSummary) {
+        const enoncePages = newPageCount && lastPageText ? '?' : '?';
+        updateData.correctionSummary =
+          `Le corrigé détaillé est intégré à la fin du document. Faites défiler pour le consulter.`;
+      }
+    } else if (detectedHasCorrection === false) {
+      // Explicit detection: NO correction in this file
+      // Only override if we had strong signal it's missing
+      // For now, keep existing value (don't change)
+    }
+
+    console.log(
+      `[resource-overwrite] auto-detect: hasCorrection=${detectedHasCorrection} method=${detectionMethod} newPages=${newPageCount} newSize=${pdfBuffer.length} oldSize=${resource.fileSize}`
+    );
+
+    // Update resource with new key + auto-detected fields
     await prisma.resource.update({
       where: { id: resourceId },
-      data: {
-        fileKey: blob.pathname,
-        fileUrl: blob.url,
-        fileSize: pdfBuffer.length,
-      },
+      data: updateData,
     });
 
     // Also update TeacherFile
@@ -104,6 +199,12 @@ export async function POST(req: NextRequest) {
       oldSize: resource.fileSize,
       newSize: pdfBuffer.length,
       sizeDelta: resource.fileSize - pdfBuffer.length,
+      detected: {
+        hasCorrection: detectedHasCorrection,
+        method: detectionMethod,
+        pageCount: newPageCount,
+        keywordsFound: lastPageText ? correctionKeywords.filter((kw) => lastPageText.includes(kw)) : [],
+      },
     });
   } catch (e: any) {
     console.error('[resource-overwrite]', e);

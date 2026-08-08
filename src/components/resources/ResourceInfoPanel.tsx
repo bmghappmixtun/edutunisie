@@ -10,6 +10,10 @@ import {
 const LANGUAGE_LABELS: Record<string, string> = {
   fr: '🇫🇷 Français',
   ar: '🇹🇳 العربية',
+  en: '🇬🇧 English',
+  it: '🇮🇹 Italiano',
+  de: '🇩🇪 Deutsch',
+  es: '🇪🇸 Español',
   'fr+ar': '🇫🇷 + 🇹🇳 Bilingue',
 };
 

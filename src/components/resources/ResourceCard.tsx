@@ -64,7 +64,12 @@ function formatCount(n: number): string {
 }
 
 function langBadge(lang?: string): string {
-  if (lang === 'ar') return '🇸🇦';
+  if (lang === 'ar') return '🇹🇳';
+  if (lang === 'fr') return '🇫🇷';
+  if (lang === 'en') return '🇬🇧';
+  if (lang === 'it') return '🇮🇹';
+  if (lang === 'de') return '🇩🇪';
+  if (lang === 'es') return '🇪🇸';
   if (lang === 'fr+ar' || lang === 'ar+fr') return '🇫🇷+🇹🇳';
   return '🇫🇷';
 }

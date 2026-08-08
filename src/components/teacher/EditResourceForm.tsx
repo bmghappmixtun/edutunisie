@@ -54,6 +54,10 @@ const TRIMESTERS = [
 const LANGUAGES = [
   { v: 'fr', l: '🇫🇷 Français' },
   { v: 'ar', l: '🇹🇳 العربية' },
+  { v: 'en', l: '🇬🇧 English' },
+  { v: 'it', l: '🇮🇹 Italiano' },
+  { v: 'de', l: '🇩🇪 Deutsch' },
+  { v: 'es', l: '🇪🇸 Español' },
   { v: 'fr+ar', l: '🇫🇷 + 🇹🇳' },
 ];
 
