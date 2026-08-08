@@ -107,15 +107,25 @@ async function applyOne(item: SingleUpdate) {
     });
   }
 
-  // Update Resource.summary (short 1-2 line, used for cards)
+  // Update Resource fields: tags (CSV) + summary (short 1-2 line, used for cards)
+  const updateData: any = {};
   if (summary && summary.trim().length > 0) {
+    updateData.summary = summary.trim().slice(0, 500);
+    updateData.descriptionGeneratedAt = new Date();
+    updateData.descriptionSource = modelUsed || 'mavis-manual';
+  }
+  // Write tags to Resource.tags (CSV) for UI display
+  // Source priority: shortKeyPoints > topics
+  const tagsForUI = sanitizeArray(shortKeyPoints, 10).length > 0
+    ? sanitizeArray(shortKeyPoints, 10)
+    : sanitizeArray(topics, 10);
+  if (tagsForUI.length > 0) {
+    updateData.tags = tagsForUI.join(',');
+  }
+  if (Object.keys(updateData).length > 0) {
     await prisma.resource.update({
       where: { id: resourceId },
-      data: {
-        summary: summary.trim().slice(0, 500),
-        descriptionGeneratedAt: new Date(),
-        descriptionSource: modelUsed || 'mavis-manual',
-      },
+      data: updateData,
     });
   }
 
