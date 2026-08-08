@@ -665,16 +665,13 @@ export default async function ResourcePage({
                       in alternation, max 10 bubbles total. Short KP = lighter shade
                       but SAME font size/padding as long KP (2026-08-06 update). */}
                 {(() => {
+                  // Per user rule (2026-08-08): Points clés card shows ONLY the LONG key points
+                  // (full sentences, real KP). Short tags live in their own "Tags" card.
+                  // If long KP are missing, fall back to shortKeyPoints so the card isn't empty.
                   const longKps = resource.metadata?.keyPoints || [];
                   const shortKps = (resource.metadata as any)?.shortKeyPoints || [];
-                  if (longKps.length === 0 && shortKps.length === 0) return null;
-                  // Merge: alternate short + long for visual rhythm, max 10 total
-                  const merged: { text: string; isShort: boolean }[] = [];
-                  const maxLen = Math.max(longKps.length, shortKps.length);
-                  for (let i = 0; i < maxLen && merged.length < 10; i++) {
-                    if (i < shortKps.length) merged.push({ text: shortKps[i], isShort: true });
-                    if (i < longKps.length && merged.length < 10) merged.push({ text: longKps[i], isShort: false });
-                  }
+                  const kpsToShow: string[] = longKps.length > 0 ? longKps : shortKps;
+                  if (kpsToShow.length === 0) return null;
                   // Per user rule (2026-08-02): align RIGHT for AR docs, LEFT for FR docs.
                   const isPilotePhysiqueCollege =
                     resource.schoolType === 'PILOTE' &&
@@ -684,20 +681,13 @@ export default async function ResourcePage({
                   const isArDoc = resource.language === 'ar' && !isPilotePhysiqueCollege;
                   const titleAlignRight = isArDoc;
                   const keyPointsTitle = isArDoc ? 'النقاط الرئيسية' : 'Points clés';
-                  // Long KP: full color palette. Short KP: lighter shades
+                  // KP palette: full color intensity (no more mixing of short+long)
                   const longPalette = [
                     'bg-rose-100 text-rose-800 border-rose-300',
                     'bg-fuchsia-100 text-fuchsia-800 border-fuchsia-300',
                     'bg-teal-100 text-teal-800 border-teal-300',
                     'bg-amber-100 text-amber-800 border-amber-300',
                     'bg-violet-100 text-violet-800 border-violet-300',
-                  ];
-                  const shortPalette = [
-                    'bg-rose-50 text-rose-700 border-rose-200',
-                    'bg-fuchsia-50 text-fuchsia-700 border-fuchsia-200',
-                    'bg-teal-50 text-teal-700 border-teal-200',
-                    'bg-amber-50 text-amber-700 border-amber-200',
-                    'bg-violet-50 text-violet-700 border-violet-200',
                   ];
                   return (
                   <AiContentSection
@@ -709,27 +699,20 @@ export default async function ResourcePage({
                     alignRight={titleAlignRight}
                   >
                     <div className={`flex flex-wrap gap-2 ${isArDoc ? 'justify-end' : 'justify-start'}`}>
-                      {merged.map((kp, i) => {
-                        const kpAr = isArabic(kp.text);
-                        const palette = kp.isShort ? shortPalette : longPalette;
-                        const colorClass = palette[i % palette.length];
-                        const searchQuery = encodeURIComponent(kp.text);
+                      {kpsToShow.map((kpText, i) => {
+                        const kpAr = isArabic(kpText);
+                        const colorClass = longPalette[i % longPalette.length];
+                        const searchQuery = encodeURIComponent(kpText);
                         const searchHref = `/recherche?q=${searchQuery}`;
                         return (
                         <Link
-                          key={`${kp.isShort ? 's' : 'l'}-${i}`}
+                          key={`kp-${i}`}
                           href={searchHref}
                           dir={kpAr ? 'rtl' : 'ltr'}
                           lang={kpAr ? 'ar' : 'fr'}
-                          // Per user rule (2026-08-06): short KP now uses the same
-                          // font size + padding as long KP. They were text-xs px-2.5
-                          // before, which made them look like a different species.
-                          // Now both use text-sm px-3 py-1.5; the only differentiator
-                          // is the color shade (shortPalette = lighter, longPalette
-                          // = full intensity).
                           className={`inline-block px-3 py-1.5 text-sm rounded-full font-semibold border font-arabic-title ${kpAr ? 'text-right' : 'text-left'} ${colorClass} hover:brightness-110 hover:shadow-sm hover:scale-[1.03] transition-all cursor-pointer`}
                         >
-                          {kp.text}
+                          {kpText}
                         </Link>
                         );
                       })}
