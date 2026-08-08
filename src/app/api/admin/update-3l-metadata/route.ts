@@ -68,26 +68,35 @@ async function applyOne(item: SingleUpdate) {
     return { resourceId, ok: false, error: 'Resource non trouvée' };
   }
 
-  // Upsert ResourceMetadata
-  await prisma.resourceMetadata.upsert({
-    where: { resourceId },
-    create: {
-      resourceId,
-      generalSubject: generalSubject || null,
-      keyPoints: sanitizeArray(keyPoints, 10),
-      shortKeyPoints: sanitizeArray(shortKeyPoints, 10),
-      topics: sanitizeArray(topics, 20),
-      modelUsed: modelUsed || 'mavis-manual',
-    },
-    update: {
-      generalSubject: generalSubject || null,
-      keyPoints: sanitizeArray(keyPoints, 10),
-      shortKeyPoints: sanitizeArray(shortKeyPoints, 10),
-      topics: sanitizeArray(topics, 20),
-      extractedAt: new Date(),
-      modelUsed: modelUsed || 'mavis-manual',
-    },
-  });
+  // CRITICAL: only update fields that are EXPLICITLY provided in the payload.
+  // Otherwise we'd nuke existing data when caller only sends a subset (e.g. backfill tags).
+  // We detect "provided" by checking the key exists on the object (not just truthy).
+  const hasGS = 'generalSubject' in item;
+  const hasKP = 'keyPoints' in item;
+  const hasSKP = 'shortKeyPoints' in item;
+  const hasTopics = 'topics' in item;
+
+  if (hasGS || hasKP || hasSKP || hasTopics) {
+    // Fetch current metadata to merge correctly
+    const current = await prisma.resourceMetadata.findUnique({
+      where: { resourceId },
+      select: { generalSubject: true, keyPoints: true, shortKeyPoints: true, topics: true, modelUsed: true },
+    });
+
+    const merged = {
+      generalSubject: hasGS ? (generalSubject || null) : (current?.generalSubject ?? null),
+      keyPoints: hasKP ? sanitizeArray(keyPoints, 10) : (current?.keyPoints ?? []),
+      shortKeyPoints: hasSKP ? sanitizeArray(shortKeyPoints, 10) : (current?.shortKeyPoints ?? []),
+      topics: hasTopics ? sanitizeArray(topics, 20) : (current?.topics ?? []),
+      modelUsed: modelUsed || current?.modelUsed || 'mavis-manual',
+    };
+
+    await prisma.resourceMetadata.upsert({
+      where: { resourceId },
+      create: { resourceId, ...merged },
+      update: { ...merged, extractedAt: new Date() },
+    });
+  }
 
   // Upsert ResourceSummary (uses French summary if provided, else original language)
   const summaryText = summary || summaryOriginal;
@@ -115,10 +124,20 @@ async function applyOne(item: SingleUpdate) {
     updateData.descriptionSource = modelUsed || 'mavis-manual';
   }
   // Write tags to Resource.tags (CSV) for UI display
-  // Source priority: shortKeyPoints > topics
-  const tagsForUI = sanitizeArray(shortKeyPoints, 10).length > 0
-    ? sanitizeArray(shortKeyPoints, 10)
-    : sanitizeArray(topics, 10);
+  // Source priority: shortKeyPoints (from payload or current DB) > topics
+  let tagsForUI: string[] = [];
+  if (hasSKP) {
+    tagsForUI = sanitizeArray(shortKeyPoints, 10);
+  } else {
+    // Read current shortKeyPoints from DB
+    const cur = await prisma.resourceMetadata.findUnique({
+      where: { resourceId },
+      select: { shortKeyPoints: true, topics: true },
+    });
+    tagsForUI = (cur?.shortKeyPoints && cur.shortKeyPoints.length > 0)
+      ? cur.shortKeyPoints
+      : (cur?.topics || []);
+  }
   if (tagsForUI.length > 0) {
     updateData.tags = tagsForUI.join(',');
   }
