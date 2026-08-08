@@ -84,22 +84,41 @@ export default async function TeachersPage(props: { searchParams: Promise<Search
 
   // -------- 1. Build teacher WHERE filter --------
   // Note: subject/class filters are applied later via resource JOIN (subjects/classes taught).
-  // Search: name FR/AR + school name.
+  // Search: token-based name + school + email + bio + numericId.
+  // Each whitespace-separated token must match at least one searchable field (AND between tokens, OR between fields).
+  // This handles "Houcine Labiadh" (full name), "Labiadh Houcine" (reversed), "Ali naf" (partial), etc.
   const teacherWhere: Prisma.UserWhereInput = {
     role: 'TEACHER',
     status: 'ACTIVE',
     ...(verifiedOnly ? { isVerifiedTeacher: true } : {}),
     ...(q
-      ? {
-          OR: [
-            { firstName: { contains: q, mode: 'insensitive' } },
-            { lastName: { contains: q, mode: 'insensitive' } },
-            { firstNameAr: { contains: q, mode: 'insensitive' } },
-            { lastNameAr: { contains: q, mode: 'insensitive' } },
-            { schoolName: { contains: q, mode: 'insensitive' } },
-            { schoolNameAr: { contains: q, mode: 'insensitive' } },
-          ],
-        }
+      ? (() => {
+          const tokens = q
+            .split(/\s+/)
+            .map((t) => t.trim())
+            .filter((t) => t.length > 0);
+          if (tokens.length === 0) return {};
+          return {
+            AND: tokens.map((token) => ({
+              OR: [
+                { firstName: { contains: token, mode: 'insensitive' } },
+                { lastName: { contains: token, mode: 'insensitive' } },
+                { firstNameAr: { contains: token, mode: 'insensitive' } },
+                { lastNameAr: { contains: token, mode: 'insensitive' } },
+                { schoolName: { contains: token, mode: 'insensitive' } },
+                { schoolNameAr: { contains: token, mode: 'insensitive' } },
+                { email: { contains: token, mode: 'insensitive' } },
+                { bio: { contains: token, mode: 'insensitive' } },
+                // numericId exact match (if user types a number)
+                ...(/^\d+$/.test(token)
+                  ? [{ numericId: parseInt(token, 10) }]
+                  : []),
+                // slug match (URL-friendly name)
+                { slug: { contains: token, mode: 'insensitive' } },
+              ],
+            })),
+          };
+        })()
       : {}),
   };
 
