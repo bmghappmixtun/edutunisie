@@ -1,0 +1,222 @@
+/**
+ * POST /api/admin/update-3l-metadata
+ * Bulk update AI metadata for 3ème Langue files (Allemand, Italien, Espagnol).
+ *
+ * Auth: ADMIN role OR SEED_TOKEN (header x-seed-token, query ?token=, or cookie)
+ *
+ * Accepts two modes:
+ *   1) Single update: { resourceId, generalSubject, keyPoints, shortKeyPoints, summary, summaryOriginal, modelUsed }
+ *   2) Bulk update:   { items: [{ resourceId, generalSubject, keyPoints, ... }, ...] }
+ *
+ * Writes to:
+ *   - ResourceMetadata (generalSubject, keyPoints, shortKeyPoints, topics, modelUsed)
+ *   - ResourceSummary (summary in target language)
+ *   - Resource.description (short French summary, optional)
+ */
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+interface SingleUpdate {
+  resourceId: string;
+  generalSubject?: string;
+  keyPoints?: string[];
+  shortKeyPoints?: string[];
+  topics?: string[];
+  summary?: string; // Short description (1-2 lines, French)
+  summaryOriginal?: string; // Short description in original language (de/it/es)
+  modelUsed?: string;
+}
+
+interface BulkPayload {
+  items: SingleUpdate[];
+}
+
+async function checkAuth(req: NextRequest) {
+  const seedToken =
+    req.nextUrl.searchParams.get('seedToken') ||
+    req.nextUrl.searchParams.get('token') ||
+    req.headers.get('x-seed-token') ||
+    req.cookies.get('seed-token')?.value;
+  if (seedToken && seedToken === process.env.SEED_TOKEN) return { isAuth: true, isSeed: true };
+  return { isAuth: false, isSeed: false };
+}
+
+function sanitizeArray(arr: any, max = 50): string[] {
+  if (!Array.isArray(arr)) return [];
+  return arr
+    .filter((x) => typeof x === 'string' && x.trim().length > 0)
+    .map((x) => x.trim().slice(0, 200))
+    .slice(0, max);
+}
+
+async function applyOne(item: SingleUpdate) {
+  const { resourceId, generalSubject, keyPoints, shortKeyPoints, topics, summary, summaryOriginal, modelUsed } = item;
+
+  if (!resourceId) {
+    return { resourceId, ok: false, error: 'resourceId requis' };
+  }
+
+  // Check resource exists
+  const resource = await prisma.resource.findUnique({
+    where: { id: resourceId },
+    select: { id: true, language: true, title: true },
+  });
+  if (!resource) {
+    return { resourceId, ok: false, error: 'Resource non trouvée' };
+  }
+
+  // Upsert ResourceMetadata
+  await prisma.resourceMetadata.upsert({
+    where: { resourceId },
+    create: {
+      resourceId,
+      generalSubject: generalSubject || null,
+      keyPoints: sanitizeArray(keyPoints, 10),
+      shortKeyPoints: sanitizeArray(shortKeyPoints, 10),
+      topics: sanitizeArray(topics, 20),
+      modelUsed: modelUsed || 'mavis-manual',
+    },
+    update: {
+      generalSubject: generalSubject || null,
+      keyPoints: sanitizeArray(keyPoints, 10),
+      shortKeyPoints: sanitizeArray(shortKeyPoints, 10),
+      topics: sanitizeArray(topics, 20),
+      extractedAt: new Date(),
+      modelUsed: modelUsed || 'mavis-manual',
+    },
+  });
+
+  // Upsert ResourceSummary (uses French summary if provided, else original language)
+  const summaryText = summary || summaryOriginal;
+  if (summaryText && summaryText.trim().length > 0) {
+    await prisma.resourceSummary.upsert({
+      where: { resourceId },
+      create: {
+        resourceId,
+        summary: summaryText.trim().slice(0, 5000),
+        modelUsed: modelUsed || 'mavis-manual',
+      },
+      update: {
+        summary: summaryText.trim().slice(0, 5000),
+        extractedAt: new Date(),
+        modelUsed: modelUsed || 'mavis-manual',
+      },
+    });
+  }
+
+  // Update Resource.summary (short 1-2 line, used for cards)
+  if (summary && summary.trim().length > 0) {
+    await prisma.resource.update({
+      where: { id: resourceId },
+      data: {
+        summary: summary.trim().slice(0, 500),
+        descriptionGeneratedAt: new Date(),
+        descriptionSource: modelUsed || 'mavis-manual',
+      },
+    });
+  }
+
+  return { resourceId, ok: true, title: resource.title };
+}
+
+export async function POST(req: NextRequest) {
+  // Auth
+  const auth = await checkAuth(req);
+  if (!auth.isAuth) {
+    return NextResponse.json({ error: 'Admin ou SEED_TOKEN requis' }, { status: 401 });
+  }
+
+  let body: SingleUpdate | BulkPayload;
+  try {
+    body = await req.json();
+  } catch (e: any) {
+    return NextResponse.json({ error: 'JSON invalide', details: e.message }, { status: 400 });
+  }
+
+  // Detect bulk vs single
+  const items: SingleUpdate[] = 'items' in body && Array.isArray(body.items)
+    ? body.items
+    : [body as SingleUpdate];
+
+  if (items.length === 0) {
+    return NextResponse.json({ error: 'Aucun item fourni' }, { status: 400 });
+  }
+
+  // Limit bulk size for safety
+  if (items.length > 200) {
+    return NextResponse.json(
+      { error: `Trop d'items (${items.length}). Maximum 200 par appel.` },
+      { status: 400 }
+    );
+  }
+
+  const results = [];
+  let success = 0;
+  let failed = 0;
+
+  for (const item of items) {
+    try {
+      const r = await applyOne(item);
+      if (r.ok) success++;
+      else failed++;
+      results.push(r);
+    } catch (e: any) {
+      failed++;
+      results.push({ resourceId: item.resourceId, ok: false, error: e.message });
+    }
+  }
+
+  return NextResponse.json({
+    status: 'ok',
+    total: items.length,
+    success,
+    failed,
+    results,
+  });
+}
+
+/**
+ * GET endpoint to check current metadata for a resource (or list of IDs).
+ * Query: ?ids=id1,id2,id3
+ */
+export async function GET(req: NextRequest) {
+  const auth = await checkAuth(req);
+  if (!auth.isAuth) {
+    return NextResponse.json({ error: 'Admin ou SEED_TOKEN requis' }, { status: 401 });
+  }
+
+  const idsParam = req.nextUrl.searchParams.get('ids') || '';
+  const ids = idsParam.split(',').filter(Boolean);
+
+  if (ids.length === 0) {
+    return NextResponse.json({ error: 'Param ids=id1,id2,... requis' }, { status: 400 });
+  }
+
+  const metadata = await prisma.resourceMetadata.findMany({
+    where: { resourceId: { in: ids } },
+    select: {
+      resourceId: true,
+      generalSubject: true,
+      keyPoints: true,
+      shortKeyPoints: true,
+      topics: true,
+      modelUsed: true,
+      extractedAt: true,
+    },
+  });
+
+  const summaries = await prisma.resourceSummary.findMany({
+    where: { resourceId: { in: ids } },
+    select: { resourceId: true, summary: true, modelUsed: true, extractedAt: true },
+  });
+
+  return NextResponse.json({
+    total: ids.length,
+    found: metadata.length,
+    metadata,
+    summaries,
+  });
+}
