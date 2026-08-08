@@ -41,6 +41,23 @@ import { Loader2 } from 'lucide-react';
  *     (hidden via CSS), so the main <div> has 5 children: toolbar, chips
  *     wrapper, grid, empty state, pagination wrapper. We mirror that
  *     exactly here.
+ *   - 2026-08-08 (this commit): the per-section child structure inside the
+ *     sidebar content was wrong. The FilterShell page wraps each filter
+ *     section in a div containing exactly 1 child (the <MultiSelectChips>
+ *     component, which itself contains 2 grandchildren: label + chip
+ *     group). The previous loading.tsx skeleton used 2 direct children
+ *     per section (label + chip group) at the wrapper level — a structural
+ *     mismatch (1 vs 2) that triggered React #418/#422 hydration errors
+ *     on /ressources, /ar/ressources, /ressources?view=list, etc.
+ *     (ERR-YD9HCJ 31× #418 on /ressources?teacherId=1955,
+ *     ERR-LSTEBA 30× #422 on /ar/ressources?teacherId=1267,
+ *     ERR-FLR73U 3× #422 on /ressources?teacherId=1201&view=list,
+ *     ERR-EVNQQD 2× #418 on /ressources?teacherId=1201&view=list&page=2,
+ *     in the 2026-08-08 nightly digest). The Options section has 3 direct
+ *     children (label + button + count) and the Catégorie section has 3
+ *     direct children (label + 4-switches wrapper + count) — we mirror
+ *     those exactly here so the sidebar's child structure is stable
+ *     between the Suspense fallback and the streamed page.
  *
  * The page-level wrappers (`min-h-screen flex flex-col`, Header, main
  * padding, Footer) are mirrored byte-for-byte to keep the Suspense
@@ -131,27 +148,37 @@ export default function Loading() {
               </div>
               {/* Content skeleton — same wrapper as the page (max-h + overflow-y
                   + px-5 py-4 space-y-5) so the Suspense patch lands cleanly.
-                  IMPORTANT (2026-08-05): the page renders up to 9 top-level
-                  filter sections (Recherche, Type, Matière, Classe, Section,
-                  Année, Trimestre, Langue, Options, then the always-rendered
-                  Catégorie wrapper). We render 9 skeleton sections here so
-                  the sidebar's child count matches in all cases — the page
-                  wraps each section in <div className="hidden"> when the
-                  corresponding facet is empty, so on hydrate the React
-                  walker sees the same number of children here as it saw on
-                  the SSR pass. The previous version rendered only 5 sections,
-                  which mismatched the page's 9 on most filtered views
-                  (ERR-SGFVDH 5x #422, ERR-XCZNW4 5x #418, 2026-08-05 digest). */}
+                  IMPORTANT (2026-08-05 + 2026-08-08): the page renders 10
+                  top-level filter sections (Recherche + 7 chip-group sections
+                  + Options + always-rendered Catégorie wrapper). We render
+                  10 skeleton sections here so the sidebar's child count
+                  matches in all cases — the page wraps each section in
+                  <div className="hidden"> when the corresponding facet is
+                  empty, so on hydrate the React walker sees the same number
+                  of children here as it saw on the SSR pass.
+                  CRITICAL (2026-08-08): the FilterShell page wraps each
+                  MultiSelectChips section in a <div> with exactly 1 child
+                  (the <MultiSelectChips> component itself). The previous
+                  loading.tsx skeleton used 2 direct children per section
+                  (label + chip group), which triggered React #418/#422
+                  hydration mismatches on /ressources and /ar/ressources
+                  (ERR-YD9HCJ 31×, ERR-LSTEBA 30× in 2026-08-08 digest). We
+                  now mirror the page's per-section structure exactly. */}
               <div className="max-h-[calc(100vh-180px)] overflow-y-auto px-5 py-4 space-y-5">
-                {/* 1. Recherche — input skeleton (no chips, just a label + input) */}
-                <div className="space-y-2">
-                  <div className="h-3 w-20 bg-slate-200 rounded animate-pulse" />
+                {/* 1. Recherche — page renders 2 children (label + relative input
+                    wrapper) at the section level. We mirror that exactly. */}
+                <div>
+                  <div className="h-3 w-20 bg-slate-200 rounded animate-pulse mb-2" />
                   <div className="h-9 w-full bg-slate-50 rounded-lg animate-pulse" />
                 </div>
-                {/* 2-9. Filter chip groups (Type, Matière, Classe, Section, Année, Trimestre, Langue, Options) */}
-                {[...Array(8)].map((_, i) => (
-                  <div key={i} className="space-y-2">
-                    <div className="h-3 w-20 bg-slate-200 rounded animate-pulse" />
+                {/* 2-8. Filter chip groups (Type, Matière, Classe, Section, Année,
+                    Trimestre, Langue). The page renders each section as a wrapper
+                    <div> with EXACTLY 1 child (the <MultiSelectChips> component).
+                    We mirror that by wrapping our label + chip group in a single
+                    <div>, so this slot has 1 child matching the page. */}
+                {[...Array(7)].map((_, i) => (
+                  <div key={i}>
+                    <div className="h-3 w-20 bg-slate-200 rounded animate-pulse mb-2" />
                     <div className="flex flex-wrap gap-1.5">
                       {[...Array(3)].map((__, j) => (
                         <div
@@ -162,32 +189,49 @@ export default function Loading() {
                     </div>
                   </div>
                 ))}
+                {/* 9. Options (Avec corrigé). The page renders this section with
+                    EXACTLY 3 direct children (label div + button + count line).
+                    We mirror that exactly. The button uses <button> element type
+                    to match FilterShell.tsx ~line 546, and the count line is
+                    always rendered (hidden via CSS) so the section has 3
+                    children whether the "Avec corrigé" facet is 0 or > 0.
+                    2026-08-08 fix: this is the structural mismatch that was
+                    triggering ERR-YD9HCJ 31× #418 on /ressources?teacherId=1955. */}
+                <div>
+                  <div className="h-3 w-20 bg-slate-200 rounded animate-pulse mb-2" />
+                  <div className="h-9 w-full bg-slate-50 rounded-lg border border-slate-200 animate-pulse" />
+                  <div className="h-3 w-48 bg-slate-100 rounded animate-pulse mt-1.5 ml-1" />
+                </div>
                 {/* 10. Catégorie (4 category switches — always rendered in the page
                  *  via the "always render, hide via CSS" pattern). The Catégorie
-                 *  wrapper itself is always present in FilterShell.tsx (~line 574),
-                 *  so we MUST mirror it here — otherwise the sidebar's content
-                 *  div has 9 children in the skeleton but 10 in the streamed page,
-                 *  a structural mismatch that triggers React #418/#422 on
-                 *  /ressources and /ar/ressources?teacherId=* (60 events in the
-                 *  2026-08-06 digest: ERR-477B47 18x #422, ERR-5U9VEJ 18x #418,
-                 *  ERR-8V4H58 12x #418, ERR-G4CV55 12x #422).
-                 *  Inner structure mirrors the page exactly: top border + label +
-                 *  4 switch rows + 1 hidden count-line placeholder (so the wrapper
-                 *  has 3 children: label + switches + count-placeholder, matching
-                 *  FilterShell.tsx ~line 574-633). */}
-                <div className="mt-4 pt-3 border-t border-slate-200 space-y-2">
-                  <div className="h-3 w-20 bg-slate-200 rounded animate-pulse" />
-                  {[...Array(4)].map((_, i) => (
-                    <div
-                      key={i}
-                      className="h-9 w-full bg-slate-50 rounded-lg border border-slate-100 animate-pulse"
-                    />
-                  ))}
+                 *  wrapper itself is always present in FilterShell.tsx (~line 577),
+                 *  so we MUST mirror it here. CRITICAL (2026-08-08): the page
+                 *  renders the Catégorie wrapper with EXACTLY 3 direct children:
+                 *    1. label div "Catégorie"
+                 *    2. <div className="space-y-2"> wrapping the 4 <CategorySwitch> buttons
+                 *    3. hidden count-line placeholder
+                 *  The previous version inlined the 4 switches as separate
+                 *  children (1 label + 4 switches + 1 count = 6 children),
+                 *  a structural mismatch (3 vs 6) that triggered React #418/#422
+                 *  on /ressources?teacherId=* (ERR-YD9HCJ 31×, ERR-LSTEBA 30×,
+                 *  2026-08-08 nightly digest). We now wrap the 4 switch
+                 *  skeletons in a single <div className="space-y-2"> so the
+                 *  wrapper has exactly 3 children, matching the page. */}
+                <div className="mt-4 pt-3 border-t border-slate-200">
+                  <div className="h-3 w-20 bg-slate-200 rounded animate-pulse mb-2" />
+                  <div className="space-y-2">
+                    {[...Array(4)].map((_, i) => (
+                      <div
+                        key={i}
+                        className="h-9 w-full bg-slate-50 rounded-lg border border-slate-100 animate-pulse"
+                      />
+                    ))}
+                  </div>
                   {/* Hidden count-line placeholder — mirrors the page's
                    *  always-rendered <div ... hidden /> at FilterShell.tsx
-                   *  ~line 631. Keeps the wrapper's child count at 3 in both
+                   *  ~line 634. Keeps the wrapper's child count at 3 in both
                    *  states (filter active or not). */}
-                  <div className="h-3 w-48 bg-slate-100 rounded animate-pulse hidden" aria-hidden="true" />
+                  <div className="h-3 w-48 bg-slate-100 rounded animate-pulse mt-2 ml-1 hidden" aria-hidden="true" />
                 </div>
               </div>
             </aside>
