@@ -37,6 +37,10 @@ interface HeaderData {
 interface AiDescriptionProps {
   /** The description text (already in target language). */
   text: string;
+  /** Optional 2nd summary in the original document language (de/it/es for 3L files).
+   *  When provided, displayed in the same card below the main summary with its own
+   *  language detection. */
+  secondaryText?: string | null;
   /** Origin of the description: 'agent-v2-multilingual' | 'manual' | null */
   source: string | null | undefined;
   /** Resource language code ('ar' | 'fr' | 'en'). Drives RTL direction. */
@@ -340,6 +344,7 @@ export default function AiDescription({
 
 // CACHE_BUST_V2_2026_08_03_1115_BUILD_AR_FOR_AR_DOCS
   text,
+  secondaryText,
   source,
   language,
   className = '',
@@ -759,6 +764,38 @@ export default function AiDescription({
               className={`flex-1 text-sm text-slate-700 leading-relaxed ${summaryAr ? 'text-right' : 'text-left'}`}
             >
               {summary}
+            </div>
+          </div>
+        </div>
+        );
+      })()}
+
+      {/* Per user rule (2026-08-08): for 3L files, show the 2nd summary in the
+          original document language (de/it/es) below the main FR summary, in
+          the same AI summary card. Each block has its own lang/dir. */}
+      {secondaryText && (() => {
+        const secAr = isArabic(secondaryText);
+        return (
+        <div dir={secAr ? 'rtl' : 'ltr'} className="mt-3 pt-3 border-t border-violet-100">
+          <div className="flex items-start gap-2">
+            <ScrollText className="w-4 h-4 mt-1 flex-shrink-0 text-violet-600" />
+            <div
+              dir={secAr ? 'rtl' : 'ltr'}
+              lang={secAr ? 'ar' : (language || 'fr')}
+              style={{
+                unicodeBidi: 'isolate',
+                whiteSpace: 'pre-wrap',
+                ...(secAr
+                  ? {
+                      fontFamily:
+                        'var(--font-fustat), "Cairo", "Inter", system-ui, sans-serif',
+                      lineHeight: 1.85,
+                    }
+                  : {}),
+              }}
+              className={`flex-1 text-sm text-slate-700 leading-relaxed ${secAr ? 'text-right' : 'text-left'}`}
+            >
+              {secondaryText}
             </div>
           </div>
         </div>

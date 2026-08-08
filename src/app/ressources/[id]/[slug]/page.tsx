@@ -591,6 +591,7 @@ export default async function ResourcePage({
                     as a labeled field with a Tag icon. */}
                 {resource.aiSummary?.summary && (() => {
                   const summary = resource.aiSummary.summary;
+                  const summaryOriginal = (resource.aiSummary as any)?.summaryOriginal || null;
                   // Per user rule (2026-07-30): for college, hide Type (النوع) and
                   // Niveau (المستوى) from the AI card — they're always the same.
                   const isCollege = resource.class?.level?.slug === 'college';
@@ -630,6 +631,7 @@ export default async function ResourcePage({
                     <div className="mb-4">
                       <AiDescription
                         text={summary}
+                        secondaryText={summaryOriginal}
                         source={resource.aiSummary.modelUsed || 'gpt-4o-mini-batch-v1'}
                         language={resource.language}
                         headerData={resource.headerData as any}
