@@ -42,6 +42,7 @@ import {
   Wrench,
   Building2,
   Target,
+  Hash,
 } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -720,6 +721,53 @@ export default async function ResourcePage({
                       })}
                     </div>
                   </AiContentSection>
+                  );
+                })()}
+
+                {/* Tags card — Per user rule (2026-08-08): short key points (the
+                    1-2 word tags) live in their own card. Shows resource.tags
+                    (CSV from Resource model) + shortKeyPoints from metadata.
+                    Hidden if no tags (legacy files). */}
+                {(() => {
+                  const tagsFromField = (resource.tags || '')
+                    .split(',').map((t: string) => t.trim()).filter(Boolean);
+                  const shortKps = (resource.metadata as any)?.shortKeyPoints || [];
+                  // Merge unique (shortKps first, then tags not already in shortKps)
+                  const seen = new Set<string>();
+                  const tags: string[] = [];
+                  for (const t of shortKps) {
+                    const k = t.toLowerCase();
+                    if (!seen.has(k)) { seen.add(k); tags.push(t); }
+                  }
+                  for (const t of tagsFromField) {
+                    const k = t.toLowerCase();
+                    if (!seen.has(k)) { seen.add(k); tags.push(t); }
+                  }
+                  if (tags.length === 0) return null;
+                  return (
+                    <div className="mb-4 p-4 bg-white border border-slate-200 rounded-xl">
+                      <div className="text-xs font-bold text-slate-600 uppercase tracking-wide mb-3 flex items-center gap-2">
+                        <Hash className="w-4 h-4" />
+                        <span>Tags</span>
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-slate-800 text-white text-[10px] font-bold rounded-full uppercase">
+                          AI
+                        </span>
+                      </div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {tags.map((t, i) => {
+                          const searchHref = `/recherche?q=${encodeURIComponent(t)}`;
+                          return (
+                            <Link
+                              key={`tag-${i}`}
+                              href={searchHref}
+                              className="px-2 py-1 bg-slate-100 text-slate-600 text-xs rounded-md hover:bg-primary-100 hover:text-primary-700 transition"
+                            >
+                              #{t}
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    </div>
                   );
                 })()}
 
