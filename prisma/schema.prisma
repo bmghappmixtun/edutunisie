@@ -391,12 +391,15 @@ model ResourceMetadata {
 
 /// AI-generated summary (3-5 phrases du contenu principal).
 model ResourceSummary {
-  id          String   @id @default(cuid())
-  resourceId  String   @unique
-  resource    Resource @relation("ResourceAISummary", fields: [resourceId], references: [id], onDelete: Cascade)
-  summary     String   @db.Text
-  extractedAt DateTime @default(now())
-  modelUsed   String?
+  id               String   @id @default(cuid())
+  resourceId       String   @unique
+  resource         Resource @relation("ResourceAISummary", fields: [resourceId], references: [id], onDelete: Cascade)
+  summary          String   @db.Text
+  /// Summary in the original document language (de/it/es for 3ème Langue files).
+  /// When set, the UI displays both summaries in the same card (FR on top, original below).
+  summaryOriginal  String?  @db.Text
+  extractedAt      DateTime @default(now())
+  modelUsed        String?
 
   @@index([resourceId])
 }

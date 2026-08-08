@@ -98,18 +98,23 @@ async function applyOne(item: SingleUpdate) {
     });
   }
 
-  // Upsert ResourceSummary (uses French summary if provided, else original language)
-  const summaryText = summary || summaryOriginal;
-  if (summaryText && summaryText.trim().length > 0) {
+  // Upsert ResourceSummary (FR in `summary`, original lang in `summaryOriginal`).
+  // If only one is provided, we still set both fields — the second stays null.
+  if ((summary && summary.trim().length > 0) || (summaryOriginal && summaryOriginal.trim().length > 0)) {
+    const frSummary = (summary && summary.trim().length > 0) ? summary.trim().slice(0, 5000) : null;
+    const origSummary = (summaryOriginal && summaryOriginal.trim().length > 0) ? summaryOriginal.trim().slice(0, 5000) : null;
     await prisma.resourceSummary.upsert({
       where: { resourceId },
       create: {
         resourceId,
-        summary: summaryText.trim().slice(0, 5000),
+        summary: frSummary || origSummary || '',
+        summaryOriginal: origSummary,
         modelUsed: modelUsed || 'mavis-manual',
       },
       update: {
-        summary: summaryText.trim().slice(0, 5000),
+        // Only update each field if explicitly provided (same "merge" pattern as metadata)
+        ...(frSummary !== null ? { summary: frSummary } : {}),
+        ...(origSummary !== null ? { summaryOriginal: origSummary } : {}),
         extractedAt: new Date(),
         modelUsed: modelUsed || 'mavis-manual',
       },
