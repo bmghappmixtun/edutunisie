@@ -58,6 +58,18 @@ import { Loader2 } from 'lucide-react';
  *     direct children (label + 4-switches wrapper + count) — we mirror
  *     those exactly here so the sidebar's child structure is stable
  *     between the Suspense fallback and the streamed page.
+ *   - 2026-08-08 (follow-up): the first attempt at this fix kept the
+ *     label and chip group as siblings inside the outer wrapper (so the
+ *     outer wrapper still had 2 children). The verifier correctly flagged
+ *     this — the label and chip group must be wrapped in a SINGLE inner
+ *     <div> so the outer section wrapper has exactly 1 child, mirroring
+ *     the streamed <MultiSelectChips> component structure. This applies
+ *     to all 7 chip-group slots (Type, Matière, Classe, Section, Année,
+ *     Trimestre, Langue). The Options section keeps 3 children
+ *     (matching the streamed button + count), and the Catégorie section
+ *     keeps 3 children (matching the streamed 4-switches wrapper + count).
+ *     The Recherche section keeps 2 children (label + input wrapper),
+ *     matching the streamed structure.
  *
  * The page-level wrappers (`min-h-screen flex flex-col`, Header, main
  * padding, Footer) are mirrored byte-for-byte to keep the Suspense
@@ -173,33 +185,50 @@ export default function Loading() {
                 </div>
                 {/* 2-8. Filter chip groups (Type, Matière, Classe, Section, Année,
                     Trimestre, Langue). The page renders each section as a wrapper
-                    <div> with EXACTLY 1 child (the <MultiSelectChips> component).
-                    We mirror that by wrapping our label + chip group in a single
-                    <div>, so this slot has 1 child matching the page. */}
+                    <div> with EXACTLY 1 child (the <MultiSelectChips> component,
+                    which internally has 2 children: label + chip group). We
+                    mirror that by wrapping our label + chip group in a SINGLE
+                    inner <div>, so the outer section wrapper has exactly 1
+                    child matching the streamed <MultiSelectChips> structure.
+                    The first attempt kept the label and chip group as siblings
+                    inside the outer wrapper (2 children) — a mismatch with the
+                    streamed 1-child structure. Now wrapped in an extra <div> so
+                    both structures have 1 child at the section level. */}
                 {[...Array(7)].map((_, i) => (
                   <div key={i}>
-                    <div className="h-3 w-20 bg-slate-200 rounded animate-pulse mb-2" />
-                    <div className="flex flex-wrap gap-1.5">
-                      {[...Array(3)].map((__, j) => (
-                        <div
-                          key={j}
-                          className="h-6 w-16 bg-slate-100 rounded-full animate-pulse"
-                        />
-                      ))}
+                    <div>
+                      <div className="h-3 w-20 bg-slate-200 rounded animate-pulse mb-2" />
+                      <div className="flex flex-wrap gap-1.5">
+                        {[...Array(3)].map((__, j) => (
+                          <div
+                            key={j}
+                            className="h-6 w-16 bg-slate-100 rounded-full animate-pulse"
+                          />
+                        ))}
+                      </div>
                     </div>
                   </div>
                 ))}
                 {/* 9. Options (Avec corrigé). The page renders this section with
-                    EXACTLY 3 direct children (label div + button + count line).
-                    We mirror that exactly. The button uses <button> element type
-                    to match FilterShell.tsx ~line 546, and the count line is
-                    always rendered (hidden via CSS) so the section has 3
-                    children whether the "Avec corrigé" facet is 0 or > 0.
-                    2026-08-08 fix: this is the structural mismatch that was
+                    EXACTLY 3 direct children:
+                      1. <div>Options</div> label
+                      2. <button> wrapping the switch + label
+                      3. <div>0 ressources avec corrigé</div> count line
+                    Element types MUST match: the 2nd child is <button> (NOT
+                    <div>) — the previous version used <div> for the switch
+                    skeleton, an element-type mismatch that triggered #418/#422.
+                    The count line is always rendered (visible when the page
+                    has withCorrection data, hidden via CSS when empty).
+                    2026-08-08 fix: this is one of the structural mismatches
                     triggering ERR-YD9HCJ 31× #418 on /ressources?teacherId=1955. */}
                 <div>
                   <div className="h-3 w-20 bg-slate-200 rounded animate-pulse mb-2" />
-                  <div className="h-9 w-full bg-slate-50 rounded-lg border border-slate-200 animate-pulse" />
+                  <button
+                    type="button"
+                    aria-hidden="true"
+                    tabIndex={-1}
+                    className="w-full h-9 px-3 py-2.5 rounded-lg border border-slate-200 bg-slate-50 text-[0px] leading-none animate-pulse"
+                  />
                   <div className="h-3 w-48 bg-slate-100 rounded animate-pulse mt-1.5 ml-1" />
                 </div>
                 {/* 10. Catégorie (4 category switches — always rendered in the page
@@ -208,8 +237,12 @@ export default function Loading() {
                  *  so we MUST mirror it here. CRITICAL (2026-08-08): the page
                  *  renders the Catégorie wrapper with EXACTLY 3 direct children:
                  *    1. label div "Catégorie"
-                 *    2. <div className="space-y-2"> wrapping the 4 <CategorySwitch> buttons
+                 *    2. <div className="space-y-2"> wrapping the 4 <CategorySwitch> BUTTONs
                  *    3. hidden count-line placeholder
+                 *  The 4 switch elements MUST be <button> (NOT <div>) to match
+                 *  the <CategorySwitch> component's element type — a <div>
+                 *  skeleton would trigger an element-type mismatch in React's
+                 *  hydration check.
                  *  The previous version inlined the 4 switches as separate
                  *  children (1 label + 4 switches + 1 count = 6 children),
                  *  a structural mismatch (3 vs 6) that triggered React #418/#422
@@ -221,9 +254,12 @@ export default function Loading() {
                   <div className="h-3 w-20 bg-slate-200 rounded animate-pulse mb-2" />
                   <div className="space-y-2">
                     {[...Array(4)].map((_, i) => (
-                      <div
+                      <button
                         key={i}
-                        className="h-9 w-full bg-slate-50 rounded-lg border border-slate-100 animate-pulse"
+                        type="button"
+                        aria-hidden="true"
+                        tabIndex={-1}
+                        className="w-full h-9 bg-slate-50 rounded-lg border border-slate-100 animate-pulse"
                       />
                     ))}
                   </div>
