@@ -31,7 +31,14 @@ import {
 } from 'lucide-react';
 import * as Popover from '@radix-ui/react-popover';
 import * as ToggleGroup from '@radix-ui/react-toggle-group';
-import * as Switch from '@radix-ui/react-switch';
+// BUGFIX 2026-08-09: removed the @radix-ui/react-switch import. The
+// Switch.Root inside CategorySwitch + hasCorrection was firing its
+// `onCheckedChange` handler on top of the parent <button> onClick,
+// causing a double-toggle that cancelled itself out (filter state
+// never actually changed, so the auto-update never fired).
+// Replaced Switch.Root with a pure visual span (no event handlers).
+// If we later need keyboard-toggleable a11y on these switches, we
+// can re-introduce a single, well-placed Switch.
 import type { LucideIcon } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 import ResourceCard from '@/components/resources/ResourceCard';
@@ -564,15 +571,26 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
                 <CheckCircle2 className="w-4 h-4" />
                 Avec corrigé seulement
               </span>
-              <Switch.Root
-                checked={filters.hasCorrection}
-                onCheckedChange={(c) => update({ hasCorrection: c })}
+              {/*
+                BUGFIX 2026-08-09: same double-toggle issue as the
+                CategorySwitch below — Switch.Root's onCheckedChange
+                fired a second toggle on top of the outer <button>
+                onClick, cancelling itself out. Switch is now a pure
+                visual indicator.
+              */}
+              <span
+                role="img"
+                aria-hidden="true"
                 className={`w-9 h-5 rounded-full relative transition ${
                   filters.hasCorrection ? 'bg-emerald-500' : 'bg-slate-300'
                 }`}
               >
-                <Switch.Thumb className="block w-4 h-4 bg-white rounded-full shadow transition-transform translate-x-0.5 data-[state=checked]:translate-x-[18px]" />
-              </Switch.Root>
+                <span
+                  className={`block w-4 h-4 bg-white rounded-full shadow transition-transform absolute top-0.5 ${
+                    filters.hasCorrection ? 'translate-x-[18px]' : 'translate-x-0.5'
+                  }`}
+                />
+              </span>
             </button>
             <div className="text-[11px] text-slate-500 mt-1.5 ml-1">
               {data.facets.withCorrection.toLocaleString('fr-FR')} ressources avec corrigé
@@ -882,13 +900,30 @@ function CategorySwitch({
         <span className="text-base shrink-0">{icon}</span>
         <span className="font-semibold truncate">{label}</span>
       </span>
-      <Switch.Root
-        checked={active}
-        onCheckedChange={onToggle}
+      {/*
+        BUGFIX 2026-08-09: previously this Switch.Root had
+        `onCheckedChange={onToggle}` which fired the toggle a SECOND
+        time on every click (the outer <button> onClick already does).
+        The double-toggle cancelled itself out — `lyceePilote: false`
+        → `true` → `false` in the same tick — so the visible filter
+        state never changed and the auto-update never fired.
+        Fix: the Switch is now a pure visual indicator. We render it
+        with `checked={active}` only, no onCheckedChange handler. To
+        still allow keyboard activation (Space/Enter) on the switch
+        for a11y, we keep the outer <button> as the single source of
+        truth for the toggle action.
+      */}
+      <span
+        role="img"
+        aria-hidden="true"
         className={`w-9 h-5 rounded-full relative transition ${active ? switchActive : 'bg-slate-300'}`}
       >
-        <Switch.Thumb className="block w-4 h-4 bg-white rounded-full shadow transition-transform translate-x-0.5 data-[state=checked]:translate-x-[18px]" />
-      </Switch.Root>
+        <span
+          className={`block w-4 h-4 bg-white rounded-full shadow transition-transform absolute top-0.5 ${
+            active ? 'translate-x-[18px]' : 'translate-x-0.5'
+          }`}
+        />
+      </span>
     </button>
   );
 }
