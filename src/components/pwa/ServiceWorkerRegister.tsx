@@ -27,6 +27,17 @@ export default function ServiceWorkerRegister() {
           updateViaCache: 'none', // Always check for updates
         });
 
+        // Force an immediate update check on every page load. By default
+        // the browser only re-checks the SW script every 24h, which means
+        // a critical JS fix (like a double-toggle bug) wouldn't land
+        // for up to a day. We call .update() to force the check now.
+        // 2026-08-09: this was added after a user reported the filter
+        // UI was stuck on the old buggy chunks for hours despite the
+        // server having deployed the fix.
+        reg.update().catch((err) => {
+          console.warn('[SW] update() check failed:', err);
+        });
+
         // Listen for waiting worker (new version installed)
         reg.addEventListener('updatefound', () => {
           const newWorker = reg.installing;
@@ -41,6 +52,16 @@ export default function ServiceWorkerRegister() {
             }
           });
         });
+
+        // If there's already a waiting worker on page load (browser
+        // detected a new version in a background tab and downloaded it),
+        // activate it NOW and reload — no 5s wait. The previous code
+        // relied on `updatefound` which only fires during the current
+        // registration session; if the new SW was downloaded in a prior
+        // tab, it would just sit there waiting.
+        if (reg.waiting) {
+          reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+        }
 
         // Reload page when new SW takes over
         let refreshing = false;
