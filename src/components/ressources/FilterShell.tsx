@@ -281,6 +281,15 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
       // Any filter change resets page to 1
       const next: Record<string, unknown> = { ...patch };
       if (!('page' in patch)) next.page = 1;
+      // PERF/DEBUG 2026-08-09: log every filter change to the console
+      // so the user can verify in DevTools that clicks are registering.
+      // If a click produces no log here, the issue is the click handler
+      // (e.g. CSS pointer-events, or Radix Switch bug returning). If a
+      // log appears but the page doesn't update, the issue is the
+      // useEffect debounce/fetch. Useful for diagnosing "the page
+      // doesn't update" reports.
+      // eslint-disable-next-line no-console
+      console.log('[FilterShell] update() called with:', next);
       startTransition(() => {
         void setFilters(next as any);
       });
