@@ -211,19 +211,33 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
 
   // ============== FETCH ON FILTER CHANGE (debounced) ==============
   useEffect(() => {
+    // PERF/DEBUG 2026-08-09: full instrumentation of the filter flow.
+    // Logs at every decision point so we can see exactly where the
+    // chain breaks when "the page doesn't update" reports come in.
+    // eslint-disable-next-line no-console
+    console.log('[FilterShell] useEffect fired, filterKey:', filterKey);
+
     // Skip the initial fetch on first render if the SSR data already
     // matches the current filter key (prevents the brief "resources
     // appear then disappear" race when the page first hydrates).
     if (isFirstRender.current) {
       isFirstRender.current = false;
       if (filterKey === firstRenderKey.current) {
+        // eslint-disable-next-line no-console
+        console.log('[FilterShell] first render matches SSR, skipping fetch');
         lastFetchKey.current = filterKey; // mark as "already fetched" (with SSR data)
         return;
       }
     }
 
-    if (lastFetchKey.current === filterKey) return;
+    if (lastFetchKey.current === filterKey) {
+      // eslint-disable-next-line no-console
+      console.log('[FilterShell] same filterKey as last fetch, skipping');
+      return;
+    }
     lastFetchKey.current = filterKey;
+    // eslint-disable-next-line no-console
+    console.log('[FilterShell] starting fetch for new filterKey:', filterKey);
 
     const controller = new AbortController();
     // PERF 2026-08-09: reduced debounce from 200ms → 80ms. The previous
@@ -255,14 +269,23 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
         params.set('sort', filters.sort);
         params.set('page', String(filters.page));
 
-        const res = await fetch(`/api/ressources?${params.toString()}`, {
+        const url = `/api/ressources?${params.toString()}`;
+        // eslint-disable-next-line no-console
+        console.log('[FilterShell] fetching:', url);
+        const res = await fetch(url, {
           signal: controller.signal,
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json: ApiResponse = await res.json();
+        // eslint-disable-next-line no-console
+        console.log('[FilterShell] fetch OK, total:', json.total, 'items:', json.resources?.length);
         setData(json);
       } catch (err) {
-        if (err instanceof DOMException && err.name === 'AbortError') return;
+        if (err instanceof DOMException && err.name === 'AbortError') {
+          // eslint-disable-next-line no-console
+          console.log('[FilterShell] fetch aborted (newer filter click)');
+          return;
+        }
         console.error('[FilterShell] fetch error:', err);
       } finally {
         setIsFetching(false);
