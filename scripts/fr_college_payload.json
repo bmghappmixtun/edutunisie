@@ -342,6 +342,350 @@
       "hasCorrection": false,
       "modelUsed": "gpt-4o-mini-v2-fr",
       "_elapsedMs": 2617
+    },
+    {
+      "resourceId": "cmqte49pv002a142l246jrxv4",
+      "generalSubject": "Les découvertes scientifiques",
+      "shortKeyPoints": [
+        "Pierre Curie",
+        "Marie Curie",
+        "radioactivité",
+        "prix Nobel",
+        "impact scientifique"
+      ],
+      "description": "Pierre et Marie Curie ont découvert le polonium et le radium, établissant les bases de la radioactivité. Leur travail a eu un impact majeur sur la science et la médecine.",
+      "summary": "Le couple Curie a marqué l'histoire par ses découvertes en radioactivité, recevant plusieurs prix Nobel. Leur héritage scientifique perdure malgré les tragédies liées à leur recherche.",
+      "homeworkSubtype": "synthese",
+      "homeworkNumber": 2,
+      "hasCorrection": false,
+      "modelUsed": "gpt-4o-mini-v2-fr",
+      "_elapsedMs": 3192
+    },
+    {
+      "resourceId": "cmqte4b48002e142l6kotva0m",
+      "generalSubject": "transformation industrielle du bois",
+      "shortKeyPoints": [
+        "scierie",
+        "bruit des machines",
+        "accidents",
+        "progrès technologique"
+      ],
+      "description": "Ce document traite de la transformation industrielle du bois à travers l'expérience de Joseph et Gustave dans une scierie. Il met en avant les changements apportés par la mécanisation du travail du bois.",
+      "summary": "L'extrait décrit l'environnement bruyant et chaotique d'une scierie, contrastant avec le calme d'autrefois. Joseph et Gustave s'interrogent sur les conséquences de la mécanisation, notamment en termes de sécurité et de qualité du travail.",
+      "homeworkSubtype": "synthese",
+      "homeworkNumber": 3,
+      "hasCorrection": false,
+      "modelUsed": "gpt-4o-mini-v2-fr",
+      "_elapsedMs": 2686
+    },
+    {
+      "resourceId": "cmqtear4r00kv142ln9yuqr3c",
+      "generalSubject": "les sentiments de la mère Barberin",
+      "shortKeyPoints": [
+        "enfant trouvé",
+        "mère nourrice",
+        "relation père-fils",
+        "sentiments maternels"
+      ],
+      "description": "Ce document est un devoir de contrôle en français pour la 7ème année de base, portant sur le texte 'Sans famille' d'Hector Malot. Il évalue la compréhension des sentiments de la mère Barberin envers Rémi et les interactions familiales.",
+      "summary": "Le devoir explore les émotions de la mère Barberin, qui élève Rémi comme son propre fils malgré son statut d'enfant trouvé. Les questions portent sur la dynamique familiale et les réactions des personnages face à leur situation.",
+      "homeworkSubtype": "synthese",
+      "homeworkNumber": 1,
+      "hasCorrection": false,
+      "modelUsed": "gpt-4o-mini-v2-fr",
+      "_elapsedMs": 3326
+    },
+    {
+      "resourceId": "cmqteasc200kz142lnzsxi2ls",
+      "generalSubject": "le quotidien d'un berger",
+      "shortKeyPoints": [
+        "solitude",
+        "rencontre inattendue",
+        "sentiments",
+        "nature"
+      ],
+      "description": "Ce document présente un devoir de français pour la 7ème année de base, centré sur un extrait d'Alphonse Daudet. Il traite de la vie d'un berger solitaire et de sa rencontre avec une demoiselle.",
+      "summary": "Le texte décrit la vie isolée d'un berger dans le Luberon, attendant des provisions. Sa rencontre avec Stéphanette, une demoiselle, suscite en lui des sentiments de trouble et d'admiration. Le devoir évalue la compréhension et l'analyse de ce récit.",
+      "homeworkSubtype": "synthese",
+      "homeworkNumber": 1,
+      "hasCorrection": false,
+      "modelUsed": "gpt-4o-mini-v2-fr",
+      "_elapsedMs": 3129
+    },
+    {
+      "resourceId": "cmqteau6u00l3142lgl5cztrv",
+      "generalSubject": "les pratiques agricoles traditionnelles",
+      "shortKeyPoints": [
+        "agriculture familiale",
+        "élevage d'animaux",
+        "travail du père",
+        "économie domestique"
+      ],
+      "description": "Ce document présente un devoir de français pour la 7ème année, axé sur les pratiques agricoles traditionnelles d'une famille. Il inclut un extrait d'un texte littéraire et des questions de compréhension et de grammaire.",
+      "summary": "Le texte décrit la vie d'un père fellah et ses activités agricoles, ainsi que l'élevage des animaux. Les questions visent à évaluer la compréhension du texte et les compétences grammaticales des élèves.",
+      "homeworkSubtype": "synthese",
+      "homeworkNumber": 1,
+      "hasCorrection": false,
+      "modelUsed": "gpt-4o-mini-v2-fr",
+      "_elapsedMs": 3653
+    },
+    {
+      "resourceId": "cmqteavai00l7142lxr6lxlaz",
+      "generalSubject": "rencontre avec un lion",
+      "shortKeyPoints": [
+        "piste africaine",
+        "lion majestueux",
+        "angoisse",
+        "sentiments mêlés"
+      ],
+      "description": "Ce document est un devoir de synthèse pour les élèves de 7ème année de base, portant sur une rencontre avec un lion dans la plaine du Tchad. Il comprend des questions de compréhension, de vocabulaire, de syntaxe, de conjugaison et d'orthographe.",
+      "summary": "L'extrait décrit une scène où Hélène et sa mère rencontrent un lion sur une piste en Afrique. Les émotions de peur et d'émerveillement sont présentes alors qu'elles observent la majesté de l'animal. Le devoir évalue la compréhension du texte et les compétences linguistiques des élèves.",
+      "homeworkSubtype": "synthese",
+      "homeworkNumber": 2,
+      "hasCorrection": false,
+      "modelUsed": "gpt-4o-mini-v2-fr",
+      "_elapsedMs": 3379
+    },
+    {
+      "resourceId": "cmqteawoo00lb142lbya0sic4",
+      "generalSubject": "les vacances à la campagne",
+      "shortKeyPoints": [
+        "narrateur enfant",
+        "voyage à la campagne",
+        "climat rural",
+        "découverte de la nature"
+      ],
+      "description": "Ce document est un devoir de français pour les élèves de 7ème année, portant sur un extrait de 'L'Enfant' de Jules Vallès. Il aborde les impressions d'un enfant citadin lors de ses vacances à la campagne.",
+      "summary": "Le narrateur, un enfant citadin, découvre la campagne chez son oncle après un long voyage. Bien que d'abord triste, il finit par apprécier la beauté de la nature et les plaisirs simples de la vie rurale.",
+      "homeworkSubtype": "synthese",
+      "homeworkNumber": 2,
+      "hasCorrection": false,
+      "modelUsed": "gpt-4o-mini-v2-fr",
+      "_elapsedMs": 4088
+    },
+    {
+      "resourceId": "cmqteay0600lf142lj8ektgk8",
+      "generalSubject": "la rencontre avec la faune sauvage",
+      "shortKeyPoints": [
+        "animaux sauvages",
+        "narrateur",
+        "sentiment d'émerveillement",
+        "enfant",
+        "observation",
+        "Kilimandjaro"
+      ],
+      "description": "Ce document présente un devoir de français pour la 7ème année de base, centré sur un extrait de Joseph Kessel décrivant une rencontre avec des animaux sauvages au Kenya. Les élèves doivent répondre à des questions de compréhension.",
+      "summary": "L'extrait met en lumière la fascination du narrateur pour la faune sauvage et son interaction avec une jeune fille. À travers ses observations, il ressent un profond lien avec la nature et une certaine introspection face à l'enfance.",
+      "homeworkSubtype": "synthese",
+      "homeworkNumber": 2,
+      "hasCorrection": false,
+      "modelUsed": "gpt-4o-mini-v2-fr",
+      "_elapsedMs": 3960
+    },
+    {
+      "resourceId": "cmqteazgi00lj142l5wxkax1e",
+      "generalSubject": "la rencontre avec des animaux",
+      "shortKeyPoints": [
+        "narrateur",
+        "singe",
+        "gazelle",
+        "sentiments partagés"
+      ],
+      "description": "Ce document présente un devoir de français pour la 7ème année de base, centré sur un extrait littéraire où un narrateur rencontre une gazelle. Il explore les émotions et les détails de cette rencontre.",
+      "summary": "L'extrait décrit une rencontre entre un narrateur et une gazelle, mettant en avant les sentiments de tendresse et de mélancolie. Le devoir évalue la compréhension du texte et la maîtrise de la langue française à travers des questions et des exercices.",
+      "homeworkSubtype": "synthese",
+      "homeworkNumber": 2,
+      "hasCorrection": false,
+      "modelUsed": "gpt-4o-mini-v2-fr",
+      "_elapsedMs": 4362
+    },
+    {
+      "resourceId": "cmqteb0w100ln142lr4d84zt1",
+      "generalSubject": "la dérive sur la rivière",
+      "shortKeyPoints": [
+        "narrateur seul",
+        "peur de la dérive",
+        "nature paisible",
+        "émotion intense"
+      ],
+      "description": "Ce document est un devoir de synthèse en français pour la 7ème année de base, portant sur un extrait narratif d'Henri Bosco. Les élèves doivent répondre à des questions de compréhension sur le texte.",
+      "summary": "L'extrait décrit la dérive d'un narrateur sur une rivière, évoquant ses émotions face à la nature. Il ressent à la fois la beauté du paysage et la peur de s'éloigner du rivage, illustrant un moment de tension dramatique.",
+      "homeworkSubtype": "synthese",
+      "homeworkNumber": 2,
+      "hasCorrection": false,
+      "modelUsed": "gpt-4o-mini-v2-fr",
+      "_elapsedMs": 4516
+    },
+    {
+      "resourceId": "cmqteb1yd00lr142lyirp2sea",
+      "generalSubject": "Pasteur et la rage",
+      "shortKeyPoints": [
+        "traitement de la rage",
+        "Joseph Meister",
+        "émotion de Pasteur",
+        "exploit médical"
+      ],
+      "description": "Ce document présente un devoir de synthèse sur le traitement de la rage par Pasteur, centré sur le cas de Joseph Meister, un enfant attaqué par un chien enragé. Il aborde les émotions de Pasteur et les étapes du traitement.",
+      "summary": "Le devoir décrit l'intervention de Pasteur pour sauver Joseph Meister, un enfant mordu par un chien enragé. Il met en lumière les défis émotionnels et médicaux rencontrés par Pasteur durant ce traitement, qui s'est finalement avéré couronné de succès.",
+      "homeworkSubtype": "synthese",
+      "homeworkNumber": 2,
+      "hasCorrection": false,
+      "modelUsed": "gpt-4o-mini-v2-fr",
+      "_elapsedMs": 3860
+    },
+    {
+      "resourceId": "cmqteb3a700lv142ls756flnz",
+      "generalSubject": "le courage des pompiers",
+      "shortKeyPoints": [
+        "sauvetage héroïque",
+        "incendie",
+        "dévouement",
+        "émotion",
+        "sacrifice"
+      ],
+      "description": "Ce document présente un devoir de synthèse sur le courage des pompiers lors d'un incendie, mettant en avant le sauvetage d'une mère et de son enfant. Il inclut des questions de compréhension et des exercices de langue.",
+      "summary": "Le texte décrit une scène dramatique où des pompiers interviennent pour sauver une mère et sa fille d'un incendie. Le lieutenant Green et le sergent Rose font preuve de bravoure et de dévouement face à la détresse de la mère, illustrant ainsi le courage des pompiers.",
+      "homeworkSubtype": "synthese",
+      "homeworkNumber": 2,
+      "hasCorrection": false,
+      "modelUsed": "gpt-4o-mini-v2-fr",
+      "_elapsedMs": 3325
+    },
+    {
+      "resourceId": "cmqteb4q300lz142li3oacfl2",
+      "generalSubject": "la vie et la mort du soleil",
+      "shortKeyPoints": [
+        "formation du soleil",
+        "réactions nucléaires",
+        "étoile géante rouge",
+        "naine blanche"
+      ],
+      "description": "Ce document présente un devoir de synthèse sur la formation et l'évolution du soleil, abordant ses phases de vie et sa mort. Il est destiné aux élèves de 9ème année de base.",
+      "summary": "Le texte explique comment le soleil, une étoile, naît d'une nébuleuse et évolue au cours de sa vie. Il décrit les transformations du soleil, de sa jeunesse à sa mort, en soulignant les conséquences pour la Terre et l'humanité.",
+      "homeworkSubtype": "synthese",
+      "homeworkNumber": 2,
+      "hasCorrection": false,
+      "modelUsed": "gpt-4o-mini-v2-fr",
+      "_elapsedMs": 3677
+    },
+    {
+      "resourceId": "cmqteb67800m3142l4d679qu5",
+      "generalSubject": "choix de métiers et valeurs",
+      "shortKeyPoints": [
+        "compréhension du métier",
+        "critères de choix",
+        "opinion maternelle",
+        "rêves d'enfance"
+      ],
+      "description": "Ce document est un devoir de synthèse pour les élèves de 9ème année, portant sur les choix de métiers et les valeurs associées. Il comprend des questions de compréhension, de vocabulaire, de syntaxe, de conjugaison et d'orthographe.",
+      "summary": "Le devoir explore la perception des métiers à travers les yeux d'un enfant et l'influence de sa mère sur ses choix. Les élèves doivent réfléchir sur leurs propres aspirations professionnelles et justifier leurs choix.",
+      "homeworkSubtype": "synthese",
+      "homeworkNumber": 2,
+      "hasCorrection": false,
+      "modelUsed": "gpt-4o-mini-v2-fr",
+      "_elapsedMs": 3211
+    },
+    {
+      "resourceId": "cmqteb7od00m7142lru04psvn",
+      "generalSubject": "l'admiration d'un camelot",
+      "shortKeyPoints": [
+        "admiration",
+        "enfance",
+        "camelot",
+        "interaction sociale"
+      ],
+      "description": "Ce document est un devoir de synthèse en français pour les élèves de 9ème année de base, portant sur un extrait littéraire. Il comprend des questions de compréhension sur le texte.",
+      "summary": "L'extrait décrit l'admiration d'un jeune narrateur pour un camelot qui vend des détacheurs. À travers ses yeux, on découvre une interaction pleine d'émerveillement et de joie, illustrant les émotions d'un enfant face à un personnage charismatique.",
+      "homeworkSubtype": "synthese",
+      "homeworkNumber": 2,
+      "hasCorrection": false,
+      "modelUsed": "gpt-4o-mini-v2-fr",
+      "_elapsedMs": 3068
+    },
+    {
+      "resourceId": "cmqteb8t400mb142l13xrtpbh",
+      "generalSubject": "La musique comme consolation émotionnelle",
+      "shortKeyPoints": [
+        "musicien ambulant",
+        "émotions",
+        "chanson triste",
+        "impact de la musique"
+      ],
+      "description": "Ce document est un devoir de français pour les élèves de 9ème année, axé sur un extrait littéraire traitant de la musique comme source de réconfort émotionnel. Il comprend des questions de compréhension et de grammaire.",
+      "summary": "L'extrait présente un jeune musicien qui joue de la harpe pour gagner sa vie tout en exprimant ses émotions à travers la musique. La réaction de la petite Lise souligne l'impact émotionnel que la musique peut avoir sur les individus.",
+      "homeworkSubtype": "MAISON",
+      "homeworkNumber": 3,
+      "hasCorrection": false,
+      "modelUsed": "gpt-4o-mini-v2-fr",
+      "_elapsedMs": 2883
+    },
+    {
+      "resourceId": "cmqteba1s00mf142l6ot2hbho",
+      "generalSubject": "l'apprentissage de la musique",
+      "shortKeyPoints": [
+        "enseignement musical",
+        "questions de Mattia",
+        "rôle du professeur",
+        "difficultés d'apprentissage"
+      ],
+      "description": "Ce document présente un devoir de synthèse en français pour les élèves de 9ème année, centré sur l'apprentissage de la musique à travers le récit d'un professeur et de son élève Mattia.",
+      "summary": "Le texte met en lumière les défis rencontrés par un professeur de musique face aux questions curieuses de son élève, Mattia. Malgré ses efforts pour enseigner, le professeur se sent parfois dépassé par l'intelligence et la curiosité de son élève.",
+      "homeworkSubtype": "synthese",
+      "homeworkNumber": 3,
+      "hasCorrection": false,
+      "modelUsed": "gpt-4o-mini-v2-fr",
+      "_elapsedMs": 3645
+    },
+    {
+      "resourceId": "cmqtebbbj00mj142lpzkzbmbo",
+      "generalSubject": "la trompette et l'enfance",
+      "shortKeyPoints": [
+        "Poil de Carotte",
+        "M. Lepic",
+        "cadeaux",
+        "préférences d'enfants"
+      ],
+      "description": "Ce document est un devoir de synthèse de français pour la 9ème année de base, portant sur un extrait du livre 'Poil de Carotte' de Jules Renard. Il évalue la compréhension et la grammaire des élèves.",
+      "summary": "Le texte présente une scène où M. Lepic offre des cadeaux à ses enfants, mettant en avant les préférences de Poil de Carotte entre une trompette et un pistolet. La réaction de Madame Lepic souligne les valeurs éducatives concernant les choix des enfants.",
+      "homeworkSubtype": "synthese",
+      "homeworkNumber": 3,
+      "hasCorrection": false,
+      "modelUsed": "gpt-4o-mini-v2-fr",
+      "_elapsedMs": 3900
+    },
+    {
+      "resourceId": "cmqtebcjq00mn142lbgfv3hz5",
+      "generalSubject": "l'émerveillement de l'enfance",
+      "shortKeyPoints": [
+        "musique",
+        "piano",
+        "enfance",
+        "émotion"
+      ],
+      "description": "Ce document est un devoir de synthèse en français pour les élèves de 9ème année de base, portant sur l'émerveillement de l'enfance à travers la musique. Il comprend un extrait d'une œuvre littéraire et des questions de compréhension.",
+      "summary": "L'extrait met en lumière la fascination de l'enfant, Christophe, pour un vieux piano offert par son grand-père. Malgré le désintérêt de sa famille, il découvre la magie de la musique, illustrant ainsi l'émerveillement et l'imaginaire de l'enfance.",
+      "homeworkSubtype": "synthese",
+      "homeworkNumber": 3,
+      "hasCorrection": false,
+      "modelUsed": "gpt-4o-mini-v2-fr",
+      "_elapsedMs": 3471
+    },
+    {
+      "resourceId": "cmqteberx00mr142l93h09jmw",
+      "generalSubject": "relation élève-professeur en musique",
+      "shortKeyPoints": [
+        "leçon de musique",
+        "progrès de Mattia",
+        "questions de l'élève",
+        "rôle du professeur"
+      ],
+      "description": "Ce document présente un devoir de français pour la 9ème année de base, centré sur une leçon de musique entre un professeur et son élève Mattia. Il explore les défis rencontrés par le professeur face aux questions de son élève.",
+      "summary": "Le texte met en avant la dynamique entre un professeur de musique et son élève, Mattia, qui montre un intérêt marqué pour la musique. Le professeur, bien qu'expérimenté, se trouve parfois déstabilisé par les questions pertinentes de son élève, illustrant les défis de l'enseignement.",
+      "homeworkSubtype": "synthese",
+      "homeworkNumber": 3,
+      "hasCorrection": false,
+      "modelUsed": "gpt-4o-mini-v2-fr",
+      "_elapsedMs": 4224
     }
   ],
   "errors": []
