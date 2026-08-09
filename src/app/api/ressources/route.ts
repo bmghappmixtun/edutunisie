@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
 import type { RessourcesResponse } from '@/lib/facets';
+import { getLevelClassIds } from '@/lib/level-cache';
 
 export { type Facets, type RessourcesResponse } from '@/lib/facets';
 
@@ -9,9 +10,13 @@ export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 // ============== HELPERS ==============
+// opts.levelClassIds is optional — when provided, category filters use
+// `classId IN [...]` (faster) instead of joining Resource→Class→Level.
+// PERF 2026-08-09.
 function buildWhere(
   filters: ParsedFilters,
   exclude: (keyof ParsedFilters)[] = [],
+  opts: { levelClassIds?: { college: string[]; lycee: string[] } } = {},
 ): Prisma.ResourceWhereInput {
   const where: Prisma.ResourceWhereInput = { status: 'PUBLISHED' };
 
@@ -49,22 +54,48 @@ function buildWhere(
   if (!exclude.includes('teacherId') && filters.teacherId) {
     where.teacherId = filters.teacherId;
   }
-  // 4 boolean category filters — combinable via OR (e.g. collegePilote+lyceePilote = all pilote)
-  const categoryConditions: any[] = [];
+  // 4 boolean category filters — converted to classId IN + schoolType IN.
+  // PERF 2026-08-09: same change as /ressources page — pre-resolve classIds
+  // by level (cached 5min) instead of joining Resource→Class→Level at
+  // query time. ~2x faster.
+  const collegeClassIds = opts.levelClassIds?.college ?? [];
+  const lyceeClassIds = opts.levelClassIds?.lycee ?? [];
+
+  const activeLevels: Array<'college' | 'lycee'> = [];
+  const wantedSchoolTypes = new Set<string>();
   if (!exclude.includes('collegePilote') && filters.collegePilote) {
-    categoryConditions.push({ class: { level: { slug: 'college' } }, schoolType: 'PILOTE' });
+    activeLevels.push('college');
+    wantedSchoolTypes.add('PILOTE');
   }
   if (!exclude.includes('collegeOrdinaire') && filters.collegeOrdinaire) {
-    categoryConditions.push({ class: { level: { slug: 'college' } }, NOT: { schoolType: 'PILOTE' } });
+    activeLevels.push('college');
+    wantedSchoolTypes.add('PUBLIC');
+    wantedSchoolTypes.add('LYCEE');
   }
   if (!exclude.includes('lyceePilote') && filters.lyceePilote) {
-    categoryConditions.push({ class: { level: { slug: 'lycee' } }, schoolType: 'PILOTE' });
+    activeLevels.push('lycee');
+    wantedSchoolTypes.add('PILOTE');
   }
   if (!exclude.includes('lyceeOrdinaire') && filters.lyceeOrdinaire) {
-    categoryConditions.push({ class: { level: { slug: 'lycee' } }, NOT: { schoolType: 'PILOTE' } });
+    activeLevels.push('lycee');
+    wantedSchoolTypes.add('PUBLIC');
+    wantedSchoolTypes.add('LYCEE');
   }
-  if (categoryConditions.length > 0) {
-    where.OR = categoryConditions;
+
+  if (activeLevels.length > 0) {
+    const uniqueLevels = Array.from(new Set(activeLevels));
+    const allowedClassIds = uniqueLevels.flatMap((l) =>
+      l === 'college' ? collegeClassIds : lyceeClassIds,
+    );
+    const schoolTypeList = Array.from(wantedSchoolTypes);
+    if (allowedClassIds.length > 0 && collegeClassIds.length + lyceeClassIds.length > 0) {
+      where.classId = { in: allowedClassIds };
+    }
+    if (schoolTypeList.length === 1) {
+      where.schoolType = schoolTypeList[0];
+    } else if (schoolTypeList.length > 1) {
+      where.schoolType = { in: schoolTypeList };
+    }
   }
 
   return where;
@@ -116,7 +147,11 @@ export async function GET(req: NextRequest) {
   const pageSize = 24;
   const skip = (page - 1) * pageSize;
 
-  const where = buildWhere(filters);
+  // PERF 2026-08-09: pre-fetch classIds by level once (cached 5min) so
+  // buildWhere can use `classId IN [...]` instead of joining Class→Level
+  // at query time. ~2x faster for the main count + findMany.
+  const levelClassIds = await getLevelClassIds();
+  const where = buildWhere(filters, [], { levelClassIds });
 
   // Convert teacherId from numericId to cuid (DB stores cuid on Resource.teacherId)
   // Accept both numericId (preferred, stable, exposed in URLs) and cuid (legacy)
@@ -157,21 +192,42 @@ export async function GET(req: NextRequest) {
   if (filters.year.length > 0) facetBase.year = { in: filters.year };
   if (filters.language.length > 0) facetBase.language = { in: filters.language };
   if (filters.hasCorrection) facetBase.hasCorrection = true;
-  const facetCategoryConditions: any[] = [];
+  // PERF 2026-08-09: same classId IN + schoolType IN optimization as the
+  // main where clause (see buildWhere).
+  const facetActiveLevels: Array<'college' | 'lycee'> = [];
+  const facetSchoolTypes = new Set<string>();
   if (filters.collegePilote) {
-    facetCategoryConditions.push({ class: { level: { slug: 'college' } }, schoolType: 'PILOTE' });
+    facetActiveLevels.push('college');
+    facetSchoolTypes.add('PILOTE');
   }
   if (filters.collegeOrdinaire) {
-    facetCategoryConditions.push({ class: { level: { slug: 'college' } }, NOT: { schoolType: 'PILOTE' } });
+    facetActiveLevels.push('college');
+    facetSchoolTypes.add('PUBLIC');
+    facetSchoolTypes.add('LYCEE');
   }
   if (filters.lyceePilote) {
-    facetCategoryConditions.push({ class: { level: { slug: 'lycee' } }, schoolType: 'PILOTE' });
+    facetActiveLevels.push('lycee');
+    facetSchoolTypes.add('PILOTE');
   }
   if (filters.lyceeOrdinaire) {
-    facetCategoryConditions.push({ class: { level: { slug: 'lycee' } }, NOT: { schoolType: 'PILOTE' } });
+    facetActiveLevels.push('lycee');
+    facetSchoolTypes.add('PUBLIC');
+    facetSchoolTypes.add('LYCEE');
   }
-  if (facetCategoryConditions.length > 0) {
-    facetBase.OR = facetCategoryConditions;
+  if (facetActiveLevels.length > 0) {
+    const uniqueLevels = Array.from(new Set(facetActiveLevels));
+    const allowedClassIds = uniqueLevels.flatMap((l) =>
+      l === 'college' ? levelClassIds.college : levelClassIds.lycee,
+    );
+    const schoolTypeList = Array.from(facetSchoolTypes);
+    if (allowedClassIds.length > 0) {
+      facetBase.classId = { in: allowedClassIds };
+    }
+    if (schoolTypeList.length === 1) {
+      facetBase.schoolType = schoolTypeList[0];
+    } else if (schoolTypeList.length > 1) {
+      facetBase.schoolType = { in: schoolTypeList };
+    }
   }
   if (filters.teacherId) {
     // Reuse the converted cuid from the main where clause

@@ -219,8 +219,16 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
     lastFetchKey.current = filterKey;
 
     const controller = new AbortController();
+    // PERF 2026-08-09: reduced debounce from 200ms → 80ms. The previous
+    // 200ms felt sluggish for category toggles, especially when combined
+    // with the ~250-400ms server round-trip. 80ms is short enough to feel
+    // instant on click but long enough to batch rapid keyboard typing
+    // (e.g. search input).
+    const DEBOUNCE_MS = 80;
+    // Show the loading indicator immediately so users get visual feedback
+    // that the click registered, even before the debounce fires.
+    setIsFetching(true);
     const t = setTimeout(async () => {
-      setIsFetching(true);
       try {
         const params = new URLSearchParams();
         if (filters.q) params.set('q', filters.q);
@@ -252,10 +260,11 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
       } finally {
         setIsFetching(false);
       }
-    }, 200);
+    }, DEBOUNCE_MS);
     return () => {
       clearTimeout(t);
       controller.abort();
+      setIsFetching(false);
     };
   }, [filterKey, filters]);
 
