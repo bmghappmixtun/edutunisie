@@ -1,0 +1,348 @@
+{
+  "payload": [
+    {
+      "resourceId": "cmqte3jjk0002142lm3nb8l4z",
+      "generalSubject": "la vie à la campagne",
+      "shortKeyPoints": [
+        "découverte",
+        "ferme",
+        "animaux",
+        "vacances"
+      ],
+      "description": "Ce document présente un devoir de synthèse sur un extrait de la vie de Maurice à la campagne, où il découvre la ferme et ses animaux. Les questions portent sur sa compréhension du texte et des éléments de langue.",
+      "summary": "Dans cet extrait, Maurice, un jeune garçon, passe des vacances à la campagne chez son oncle et découvre la vie à la ferme. Il interagit avec les animaux et compare cette expérience à sa vie précédente. Les questions visent à évaluer sa compréhension et ses compétences linguistiques.",
+      "homeworkSubtype": "synthese",
+      "homeworkNumber": 1,
+      "hasCorrection": false,
+      "modelUsed": "gpt-4o-mini-v2-fr",
+      "_elapsedMs": 2931
+    },
+    {
+      "resourceId": "cmqte3kgm0006142lnx8p9hic",
+      "generalSubject": "le retour des cigognes",
+      "shortKeyPoints": [
+        "cigognes",
+        "Hunebourg",
+        "tumulte",
+        "saisons",
+        "nature"
+      ],
+      "description": "Ce document présente un devoir de français pour la 7ème année de base, centré sur le retour des cigognes à Hunebourg. Il comprend des questions de compréhension et des exercices de langue.",
+      "summary": "Le texte décrit l'arrivée des cigognes à Hunebourg, suscitant l'enthousiasme des habitants. Les questions du devoir visent à évaluer la compréhension du texte ainsi que les compétences en vocabulaire et en syntaxe.",
+      "homeworkSubtype": "synthese",
+      "homeworkNumber": 1,
+      "hasCorrection": false,
+      "modelUsed": "gpt-4o-mini-v2-fr",
+      "_elapsedMs": 3059
+    },
+    {
+      "resourceId": "cmqte3ll6000a142lx5udjeip",
+      "generalSubject": "la découverte de la neige",
+      "shortKeyPoints": [
+        "émerveillement",
+        "neige",
+        "grand-mère",
+        "chatte Miquette"
+      ],
+      "description": "Ce document présente un extrait d'une histoire où Corinne découvre la neige pour la première fois chez sa grand-mère. Il inclut des questions de compréhension et des exercices de langue.",
+      "summary": "Corinne, en visite chez sa grand-mère, découvre la neige et exprime son émerveillement. Le texte explore ses réactions et celles de la chatte Miquette face à ce phénomène. Des exercices de compréhension et de langue accompagnent le récit.",
+      "homeworkSubtype": "synthese",
+      "homeworkNumber": 1,
+      "hasCorrection": false,
+      "modelUsed": "gpt-4o-mini-v2-fr",
+      "_elapsedMs": 2839
+    },
+    {
+      "resourceId": "cmqte3o1m000e142l4xiu7cwc",
+      "generalSubject": "la vie à la campagne",
+      "shortKeyPoints": [
+        "découverte",
+        "ferme",
+        "animaux",
+        "vacances"
+      ],
+      "description": "Ce document présente un extrait d'un devoir de français pour les élèves de 7ème année, centré sur la découverte de la vie à la campagne à travers les yeux de Maurice, un jeune garçon en vacances chez son oncle.",
+      "summary": "Maurice, un jeune garçon, découvre la vie à la campagne en visitant la ferme de son oncle. Il interagit avec les animaux et s'émerveille de la nature environnante. Ce devoir évalue la compréhension et l'expression écrite des élèves.",
+      "homeworkSubtype": "synthese",
+      "homeworkNumber": 1,
+      "hasCorrection": false,
+      "modelUsed": "gpt-4o-mini-v2-fr",
+      "_elapsedMs": 57245
+    },
+    {
+      "resourceId": "cmqte3p9g000i142lp10dfrwo",
+      "generalSubject": "l'atmosphère du métro parisien",
+      "shortKeyPoints": [
+        "odeur souterraine",
+        "éclairage de cinéma",
+        "vitesse du métro",
+        "arrivée en station"
+      ],
+      "description": "Ce devoir de contrôle évalue la compréhension et l'analyse d'un extrait sur l'atmosphère du métro parisien à travers les impressions d'Antoine. Les élèves doivent répondre à des questions de compréhension et de langue.",
+      "summary": "L'extrait présente les sensations d'Antoine dans le métro parisien, mettant en avant l'odeur, l'éclairage et la rapidité. Les élèves sont invités à analyser ces éléments et à reformuler des phrases tout en développant un essai sur son expérience.",
+      "homeworkSubtype": "controle",
+      "homeworkNumber": 2,
+      "hasCorrection": false,
+      "modelUsed": "gpt-4o-mini-v2-fr",
+      "_elapsedMs": 3496
+    },
+    {
+      "resourceId": "cmqte3qaz000m142lcelgk6x8",
+      "generalSubject": "caractères des animaux de compagnie",
+      "shortKeyPoints": [
+        "Tap le chien",
+        "Minouche la chatte",
+        "description des animaux",
+        "caractères opposés"
+      ],
+      "description": "Ce document présente un devoir de contrôle en français pour la 7ème année, axé sur l'étude d'un texte décrivant les caractères de deux animaux de compagnie, un chien et une chatte.",
+      "summary": "Le texte met en avant les différences de caractère entre Tap, le chien, et Minouche, la chatte. Il invite les élèves à analyser ces traits à travers des questions de compréhension et des exercices de grammaire.",
+      "homeworkSubtype": "controle",
+      "homeworkNumber": 2,
+      "hasCorrection": false,
+      "modelUsed": "gpt-4o-mini-v2-fr",
+      "_elapsedMs": 2897
+    },
+    {
+      "resourceId": "cmqte3r33000q142levl7vqp0",
+      "generalSubject": "les animaux du zoo japonais",
+      "shortKeyPoints": [
+        "Tonkis",
+        "Sankichi",
+        "zoo",
+        "animaux exotiques"
+      ],
+      "description": "Ce document présente un devoir de contrôle en français pour les élèves de 7ème année, centré sur un texte narratif concernant un éléphant nommé Tonki et ses interactions avec les gardiens du zoo japonais.",
+      "summary": "Le texte raconte l'histoire de Tonki, un éléphant au zoo japonais, et de sa relation avec les gardiens, notamment Sankichi. Il décrit les soins apportés aux animaux et les activités qui font de Tonki la vedette du zoo.",
+      "homeworkSubtype": "controle",
+      "homeworkNumber": 2,
+      "hasCorrection": false,
+      "modelUsed": "gpt-4o-mini-v2-fr",
+      "_elapsedMs": 2926
+    },
+    {
+      "resourceId": "cmqte3siy000u142l6dkchvwt",
+      "generalSubject": "le chat affamé",
+      "shortKeyPoints": [
+        "transformation",
+        "famine",
+        "compassion",
+        "soins",
+        "adoption"
+      ],
+      "description": "Ce document présente un devoir de français pour la 7ème année, centré sur le texte 'Le Chat recueilli' de Cristan Derême. Il aborde la compréhension du texte et des exercices de langue.",
+      "summary": "Le texte raconte l'histoire d'un chat affamé qui est recueilli par des enfants. Ils lui donnent à manger et s'attachent à lui, le transformant d'un animal misérable à un superbe matou. Le devoir inclut des questions de compréhension et des exercices de langue.",
+      "homeworkSubtype": "synthese",
+      "homeworkNumber": 2,
+      "hasCorrection": false,
+      "modelUsed": "gpt-4o-mini-v2-fr",
+      "_elapsedMs": 3719
+    },
+    {
+      "resourceId": "cmqte3txq000y142lnengpqyp",
+      "generalSubject": "la beauté du printemps",
+      "shortKeyPoints": [
+        "printemps en Provence",
+        "nature et émotions",
+        "expérience enfantine",
+        "changement de paysage"
+      ],
+      "description": "Ce document est un devoir de contrôle en français pour la 7ème année de base, axé sur un extrait littéraire décrivant le printemps en Provence à travers les yeux d'un enfant. Il comprend des questions de compréhension et de langue.",
+      "summary": "L'extrait présente Pascalet, un enfant qui explore la beauté de la nature au printemps en Provence. À travers ses émotions et ses observations, le texte met en avant l'impact de la nature sur son expérience personnelle.",
+      "homeworkSubtype": "controle",
+      "homeworkNumber": 3,
+      "hasCorrection": false,
+      "modelUsed": "gpt-4o-mini-v2-fr",
+      "_elapsedMs": 3071
+    },
+    {
+      "resourceId": "cmqte3v330012142lakhenivg",
+      "generalSubject": "les conséquences d'une avalanche",
+      "shortKeyPoints": [
+        "avalanche",
+        "catastrophe naturelle",
+        "secours",
+        "village désolé"
+      ],
+      "description": "Ce devoir de contrôle porte sur les conséquences d'une avalanche sur un village. Les élèves doivent analyser un extrait narratif et répondre à des questions de compréhension et de langue.",
+      "summary": "Le document présente une situation tragique causée par une avalanche, affectant un village et ses habitants. Les élèves sont invités à réfléchir sur les événements et à exprimer leurs idées à travers des exercices variés.",
+      "homeworkSubtype": "controle",
+      "homeworkNumber": 3,
+      "hasCorrection": false,
+      "modelUsed": "gpt-4o-mini-v2-fr",
+      "_elapsedMs": 2692
+    },
+    {
+      "resourceId": "cmqte3wb10016142lvbf9gj68",
+      "generalSubject": "les joies de la neige",
+      "shortKeyPoints": [
+        "neige",
+        "activités hivernales",
+        "enfants heureux",
+        "rêves d'hiver"
+      ],
+      "description": "Ce devoir de contrôle de français pour la 7ème année de base aborde les joies de la neige à travers un extrait narratif. Les élèves doivent répondre à des questions de compréhension et effectuer des exercices de langue.",
+      "summary": "Le texte décrit une journée d'hiver où des enfants découvrent la neige et s'engagent dans diverses activités ludiques. Ils expriment leur excitation et leurs rêves en rapport avec cet environnement hivernal.",
+      "homeworkSubtype": "controle",
+      "homeworkNumber": 3,
+      "hasCorrection": false,
+      "modelUsed": "gpt-4o-mini-v2-fr",
+      "_elapsedMs": 29142
+    },
+    {
+      "resourceId": "cmqte3x9x001a142lzv5xbvi1",
+      "generalSubject": "la séparation des parents",
+      "shortKeyPoints": [
+        "conséquences émotionnelles",
+        "enfance scindée",
+        "difficultés familiales",
+        "espoir déçu"
+      ],
+      "description": "Ce document présente un devoir de contrôle pour les élèves de 9ème année de base, centré sur le thème de la séparation des parents et ses impacts sur l'enfant. Il inclut un extrait narratif et des questions de compréhension et de langue.",
+      "summary": "L'extrait raconte les pensées d'une jeune fille, Sophie, dont les parents se séparent. Elle décrit ses émotions face à cette situation difficile et son espoir déçu de voir ses parents rester ensemble. Le devoir évalue la compréhension et l'analyse du texte.",
+      "homeworkSubtype": "controle",
+      "homeworkNumber": 1,
+      "hasCorrection": false,
+      "modelUsed": "gpt-4o-mini-v2-fr",
+      "_elapsedMs": 2762
+    },
+    {
+      "resourceId": "cmqte3y78001e142lwalbcwl4",
+      "generalSubject": "la peur et la défense personnelle",
+      "shortKeyPoints": [
+        "violence enfantine",
+        "relation mère-fils",
+        "peur",
+        "défense personnelle"
+      ],
+      "description": "Ce document présente un extrait d'une œuvre de Richard Wright, où un jeune garçon fait face à la violence d'une bande d'enfants. Sa mère lui impose d'apprendre à se défendre.",
+      "summary": "Dans cet extrait, Richard, un jeune garçon, est victime de violence dans son quartier. Sa mère, au lieu de le protéger, lui demande de se défendre et de retourner à l'épicerie, renforçant ainsi le thème de la peur et de la résilience.",
+      "homeworkSubtype": "controle",
+      "homeworkNumber": 1,
+      "hasCorrection": false,
+      "modelUsed": "gpt-4o-mini-v2-fr",
+      "_elapsedMs": 2703
+    },
+    {
+      "resourceId": "cmqte3z4n001i142lmzrv9qlm",
+      "generalSubject": "relation père-fille complexe",
+      "shortKeyPoints": [
+        "découverte",
+        "sentiments retenus",
+        "souvenirs d'enfance",
+        "interaction père-fille"
+      ],
+      "description": "Ce document est un devoir de contrôle de français pour la 9ème année, centré sur un extrait de Nathalie Sarraute. Il aborde la relation entre une fillette et son père, mettant en lumière des sentiments complexes.",
+      "summary": "L'extrait explore la découverte progressive de la fillette de son père, un homme réservé et souvent absent. À travers des interactions simples, le texte révèle des émotions sous-jacentes et des souvenirs d'enfance marquants.",
+      "homeworkSubtype": "controle",
+      "homeworkNumber": 1,
+      "hasCorrection": false,
+      "modelUsed": "gpt-4o-mini-v2-fr",
+      "_elapsedMs": 3397
+    },
+    {
+      "resourceId": "cmqte42yn001m142lk4rqdflt",
+      "generalSubject": "la beauté et l'apparence sociale",
+      "shortKeyPoints": [
+        "accueil de Denise",
+        "moquerie des collègues",
+        "cheveux de Denise",
+        "solidarité entre vendeuses"
+      ],
+      "description": "Ce document présente un extrait du roman 'Au Bonheur des dames' d'Émile Zola, centré sur l'arrivée de Denise dans un grand magasin à Paris et son accueil par ses collègues. Il met en lumière les tensions sociales liées à l'apparence.",
+      "summary": "Dans cet extrait, Denise, nouvelle employée, est accueillie avec moquerie par ses collègues en raison de son apparence. Malgré les railleries, une vendeuse se désolidarise du groupe, rappelant ses propres difficultés. Le texte explore les thèmes de la beauté et de l'acceptation sociale.",
+      "homeworkSubtype": "synthese",
+      "homeworkNumber": 1,
+      "hasCorrection": false,
+      "modelUsed": "gpt-4o-mini-v2-fr",
+      "_elapsedMs": 2577
+    },
+    {
+      "resourceId": "cmqte43vb001q142lwgkt8mrj",
+      "generalSubject": "Pasteur et la médecine humanitaire",
+      "shortKeyPoints": [
+        "médecine humanitaire",
+        "Pasteur",
+        "Russie",
+        "inoculation",
+        "soulagement des souffrances"
+      ],
+      "description": "Ce devoir de synthèse porte sur l'intervention de Pasteur auprès des soldats russes blessés par un loup enragé. Il met en lumière les actions humanitaires de Pasteur face à la souffrance.",
+      "summary": "Le document analyse l'engagement de Pasteur dans la médecine humanitaire, en particulier son aide aux soldats russes. Il aborde les décisions prises par Pasteur et l'impact de son nom sur les malades, soulignant l'importance de l'humanité dans la médecine.",
+      "homeworkSubtype": "synthese",
+      "homeworkNumber": 1,
+      "hasCorrection": false,
+      "modelUsed": "gpt-4o-mini-v2-fr",
+      "_elapsedMs": 2544
+    },
+    {
+      "resourceId": "cmqte4533001u142lgoqfmyhw",
+      "generalSubject": "la timidité et l'humiliation sociale",
+      "shortKeyPoints": [
+        "timidité",
+        "humiliation",
+        "confiance en soi",
+        "relations sociales"
+      ],
+      "description": "Ce document présente un devoir de synthèse sur la timidité à travers le récit de Marc Moulin, un adolescent confronté à l'humiliation sociale. Il explore ses sentiments et ses interactions avec ses camarades et une fille nommée Emilie.",
+      "summary": "Marc Moulin partage son expérience de la timidité et de l'humiliation au lycée. Malgré ses efforts pour surmonter sa timidité, il se sent souvent isolé et incapable de défendre ses sentiments, ce qui le conduit à une profonde humiliation.",
+      "homeworkSubtype": "synthese",
+      "homeworkNumber": 1,
+      "hasCorrection": false,
+      "modelUsed": "gpt-4o-mini-v2-fr",
+      "_elapsedMs": 3193
+    },
+    {
+      "resourceId": "cmqte46ly001y142l04scl7yn",
+      "generalSubject": "l'amitié et la cécité précoce",
+      "shortKeyPoints": [
+        "rencontre d'amis",
+        "problème de vue",
+        "émotions d'enfance",
+        "solidarité"
+      ],
+      "description": "Ce devoir de contrôle aborde le thème de l'amitié à travers l'histoire d'un narrateur et de son ami Mouton, qui souffre de problèmes de vue. Les questions portent sur la compréhension du texte et l'analyse linguistique.",
+      "summary": "Le texte présente la relation entre le narrateur et Mouton, un enfant aveugle. À travers des questions de compréhension et d'analyse, les élèves sont invités à réfléchir sur les thèmes de l'amitié et des défis liés à la cécité.",
+      "homeworkSubtype": "controle",
+      "homeworkNumber": 2,
+      "hasCorrection": false,
+      "modelUsed": "gpt-4o-mini-v2-fr",
+      "_elapsedMs": 3413
+    },
+    {
+      "resourceId": "cmqte47yh0022142l6w2478n5",
+      "generalSubject": "choix de métiers des jeunes",
+      "shortKeyPoints": [
+        "métiers refusés",
+        "métiers prisés",
+        "peurs des jeunes",
+        "changement de métier"
+      ],
+      "description": "Ce devoir de contrôle aborde les choix de métiers des jeunes, en se concentrant sur leurs préférences et leurs craintes. Les élèves doivent analyser des questions liées aux métiers et à leur perception.",
+      "summary": "Le document explore les choix professionnels des adolescents, en identifiant les métiers qu'ils refusent et ceux qu'ils privilégient. Il met également en lumière les peurs associées à certaines professions et la possibilité de changer de métier fréquemment.",
+      "homeworkSubtype": "controle",
+      "homeworkNumber": 2,
+      "hasCorrection": false,
+      "modelUsed": "gpt-4o-mini-v2-fr",
+      "_elapsedMs": 2952
+    },
+    {
+      "resourceId": "cmqte48ql0026142lo4kdepoz",
+      "generalSubject": "performance sportive extrême",
+      "shortKeyPoints": [
+        "cyclisme",
+        "Pierre-Michaël Micaletti",
+        "défi",
+        "Tour de France virtuel"
+      ],
+      "description": "Pierre-Michaël Micaletti a parcouru 2738 km en 6 jours sur un vélo à rouleaux, défiant les limites humaines. Son exploit a été suivi par une équipe scientifique.",
+      "summary": "Ce document présente l'exploit de Pierre-Michaël Micaletti, qui a réussi à pédaler non-stop pendant six jours. L'événement, parrainé par Bernard Hinault, visait à étudier les capacités humaines en matière d'endurance.",
+      "homeworkSubtype": "controle",
+      "homeworkNumber": 2,
+      "hasCorrection": false,
+      "modelUsed": "gpt-4o-mini-v2-fr",
+      "_elapsedMs": 2617
+    }
+  ],
+  "errors": []
+}
