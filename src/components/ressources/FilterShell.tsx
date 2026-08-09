@@ -223,31 +223,19 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
   const filtersRef = useRef(filters);
   filtersRef.current = filters;
   useEffect(() => {
-    // PERF/DEBUG 2026-08-09: full instrumentation of the filter flow.
-    // eslint-disable-next-line no-console
-    console.log('[FilterShell] useEffect fired, filterKey:', filterKey);
-
     // Skip the initial fetch on first render if the SSR data already
     // matches the current filter key (prevents the brief "resources
     // appear then disappear" race when the page first hydrates).
     if (isFirstRender.current) {
       isFirstRender.current = false;
       if (filterKey === firstRenderKey.current) {
-        // eslint-disable-next-line no-console
-        console.log('[FilterShell] first render matches SSR, skipping fetch');
         lastFetchKey.current = filterKey; // mark as "already fetched" (with SSR data)
         return;
       }
     }
 
-    if (lastFetchKey.current === filterKey) {
-      // eslint-disable-next-line no-console
-      console.log('[FilterShell] same filterKey as last fetch, skipping');
-      return;
-    }
+    if (lastFetchKey.current === filterKey) return;
     lastFetchKey.current = filterKey;
-    // eslint-disable-next-line no-console
-    console.log('[FilterShell] starting fetch for new filterKey:', filterKey);
 
     const controller = new AbortController();
     const DEBOUNCE_MS = 80;
@@ -277,22 +265,14 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
         params.set('page', String(f.page));
 
         const url = `/api/ressources?${params.toString()}`;
-        // eslint-disable-next-line no-console
-        console.log('[FilterShell] fetching:', url);
         const res = await fetch(url, {
           signal: controller.signal,
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json: ApiResponse = await res.json();
-        // eslint-disable-next-line no-console
-        console.log('[FilterShell] fetch OK, total:', json.total, 'items:', json.resources?.length);
         setData(json);
       } catch (err) {
-        if (err instanceof DOMException && err.name === 'AbortError') {
-          // eslint-disable-next-line no-console
-          console.log('[FilterShell] fetch aborted (newer filter click)');
-          return;
-        }
+        if (err instanceof DOMException && err.name === 'AbortError') return;
         console.error('[FilterShell] fetch error:', err);
       } finally {
         setIsFetching(false);
@@ -312,15 +292,6 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
       // Any filter change resets page to 1
       const next: Record<string, unknown> = { ...patch };
       if (!('page' in patch)) next.page = 1;
-      // PERF/DEBUG 2026-08-09: log every filter change to the console
-      // so the user can verify in DevTools that clicks are registering.
-      // If a click produces no log here, the issue is the click handler
-      // (e.g. CSS pointer-events, or Radix Switch bug returning). If a
-      // log appears but the page doesn't update, the issue is the
-      // useEffect debounce/fetch. Useful for diagnosing "the page
-      // doesn't update" reports.
-      // eslint-disable-next-line no-console
-      console.log('[FilterShell] update() called with:', next);
       startTransition(() => {
         void setFilters(next as any);
       });
