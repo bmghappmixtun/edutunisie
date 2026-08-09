@@ -13,7 +13,7 @@
 // Bump this version to force all clients to drop their old caches
 // and re-fetch the new bundles. Each deploy that touches a JS chunk
 // MUST bump this or users on the old bundle won't see the fix.
-const SW_VERSION = 'v1.0.6';
+const SW_VERSION = 'v1.0.7';
 const STATIC_CACHE = `examanet-static-${SW_VERSION}`;
 const PAGES_CACHE = `examanet-pages-${SW_VERSION}`;
 const API_CACHE = `examanet-api-${SW_VERSION}`;

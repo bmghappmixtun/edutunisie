@@ -210,10 +210,20 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
   }
 
   // ============== FETCH ON FILTER CHANGE (debounced) ==============
+  // BUGFIX 2026-08-09 (FINAL): the dependency array was `[filterKey, filters]`
+  // which caused the effect to re-fire on every render — `filters` is a new
+  // object reference from useQueryStates on every render, even when the
+  // underlying values are identical. The cleanup of each effect run was
+  // calling `clearTimeout(t)`, so the 80ms debounced fetch was cancelled
+  // before it could fire. The user saw the page NOT update on filter click.
+  //
+  // Fix: depend ONLY on `filterKey` (the memoized string). Read the latest
+  // `filters` value via a ref so we always build the URL with the freshest
+  // data without re-triggering the effect.
+  const filtersRef = useRef(filters);
+  filtersRef.current = filters;
   useEffect(() => {
     // PERF/DEBUG 2026-08-09: full instrumentation of the filter flow.
-    // Logs at every decision point so we can see exactly where the
-    // chain breaks when "the page doesn't update" reports come in.
     // eslint-disable-next-line no-console
     console.log('[FilterShell] useEffect fired, filterKey:', filterKey);
 
@@ -240,34 +250,31 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
     console.log('[FilterShell] starting fetch for new filterKey:', filterKey);
 
     const controller = new AbortController();
-    // PERF 2026-08-09: reduced debounce from 200ms → 80ms. The previous
-    // 200ms felt sluggish for category toggles, especially when combined
-    // with the ~250-400ms server round-trip. 80ms is short enough to feel
-    // instant on click but long enough to batch rapid keyboard typing
-    // (e.g. search input).
     const DEBOUNCE_MS = 80;
-    // Show the loading indicator immediately so users get visual feedback
-    // that the click registered, even before the debounce fires.
     setIsFetching(true);
     const t = setTimeout(async () => {
       try {
+        // Read the latest filters from the ref so the URL we build
+        // matches the user's most recent click, even if the effect
+        // was scheduled by a slightly older snapshot.
+        const f = filtersRef.current;
         const params = new URLSearchParams();
-        if (filters.q) params.set('q', filters.q);
-        filters.type.forEach((v) => params.append('type', v));
-        filters.class.forEach((v) => params.append('class', v));
-        filters.section.forEach((v) => params.append('section', v));
-        filters.subject.forEach((v) => params.append('subject', v));
-        filters.trimestre.forEach((v) => params.append('trimestre', v));
-        filters.year.forEach((v) => params.append('year', v));
-        filters.language.forEach((v) => params.append('language', v));
-        if (filters.hasCorrection) params.set('hasCorrection', '1');
-        if (filters.collegePilote) params.set('collegePilote', '1');
-        if (filters.collegeOrdinaire) params.set('collegeOrdinaire', '1');
-        if (filters.lyceePilote) params.set('lyceePilote', '1');
-        if (filters.lyceeOrdinaire) params.set('lyceeOrdinaire', '1');
-        if (filters.teacherId) params.set('teacherId', filters.teacherId);
-        params.set('sort', filters.sort);
-        params.set('page', String(filters.page));
+        if (f.q) params.set('q', f.q);
+        f.type.forEach((v) => params.append('type', v));
+        f.class.forEach((v) => params.append('class', v));
+        f.section.forEach((v) => params.append('section', v));
+        f.subject.forEach((v) => params.append('subject', v));
+        f.trimestre.forEach((v) => params.append('trimestre', v));
+        f.year.forEach((v) => params.append('year', v));
+        f.language.forEach((v) => params.append('language', v));
+        if (f.hasCorrection) params.set('hasCorrection', '1');
+        if (f.collegePilote) params.set('collegePilote', '1');
+        if (f.collegeOrdinaire) params.set('collegeOrdinaire', '1');
+        if (f.lyceePilote) params.set('lyceePilote', '1');
+        if (f.lyceeOrdinaire) params.set('lyceeOrdinaire', '1');
+        if (f.teacherId) params.set('teacherId', f.teacherId);
+        params.set('sort', f.sort);
+        params.set('page', String(f.page));
 
         const url = `/api/ressources?${params.toString()}`;
         // eslint-disable-next-line no-console
@@ -296,7 +303,8 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
       controller.abort();
       setIsFetching(false);
     };
-  }, [filterKey, filters]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filterKey]);
 
   // ============== MUTATIONS ==============
   const update = useCallback(
