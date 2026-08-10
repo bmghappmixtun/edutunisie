@@ -741,9 +741,21 @@ function ChangePassword() {
         toast.error(data.error);
         return;
       }
-      toast.success('Mot de passe changé ✅ — Un email de confirmation vous a été envoyé', {
-        duration: 6000,
-      });
+
+      // Build an honest toast that reports what actually happened
+      const parts: string[] = ['Mot de passe changé ✅'];
+      if (data.sessionsInvalidated > 0) {
+        parts.push(
+          `${data.sessionsInvalidated} autre${data.sessionsInvalidated > 1 ? 's' : ''} session${data.sessionsInvalidated > 1 ? 's' : ''} déconnectée${data.sessionsInvalidated > 1 ? 's' : ''}`,
+        );
+      }
+      if (data.emailSent === true) {
+        parts.push('email de confirmation envoyé');
+      } else if (data.emailSent === false) {
+        parts.push("⚠️ email de confirmation NON envoyé (vérifiez vos spams ou contactez l'admin)");
+      }
+      toast.success(parts.join(' — '), { duration: 8000 });
+
       setCurrent('');
       setNext('');
       setConfirm('');

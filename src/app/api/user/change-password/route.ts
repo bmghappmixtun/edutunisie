@@ -13,25 +13,31 @@ export const dynamic = 'force-dynamic';
  *  4. New password must differ from current (prevents accidental same-password)
  *  5. Password length 8-128 chars
  *  6. Rate limit: 3 changes per hour per user (prevents brute force / abuse)
- *  7. Session is re-validated after change (JWT gets new timestamp)
- *  8. All other sessions are NOT invalidated (we don't have a session list)
- *     → Email is the recovery path if attacker changes pwd
- *  9. Confirmation email sent with IP, UA, timestamp + "if not you" warning
- * 10. Audit log records the change (email, userId, ip)
+ *  7. Confirmation email sent with IP, UA, timestamp + "if not you" warning
+ *  8. **All other sessions for this user are invalidated** (anti-hijacking:
+ *     if an attacker had a stolen cookie, they are kicked out on pwd change)
+ *  9. The current session is kept (user keeps their own session)
+ * 10. Email send result is returned in the response so the user knows
+ *     if the confirmation actually went out
+ * 11. Audit log records the change (email, userId, ip, invalidated count)
  *
  * POST /api/user/change-password
  *   { currentPassword: string, newPassword: string }
- *   → { success: true }
+ *   → { success: true, emailSent: boolean, sessionsInvalidated: number }
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
+import { cookies } from 'next/headers';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { sendPasswordChangedEmail } from '@/lib/email';
 import { getClientIp } from '@/lib/security';
 
 export const runtime = 'nodejs';
+
+const SESSION_COOKIE =
+  process.env.NODE_ENV === 'production' ? '__Secure-examanet_session' : 'examanet_session';
 
 const MIN_PASSWORD_LENGTH = 8;
 const MAX_PASSWORD_LENGTH = 128;
@@ -133,21 +139,56 @@ export async function POST(req: NextRequest) {
     },
   });
 
-  // Audit log
-  console.log(`[change-password] success userId=${user.id} email=${user.email} ip=${ip}`);
-
-  // Send confirmation email (non-blocking — log on failure, don't fail the request)
-  sendPasswordChangedEmail({
-    to: user.email,
-    firstName: user.firstName ?? '',
-    ip,
-    userAgent,
-  }).catch((err) => {
-    console.error('[change-password] confirmation email failed', err);
+  // SECURITY: invalidate all other sessions for this user.
+  // The current session (matched by token in cookie) is kept so the user
+  // doesn't get logged out of the device they used to change the password.
+  // Any stolen cookies / other devices are forced to re-authenticate.
+  const currentToken = (await cookies()).get(SESSION_COOKIE)?.value;
+  const invalidateResult = await prisma.session.deleteMany({
+    where: {
+      userId: user.id,
+      ...(currentToken ? { NOT: { token: currentToken } } : {}),
+    },
   });
+  const sessionsInvalidated = invalidateResult.count;
+  console.log(
+    `[change-password] invalidated ${sessionsInvalidated} other session(s) for userId=${user.id}`,
+  );
+
+  // Audit log
+  console.log(
+    `[change-password] success userId=${user.id} email=${user.email} ip=${ip} sessionsInvalidated=${sessionsInvalidated}`,
+  );
+
+  // Send confirmation email — BLOCKING so we can report the status to the user.
+  // Old behavior used .catch() which silently swallowed failures, leaving the
+  // user thinking they got a confirmation email when they didn't.
+  let emailSent = false;
+  let emailError: string | null = null;
+  try {
+    const result = await sendPasswordChangedEmail({
+      to: user.email,
+      firstName: user.firstName ?? '',
+      ip,
+      userAgent,
+    });
+    emailSent = result.success;
+    if (!result.success) {
+      emailError = result.error || 'unknown error';
+      console.error(
+        `[change-password] confirmation email FAILED userId=${user.id} reason=${emailError}`,
+      );
+    }
+  } catch (err: any) {
+    emailError = err?.message || 'unknown error';
+    console.error('[change-password] confirmation email threw', err);
+  }
 
   return NextResponse.json({
     success: true,
     message: 'Mot de passe changé avec succès',
+    emailSent,
+    emailError,
+    sessionsInvalidated,
   });
 }
