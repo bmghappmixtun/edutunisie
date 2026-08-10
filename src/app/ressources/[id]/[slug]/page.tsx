@@ -204,6 +204,11 @@ export default async function ResourcePage({
         }
       : null;
   if (!resource) notFound();
+  // 301 redirect to canonical slug when the requested slug is outdated
+  // (titles get rebuilt periodically; this preserves SEO equity from old links).
+  if (slug !== resource.slug) {
+    redirect(`/ressources/${resource.numericId}/${resource.slug}`);
+  }
   // PUBLISHED resources are fully public. ARCHIVED ones still load (so users
   // following old links / SEO see a friendly message instead of a 404), but
   // we skip the body (no PDF, no view tracking) below. DRAFT/PENDING/REJECTED
