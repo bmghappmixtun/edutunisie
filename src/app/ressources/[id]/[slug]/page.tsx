@@ -1,4 +1,4 @@
-import { notFound, redirect } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
@@ -207,7 +207,7 @@ export default async function ResourcePage({
   // 301 redirect to canonical slug when the requested slug is outdated
   // (titles get rebuilt periodically; this preserves SEO equity from old links).
   if (slug !== resource.slug) {
-    redirect(`/ressources/${resource.numericId}/${resource.slug}`);
+    permanentRedirect(`/ressources/${resource.numericId}/${resource.slug}`);
   }
   // PUBLISHED resources are fully public. ARCHIVED ones still load (so users
   // following old links / SEO see a friendly message instead of a 404), but
