@@ -689,7 +689,7 @@ export default async function ResourcePage({
                       so its card title stays in French ("Points clés") even if resource.lang === 'ar'
                     - Per user rule (2026-08-06): merge long (keyPoints) + short (shortKeyPoints) KP
                       in alternation, max 10 bubbles total. Short KP = lighter shade
-                      but SAME font size/padding as long KP (2026-08-06 update). */}
+                      but SAME font size/padding as long KP (2026-08-10 update). */}
                 {(() => {
                   // Per user rule (2026-08-09): Points clés card MIXES long KP (full
                   // sentences) + short KP (2-3 word concepts) in alternation.
@@ -715,7 +715,7 @@ export default async function ResourcePage({
                   const isArDoc = resource.language === 'ar' && !isPilotePhysiqueCollege;
                   const titleAlignRight = isArDoc;
                   const keyPointsTitle = isArDoc ? 'النقاط الرئيسية' : 'Points clés';
-                  // Long KP: full color, normal font. Short KP: lighter shade + smaller font.
+                  // Long KP: full color. Short KP: lighter shade. Both same size (2026-08-10).
                   const longPalette = [
                     'bg-rose-100 text-rose-800 border-rose-300',
                     'bg-fuchsia-100 text-fuchsia-800 border-fuchsia-300',
@@ -746,8 +746,9 @@ export default async function ResourcePage({
                         const colorClass = palette[i % palette.length];
                         const searchQuery = encodeURIComponent(kp.text);
                         const searchHref = `/recherche?q=${searchQuery}`;
-                        // Short KP: smaller font (text-xs) + same padding for visual distinction
-                        const sizeClass = kp.isShort ? 'text-xs px-2.5 py-1' : 'text-sm px-3 py-1.5';
+                        // Per user rule (2026-08-10): SAME font and size for short + long KP.
+                        // Visual distinction is only via the lighter/darker color palette.
+                        const sizeClass = 'text-sm px-3 py-1.5';
                         return (
                         <Link
                           key={`${kp.isShort ? 's' : 'l'}-${i}`}
