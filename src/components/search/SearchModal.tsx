@@ -247,6 +247,7 @@ export default function SearchModal({ open, onClose, initialQuery = '' }: Search
   );
 
   if (!mounted) return null;
+  if (!open) return null;
 
   const hasQuery = query.trim().length >= 2;
   const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform);
