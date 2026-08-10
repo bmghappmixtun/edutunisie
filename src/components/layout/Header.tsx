@@ -5,8 +5,7 @@ import { prisma } from '@/lib/prisma';
 import UserMenu from './UserMenu';
 import MobileMenu from './MobileMenu';
 import LanguageSwitcher from './LanguageSwitcher';
-import HoverSearchBar from '@/components/search/HoverSearchBar';
-import MobileSearchTrigger from '@/components/search/MobileSearchTrigger';
+import SearchModalTrigger from '@/components/search/SearchModalTrigger';
 import { getT } from '@/lib/i18n-server';
 
 export const dynamic = 'force-dynamic';
@@ -82,8 +81,7 @@ export default async function Header() {
 
           {/* RIGHT: Search + actions */}
           <div className="flex-1 flex items-center justify-end gap-2 min-w-0">
-            <HoverSearchBar />
-            <MobileSearchTrigger />
+            <SearchModalTrigger />
             <LanguageSwitcher />
             {user ? (
               <UserMenu user={user} unreadCount={unreadNotifications} />
