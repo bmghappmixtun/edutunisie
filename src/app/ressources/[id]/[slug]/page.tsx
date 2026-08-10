@@ -15,6 +15,7 @@ import CommentsSection from '@/components/resources/CommentsSection';
 import ResourceInfoPanel from '@/components/resources/ResourceInfoPanel';
 import AiDescription from '@/components/resources/AiDescription';
 import AiContentSection from '@/components/resources/AiContentSection';
+import AiExerciseOverview from '@/components/resources/AiExerciseOverview';
 import { getPaletteForSubject } from '@/lib/ai-palettes';
 // NOTE: getPaletteForSubject is kept for future use but currently no consumer
 // in this file (the "Sujets abordés" section was removed 2026-08-02 since
@@ -652,6 +653,24 @@ export default async function ResourcePage({
                         hideFields={hideFields}
                       />
                     </div>
+                  );
+                })()}
+
+                {/* AI Exercise Overview — Per user rule (2026-08-10):
+                    Display the AI-extracted exercise summaries (from ResourceMetadata.keyInsights)
+                    as a separate collapsible card between the AI Summary and the "Points clés" card.
+                    Shows a chip count (X physique + Y chimie) and a list of each exercise with
+                    its 1-sentence summary. Per user rule, hidden for course files (no exercises). */}
+                {(() => {
+                  const keyInsights = (resource.metadata as any)?.keyInsights as string[] | undefined;
+                  // Don't show for course files (no exercises)
+                  if (resource.type === 'COURSE') return null;
+                  if (!keyInsights || keyInsights.length === 0) return null;
+                  return (
+                    <AiExerciseOverview
+                      keyInsights={keyInsights}
+                      subjectSlug={resource.subject?.slug}
+                    />
                   );
                 })()}
 
