@@ -1,6 +1,6 @@
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
-import { Loader2, BookOpen, FileText, Star, Eye, Download } from 'lucide-react';
+import { Loader2, FileText, Star, Eye, Download } from 'lucide-react';
 
 /**
  * Per-route loading state for /ressources/[id]/[slug]
@@ -29,22 +29,29 @@ export default function Loading() {
       <Header />
       <main className="flex-1 pt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          {/* Loading hero with icon */}
-          <div className="text-center py-12">
-            <div className="relative inline-flex items-center justify-center mb-6">
-              <div className="absolute inset-0 bg-primary-200 rounded-full blur-2xl opacity-50 animate-pulse" />
-              <div className="relative flex items-center gap-3">
-                <BookOpen className="w-10 h-10 text-sky-500 animate-pulse" />
-                <Loader2 className="w-12 h-12 text-primary-500 animate-spin" />
-                <BookOpen className="w-10 h-10 text-purple-500 animate-pulse" />
-              </div>
-            </div>
-            <h1 className="text-2xl font-bold text-slate-700 mb-1">Chargement en cours…</h1>
-            <p className="text-slate-500">Récupération de la ressource et de son aperçu</p>
-          </div>
+          {/* Breadcrumb nav skeleton — MUST be a <nav> to match the page's
+              first child element type. Previously this was a `<div className="text-center py-12">`
+              loading hero, but the page renders a `<nav aria-label="Fil d'Ariane">`
+              here. Same position, different element type → React #418/#422
+              (minified to #419 in production) hydration error when the
+              Suspense fallback is replaced by the streamed content.
+              Errors: ERR-G8SE85 (35× on /ar/ressources/8477/...) and
+              ERR-4UFBXH (4× on /ressources/15333/...) in 2026-08-10 nightly. */}
+          <nav
+            aria-label="Fil d'Ariane"
+            className="flex items-center gap-1 text-xs text-slate-500 mb-4 flex-wrap"
+          >
+            <div className="h-3 w-12 bg-slate-200 rounded animate-pulse" />
+            <div className="h-3 w-3 bg-slate-200 rounded-full animate-pulse" />
+            <div className="h-3 w-16 bg-slate-200 rounded animate-pulse" />
+            <div className="h-3 w-3 bg-slate-200 rounded-full animate-pulse" />
+            <div className="h-3 w-20 bg-slate-200 rounded animate-pulse" />
+            <div className="h-3 w-3 bg-slate-200 rounded-full animate-pulse" />
+            <div className="h-3 w-16 bg-slate-200 rounded animate-pulse" />
+          </nav>
 
           {/* Page structure skeleton matching the actual layout */}
-          <div className="grid lg:grid-cols-[1fr_360px] gap-6 mt-6">
+          <div className="grid lg:grid-cols-[1fr_360px] gap-6">
             {/* MAIN COLUMN */}
             <div className="space-y-6">
               {/* Title + breadcrumb skeleton */}
