@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { 
   AlertTriangle, CheckCircle, Clock, Mail, User, Globe, 
   RefreshCw, Filter, ExternalLink, X, ChevronDown, ChevronRight,
-  Activity, Server, AlertOctagon, Info, Search
+  Activity, Server, AlertOctagon, Info, Search, Trash2
 } from 'lucide-react';
 
 type Period = '1h' | '24h' | '7d' | '30d';
@@ -81,6 +81,13 @@ export default function AdminErrorsPage() {
   const [error, setError] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
+  // Clear history dialog state
+  const [clearDialog, setClearDialog] = useState(false);
+  const [clearSource, setClearSource] = useState<'all' | 'vercel' | 'errorlog'>('all');
+  const [clearDays, setClearDays] = useState<number | null>(null);
+  const [clearing, setClearing] = useState(false);
+  const [preview, setPreview] = useState<{ vercel: number; errorlog: number } | null>(null);
+
   // Fetch function
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -103,6 +110,50 @@ export default function AdminErrorsPage() {
       setLoading(false);
     }
   }, [period, source, severity]);
+
+  // Preview what will be deleted
+  const openClearDialog = useCallback(async () => {
+    setClearDialog(true);
+    setPreview(null);
+    try {
+      const params = new URLSearchParams();
+      params.set('source', clearSource);
+      if (clearDays != null) params.set('olderThanDays', String(clearDays));
+      const res = await fetch(`/api/admin/logs/clear?${params}`);
+      if (res.ok) {
+        const d = await res.json();
+        setPreview(d.wouldDelete);
+      }
+    } catch {}
+  }, [clearSource, clearDays]);
+
+  // Refresh preview when filters change
+  useEffect(() => {
+    if (!clearDialog) return;
+    openClearDialog();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clearSource, clearDays, clearDialog]);
+
+  const confirmClear = useCallback(async () => {
+    setClearing(true);
+    try {
+      const res = await fetch('/api/admin/logs/clear', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ source: clearSource, olderThanDays: clearDays }),
+      });
+      if (!res.ok) throw new Error('Suppression échouée');
+      const d = await res.json();
+      setClearDialog(false);
+      // Refresh data
+      await fetchData();
+      alert(`✓ ${d.deleted.vercel} entrée(s) Vercel + ${d.deleted.errorlog} entrée(s) ErrorLog supprimées`);
+    } catch (e: any) {
+      alert('Erreur : ' + e.message);
+    } finally {
+      setClearing(false);
+    }
+  }, [clearSource, clearDays, fetchData]);
 
   // Initial + auto-refresh
   useEffect(() => {
@@ -190,8 +241,88 @@ export default function AdminErrorsPage() {
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
               Rafraîchir
             </button>
+            <button
+              onClick={openClearDialog}
+              disabled={totalCount === 0}
+              className="flex items-center gap-1.5 px-3 py-2 text-sm bg-white text-red-700 border border-red-200 hover:bg-red-50 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Supprimer l'historique"
+            >
+              <Trash2 className="w-4 h-4" />
+              <span className="hidden sm:inline">Vider l'historique</span>
+            </button>
           </div>
         </div>
+
+        {/* Clear history dialog */}
+        {clearDialog && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+              <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <Trash2 className="w-5 h-5 text-red-600" />
+                Supprimer l'historique
+              </h3>
+              <p className="text-sm text-slate-600 mt-2">
+                Cette action est <strong>irréversible</strong>. Toutes les entrées correspondant aux critères ci-dessous seront définitivement supprimées.
+              </p>
+
+              <div className="mt-4 space-y-3">
+                <div>
+                  <label className="text-sm font-medium text-slate-700">Source</label>
+                  <select
+                    value={clearSource}
+                    onChange={e => setClearSource(e.target.value as 'all' | 'vercel' | 'errorlog')}
+                    className="mt-1 w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  >
+                    <option value="all">Toutes ({preview?.vercel != null && preview?.errorlog != null ? preview.vercel + preview.errorlog : '…'} entrées)</option>
+                    <option value="vercel">Vercel uniquement ({preview?.vercel ?? '…'})</option>
+                    <option value="errorlog">ErrorLog uniquement ({preview?.errorlog ?? '…'})</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-slate-700">Ancienneté</label>
+                  <select
+                    value={clearDays ?? ''}
+                    onChange={e => setClearDays(e.target.value === '' ? null : Number(e.target.value))}
+                    className="mt-1 w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  >
+                    <option value="">Tout supprimer</option>
+                    <option value="1">Plus d'1 jour</option>
+                    <option value="7">Plus de 7 jours</option>
+                    <option value="30">Plus de 30 jours</option>
+                  </select>
+                </div>
+
+                {preview && (
+                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm">
+                    <strong>Suppression prévue :</strong>
+                    <ul className="mt-1 text-slate-600">
+                      {clearSource !== 'errorlog' && <li>• {preview.vercel} entrée(s) Vercel</li>}
+                      {clearSource !== 'vercel' && <li>• {preview.errorlog} entrée(s) ErrorLog</li>}
+                    </ul>
+                  </div>
+                )}
+              </div>
+
+              <div className="mt-6 flex justify-end gap-2">
+                <button
+                  onClick={() => setClearDialog(false)}
+                  className="px-4 py-2 text-sm bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition"
+                >
+                  Annuler
+                </button>
+                <button
+                  onClick={confirmClear}
+                  disabled={clearing}
+                  className="flex items-center gap-1.5 px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition disabled:opacity-50"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  {clearing ? 'Suppression…' : 'Supprimer définitivement'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Filters bar */}
         <div className="bg-white border border-slate-200 rounded-2xl p-4 mb-4 shadow-sm">
