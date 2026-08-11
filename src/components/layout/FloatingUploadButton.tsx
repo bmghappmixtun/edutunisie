@@ -1,5 +1,6 @@
 'use client';
 import { Link } from '@/i18n/navigation';
+import NextLink from 'next/link';
 import { Upload, Lock } from 'lucide-react';
 import { useState, useEffect } from 'react';
 

@@ -1,4 +1,5 @@
 import { Link } from '@/i18n/navigation';
+import NextLink from 'next/link';
 import Image from 'next/image';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
@@ -93,9 +94,9 @@ export default async function Header() {
                 >
                   {t('nav.login')}
                 </Link>
-                <Link href="/inscription" className="btn-primary text-sm">
+                <NextLink href="/inscription" className="btn-primary text-sm">
                   {t('nav.signup')}
-                </Link>
+                </NextLink>
               </>
             )}
             <MobileMenu user={user} />

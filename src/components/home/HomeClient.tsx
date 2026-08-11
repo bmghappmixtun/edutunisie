@@ -1,5 +1,6 @@
 'use client';
 import { Link } from '@/i18n/navigation';
+import NextLink from 'next/link';
 import {
   Search,
   BookOpen,
@@ -127,9 +128,9 @@ export default function HomeClient({
                 <Link href="/ressources" className="btn-primary text-base px-7 py-3.5">
                   <BookOpen className="w-5 h-5" /> {t('home.exploreResources')}
                 </Link>
-                <Link href="/inscription" className="btn-accent text-base px-7 py-3.5">
+                <NextLink href="/inscription" className="btn-accent text-base px-7 py-3.5">
                   <Upload className="w-5 h-5" /> {t('home.becomeTeacher')}
-                </Link>
+                </NextLink>
               </div>
             </div>
 
@@ -435,9 +436,9 @@ export default function HomeClient({
                   </div>
                 </div>
               ))}
-              <Link href="/inscription" className="btn-accent mt-4">
+              <NextLink href="/inscription" className="btn-accent mt-4">
                 {t('home.becomeTeacher')} <ArrowRight className="w-4 h-4 rtl:rotate-180" />
-              </Link>
+              </NextLink>
             </div>
           </div>
         </div>
