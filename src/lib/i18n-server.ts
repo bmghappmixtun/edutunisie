@@ -25,7 +25,7 @@ export function getServerLocale(): Locale {
     const xPathname = headerStore.get('x-pathname') || headerStore.get('x-invoke-path') || '';
     if (xPathname.startsWith('/ar') || xPathname.startsWith('/ar/')) return 'ar';
 
-    // 3. Cookie (set by LanguageSwitcher or middleware)
+    // 3. Cookie (set by LanguagePicker or middleware)
     const cookieStore = cookies();
     const cookieLocale = cookieStore.get('locale')?.value as Locale | undefined;
     if (cookieLocale === 'fr' || cookieLocale === 'ar') return cookieLocale;

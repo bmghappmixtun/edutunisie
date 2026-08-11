@@ -5,7 +5,6 @@ import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import UserMenu from './UserMenu';
 import MobileMenu from './MobileMenu';
-import LanguageSwitcher from './LanguageSwitcher';
 import SearchModalTrigger from '@/components/search/SearchModalTrigger';
 import { getTranslations } from 'next-intl/server';
 
@@ -83,7 +82,6 @@ export default async function Header() {
           {/* RIGHT: Search + actions */}
           <div className="flex-1 flex items-center justify-end gap-2 min-w-0">
             <SearchModalTrigger />
-            <LanguageSwitcher />
             {user ? (
               <UserMenu user={user} unreadCount={unreadNotifications} />
             ) : (
