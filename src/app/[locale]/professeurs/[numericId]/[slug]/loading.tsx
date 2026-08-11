@@ -1,6 +1,3 @@
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
-
 /**
  * Per-route loading state for /professeurs/[numericId]/[slug]
  *
@@ -53,8 +50,6 @@ export default function Loading() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: '{}' }}
       />
-
-      <Header />
 
       <main className="flex-1 pt-20">
         {/* Breadcrumb skeleton — <nav> (NOT <div>) to match the page's actual
@@ -266,7 +261,6 @@ export default function Loading() {
         </div>
       </main>
 
-      <Footer />
-    </div>
+      </div>
   );
 }

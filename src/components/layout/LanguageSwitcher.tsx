@@ -1,57 +1,34 @@
 'use client';
-import { useI18n } from '@/lib/i18n';
+import { useLocale } from 'next-intl';
 import { Globe } from 'lucide-react';
-import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
+import { Link } from '@/i18n/navigation';
 
 /**
- * AR URL Routing Aware Language Switcher
+ * Language Switcher (next-intl version)
  *
- * - On FR page: clicking AR navigates to /ar/{current-path}
- * - On AR page: clicking FR navigates to {path without /ar prefix}
- * - Maintains search params
- * - Updates locale cookie too (for SSR consistency)
+ * Uses next-intl's `Link` with the `locale` prop to switch languages.
+ * - Auto-handles URL prefixing (strips /fr/ when switching to /ar/, adds /ar/ when switching from /fr/)
+ * - Preserves the current page (just changes locale)
+ * - Updates the NEXT_LOCALE cookie via next-intl
  */
 export default function LanguageSwitcher() {
-  const { locale, setLocale } = useI18n();
-  const router = useRouter();
+  const locale = useLocale() as 'fr' | 'ar';
   const pathname = usePathname();
-  const [search, setSearch] = useState('');
-
-  useEffect(() => {
-    setSearch(window.location.search);
-  }, [pathname]);
-
-  function switchLocale() {
-    const newLocale = locale === 'fr' ? 'ar' : 'fr';
-    // Compute target URL
-    let targetPath: string;
-    if (newLocale === 'ar') {
-      // Add /ar prefix if not already present
-      targetPath = pathname.startsWith('/ar') ? pathname : `/ar${pathname === '/' ? '' : pathname}`;
-    } else {
-      // Remove /ar prefix
-      targetPath = pathname.replace(/^\/ar/, '') || '/';
-    }
-
-    // Set cookie for SSR consistency (1 year)
-    document.cookie = `locale=${newLocale}; path=/; max-age=31536000; SameSite=Lax`;
-    setLocale(newLocale);
-
-    // Navigate to new URL (real URL change — shareable)
-    router.push(targetPath + search);
-  }
+  const targetLocale = locale === 'fr' ? 'ar' : 'fr';
+  const targetLabel = locale === 'fr' ? 'AR' : 'FR';
 
   return (
-    <button
-      onClick={switchLocale}
+    <Link
+      href={pathname}
+      locale={targetLocale}
       className="flex items-center gap-1.5 px-3 py-1.5 min-h-[44px] text-sm font-medium text-slate-600 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition"
-      title="Changer de langue / تغيير اللغة"
-      aria-label={`Switch to ${locale === 'fr' ? 'Arabic' : 'French'}`}
+      title={locale === 'fr' ? 'تغيير اللغة' : 'Changer de langue'}
+      aria-label={`Switch to ${targetLocale === 'ar' ? 'Arabic' : 'French'}`}
     >
       <Globe className="w-4 h-4" />
-      <span className="font-bold">{locale === 'fr' ? 'FR' : 'AR'}</span>
-      <span className="text-xs text-slate-400">→ {locale === 'fr' ? 'AR' : 'FR'}</span>
-    </button>
+      <span className="font-bold">{targetLabel}</span>
+      <span className="text-xs text-slate-400">→ {targetLabel === 'FR' ? 'AR' : 'FR'}</span>
+    </Link>
   );
 }

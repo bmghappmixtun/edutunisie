@@ -1,10 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
 import { prisma } from '@/lib/prisma';
 import { itemListSchema } from '@/lib/structured-data';
-import { getLocale, getT } from '@/lib/i18n-server';
+import { getTranslations, getLocale } from 'next-intl/server';
 import {
   BookOpen,
   ArrowRight,
@@ -19,7 +17,7 @@ import {
 import ClassAccordion from '@/components/niveaux/ClassAccordion';
 
 export async function generateMetadata(): Promise<Metadata> {
-  const locale = getLocale();
+  const locale = await getLocale();
   const isAr = locale === 'ar';
   return {
     title: isAr
@@ -125,8 +123,8 @@ function sectionStyle(classSlug: string, sectionSlug: string): { emoji: string; 
 const CLASSES_WITH_SECTIONS = new Set(['2eme-secondaire', '3eme-secondaire', '4eme-secondaire']);
 
 export default async function NiveauxPage() {
-  const t = getT();
-  const locale = getLocale();
+  const t = await getTranslations();
+  const locale = await getLocale();
   const isAr = locale === 'ar';
   const levels = await prisma.level.findMany({
     orderBy: { order: 'asc' },
@@ -196,8 +194,6 @@ export default async function NiveauxPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(niveauxListJsonLd) }}
       />
-      <Header />
-
       <main className="flex-1 pt-20">
         {/* ============== HERO ============== */}
         <section className="relative overflow-hidden bg-gradient-to-br from-slate-50 via-primary-50/30 to-indigo-50/30">
@@ -526,7 +522,6 @@ export default async function NiveauxPage() {
           </div>
         </section>
       </main>
-      <Footer />
-    </div>
+      </div>
   );
 }

@@ -1,10 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
 import { getConcoursStats, groupByYear } from '@/lib/concours-9eme-data';
 import { itemListSchema, breadcrumbSchema, SITE_URL } from '@/lib/structured-data';
-import { getLocale, getT } from '@/lib/i18n-server';
+import { getTranslations, getLocale } from 'next-intl/server';
 import { ChevronRight, ArrowLeft } from 'lucide-react';
 import { ConcoursSujetsClient } from './client';
 
@@ -14,9 +12,9 @@ const PAGE_URL = `${SITE_URL}/concours-9eme-tunisie/sujets-passes`;
 const PARENT_URL = `${SITE_URL}/concours-9eme-tunisie`;
 
 export async function generateMetadata(): Promise<Metadata> {
-  const t = getT();
+  const t = await getTranslations();
   const stats = getConcoursStats();
-  const locale = getLocale();
+  const locale = await getLocale();
   const title = t('concours.passes.title')
     .replace('{highlight}', '')
     .replace('{total}', String(stats.totalFiles));
@@ -67,8 +65,8 @@ interface PageProps {
   searchParams: { year?: string; subject?: string; voie?: string; type?: string; q?: string };
 }
 
-export default function ConcoursSujetsPassesPage({ searchParams }: PageProps) {
-  const t = getT();
+export default async function ConcoursSujetsPassesPage({ searchParams }: PageProps) {
+  const t = await getTranslations();
   const stats = getConcoursStats();
   const yearGroups = groupByYear();
 
@@ -161,8 +159,6 @@ export default function ConcoursSujetsPassesPage({ searchParams }: PageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
 
-      <Header />
-
       <main className="flex-1 pt-20">
         {/* COMPACT HERO */}
         <section className="relative bg-gradient-to-br from-primary-50 via-white to-amber-50 py-8 lg:py-12 overflow-hidden">
@@ -247,7 +243,6 @@ export default function ConcoursSujetsPassesPage({ searchParams }: PageProps) {
         />
       </main>
 
-      <Footer />
-    </div>
+      </div>
   );
 }

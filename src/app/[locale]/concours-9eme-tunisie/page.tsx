@@ -1,7 +1,5 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
 import {
   getConcoursStats,
   getCorriges2020Plus,
@@ -16,7 +14,7 @@ import {
   itemListSchema,
   SITE_URL,
 } from '@/lib/structured-data';
-import { getLocale, getT } from '@/lib/i18n-server';
+import { getTranslations, getLocale } from 'next-intl/server';
 import {
   ChevronRight,
   Sparkles,
@@ -43,8 +41,8 @@ const PAGE_URL = `${SITE_URL}/concours-9eme-tunisie`;
 // METADATA — generated dynamically based on locale
 // ============================================================================
 export async function generateMetadata(): Promise<Metadata> {
-  const t = getT();
-  const locale = getLocale();
+  const t = await getTranslations();
+  const locale = await getLocale();
   const stats = getConcoursStats();
   const title = t('concours.meta.title').replace('{total}', String(stats.totalFiles));
   const desc = t('concours.meta.description').replace('{total}', String(stats.totalFiles));
@@ -117,9 +115,9 @@ export async function generateMetadata(): Promise<Metadata> {
 // ============================================================================
 // PAGE
 // ============================================================================
-export default function Concours9emePillar() {
-  const t = getT();
-  const locale = getLocale();
+export default async function Concours9emePillar() {
+  const t = await getTranslations();
+  const locale = await getLocale();
   const stats = getConcoursStats();
   const corriges2020Plus = getCorriges2020Plus();
   const upcoming = getUpcomingCorriges();
@@ -398,7 +396,7 @@ export default function Concours9emePillar() {
     slug: 'concours-9eme-tunisie',
     title: t('concours.meta.title').replace('{total}', String(stats.totalFiles)),
     description: t('concours.meta.description').replace('{total}', String(stats.totalFiles)),
-    language: getLocale(),
+    language: await getLocale(),
     level: '9ème année de base',
     cycle: 'Enseignement de base',
     subject: 'Multidisciplinaire',
@@ -462,8 +460,6 @@ export default function Concours9emePillar() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
       />
-
-      <Header />
 
       <main className="flex-1 pt-20">
         {/* ========== HERO ========== */}
@@ -1216,7 +1212,6 @@ export default function Concours9emePillar() {
         </section>
       </main>
 
-      <Footer />
-    </div>
+      </div>
   );
 }

@@ -1,8 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
 import ResourceCard from '@/components/resources/ResourceCard';
 import { prisma } from '@/lib/prisma';
 import { getUserFavorites, decorateWithFavorites } from '@/lib/resource-helpers';
@@ -370,8 +368,6 @@ export default async function SubjectPage({ params, searchParams }: PageProps) {
         />
       )}
 
-      <Header />
-
       <main className="flex-1 pt-20">
         {/* ============== HERO ============== */}
         <SubjectHero
@@ -546,8 +542,7 @@ export default async function SubjectPage({ params, searchParams }: PageProps) {
         </div>
       </main>
 
-      <Footer />
-    </div>
+      </div>
   );
 }
 

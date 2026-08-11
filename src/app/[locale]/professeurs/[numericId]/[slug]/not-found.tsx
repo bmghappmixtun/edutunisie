@@ -1,8 +1,5 @@
 import Link from 'next/link';
 import { FileQuestion, Home, Search } from 'lucide-react';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
-
 /**
  * Per-route not-found page for /professeurs/[numericId]/[slug]
  *
@@ -64,8 +61,6 @@ export default function NotFound() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: '{}' }}
       />
-
-      <Header />
 
       <main className="flex-1 pt-20">
         {/* 1. Breadcrumb placeholder (hidden via CSS). The page.tsx + loading.tsx
@@ -160,7 +155,6 @@ export default function NotFound() {
         </div>
       </main>
 
-      <Footer />
-    </div>
+      </div>
   );
 }

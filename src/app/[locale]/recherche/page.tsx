@@ -1,19 +1,17 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
 import HideOnScrollSearchBar from '@/components/search/HideOnScrollSearchBar';
 import SearchResultsV2 from '@/components/search/SearchResultsV2';
 import { searchV2, SearchResponse, cachedSearchV2 } from '@/lib/search-v2';
 import { prisma } from '@/lib/prisma';
-import { getLocale } from '@/lib/i18n-server';
+import { getLocale } from 'next-intl/server';
 
 export const dynamic = 'force-dynamic';
 
 // Search results with query params should not be indexed (avoid duplicate
 // + thin content penalty). Base /recherche is indexable.
-export function generateMetadata({ searchParams }: { searchParams: any }): Metadata {
-  const locale = getLocale();
+export async function generateMetadata({ searchParams }: { searchParams: any }): Promise<Metadata> {
+  const locale = await getLocale();
   const isAr = locale === 'ar';
   const hasQuery = !!(searchParams?.q || searchParams?.subject || searchParams?.class);
   return {
@@ -140,7 +138,6 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50">
-      <Header />
       <div className="h-20" />
       <HideOnScrollSearchBar initialQuery={currentQ} />
       <main className="flex-1 mt-6">
@@ -155,7 +152,6 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
           <SearchResultsAsync params={params} />
         </Suspense>
       </main>
-      <Footer />
-    </div>
+      </div>
   );
 }

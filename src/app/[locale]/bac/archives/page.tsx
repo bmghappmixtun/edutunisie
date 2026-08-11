@@ -1,10 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
 import { getBacStats, groupByYearForArchive } from '@/lib/bac-data';
 import { itemListSchema, breadcrumbSchema, SITE_URL } from '@/lib/structured-data';
-import { getLocale, getT, getDict } from '@/lib/i18n-server';
+import { getTranslations, getLocale, getMessages } from 'next-intl/server';
 import { ChevronRight, ArrowLeft } from 'lucide-react';
 import { BacArchivesClient } from './client';
 
@@ -14,7 +12,7 @@ const PAGE_URL = `${SITE_URL}/bac/archives`;
 const PARENT_URL = `${SITE_URL}/bac`;
 
 export async function generateMetadata(): Promise<Metadata> {
-  const locale = getLocale();
+  const locale = await getLocale();
   const isAr = locale === 'ar';
   const stats = getBacStats();
   const title = isAr
@@ -125,10 +123,11 @@ interface PageProps {
   };
 }
 
-export default function BacArchivesPage({ searchParams }: PageProps) {
-  const t = getT();
-  const dict = getDict();
-  const locale = getLocale();
+export default async function BacArchivesPage({ searchParams }: PageProps) {
+  const t = await getTranslations();
+  const dict = await getTranslations();
+  const messages = await getMessages();
+  const locale = await getLocale();
   const isAr = locale === 'ar';
 
   const stats = getBacStats();
@@ -212,8 +211,6 @@ export default function BacArchivesPage({ searchParams }: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-
-      <Header />
 
       <main className="flex-1 pt-20">
         {/* COMPACT HERO */}
@@ -341,7 +338,6 @@ export default function BacArchivesPage({ searchParams }: PageProps) {
         />
       </main>
 
-      <Footer />
-    </div>
+      </div>
   );
 }

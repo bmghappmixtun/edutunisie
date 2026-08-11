@@ -1,14 +1,12 @@
 import type { Metadata } from 'next';
 import { Scale, CheckCircle } from 'lucide-react';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
-import { getLocale, getT, getDict } from '@/lib/i18n-server';
+import { getTranslations, getLocale, getMessages } from 'next-intl/server';
 import { breadcrumbSchema, SITE_URL } from '@/lib/structured-data';
 
 export const revalidate = 3600; // 1 hour cache
 
 export async function generateMetadata(): Promise<Metadata> {
-  const locale = getLocale();
+  const locale = await getLocale();
   const isAr = locale === 'ar';
   return {
     title: isAr ? 'شروط الاستخدام — إكسامانت' : "CGU — Conditions Générales d'Utilisation",
@@ -24,11 +22,12 @@ const breadcrumbJsonLd = breadcrumbSchema([
   { name: 'CGU', url: `${SITE_URL}/cgu` },
 ]);
 
-export default function CGUPage() {
-  const t = getT();
-  const dict = getDict();
+export default async function CGUPage() {
+  const t = await getTranslations();
+  const dict = await getTranslations();
+  const messages = await getMessages();
   const sections =
-    (dict.cgu?.sections as Array<{ id: string; title: string; content: string }>) || [];
+    (messages.cgu?.sections as Array<{ id: string; title: string; content: string }>) || [];
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -36,8 +35,6 @@ export default function CGUPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-      <Header />
-
       <main className="flex-1 pt-16 lg:pt-20">
         {/* HERO */}
         <section className="bg-gradient-to-br from-primary-50 via-white to-sky-50 py-12 lg:py-16">
@@ -116,7 +113,6 @@ export default function CGUPage() {
         </article>
       </main>
 
-      <Footer />
-    </div>
+      </div>
   );
 }

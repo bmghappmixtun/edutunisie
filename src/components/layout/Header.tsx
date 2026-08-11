@@ -6,13 +6,13 @@ import UserMenu from './UserMenu';
 import MobileMenu from './MobileMenu';
 import LanguageSwitcher from './LanguageSwitcher';
 import SearchModalTrigger from '@/components/search/SearchModalTrigger';
-import { getT } from '@/lib/i18n-server';
+import { getTranslations } from 'next-intl/server';
 
 export const dynamic = 'force-dynamic';
 
 export default async function Header() {
   const user = await getCurrentUser();
-  const t = getT();
+  const t = await getTranslations();
   const unreadNotifications = user
     ? await prisma.notification.count({ where: { userId: user.id, isRead: false } })
     : 0;

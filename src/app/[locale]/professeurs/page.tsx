@@ -1,9 +1,7 @@
 import Link from 'next/link';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
 import { prisma } from '@/lib/prisma';
 import { itemListSchema, breadcrumbSchema, SITE_URL } from '@/lib/structured-data';
-import { getLocale, getT } from '@/lib/i18n-server';
+import { getTranslations, getLocale } from 'next-intl/server';
 import {
   GraduationCap,
   MapPin,
@@ -39,7 +37,7 @@ type SearchParams = {
 export async function generateMetadata({ searchParams }: { searchParams: Promise<SearchParams> }) {
   const sp = await searchParams;
   const total = await prisma.user.count({ where: { role: 'TEACHER', status: 'ACTIVE' } });
-  const locale = getLocale();
+  const locale = await getLocale();
   const isAr = locale === 'ar';
   return {
     title: isAr ? `المعلمون — ${total} معلم معتمد` : `Professeurs — ${total} enseignants certifiés`,
@@ -73,7 +71,7 @@ const breadcrumbJsonLd = breadcrumbSchema([
 ]);
 
 export default async function TeachersPage(props: { searchParams: Promise<SearchParams> }) {
-  const tt = getT();
+  const tt = await getTranslations();
   const sp = await props.searchParams;
   const q = (sp.q || '').trim();
   const subjectSlugs = (sp.subject || '').split(',').filter(Boolean);
@@ -433,7 +431,6 @@ export default async function TeachersPage(props: { searchParams: Promise<Search
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-      <Header />
       <main className="flex-1 pt-20">
         {/* HERO */}
         <section className="bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 py-12 lg:py-16 border-b border-amber-100">
@@ -539,8 +536,7 @@ export default async function TeachersPage(props: { searchParams: Promise<Search
           </div>
         </section>
       </main>
-      <Footer />
-    </div>
+      </div>
   );
 }
 
@@ -880,7 +876,6 @@ async function renderEmpty(props: any) {
   } = props;
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
       <main className="flex-1 pt-20">
         <section className="bg-gradient-to-br from-amber-50 to-orange-50 py-12">
           <div className="max-w-7xl mx-auto px-4">
@@ -912,8 +907,7 @@ async function renderEmpty(props: any) {
           </div>
         </section>
       </main>
-      <Footer />
-    </div>
+      </div>
   );
 }
 

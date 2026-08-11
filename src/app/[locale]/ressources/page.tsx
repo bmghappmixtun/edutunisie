@@ -1,9 +1,7 @@
 import type { Metadata } from 'next';
 import { Prisma } from '@prisma/client';
 import { redirect } from 'next/navigation';
-import Header from '@/components/layout/Header';
-import { getLocale } from '@/lib/i18n-server';
-import Footer from '@/components/layout/Footer';
+import { getLocale } from 'next-intl/server';
 import { prisma } from '@/lib/prisma';
 import { getUserFavorites } from '@/lib/resource-helpers';
 import { itemListSchema } from '@/lib/structured-data';
@@ -29,7 +27,7 @@ export async function generateMetadata({
 }: {
   searchParams: Promise<SearchParams>;
 }): Promise<Metadata> {
-  const locale = getLocale();
+  const locale = await getLocale();
   const isAr = locale === 'ar';
   const sp = await searchParams;
   const teacherNumericId = sp.teacherId ? parseInt(sp.teacherId, 10) : null;
@@ -664,8 +662,6 @@ export default async function ResourcesPage(props: { searchParams: Promise<Searc
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLd ? JSON.stringify(jsonLd) : '{}' }}
       />
-      <Header />
-
       <main className="flex-1 pt-24 lg:pt-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Page header — element type + child count MUST match loading.tsx
@@ -709,8 +705,7 @@ export default async function ResourcesPage(props: { searchParams: Promise<Searc
         </div>
       </main>
 
-      <Footer />
-    </div>
+      </div>
   );
 }
 

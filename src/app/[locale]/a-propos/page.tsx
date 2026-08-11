@@ -12,15 +12,13 @@ import {
   ArrowRight,
   Mail,
 } from 'lucide-react';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
-import { getLocale, getT, getDict } from '@/lib/i18n-server';
+import { getTranslations, getLocale, getMessages } from 'next-intl/server';
 import { breadcrumbSchema, SITE_URL } from '@/lib/structured-data';
 
 export const revalidate = 3600; // 1 hour cache
 
 export async function generateMetadata(): Promise<Metadata> {
-  const locale = getLocale();
+  const locale = await getLocale();
   const isAr = locale === 'ar';
   return {
     title: isAr
@@ -52,9 +50,10 @@ const breadcrumbJsonLd = breadcrumbSchema([
 // Contact: /contact page (generic, monitored)
 const team = [{ name: 'B.Mehdi', roleKey: 'about.team.founder' as const }];
 
-export default function AboutPage() {
-  const t = getT();
-  const dict = getDict();
+export default async function AboutPage() {
+  const t = await getTranslations();
+  const dict = await getTranslations();
+  const messages = await getMessages();
   const isAr = dict === (require('@/messages/ar.json') as any);
 
   const milestones = [
@@ -105,8 +104,6 @@ export default function AboutPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-      <Header />
-
       <main className="flex-1 pt-16 lg:pt-20">
         {/* HERO */}
         <section className="relative bg-gradient-to-br from-primary-50 via-white to-sky-50 py-16 lg:py-24 overflow-hidden">
@@ -300,7 +297,6 @@ export default function AboutPage() {
         </section>
       </main>
 
-      <Footer />
-    </div>
+      </div>
   );
 }

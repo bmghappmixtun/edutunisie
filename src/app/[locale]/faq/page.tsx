@@ -1,14 +1,12 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
-import { getLocale, getT, getDict } from '@/lib/i18n-server';
+import { getTranslations, getLocale, getMessages } from 'next-intl/server';
 import { faqSchema, breadcrumbSchema } from '@/lib/structured-data';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
 
 export async function generateMetadata(): Promise<Metadata> {
-  const locale = getLocale();
+  const locale = await getLocale();
   const isAr = locale === 'ar';
   return {
     title: isAr ? 'الأسئلة الشائعة — إكسامانت' : 'FAQ — Questions fréquentes',
@@ -28,11 +26,12 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function FAQPage() {
-  const t = getT();
-  const dict = getDict();
+export default async function FAQPage() {
+  const t = await getTranslations();
+  const dict = await getTranslations();
+  const messages = await getMessages();
   const FAQS =
-    (dict.faq?.sections as Array<{
+    (messages.faq?.sections as Array<{
       category: string;
       questions: Array<{ q: string; a: string }>;
     }>) || [];
@@ -55,8 +54,6 @@ export default function FAQPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-      <Header />
-
       <main className="flex-1 pt-20">
         <div className="bg-gradient-to-br from-primary-50 to-sky-50 py-12">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -113,7 +110,6 @@ export default function FAQPage() {
         </div>
       </main>
 
-      <Footer />
-    </div>
+      </div>
   );
 }

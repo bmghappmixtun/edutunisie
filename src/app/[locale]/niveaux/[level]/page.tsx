@@ -1,6 +1,4 @@
 import Link from 'next/link';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
 import ResourceCard from '@/components/resources/ResourceCard';
 import { prisma } from '@/lib/prisma';
 import { getUserFavorites, decorateWithFavorites } from '@/lib/resource-helpers';
@@ -66,7 +64,6 @@ export default async function LevelPage({ params }: { params: Promise<{ level: s
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -150,7 +147,6 @@ export default async function LevelPage({ params }: { params: Promise<{ level: s
           </div>
         </div>
       </main>
-      <Footer />
-    </div>
+      </div>
   );
 }

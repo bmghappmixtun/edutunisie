@@ -1,5 +1,3 @@
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
 import { Loader2, FileText, Star, Eye, Download } from 'lucide-react';
 
 /**
@@ -18,7 +16,7 @@ export default function Loading() {
     <div className="min-h-screen flex flex-col">
       {/* JSON-LD placeholders matching the 2 scripts in the page (course + breadcrumb).
           The page renders them as the FIRST children of the wrapper (before
-          <Header />), so the loading must too — placing them inside <main>
+          ), so the loading must too — placing them inside <main>
           (the previous version) produced a structural mismatch when the
           Suspense fallback was replaced by the streamed content, triggering
           React #418/#422 hydration errors (ERR-3EU598, ERR-..., in the
@@ -26,7 +24,6 @@ export default function Loading() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: '{}' }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: '{}' }} />
 
-      <Header />
       <main className="flex-1 pt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           {/* Breadcrumb nav skeleton — MUST be a <nav> to match the page's
@@ -130,7 +127,6 @@ export default function Loading() {
           </div>
         </div>
       </main>
-      <Footer />
-    </div>
+      </div>
   );
 }

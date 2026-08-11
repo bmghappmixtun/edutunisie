@@ -1,8 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
-import { getLocale, getT } from '@/lib/i18n-server';
+import { getTranslations, getLocale } from 'next-intl/server';
 import { Calculator, ArrowLeft, Award } from 'lucide-react';
 import { SITE_URL } from '@/lib/structured-data';
 
@@ -11,7 +9,7 @@ export const revalidate = 3600;
 const PAGE_URL = `${SITE_URL}/outils/moyenne-bac`;
 
 export async function generateMetadata(): Promise<Metadata> {
-  const locale = getLocale();
+  const locale = await getLocale();
   const isAr = locale === 'ar';
   return {
     title: isAr
@@ -33,14 +31,13 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function MoyenneBacPage() {
-  const t = getT();
-  const locale = getLocale();
+export default async function MoyenneBacPage() {
+  const t = await getTranslations();
+  const locale = await getLocale();
   const isAr = locale === 'ar';
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
       <main className="flex-1 pt-20">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <Link
@@ -84,7 +81,6 @@ export default function MoyenneBacPage() {
           </div>
         </div>
       </main>
-      <Footer />
-    </div>
+      </div>
   );
 }

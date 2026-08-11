@@ -1,15 +1,15 @@
-import type messages from '../messages/fr.json';
-
 /**
  * Type-safe message keys via next-intl AppConfig.
- * 
- * With this declaration, `t('invalidKey')` will be a TypeScript error.
+ *
+ * Currently disabled because the codebase uses dynamic key construction
+ * (e.g., `t('foo' + someVar + '.bar')`) which doesn't fit the strict
+ * type system. Re-enable when all dynamic calls are converted to use
+ * proper namespacing.
  */
-declare module 'next-intl' {
-  interface AppConfig {
-    Messages: typeof messages;
-    // Locale comes from routing.locales
-  }
-}
+// declare module 'next-intl' {
+//   interface AppConfig {
+//     Messages: typeof messages;
+//   }
+// }
 
 export {};

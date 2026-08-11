@@ -1,7 +1,5 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
 import ResourceCard from '@/components/resources/ResourceCard';
 import { prisma } from '@/lib/prisma';
 import { getUserFavorites, decorateWithFavorites } from '@/lib/resource-helpers';
@@ -16,7 +14,7 @@ import {
   CheckCircle,
   ArrowRight,
 } from 'lucide-react';
-import { getLocale, getT } from '@/lib/i18n-server';
+import { getTranslations, getLocale } from 'next-intl/server';
 import { itemListSchema, breadcrumbSchema } from '@/lib/structured-data';
 
 export const revalidate = 3600; // ISR: refresh every hour
@@ -24,7 +22,7 @@ export const revalidate = 3600; // ISR: refresh every hour
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
 
 export async function generateMetadata(): Promise<Metadata> {
-  const locale = getLocale();
+  const locale = await getLocale();
   const isAr = locale === 'ar';
   return {
     title: isAr
@@ -79,7 +77,7 @@ const SUBJECT_INFO: Record<string, { color: string; icon: string; desc: string }
 };
 
 export default async function CollegePillar() {
-  const t = getT();
+  const t = await getTranslations();
   // Top resources (by views) for carousel
   const topResources = await prisma.resource.findMany({
     where: {
@@ -192,8 +190,6 @@ export default async function CollegePillar() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-      <Header />
-
       <main className="flex-1 pt-20">
         {/* HERO */}
         <section className="relative bg-gradient-to-br from-primary-50 via-white to-sky-50 py-12 lg:py-20 overflow-hidden">
@@ -573,7 +569,6 @@ export default async function CollegePillar() {
         </section>
       </main>
 
-      <Footer />
-    </div>
+      </div>
   );
 }

@@ -10,7 +10,6 @@ import ErrorHandlerInit from '@/components/errors/ErrorHandlerInit';
 import I18nProviderWrapper from '@/components/layout/I18nProviderWrapper';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import { organizationSchema } from '@/lib/structured-data';
-import { getServerLocale } from '@/lib/i18n-server';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
 
@@ -82,7 +81,11 @@ const LOCALE_DEFAULTS = {
 // Function-based metadata so it can read the locale at request time
 // (the previous static `export const metadata` always used FR).
 export async function generateMetadata(): Promise<Metadata> {
-  const locale = getServerLocale();
+  // Read locale from next-intl middleware header (x-next-intl-locale).
+  // Falls back to fr if not present (non-localized routes like /admin, /connexion).
+  const headerStore = await headers();
+  const xLocale = headerStore.get('x-next-intl-locale') || headerStore.get('x-locale');
+  const locale: 'fr' | 'ar' = xLocale === 'ar' ? 'ar' : 'fr';
   const isAr = locale === 'ar';
   const t = LOCALE_DEFAULTS[locale];
   const canonical = isAr ? `${SITE_URL}/ar` : SITE_URL;

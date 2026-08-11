@@ -1,7 +1,5 @@
 import type { Metadata } from 'next';
 import { headers } from 'next/headers';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
 import dynamic from 'next/dynamic';
 
 import { prisma } from '@/lib/prisma';
@@ -124,10 +122,8 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
       <HomeClient {...data} />
-      <Footer />
-    </div>
+      </div>
   );
 }
 // 1784381489

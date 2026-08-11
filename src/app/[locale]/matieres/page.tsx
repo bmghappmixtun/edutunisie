@@ -1,16 +1,14 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
 import { prisma } from '@/lib/prisma';
-import { getLocale, getT } from '@/lib/i18n-server';
+import { getTranslations, getLocale } from 'next-intl/server';
 import { itemListSchema } from '@/lib/structured-data';
 import { BookOpen, Sparkles, ArrowRight, GraduationCap } from 'lucide-react';
 import { getSubjectConfig } from '@/lib/subjects.config';
 import { SUBJECT_ICONS } from '@/lib/subjects.icons';
 
 export async function generateMetadata(): Promise<Metadata> {
-  const locale = getLocale();
+  const locale = await getLocale();
   const isAr = locale === 'ar';
   return {
     title: isAr
@@ -57,7 +55,7 @@ export const revalidate = 300; // 5 min cache
 const EXCLUDED_SLUGS = new Set(['sport', 'sciences-informatique-matiere']);
 
 export default async function SubjectsPage() {
-  const t = getT();
+  const t = await getTranslations();
   const dbSubjects = await prisma.subject.findMany({
     where: { slug: { notIn: Array.from(EXCLUDED_SLUGS) } },
     orderBy: { order: 'asc' },
@@ -88,7 +86,6 @@ export default async function SubjectsPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(subjectListJsonLd) }}
       />
-      <Header />
       <main className="flex-1 pt-20">
         {/* ============== HERO ============== */}
         <section className="relative overflow-hidden bg-gradient-to-br from-slate-50 via-primary-50/30 to-sky-50">
@@ -297,7 +294,6 @@ export default async function SubjectsPage() {
           </div>
         </section>
       </main>
-      <Footer />
-    </div>
+      </div>
   );
 }

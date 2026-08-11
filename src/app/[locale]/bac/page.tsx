@@ -1,7 +1,5 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
 import {
   courseSchema,
   faqSchema,
@@ -9,7 +7,7 @@ import {
   itemListSchema,
   SITE_URL,
 } from '@/lib/structured-data';
-import { getLocale, getT, getDict } from '@/lib/i18n-server';
+import { getTranslations, getLocale, getMessages } from 'next-intl/server';
 import { getBacFiles, getSectionMeta, getSubjectMeta } from '@/lib/bac-data';
 import {
   BookOpen,
@@ -83,7 +81,7 @@ const PAGE_URL = `${SITE_URL}/bac`;
 // METADATA — full SEO optimized
 // ============================================================================
 export async function generateMetadata(): Promise<Metadata> {
-  const locale = getLocale();
+  const locale = await getLocale();
   const isAr = locale === 'ar';
 
   const title = isAr
@@ -244,9 +242,9 @@ export async function generateMetadata(): Promise<Metadata> {
 // ============================================================================
 // PAGE — top of the top pillar
 // ============================================================================
-export default function BacPillar() {
-  const t = getT();
-  const locale = getLocale();
+export default async function BacPillar() {
+  const t = await getTranslations();
+  const locale = await getLocale();
   const isAr = locale === 'ar';
 
   // ==========================================================================
@@ -297,8 +295,9 @@ export default function BacPillar() {
     .slice(0, 8);
 
   // FAQ schema
-  const dict = getDict();
-  const faqItems = (dict.bac?.faq?.items as Array<{ q: string; a: string }>) || [];
+  const dict = await getTranslations();
+  const messages = await getMessages();
+  const faqItems = (messages.bac?.faq?.items as Array<{ q: string; a: string }>) || [];
   const faqJsonLd = faqSchema(
     faqItems.map((f) => ({
       question: f.q,
@@ -335,8 +334,6 @@ export default function BacPillar() {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
         />
       ))}
-      <Header />
-
       <main className="flex-1">
         {/* =================================================================
             HERO
@@ -560,9 +557,9 @@ export default function BacPillar() {
             </div>
 
             {(() => {
-              const subjects = (dict.bac?.matieres?.list as Array<any>) || [];
+              const subjects = (messages.bac?.matieres?.list as Array<any>) || [];
               const categories =
-                (dict.bac?.matieres?.categories as Record<string, { fr: string; ar: string }>) ||
+                (messages.bac?.matieres?.categories as Record<string, { fr: string; ar: string }>) ||
                 {};
               const catOrder = ['common', 'sciences', 'langues', 'arts'];
               const catGradient: Record<string, string> = {
@@ -960,7 +957,6 @@ export default function BacPillar() {
         </section>
       </main>
 
-      <Footer />
-    </div>
+      </div>
   );
 }

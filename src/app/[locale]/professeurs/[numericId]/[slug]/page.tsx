@@ -1,8 +1,6 @@
 import { notFound } from 'next/navigation';
 import { getInitials } from '@/lib/text-utils';
 import Link from 'next/link';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
 import { prisma } from '@/lib/prisma';
 import { getUserFavorites, decorateWithFavorites } from '@/lib/resource-helpers';
 import { getCurrentUser } from '@/lib/auth';
@@ -420,8 +418,6 @@ export default async function TeacherProfilePage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-      <Header />
-
       <main className="flex-1 pt-20">
         {/* Visual breadcrumb (matches BreadcrumbList JSON-LD) */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
@@ -1005,8 +1001,7 @@ export default async function TeacherProfilePage({
         </div>
       </main>
 
-      <Footer />
-    </div>
+      </div>
   );
 }
 

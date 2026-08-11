@@ -2,8 +2,6 @@ import { notFound, permanentRedirect } from 'next/navigation';
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
 import ResourceActions from '@/components/resources/ResourceActions';
 // PDFViewer is lazy-loaded via LazyPDFViewer (~90 KB gzipped saved on initial
 // load). The full react-pdf + pdfjs-dist bundle was the biggest chunk on the
@@ -334,7 +332,6 @@ export default async function ResourcePage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-      <Header />
       <main className="flex-1 pt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           {/* Visual breadcrumb (matches BreadcrumbList JSON-LD) */}
@@ -972,8 +969,7 @@ export default async function ResourcePage({
           </div>
         </div>
       </main>
-      <Footer />
-    </div>
+      </div>
   );
 }
 

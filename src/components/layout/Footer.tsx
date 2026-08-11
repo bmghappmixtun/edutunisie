@@ -1,10 +1,10 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Facebook, Twitter, Instagram, Youtube, GraduationCap } from 'lucide-react';
-import { getT } from '@/lib/i18n-server';
+import { getTranslations } from 'next-intl/server';
 
-export default function Footer() {
-  const t = getT();
+export default async function Footer() {
+  const t = await getTranslations();
 
   // Compute the year once on the server to avoid hydration mismatches
   // when the server timezone differs from the client timezone (e.g., around

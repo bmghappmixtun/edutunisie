@@ -1,8 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
-import { getT, getLocale } from '@/lib/i18n-server';
+import { getTranslations, getLocale } from 'next-intl/server';
 import {
   Eye,
   MessageCircle,
@@ -24,7 +22,7 @@ import {
 } from 'lucide-react';
 
 export async function generateMetadata(): Promise<Metadata> {
-  const locale = getLocale();
+  const locale = await getLocale();
   const isAr = locale === 'ar';
   return {
     title: isAr ? 'انضم كمعلم — Examanet' : 'Espace Enseignants — Rejoignez Examanet',
@@ -41,9 +39,9 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function TeacherLandingPage() {
-  const t = getT();
-  const locale = getLocale();
+export default async function TeacherLandingPage() {
+  const t = await getTranslations();
+  const locale = await getLocale();
   const isAr = locale === 'ar';
 
   // Stats (real numbers from DB feel; can be made dynamic later)
@@ -56,8 +54,6 @@ export default function TeacherLandingPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50">
-      <Header />
-
       <main className="flex-1">
         {/* =================================================================
             HERO
@@ -341,8 +337,7 @@ export default function TeacherLandingPage() {
         </section>
       </main>
 
-      <Footer />
-    </div>
+      </div>
   );
 }
 

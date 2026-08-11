@@ -1,10 +1,8 @@
 import type { Metadata } from 'next';
 import fs from 'fs';
 import path from 'path';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
 import ReferentielContent from './ReferentielContent';
-import { getLocale } from '@/lib/i18n-server';
+import { getLocale } from 'next-intl/server';
 import { breadcrumbSchema } from '@/lib/structured-data';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
@@ -15,7 +13,7 @@ const breadcrumbJsonLd = breadcrumbSchema([
 ]);
 
 export async function generateMetadata(): Promise<Metadata> {
-  const locale = getLocale();
+  const locale = await getLocale();
   const isAr = locale === 'ar';
   return {
     title: isAr
@@ -90,7 +88,6 @@ export default function ReferentielNationalPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-      <Header />
       {/* Inline the page-specific CSS so it scopes itself */}
       <style dangerouslySetInnerHTML={{ __html: css }} />
 
@@ -99,7 +96,6 @@ export default function ReferentielNationalPage() {
         <ReferentielContent html={bodyHtml} scripts={scriptBlocks} />
       </main>
 
-      <Footer />
-    </>
+      </>
   );
 }

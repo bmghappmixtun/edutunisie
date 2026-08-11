@@ -1,15 +1,13 @@
 import type { Metadata } from 'next';
 import { Mail, MessageSquare, Phone, MapPin, Clock } from 'lucide-react';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
 import ContactForm from '@/components/contact/ContactForm';
-import { getLocale, getT } from '@/lib/i18n-server';
+import { getTranslations, getLocale } from 'next-intl/server';
 import { breadcrumbSchema, SITE_URL } from '@/lib/structured-data';
 
 export const revalidate = 3600; // 1 hour cache
 
 export async function generateMetadata(): Promise<Metadata> {
-  const locale = getLocale();
+  const locale = await getLocale();
   const isAr = locale === 'ar';
   return {
     title: isAr ? 'اتصل بنا — إكسامانت' : 'Contact — Nous contacter',
@@ -34,8 +32,8 @@ const breadcrumbJsonLd = breadcrumbSchema([
   { name: 'Contact', url: `${SITE_URL}/contact` },
 ]);
 
-export default function ContactPage() {
-  const t = getT();
+export default async function ContactPage() {
+  const t = await getTranslations();
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -43,8 +41,6 @@ export default function ContactPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-      <Header />
-
       <main className="flex-1 pt-16 lg:pt-20">
         {/* HERO */}
         <section className="bg-gradient-to-br from-primary-50 via-white to-sky-50 py-16">
@@ -206,7 +202,6 @@ export default function ContactPage() {
         </section>
       </main>
 
-      <Footer />
-    </div>
+      </div>
   );
 }
