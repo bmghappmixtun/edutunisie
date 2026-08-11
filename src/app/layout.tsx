@@ -203,9 +203,11 @@ export const viewport = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  // Read locale from middleware-set header (for /ar/* URLs)
+  // Read locale from middleware-injected header.
+  // next-intl sets x-next-intl-locale; we also keep x-locale for the old middleware
+  // (admin/auth pages still set it).
   const headerStore = await headers();
-  const xLocale = headerStore.get('x-locale');
+  const xLocale = headerStore.get('x-next-intl-locale') || headerStore.get('x-locale');
   const locale: 'fr' | 'ar' = xLocale === 'ar' ? 'ar' : 'fr';
   const dir = locale === 'ar' ? 'rtl' : 'ltr';
 
