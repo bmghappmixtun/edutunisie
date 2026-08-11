@@ -208,7 +208,7 @@ export default function SearchBar({
       <form onSubmit={handleSubmit}>
         <div className="relative">
           <Search
-            className={`absolute top-1/2 -translate-y-1/2 text-slate-400 ${size === 'lg' ? 'left-4 w-5 h-5' : 'left-3 w-4 h-4'}`}
+            className={`absolute top-1/2 -translate-y-1/2 text-slate-400 ${size === 'lg' ? 'start-4 w-5 h-5' : 'start-3 w-4 h-4'}`}
           />
           <input
             ref={inputRef}
@@ -222,27 +222,27 @@ export default function SearchBar({
             onFocus={() => setOpen(true)}
             onKeyDown={onKeyDown}
             placeholder={t('search.placeholder')}
-            className={`w-full ${sizeClasses} pl-10 pr-10 rounded-xl border border-slate-200 bg-white focus:border-primary-400 focus:ring-4 focus:ring-primary-100 outline-none transition`}
+            className={`w-full ${sizeClasses} ps-10 pe-10 rounded-xl border border-slate-200 bg-white focus:border-primary-400 focus:ring-4 focus:ring-primary-100 outline-none transition`}
             autoComplete="off"
           />
           {query && (
             <button
               type="button"
               onClick={clearQuery}
-              className="absolute top-1/2 -translate-y-1/2 right-3 p-1 text-slate-400 hover:text-slate-600"
+              className="absolute top-1/2 -translate-y-1/2 end-3 p-1 text-slate-400 hover:text-slate-600"
             >
               <X className="w-4 h-4" />
             </button>
           )}
           {loading && (
-            <Loader2 className="absolute top-1/2 -translate-y-1/2 right-10 w-4 h-4 text-primary-500 animate-spin" />
+            <Loader2 className="absolute top-1/2 -translate-y-1/2 end-10 w-4 h-4 text-primary-500 animate-spin" />
           )}
         </div>
       </form>
 
       {/* Dropdown */}
       {open && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl border border-slate-200 shadow-2xl z-50 max-h-[70vh] overflow-y-auto">
+        <div className="absolute top-full start-0 end-0 mt-2 bg-white rounded-xl border border-slate-200 shadow-2xl z-50 max-h-[70vh] overflow-y-auto">
           {/* Query results */}
           {query.trim().length >= 2 && results && (
             <div className="p-2">

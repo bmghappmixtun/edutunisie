@@ -24,7 +24,7 @@ export default function AiBadge({ isRtl }: { isRtl: boolean }) {
       </span>
       {/* Pure CSS tooltip — no JS state needed */}
       <span
-        className={`pointer-events-none absolute z-50 top-full mt-1.5 w-56 px-3 py-2 rounded-lg bg-slate-900 text-white text-xs leading-relaxed shadow-xl opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-150 ${isRtl ? 'left-0' : 'right-0'}`}
+        className={`pointer-events-none absolute z-50 top-full mt-1.5 w-56 px-3 py-2 rounded-lg bg-slate-900 text-white text-xs leading-relaxed shadow-xl opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-150 ${isRtl ? 'start-0' : 'end-0'}`}
       >
         <span className="block font-semibold mb-0.5">
           {isRtl ? '✨ ملخص مُولَّد بالذكاء الاصطناعي' : '✨ Résumé généré par IA'}

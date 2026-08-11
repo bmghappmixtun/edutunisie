@@ -110,7 +110,7 @@ export default function ClassAccordion({
     <>
       {/* Top accent bar */}
       <div
-        className="absolute top-0 left-0 right-0 h-1 origin-left scale-x-0 group-hover:scale-x-100 group-focus-visible:scale-x-100 transition-transform duration-300"
+        className="absolute top-0 start-0 end-0 h-1 origin-left scale-x-0 group-hover:scale-x-100 group-focus-visible:scale-x-100 transition-transform duration-300"
         style={{ background: design.color }}
       />
       {/* Background tint */}
@@ -162,14 +162,14 @@ export default function ClassAccordion({
       {/* Bottom-right chevron (always shown if has sections) */}
       {hasSections && (
         <ChevronDown
-          className={`absolute bottom-3 right-3 w-4 h-4 transition-all duration-300 ${
+          className={`absolute bottom-3 end-3 w-4 h-4 transition-all duration-300 ${
             isExpanded ? 'rotate-180' : ''
           }`}
           style={{ color: tint }}
         />
       )}
       {!hasSections && (
-        <ArrowRight className="absolute bottom-3 right-3 w-4 h-4 text-slate-300 group-hover:text-slate-600 group-hover:translate-x-1 transition-all duration-300" />
+        <ArrowRight className="absolute bottom-3 end-3 w-4 h-4 text-slate-300 group-hover:text-slate-600 group-hover:translate-x-1 transition-all duration-300" />
       )}
     </>
   );
@@ -282,7 +282,7 @@ export default function ClassAccordion({
                     </span>
                   </div>
                   <ChevronRight
-                    className={`absolute top-2 right-2 w-3.5 h-3.5 transition-transform ${
+                    className={`absolute top-2 end-2 w-3.5 h-3.5 transition-transform ${
                       isActive ? 'rotate-90' : ''
                     }`}
                     style={{ color: isActive ? section.tint : '#94a3b8' }}

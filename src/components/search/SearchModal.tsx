@@ -274,7 +274,7 @@ export default function SearchModal({ open, onClose, initialQuery = '' }: Search
       >
         {/* Search input row */}
         <form onSubmit={handleSubmit} className="relative border-b border-slate-100">
-          <Search className="absolute top-1/2 -translate-y-1/2 left-5 w-5 h-5 text-slate-400 pointer-events-none" />
+          <Search className="absolute top-1/2 -translate-y-1/2 start-5 w-5 h-5 text-slate-400 pointer-events-none" />
           <input
             ref={inputRef}
             type="text"
@@ -285,7 +285,7 @@ export default function SearchModal({ open, onClose, initialQuery = '' }: Search
             }}
             onKeyDown={onKeyDown}
             placeholder={t('search.placeholder')}
-            className="w-full h-16 sm:h-20 pl-14 pr-24 sm:pr-28 text-base sm:text-lg bg-transparent outline-none text-slate-900 placeholder:text-slate-400"
+            className="w-full h-16 sm:h-20 ps-14 pe-24 sm:pe-28 text-base sm:text-lg bg-transparent outline-none text-slate-900 placeholder:text-slate-400"
             autoComplete="off"
             autoCorrect="off"
             autoCapitalize="off"
@@ -293,7 +293,7 @@ export default function SearchModal({ open, onClose, initialQuery = '' }: Search
             aria-label="Rechercher"
           />
           {/* Right side: clear + loading + kbd hint */}
-          <div className="absolute top-1/2 -translate-y-1/2 right-4 flex items-center gap-2">
+          <div className="absolute top-1/2 -translate-y-1/2 end-4 flex items-center gap-2">
             {query && (
               <button
                 type="button"
@@ -426,7 +426,7 @@ function ResultsPanel({
             <div className="px-3 py-1.5 text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
               <Icon className="w-3 h-3" />
               {LABEL_MAP[groupKey]}
-              <span className="ml-1 px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-500 normal-case font-semibold text-[10px]">
+              <span className="ms-1 px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-500 normal-case font-semibold text-[10px]">
                 {group.length}
               </span>
             </div>

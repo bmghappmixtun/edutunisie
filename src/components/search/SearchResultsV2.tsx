@@ -209,7 +209,7 @@ export default function SearchResultsV2({ initialData, options }: Props) {
             <span className="font-bold text-slate-900">{formatNumber(data.total)}</span> ressources
             {data.durationMs ? <> · {data.durationMs}ms</> : null}
             {data.synonymsApplied?.length ? (
-              <span className="ml-2 inline-flex items-center gap-1 text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full text-xs">
+              <span className="ms-2 inline-flex items-center gap-1 text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full text-xs">
                 <Sparkles className="w-3 h-3" />
                 {data.synonymsApplied.length} synonyme{data.synonymsApplied.length > 1 ? 's' : ''}{' '}
                 appliqué{data.synonymsApplied.length > 1 ? 's' : ''}

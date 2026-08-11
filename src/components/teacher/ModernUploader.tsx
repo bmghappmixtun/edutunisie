@@ -344,9 +344,9 @@ export default function ModernUploader({
         >
           {/* Animated background blobs */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute -top-20 -left-20 w-64 h-64 bg-primary-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 group-hover:opacity-50 transition-opacity duration-700 animate-blob" />
-            <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-amber-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 group-hover:opacity-50 transition-opacity duration-700 animate-blob animation-delay-2000" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-cyan-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 group-hover:opacity-40 transition-opacity duration-700 animate-blob animation-delay-4000" />
+            <div className="absolute -top-20 -start-20 w-64 h-64 bg-primary-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 group-hover:opacity-50 transition-opacity duration-700 animate-blob" />
+            <div className="absolute -bottom-20 -end-20 w-64 h-64 bg-amber-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 group-hover:opacity-50 transition-opacity duration-700 animate-blob animation-delay-2000" />
+            <div className="absolute top-1/2 start-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-cyan-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 group-hover:opacity-40 transition-opacity duration-700 animate-blob animation-delay-4000" />
           </div>
 
           <input
@@ -369,7 +369,7 @@ export default function ModernUploader({
                 <span className="absolute inset-0 rounded-full border-2 border-primary-400 animate-ping" />
                 <span className="absolute inset-0 rounded-full border-2 border-primary-400 animate-ping animation-delay-1000" />
               </div>
-              <Sparkles className="absolute -top-2 -right-2 w-6 h-6 text-amber-400 animate-spin-slow" />
+              <Sparkles className="absolute -top-2 -end-2 w-6 h-6 text-amber-400 animate-spin-slow" />
             </div>
 
             <div>

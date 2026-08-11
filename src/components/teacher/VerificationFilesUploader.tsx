@@ -348,7 +348,7 @@ export default function VerificationFilesUploader({
                       <div className="font-bold text-sm text-slate-900 truncate">{f.fileName}</div>
                       {f.reviewedByAdmin && (
                         <span className="inline-flex items-center text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 flex-shrink-0">
-                          <CheckCircle className="w-3 h-3 mr-0.5" /> Examiné
+                          <CheckCircle className="w-3 h-3 me-0.5" /> Examiné
                         </span>
                       )}
                     </div>

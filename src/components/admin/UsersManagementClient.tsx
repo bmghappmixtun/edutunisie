@@ -801,7 +801,7 @@ export default function UsersManagementClient({
             <span className="text-sm text-slate-600">
               Page <strong>{page}</strong> sur <strong>{totalPages}</strong>
             </span>
-            <div className="flex gap-1 ml-2">
+            <div className="flex gap-1 ms-2">
               <button
                 onClick={() => goToPage(1)}
                 disabled={page === 1}

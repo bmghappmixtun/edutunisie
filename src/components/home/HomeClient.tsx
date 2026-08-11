@@ -58,13 +58,13 @@ export default function HomeClient({
     <main className="flex-1 pt-16 lg:pt-20">
       {/* HERO */}
       <section className="relative bg-gradient-to-br from-primary-50 via-white to-sky-50 overflow-hidden">
-        <div className="absolute top-20 -left-20 w-48 h-48 sm:w-72 sm:h-72 lg:w-96 lg:h-96 bg-primary-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float" />
+        <div className="absolute top-20 -start-20 w-48 h-48 sm:w-72 sm:h-72 lg:w-96 lg:h-96 bg-primary-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float" />
         <div
-          className="absolute top-40 -right-20 w-48 h-48 sm:w-72 sm:h-72 lg:w-96 lg:h-96 bg-amber-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float"
+          className="absolute top-40 -end-20 w-48 h-48 sm:w-72 sm:h-72 lg:w-96 lg:h-96 bg-amber-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float"
           style={{ animationDelay: '2s' }}
         />
         <div
-          className="absolute -bottom-20 left-1/3 w-48 h-48 sm:w-72 sm:h-72 lg:w-96 lg:h-96 bg-sky-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float"
+          className="absolute -bottom-20 start-1/3 w-48 h-48 sm:w-72 sm:h-72 lg:w-96 lg:h-96 bg-sky-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float"
           style={{ animationDelay: '4s' }}
         />
 
@@ -143,7 +143,7 @@ export default function HomeClient({
                     <div className="text-lg opacity-90">{t('home.sections.whyFreeDesc')}</div>
                   </div>
                 </div>
-                <div className="absolute -top-4 -right-4 bg-white rounded-2xl shadow-2xl p-4 animate-float">
+                <div className="absolute -top-4 -end-4 bg-white rounded-2xl shadow-2xl p-4 animate-float">
                   <div className="flex items-center gap-2">
                     <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
                       <Download className="w-5 h-5 text-green-600" />
@@ -155,7 +155,7 @@ export default function HomeClient({
                   </div>
                 </div>
                 <div
-                  className="absolute -bottom-4 -left-4 bg-white rounded-2xl shadow-2xl p-4 animate-float"
+                  className="absolute -bottom-4 -start-4 bg-white rounded-2xl shadow-2xl p-4 animate-float"
                   style={{ animationDelay: '1s' }}
                 >
                   <div className="flex items-center gap-2">
@@ -271,7 +271,7 @@ export default function HomeClient({
                 href={n.href}
                 className={`group relative bg-gradient-to-br ${n.bg} rounded-3xl p-8 border-2 ${n.border} hover:border-primary-400 transition-all card-hover overflow-hidden`}
               >
-                <div className="absolute -top-10 -right-10 w-40 h-40 bg-primary-200 rounded-full opacity-30 group-hover:scale-150 transition-transform duration-500" />
+                <div className="absolute -top-10 -end-10 w-40 h-40 bg-primary-200 rounded-full opacity-30 group-hover:scale-150 transition-transform duration-500" />
                 <div className="relative z-10">
                   <div className="text-6xl mb-4">{n.icon}</div>
                   <h3 className="text-2xl font-extrabold text-slate-900 mb-2">{n.name}</h3>
@@ -513,8 +513,8 @@ export default function HomeClient({
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative bg-gradient-to-br from-primary-600 via-primary-700 to-primary-900 rounded-3xl p-10 lg:p-16 overflow-hidden">
-            <div className="absolute -top-20 -right-20 w-80 h-80 bg-primary-400 rounded-full opacity-20 blur-3xl" />
-            <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-amber-400 rounded-full opacity-20 blur-3xl" />
+            <div className="absolute -top-20 -end-20 w-80 h-80 bg-primary-400 rounded-full opacity-20 blur-3xl" />
+            <div className="absolute -bottom-20 -start-20 w-80 h-80 bg-amber-400 rounded-full opacity-20 blur-3xl" />
             <div className="relative z-10 grid lg:grid-cols-2 gap-8 items-center">
               <div>
                 <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur border border-white/20 rounded-full px-4 py-2 mb-6">

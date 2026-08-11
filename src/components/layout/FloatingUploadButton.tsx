@@ -46,7 +46,7 @@ export default function FloatingUploadButton() {
   // If loading or allowed, show the orange FAB
   if (canUpload === null || canUpload === true) {
     return (
-      <div className="fixed right-6 z-40 flex flex-col items-end gap-3 print:hidden safe-bottom">
+      <div className="fixed end-6 z-40 flex flex-col items-end gap-3 print:hidden safe-bottom">
         {expanded && (
           <div
             role="button"
@@ -71,7 +71,7 @@ export default function FloatingUploadButton() {
         >
           <span className="absolute inset-0 rounded-full bg-amber-400 animate-ping opacity-20" />
           <Upload className="w-6 h-6 sm:w-7 sm:h-7 relative z-10" strokeWidth={2.5} />
-          <span className="absolute -top-1 -right-1 w-5 h-5 bg-white text-orange-600 rounded-full flex items-center justify-center text-xs font-extrabold shadow-md">
+          <span className="absolute -top-1 -end-1 w-5 h-5 bg-white text-orange-600 rounded-full flex items-center justify-center text-xs font-extrabold shadow-md">
             +
           </span>
         </Link>
@@ -81,7 +81,7 @@ export default function FloatingUploadButton() {
 
   // Disabled state
   return (
-    <div className="fixed right-6 z-40 flex flex-col items-end gap-2 print:hidden safe-bottom">
+    <div className="fixed end-6 z-40 flex flex-col items-end gap-2 print:hidden safe-bottom">
       {expanded && (
         <div className="bg-slate-900 text-white text-xs font-semibold px-4 py-2 rounded-xl shadow-xl max-w-xs text-right">
           {statusMessage}

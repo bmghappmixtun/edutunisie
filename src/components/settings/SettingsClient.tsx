@@ -376,7 +376,7 @@ export default function SettingsClient({
                               : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                           }`}
                         >
-                          {selected && <Check className="w-3.5 h-3.5 inline mr-1" />}
+                          {selected && <Check className="w-3.5 h-3.5 inline me-1" />}
                           {s.nameFr}
                         </button>
                       );
@@ -406,7 +406,7 @@ export default function SettingsClient({
                               : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                           }`}
                         >
-                          {selected && <Check className="w-3.5 h-3.5 inline mr-1" />}
+                          {selected && <Check className="w-3.5 h-3.5 inline me-1" />}
                           {l.nameFr}
                         </button>
                       );
@@ -557,7 +557,7 @@ export default function SettingsClient({
                       }}
                       className="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-xl text-sm font-semibold"
                     >
-                      <Trash2 className="w-4 h-4 inline mr-2" />
+                      <Trash2 className="w-4 h-4 inline me-2" />
                       Supprimer mon compte
                     </button>
                   </div>
@@ -679,7 +679,7 @@ function ToggleRow({
         className={`relative w-12 h-6 rounded-full transition ${checked ? 'bg-emerald-500' : 'bg-slate-300'}`}
       >
         <div
-          className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition ${checked ? 'left-6' : 'left-0.5'}`}
+          className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition ${checked ? 'start-6' : 'start-0.5'}`}
         />
       </button>
     </div>
@@ -778,12 +778,12 @@ function ChangePassword() {
             type={show ? 'text' : 'password'}
             value={current}
             onChange={(e) => setCurrent(e.target.value)}
-            className="input pr-10"
+            className="input pe-10"
           />
           <button
             type="button"
             onClick={() => setShow(!show)}
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600"
+            className="absolute end-2 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600"
           >
             {show ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
           </button>

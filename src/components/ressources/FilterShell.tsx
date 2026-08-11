@@ -392,7 +392,7 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
              * with CSS rather than conditionally rendering it is safe.
              */}
             <span
-              className={`ml-1 inline-flex items-center justify-center w-5 h-5 rounded-full bg-primary-600 text-white text-[10px] font-bold ${activeCount > 0 ? '' : 'hidden'}`}
+              className={`ms-1 inline-flex items-center justify-center w-5 h-5 rounded-full bg-primary-600 text-white text-[10px] font-bold ${activeCount > 0 ? '' : 'hidden'}`}
               aria-hidden={activeCount === 0}
             >
               {activeCount}
@@ -421,18 +421,18 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
               Recherche
             </div>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+              <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
               <input
                 type="text"
                 value={filters.q}
                 onChange={(e) => update({ q: e.target.value })}
                 placeholder="Mots-clés..."
-                className="w-full pl-9 pr-9 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary-200 focus:border-primary-400 focus:bg-white outline-none transition"
+                className="w-full ps-9 pe-9 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary-200 focus:border-primary-400 focus:bg-white outline-none transition"
               />
               {filters.q && (
                 <button
                   onClick={() => update({ q: '' })}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600"
+                  className="absolute end-2 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600"
                   aria-label="Effacer"
                 >
                   <X className="w-3.5 h-3.5" />
@@ -603,7 +603,7 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
                 />
               </span>
             </button>
-            <div className="text-[11px] text-slate-500 mt-1.5 ml-1">
+            <div className="text-[11px] text-slate-500 mt-1.5 ms-1">
               {data.facets.withCorrection.toLocaleString('fr-FR')} ressources avec corrigé
             </div>
           </div>
@@ -654,7 +654,7 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
               filters.collegeOrdinaire ||
               filters.lyceePilote ||
               filters.lyceeOrdinaire) ? (
-              <div className="text-[11px] text-slate-500 mt-2 ml-1">
+              <div className="text-[11px] text-slate-500 mt-2 ms-1">
                 {(
                   (filters.collegePilote ? data.facets.collegePilote : 0) +
                   (filters.collegeOrdinaire ? data.facets.collegeOrdinaire : 0) +
@@ -669,7 +669,7 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
                * div, regardless of whether any category filter is active).
                * 2026-08-05: prevents React #418/#422 when toggling category
                * filters on /ressources. */
-              <div className="text-[11px] text-slate-500 mt-2 ml-1 hidden" aria-hidden="true" />
+              <div className="text-[11px] text-slate-500 mt-2 ms-1 hidden" aria-hidden="true" />
             )}
           </div>
         </div>
@@ -691,7 +691,7 @@ export default function FilterShell({ initialData, userId, initialFavorites }: F
               </strong>{' '}
               <span className="text-slate-500">ressource{data.total > 1 ? 's' : ''}</span>
               {data.total > 0 && data.totalPages > 1 && (
-                <span className="text-slate-400 ml-1">
+                <span className="text-slate-400 ms-1">
                   · page {data.currentPage}/{data.totalPages}
                 </span>
               )}
@@ -1198,7 +1198,7 @@ function ActiveFilterChips({
       {chips.map((c) => (
         <span
           key={c.key}
-          className={`inline-flex items-center gap-1.5 pl-3 pr-1 py-1 rounded-full text-xs font-semibold ${c.color}`}
+          className={`inline-flex items-center gap-1.5 ps-3 pe-1 py-1 rounded-full text-xs font-semibold ${c.color}`}
         >
           {c.label}
           <button

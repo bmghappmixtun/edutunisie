@@ -19,7 +19,7 @@ export default async function Header() {
     : 0;
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white/85 backdrop-blur-xl border-b border-slate-200/50">
+    <header className="fixed top-0 start-0 end-0 z-50 bg-white/85 backdrop-blur-xl border-b border-slate-200/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center h-[62px] lg:h-[73px] gap-4">
           {/* LEFT: Logo */}

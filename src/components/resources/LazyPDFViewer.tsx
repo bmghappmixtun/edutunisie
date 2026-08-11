@@ -25,7 +25,7 @@ const PDFViewer = nextDynamic(
     ssr: false,
     loading: () => (
       <div className="flex items-center justify-center py-20 text-slate-500">
-        <Loader2 className="w-6 h-6 animate-spin mr-2" /> Chargement du lecteur PDF…
+        <Loader2 className="w-6 h-6 animate-spin me-2" /> Chargement du lecteur PDF…
       </div>
     ),
   }

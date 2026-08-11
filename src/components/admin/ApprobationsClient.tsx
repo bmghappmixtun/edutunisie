@@ -365,13 +365,13 @@ export default function ApprobationsClient({
       {/* Search + Bulk actions */}
       <div className="flex flex-col sm:flex-row gap-3 mb-4 sticky top-16 bg-slate-50/95 backdrop-blur z-10 py-3 -mx-4 px-4 border-b border-slate-200">
         <div className="flex-1 relative">
-          <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Filter className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={`Filtrer ${tab === 'teachers' ? 'les enseignants' : 'les ressources'}...`}
-            className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            className="w-full ps-10 pe-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
           />
         </div>
 
@@ -442,7 +442,7 @@ export default function ApprobationsClient({
         )}
 
         {selected.size > 0 && (
-          <div className="flex gap-2 animate-in fade-in slide-in-from-right-2 flex-wrap">
+          <div className="flex gap-2 animate-in fade-in slide-in-from-end-2 flex-wrap">
             <span className="px-3 py-2 bg-primary-100 text-primary-700 rounded-xl text-sm font-semibold flex items-center">
               {selected.size} sélectionné{selected.size > 1 ? 's' : ''}
             </span>
@@ -961,7 +961,7 @@ export default function ApprobationsClient({
             </div>
             <div className="p-6">
               <div className="bg-violet-50 border border-violet-200 rounded-xl p-3 mb-4 text-sm text-violet-800">
-                <Shield className="w-4 h-4 inline mr-1" />
+                <Shield className="w-4 h-4 inline me-1" />
                 Cette action enverra un email au prof lui demandant de nous envoyer
                 <strong> 5 fichiers Word/PDF d'exemple</strong> avec son nom et prénom.
                 <br />

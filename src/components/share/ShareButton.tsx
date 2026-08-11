@@ -79,7 +79,7 @@ export default function ShareButton({
           />
 
           {/* Dropdown */}
-          <div className="absolute right-0 top-full mt-2 bg-white rounded-2xl shadow-2xl border border-slate-200 p-2 z-[101] min-w-[240px]">
+          <div className="absolute end-0 top-full mt-2 bg-white rounded-2xl shadow-2xl border border-slate-200 p-2 z-[101] min-w-[240px]">
             <button
               onClick={copyLink}
               className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl text-left transition"

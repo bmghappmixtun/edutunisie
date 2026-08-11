@@ -45,7 +45,7 @@ export default function MobileMenu({ user }: { user: any }) {
         onClick={() => setOpen(false)}
         onKeyDown={(e) => { if (e.key === "Escape") setOpen(false); }}
       />
-      <div className="absolute right-0 top-0 bottom-0 w-80 max-w-[85vw] bg-white shadow-2xl overflow-y-auto flex flex-col">
+      <div className="absolute end-0 top-0 bottom-0 w-80 max-w-[85vw] bg-white shadow-2xl overflow-y-auto flex flex-col">
         <div className="flex items-center justify-between p-4 border-b border-slate-100 flex-shrink-0">
           <span className="font-extrabold text-lg">{t('nav.menu')}</span>
           <button

@@ -62,11 +62,11 @@ export default function SubjectHero({
 
       {/* Floating decorative shapes */}
       <div
-        className="absolute -top-20 -right-20 w-72 h-72 rounded-full blur-3xl opacity-30"
+        className="absolute -top-20 -end-20 w-72 h-72 rounded-full blur-3xl opacity-30"
         style={{ background: subject.color }}
       />
       <div
-        className="absolute -bottom-16 -left-16 w-64 h-64 rounded-full blur-3xl opacity-20"
+        className="absolute -bottom-16 -start-16 w-64 h-64 rounded-full blur-3xl opacity-20"
         style={{ background: subject.color }}
       />
 
@@ -201,7 +201,7 @@ function QuickAccessTags({ slug, color }: { slug: string; color: string }) {
   ];
   return (
     <div className="flex flex-wrap gap-1.5">
-      <span className="text-xs text-slate-500 self-center mr-1">Accès rapide:</span>
+      <span className="text-xs text-slate-500 self-center me-1">Accès rapide:</span>
       {tags.map((t) => (
         <Link
           key={t.qs}
@@ -231,7 +231,7 @@ function SubjectMotif({
   if (motif === 'circuit' || motif === 'globe' || motif === 'lines') {
     return (
       <svg
-        className="absolute right-0 top-0 h-full w-1/2 opacity-40 pointer-events-none"
+        className="absolute end-0 top-0 h-full w-1/2 opacity-40 pointer-events-none"
         viewBox="0 0 400 400"
         preserveAspectRatio="xMidYMid slice"
       >
@@ -287,7 +287,7 @@ function SubjectMotif({
   if (motif === 'tree') {
     return (
       <svg
-        className="absolute right-0 top-0 h-full w-1/2 opacity-30 pointer-events-none"
+        className="absolute end-0 top-0 h-full w-1/2 opacity-30 pointer-events-none"
         viewBox="0 0 200 200"
       >
         <path
@@ -307,7 +307,7 @@ function SubjectMotif({
   // dots / sparkles / waves fallback
   return (
     <svg
-      className="absolute right-0 top-0 h-full w-1/2 opacity-30 pointer-events-none"
+      className="absolute end-0 top-0 h-full w-1/2 opacity-30 pointer-events-none"
       viewBox="0 0 200 200"
     >
       {Array.from({ length: 30 }, (_, i) => (

@@ -205,9 +205,9 @@ export default function TeacherLibraryClient({
                 placeholder="Rechercher dans mes fichiers…"
                 value={filter.search}
                 onChange={(e) => setFilter((f) => ({ ...f, search: e.target.value }))}
-                className="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent"
+                className="w-full ps-10 pe-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent"
               />
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">🔍</span>
+              <span className="absolute start-3 top-1/2 -translate-y-1/2 text-slate-400">🔍</span>
             </div>
           </div>
           <select

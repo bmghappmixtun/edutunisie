@@ -178,7 +178,7 @@ export default function InviteNewProfModal({ open, onClose, onSuccess }: InviteN
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-                  <User className="w-3.5 h-3.5 inline mr-1" /> Prénom
+                  <User className="w-3.5 h-3.5 inline me-1" /> Prénom
                 </label>
                 <input
                   type="text"
@@ -192,7 +192,7 @@ export default function InviteNewProfModal({ open, onClose, onSuccess }: InviteN
               </div>
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-                  <User className="w-3.5 h-3.5 inline mr-1" /> Nom
+                  <User className="w-3.5 h-3.5 inline me-1" /> Nom
                 </label>
                 <input
                   type="text"
@@ -208,7 +208,7 @@ export default function InviteNewProfModal({ open, onClose, onSuccess }: InviteN
 
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-                <Mail className="w-3.5 h-3.5 inline mr-1" /> Email
+                <Mail className="w-3.5 h-3.5 inline me-1" /> Email
               </label>
               <input
                 type="email"
@@ -223,7 +223,7 @@ export default function InviteNewProfModal({ open, onClose, onSuccess }: InviteN
 
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-2">
-                <Globe className="w-3.5 h-3.5 inline mr-1" /> Site d'origine
+                <Globe className="w-3.5 h-3.5 inline me-1" /> Site d'origine
               </label>
               <div className="grid grid-cols-2 gap-2">
                 <button
@@ -260,7 +260,7 @@ export default function InviteNewProfModal({ open, onClose, onSuccess }: InviteN
 
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-                <MessageSquare className="w-3.5 h-3.5 inline mr-1" /> Message personnalisé{' '}
+                <MessageSquare className="w-3.5 h-3.5 inline me-1" /> Message personnalisé{' '}
                 <span className="text-slate-400 font-normal">(optionnel)</span>
               </label>
               <textarea

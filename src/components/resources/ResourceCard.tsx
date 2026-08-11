@@ -95,12 +95,12 @@ export default function ResourceCard({ resource }: { resource: ResourceCardData 
     >
       {/* Accent bar top — subject color */}
       <div
-        className="absolute top-0 left-0 right-0 h-1 opacity-90"
+        className="absolute top-0 start-0 end-0 h-1 opacity-90"
         style={{ background: subjectColor }}
       />
 
       {/* Favorite button — top right */}
-      <div className="absolute top-2 right-2 z-10">
+      <div className="absolute top-2 end-2 z-10">
         <FavoriteButton
           resourceId={resource.id}
           initialFavorited={resource.isFavorited ?? false}
@@ -110,7 +110,7 @@ export default function ResourceCard({ resource }: { resource: ResourceCardData 
 
       <div className="p-5">
         {/* Pills row */}
-        <div className="flex flex-wrap items-center gap-1.5 mb-3 pr-10">
+        <div className="flex flex-wrap items-center gap-1.5 mb-3 pe-10">
           <span className="px-2.5 py-1 bg-blue-50 text-blue-700 text-[10px] font-bold uppercase tracking-wider rounded-full">
             {typeLabel.fr}
           </span>

@@ -34,7 +34,7 @@ export default function UserMenu({ user, unreadCount }: { user: any; unreadCount
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 pl-1 pr-2 py-1 min-h-[44px] rounded-full hover:bg-slate-100 transition"
+        className="flex items-center gap-2 ps-1 pe-2 py-1 min-h-[44px] rounded-full hover:bg-slate-100 transition"
       >
         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 text-white font-bold text-sm flex items-center justify-center">
           {initials}
@@ -43,7 +43,7 @@ export default function UserMenu({ user, unreadCount }: { user: any; unreadCount
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-72 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-50">
+        <div className="absolute end-0 mt-2 w-72 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-50">
           <div className="p-4 border-b border-slate-100 bg-gradient-to-br from-primary-50 to-white">
             <div className="font-bold text-slate-900">
               {user.firstName} {user.lastName}

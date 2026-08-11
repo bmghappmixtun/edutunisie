@@ -86,7 +86,7 @@ export default function ChatWindow({
             <div key={m.id} className={`flex ${mine ? 'justify-end' : 'justify-start'}`}>
               <div className={`max-w-[75%] ${mine ? 'order-2' : ''}`}>
                 {!mine && (
-                  <div className="text-xs text-slate-500 mb-0.5 ml-1">
+                  <div className="text-xs text-slate-500 mb-0.5 ms-1">
                     {m.sender.firstName || 'Utilisateur'}
                   </div>
                 )}
@@ -100,7 +100,7 @@ export default function ChatWindow({
                   <p className="whitespace-pre-wrap break-words text-sm">{m.content}</p>
                 </div>
                 <div
-                  className={`text-xs text-slate-400 mt-0.5 ${mine ? 'text-right mr-1' : 'ml-1'}`}
+                  className={`text-xs text-slate-400 mt-0.5 ${mine ? 'text-right me-1' : 'ms-1'}`}
                 >
                   {new Date(m.createdAt).toLocaleTimeString('fr-FR', {
                     hour: '2-digit',
