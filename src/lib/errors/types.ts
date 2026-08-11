@@ -38,6 +38,10 @@ export interface ErrorReport {
   method?: string;
   // User agent
   userAgent?: string;
+  // Vercel request ID for correlation with VercelLog
+  requestId?: string;
+  // Vercel region (e.g. 'fra1')
+  region?: string;
   // Additional context
   context?: ErrorContext;
   // Whether to send email

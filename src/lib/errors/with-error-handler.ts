@@ -72,6 +72,14 @@ export function withErrorHandler<P = unknown>(
       const customContext = options.getContext?.(req, ctx) || {};
       console.error(`[${reference}] ${options.action}:`, err);
 
+      // Capture Vercel request ID for correlation with VercelLog
+      // Vercel adds these headers to every request:
+      //   x-vercel-id: unique request ID (e.g. "fra1::abc123")
+      //   x-vercel-forwarded-for: client IP
+      const vercelRequestId = req.headers.get('x-vercel-id') || undefined;
+      const vercelRegion = req.headers.get('x-vercel-ip-region') || undefined;
+      const forwardedFor = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || undefined;
+
       await logError({
         reference,
         source: 'SERVER',
@@ -81,11 +89,13 @@ export function withErrorHandler<P = unknown>(
         url: req.url,
         method: req.method,
         userAgent: req.headers.get('user-agent') || undefined,
+        requestId: vercelRequestId,
+        region: vercelRegion,
         context: {
           action: options.action,
           userId,
           userEmail,
-          ip: req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || undefined,
+          ip: forwardedFor,
           ...customContext,
         },
         sendEmail: !!userEmail,

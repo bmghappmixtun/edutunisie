@@ -58,6 +58,8 @@ export async function logError(report: ErrorReport): Promise<LogResult> {
         userAgent: report.userAgent,
         userId,
         userEmail, // tracked in DB, not used for email
+        requestId: report.requestId,
+        region: report.region,
         context: (report.context || {}) as any,
         emailSent: false, // never email users
         agentNotified: shouldAlertAgent,
