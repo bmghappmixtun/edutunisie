@@ -6,6 +6,7 @@ import { routing } from '@/i18n/routing';
 import { hasLocale } from 'next-intl';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import SyncLocaleAttrs from '@/components/i18n/SyncLocaleAttrs';
 
 type Props = {
   children: React.ReactNode;
@@ -36,6 +37,7 @@ export default async function LocaleLayout({ children, params }: Props) {
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
+      <SyncLocaleAttrs />
       <Header />
       <main className="min-h-screen">
         {children}
