@@ -88,12 +88,12 @@ export default async function Header() {
               <UserMenu user={user} unreadCount={unreadNotifications} />
             ) : (
               <>
-                <Link
+                <NextLink
                   href="/connexion"
                   className="hidden sm:block text-sm font-semibold text-slate-700 hover:text-primary-600 px-3 py-2 transition"
                 >
                   {t('nav.login')}
-                </Link>
+                </NextLink>
                 <NextLink href="/inscription" className="btn-primary text-sm">
                   {t('nav.signup')}
                 </NextLink>
