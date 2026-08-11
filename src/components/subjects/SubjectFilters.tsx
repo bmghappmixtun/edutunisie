@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter, usePathname } from '@/i18n/navigation';
 import { useCallback } from 'react';
 import { X, Users, BookOpen, BookText, Filter } from 'lucide-react';
 

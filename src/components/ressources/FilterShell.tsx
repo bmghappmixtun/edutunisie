@@ -40,7 +40,7 @@ import * as ToggleGroup from '@radix-ui/react-toggle-group';
 // If we later need keyboard-toggleable a11y on these switches, we
 // can re-introduce a single, well-placed Switch.
 import type { LucideIcon } from 'lucide-react';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter, usePathname } from '@/i18n/navigation';
 import ResourceCard from '@/components/resources/ResourceCard';
 import ResourceListItem from '@/components/resources/ResourceListItem';
 

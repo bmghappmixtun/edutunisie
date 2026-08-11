@@ -1,7 +1,7 @@
 'use client';
 import { useLocale } from 'next-intl';
 import { Globe } from 'lucide-react';
-import { usePathname } from 'next/navigation';
+import { usePathname } from '@/i18n/navigation';
 import { Link } from '@/i18n/navigation';
 
 /**
