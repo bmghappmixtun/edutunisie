@@ -531,12 +531,12 @@ export default function HomeClient({
                 </h2>
                 <p className="text-primary-100 text-lg mb-6">{t('home.sections.ctaTeacherDesc')}</p>
                 <div className="flex flex-wrap gap-3">
-                  <Link
+                  <NextLink
                     href="/inscription"
                     className="bg-white text-primary-700 font-bold px-7 py-3.5 rounded-full shadow-xl hover:scale-105 transition-all inline-flex items-center gap-2"
                   >
                     <Upload className="w-5 h-5" /> {t('home.becomeTeacher')}
-                  </Link>
+                  </NextLink>
                   <Link
                     href="/professeurs"
                     className="bg-white/10 backdrop-blur border border-white/30 text-white font-bold px-7 py-3.5 rounded-full hover:bg-white/20 transition inline-flex items-center gap-2"

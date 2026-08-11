@@ -144,13 +144,13 @@ export default function MobileMenu({ user }: { user: any }) {
               >
                 {t('nav.myAccount')}
               </NextLink>
-              <Link
+              <NextLink
                 href="/mon-compte/favoris"
                 onClick={() => setOpen(false)}
                 className="block px-4 py-3 hover:bg-slate-50 rounded-lg font-medium"
               >
                 {t('nav.favorites')}
-              </Link>
+              </NextLink>
               {(isTeacher || isAdmin) && (
                 <NextLink
                   href="/enseignant"

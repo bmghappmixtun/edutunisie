@@ -1,5 +1,6 @@
 'use client';
 import { Link } from '@/i18n/navigation';
+import NextLink from 'next/link';
 import { getInitials } from '@/lib/text-utils';
 import { useState, useRef, useEffect } from 'react';
 import {
@@ -54,21 +55,21 @@ export default function UserMenu({ user, unreadCount }: { user: any; unreadCount
           </div>
 
           <div className="py-2">
-            <Link
+            <NextLink
               href="/mon-compte"
               onClick={() => setOpen(false)}
               className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 text-sm text-slate-700"
             >
               <LayoutDashboard className="w-4 h-4" /> Mon tableau de bord
-            </Link>
-            <Link
+            </NextLink>
+            <NextLink
               href="/mon-compte/favoris"
               onClick={() => setOpen(false)}
               className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 text-sm text-slate-700"
             >
               <Heart className="w-4 h-4" /> Mes favoris
-            </Link>
-            <Link
+            </NextLink>
+            <NextLink
               href="/mon-compte/notifications"
               onClick={() => setOpen(false)}
               className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 text-sm text-slate-700 justify-between"
@@ -81,34 +82,34 @@ export default function UserMenu({ user, unreadCount }: { user: any; unreadCount
                   {unreadCount}
                 </span>
               )}
-            </Link>
+            </NextLink>
 
             {(isTeacher || isAdmin) && (
-              <Link
+              <NextLink
                 href="/enseignant"
                 onClick={() => setOpen(false)}
                 className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 text-sm text-slate-700"
               >
                 <Upload className="w-4 h-4" /> Espace enseignant
-              </Link>
+              </NextLink>
             )}
             {isAdmin && (
-              <Link
+              <NextLink
                 href="/admin"
                 onClick={() => setOpen(false)}
                 className="flex items-center gap-3 px-4 py-2.5 hover:bg-amber-50 text-sm text-amber-700 font-semibold"
               >
                 <Shield className="w-4 h-4" /> Administration
-              </Link>
+              </NextLink>
             )}
 
-            <Link
+            <NextLink
               href="/mon-compte/parametres"
               onClick={() => setOpen(false)}
               className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 text-sm text-slate-700"
             >
               <Settings className="w-4 h-4" /> Paramètres
-            </Link>
+            </NextLink>
           </div>
 
           <div className="border-t border-slate-100 p-2">
