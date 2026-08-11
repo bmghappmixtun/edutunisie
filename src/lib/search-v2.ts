@@ -10,6 +10,7 @@
  *   5. GROUP BY for facets (single query, parallel aggregation)
  */
 import { prisma } from './prisma';
+import { getAllSynonyms, resolveSubjectSlugs, resolveClassSlugs, resolveSectionSlugs } from './search-cache';
 import { sanitizeHighlightHtml } from './security';
 
 export interface SearchFilters {
@@ -175,10 +176,8 @@ export async function searchV2(options: SearchOptions): Promise<SearchResponse> 
   const sort = options.sort || 'relevance';
   const filters: SearchFilters = options.filters || {};
 
-  // 1. Pre-fetch synonyms
-  const synonyms = await prisma.searchSynonym.findMany({
-    select: { term: true, synonyms: true },
-  });
+  // 1. Pre-fetch synonyms (CACHED for 5 min)
+  const synonyms = await getAllSynonyms();
 
   // 2. Expand query → list of variants
   const expandedQuery = expandQueryWithSynonyms(q, synonyms);
@@ -190,28 +189,19 @@ export async function searchV2(options: SearchOptions): Promise<SearchResponse> 
   let sectionIds: string[] = [];
 
   if (filters.subject?.length) {
-    const r = await prisma.subject.findMany({
-      where: { slug: { in: filters.subject } },
-      select: { id: true },
-    });
+    const r = await resolveSubjectSlugs(filters.subject);
     subjectIds = r.map((s) => s.id);
     if (!subjectIds.length)
       return emptyResponse({ q, page, limit, sort, filters, t0, expandedQuery });
   }
   if (filters.class?.length) {
-    const r = await prisma.class.findMany({
-      where: { slug: { in: filters.class } },
-      select: { id: true },
-    });
+    const r = await resolveClassSlugs(filters.class);
     classIds = r.map((c) => c.id);
     if (!classIds.length)
       return emptyResponse({ q, page, limit, sort, filters, t0, expandedQuery });
   }
   if (filters.section?.length) {
-    const r = await prisma.section.findMany({
-      where: { slug: { in: filters.section } },
-      select: { id: true },
-    });
+    const r = await resolveSectionSlugs(filters.section);
     sectionIds = r.map((s) => s.id);
     if (!sectionIds.length)
       return emptyResponse({ q, page, limit, sort, filters, t0, expandedQuery });

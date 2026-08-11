@@ -23,11 +23,25 @@ function createPrismaClient() {
     },
   });
 
-  // Connection limit via query string (works with both pooled and direct URLs)
-  // Falls back to env var if not in URL
-  if (process.env.DATABASE_URL && !process.env.DATABASE_URL.includes('connection_limit')) {
-    const sep = process.env.DATABASE_URL.includes('?') ? '&' : '?';
-    process.env.DATABASE_URL = `${process.env.DATABASE_URL}${sep}connection_limit=10&pool_timeout=20`;
+  // Connection pool config:
+  // - Neon pooler uses PgBouncer in transaction mode
+  // - We set ?pgbouncer=true to tell Prisma to use transaction mode
+  //   (disables prepared statements, uses simple query protocol)
+  // - connection_limit=2 per Lambda (Vercel creates new Lambda per request
+  //   in serverless, so each Lambda gets at most 2 connections)
+  // - pool_timeout=20s: wait longer for a connection before failing
+  if (process.env.DATABASE_URL) {
+    const url = new URL(process.env.DATABASE_URL);
+    if (!url.searchParams.has('pgbouncer')) {
+      url.searchParams.set('pgbouncer', 'true');
+    }
+    if (!url.searchParams.has('connection_limit')) {
+      url.searchParams.set('connection_limit', '2');
+    }
+    if (!url.searchParams.has('pool_timeout')) {
+      url.searchParams.set('pool_timeout', '20');
+    }
+    process.env.DATABASE_URL = url.toString();
   }
 
   // Auto-fill User.slug on create if not provided
