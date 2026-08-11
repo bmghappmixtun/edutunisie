@@ -1,14 +1,17 @@
+import { getLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import ResourceCard from '@/components/resources/ResourceCard';
 import { prisma } from '@/lib/prisma';
 import { getUserFavorites, decorateWithFavorites } from '@/lib/resource-helpers';
 import { ChevronRight } from 'lucide-react';
 import { breadcrumbSchema } from '@/lib/structured-data';
+import { getLocalizedName } from '@/lib/localized-name';
 
 export const revalidate = 300; // 5 min cache
 
 export async function generateMetadata({ params }: { params: Promise<{ level: string }> }) {
   const { level: levelSlug } = await params;
+  const locale = await getLocale();
   const level = await prisma.level.findUnique({
     where: { slug: levelSlug },
     select: { nameFr: true, nameAr: true, slug: true },
@@ -16,12 +19,12 @@ export async function generateMetadata({ params }: { params: Promise<{ level: st
   if (!level) return { title: 'Niveau non trouvé' };
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
   return {
-    title: `${level.nameFr} — Cours et Devoirs gratuits`,
-    description: `Ressources pédagogiques gratuites pour ${level.nameFr} en Tunisie : cours, devoirs, exercices et corrigés.`,
+    title: `${getLocalizedName(level, locale)} — Cours et Devoirs gratuits`,
+    description: `Ressources pédagogiques gratuites pour ${getLocalizedName(level, locale)} en Tunisie : cours, devoirs, exercices et corrigés.`,
     alternates: { canonical: `${baseUrl}/niveaux/${level.slug}` },
     openGraph: {
-      title: `${level.nameFr} — Examanet`,
-      description: `Cours et devoirs gratuits pour ${level.nameFr}.`,
+      title: `${getLocalizedName(level, locale)} — Examanet`,
+      description: `Cours et devoirs gratuits pour ${getLocalizedName(level, locale)}.`,
       url: `${baseUrl}/niveaux/${level.slug}`,
       locale: 'fr_TN',
       type: 'website',
@@ -31,6 +34,7 @@ export async function generateMetadata({ params }: { params: Promise<{ level: st
 
 export default async function LevelPage({ params }: { params: Promise<{ level: string }> }) {
   const { level: levelSlug } = await params;
+  const locale = await getLocale();
   const level = await prisma.level.findUnique({ where: { slug: levelSlug } });
   if (!level)
     return (
@@ -93,9 +97,9 @@ export default async function LevelPage({ params }: { params: Promise<{ level: s
                 Accueil
               </Link>
               <ChevronRight className="w-4 h-4" />
-              <span className="text-slate-900 font-semibold">{level.nameFr}</span>
+              <span className="text-slate-900 font-semibold">{getLocalizedName(level, locale)}</span>
             </nav>
-            <h1 className="text-4xl lg:text-5xl font-extrabold mb-3">{level.nameFr}</h1>
+            <h1 className="text-4xl lg:text-5xl font-extrabold mb-3">{getLocalizedName(level, locale)}</h1>
             <p className="text-lg text-slate-600">
               {classes.length} classes · {classes.reduce((s, c) => s + c._count.resources, 0)}{' '}
               ressources
@@ -115,7 +119,7 @@ export default async function LevelPage({ params }: { params: Promise<{ level: s
                       href={`/niveaux/${levelSlug}?class=${c.slug}`}
                       className="flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-primary-50 text-sm font-medium transition"
                     >
-                      <span>{c.nameFr}</span>
+                      <span>{getLocalizedName(c, locale)}</span>
                       <span className="text-xs bg-slate-100 px-2 py-0.5 rounded-full">
                         {c._count.resources}
                       </span>

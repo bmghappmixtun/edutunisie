@@ -6,6 +6,7 @@ import { itemListSchema } from '@/lib/structured-data';
 import { BookOpen, Sparkles, ArrowRight, GraduationCap } from 'lucide-react';
 import { getSubjectConfig } from '@/lib/subjects.config';
 import { SUBJECT_ICONS } from '@/lib/subjects.icons';
+import { getLocalizedName } from '@/lib/localized-name';
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
@@ -56,6 +57,7 @@ const EXCLUDED_SLUGS = new Set(['sport', 'sciences-informatique-matiere']);
 
 export default async function SubjectsPage() {
   const t = await getTranslations();
+  const locale = await getLocale();
   const dbSubjects = await prisma.subject.findMany({
     where: { slug: { notIn: Array.from(EXCLUDED_SLUGS) } },
     orderBy: { order: 'asc' },
@@ -72,11 +74,11 @@ export default async function SubjectsPage() {
     description: t('subjects.page.richSnippet').replace('{count}', String(dbSubjects.length)),
     url: `${baseUrl}/matieres`,
     items: dbSubjects.slice(0, 50).map((s) => ({
-      name: s.nameFr,
+      name: getLocalizedName(s, locale),
       url: `${baseUrl}/matieres/${s.slug}`,
       description: t('subjects.page.richSnippetItem')
         .replace('{count}', String(s._count.resources))
-        .replace('{name}', s.nameFr),
+        .replace('{name}', getLocalizedName(s, locale)),
     })),
   });
 
@@ -228,7 +230,7 @@ export default async function SubjectsPage() {
                     className="relative font-bold text-sm lg:text-base text-slate-900 leading-tight mb-0.5 group-hover:text-slate-900 transition-colors"
                     style={{ color: undefined }}
                   >
-                    {s.nameFr}
+                    {getLocalizedName(s, locale)}
                   </h3>
 
                   {/* AR name (if available) */}

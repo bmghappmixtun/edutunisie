@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { getTranslations, getLocale } from 'next-intl/server';
 import { itemListSchema, breadcrumbSchema } from '@/lib/structured-data';
+import { getLocalizedName } from '@/lib/localized-name';
 
 export const revalidate = 3600; // ISR: refresh every hour
 
@@ -78,6 +79,7 @@ const SUBJECT_INFO: Record<string, { color: string; icon: string; desc: string }
 
 export default async function CollegePillar() {
   const t = await getTranslations();
+  const locale = await getLocale();
   // Top resources (by views) for carousel
   const topResources = await prisma.resource.findMany({
     where: {
@@ -336,7 +338,7 @@ export default async function CollegePillar() {
                     <div className="text-xs font-bold uppercase tracking-wider text-primary-600 mb-2">
                       {cls.nameAr}
                     </div>
-                    <h3 className="text-2xl font-extrabold text-slate-900 mb-3">{cls.nameFr}</h3>
+                    <h3 className="text-2xl font-extrabold text-slate-900 mb-3">{getLocalizedName(cls, locale)}</h3>
                     <p className="text-slate-600 mb-4 text-sm">
                       {cls.slug === '7eme' && t('college.classes.desc7')}
                       {cls.slug === '8eme' && t('college.classes.desc8')}

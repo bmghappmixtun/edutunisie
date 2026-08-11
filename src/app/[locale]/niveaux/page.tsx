@@ -15,6 +15,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import ClassAccordion from '@/components/niveaux/ClassAccordion';
+import { getLocalizedName } from '@/lib/localized-name';
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
@@ -176,9 +177,9 @@ export default async function NiveauxPage() {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
   const allClasses = levels.flatMap((lvl) =>
     lvl.classes.map((c) => ({
-      name: `${c.nameFr} — ${lvl.nameFr}`,
+      name: `${getLocalizedName(c, locale)} — ${getLocalizedName(lvl, locale)}`,
       url: `${baseUrl}/ressources?class=${c.slug}`,
-      description: `${c._count.resources} ressources en ${c.nameFr}`,
+      description: `${c._count.resources} ressources en ${getLocalizedName(c, locale)}`,
     })),
   );
   const niveauxListJsonLd = itemListSchema({
@@ -307,7 +308,7 @@ export default async function NiveauxPage() {
               accent: '#0EA5E9',
               Icon: BookOpen,
               badge: 'bg-slate-100 text-slate-700',
-              tagline: level.nameFr,
+              tagline: getLocalizedName(level, locale),
             };
             const LevelIcon = design.Icon;
             const classCount = level.classes.length;
@@ -352,7 +353,7 @@ export default async function NiveauxPage() {
                         <span className="text-xs text-slate-500">{design.tagline}</span>
                       </div>
                       <h2 className="text-2xl lg:text-3xl font-extrabold text-slate-900 leading-tight">
-                        {level.nameFr}
+                        {getLocalizedName(level, locale)}
                       </h2>
                       <p className="text-slate-600 mt-1 text-sm lg:text-base">
                         <strong className="font-bold text-slate-900">{classCount}</strong> classe
@@ -392,7 +393,7 @@ export default async function NiveauxPage() {
                           return {
                             id: s.id,
                             slug: s.slug,
-                            nameFr: s.nameFr,
+                            nameFr: getLocalizedName(s, locale),
                             nameAr: s.nameAr,
                             emoji: sStyle.emoji,
                             tint: sStyle.tint,
@@ -410,7 +411,7 @@ export default async function NiveauxPage() {
                               downloadsCount: r.downloadsCount,
                               subject: {
                                 slug: r.subject.slug,
-                                nameFr: r.subject.nameFr,
+                                nameFr: getLocalizedName(r.subject, locale),
                                 color: r.subject.color,
                               },
                               teacher: r.teacher
@@ -429,7 +430,7 @@ export default async function NiveauxPage() {
                         classData={{
                           id: cls.id,
                           slug: cls.slug,
-                          nameFr: cls.nameFr,
+                          nameFr: getLocalizedName(cls, locale),
                           nameAr: cls.nameAr,
                           _count: cls._count,
                         }}

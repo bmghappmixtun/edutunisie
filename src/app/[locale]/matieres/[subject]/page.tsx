@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Link } from '@/i18n/navigation';
+import { getLocale } from 'next-intl/server';
 import ResourceCard from '@/components/resources/ResourceCard';
 import { prisma } from '@/lib/prisma';
 import { getUserFavorites, decorateWithFavorites } from '@/lib/resource-helpers';
@@ -11,6 +12,7 @@ import SubjectHero from '@/components/subjects/SubjectHero';
 import SubjectFilters from '@/components/subjects/SubjectFilters';
 import SmartPagination from '@/components/ui/SmartPagination';
 import { SlidersHorizontal, Sparkles, ArrowRight } from 'lucide-react';
+import { getLocalizedName } from '@/lib/localized-name';
 
 // ============== TYPES ==============
 interface PageProps {
@@ -66,6 +68,7 @@ const PAGE_SIZE = 24;
 // ============== METADATA (full SEO) ==============
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { subject: subjectSlug } = await params;
+  const locale = await getLocale();
   const subject = await prisma.subject.findUnique({ where: { slug: subjectSlug } });
   if (!subject) return { title: 'Matière non trouvée' };
 
@@ -74,9 +77,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const baseUrl = SITE_URL;
 
   return {
-    title: seo?.titleFr ?? `${subject.nameFr} — Cours, Devoirs et Exercices`,
+    title: seo?.titleFr ?? `${getLocalizedName(subject, locale)} — Cours, Devoirs et Exercices`,
     description:
-      seo?.descriptionFr ?? `Ressources en ${subject.nameFr} pour le système éducatif tunisien.`,
+      seo?.descriptionFr ?? `Ressources en ${getLocalizedName(subject, locale)} pour le système éducatif tunisien.`,
     keywords: [
       ...(seo?.keywordsFr ?? []),
       subject.nameFr.toLowerCase(),
@@ -92,7 +95,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       },
     },
     openGraph: {
-      title: seo?.titleFr ?? `${subject.nameFr} — Examanet`,
+      title: seo?.titleFr ?? `${getLocalizedName(subject, locale)} — Examanet`,
       description: seo?.descriptionFr,
       url: `${baseUrl}/matieres/${subject.slug}`,
       siteName: 'Examanet',
@@ -103,7 +106,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
           url: `${baseUrl}/api/og/subject/${subject.slug}`,
           width: 1200,
           height: 630,
-          alt: `${subject.nameFr} — Examanet`,
+          alt: `${getLocalizedName(subject, locale)} — Examanet`,
         },
       ],
     },
@@ -125,6 +128,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function SubjectPage({ params, searchParams }: PageProps) {
   const { subject: subjectSlug } = await params;
   const sp = await searchParams;
+  const locale = await getLocale();
 
   const subject = await prisma.subject.findUnique({ where: { slug: subjectSlug } });
   if (!subject) notFound();
@@ -281,14 +285,14 @@ export default async function SubjectPage({ params, searchParams }: PageProps) {
 
   const courseJsonLd = courseSchema({
     slug: subject.slug,
-    title: subject.nameFr,
+    title: getLocalizedName(subject, locale),
     description:
       cfg?.seo?.descriptionFr ??
-      `Cours complets en ${subject.nameFr} pour le système éducatif tunisien (7ème au Baccalauréat).`,
+      `Cours complets en ${getLocalizedName(subject, locale)} pour le système éducatif tunisien (7ème au Baccalauréat).`,
     language: 'fr',
     level: 'Enseignement Secondaire',
     cycle: 'Tous niveaux',
-    subject: subject.nameFr,
+    subject: getLocalizedName(subject, locale),
     type: 'COURSE',
     url,
     // Single timestamp reused for both fields — keeps them consistent and
@@ -301,8 +305,8 @@ export default async function SubjectPage({ params, searchParams }: PageProps) {
   const itemListJsonLd =
     totalCount > 0
       ? itemListSchema({
-          name: `Ressources en ${subject.nameFr} — Examanet`,
-          description: `Liste de ressources en ${subject.nameFr} pour élèves tunisiens.`,
+          name: `Ressources en ${getLocalizedName(subject, locale)} — Examanet`,
+          description: `Liste de ressources en ${getLocalizedName(subject, locale)} pour élèves tunisiens.`,
           url,
           items: resources.slice(0, 10).map((r) => ({
             name: r.title,
@@ -324,7 +328,7 @@ export default async function SubjectPage({ params, searchParams }: PageProps) {
     .filter(Boolean)
     .map((c) => ({
       slug: c.slug,
-      nameFr: subject.nameFr, // placeholder, replaced below
+      nameFr: getLocalizedName(subject, locale), // placeholder, replaced below
       color: c.color,
       emoji: c.design.emoji,
       gradient: c.design.gradient,
@@ -373,7 +377,7 @@ export default async function SubjectPage({ params, searchParams }: PageProps) {
         <SubjectHero
           subject={{
             slug: subject.slug,
-            nameFr: subject.nameFr,
+            nameFr: getLocalizedName(subject, locale),
             nameAr: subject.nameAr,
             color,
             emoji: cfg?.design.emoji ?? '📚',
@@ -390,11 +394,11 @@ export default async function SubjectPage({ params, searchParams }: PageProps) {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="prose prose-slate max-w-4xl">
               <h2 className="text-2xl font-bold text-slate-900 mb-3">
-                Tout sur {subject.nameFr} au système éducatif tunisien
+                Tout sur {getLocalizedName(subject, locale)} au système éducatif tunisien
               </h2>
               <p className="text-slate-600 leading-relaxed">
                 {cfg?.seo?.introFr ??
-                  `Trouvez toutes les ressources en ${subject.nameFr} : cours, devoirs, séries d'exercices, sujets de BAC et corrigés, pour les classes de 7ème jusqu'au Baccalauréat.`}
+                  `Trouvez toutes les ressources en ${getLocalizedName(subject, locale)} : cours, devoirs, séries d'exercices, sujets de BAC et corrigés, pour les classes de 7ème jusqu'au Baccalauréat.`}
               </p>
             </div>
           </div>
@@ -410,7 +414,7 @@ export default async function SubjectPage({ params, searchParams }: PageProps) {
                 classes={classes}
                 sections={sections.map((s) => ({
                   id: s.id,
-                  name: s.nameFr,
+                  name: getLocalizedName(s, locale),
                   slug: s.slug,
                   class: s.class,
                 }))}
@@ -464,7 +468,7 @@ export default async function SubjectPage({ params, searchParams }: PageProps) {
 
               {/* Grid */}
               {totalCount === 0 ? (
-                <EmptyState subjectName={subject.nameFr} />
+                <EmptyState subjectName={getLocalizedName(subject, locale)} />
               ) : (
                 <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-5">
                   {decoratedResources.map((r) => (
@@ -493,7 +497,7 @@ export default async function SubjectPage({ params, searchParams }: PageProps) {
                 <h2 className="text-2xl font-bold text-slate-900">Matières complémentaires</h2>
               </div>
               <p className="text-slate-600 mb-6 -mt-3">
-                Ces matières sont liées à <strong>{subject.nameFr}</strong> dans le système éducatif
+                Ces matières sont liées à <strong>{getLocalizedName(subject, locale)}</strong> dans le système éducatif
                 tunisien. Explorez-les pour une vision complète de votre parcours scolaire.
               </p>
               <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -506,7 +510,7 @@ export default async function SubjectPage({ params, searchParams }: PageProps) {
                     <div className="text-4xl mb-2 group-hover:scale-110 transition-transform">
                       {r.emoji}
                     </div>
-                    <h3 className="font-bold text-slate-900 mb-1">{r.nameFr}</h3>
+                    <h3 className="font-bold text-slate-900 mb-1">{getLocalizedName(r, locale)}</h3>
                     <p className="text-xs text-slate-600 mb-3">Découvrir →</p>
                     <ArrowRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform" />
                   </Link>
@@ -519,7 +523,7 @@ export default async function SubjectPage({ params, searchParams }: PageProps) {
           {cfg?.seo?.faq && cfg.seo.faq.length > 0 && (
             <section className="mt-16 border-t border-slate-200 pt-12">
               <h2 className="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
-                <span>❓</span> Questions fréquentes — {subject.nameFr}
+                <span>❓</span> Questions fréquentes — {getLocalizedName(subject, locale)}
               </h2>
               <div className="space-y-4">
                 {cfg.seo.faq.map((f, i) => (
