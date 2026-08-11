@@ -1,3 +1,4 @@
+import 'server-only';
 import { PrismaClient } from '@prisma/client';
 import { buildTeacherSlug } from './teacher-url';
 
@@ -33,3 +34,19 @@ function createPrismaClient() {
 export const prisma = globalForPrisma.prisma || createPrismaClient();
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+
+/**
+ * SECURITY & BEST PRACTICES:
+ * 
+ * 1. Singleton pattern: PrismaClient is cached on globalThis to prevent
+ *    connection proliferation during dev hot-reload.
+ * 
+ * 2. server-only: import 'server-only' at the top ensures this file cannot
+ *    be imported from a Client Component. Build will fail if attempted.
+ * 
+ * 3. NO $disconnect() per request: Neon pooling handles connection lifecycle.
+ * 
+ * 4. For Server Components: call prisma directly. No need for /api routes.
+ * 
+ * 5. For mutations: use Server Actions + Zod validation.
+ */
