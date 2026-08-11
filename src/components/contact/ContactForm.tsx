@@ -3,10 +3,10 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Send, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { useI18n } from '@/lib/i18n';
+import { useTranslations, useLocale } from 'next-intl';
 
 export default function ContactForm() {
-  const { t } = useI18n();
+  const t = useTranslations();
   const searchParams = useSearchParams();
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
   const [loading, setLoading] = useState(false);

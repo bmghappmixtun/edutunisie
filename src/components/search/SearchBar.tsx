@@ -15,7 +15,7 @@ import {
   FolderOpen,
   ChevronRight,
 } from 'lucide-react';
-import { useI18n } from '@/lib/i18n';
+import { useTranslations, useLocale } from 'next-intl';
 import { safeGetJSON, safeSetJSON, safeRemoveItem } from '@/lib/safeStorage';
 
 type SuggestResult = {
@@ -66,7 +66,7 @@ export default function SearchBar({
   initialQuery?: string;
 }) {
   const router = useRouter();
-  const { t, locale } = useI18n();
+  const t = useTranslations(); const locale = useLocale();
   const [query, setQuery] = useState(initialQuery);
   const [results, setResults] = useState<GroupedResults | null>(null);
   const [loading, setLoading] = useState(false);

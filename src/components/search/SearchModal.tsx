@@ -17,7 +17,7 @@ import {
   ChevronRight,
   Command,
 } from 'lucide-react';
-import { useI18n } from '@/lib/i18n';
+import { useTranslations, useLocale } from 'next-intl';
 import { safeGetJSON, safeSetJSON, safeRemoveItem } from '@/lib/safeStorage';
 
 type SuggestResult = {
@@ -77,7 +77,7 @@ interface SearchModalProps {
 
 export default function SearchModal({ open, onClose, initialQuery = '' }: SearchModalProps) {
   const router = useRouter();
-  const { t } = useI18n();
+  const t = useTranslations();
   const [query, setQuery] = useState(initialQuery);
   const [results, setResults] = useState<GroupedResults | null>(null);
   const [loading, setLoading] = useState(false);

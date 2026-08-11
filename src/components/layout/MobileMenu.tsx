@@ -3,10 +3,10 @@ import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { Menu, X, LogIn, UserPlus } from 'lucide-react';
-import { useI18n } from '@/lib/i18n';
+import { useTranslations, useLocale } from 'next-intl';
 
 export default function MobileMenu({ user }: { user: any }) {
-  const { t } = useI18n();
+  const t = useTranslations();
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const isTeacher = user?.role === 'TEACHER';

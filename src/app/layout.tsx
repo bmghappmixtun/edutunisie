@@ -7,7 +7,6 @@ import { Toaster } from 'react-hot-toast';
 import AnalyticsWithOptOut from '@/components/analytics/AnalyticsWithOptOut';
 import ServiceWorkerRegister from '@/components/pwa/ServiceWorkerRegister';
 import ErrorHandlerInit from '@/components/errors/ErrorHandlerInit';
-import I18nProviderWrapper from '@/components/layout/I18nProviderWrapper';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import { organizationSchema } from '@/lib/structured-data';
 
@@ -248,7 +247,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body className="font-sans">
         <NuqsAdapter>
-          <I18nProviderWrapper
+          
             initialLocale={(() => {
               try {
                 const h = headers();
@@ -260,7 +259,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             })()}
           >
             {children}
-          </I18nProviderWrapper>
+          
         </NuqsAdapter>
         <Toaster
           position="top-right"

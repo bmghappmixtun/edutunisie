@@ -1,5 +1,5 @@
 'use client';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import {
   Search,
   BookOpen,
@@ -19,7 +19,7 @@ import {
   Award,
   Mail,
 } from 'lucide-react';
-import { useI18n } from '@/lib/i18n';
+import { useTranslations, useLocale } from 'next-intl';
 import ResourceCard from '@/components/resources/ResourceCard';
 import { formatNumber } from '@/lib/utils';
 
@@ -43,7 +43,7 @@ export default function HomeClient({
   subjects: Subject[];
   stats: { resources: number; teachers: number; students: number; downloads: number };
 }) {
-  const { t, locale } = useI18n();
+  const t = useTranslations(); const locale = useLocale();
   const [resourceCount, teacherCount, studentCount, downloads] = [
     stats.resources,
     stats.teachers,
