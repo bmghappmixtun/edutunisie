@@ -121,12 +121,21 @@ function buildMatchConditions(
   originalQ: string,
 ): {
   ftsSql: string;
+  ftsTsquery: string;  // the tsquery expression (no "search_vector @@ " prefix)
   trgmSql: string;
   params: (string | number | boolean | string[])[];
   ftsCombined: string;
 } {
   if (variants.length === 0) {
-    return { ftsSql: 'FALSE', trgmSql: 'FALSE', params: [], ftsCombined: '' };
+    // No variants → no FTS possible, skip tsquery evaluation
+    // Use a NULL tsquery so r.search_vector @@ NULL returns NULL (not boolean)
+    return {
+      ftsSql: 'FALSE',
+      ftsTsquery: 'NULL::tsquery',
+      trgmSql: 'FALSE',
+      params: [],
+      ftsCombined: ''
+    };
   }
 
   // FTS: build OR'd tsqueries using `||` operator (PostgreSQL tsquery OR)
@@ -147,6 +156,7 @@ function buildMatchConditions(
 
   return {
     ftsSql,
+    ftsTsquery: ftsParts.join(' || '),  // just the tsquery expression
     trgmSql,
     params: [...ftsParams, originalQ || variants[0]], // variants + trgm query
     ftsCombined: variants.join(' · '),
@@ -299,8 +309,10 @@ export async function searchV2(options: SearchOptions): Promise<SearchResponse> 
       SELECT
         r.id,
         -- FTS score: use the OR'd variants tsquery
-        CASE WHEN r.search_vector @@ (${match.ftsSql.replace(/^search_vector @@ /, '')})
-             THEN ts_rank_cd(r.search_vector, (${match.ftsSql.replace(/^search_vector @@ /, '')}))
+        -- Note: match.ftsTsquery is just the tsquery expression, no "search_vector @@" prefix.
+        -- When no variants, ftsTsquery is NULL::tsquery so r.search_vector @@ NULL returns NULL.
+        CASE WHEN r.search_vector @@ (${match.ftsTsquery})
+             THEN ts_rank_cd(r.search_vector, (${match.ftsTsquery}))
              ELSE 0
         END AS fts_score,
         -- TRGM score (original q)
