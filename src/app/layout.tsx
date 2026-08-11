@@ -247,19 +247,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body className="font-sans">
         <NuqsAdapter>
-          
-            initialLocale={(() => {
-              try {
-                const h = headers();
-                const l = h.get('x-locale');
-                return l === 'ar' || l === 'fr' ? l : 'fr';
-              } catch {
-                return 'fr';
-              }
-            })()}
-          >
-            {children}
-          
+          {children}
         </NuqsAdapter>
         <Toaster
           position="top-right"
