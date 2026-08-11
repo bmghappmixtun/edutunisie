@@ -15,14 +15,14 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { useI18n } from '@/lib/i18n';
+import { useTranslations } from 'next-intl';
 
 type Step = 'email' | 'code' | 'done';
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { t } = useI18n();
+  const t = useTranslations();
 
   const [step, setStep] = useState<Step>('email');
   const [email, setEmail] = useState(searchParams.get('email') || '');

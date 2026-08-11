@@ -8,6 +8,8 @@ import AnalyticsWithOptOut from '@/components/analytics/AnalyticsWithOptOut';
 import ServiceWorkerRegister from '@/components/pwa/ServiceWorkerRegister';
 import ErrorHandlerInit from '@/components/errors/ErrorHandlerInit';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
+import { NextIntlClientProvider } from 'next-intl';
+import { getMessages } from 'next-intl/server';
 import { organizationSchema } from '@/lib/structured-data';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
@@ -246,9 +248,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
       </head>
       <body className="font-sans">
+        <NextIntlClientProvider locale={locale} messages={await getMessages()}>
         <NuqsAdapter>
           {children}
         </NuqsAdapter>
+        </NextIntlClientProvider>
         <Toaster
           position="top-right"
           toastOptions={{

@@ -11,7 +11,7 @@ import {
   Calendar,
   Sparkles,
 } from 'lucide-react';
-import { useI18n } from '@/lib/i18n';
+import { useTranslations, useLocale } from 'next-intl';
 
 type BacFile = {
   url: string;
@@ -77,7 +77,8 @@ export function BacArchivesClient({
   allYearGroups: ArchiveYearGroup[];
   totalFiles: number;
 }) {
-  const { t, locale } = useI18n();
+  const t = useTranslations();
+  const locale = useLocale();
   const isAr = locale === 'ar';
 
   const [searchQuery, setSearchQuery] = useState('');

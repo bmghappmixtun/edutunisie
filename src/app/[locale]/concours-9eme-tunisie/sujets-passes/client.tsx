@@ -11,7 +11,7 @@ import {
   ChevronDown,
   Calendar,
 } from 'lucide-react';
-import { useI18n } from '@/lib/i18n';
+import { useTranslations, useLocale } from 'next-intl';
 
 type ConcoursFile = {
   key: string;
@@ -43,7 +43,7 @@ export function ConcoursSujetsClient({
   allYearGroups: YearGroup[];
   totalFiles: number;
 }) {
-  const { t } = useI18n();
+  const t = useTranslations();
   const [searchQuery, setSearchQuery] = useState('');
   const [yearFilter, setYearFilter] = useState<string>('');
   const [subjectFilter, setSubjectFilter] = useState<string>('');

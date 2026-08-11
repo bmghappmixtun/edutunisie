@@ -4,12 +4,13 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { GraduationCap, Eye, EyeOff } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useTranslations } from 'next-intl';
 import OAuthButtons from '@/components/auth/OAuthButtons';
-import { useI18n } from '@/lib/i18n';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { t } = useI18n();
+  const t = useTranslations('auth');
+  const tCommon = useTranslations('common');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPw, setShowPw] = useState(false);
@@ -28,16 +29,16 @@ export default function LoginPage() {
       if (!res.ok) {
         // Special handling: redirect to OTP verification if account is pending
         if (data.code === 'PENDING_OTP' && data.email) {
-          toast.error(data.error || t('auth.invalidCredentials'));
+          toast.error(data.error || t('invalidCredentials'));
           router.push(`/verifier?email=${encodeURIComponent(data.email)}`);
           return;
         }
         if (data.code === 'PENDING_APPROVAL') {
-          toast.error(data.error || t('auth.invalidCredentials'));
+          toast.error(data.error || t('invalidCredentials'));
           router.push('/en-attente');
           return;
         }
-        toast.error(data.error || t('auth.invalidCredentials'));
+        toast.error(data.error || t('invalidCredentials'));
         return;
       }
       toast.success('Bienvenue ! 🎉');
@@ -45,7 +46,7 @@ export default function LoginPage() {
       else if (data.user.role === 'TEACHER') router.push('/enseignant');
       else router.push('/mon-compte');
     } catch {
-      toast.error(t('common.error'));
+      toast.error(tCommon('error'));
     } finally {
       setLoading(false);
     }
@@ -60,8 +61,8 @@ export default function LoginPage() {
               <GraduationCap className="w-7 h-7 text-white" />
             </div>
           </Link>
-          <h1 className="text-2xl font-extrabold">{t('auth.loginTitle')}</h1>
-          <p className="text-slate-500 mt-1">{t('auth.loginSubtitle')}</p>
+          <h1 className="text-2xl font-extrabold">{t('loginTitle')}</h1>
+          <p className="text-slate-500 mt-1">{t('loginSubtitle')}</p>
         </div>
 
         <form
@@ -69,7 +70,7 @@ export default function LoginPage() {
           className="bg-white rounded-2xl p-6 lg:p-8 shadow-xl border border-slate-100"
         >
           <div className="mb-4">
-            <label className="label">{t('auth.email')}</label>
+            <label className="label">{t('email')}</label>
             <input
               type="email"
               value={email}
@@ -80,7 +81,7 @@ export default function LoginPage() {
             />
           </div>
           <div className="mb-6">
-            <label className="label">{t('auth.password')}</label>
+            <label className="label">{t('password')}</label>
             <div className="relative">
               <input
                 type={showPw ? 'text' : 'password'}
@@ -104,22 +105,22 @@ export default function LoginPage() {
             disabled={loading}
             className="btn-primary w-full justify-center py-3 text-base"
           >
-            {loading ? '...' : t('auth.loginButton')}
+            {loading ? '...' : t('loginButton')}
           </button>
 
           <OAuthButtons />
 
           <div className="text-center mt-4">
             <Link href="/mot-de-passe-oublie" className="text-sm text-primary-600 hover:underline">
-              {t('auth.forgotPassword')}
+              {t('forgotPassword')}
             </Link>
           </div>
         </form>
 
         <p className="text-center mt-6 text-sm text-slate-500">
-          {t('auth.noAccount')}{' '}
+          {t('noAccount')}{' '}
           <Link href="/inscription" className="text-primary-600 font-semibold hover:underline">
-            {t('auth.signupNow')}
+            {t('signupNow')}
           </Link>
         </p>
       </div>

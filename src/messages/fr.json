@@ -242,7 +242,7 @@
     "codeSentTo": "Un code a été envoyé à",
     "codeSent": "Code envoyé !",
     "resendCode": "Renvoyer le code",
-    "changeEmail": "Changer d'email",
+    "changeEmail": "Changer l'email",
     "code": "Code reçu",
     "confirmPassword": "Confirmer le mot de passe",
     "resetPassword": "Réinitialiser le mot de passe",
@@ -274,7 +274,6 @@
     "youCanPaste": "Vous pouvez coller le code directement",
     "verify": "Vérifier",
     "didntReceiveCode": "Vous n'avez pas reçu le code ?",
-    "resendCode": "Renvoyer le code",
     "codeValidFor": "Code valide {minutes} minutes · Max {attempts} tentatives",
     "pendingApprovalTitle": "En attente d'approbation",
     "pendingApprovalSubtitle": "Votre email a été vérifié ✓",
@@ -288,10 +287,8 @@
     "usualDelayDesc": "Notre équipe vérifie chaque demande pour garantir la qualité de la communauté.",
     "backHome": "Retour à l'accueil",
     "changePassword": "Changer le mot de passe",
-    "changeEmail": "Changer l'email",
     "currentPassword": "Mot de passe actuel",
     "newPassword": "Nouveau mot de passe",
-    "confirmPassword": "Confirmer le mot de passe",
     "saveChanges": "Enregistrer les modifications",
     "passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
     "passwordTooShort": "Le mot de passe doit contenir au moins 8 caractères",
@@ -1251,7 +1248,8 @@
       "subtitle": "Sujets, corrigés, méthodologie et ressources gratuites pour les 7 sections du Baccalauréat tunisien. Préparation complète, de la 3ème année jusqu'à la session principale.",
       "ctaPrimary": "Voir les sujets du Bac",
       "ctaSecondary": "Calculer ma moyenne",
-      "ctaTertiary": "Méthodologie de révision"
+      "ctaTertiary": "Méthodologie de révision",
+      "ctaArchives": "Voir les archives"
     },
     "stats": {
       "subjects": "Sujets depuis 1994",

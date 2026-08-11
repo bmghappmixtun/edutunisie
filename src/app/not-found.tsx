@@ -2,10 +2,10 @@
 
 import Link from 'next/link';
 import { FileQuestion, Home, Search } from 'lucide-react';
-import { useI18n } from '@/lib/i18n';
+import { useTranslations } from 'next-intl';
 
 export default function NotFound() {
-  const { t } = useI18n();
+  const t = useTranslations();
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-sky-50 to-indigo-50">
       <main className="flex-1 flex items-center justify-center px-4 py-12">
