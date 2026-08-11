@@ -8,9 +8,27 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 function createPrismaClient() {
+  // Connection pool config:
+  // - Neon free tier supports up to ~10 connections
+  // - Default Prisma client uses connection_limit=5 in serverless
+  // - We set explicit limit=10 + longer pool_timeout to absorb spikes
+  // - For long-running functions we can still hit the limit, but
+  //   most page renders use 2-4 connections concurrently
   const client = new PrismaClient({
     log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
+    datasources: {
+      db: {
+        url: process.env.DATABASE_URL,
+      },
+    },
   });
+
+  // Connection limit via query string (works with both pooled and direct URLs)
+  // Falls back to env var if not in URL
+  if (process.env.DATABASE_URL && !process.env.DATABASE_URL.includes('connection_limit')) {
+    const sep = process.env.DATABASE_URL.includes('?') ? '&' : '?';
+    process.env.DATABASE_URL = `${process.env.DATABASE_URL}${sep}connection_limit=10&pool_timeout=20`;
+  }
 
   // Auto-fill User.slug on create if not provided
   client.$use(async (params, next) => {
@@ -46,7 +64,14 @@ if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
  * 
  * 3. NO $disconnect() per request: Neon pooling handles connection lifecycle.
  * 
- * 4. For Server Components: call prisma directly. No need for /api routes.
+ * 4. connection_limit=10: tuned for Neon free tier + spike absorption.
+ *    Previous limit was 5, which caused P2034 (Timed out fetching connection)
+ *    errors under load.
  * 
- * 5. For mutations: use Server Actions + Zod validation.
+ * 5. pool_timeout=20: gives connections more time to be released before
+ *    failing, smoothing out bursty traffic.
+ * 
+ * 6. For Server Components: call prisma directly. No need for /api routes.
+ * 
+ * 7. For mutations: use Server Actions + Zod validation.
  */

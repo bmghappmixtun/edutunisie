@@ -911,3 +911,46 @@ enum ErrorSeverity {
   ERROR
   CRITICAL
 }
+
+// ============================================================================
+// VercelLog: Runtime logs from Vercel via Log Drain
+// ============================================================================
+model VercelLog {
+  id                String   @id @default(cuid())
+  // External ID from Vercel (for dedup)
+  externalId        String   @unique
+  // Timestamp from Vercel
+  timestamp         DateTime
+  // Log level
+  level             String   // "error" | "warning" | "info"
+  // Vercel metadata
+  deploymentId      String?
+  source            String?  // "function" | "edge" | "build" | "static"
+  domain            String?
+  // Request details
+  requestMethod     String?
+  requestPath       String?
+  responseStatusCode Int?
+  requestId         String?
+  // Environment
+  environment       String?  // "production" | "preview"
+  branch            String?
+  cache             String?
+  // The actual log content
+  message           String   @db.Text
+  // Project
+  projectId         String?
+  // Has been reviewed by the user/agent?
+  reviewed          Boolean  @default(false)
+  reviewedAt        DateTime?
+  // Timestamps
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([level, timestamp])
+  @@index([deploymentId, timestamp])
+  @@index([requestPath, timestamp])
+  @@index([responseStatusCode, timestamp])
+  @@index([reviewed, timestamp])
+  @@index([timestamp])
+}
