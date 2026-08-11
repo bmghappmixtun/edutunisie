@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { prisma } from '@/lib/prisma';
 import { getTranslations, getLocale } from 'next-intl/server';
 import { itemListSchema } from '@/lib/structured-data';

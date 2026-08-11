@@ -1,5 +1,5 @@
 import { notFound, permanentRedirect } from 'next/navigation';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
 import ResourceActions from '@/components/resources/ResourceActions';

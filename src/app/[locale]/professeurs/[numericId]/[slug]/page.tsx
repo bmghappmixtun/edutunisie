@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { getInitials } from '@/lib/text-utils';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { prisma } from '@/lib/prisma';
 import { getUserFavorites, decorateWithFavorites } from '@/lib/resource-helpers';
 import { getCurrentUser } from '@/lib/auth';

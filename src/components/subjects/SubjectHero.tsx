@@ -1,5 +1,5 @@
 import { BookOpen, FileText, Users, ChevronRight, Sparkles } from 'lucide-react';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import type { LucideIcon } from 'lucide-react';
 import { SUBJECT_ICONS } from '@/lib/subjects.icons';
 

@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { headers } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 import { getVisitorIp, isBotOrPlaceholder } from '@/lib/visitor';

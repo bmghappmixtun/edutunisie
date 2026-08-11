@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { FileQuestion, Home, Search } from 'lucide-react';
 /**
  * Per-route not-found page for /professeurs/[numericId]/[slug]

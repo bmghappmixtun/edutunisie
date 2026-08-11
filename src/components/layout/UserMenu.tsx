@@ -1,5 +1,5 @@
 'use client';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { getInitials } from '@/lib/text-utils';
 import { useState, useRef, useEffect } from 'react';
 import {

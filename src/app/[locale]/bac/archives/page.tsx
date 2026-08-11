@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { getBacStats, groupByYearForArchive } from '@/lib/bac-data';
 import { itemListSchema, breadcrumbSchema, SITE_URL } from '@/lib/structured-data';
 import { getTranslations, getLocale, getMessages } from 'next-intl/server';

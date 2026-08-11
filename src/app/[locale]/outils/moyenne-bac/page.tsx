@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { getTranslations, getLocale } from 'next-intl/server';
 import { Calculator, ArrowLeft, Award } from 'lucide-react';
 import { SITE_URL } from '@/lib/structured-data';

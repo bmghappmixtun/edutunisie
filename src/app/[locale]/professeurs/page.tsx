@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { prisma } from '@/lib/prisma';
 import { itemListSchema, breadcrumbSchema, SITE_URL } from '@/lib/structured-data';
 import { getTranslations, getLocale } from 'next-intl/server';
