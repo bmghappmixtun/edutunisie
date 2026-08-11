@@ -2,6 +2,7 @@ import { Link } from '@/i18n/navigation';
 import Image from 'next/image';
 import { Facebook, Twitter, Instagram, Youtube, GraduationCap } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
+import LanguagePicker from './LanguagePicker';
 
 export default async function Footer() {
   const t = await getTranslations();
@@ -176,7 +177,10 @@ export default async function Footer() {
           <p className="text-xs text-slate-500">
             {t('footer.copyright', { year: String(currentYear) })}
           </p>
-          <p className="text-xs text-slate-500">{t('footer.madeWith')}</p>
+          <div className="flex items-center gap-3">
+            <LanguagePicker />
+            <p className="text-xs text-slate-500">{t('footer.madeWith')}</p>
+          </div>
         </div>
       </div>
     </footer>
