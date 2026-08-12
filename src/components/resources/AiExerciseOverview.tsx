@@ -217,27 +217,23 @@ export default function AiExerciseOverview({
         )
       )}
 
-      {/* Numbered list */}
+      {/* Numbered list — clean: just text, no badges */}
       <ol className="space-y-2 list-decimal ps-5 marker:text-slate-400 marker:font-bold">
         {parsed.map((p, idx) => {
           if (p.kind === 'exercise') {
-            const ExIcon = TYPE_ICON[p.type];
-            const colors = TYPE_COLOR_DARK[p.type];
+            // Exercise: title in bold (incl "Exercice N: sujet") + summary
+            // The "Ex. N · Math" badge is removed — numbering comes from <ol>
             return (
               <li
                 key={idx}
                 className="p-2.5 rounded-lg border border-slate-100 bg-white hover:bg-slate-50 transition-colors"
               >
-                <div className="flex items-start gap-3">
-                  <span className={`shrink-0 inline-flex items-center gap-1.5 px-2 py-1 text-xs font-bold rounded-md border ${colors}`}>
-                    <ExIcon className="w-3 h-3" />
-                    Ex. {p.number}
-                    <span className="text-[10px] font-normal opacity-75">· {p.type}</span>
-                  </span>
-                  <p className="flex-1 text-sm text-slate-700 leading-relaxed">
-                    {p.summary}
-                  </p>
-                </div>
+                <p className="text-sm font-semibold text-slate-900 leading-snug">
+                  Exercice {p.number}
+                </p>
+                <p className="text-sm text-slate-700 leading-relaxed mt-1">
+                  {p.summary}
+                </p>
               </li>
             );
           } else {
