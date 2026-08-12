@@ -45,19 +45,22 @@ type Parsed = ParsedExercise | ParsedCourseSection;
 /**
  * Parse a keyInsight string in EITHER format.
  *
- * Format 1 (exercice): "Exercice N (Type): résumé"
- *   → ParsedExercise
+ * Format 1a (exercice legacy): "Exercice N (Type): résumé"
+ *   → ParsedExercise (with type badge)
+ *
+ * Format 1b (exercice math): "Exercice N: sujet - résumé"  (no type in parens)
+ *   → ParsedExercise (with inferred type from resourceType)
  *
  * Format 2 (cours): "Titre: résumé"  (no "Exercice" prefix, no parentheses)
  *   → ParsedCourseSection
  *
  * Returns null if neither format matches.
  */
-function parseKeyInsight(ki: string): Parsed | null {
-  // Format 1: Exercice N (Type): summary
-  const mEx = ki.match(/^Exercice\s+(\d+(?:\s*[A-Za-z])?)\s*\(([A-Za-zÀ-ÿ][A-Za-zÀ-ÿ\s]*)\)[:\s]+(.+)$/i);
-  if (mEx) {
-    const typeLower = mEx[2].toLowerCase().trim();
+function parseKeyInsight(ki: string, inferredType?: KeyInsightType | null): Parsed | null {
+  // Format 1a: Exercice N (Type): summary  (physique legacy, has type tag)
+  const mExTyped = ki.match(/^Exercice\s+(\d+(?:\s*[A-Za-z])?)\s*\(([A-Za-zÀ-ÿ][A-Za-zÀ-ÿ\s]*)\)[:\s]+(.+)$/i);
+  if (mExTyped) {
+    const typeLower = mExTyped[2].toLowerCase().trim();
     let type: KeyInsightType | null = null;
     if (typeLower === 'physique') type = 'Physique';
     else if (typeLower === 'chimie') type = 'Chimie';
@@ -66,24 +69,38 @@ function parseKeyInsight(ki: string): Parsed | null {
     if (type) {
       return {
         kind: 'exercise',
-        number: mEx[1].trim(),
+        number: mExTyped[1].trim(),
         type,
-        summary: mEx[3].trim(),
+        summary: mExTyped[3].trim(),
       };
     }
   }
 
+  // Format 1b: "Exercice N: sujet - résumé"  (math new format, no type tag)
+  //   - Must start with "Exercice" + number + colon
+  //   - No parentheses allowed (those are Format 1a)
+  const mExPlain = ki.match(/^Exercice\s+(\d+(?:\s*[A-Za-z])?)\s*:\s*(.+)$/i);
+  if (mExPlain) {
+    // Use inferred type from resourceType, default to Math
+    let type: KeyInsightType = inferredType || 'Math';
+    return {
+      kind: 'exercise',
+      number: mExPlain[1].trim(),
+      type,
+      summary: mExPlain[2].trim(),
+    };
+  }
+
   // Format 2: "Titre: résumé" (cours)
-  //   - No leading "Exercice" / "Section" / numbering
+  //   - Title does NOT start with "Exercice" (Format 1b catches that)
   //   - Must have at least one colon
   //   - Title must be non-empty, summary must be non-empty
-  //   - Title should not be wrapped in parens (those are Format 1)
   const mCourse = ki.match(/^([A-ZÀ-ÿ«'][^:]+?):\s*(.+)$/);
   if (mCourse) {
     const title = mCourse[1].trim();
     const summary = mCourse[2].trim();
-    // Reject if title looks like a number only (probably misparsed)
-    if (title && summary && title.length < 200 && summary.length > 5) {
+    // Reject if title looks like "Exercice X" (should be caught by Format 1b)
+    if (title && summary && title.length < 200 && summary.length > 5 && !/^Exercice\b/i.test(title)) {
       return { kind: 'course', title, summary };
     }
   }
@@ -119,8 +136,17 @@ export default function AiExerciseOverview({
 }: AiExerciseOverviewProps) {
   if (!keyInsights || keyInsights.length === 0) return null;
 
+  // Map subjectSlug to KeyInsightType so we can tag the badge correctly
+  const slugToType: Record<string, KeyInsightType> = {
+    'mathematiques': 'Math',
+    'physique': 'Physique',
+    'svt': 'SVT',
+    // Chimie is a sub-type of Physique
+  };
+  const inferredType = subjectSlug ? slugToType[subjectSlug] ?? null : null;
+
   const parsed = keyInsights
-    .map(parseKeyInsight)
+    .map(ki => parseKeyInsight(ki, inferredType))
     .filter((p): p is Parsed => p !== null);
 
   // If no parseable insights, don't render the card
