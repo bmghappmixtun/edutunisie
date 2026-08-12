@@ -67,7 +67,7 @@ export async function generateMetadata({
   }
   const resource = await prisma.resource.findUnique({
     where: { numericId },
-    include: { subject: true, class: true, teacher: true, metadata: true },
+    include: { subject: true, class: true, teacher: true, metadata: true, content: true },
   });
   if (!resource) return { title: 'Ressource non trouvée' };
 
@@ -190,6 +190,7 @@ export default async function ResourcePage({
       // AI-extracted content (2026-07-20 Mavis pipeline)
       metadata: true,
       aiSummary: true,
+      content: true,
     },
   });
 
