@@ -379,7 +379,11 @@ model ResourceMetadata {
   difficulty            String?  // "facile" | "moyen" | "difficile"
   estimatedTimeMinutes  Int?
   prerequisites         String[] // prérequis
-  keyInsights           String[] // insights profonds
+  keyInsights           String[] // insights profonds (générique, type "L'importance de...")
+  /// Exercise-by-exercise breakdown OR section-by-section for courses.
+  /// Format: "Exercice N: sujet - résumé" (DEVOIR/EXERCISE) or "Titre: résumé" (COURS)
+  /// Populated by the math-lycee / physique-lycee AI pipeline (2026-08-12).
+  exerciseInsights      String[] // insights détaillés par exercice ou section
   extractedAt           DateTime @default(now())
   modelUsed             String?
 
