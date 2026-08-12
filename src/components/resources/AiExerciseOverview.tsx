@@ -241,26 +241,18 @@ export default function AiExerciseOverview({
               </li>
             );
           } else {
-            // Course section
+            // Course section — clean: title in bold + summary, no badge
             return (
               <li
                 key={idx}
                 className="p-2.5 rounded-lg border border-slate-100 bg-white hover:bg-slate-50 transition-colors"
               >
-                <div className="flex items-start gap-3">
-                  <span className="shrink-0 inline-flex items-center gap-1.5 px-2 py-1 text-xs font-bold rounded-md border bg-indigo-50 text-indigo-700 border-indigo-200">
-                    <BookOpen className="w-3 h-3" />
-                    Cours
-                  </span>
-                  <div className="flex-1">
-                    <p className="text-sm font-semibold text-slate-900 leading-snug">
-                      {p.title}
-                    </p>
-                    <p className="text-sm text-slate-700 leading-relaxed mt-1">
-                      {p.summary}
-                    </p>
-                  </div>
-                </div>
+                <p className="text-sm font-semibold text-slate-900 leading-snug">
+                  {p.title}
+                </p>
+                <p className="text-sm text-slate-700 leading-relaxed mt-1">
+                  {p.summary}
+                </p>
               </li>
             );
           }
