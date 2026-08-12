@@ -665,13 +665,12 @@ export default async function ResourcePage({
                     its 1-sentence summary. Per user rule, hidden for course files (no exercises). */}
                 {(() => {
                   const keyInsights = (resource.metadata as any)?.keyInsights as string[] | undefined;
-                  // Don't show for course files (no exercises)
-                  if (resource.type === 'COURSE') return null;
                   if (!keyInsights || keyInsights.length === 0) return null;
                   return (
                     <AiExerciseOverview
                       keyInsights={keyInsights}
                       subjectSlug={resource.subject?.slug}
+                      resourceType={resource.type as 'COURSE' | 'EXERCISE' | 'DEVOIR' | 'SUMMARY' | 'OTHER'}
                     />
                   );
                 })()}
