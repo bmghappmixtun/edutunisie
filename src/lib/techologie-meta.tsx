@@ -23,7 +23,7 @@ const TITLE_NOISE = [
 const GM_KEYWORDS = [
   'liaison', 'cinématique', 'cotation', 'engrenage', 'poulie', 'courroie', 'bielle', 'came',
   'matériaux', 'rdm', 'contrainte', 'flexion', 'torsion', 'ajustement', 'tolérance',
-  'classe d\'équivalence', 'graphe des liaisons', 'fraisage', 'tournage', 'perçage',
+  "classe d'équivalence", 'graphe des liaisons', 'fraisage', 'tournage', 'perçage',
   'projection orthogonale'
 ];
 
@@ -55,19 +55,16 @@ export function extractSystemNameFromTitle(title: string): string | null {
   if (!title) return null;
 
   // Pattern 1: "Technologie: SYSTEME - CLASS"
-  let m = title.match(/Technologie\s*[:]\s+([^-:]+?)(?:\s*-\s*(?:1AS|2AS|3AS|4AS|1ère|2ème|3ème|4ème|\d)|\s*$)/i);
-  if (m && isValidName(m[1])) return cleanName(m[1]);
+  const p1 = title.match(/Technologie\s*[:]\s+([^-:]+?)(?:\s*-\s*(?:1AS|2AS|3AS|4AS|1ère|2ème|3ème|4ème|\d)|\s*$)/i);
+  if (p1 && isValidName(p1[1])) return cleanName(p1[1]);
 
   // Pattern 2: "Machine/Poste/Station/Système/Unité de X"
-  const systemWords = '(Machine|Poste|Station|Système|Unité|Dispositif|Montage|Installation|[ÉEé]tau|Banc|Maillet|Presse|Pompe|Vérin|M[ée]canisme|Convoyeur|Robot)';
-  const afterWords = '(?:de\\s+|d\\'|d\\s+)?';
-  const stopWords = '(?:\\d|\\(|$|1ère|2ème|3ème|4ème|1AS|2AS|3AS|4AS|Techno|Technologie|Maths|Math[ée]matiques|Physique|SVT|Français|AR|Arabe|Anglais|Histoire|G[ée]ographie|Philo|Informatique|Économie|Sciences|Section|Trim|Profil)';
-  const re2 = new RegExp(systemWords + '\\s+' + afterWords + '([^-:]+?)(?:\\s*[-:]\\s*' + stopWords + '|\\s*$)', 'i');
-  m = title.match(re2);
-  if (m) {
-    let name = (m[1] + ' ' + m[2]).trim();
+  const systemRegex = /(Machine|Poste|Station|Système|Unité|Dispositif|Montage|Installation|Étau|Banc|Maillet|Presse|Pompe|Vérin|Mécanisme|Convoyeur|Robot)\s+(?:de\s+|d'\s*|d\s+)?([^-:]+?)(?:\s*[-:]\s*(?:\d|\(|$|1ère|2ème|3ème|4ème|1AS|2AS|3AS|4AS|Techno|Technologie|Maths|Mathématiques|Physique|SVT|Français|AR|Arabe|Anglais|Histoire|Géographie|Philo|Informatique|Économie|Sciences|Section|Trim|Profil)|\s*$)/i;
+  const p2 = title.match(systemRegex);
+  if (p2) {
+    const name = (p2[1] + ' ' + p2[2]).trim();
     if (isValidName(name)) {
-      if (name.length > 80) name = name.slice(0, 77) + '...';
+      if (name.length > 80) return cleanName(name.slice(0, 77) + '...');
       return cleanName(name);
     }
   }
@@ -127,7 +124,7 @@ export function buildTechMeta(
 export function getTechMeta(
   title: string,
   text: string | null,
-  savedSystemName?: string | null
+  savedSystemName: string | null = null
 ): TechMeta[] {
   const systemName = savedSystemName || extractSystemNameFromTitle(title);
   const specialty = detectSpecialty(title, text);

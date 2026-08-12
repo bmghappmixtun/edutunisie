@@ -695,7 +695,7 @@ export default async function ResourcePage({
                   const techMeta = isTechnologie
                     ? getTechMeta(
                         resource.title,
-                        (resource.content as any)?.fullText || null,
+                        (resource as any).content?.fullText || null,
                         meta?.systemName || null
                       )
                     : null;
