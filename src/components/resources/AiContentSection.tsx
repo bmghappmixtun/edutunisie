@@ -23,6 +23,8 @@ interface AiContentSectionProps {
    * both Arabic (e.g. AR keyPoints in an AR file).
    */
   alignRight?: boolean;
+  /** Optional wrapper class for the outermost container (e.g. mb-4). */
+  className?: string;
 }
 
 // Re-export for backward compat
@@ -41,6 +43,7 @@ export default function AiContentSection({
   variant = 'default',
   subjectSlug,
   alignRight = false,
+  className = '',
 }: AiContentSectionProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const v = getPaletteForSubject(subjectSlug);
@@ -68,7 +71,7 @@ export default function AiContentSection({
       : 'text-slate-600';
 
   return (
-    <div className={containerClass}>
+    <div className={`${containerClass} ${className}`.trim()}>
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}

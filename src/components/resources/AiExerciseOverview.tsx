@@ -173,7 +173,7 @@ export default function AiExerciseOverview({
       title={title}
       icon={<Icon className="w-4 h-4" />}
       badge="AI"
-      defaultOpen={true}
+      defaultOpen={false}
       subjectSlug={subjectSlug}
     >
       {/* Summary chips: counts per type (exercises) OR section count (course) */}

@@ -41,6 +41,7 @@ import {
   Wrench,
   Building2,
   Target,
+  Sparkles,
 } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -543,7 +544,13 @@ export default async function ResourcePage({
                   );
                 })()}
                 {resource.description && !resource.aiSummary?.summary && (
-                  <div className="mb-4">
+                  <AiContentSection
+                    title={resource.language === 'ar' ? 'ملخص ذكي' : 'Résumé intelligent'}
+                    icon={<Sparkles className="w-4 h-4" />}
+                    subjectSlug={resource.subject?.slug}
+                    defaultOpen={false}
+                    className="mb-4"
+                  >
                     <AiDescription
                       text={resource.description}
                       source={resource.descriptionSource}
@@ -559,7 +566,7 @@ export default async function ResourcePage({
                           : null
                       }
                     />
-                  </div>
+                  </AiContentSection>
                 )}
 
                 {/* AI-extracted content (2026-07-20 Mavis pipeline)
@@ -631,7 +638,13 @@ export default async function ResourcePage({
                     return null;
                   })();
                   return (
-                    <div className="mb-4">
+                    <AiContentSection
+                      title={resource.language === 'ar' ? 'ملخص ذكي' : 'Résumé intelligent'}
+                      icon={<Sparkles className="w-4 h-4" />}
+                      subjectSlug={resource.subject?.slug}
+                      defaultOpen={false}
+                      className="mb-4"
+                    >
                       <AiDescription
                         text={summary}
                         secondaryText={summaryOriginal}
@@ -654,7 +667,7 @@ export default async function ResourcePage({
                         schoolType={resource.schoolType}
                         hideFields={hideFields}
                       />
-                    </div>
+                    </AiContentSection>
                   );
                 })()}
 
@@ -737,7 +750,7 @@ export default async function ResourcePage({
                   <AiContentSection
                     title={keyPointsTitle}
                     icon={<Target className="w-4 h-4" />}
-                    variant="points"
+                    variant="default"
                     subjectSlug={resource.subject?.slug}
                     defaultOpen={false}
                     alignRight={titleAlignRight}
