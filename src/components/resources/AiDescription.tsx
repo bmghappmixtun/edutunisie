@@ -35,6 +35,9 @@ interface HeaderData {
 }
 
 interface AiDescriptionProps {
+  /** When true, hide the internal "Résumé intelligent" header. Use when the
+   *  component is wrapped in an AiContentSection (which already provides the title). */
+  hideTitle?: boolean;
   /** The description text (already in target language). */
   text: string;
   /** Optional 2nd summary in the original document language (de/it/es for 3L files).
@@ -348,6 +351,7 @@ export default function AiDescription({
   source,
   language,
   className = '',
+  hideTitle = false,
   headerData,
   classNameFr,
   classNameAr,
@@ -656,19 +660,21 @@ export default function AiDescription({
       className={`relative rounded-xl border border-violet-200/60 bg-gradient-to-br from-violet-50/50 via-white to-indigo-50/30 p-4 shadow-sm ${className}`}
     >
       {/* Header */}
-      <div
-        dir={isRtl ? 'rtl' : 'ltr'}
-        className="flex items-center gap-2 mb-3 pb-2 border-b border-violet-100"
-      >
-        <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 text-white shadow-sm flex-shrink-0">
-          <Sparkles className="w-3.5 h-3.5" />
-        </span>
-        <span className={`font-bold text-sm text-slate-800 flex-1 ${isRtl ? 'font-arabic-title' : ''}`}>
-          {isRtl ? 'ملخص ذكي' : 'Résumé intelligent'}
-        </span>
+      {!hideTitle && (
+        <div
+          dir={isRtl ? 'rtl' : 'ltr'}
+          className="flex items-center gap-2 mb-3 pb-2 border-b border-violet-100"
+        >
+          <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 text-white shadow-sm flex-shrink-0">
+            <Sparkles className="w-3.5 h-3.5" />
+          </span>
+          <span className={`font-bold text-sm text-slate-800 flex-1 ${isRtl ? 'font-arabic-title' : ''}`}>
+            {isRtl ? 'ملخص ذكي' : 'Résumé intelligent'}
+          </span>
 
-        {isAi && <AiBadge isRtl={isRtl} />}
-      </div>
+          {isAi && <AiBadge isRtl={isRtl} />}
+        </div>
+      )}
 
       {/* Info grid — natural RTL flow via dir="rtl" */}
       {displayFields.length > 0 && (

@@ -552,6 +552,7 @@ export default async function ResourcePage({
                     className="mb-4"
                   >
                     <AiDescription
+                      hideTitle={true}
                       text={resource.description}
                       source={resource.descriptionSource}
                       language={resource.language}
@@ -646,6 +647,7 @@ export default async function ResourcePage({
                       className="mb-4"
                     >
                       <AiDescription
+                      hideTitle={true}
                         text={summary}
                         secondaryText={summaryOriginal}
                         source={resource.aiSummary.modelUsed || 'gpt-4o-mini-batch-v1'}
