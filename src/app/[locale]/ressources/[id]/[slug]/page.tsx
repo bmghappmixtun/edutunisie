@@ -659,16 +659,23 @@ export default async function ResourcePage({
                 })()}
 
                 {/* AI Exercise Overview — Per user rule (2026-08-10):
-                    Display the AI-extracted exercise summaries (from ResourceMetadata.keyInsights)
-                    as a separate collapsible card between the AI Summary and the "Points clés" card.
-                    Shows a chip count (X physique + Y chimie) and a list of each exercise with
-                    its 1-sentence summary. Per user rule, hidden for course files (no exercises). */}
+                    Display the AI-extracted exercise summaries from ResourceMetadata.exerciseInsights
+                    (new field, 2026-08-12) OR fallback to keyInsights (legacy physique pipeline).
+                    Two display modes:
+                    - EXERCISE/DEVOIR: "Exercice N (Type): summary" → badge + summary
+                    - COURSE: "Titre: summary" → title + summary, numbered list
+                    Hidden for SUMMARY/OTHER types. */}
                 {(() => {
-                  const keyInsights = (resource.metadata as any)?.keyInsights as string[] | undefined;
-                  if (!keyInsights || keyInsights.length === 0) return null;
+                  const meta = resource.metadata as any;
+                  // Prefer the new exerciseInsights field; fallback to legacy keyInsights
+                  const insights = (meta?.exerciseInsights as string[] | undefined)?.length
+                    ? (meta.exerciseInsights as string[])
+                    : (meta?.keyInsights as string[] | undefined);
+                  if (!insights || insights.length === 0) return null;
+                  if (resource.type === 'SUMMARY') return null;
                   return (
                     <AiExerciseOverview
-                      keyInsights={keyInsights}
+                      keyInsights={insights}
                       subjectSlug={resource.subject?.slug}
                       resourceType={resource.type as 'COURSE' | 'EXERCISE' | 'DEVOIR' | 'SUMMARY' | 'OTHER'}
                     />
