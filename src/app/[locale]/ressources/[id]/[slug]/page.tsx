@@ -672,7 +672,7 @@ export default async function ResourcePage({
                     ? (meta.exerciseInsights as string[])
                     : (meta?.keyInsights as string[] | undefined);
                   if (!insights || insights.length === 0) return null;
-                  if (resource.type === 'SUMMARY') return null;
+
                   return (
                     <AiExerciseOverview
                       keyInsights={insights}
