@@ -11,6 +11,10 @@ import {
   FlaskConical,
   Atom,
   BookOpen,
+  Wrench,
+  Cog,
+  Zap,
+  FileText,
 } from 'lucide-react';
 import AiContentSection from './AiContentSection';
 
@@ -23,6 +27,15 @@ interface AiExerciseOverviewProps {
   subjectSlug?: string | null;
   /** Resource type — used to switch the title and badge. */
   resourceType?: 'COURSE' | 'EXERCISE' | 'DEVOIR' | 'SUMMARY' | 'OTHER' | null;
+  /** Optional metadata chips to display above the list (e.g. "Dossier technique",
+   *  system name, specialty). For Technologie, replaces the default "N exercices math" chip. */
+  meta?: Array<{
+    label: string;
+    /** Lucide icon name. Optional. */
+    icon?: 'wrench' | 'cog' | 'zap' | 'book' | 'file' | 'flask' | 'atom';
+    /** Color theme. Default is "indigo". */
+    color?: 'indigo' | 'emerald' | 'amber' | 'rose' | 'sky' | 'slate';
+  }> | null;
 }
 
 type KeyInsightType = 'Physique' | 'Chimie' | 'Math' | 'SVT';
@@ -133,6 +146,7 @@ export default function AiExerciseOverview({
   keyInsights,
   subjectSlug,
   resourceType = null,
+  meta = null,
 }: AiExerciseOverviewProps) {
   if (!keyInsights || keyInsights.length === 0) return null;
 
@@ -168,6 +182,25 @@ export default function AiExerciseOverview({
   const mathCount = parsed.filter((p) => p.kind === 'exercise' && (p as ParsedExercise).type === 'Math').length;
   const svtCount = parsed.filter((p) => p.kind === 'exercise' && (p as ParsedExercise).type === 'SVT').length;
 
+  // Color palette for meta chips
+  const META_COLORS: Record<string, string> = {
+    indigo: 'bg-indigo-100 text-indigo-700 border-indigo-200',
+    emerald: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+    amber: 'bg-amber-100 text-amber-700 border-amber-200',
+    rose: 'bg-rose-100 text-rose-700 border-rose-200',
+    sky: 'bg-sky-100 text-sky-700 border-sky-200',
+    slate: 'bg-slate-100 text-slate-700 border-slate-200',
+  };
+  const ICON_MAP: Record<string, typeof Wrench> = {
+    wrench: Wrench,
+    cog: Cog,
+    zap: Zap,
+    book: BookOpen,
+    file: FileText,
+    flask: FlaskConical,
+    atom: Atom,
+  };
+
   return (
     <AiContentSection
       title={title}
@@ -176,8 +209,24 @@ export default function AiExerciseOverview({
       defaultOpen={false}
       subjectSlug={subjectSlug}
     >
-      {/* Summary chips: counts per type (exercises) OR section count (course) */}
-      {isCourse ? (
+      {/* Summary chips: meta (if provided) OR counts per type (exercises) OR section count (course) */}
+      {meta && meta.length > 0 ? (
+        <div className="flex flex-wrap gap-2 mb-3">
+          {meta.map((m, i) => {
+            const IconComponent = m.icon ? ICON_MAP[m.icon] : null;
+            const color = META_COLORS[m.color || 'indigo'] || META_COLORS.indigo;
+            return (
+              <span
+                key={i}
+                className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold rounded-full border ${color}`}
+              >
+                {IconComponent && <IconComponent className="w-3 h-3" />}
+                {m.label}
+              </span>
+            );
+          })}
+        </div>
+      ) : isCourse ? (
         sectionCount && sectionCount > 0 ? (
           <div className="flex flex-wrap gap-2 mb-3">
             <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold rounded-full border bg-indigo-100 text-indigo-700 border-indigo-200">
