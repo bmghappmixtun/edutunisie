@@ -692,12 +692,21 @@ export default async function ResourcePage({
 
                   // For Technologie: extract meta (system name, specialty, dossier)
                   // and pass to the component to display at the top of the card.
+                  // For COURS: prefer DB courseSubject (pre-extracted), fall back to title regex,
+                  // then generalSubject.
                   const isTechnologie = resource.subject?.slug === 'technologie';
+                  const isCourse = resource.type === 'COURSE';
                   const techMeta = isTechnologie
                     ? getTechMeta(
                         resource.title,
                         (resource as any).content?.fullText || null,
-                        meta?.systemName || null
+                        meta?.systemName || null,
+                        {
+                          isCourse,
+                          // For COURS: prefer the pre-extracted courseSubject from DB
+                          courseSubject: isCourse ? (meta as any)?.courseSubject || null : null,
+                          generalSubject: (meta as any)?.generalSubject || null,
+                        }
                       )
                     : null;
 

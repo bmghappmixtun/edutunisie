@@ -371,6 +371,7 @@ model ResourceMetadata {
   generalSubject        String?  // sujet général du document (max 6 mots, FR/AR selon la langue du PDF)
   dossierTechnique      String?  // for Technologie/Sciences techniques
   systemName            String?  // for Technologie/Sciences techniques
+  courseSubject         String?  // for Technologie COURS: sujet principal du cours (max 8 mots)
   duration              String?  // "2h" | "1h30"
   level                 String?  // "standard" | "avancé"
   keyPoints             String[] // 3-5 points clés (longs, depuis l'extraction initiale)
