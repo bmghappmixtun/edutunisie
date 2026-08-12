@@ -211,17 +211,17 @@ export default function AiExerciseOverview({
     >
       {/* Summary chips: meta (if provided) OR counts per type (exercises) OR section count (course) */}
       {meta && meta.length > 0 ? (
-        <div className="flex flex-wrap gap-2 mb-3">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mb-3 text-sm">
           {meta.map((m, i) => {
             const IconComponent = m.icon ? ICON_MAP[m.icon] : null;
             const color = META_COLORS[m.color || 'indigo'] || META_COLORS.indigo;
             return (
-              <span
-                key={i}
-                className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold rounded-full border ${color}`}
-              >
-                {IconComponent && <IconComponent className="w-3 h-3" />}
-                {m.label}
+              <span key={i} className={`inline-flex items-center gap-1.5 font-semibold ${color.split(' ')[1] || 'text-slate-700'}`}>
+                {IconComponent && <IconComponent className="w-3.5 h-3.5" />}
+                <span>{m.label}</span>
+                {i < meta.length - 1 && (
+                  <span className="text-slate-300 font-normal">|</span>
+                )}
               </span>
             );
           })}

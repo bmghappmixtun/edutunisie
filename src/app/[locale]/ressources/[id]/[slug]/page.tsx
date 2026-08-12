@@ -2,6 +2,7 @@ import { notFound, permanentRedirect } from 'next/navigation';
 import { Link } from '@/i18n/navigation';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
+import { getTechMeta } from '@/lib/techologie-meta';
 import ResourceActions from '@/components/resources/ResourceActions';
 // PDFViewer is lazy-loaded via LazyPDFViewer (~90 KB gzipped saved on initial
 // load). The full react-pdf + pdfjs-dist bundle was the biggest chunk on the
@@ -688,11 +689,23 @@ export default async function ResourcePage({
                     : (meta?.keyInsights as string[] | undefined);
                   if (!insights || insights.length === 0) return null;
 
+                  // For Technologie: extract meta (system name, specialty, dossier)
+                  // and pass to the component to display at the top of the card.
+                  const isTechnologie = resource.subject?.slug === 'technologie';
+                  const techMeta = isTechnologie
+                    ? getTechMeta(
+                        resource.title,
+                        (resource.content as any)?.fullText || null,
+                        meta?.systemName || null
+                      )
+                    : null;
+
                   return (
                     <AiExerciseOverview
                       keyInsights={insights}
                       subjectSlug={resource.subject?.slug}
                       resourceType={resource.type as 'COURSE' | 'EXERCISE' | 'DEVOIR' | 'SUMMARY' | 'OTHER'}
+                      meta={techMeta}
                     />
                   );
                 })()}
