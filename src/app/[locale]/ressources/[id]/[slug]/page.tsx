@@ -561,13 +561,11 @@ export default async function ResourcePage({
                   </AiContentSection>
                 )}
 
-                {/* AI-extracted content (2026-07-20 Mavis pipeline)
-                    Per user rule (2026-08-13): the standalone "Système étudié" card
-                    was DELETED. The system name now lives in the green cadre at
-                    the top with the French label "Système technique".
-                    Keeping the dossierTechnique here as a separate section
-                    because it's a different piece of info. */}
-                {resource.metadata?.dossierTechnique && (() => {
+                {/* Dossier technique card REMOVED per user rule (2026-08-13):
+                    The standalone "Dossier technique" card was deleted for ALL
+                    files (not just Technologie). The info was redundant with
+                    the meta chips inside the "Aperçu des exercices" card. */}
+                {false && resource.metadata?.dossierTechnique && (() => {
                   const dtAr = isArabic(resource.metadata.dossierTechnique || '');
                   return (
                   <AiContentSection
