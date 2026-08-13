@@ -16,7 +16,6 @@ import {
   ListChecks,
   ScrollText,
   Tag,
-  Wrench,
 } from 'lucide-react';
 import { isArabic } from '@/lib/text-utils';
 import AiBadge from './AiBadge';
@@ -466,18 +465,11 @@ export default function AiDescription({
     }
   }
 
-  // Add the system/product name (اسم النظام المدروس) — for Technologie only.
-  // Wrench icon distinguishes the "system" from the "general subject".
-  if (systemName && subjectSlug === 'technologie') {
-    const sysValue = String(systemName).trim();
-    if (sysValue && sysValue !== '-' && sysValue !== '—' && sysValue !== '–') {
-      const sysLabel = isRtl ? 'النظام المدروس' : 'Système étudié';
-      if (!existingLabels.has(sysLabel)) {
-        headerFields.push({ Icon: Wrench, label: sysLabel, value: sysValue });
-        existingLabels.add(sysLabel);
-      }
-    }
-  }
+  // Per user rule (2026-08-13): the "Système étudié" attribute was removed
+  // from the AI summary card. The system name is already shown in the green
+  // cadre at the top of the page (with the "Système technique" label),
+  // so we skip it here to avoid redundancy.
+  // (Previously: `if (systemName && subjectSlug === 'technologie') { ... }`)
 
   // ===== School (المدرسة) and Teacher (الأستاذ) =====
   // Per user rule (2026-07-30):
