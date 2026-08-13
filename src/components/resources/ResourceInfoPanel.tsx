@@ -18,36 +18,13 @@ const LANGUAGE_LABELS: Record<string, string> = {
 };
 
 export default function ResourceInfoPanel({ resource, hideClasse = false }: { resource: any; hideClasse?: boolean }) {
-  // Parse PostgreSQL array literal: {a,b,"c d","e f"} → ['a','b','c d','e f']
-  // Also handles malformed inputs: {a,b (no closing }) or a,b (no braces)
-  const parsePgArray = (s: string): string[] => {
-    if (!s || typeof s !== 'string') return [];
-    let str = s.trim();
-    // Strip outer braces
-    if (str.startsWith('{')) str = str.slice(1);
-    if (str.endsWith('}')) str = str.slice(0, -1);
-    if (!str) return [];
-    const out: string[] = [];
-    let cur = '';
-    let inQuotes = false;
-    for (let i = 0; i < str.length; i++) {
-      const c = str[i];
-      if (c === '"' && (i === 0 || str[i - 1] !== '\\')) {
-        inQuotes = !inQuotes;
-      } else if (c === ',' && !inQuotes) {
-        const t = cur.trim().replace(/^["']|["']$/g, '');
-        if (t) out.push(t);
-        cur = '';
-      } else {
-        cur += c;
-      }
-    }
-    const t = cur.trim().replace(/^["']|["']$/g, '');
-    if (t) out.push(t);
-    return out;
-  };
-
-  const tags = resource.tags ? parsePgArray(resource.tags) : [];
+  // AI-extracted topics (from `metadata.topics`) — shown as chips in the
+  // sidebar right under "Langue" per user rule (2026-08-13). The old
+  // `resource.tags` (PostgreSQL array, manual tags) is no longer rendered
+  // here to avoid two "Tags" sections in the same panel.
+  const topics: string[] = Array.isArray(resource.metadata?.topics)
+    ? resource.metadata.topics.filter((t: any) => t && typeof t === 'string' && t.trim().length > 0)
+    : [];
 
   return (
     <div className="card p-5">
@@ -81,31 +58,35 @@ export default function ResourceInfoPanel({ resource, hideClasse = false }: { re
           </Row>
         )}
 
+        {/* AI TOPICS (mots-clés 1 mot) — Per user rule (2026-08-13):
+            The AI-extracted topics from `metadata.topics` are shown as small
+            clickable chips right under "Langue" in the sidebar. Each tag links
+            to the search page filtered by that topic. */}
+        {topics.length > 0 && (
+          <Row icon={<Tag className="w-4 h-4" />} label="Tags">
+            <div className="flex flex-wrap gap-1.5">
+              {topics.map((t: string, i: number) => (
+                <Link
+                  key={`${t}-${i}`}
+                  href={`/recherche?q=${encodeURIComponent(t)}`}
+                  className="inline-block text-xs px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 hover:bg-slate-200 hover:text-slate-900 transition-colors"
+                >
+                  #{t}
+                </Link>
+              ))}
+            </div>
+          </Row>
+        )}
+
         {/* Technical info — per user rule (2026-08-06): Pages is removed from
             the sidebar. The PDF viewer in the main column already shows the
             page count + navigation controls, so duplicating it in the
             sidebar was redundant. */}
         <div className="pt-3 border-t border-slate-100 space-y-2">
-          {/* TAGS — just before file size, clickable for SEO + UX */}
-          {tags.length > 0 && (
-            <div className="pt-2">
-              <div className="flex items-center gap-2 mb-2">
-                <Tag className="w-3.5 h-3.5 text-slate-400" />
-                <span className="text-xs font-bold text-slate-500 uppercase">Tags</span>
-              </div>
-              <div className="flex flex-wrap gap-1.5">
-                {tags.map((t: string) => (
-                  <Link
-                    key={t}
-                    href={`/recherche?q=${encodeURIComponent(t)}`}
-                    className="px-2 py-1 bg-slate-100 text-slate-600 text-xs rounded-md hover:bg-primary-100 hover:text-primary-700 transition"
-                  >
-                    #{t}
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
+          {/* NOTE (2026-08-13): the "Tags" block (using `resource.tags`) was
+              removed. The AI-extracted `metadata.topics` are now shown as
+              chips right under "Langue" (per user rule), and showing two
+              "Tags" sections in the same panel was redundant. */}
 
           <div className="flex justify-between text-xs">
             <dt className="text-slate-500">Taille du fichier</dt>
