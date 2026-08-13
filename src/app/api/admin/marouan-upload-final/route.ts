@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { revalidatePath } from 'next/cache';
 
 const prisma = new PrismaClient();
 
@@ -40,8 +41,14 @@ export async function POST(req: NextRequest) {
       const updated = await prisma.resource.update({
         where: { numericId: u.numericId },
         data,
-        select: { id: true, numericId: true, title: true, fileKey: true, fileSize: true, pageCount: true },
+        select: { id: true, numericId: true, title: true, fileKey: true, fileSize: true, pageCount: true, slug: true },
       });
+      
+      // Revalidate the page cache
+      revalidatePath(`/ressources/${u.numericId}/${updated.slug}`);
+      revalidatePath(`/fr/ressources/${u.numericId}/${updated.slug}`);
+      revalidatePath(`/ar/ressources/${u.numericId}/${updated.slug}`);
+      
       results.push({ numericId: u.numericId, status: 'updated', resource: updated });
     }
 
