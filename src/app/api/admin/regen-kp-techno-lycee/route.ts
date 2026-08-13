@@ -1,15 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
-import OpenAI from 'openai';
 
 const prisma = new PrismaClient();
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 export const maxDuration = 300;
-
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const SYSTEM_PROMPT = `Tu es un expert en TECHNOLOGIE du système éducatif tunisien (lycée, Génie Mécanique / Génie Électrique).
 
@@ -33,6 +30,10 @@ FORMAT DE RÉPONSE (JSON strict):
 {"shortKeyPoints":["Terme 1","Terme 2","Terme 3"],"keyPoints":["Phrase 1","Phrase 2","Phrase 3"],"topics":["tag1","tag2","tag3","tag4","tag5","tag6","tag7","tag8","tag9"]}`;
 
 async function extractKPForFile(file: any): Promise<any> {
+  // Lazy import to avoid build-time initialization
+  const { default: OpenAI } = await import('openai');
+  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
   const userPrompt = `Sujet: ${file.title}
 Matière: Technologie
 Classe: ${file.className}
