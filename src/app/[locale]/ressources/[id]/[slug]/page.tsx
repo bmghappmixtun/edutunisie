@@ -774,6 +774,27 @@ export default async function ResourcePage({
                   );
                 })()}
 
+                {/* Tags (mots-clés 1 mot) - Per user rule (2026-08-13):
+                    Display the AI-extracted topics as small chips below the
+                    "Points clés" card. Only for Technologie files.
+                    Each tag links to the search page for that topic. */}
+                {resource.metadata?.topics && resource.metadata.topics.length > 0 && (
+                  <div className="mb-4 flex flex-wrap items-center gap-1.5">
+                    <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide mr-1">
+                      Tags :
+                    </span>
+                    {resource.metadata.topics.map((topic, i) => (
+                      <Link
+                        key={i}
+                        href={`/recherche?q=${encodeURIComponent(topic)}`}
+                        className="inline-block text-xs px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 hover:bg-slate-200 hover:text-slate-900 transition-colors"
+                      >
+                        #{topic}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+
                 {/* Product (المنتج) — only for technologie + college */}
                 {resource.product &&
                   resource.subject?.slug === 'technologie' &&
