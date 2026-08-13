@@ -122,6 +122,7 @@ export async function POST(req: NextRequest) {
     // Process files that are missing any of: KP, SKP, topics, generalSubject, or exerciseInsights
     const targetFiles = allFiles.filter((f: any) => {
       if (onlyMissingGeneralSubject) {
+        // onlyMissingGeneralSubject takes priority: process if GS is missing, regardless of KP/SKP state
         return !f.metadata?.generalSubject;
       }
       if (!f.metadata) return true;
