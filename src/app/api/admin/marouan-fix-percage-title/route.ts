@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
     const updated = await prisma.resource.update({
       where: { numericId: 15458 },
       data: { title: newTitle, slug: newSlug },
-      select: { id: true, numericId: true, title: true, slug: true, oldSlug: true },
+      select: { id: true, numericId: true, title: true, slug: true },
     });
 
     // Revalidate both old and new URLs (for SEO redirect)
