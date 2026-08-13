@@ -487,13 +487,10 @@ export default async function ResourcePage({
                 {(() => {
                   const { fr, ar } = splitArabicSubject(resource.title);
                   const gs = (resource.metadata?.generalSubject || '').trim();
-                  // Per user rule (2026-07-30): the green cadre used to show
-                  // "الموضوع العام: X" but that's already in the title. Now it
-                  // shows the AI-extracted system name with the new AR label
-                  // "اسم المنتج" (Product Name) — the old standalone "Système
-                  // étudié" card was deleted; its content moved here.
+                  // Per user rule (2026-08-13): the green cadre shows the
+                  // AI-extracted system name with the French label "Système
+                  // technique", centered. Replaces the Arabic "اسم المنتج".
                   const sys = (resource.metadata?.systemName || '').trim();
-                  const sysAr = isArabic(sys);
                   return (
                     <>
                       <h1
@@ -513,22 +510,14 @@ export default async function ResourcePage({
                         </div>
                       )}
                       {/* Green cadre: shows the AI-extracted system name with
-                          the new AR label "اسم المنتج" (Product Name) for
-                          Technologie. Falls back to general subject display
-                          for backward compatibility (e.g. when systemName is
-                          not yet populated). */}
+                          the French label "Système technique", centered.
+                          Falls back to general subject display for backward
+                          compatibility (e.g. when systemName is not yet
+                          populated). */}
                       {sys ? (
-                        <div
-                          dir={sysAr ? 'rtl' : 'ltr'}
-                          lang="ar"
-                          className="mb-4 flex"
-                        >
-                          <span
-                            dir={sysAr ? 'rtl' : 'ltr'}
-                            lang="ar"
-                            className={`ml-auto inline-block px-3 py-1.5 rounded-lg border-2 border-emerald-400 bg-emerald-50 text-sm font-semibold text-emerald-900 font-arabic-title ${sysAr ? 'text-right' : 'text-left'}`}
-                          >
-                            <span className="text-emerald-700">اسم المنتج: </span>
+                        <div className="mb-4 flex justify-center">
+                          <span className="inline-block px-4 py-2 rounded-lg border-2 border-emerald-400 bg-emerald-50 text-sm font-semibold text-emerald-900 text-center">
+                            <span className="text-emerald-700">Système technique : </span>
                             <span className="font-bold">{sys}</span>
                           </span>
                         </div>
@@ -573,9 +562,9 @@ export default async function ResourcePage({
                 )}
 
                 {/* AI-extracted content (2026-07-20 Mavis pipeline)
-                    Per user rule (2026-07-30): the standalone "Système étudié" card
+                    Per user rule (2026-08-13): the standalone "Système étudié" card
                     was DELETED. The system name now lives in the green cadre at
-                    the top with the new AR label "اسم المنتج" (Product Name).
+                    the top with the French label "Système technique".
                     Keeping the dossierTechnique here as a separate section
                     because it's a different piece of info. */}
                 {resource.metadata?.dossierTechnique && (() => {
