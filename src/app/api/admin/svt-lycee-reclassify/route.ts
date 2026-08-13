@@ -16,6 +16,7 @@ const SEED_TOKEN = process.env.SEED_TOKEN || '';
 const MISCLASSIFIED_IDS = [
   15263, 15258, 7111, 4559, 4125, 14844, 14587, 12726, 4523,
   11915, 5021, 8626, 8513, 4401, 6044, 7112, 13481,
+  15300, 7041, 6750,
 ];
 
 export async function POST(req: NextRequest) {
