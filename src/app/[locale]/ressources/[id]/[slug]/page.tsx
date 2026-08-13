@@ -562,29 +562,9 @@ export default async function ResourcePage({
                 )}
 
                 {/* Dossier technique card REMOVED per user rule (2026-08-13):
-                    The standalone "Dossier technique" card was deleted for ALL
-                    files (not just Technologie). The info was redundant with
-                    the meta chips inside the "Aperçu des exercices" card. */}
-                {false && resource.metadata?.dossierTechnique && (() => {
-                  const dtAr = isArabic(resource.metadata.dossierTechnique || '');
-                  return (
-                  <AiContentSection
-                    title="Dossier technique"
-                    icon={<Wrench className="w-4 h-4" />}
-                    variant="system"
-                    subjectSlug={resource.subject?.slug}
-                    defaultOpen={false}
-                  >
-                    <div
-                      className={`text-sm text-orange-900 ${dtAr ? 'text-right' : 'text-left'}`}
-                      dir={dtAr ? 'rtl' : 'ltr'}
-                      lang={dtAr ? 'ar' : 'fr'}
-                    >
-                      <span className="font-semibold">Dossier technique :</span> {resource.metadata.dossierTechnique}
-                    </div>
-                  </AiContentSection>
-                  );
-                })()}
+                    Deleted for ALL files (not just Technologie). The info
+                    was redundant with the meta chips inside the
+                    "Aperçu des exercices" card. */}
 
                                 {/* AI-generated summary — render via AiDescription for the structured grid card.
                     The general subject (الموضوع العام) is integrated inside the card
