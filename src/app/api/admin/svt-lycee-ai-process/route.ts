@@ -23,7 +23,10 @@ const SYSTEM_PROMPT = `Tu es un expert en SCIENCES DE LA VIE ET DE LA TERRE (SVT
 4. **generalSubject** (1 chaîne, 2-6 mots) : le sujet principal du document. Utilisé dans le titre après ":". Doit être :
    - Concis (2-6 mots)
    - En français
-   - Refléter le thème principal (ex: "Glycémie", "Procréation", "Évolution biologique", "Régulation de la pression artérielle", "Nutrition minérale", "Diversité du monde microbien", "Hérédité liée au sexe", "Génétique des populations", "Neurophysiologie")
+   - Refléter le thème principal BIOLOGIQUE/SVT (ex: "Glycémie", "Procréation", "Évolution biologique", "Régulation de la pression artérielle", "Nutrition minérale", "Diversité du monde microbien", "Hérédité liée au sexe", "Génétique des populations", "Neurophysiologie")
+   - **IGNORE le nom de la section** (Math, Sciences, Lettres, etc.) - c'est la classe, PAS le sujet
+   - Si le titre mentionne "Mathématiques" c'est la section (classe), PAS le sujet SVT
+   - Le generalSubject doit toujours être un sujet BIOLOGIQUE (nutrition, génétique, immunologie, géologie, écologie, etc.)
 
 5. **exerciseInsights** (3-5 entrées) : aperçu structuré du document.
    - Pour DEVOIR/EXERCISE: aperçu exercice par exercice.
@@ -97,6 +100,7 @@ export async function POST(req: NextRequest) {
     const startIndex = body.startIndex || 0;
     const dryRun = body.dryRun === true;
     const skipExisting = body.skipExisting !== false; // default true
+    const onlyMissingGeneralSubject = body.onlyMissingGeneralSubject === true; // new mode for title rebuild prep
 
     // All SVT lycée files
     const allFiles: any[] = await prisma.resource.findMany({
@@ -111,6 +115,10 @@ export async function POST(req: NextRequest) {
 
     // Process files that are missing any of: KP, SKP, topics, generalSubject, or exerciseInsights
     const targetFiles = allFiles.filter((f: any) => {
+      if (onlyMissingGeneralSubject) {
+        // Mode: just need generalSubject for title rebuild
+        return !f.metadata?.generalSubject;
+      }
       if (!f.metadata) return true; // no metadata at all
       if (skipExisting && f.metadata.keyPoints?.length > 0) return false; // already has KP
       if (!f.metadata.keyPoints || f.metadata.keyPoints.length === 0) return true;
