@@ -86,13 +86,22 @@ export async function POST(req: NextRequest) {
       moveResults.push({ numericId: id, status: 'reclassified', to, reason, title: f.title.substring(0, 50) });
     }
 
-    // 2) Fix 6 gestion files wrongly tagged 1AS → 4AS
+    // 2) Fix 6 gestion files wrongly tagged 1AS → 4AS.
+    // NOTE: Section table isn't strictly bound to class in the schema — the existing
+    // 4AS/eco-gestion files already share their sectionId with 1AS files. We just
+    // need to flip classId; keep the same sectionId so we don't introduce orphans.
     const class4 = await prisma.class.findUnique({ where: { slug: '4eme-secondaire' } });
-    const sectionEcoGestion = await prisma.section.findUnique({
-      where: { classId_slug: { classId: class4!.id, slug: 'eco-gestion' } },
+    if (!class4) {
+      return NextResponse.json({ error: 'class 4eme-secondaire not found' }, { status: 500 });
+    }
+    // Sanity: pull the eco-gestion section id from an existing 4AS economie file
+    const sample4as = await prisma.resource.findFirst({
+      where: { classId: class4.id, subject: { slug: 'economie' } },
+      select: { sectionId: true },
     });
-    if (!class4 || !sectionEcoGestion) {
-      return NextResponse.json({ error: 'class 4eme-secondaire or section eco-gestion not found' }, { status: 500 });
+    const sectionEcoGestionId = sample4as?.sectionId;
+    if (!sectionEcoGestionId) {
+      return NextResponse.json({ error: 'no existing 4AS eco-gestion section id to reuse' }, { status: 500 });
     }
 
     const fixResults: any[] = [];
@@ -105,14 +114,14 @@ export async function POST(req: NextRequest) {
         fixResults.push({ numericId: id, status: 'not-found' });
         continue;
       }
-      if (f.classId === class4.id && f.sectionId === sectionEcoGestion.id) {
+      if (f.classId === class4.id && f.sectionId === sectionEcoGestionId) {
         fixResults.push({ numericId: id, status: 'already-4as', title: f.title.substring(0, 50) });
         continue;
       }
       if (!dryRun) {
         await prisma.resource.update({
           where: { numericId: id },
-          data: { classId: class4.id, sectionId: sectionEcoGestion.id },
+          data: { classId: class4.id, sectionId: sectionEcoGestionId },
         });
         if (f.slug) {
           revalidatePath(`/ressources/${f.numericId}/${f.slug}`);
