@@ -100,57 +100,77 @@ export default function NotFound() {
 
         {/* 4. Content div — visible. This is the 4th child of <main>, matching
             the loading.tsx skeleton's 4th child (`<div className="max-w-7xl
-            mx-auto px-4 sm:px-6 lg:px-8 py-10">`). We keep the centered 404 UI
-            inside this div; the page.tsx normally renders a 2-column grid
-            (sidebar + main) here, but for the 404 we center the content
-            instead. The wrapper's child count is 1 in both states (the
-            loading.tsx has 1 <div className="grid lg:grid-cols-3 gap-8">
-            child, we have 1 <div className="max-w-lg w-full text-center">
-            child — both <div> at the same nesting level). */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex items-center justify-center">
-          <div className="max-w-lg w-full text-center">
-            {/* Animated icon */}
-            <div className="relative inline-block mb-6">
-              <div className="absolute inset-0 bg-sky-200 rounded-full blur-2xl opacity-50" />
-              <div className="relative w-24 h-24 rounded-full bg-gradient-to-br from-sky-100 to-indigo-100 flex items-center justify-center mx-auto shadow-lg">
-                <FileQuestion className="w-12 h-12 text-sky-600" aria-hidden="true" />
+            mx-auto px-4 sm:px-6 lg:px-8 py-10">`).
+            2026-08-13 fix: the loading.tsx renders this wrapper with 1 child
+            `<div className="grid lg:grid-cols-3 gap-8">` that itself has
+            2 children (main column + sidebar <aside>). The previous not-found
+            had 1 child `<div className="max-w-lg w-full text-center">` with
+            the 404 content. When the not-found boundary replaced the loading
+            during hydration, React saw a child-count mismatch at the grandchild
+            level (2 vs 1) and threw React #418/#419/#422 hydration errors on
+            /professeurs/[numericId]/[slug] when the teacher doesn't exist
+            (ERR-NYG44E 5x #418, ERR-F55U7S 1x #422 in 2026-08-13 nightly
+            digest, all on /fr/professeurs/757/... which notFound()s because
+            the Arabic-encoded slug doesn't match a real teacher).
+            Fix: use the same `<div className="grid lg:grid-cols-3 gap-8">`
+            wrapper as the loading, with the centered 404 content in the first
+            column (spanning 2) and a hidden <aside> placeholder in the second
+            column. This keeps the grandchild structure identical between the
+            loading and the not-found boundary. */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+          <div className="grid lg:grid-cols-3 gap-8">
+            {/* Main column — centered 404 content, spans 2 cols on lg+ */}
+            <div className="lg:col-span-2 flex items-center justify-center min-h-[400px]">
+              <div className="max-w-lg w-full text-center">
+                {/* Animated icon */}
+                <div className="relative inline-block mb-6">
+                  <div className="absolute inset-0 bg-sky-200 rounded-full blur-2xl opacity-50" />
+                  <div className="relative w-24 h-24 rounded-full bg-gradient-to-br from-sky-100 to-indigo-100 flex items-center justify-center mx-auto shadow-lg">
+                    <FileQuestion className="w-12 h-12 text-sky-600" aria-hidden="true" />
+                  </div>
+                </div>
+
+                {/* 404 */}
+                <div className="text-7xl sm:text-8xl font-extrabold bg-gradient-to-br from-sky-500 to-indigo-600 bg-clip-text text-transparent mb-3 tracking-tight">
+                  404
+                </div>
+
+                {/* Title */}
+                <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3 tracking-tight">
+                  Enseignant introuvable
+                </h1>
+
+                {/* Message */}
+                <p className="text-base sm:text-lg text-slate-600 mb-8 leading-relaxed">
+                  Ce profil d'enseignant n'existe pas ou n'est plus accessible. Il a peut-être été
+                  supprimé, ou le lien que vous avez suivi est obsolète.
+                </p>
+
+                {/* Actions */}
+                <div className="flex flex-col sm:flex-row gap-3 justify-center mb-8">
+                  <Link
+                    href="/"
+                    className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold shadow-md hover:shadow-lg hover:from-primary-600 hover:to-primary-700 transition-all min-h-[44px]"
+                  >
+                    <Home className="w-5 h-5" />
+                    Accueil
+                  </Link>
+
+                  <Link
+                    href="/professeurs"
+                    className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-white border-2 border-slate-200 text-slate-700 font-semibold hover:bg-slate-50 hover:border-slate-300 transition-all min-h-[44px]"
+                  >
+                    <Search className="w-5 h-5" />
+                    Tous les enseignants
+                  </Link>
+                </div>
               </div>
             </div>
 
-            {/* 404 */}
-            <div className="text-7xl sm:text-8xl font-extrabold bg-gradient-to-br from-sky-500 to-indigo-600 bg-clip-text text-transparent mb-3 tracking-tight">
-              404
-            </div>
-
-            {/* Title */}
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3 tracking-tight">
-              Enseignant introuvable
-            </h1>
-
-            {/* Message */}
-            <p className="text-base sm:text-lg text-slate-600 mb-8 leading-relaxed">
-              Ce profil d'enseignant n'existe pas ou n'est plus accessible. Il a peut-être été
-              supprimé, ou le lien que vous avez suivi est obsolète.
-            </p>
-
-            {/* Actions */}
-            <div className="flex flex-col sm:flex-row gap-3 justify-center mb-8">
-              <Link
-                href="/"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold shadow-md hover:shadow-lg hover:from-primary-600 hover:to-primary-700 transition-all min-h-[44px]"
-              >
-                <Home className="w-5 h-5" />
-                Accueil
-              </Link>
-
-              <Link
-                href="/professeurs"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-white border-2 border-slate-200 text-slate-700 font-semibold hover:bg-slate-50 hover:border-slate-300 transition-all min-h-[44px]"
-              >
-                <Search className="w-5 h-5" />
-                Tous les enseignants
-              </Link>
-            </div>
+            {/* Sidebar placeholder — hidden via CSS, matches the loading's
+                <aside> element type so the grid's child count is 2 in both
+                states. */}
+            <aside className="space-y-6 hidden" aria-hidden="true" />
           </div>
         </div>
       </main>

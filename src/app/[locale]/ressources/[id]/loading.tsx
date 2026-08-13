@@ -57,8 +57,31 @@ export default function Loading() {
                 children render, but this loading skeleton represents the
                 full PUBLISHED shape (most common case). */}
             <div>
-              {/* Title card (matches page.tsx div with badges, h1, summary,
-                  stats INSIDE, and ResourceActions) */}
+              {/* Title card (matches page.tsx div with badges, h1, AI cards,
+                  stats INSIDE, and ResourceActions).
+                  2026-08-13 fix: the page now renders up to 4 AI-extracted cards
+                  inside the title card for Technologie resources:
+                    1. Système technique green cadre (when systemName is set)
+                    2. Résumé intelligent (AiContentSection, when aiSummary)
+                    3. Aperçu des exercices (AiExerciseOverview, when insights)
+                    4. Points clés (AiContentSection, when keyPoints/shortKeyPoints)
+                  The previous loading had 5 children (badges, h1, subtitle, stats,
+                  actions) but the page renders 8 children for Technologie FR
+                  (badges, h1, Système, Résumé, Exercices, Points clés, stats,
+                  actions). The position 1 element type was also a <div> instead
+                  of <h1>, an element-type mismatch that triggered React #418/#419
+                  hydration errors on:
+                    - ERR-BFEVBU 15x #419 on /fr/ressources/7607/... (Technologie 1AS)
+                    - ERR-MKGGZR  6x #419 on /fr/ressources/13389/... (Technologie 4AS)
+                  in the 2026-08-13 nightly digest.
+                  Fix: use <h1> for the title skeleton, and add 4 hidden <div>
+                  placeholders for the AI cards (hidden via CSS so the skeleton
+                  stays clean). The "always render, hide via CSS" pattern keeps
+                  the child count stable at 9 children (badges, h1, 4 AI
+                  placeholders, stats, actions) regardless of which AI cards the
+                  page actually renders. For non-Technologie resources the page
+                  renders fewer children — React's hydration removes the extra
+                  placeholders at the end. */}
               <div className="bg-white rounded-2xl border border-slate-100 p-6 lg:p-8 mb-4">
                 {/* Badges row */}
                 <div className="flex flex-wrap items-center gap-2 mb-4">
@@ -67,10 +90,21 @@ export default function Loading() {
                   <div className="h-5 w-16 bg-slate-100 rounded-full animate-pulse" />
                   <div className="h-5 w-20 bg-slate-200 rounded-full animate-pulse" />
                 </div>
-                {/* h1 title */}
-                <div className="h-9 w-3/4 bg-slate-200 rounded mb-3 animate-pulse" />
-                {/* optional subtitle/description */}
-                <div className="h-5 w-1/2 bg-slate-100 rounded mb-4 animate-pulse" />
+                {/* h1 title — MUST be <h1> (NOT <div>) to match page.tsx */}
+                <h1
+                  aria-hidden="true"
+                  className="h-9 w-3/4 bg-slate-200 rounded mb-3 animate-pulse text-[0px] leading-none"
+                />
+                {/* AI card 1: Système technique green cadre (page.tsx line ~517).
+                    Hidden via CSS so it doesn't show during loading — only the
+                    element-type/child-count match matters for hydration. */}
+                <div className="hidden" aria-hidden="true" />
+                {/* AI card 2: Résumé intelligent (AiContentSection, page.tsx line ~537) */}
+                <div className="hidden" aria-hidden="true" />
+                {/* AI card 3: Aperçu des exercices (AiExerciseOverview, page.tsx line ~681) */}
+                <div className="hidden" aria-hidden="true" />
+                {/* AI card 4: Points clés (AiContentSection, page.tsx line ~742) */}
+                <div className="hidden" aria-hidden="true" />
                 {/* Stats row — INSIDE the title card to match page.tsx */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 py-4 border-y border-slate-100">
                   {[
