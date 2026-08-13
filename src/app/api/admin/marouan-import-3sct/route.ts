@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
-import OpenAI from 'openai';
 
 const prisma = new PrismaClient();
 
@@ -53,48 +52,15 @@ function slugify(s: string) {
 }
 
 async function generateInsightsFromSubject(subject: string, type: string, year: string) {
-  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-  const prompt = `Tu es un expert en TECHNOLOGIE du système éducatif tunisien (lycée 3ème année Sciences Techniques - Génie Mécanique).
-
-Le système étudié est: ${subject}
-
-Génère 3-5 insights (résumés d'exercices typiques) pour ce devoir ${type === 'DEVOIR' ? 'de contrôle' : 'de synthèse'}:
-
-Format pour CHAQUE: "Exercice N: [domaine GM] - [résumé FR, 10-25 mots]"
-
-DOMAINES GM:
-  A. ANALYSE FONCTIONNELLE (bête à cornes, diagramme pieuvre, CdCF)
-  B. ANALYSE STRUCTURELLE (graphe des liaisons, classes d'équivalence, schéma cinématique)
-  C. CINÉMATIQUE (rapports, vitesses, couples, puissances, rendement)
-  D. RDM (contraintes, déformations, flexion, torsion)
-  E. DESSIN TECHNIQUE (projection, cotation, chaîne de cotes)
-  F. MÉTROLOGIE/FABRICATION (machines-outils, usinage)
-
-JSON: {"exercises": ["Exercice 1: ... - ...", ...]}
-Année: ${year}
-IMPORTANT: PAS de "(Type)" après le numéro. Longueur max 200 chars par item.`;
-
-  try {
-    const resp = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        { role: 'system', content: prompt },
-        { role: 'user', content: 'Génère les insights.' },
-      ],
-      response_format: { type: 'json_object' },
-      temperature: 0.3,
-      max_tokens: 800,
-    });
-    const parsed = JSON.parse(resp.choices[0].message.content || '{}');
-    let insights = parsed.exercises || [];
-    insights = insights.filter((e: string) =>
-      e.includes('Exercice') && e.includes(':') && e.includes(' - ') && e.length < 250
-    );
-    return insights;
-  } catch (e: any) {
-    console.error('  AI error:', e.message);
-    return [];
-  }
+  // Generic insights for Technologie GM (no OpenAI dependency in prod)
+  // Each item: "Exercice N: domain - résumé"
+  return [
+    `Exercice 1: Analyse fonctionnelle - Identification des fonctions de service et diagramme pieuvre du système ${subject}`,
+    `Exercice 2: Analyse structurelle - Graphe des liaisons et classes d'équivalence du mécanisme`,
+    `Exercice 3: RDM - Étude des contraintes et déformations dans les pièces sollicitées`,
+    `Exercice 4: Dessin technique - Projection, cotation et chaîne de cotes du ${subject}`,
+    `Exercice 5: Cinématique - Calcul des rapports, vitesses et puissances transmises`,
+  ];
 }
 
 export async function POST(req: NextRequest) {
