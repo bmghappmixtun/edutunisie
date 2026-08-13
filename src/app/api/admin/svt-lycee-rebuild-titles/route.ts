@@ -114,9 +114,9 @@ function buildNewTitle(r: {
   return baseTitle;
 }
 
-function buildNewSlug(newTitle: string, numericId: number): string {
+function buildNewSlug(newTitle: string, numericId: number | null): string {
   let slug = slugify(newTitle);
-  slug = `${slug}-${numericId}`;
+  slug = numericId ? `${slug}-${numericId}` : slug;
   if (slug.length > 240) slug = slug.slice(0, 240);
   return slug;
 }
