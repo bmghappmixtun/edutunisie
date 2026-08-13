@@ -39,21 +39,24 @@ export async function POST(req: NextRequest) {
 
     const results: any[] = [];
     for (const f of files) {
+      if (!f.numericId) {
+        results.push({ numericId: null, status: 'no-numericId', title: f.title.substring(0, 60) });
+        continue;
+      }
       if (f.subjectId === physique.id) {
         results.push({ numericId: f.numericId, status: 'already-physique', title: f.title.substring(0, 60) });
         continue;
       }
 
       if (!dryRun) {
-        // Move the file to physique subject. Also clear metadata that was generated
-        // for SVT (KP/SKP/topics) — it will need to be regenerated under physique.
+        // Move the file to physique subject.
         await prisma.resource.update({
           where: { numericId: f.numericId },
           data: {
             subjectId: physique.id,
           },
         });
-        // Clear SVT-specific metadata fields (generalSubject, systemName, schoolName, etc.)
+        // Clear SVT-specific metadata fields (generalSubject, courseSubject, systemName, etc.)
         // Keep keyPoints/topics because they may be useful for physique too — physique regen
         // pipeline will overwrite them.
         await prisma.resourceMetadata.updateMany({
