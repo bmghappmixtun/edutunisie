@@ -25,27 +25,25 @@ const SYSTEM_PROMPT = `Tu es un expert en SCIENCES DE LA VIE ET DE LA TERRE (SVT
    - En français
    - Refléter le thème principal (ex: "Glycémie", "Procréation", "Évolution biologique", "Régulation de la pression artérielle", "Nutrition minérale", "Diversité du monde microbien", "Hérédité liée au sexe", "Génétique des populations", "Neurophysiologie")
 
-5. **exerciseInsights** (3-5 entrées, UNIQUEMENT si type=DEVOIR ou type=EXERCISE) : aperçu exercice par exercice.
-   Format STRICT : "Exercice N: sujet - résumé" où:
-   - N est le numéro (1, 2, 3...)
-   - sujet est court (3-8 mots)
-   - résumé est 1 phrase concise (5-12 mots)
-   - EXEMPLE: "Exercice 1: Procréation - Étude de la fonction reproductrice chez l'homme"
-   - PAS de guillemets, PAS de préambule
-
-6. **courseSectionInsights** (3-5 entrées, UNIQUEMENT si type=COURSE) : aperçu section par section.
-   Format STRICT : "Titre: résumé" où:
-   - Titre est court (3-8 mots)
-   - résumé est 1 phrase concise (5-12 mots)
-   - EXEMPLE: "Nutrition minérale: Absorption de l'eau et des sels minéraux par les racines"
+5. **exerciseInsights** (3-5 entrées) : aperçu structuré du document.
+   - Pour DEVOIR/EXERCISE: aperçu exercice par exercice.
+     Format STRICT : "Exercice N: sujet - résumé" où:
+     - N est le numéro (1, 2, 3...)
+     - sujet est court (3-8 mots)
+     - résumé est 1 phrase concise (5-12 mots)
+     - EXEMPLE: "Exercice 1: Procréation - Étude de la fonction reproductrice chez l'homme"
+   - Pour COURSE: aperçu section par section.
+     Format STRICT : "Titre: résumé" où:
+     - Titre est court (3-8 mots)
+     - résumé est 1 phrase concise (5-12 mots)
+     - EXEMPLE: "Nutrition minérale: Absorption de l'eau et des sels minéraux par les racines"
    - PAS de guillemets, PAS de préambule
 
 RÈGLES IMPORTANTES:
 - TOUT en FRANÇAIS (jamais d'arabe ou d'anglais)
 - Le sujet doit être DÉTAILLÉ et FACTUEL (pas vague comme "biologie" ou "SVT")
 - Le nombre est STRICT: 3 shortKeyPoints + 3 keyPoints + 9 topics + 1 generalSubject
-- exerciseInsights UNIQUEMENT pour DEVOIR/EXERCISE (sinon [])
-- courseSectionInsights UNIQUEMENT pour COURSE (sinon [])
+- exerciseInsights: 3-5 entrées selon le type (DEVOIR/EXERCISE → exercices, COURSE → sections)
 
 FORMAT DE RÉPONSE (JSON strict):
 {
@@ -53,8 +51,7 @@ FORMAT DE RÉPONSE (JSON strict):
   "keyPoints": ["Phrase 1", "Phrase 2", "Phrase 3"],
   "topics": ["tag1", "tag2", "tag3", "tag4", "tag5", "tag6", "tag7", "tag8", "tag9"],
   "generalSubject": "Sujet principal concis",
-  "exerciseInsights": ["Exercice 1: sujet - résumé", "Exercice 2: sujet - résumé"],
-  "courseSectionInsights": ["Titre: résumé", "Titre: résumé"]
+  "exerciseInsights": ["Exercice 1: sujet - résumé", "Section 1: titre - résumé"]
 }`;
 
 async function processFile(file: any): Promise<any> {
@@ -69,7 +66,7 @@ Titre: ${file.title}
 Année: ${file.year || 'N/A'}
 Type détaillé: ${file.homeworkSubtype || 'N/A'}
 
-Génère les 3 shortKeyPoints, 3 keyPoints, 9 topics, 1 generalSubject, ET ${file.type === 'COURSE' ? 'courseSectionInsights' : 'exerciseInsights'}.`;
+Génère les 3 shortKeyPoints, 3 keyPoints, 9 topics, 1 generalSubject, ET exerciseInsights (aperçu structuré).`;
 
   const response = await openai.chat.completions.create({
     model: 'gpt-4o-mini',
@@ -112,7 +109,7 @@ export async function POST(req: NextRequest) {
       orderBy: { numericId: 'asc' },
     });
 
-    // Process files that are missing any of: KP, SKP, topics, generalSubject, or exercise/courseInsights
+    // Process files that are missing any of: KP, SKP, topics, generalSubject, or exerciseInsights
     const targetFiles = allFiles.filter((f: any) => {
       if (!f.metadata) return true; // no metadata at all
       if (skipExisting && f.metadata.keyPoints?.length > 0) return false; // already has KP
@@ -120,12 +117,7 @@ export async function POST(req: NextRequest) {
       if (!f.metadata.shortKeyPoints || f.metadata.shortKeyPoints.length === 0) return true;
       if (!f.metadata.topics || f.metadata.topics.length === 0) return true;
       if (!f.metadata.generalSubject) return true;
-      if (f.type === 'DEVOIR' || f.type === 'EXERCISE') {
-        if (!f.metadata.exerciseInsights || f.metadata.exerciseInsights.length === 0) return true;
-      }
-      if (f.type === 'COURSE') {
-        if (!f.metadata.courseSectionInsights || f.metadata.courseSectionInsights.length === 0) return true;
-      }
+      if (!f.metadata.exerciseInsights || f.metadata.exerciseInsights.length === 0) return true;
       return false;
     });
 
@@ -149,8 +141,7 @@ export async function POST(req: NextRequest) {
           (ai.keyPoints?.length || 0) >= 3 &&
           (ai.topics?.length || 0) >= 9 &&
           !!ai.generalSubject &&
-          ((f.type === 'COURSE' && (ai.courseSectionInsights?.length || 0) >= 3) ||
-           (f.type !== 'COURSE' && (ai.exerciseInsights?.length || 0) >= 3))
+          (ai.exerciseInsights?.length || 0) >= 3
         );
 
         results.push({
@@ -163,7 +154,7 @@ export async function POST(req: NextRequest) {
           kpCount: ai.keyPoints?.length || 0,
           skpCount: ai.shortKeyPoints?.length || 0,
           topicCount: ai.topics?.length || 0,
-          insightCount: f.type === 'COURSE' ? (ai.courseSectionInsights?.length || 0) : (ai.exerciseInsights?.length || 0),
+          insightCount: ai.exerciseInsights?.length || 0,
         });
 
         if (!dryRun) {
@@ -172,14 +163,9 @@ export async function POST(req: NextRequest) {
             shortKeyPoints: ai.shortKeyPoints || [],
             topics: ai.topics || [],
             generalSubject: ai.generalSubject || null,
+            exerciseInsights: ai.exerciseInsights || [],
             modelUsed: 'gpt-4o-mini-svt-v1',
           };
-          if (f.type === 'DEVOIR' || f.type === 'EXERCISE') {
-            data.exerciseInsights = ai.exerciseInsights || [];
-          }
-          if (f.type === 'COURSE') {
-            data.courseSectionInsights = ai.courseSectionInsights || [];
-          }
 
           if (f.metadata) {
             await prisma.resourceMetadata.update({

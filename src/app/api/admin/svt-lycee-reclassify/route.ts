@@ -58,11 +58,11 @@ export async function POST(req: NextRequest) {
         });
         // Clear SVT-specific metadata fields (generalSubject, courseSubject, systemName, etc.)
         // Keep keyPoints/topics because they may be useful for physique too — physique regen
-        // pipeline will overwrite them. exerciseInsights/courseSectionInsights → empty array
+        // pipeline will overwrite them. exerciseInsights → empty array
         // (Prisma String[] can't be set to null).
         await prisma.resourceMetadata.updateMany({
           where: { resourceId: f.id },
-          data: { generalSubject: null, courseSubject: null, systemName: null, exerciseInsights: [], courseSectionInsights: [] },
+          data: { generalSubject: null, courseSubject: null, systemName: null, exerciseInsights: [] },
         }).catch(() => { /* metadata row may not exist yet */ });
 
         // Revalidate both old and new pages
