@@ -31,6 +31,16 @@ const SUPPRESSED_ERROR_PATTERNS: readonly string[] = [
   'MissingPDFException',
   'UnexpectedResponseException',
   'PasswordException',
+  // ChunkLoadError: stale _next/static/chunks/* reference after a Vercel
+  // deploy swaps the chunk hash. Handled by `app/error.tsx` which auto-
+  // reloads the page once (see comment there). Reporting these just
+  // floods the nightly digest — every Vercel deploy triggers ~100-200
+  // ChunkLoadError reports (one per user with a stale tab). Fixed
+  // 2026-08-14 (ERR-9X4BRN 87x, ERR-CXCQ9G 34x, ERR-R5CJJ3 10x,
+  // ERR-T9Y8SG 5x, ERR-RAJEVR 4x, ERR-CXY7HC 1x, ERR-U26YDE 1x —
+  // 142 reports/24h from deploy artifacts).
+  'chunkloaderror',
+  'loading chunk',
 ];
 
 function isSuppressedError(message: string | undefined | null): boolean {
