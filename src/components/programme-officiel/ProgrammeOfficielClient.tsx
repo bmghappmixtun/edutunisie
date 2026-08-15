@@ -178,8 +178,8 @@ export default function ProgrammeOfficielClient() {
           HERO
           ============================================ */}
       <section className="bg-gradient-to-br from-violet-600 via-purple-700 to-amber-500 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-14 relative">
-          <nav aria-label="Fil d'Ariane" className="flex items-center gap-1 text-xs text-violet-100 mb-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 relative">
+          <nav aria-label="Fil d'Ariane" className="flex items-center gap-1 text-xs text-violet-100 mb-6">
             <Link href="/" className="hover:text-white transition">
               {t('common.home')}
             </Link>
@@ -187,31 +187,31 @@ export default function ProgrammeOfficielClient() {
             <span className="text-white font-semibold">{t('title')}</span>
           </nav>
 
-          <div className="flex items-start gap-3 mb-4">
-            <div className="w-12 h-12 rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center flex-shrink-0 border border-white/20">
-              <Library className="w-6 h-6 text-white" />
+          <div className="flex items-start gap-4 mb-6">
+            <div className="w-16 h-16 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center flex-shrink-0 border border-white/20 shadow-lg">
+              <Library className="w-8 h-8 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl lg:text-5xl font-extrabold tracking-tight">
+              <h1 className="text-4xl lg:text-6xl font-extrabold tracking-tight leading-tight">
                 {t('hero.title')}
               </h1>
-              <p className="text-violet-100 mt-1 text-sm lg:text-base">
+              <p className="text-violet-100 mt-3 text-base lg:text-lg">
                 {t('hero.subtitle')}
               </p>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 mt-4">
-            <span className="inline-flex items-center gap-1 bg-white/20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-bold border border-white/20">
-              ✓ {t('badge.official')}
+          <div className="flex flex-wrap items-center gap-2.5 mt-6">
+            <span className="inline-flex items-center gap-1.5 bg-white/20 backdrop-blur-sm text-white px-4 py-1.5 rounded-full text-sm font-bold border border-white/20">
+              <span className="text-emerald-300">✓</span> {t('badge.official')}
             </span>
-            <span className="inline-flex items-center gap-1 bg-white/20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-bold border border-white/20">
+            <span className="inline-flex items-center gap-1.5 bg-white/20 backdrop-blur-sm text-white px-4 py-1.5 rounded-full text-sm font-bold border border-white/20">
               📚 7 {t('badge.levels')}
             </span>
-            <span className="inline-flex items-center gap-1 bg-white/20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-bold border border-white/20">
+            <span className="inline-flex items-center gap-1.5 bg-white/20 backdrop-blur-sm text-white px-4 py-1.5 rounded-full text-sm font-bold border border-white/20">
               🎓 {totalSubjects} {t('badge.subjects')}
             </span>
-            <span className="inline-flex items-center gap-1 bg-white/20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-bold border border-white/20">
+            <span className="inline-flex items-center gap-1.5 bg-white/20 backdrop-blur-sm text-white px-4 py-1.5 rounded-full text-sm font-bold border border-white/20">
               🌍 FR · AR · EN
             </span>
           </div>
