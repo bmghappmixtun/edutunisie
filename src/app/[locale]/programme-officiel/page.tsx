@@ -241,7 +241,6 @@ export default async function ProgrammeOfficielPage() {
     url: PAGE_URL,
     datePublished: '2024-09-01',
     dateModified: new Date().toISOString(),
-    provider: 'Ministère de l\'Éducation Tunisien',
   });
 
   // 4. ItemList for 7 BAC sections
