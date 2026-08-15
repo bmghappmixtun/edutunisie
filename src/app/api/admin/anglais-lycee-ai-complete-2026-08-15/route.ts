@@ -38,34 +38,86 @@ interface ProcessResult {
 
 const PROMPT_GS = `Tu es un expert du système éducatif tunisien.
 
-À partir d'un titre + key points + AI summary d'un document d'ANGLAIS lycée tunisien (1AS, 2AS, 3AS ou 4AS), tu dois générer UNIQUEMENT un "generalSubject" très court (2-6 mots) qui décrit le sujet principal du document.
+À partir d'un titre + key points + AI summary d'un document d'ANGLAIS lycée tunisien (1AS, 2AS, 3AS ou 4AS), tu dois générer UNIQUEMENT un "generalSubject" (3-8 mots) qui décrit le sujet principal du document.
 
-RÈGLES:
-- En FRANÇAIS ou en ANGLAIS selon ce qui est le plus naturel pour le sujet
-- 2-6 mots maximum
-- Concis et FACTUEL (pas vague comme "Anglais", "Cours d'anglais", "Devoir d'anglais")
-- Refléter le THÈME ou la COMPÉTENCE travaillée
-- IGNORER le nom de la section (Lettres, Sciences, etc.) - c'est la classe
-- IGNORER le nom du prof et le lycée
+🚨🚨🚨 RÈGLES STRICTES — À RESPECTER IMPÉRATIVEMENT 🚨🚨🚨
 
-Exemples valides:
-- "Reading comprehension"
-- "Written expression"
-- "Grammar - tenses"
-- "Grammar - conditionals"
-- "American civilization"
-- "British literature"
-- "Phonetics"
-- "Vocabulary - environment"
-- "Essay writing"
-- "Listening comprehension"
-- "Modal verbs"
-- "Reported speech"
-- "Passive voice"
+1. **INTERDIT — Ne JAMAIS générer un GS générique seul** :
+   ❌ "Reading comprehension" SEUL
+   ❌ "Listening comprehension" SEUL
+   ❌ "Compréhension de texte" SEUL
+   ❌ "Devoir de contrôle en anglais"
+   ❌ "Cours d'anglais"
+   ❌ "Anglais"
+   ❌ "Written expression" / "Essay writing" / "Grammar" / "Vocabulary" SEULS
+
+2. **OBLIGATOIRE — Toujours inclure le SUJET SPÉCIFIQUE** :
+   Le GS doit TOUJOURS être au format « Type de compétence - sujet spécifique » (ou l'inverse).
+
+3. **Source du sujet** : Extraire le sujet depuis l'AI summary (ou les key points). Le sujet est le THÈME principal du texte de compréhension, l'ÉVÉNEMENT, le PERSONNAGE, ou le CONCEPT travaillé.
+
+4. **Langue** : En FRANÇAIS ou en ANGLAIS selon ce qui est le plus naturel. Le sujet peut être dans une langue et le type dans l'autre (ex: "Reading comprehension - don d'organes").
+
+5. **Longueur** : 3-8 mots typiquement (peut aller jusqu'à 12 si le sujet l'exige).
+
+6. **INTERDIT — Ignorer** : nom de la section (Lettres, Sciences, Eco, etc.), nom du prof, nom du lycée, type d'évaluation (Devoir, Contrôle, Synthèse).
+
+EXEMPLES DE BONS GS (à imiter):
+✅ "Reading comprehension - don d'organes et solidarité"
+✅ "Reading comprehension - addiction aux jeux vidéo"
+✅ "Reading comprehension - fuite des cerveaux en Grèce"
+✅ "Reading comprehension - immersion culturelle au pair"
+✅ "Reading comprehension - histoire d'Emily, insuffisance rénale"
+✅ "Listening comprehension - multilinguisme et comportement en classe"
+✅ "Listening comprehension - discours de Rosa Parks"
+✅ "Listening comprehension - internet addiction"
+✅ "Compréhension de texte - Antonios Chalkiopoulos et l'émigration grecque"
+✅ "Compréhension écrite - voyage en famille en van"
+✅ "Written expression - rédaction sur l'anxiété des étudiants"
+✅ "Writing - essay sur l'environnement et le tourisme spatial"
+✅ "Grammar - past simple vs present perfect"
+✅ "Grammar - conditionals et wishes"
+✅ "Grammar - passive voice (textile industry)"
+✅ "Vocabulary - health and medicine"
+✅ "Vocabulary - environment and pollution"
+✅ "Essay writing - impact of technology on education"
 
 FORMAT DE RÉPONSE (JSON strict):
 {
-  "generalSubject": "Sujet principal concis"
+  "generalSubject": "Type de compétence - sujet spécifique"
+}`;
+
+const PROMPT_TAGS = `Tu es un expert du système éducatif tunisien (ANGLAIS lycée tunisien 1AS/2AS/3AS/4AS).
+
+À partir d'un titre + key points + AI summary d'un document d'ANGLAIS lycée tunisien, tu dois générer EXACTEMENT 9 tags (mots-clés) qui catégorisent le document.
+
+🚨🚨🚨 RÈGLES STRICTES 🚨🚨🚨
+
+1. **EXACTEMENT 9 tags** (pas plus, pas moins)
+2. **UN MOT par tag** (1-2 mots max, JAMAIS de phrases)
+3. **En minuscule** (sauf noms propres : "Rosa Parks", "Anousheh Ansari")
+4. **En français** (par défaut) ou en anglais si le terme est technique (ex: "phishing", "listening", "speaking")
+5. **Variés et spécifiques** — Mélanger :
+   - **Type de compétence** (1-2 tags) : reading, listening, writing, grammar, vocabulary, speaking, comprehension, expression, phonetics
+   - **Thème du contenu** (3-4 tags) : le sujet spécifique (ex: "émigration", "addiction", "environnement", "santé mentale", "fuite des cerveaux", "tourisme spatial", "internet", "dons d'organes", "handicap", "santé", "éducation", "environnement", "technologie", "multilinguisme", "écologie", "pollution", "voyage", "famille", "émotions", "adolescence", "pandémie", "réseaux sociaux")
+   - **Type d'exercice** (1-2 tags) : qcm, true/false, essay, summary, matching, fill-in-blanks, multiple choice, comprehension, analysis, listening, reading
+   - **Niveau/langue** (1-2 tags) : anglais, 1AS, 2AS, lycée, bac, expression écrite, expression orale, baccalauréat
+
+6. **Pas de doublons** entre les tags
+7. **Pas de tags trop génériques** (interdit: "cours", "exercice", "devoir", "contrôle", "synthèse", "évaluation", "élève", "education", "langue")
+8. **Pas de tags redondants avec les tags existants** (mais peut les compléter)
+
+EXEMPLES DE BONS TAGS:
+- ["reading", "émigration", "fuite des cerveaux", "économie", "grammaire", "vocabulaire", "compréhension écrite", "4AS", "anglais"]
+- ["listening", "addiction", "jeux vidéo", "santé mentale", "compréhension orale", "vocabulaire", "grammaire", "3AS", "anglais"]
+- ["reading", "don d'organes", "santé", "solidarité", "compréhension écrite", "expression écrite", "grammaire", "lycée", "anglais"]
+- ["writing", "environnement", "tourisme spatial", "pollution", "expression écrite", "essay", "vocabulaire", "3AS", "anglais"]
+- ["listening", "multilinguisme", "comportement en classe", "compréhension orale", "phonétique", "grammaire", "vocabulaire", "1AS", "anglais"]
+- ["grammar", "passive voice", "conditionals", "tenses", "vocabulaire", "exercices", "1AS", "lycée", "anglais"]
+
+FORMAT DE RÉPONSE (JSON strict):
+{
+  "topics": ["tag1", "tag2", "tag3", "tag4", "tag5", "tag6", "tag7", "tag8", "tag9"]
 }`;
 
 const PROMPT_SKP = `Tu es un expert du système éducatif tunisien.
@@ -208,7 +260,12 @@ async function getTargetFiles(mode: string, onlyIds?: number[]) {
     return all.filter((r) => !r.metadata);
   }
   if (mode === 'gs') {
-    return all.filter((r) => !r.metadata?.generalSubject);
+    // For 'gs' mode, process ALL files (we want to upgrade existing GS too)
+    return all;
+  }
+  if (mode === 'tags') {
+    // Process files with < 9 tags
+    return all.filter((r) => (r.metadata?.topics?.length || 0) < 9);
   }
   if (mode === 'skp') {
     return all.filter((r) => !r.metadata?.shortKeyPoints?.length);
@@ -221,7 +278,7 @@ async function getTargetFiles(mode: string, onlyIds?: number[]) {
 
 async function processFile(
   file: any,
-  mode: 'gs' | 'skp' | 'ei' | 'new',
+  mode: 'gs' | 'skp' | 'ei' | 'tags' | 'new',
   dryRun: boolean
 ): Promise<ProcessResult> {
   try {
@@ -238,10 +295,26 @@ Classe: ${file.class.nameFr}
 Section: ${file.section?.nameFr || 'N/A'}
 Titre: ${file.title}
 KeyPoints: ${(file.metadata?.keyPoints || []).join(' | ')}
-AI Summary: ${file.aiSummary?.summary?.slice(0, 400) || 'N/A'}
+AI Summary: ${file.aiSummary?.summary?.slice(0, 500) || 'N/A'}
+GeneralSubject actuel: ${file.metadata?.generalSubject || 'N/A'}
 
-Génère UNIQUEMENT le generalSubject.`;
+Génère UNIQUEMENT le generalSubject AMÉLIORÉ (avec sujet spécifique).`;
       maxTokens = 100;
+      data = await callOpenAI(prompt, systemPrompt, maxTokens);
+    } else if (mode === 'tags') {
+      systemPrompt = PROMPT_TAGS;
+      prompt = `Document ANGLAIS lycée tunisien:
+Type: ${file.type}
+Classe: ${file.class.nameFr}
+Section: ${file.section?.nameFr || 'N/A'}
+Titre: ${file.title}
+GeneralSubject: ${file.metadata?.generalSubject || 'N/A'}
+KeyPoints: ${(file.metadata?.keyPoints || []).join(' | ')}
+AI Summary: ${file.aiSummary?.summary?.slice(0, 500) || 'N/A'}
+Tags actuels: ${(file.metadata?.topics || []).join(', ') || 'N/A'}
+
+Génère EXACTEMENT 9 tags varié et spécifiques (1-2 mots max chacun).`;
+      maxTokens = 200;
       data = await callOpenAI(prompt, systemPrompt, maxTokens);
     } else if (mode === 'skp') {
       systemPrompt = PROMPT_SKP;
@@ -298,6 +371,20 @@ Génère TOUS les attributs IA en JSON.`;
         await prisma.resourceMetadata.create({
           data: { resourceId: file.id, generalSubject: gs },
         });
+      }
+    } else if (mode === 'tags') {
+      const topics = data.topics;
+      if (topics && Array.isArray(topics) && topics.length > 0) {
+        if (file.metadata) {
+          await prisma.resourceMetadata.update({
+            where: { id: file.metadata.id },
+            data: { topics },
+          });
+        } else {
+          await prisma.resourceMetadata.create({
+            data: { resourceId: file.id, topics },
+          });
+        }
       }
     } else if (mode === 'skp') {
       const skp = data.shortKeyPoints;
@@ -380,7 +467,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json().catch(() => ({}));
-    const mode = (body.mode || req.nextUrl.searchParams.get('mode') || 'gs') as 'gs' | 'skp' | 'ei' | 'new' | 'all';
+    const mode = (body.mode || req.nextUrl.searchParams.get('mode') || 'gs') as 'gs' | 'skp' | 'ei' | 'tags' | 'new' | 'all';
     const batchSize = body.batchSize || 15;
     const startIndex = body.startIndex || 0;
     const dryRun = body.dryRun === true;
@@ -393,7 +480,7 @@ export async function POST(req: NextRequest) {
     // For 'all' mode, run in priority order: new → gs → skp → ei
     if (mode === 'all') {
       const results: any[] = [];
-      for (const m of ['new', 'gs', 'skp', 'ei'] as const) {
+      for (const m of ['new', 'gs', 'tags', 'skp', 'ei'] as const) {
         const files = await getTargetFiles(m, onlyIds);
         const batch = files.slice(startIndex, startIndex + batchSize);
         for (const f of batch) {
