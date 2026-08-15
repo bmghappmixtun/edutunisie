@@ -450,7 +450,12 @@ function renderSubjectContent(subject: Subject, levelKey: string, isAr: boolean)
     return (
       <div className="space-y-3">
         {data.themes.map((t: any, i: number) => (
-          <div key={i} className="border-l-2 border-violet-300 pl-3">
+          <div
+            key={i}
+            className={`border-l-2 border-violet-300 pl-3 ${useAR ? 'font-arabic text-right' : 'text-left'}`}
+            dir={useAR ? 'rtl' : 'ltr'}
+            style={useAR ? { fontFamily: 'var(--font-noto-arabic), "Noto Sans Arabic", sans-serif' } : undefined}
+          >
             <div className="font-bold text-slate-900">{t.theme}</div>
             {t.duree && <div className="text-xs text-slate-500">⏱ {t.duree}</div>}
             {t.content && <div className="text-sm text-slate-700 mt-1 leading-relaxed">{t.content}</div>}
@@ -467,7 +472,12 @@ function renderSubjectContent(subject: Subject, levelKey: string, isAr: boolean)
           <div key={secKey}>
             {sec.themes ? (
               sec.themes.map((t: any, i: number) => (
-                <div key={i} className="border-l-2 border-violet-300 pl-3 mb-3">
+                <div
+                  key={i}
+                  className={`border-l-2 border-violet-300 pl-3 mb-3 ${useAR ? 'font-arabic text-right' : 'text-left'}`}
+                  dir={useAR ? 'rtl' : 'ltr'}
+                  style={useAR ? { fontFamily: 'var(--font-noto-arabic), "Noto Sans Arabic", sans-serif' } : undefined}
+                >
                   <div className="font-bold text-slate-900">{t.theme}</div>
                   {t.duree && <div className="text-xs text-slate-500">⏱ {t.duree}</div>}
                   {t.content && <div className="text-sm text-slate-700 mt-1">{t.content}</div>}
@@ -509,14 +519,16 @@ function TrimestreBlock({ label, lessons, useAR, isAr }: { label: string; lesson
   return (
     <div>
       <div
-        className="trimestre-label text-xs font-bold text-violet-700 mb-1.5"
+        className={`trimestre-label text-xs font-bold text-violet-700 mb-1.5 ${useAR ? 'font-arabic text-right' : 'text-left'}`}
         dir={useAR ? 'rtl' : 'ltr'}
+        style={useAR ? { fontFamily: 'var(--font-noto-arabic), "Noto Sans Arabic", sans-serif' } : undefined}
       >
         📌 {labels[parseInt(label) - 1]}
       </div>
       <ul
-        className="themes space-y-1 text-sm text-slate-700"
+        className={`themes space-y-1 text-sm text-slate-700 ${useAR ? 'font-arabic text-right' : 'text-left'}`}
         dir={useAR ? 'rtl' : 'ltr'}
+        style={useAR ? { fontFamily: 'var(--font-noto-arabic), "Noto Sans Arabic", sans-serif' } : undefined}
       >
         {lessons.map((lesson, i) => (
           <li key={i} className="flex items-start gap-2 leading-relaxed">
