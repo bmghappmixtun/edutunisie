@@ -38,7 +38,7 @@ interface AiExerciseOverviewProps {
   }> | null;
 }
 
-type KeyInsightType = 'Physique' | 'Chimie' | 'Math' | 'SVT';
+type KeyInsightType = 'Physique' | 'Chimie' | 'Math' | 'SVT' | 'Anglais' | 'Français' | 'Arabe' | 'Philosophie' | 'Histoire' | 'Géographie' | 'Économie' | 'Gestion' | 'Informatique' | 'Technologie' | 'Sport' | 'Autre';
 
 type ParsedExercise = {
   kind: 'exercise';
@@ -121,26 +121,62 @@ function parseKeyInsight(ki: string, inferredType?: KeyInsightType | null): Pars
   return null;
 }
 
-const TYPE_ICON = {
+const TYPE_ICON: Record<KeyInsightType, typeof Atom> = {
   Physique: Atom,
   Chimie: FlaskConical,
   Math: Atom,
   SVT: FlaskConical,
-} as const;
+  Anglais: BookOpen,
+  Français: BookOpen,
+  Arabe: BookOpen,
+  Philosophie: BookOpen,
+  Histoire: BookOpen,
+  Géographie: BookOpen,
+  Économie: BookOpen,
+  Gestion: BookOpen,
+  Informatique: Cog,
+  Technologie: Wrench,
+  Sport: Zap,
+  Autre: FileText,
+};
 
-const TYPE_COLOR = {
+const TYPE_COLOR: Record<KeyInsightType, string> = {
   Physique: 'bg-blue-100 text-blue-700 border-blue-200',
   Chimie: 'bg-emerald-100 text-emerald-700 border-emerald-200',
   Math: 'bg-violet-100 text-violet-700 border-violet-200',
   SVT: 'bg-amber-100 text-amber-700 border-amber-200',
-} as const;
+  Anglais: 'bg-sky-100 text-sky-700 border-sky-200',
+  Français: 'bg-rose-100 text-rose-700 border-rose-200',
+  Arabe: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+  Philosophie: 'bg-purple-100 text-purple-700 border-purple-200',
+  Histoire: 'bg-amber-100 text-amber-700 border-amber-200',
+  Géographie: 'bg-teal-100 text-teal-700 border-teal-200',
+  Économie: 'bg-yellow-100 text-yellow-700 border-yellow-200',
+  Gestion: 'bg-orange-100 text-orange-700 border-orange-200',
+  Informatique: 'bg-indigo-100 text-indigo-700 border-indigo-200',
+  Technologie: 'bg-slate-100 text-slate-700 border-slate-200',
+  Sport: 'bg-red-100 text-red-700 border-red-200',
+  Autre: 'bg-slate-100 text-slate-700 border-slate-200',
+};
 
-const TYPE_COLOR_DARK = {
+const TYPE_COLOR_DARK: Record<KeyInsightType, string> = {
   Physique: 'bg-blue-50 text-blue-600 border-blue-200',
   Chimie: 'bg-emerald-50 text-emerald-600 border-emerald-200',
   Math: 'bg-violet-50 text-violet-600 border-violet-200',
   SVT: 'bg-amber-50 text-amber-700 border-amber-200',
-} as const;
+  Anglais: 'bg-sky-50 text-sky-600 border-sky-200',
+  Français: 'bg-rose-50 text-rose-600 border-rose-200',
+  Arabe: 'bg-emerald-50 text-emerald-600 border-emerald-200',
+  Philosophie: 'bg-purple-50 text-purple-600 border-purple-200',
+  Histoire: 'bg-amber-50 text-amber-700 border-amber-200',
+  Géographie: 'bg-teal-50 text-teal-600 border-teal-200',
+  Économie: 'bg-yellow-50 text-yellow-600 border-yellow-200',
+  Gestion: 'bg-orange-50 text-orange-600 border-orange-200',
+  Informatique: 'bg-indigo-50 text-indigo-600 border-indigo-200',
+  Technologie: 'bg-slate-50 text-slate-600 border-slate-200',
+  Sport: 'bg-red-50 text-red-600 border-red-200',
+  Autre: 'bg-slate-50 text-slate-600 border-slate-200',
+};
 
 export default function AiExerciseOverview({
   keyInsights,
@@ -155,9 +191,20 @@ export default function AiExerciseOverview({
     'mathematiques': 'Math',
     'physique': 'Physique',
     'svt': 'SVT',
+    'anglais': 'Anglais',
+    'francais': 'Français',
+    'arabe': 'Arabe',
+    'philosophie': 'Philosophie',
+    'histoire': 'Histoire',
+    'geographie': 'Géographie',
+    'economie': 'Économie',
+    'gestion': 'Gestion',
+    'informatique': 'Informatique',
+    'technologie': 'Technologie',
+    'sport': 'Sport',
     // Chimie is a sub-type of Physique
   };
-  const inferredType = subjectSlug ? slugToType[subjectSlug] ?? null : null;
+  const inferredType = subjectSlug ? slugToType[subjectSlug] ?? 'Autre' : 'Math';
 
   const parsed = keyInsights
     .map(ki => parseKeyInsight(ki, inferredType))
@@ -236,34 +283,47 @@ export default function AiExerciseOverview({
           </div>
         ) : null
       ) : (
-        (physiqueCount > 0 || chimieCount > 0 || mathCount > 0 || svtCount > 0) && (
-          <div className="flex flex-wrap gap-2 mb-3">
-            {physiqueCount > 0 && (
-              <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold rounded-full border ${TYPE_COLOR.Physique}`}>
-                <Atom className="w-3 h-3" />
-                {physiqueCount} exercice{physiqueCount > 1 ? 's' : ''} physique
-              </span>
-            )}
-            {chimieCount > 0 && (
-              <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold rounded-full border ${TYPE_COLOR.Chimie}`}>
-                <FlaskConical className="w-3 h-3" />
-                {chimieCount} exercice{chimieCount > 1 ? 's' : ''} chimie
-              </span>
-            )}
-            {mathCount > 0 && (
-              <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold rounded-full border ${TYPE_COLOR.Math}`}>
-                <Atom className="w-3 h-3" />
-                {mathCount} exercice{mathCount > 1 ? 's' : ''} math
-              </span>
-            )}
-            {svtCount > 0 && (
-              <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold rounded-full border ${TYPE_COLOR.SVT}`}>
-                <FlaskConical className="w-3 h-3" />
-                {svtCount} exercice{svtCount > 1 ? 's' : ''} SVT
-              </span>
-            )}
+        <div className="flex flex-wrap gap-2 mb-3">
+          {/* If all exercises are same type, show ONE chip with the subject name.
+              Otherwise, show one chip per type. */}
+          {(() => {
+            const exerciseTypes: ParsedExercise[] = (parsed as Parsed[]).filter((p): p is ParsedExercise => p.kind === 'exercise');
+            const types: KeyInsightType[] = Array.from(new Set(exerciseTypes.map((p) => p.type)));
+            const totalExercises = exerciseTypes.length;
+            
+            if (types.length === 0) return null;
+            
+            // CASE 1: All same type → show "N exercices {typeLabel}" with appropriate color
+            if (types.length === 1) {
+              const t = types[0];
+              const typeLabel: string = t === 'Math' ? 'math' :
+                                t === 'SVT' ? 'SVT' :
+                                t.toLowerCase();
+              const Icon = TYPE_ICON[t];
+              return (
+                <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold rounded-full border ${TYPE_COLOR[t]}`}>
+                  <Icon className="w-3 h-3" />
+                  {totalExercises} exercice{totalExercises > 1 ? 's' : ''} {typeLabel}
+                </span>
+              );
+            }
+            
+            // CASE 2: Mixed types → show one chip per type
+            return types.map((t) => {
+              const count = exerciseTypes.filter((p) => p.type === t).length;
+              const typeLabel: string = t === 'Math' ? 'math' :
+                                t === 'SVT' ? 'SVT' :
+                                t.toLowerCase();
+              const Icon = TYPE_ICON[t];
+              return (
+                <span key={t} className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold rounded-full border ${TYPE_COLOR[t]}`}>
+                  <Icon className="w-3 h-3" />
+                  {count} exercice{count > 1 ? 's' : ''} {typeLabel}
+                </span>
+              );
+            });
+          })()}
           </div>
-        )
       )}
 
       {/* Numbered list — clean: just text, no badges */}
