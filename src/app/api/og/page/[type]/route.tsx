@@ -48,6 +48,12 @@ const PAGE_CONFIG: Record<
     badge: '🎓 Baccalauréat',
     bgGradient: 'linear-gradient(135deg, #4C1D95 0%, #7E22CE 50%, #F59E0B 100%)',
   },
+  'programme-officiel': {
+    title: 'Programme Éducatif Tunisien',
+    subtitle: '7 niveaux · 13 matières · 7 sections BAC · Ministère de l\'Éducation',
+    badge: '📚 Programme Officiel 2025-2026',
+    bgGradient: 'linear-gradient(135deg, #4C1D95 0%, #6D28D9 30%, #DB2777 70%, #F59E0B 100%)',
+  },
   college: {
     title: 'Collège — 7ème, 8ème, 9ème année',
     subtitle: '4 700+ ressources pour le cycle de base',
