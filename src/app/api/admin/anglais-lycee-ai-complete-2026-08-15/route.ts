@@ -168,19 +168,24 @@ async function callOpenAI(prompt: string, systemPrompt: string, maxTokens = 400)
   return JSON.parse(content);
 }
 
-async function getTargetFiles(mode: string) {
+async function getTargetFiles(mode: string, onlyIds?: number[]) {
   const anglais = await prisma.subject.findUnique({ where: { slug: 'anglais' } });
   if (!anglais) return [];
   const classes = await prisma.class.findMany({
     where: { slug: { in: ['1ere-secondaire', '2eme-secondaire', '3eme-secondaire', '4eme-secondaire'] } },
   });
 
+  const whereClause: any = {
+    subjectId: anglais.id,
+    classId: { in: classes.map((c) => c.id) },
+    publishedAt: { not: null },
+  };
+  if (onlyIds && onlyIds.length > 0) {
+    whereClause.numericId = { in: onlyIds };
+  }
+
   const all = await prisma.resource.findMany({
-    where: {
-      subjectId: anglais.id,
-      classId: { in: classes.map((c) => c.id) },
-      publishedAt: { not: null },
-    },
+    where: whereClause,
     include: {
       class: { select: { nameFr: true } },
       section: { select: { nameFr: true } },
@@ -189,6 +194,11 @@ async function getTargetFiles(mode: string) {
     },
     orderBy: { numericId: 'asc' },
   });
+
+  if (onlyIds && onlyIds.length > 0) {
+    // When filtering by IDs, return all (don't apply mode filter)
+    return all;
+  }
 
   if (mode === 'new') {
     // Files with no metadata at all
@@ -371,14 +381,17 @@ export async function POST(req: NextRequest) {
     const batchSize = body.batchSize || 15;
     const startIndex = body.startIndex || 0;
     const dryRun = body.dryRun === true;
+    const onlyIds = body.ids
+      ? (Array.isArray(body.ids) ? body.ids : String(body.ids).split(',').map(Number)).filter(Boolean)
+      : undefined;
 
-    let allFiles = await getTargetFiles(mode);
+    let allFiles = await getTargetFiles(mode, onlyIds);
 
     // For 'all' mode, run in priority order: new → gs → skp → ei
     if (mode === 'all') {
       const results: any[] = [];
       for (const m of ['new', 'gs', 'skp', 'ei'] as const) {
-        const files = await getTargetFiles(m);
+        const files = await getTargetFiles(m, onlyIds);
         const batch = files.slice(startIndex, startIndex + batchSize);
         for (const f of batch) {
           const r = await processFile(f, m, dryRun);
