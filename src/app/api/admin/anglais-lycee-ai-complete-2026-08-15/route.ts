@@ -170,6 +170,7 @@ async function callOpenAI(prompt: string, systemPrompt: string, maxTokens = 400)
 
 async function getTargetFiles(mode: string) {
   const anglais = await prisma.subject.findUnique({ where: { slug: 'anglais' } });
+  if (!anglais) return [];
   const classes = await prisma.class.findMany({
     where: { slug: { in: ['1ere-secondaire', '2eme-secondaire', '3eme-secondaire', '4eme-secondaire'] } },
   });
