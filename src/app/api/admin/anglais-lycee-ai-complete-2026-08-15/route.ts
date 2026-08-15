@@ -178,8 +178,11 @@ async function getTargetFiles(mode: string, onlyIds?: number[]) {
   const whereClause: any = {
     subjectId: anglais.id,
     classId: { in: classes.map((c) => c.id) },
-    publishedAt: { not: null },
   };
+  // Only require publishedAt when NOT filtering by specific IDs
+  if (!onlyIds || onlyIds.length === 0) {
+    whereClause.publishedAt = { not: null };
+  }
   if (onlyIds && onlyIds.length > 0) {
     whereClause.numericId = { in: onlyIds };
   }
