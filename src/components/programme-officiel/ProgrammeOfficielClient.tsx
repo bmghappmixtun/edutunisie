@@ -364,12 +364,13 @@ export default function ProgrammeOfficielClient() {
                         return (
                           <div
                             key={subject.slug}
-                            className={`rounded-xl border-2 ${colorSet.border} ${colorSet.bg} overflow-hidden`}
+                            className={`subject-card rounded-xl border-2 ${colorSet.border} ${colorSet.bg} overflow-hidden`}
+                            dir={isAr ? 'rtl' : 'ltr'}
                           >
                             {/* Card header */}
                             <button
                               onClick={() => toggleSubject(cardId)}
-                              className="w-full flex items-center gap-3 p-3.5 text-left hover:bg-white/50 transition"
+                              className={`w-full flex items-center gap-3 p-3.5 ${isAr ? 'flex-row-reverse text-right' : 'text-left'} hover:bg-white/50 transition`}
                             >
                               <div className={`w-9 h-9 rounded-lg ${colorSet.bg} ${colorSet.text} flex items-center justify-center flex-shrink-0`}>
                                 <Icon className="w-4 h-4" />
@@ -507,14 +508,20 @@ function TrimestreBlock({ label, lessons, useAR, isAr }: { label: string; lesson
     : ['Trimestre 1', 'Trimestre 2', 'Trimestre 3'];
   return (
     <div>
-      <div className="text-xs font-bold text-violet-700 uppercase tracking-wider mb-1.5" dir={useAR ? 'rtl' : 'ltr'}>
+      <div
+        className="trimestre-label text-xs font-bold text-violet-700 mb-1.5"
+        dir={useAR ? 'rtl' : 'ltr'}
+      >
         📌 {labels[parseInt(label) - 1]}
       </div>
-      <ul className="space-y-1 text-sm text-slate-700" dir={useAR ? 'rtl' : 'ltr'}>
+      <ul
+        className="themes space-y-1 text-sm text-slate-700"
+        dir={useAR ? 'rtl' : 'ltr'}
+      >
         {lessons.map((lesson, i) => (
-          <li key={i} className="flex items-start gap-2">
-            <span className="text-violet-500 mt-1 flex-shrink-0">▸</span>
-            <span className="leading-relaxed">{lesson}</span>
+          <li key={i} className="flex items-start gap-2 leading-relaxed">
+            <span className="text-violet-500 mt-1 flex-shrink-0">{useAR ? '◂' : '▸'}</span>
+            <span>{lesson}</span>
           </li>
         ))}
       </ul>

@@ -362,3 +362,41 @@
 [dir="rtl"] button {
   text-align: right;
 }
+
+/* =============================================================
+   PROGRAMME OFFICIEL — Force RTL alignment on all card elements
+   ============================================================= */
+[dir="rtl"] .subject-card,
+[dir="rtl"] .subject-card * {
+  text-align: right !important;
+}
+
+[dir="rtl"] .trimestre-label,
+[dir="rtl"] .themes,
+[dir="rtl"] .theme-block,
+[dir="rtl"] .theme-title,
+[dir="rtl"] .theme-content,
+[dir="rtl"] .section-tag {
+  text-align: right !important;
+}
+
+[dir="rtl"] .trimestre-label {
+  letter-spacing: 0 !important;
+}
+
+/* Use Noto Sans Arabic for ALL text in RTL mode */
+[dir="rtl"] html,
+[dir="rtl"] body,
+[dir="rtl"] div,
+[dir="rtl"] span,
+[dir="rtl"] p,
+[dir="rtl"] h1,
+[dir="rtl"] h2,
+[dir="rtl"] h3,
+[dir="rtl"] h4,
+[dir="rtl"] button,
+[dir="rtl"] li,
+[dir="rtl"] ul,
+[dir="rtl"] a {
+  font-family: var(--font-noto-arabic), 'Noto Sans Arabic', 'Segoe UI Arabic', 'Tahoma', sans-serif !important;
+}
