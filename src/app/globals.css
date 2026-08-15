@@ -339,3 +339,26 @@
     height: calc(100vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
   }
 }
+
+/* =============================================================
+   PROGRAMME OFFICIEL — Multilingue (FR/AR)
+   ============================================================= */
+/* Arabic font applied to any RTL content */
+[dir="rtl"],
+[dir="rtl"] * {
+  font-family: var(--font-noto-arabic), 'Noto Sans Arabic', 'Noto Sans', 'Segoe UI Arabic', 'Tahoma', sans-serif !important;
+}
+
+/* Force alignment of Arabic text to the right */
+[dir="rtl"] .ar-text,
+[dir="rtl"] p,
+[dir="rtl"] li,
+[dir="rtl"] h1,
+[dir="rtl"] h2,
+[dir="rtl"] h3,
+[dir="rtl"] h4,
+[dir="rtl"] div,
+[dir="rtl"] span,
+[dir="rtl"] button {
+  text-align: right;
+}
