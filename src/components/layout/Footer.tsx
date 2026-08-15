@@ -1,6 +1,6 @@
 import { Link } from '@/i18n/navigation';
 import Image from 'next/image';
-import { Facebook, Twitter, Instagram, Youtube, GraduationCap, Library } from 'lucide-react';
+import { Facebook, Twitter, Instagram, Youtube, GraduationCap } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 import LanguagePicker from './LanguagePicker';
 
@@ -109,12 +109,8 @@ export default async function Footer() {
             </h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link
-                  href="/programme-officiel"
-                  className="hover:text-primary-400 transition flex items-center gap-1.5 font-semibold text-violet-300 hover:text-violet-200"
-                >
-                  <Library className="w-3.5 h-3.5 flex-shrink-0" />
-                  <span>{t('programmeOfficiel.footerLink')}</span>
+                <Link href="/programme-officiel" className="hover:text-primary-400 transition">
+                  {t('programmeOfficiel.footerLink')}
                 </Link>
               </li>
               <li>
