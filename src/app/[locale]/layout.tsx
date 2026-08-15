@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { Inter, Noto_Sans_Arabic } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
@@ -8,14 +7,6 @@ import { hasLocale } from 'next-intl';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import SyncLocaleAttrs from '@/components/i18n/SyncLocaleAttrs';
-
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
-const notoArabic = Noto_Sans_Arabic({
-  subsets: ['arabic'],
-  weight: ['400', '500', '600', '700', '800'],
-  variable: '--font-noto-arabic',
-  display: 'swap',
-});
 
 type Props = {
   children: React.ReactNode;
@@ -34,29 +25,69 @@ export function generateStaticParams() {
  * - No more I18nProvider (old custom system) — that was the source of
  *   "content in AR but URL is /fr" bug because it overrode the locale
  *   based on localStorage
+ *
+ * NOTE: Fonts (Inter, Noto_Sans_Arabic) and <html>/<body> are owned by
+ * the root app/layout.tsx. Returning a fragment here is the Next.js
+ * App Router invariant — see fix comment in the component body below
+ * for the full rationale.
  */
 export default async function LocaleLayout({ children, params }: Props) {
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) {
     notFound();
   }
-  
+
   setRequestLocale(locale);
   const messages = await getMessages();
-  const isAr = locale === 'ar';
 
+  // 2026-08-15 nightly fix (ERR-K2N98N/SMRMP8/F6RCN5/2PR9XS/7FH8HK/6KDXHZ/
+  //   YGXCC9/DXD4MM/RGHJEC — 78 hydration errors / 7 days):
+  //
+  // PREVIOUSLY this layout returned its own <html><body> nested inside the
+  // root app/layout.tsx <html><body>. That violates the Next.js App Router
+  // invariant: "the root layout MUST be the only one with <html>/<body>",
+  // and produces a real DOM with TWO <html> + TWO <body> elements. The
+  // browser's HTML parser silently drops the inner ones (so the visible
+  // page only has the outer), but React's hydration walker follows the
+  // rendered HTML stream byte-by-byte and finds the inner ones too.
+  //
+  // The mismatch between the React tree (which DOES include the inner
+  // <html>/<body>) and the actual DOM (which only has the outer ones)
+  // caused three different error classes, all on pages that hydrate
+  // through this layout:
+  //   - React #418 ("Hydration failed"): 32+32+8+8 hits on resource,
+  //     concours, and programme-officiel pages (the first SSR pass of
+  //     the children renders one tree, the streaming pass renders a
+  //     different one)
+  //   - React #422 ("There was an error while hydrating"): same pattern
+  //   - "t.parallelRoutes is null" (5 hits) on programme-officiel
+  //     lycee tab + "insertBefore/removeChild not a child of this node"
+  //     (5 hits) on /connexion after navigating from a [locale] page.
+  //     The "t.parallelRoutes is null" error is Next.js failing to
+  //     resolve the parallel route slot when the route segment's
+  //     html/body structure changes between renders (locale vs
+  //     non-locale pages), which happens exactly when the user
+  //     crosses the [locale] route boundary.
+  //
+  // FIX: return just a fragment here. The root layout owns
+  // <html><body> + the outermost <NextIntlClientProvider> (with the
+  // locale read from the x-next-intl-locale header, which the
+  // next-intl middleware sets on every request). This inner provider
+  // overrides the outer one with the URL-resolved locale + the
+  // getMessages() payload (the outer one only has the default-locale
+  // fallback). SyncLocaleAttrs stays here so the <html> dir/lang stays
+  // in sync after client-side locale switches (the next-intl router
+  // mutates the URL but doesn't re-render the root layout).
   return (
-    <html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'} className={`${inter.variable} ${notoArabic.variable} ${isAr ? 'font-arabic' : 'font-sans'}`}>
-      <body className={isAr ? 'font-arabic' : 'font-sans'}>
-        <NextIntlClientProvider locale={locale} messages={messages}>
-          <SyncLocaleAttrs />
-          <Header />
-          <main className="min-h-screen">
-            {children}
-          </main>
-          <Footer />
-        </NextIntlClientProvider>
-      </body>
-    </html>
+    <>
+      <NextIntlClientProvider locale={locale} messages={messages}>
+        <SyncLocaleAttrs />
+        <Header />
+        <main className="min-h-screen">
+          {children}
+        </main>
+        <Footer />
+      </NextIntlClientProvider>
+    </>
   );
 }

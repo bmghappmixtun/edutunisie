@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { headers } from 'next/headers';
-import { Inter, Cairo, Nunito } from 'next/font/google';
+import { Inter, Cairo, Nunito, Noto_Sans_Arabic } from 'next/font/google';
 import localFont from 'next/font/local';
 import './globals.css';
 import { Toaster } from 'react-hot-toast';
@@ -38,6 +38,18 @@ const nunito = Nunito({
   variable: '--font-nunito',
   weight: ['600', '700', '800', '900'],
   preload: false,
+});
+// 2026-08-15: Moved Noto_Sans_Arabic from [locale]/layout.tsx to the root
+// layout (next/font/google can only be loaded in a layout, and the
+// root layout is the only one that renders <html> after the nested-html
+// hydration fix). tailwind's `font-arabic` resolves to
+// `var(--font-noto-arabic)` first, with --font-cairo as fallback.
+const notoArabic = Noto_Sans_Arabic({
+  subsets: ['arabic'],
+  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-noto-arabic',
+  display: 'swap',
+  preload: true,
 });
 
 // Fustat: used for ARABIC TITLES and AI SUMMARIES (selected 2026-07-28 after
@@ -219,7 +231,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html
       lang={locale}
       dir={dir}
-      className={`${inter.variable} ${cairo.variable} ${nunito.variable} ${fustat.variable}`}
+      className={`${inter.variable} ${cairo.variable} ${nunito.variable} ${fustat.variable} ${notoArabic.variable}`}
       suppressHydrationWarning
     >
       <head>
