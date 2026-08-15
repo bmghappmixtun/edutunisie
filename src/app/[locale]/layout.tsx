@@ -43,10 +43,11 @@ export default async function LocaleLayout({ children, params }: Props) {
   
   setRequestLocale(locale);
   const messages = await getMessages();
+  const isAr = locale === 'ar';
 
   return (
-    <html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'} className={`${inter.variable} ${notoArabic.variable}`}>
-      <body className={inter.className}>
+    <html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'} className={`${inter.variable} ${notoArabic.variable} ${isAr ? 'font-arabic' : 'font-sans'}`}>
+      <body className={isAr ? 'font-arabic' : 'font-sans'}>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <SyncLocaleAttrs />
           <Header />
