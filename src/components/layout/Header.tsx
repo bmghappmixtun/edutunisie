@@ -66,6 +66,12 @@ export default async function Header() {
               {t('nav.levels')}
             </Link>
             <Link
+              href="/programme-officiel"
+              className="text-sm font-bold text-violet-600 hover:text-violet-700 transition flex items-center gap-1"
+            >
+              📚 {t('programmeOfficiel.title')}
+            </Link>
+            <Link
               href="/matieres"
               className="text-sm font-medium text-slate-700 hover:text-primary-600 transition"
             >

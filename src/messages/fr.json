@@ -112,6 +112,35 @@
     "contact": "Contact",
     "bac": "Bac"
   },
+  "programmeOfficiel": {
+    "title": "Programme Officiel",
+    "common": {
+      "home": "Accueil",
+      "year": "Année"
+    },
+    "hero": {
+      "title": "Programme Éducatif Tunisien",
+      "subtitle": "Ministère de l'Éducation · 2025-2026 · Mise à jour officielle"
+    },
+    "badge": {
+      "official": "Programmes officiels",
+      "levels": "niveaux",
+      "subjects": "matières"
+    },
+    "sidebar": {
+      "title": "Navigation",
+      "college": "Collège",
+      "lycee": "Lycée",
+      "resources": "Ressources pédagogiques"
+    },
+    "sectionTabs": {
+      "all": "Toutes"
+    },
+    "sources": {
+      "title": "Sources officielles",
+      "subtitle": "Tous les liens pointent vers les sites officiels du Ministère de l'Éducation Tunisien."
+    }
+  },
   "home": {
     "heroTitle": "La plateforme pédagogique",
     "heroHighlight": "#1 en Tunisie",
