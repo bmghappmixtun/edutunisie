@@ -122,16 +122,15 @@
       "title": "Programme Éducatif Tunisien",
       "subtitle": "Ministère de l'Éducation · 2025-2026 · Mise à jour officielle"
     },
+    "tabs": {
+      "college": "Collège",
+      "lycee": "Lycée",
+      "sources": "Sources"
+    },
     "badge": {
       "official": "Programmes officiels",
       "levels": "niveaux",
       "subjects": "matières"
-    },
-    "sidebar": {
-      "title": "Navigation",
-      "college": "Collège",
-      "lycee": "Lycée",
-      "resources": "Ressources pédagogiques"
     },
     "sectionTabs": {
       "all": "Toutes"
