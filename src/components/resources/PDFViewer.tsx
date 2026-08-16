@@ -432,161 +432,185 @@ export default function PDFViewer({
   // ==========================================================================
   return (
     <div
-      className={`bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm ${className}`}
+      className={`pdf-viewer-shell relative bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm ${className}`}
     >
-      {/* Toolbar */}
-      <div className="pdf-viewer-toolbar bg-slate-900 text-white px-2 sm:px-3 py-2 flex items-center justify-between gap-1 sm:gap-2 flex-wrap">
+      {/* === FLOATING TOP-RIGHT STATUS PILL (replaces the bottom status bar) === */}
+      {numPages && !error && !searchOpen && (
+        <div className="pdf-viewer-status-pill absolute top-3 right-3 z-30 inline-flex items-center gap-1.5 bg-slate-900/90 backdrop-blur-md text-white text-[11px] font-semibold px-3 py-1.5 rounded-full shadow-lg border border-white/10 font-mono tabular-nums pointer-events-none">
+          <span>📄 {numPages}</span>
+          <span className="text-slate-400">·</span>
+          <span>
+            {pageNumber}/{numPages}
+          </span>
+          <span className="text-slate-400">·</span>
+          <span>
+            {fitMode === 'manual'
+              ? `${Math.round(scale * 100)}%`
+              : `Auto`}
+          </span>
+        </div>
+      )}
+
+      {/* === FLOATING BOTTOM TOOLBAR (glass, Scribd-style) === */}
+      <div className="pdf-viewer-floater absolute bottom-4 left-1/2 -translate-x-1/2 z-40 bg-slate-900/95 backdrop-blur-md text-white rounded-full px-1.5 py-1.5 shadow-2xl flex items-center gap-0.5 ring-1 ring-white/10">
         {/* Page navigation */}
-        <div className="flex items-center gap-1">
-          <button
-            type="button"
-            onClick={prevPage}
-            disabled={!numPages || pageNumber <= 1}
-            className="p-2 hover:bg-white/10 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition"
-            title="Page précédente (←)"
-            aria-label="Page précédente"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-          <div className="px-2 py-1 text-xs font-mono min-w-[70px] text-center">
-            {numPages ? (
-              <>
-                <input
-                  type="number"
-                  min={1}
-                  max={numPages}
-                  value={pageNumber}
-                  onChange={(e) => {
-                    const p = parseInt(e.target.value);
-                    if (p >= 1 && p <= numPages) setPageNumber(p);
-                  }}
-                  className="w-10 bg-transparent text-center text-white border-b border-white/30 focus:border-white outline-none"
-                  aria-label="Numéro de page"
-                />
-                <span className="text-slate-400"> / {numPages}</span>
-              </>
-            ) : (
-              <span className="text-slate-400">… / …</span>
-            )}
-          </div>
-          <button
-            type="button"
-            onClick={nextPage}
-            disabled={!numPages || pageNumber >= numPages}
-            className="p-2 hover:bg-white/10 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition"
-            title="Page suivante (→)"
-            aria-label="Page suivante"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-
-        {/* Zoom controls */}
-        <div className="flex items-center gap-1">
-          <button
-            type="button"
-            onClick={zoomOut}
-            disabled={scale <= MIN_SCALE}
-            className="p-2 hover:bg-white/10 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition"
-            title="Zoom arrière (-)"
-            aria-label="Zoom arrière"
-          >
-            <ZoomOut className="w-4 h-4" />
-          </button>
-          <button
-            type="button"
-            onClick={fitToWidth}
-            className={`px-2 py-1 hover:bg-white/10 rounded-lg text-xs font-mono min-w-[55px] transition ${fitMode === 'width' ? 'bg-white/20' : ''}`}
-            title="Ajuster à la largeur (0)"
-            aria-label="Ajuster à la largeur"
-          >
-            {fitMode === 'manual' ? `${Math.round(scale * 100)}%` : '⤢ Auto'}
-          </button>
-          <button
-            type="button"
-            onClick={zoomIn}
-            disabled={scale >= MAX_SCALE}
-            className="p-2 hover:bg-white/10 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition"
-            title="Zoom avant (+)"
-            aria-label="Zoom avant"
-          >
-            <ZoomIn className="w-4 h-4" />
-          </button>
-          <button
-            type="button"
-            onClick={fitToPage}
-            className={`p-2 hover:bg-white/10 rounded-lg transition ${fitMode === 'page' ? 'bg-white/20' : ''}`}
-            title="Ajuster à la page"
-            aria-label="Ajuster à la page"
-          >
-            {fitMode === 'page' ? (
-              <Minimize className="w-4 h-4" />
-            ) : (
-              <Maximize className="w-4 h-4" />
-            )}
-          </button>
-        </div>
-
-        {/* Right-side actions */}
-        <div className="flex items-center gap-1">
-          <button
-            type="button"
-            onClick={() => setSearchOpen((o) => !o)}
-            className={`p-2 hover:bg-white/10 rounded-lg transition ${searchOpen ? 'bg-white/20' : ''}`}
-            title="Rechercher dans le PDF (Ctrl+F)"
-            aria-label="Rechercher"
-          >
-            <Search className="w-4 h-4" />
-          </button>
-          <button
-            type="button"
-            onClick={handleCopy}
-            className="p-2 hover:bg-white/10 rounded-lg transition relative"
-            title="Copier la sélection"
-            aria-label="Copier"
-          >
-            {copySuccess ? (
-              <Check className="w-4 h-4 text-emerald-400" />
-            ) : (
-              <Copy className="w-4 h-4" />
-            )}
-          </button>
-          <button
-            type="button"
-            onClick={toggleFullscreen}
-            className="p-2 hover:bg-white/10 rounded-lg transition"
-            title="Plein écran (F)"
-            aria-label="Plein écran"
-          >
-            {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
-          </button>
-          {onDownload && (
-            <button
-              type="button"
-              onClick={onDownload}
-              className="p-2 hover:bg-white/10 rounded-lg transition"
-              title="Télécharger"
-              aria-label="Télécharger"
-            >
-              <Download className="w-4 h-4" />
-            </button>
+        <button
+          type="button"
+          onClick={prevPage}
+          disabled={!numPages || pageNumber <= 1}
+          className="w-10 h-10 inline-flex items-center justify-center hover:bg-white/10 rounded-full disabled:opacity-30 disabled:cursor-not-allowed transition active:scale-90"
+          title="Page précédente (←)"
+          aria-label="Page précédente"
+        >
+          <ChevronLeft className="w-4 h-4" />
+        </button>
+        <div className="px-3 text-sm font-bold font-mono tabular-nums min-w-[72px] text-center">
+          {numPages ? (
+            <>
+              <input
+                type="number"
+                min={1}
+                max={numPages}
+                value={pageNumber}
+                onChange={(e) => {
+                  const p = parseInt(e.target.value);
+                  if (p >= 1 && p <= numPages) setPageNumber(p);
+                }}
+                className="w-10 bg-transparent text-center text-white border-b border-white/30 focus:border-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                aria-label="Numéro de page"
+              />
+              <span className="text-slate-400"> / {numPages}</span>
+            </>
+          ) : (
+            <span className="text-slate-400">… / …</span>
           )}
         </div>
+        <button
+          type="button"
+          onClick={nextPage}
+          disabled={!numPages || pageNumber >= numPages}
+          className="w-10 h-10 inline-flex items-center justify-center hover:bg-white/10 rounded-full disabled:opacity-30 disabled:cursor-not-allowed transition active:scale-90"
+          title="Page suivante (→)"
+          aria-label="Page suivante"
+        >
+          <ChevronRight className="w-4 h-4" />
+        </button>
+
+        {/* Divider */}
+        <div className="w-px h-5 bg-white/15 mx-1" />
+
+        {/* Zoom out */}
+        <button
+          type="button"
+          onClick={zoomOut}
+          disabled={scale <= MIN_SCALE}
+          className="w-10 h-10 inline-flex items-center justify-center hover:bg-white/10 rounded-full disabled:opacity-30 disabled:cursor-not-allowed transition active:scale-90"
+          title="Zoom arrière (-)"
+          aria-label="Zoom arrière"
+        >
+          <ZoomOut className="w-4 h-4" />
+        </button>
+        {/* Zoom level / fit-to-width toggle */}
+        <button
+          type="button"
+          onClick={fitToWidth}
+          className={`px-2 h-10 inline-flex items-center justify-center hover:bg-white/10 rounded-full text-xs font-mono min-w-[60px] transition active:scale-90 ${fitMode === 'width' ? 'bg-white/20' : ''}`}
+          title="Ajuster à la largeur (0)"
+          aria-label="Ajuster à la largeur"
+        >
+          {fitMode === 'manual' ? `${Math.round(scale * 100)}%` : '⤢ Auto'}
+        </button>
+        {/* Zoom in */}
+        <button
+          type="button"
+          onClick={zoomIn}
+          disabled={scale >= MAX_SCALE}
+          className="w-10 h-10 inline-flex items-center justify-center hover:bg-white/10 rounded-full disabled:opacity-30 disabled:cursor-not-allowed transition active:scale-90"
+          title="Zoom avant (+)"
+          aria-label="Zoom avant"
+        >
+          <ZoomIn className="w-4 h-4" />
+        </button>
+        {/* Fit to page */}
+        <button
+          type="button"
+          onClick={fitToPage}
+          className={`w-10 h-10 inline-flex items-center justify-center hover:bg-white/10 rounded-full transition active:scale-90 ${fitMode === 'page' ? 'bg-white/20' : ''}`}
+          title="Ajuster à la page"
+          aria-label="Ajuster à la page"
+        >
+          {fitMode === 'page' ? (
+            <Minimize className="w-4 h-4" />
+          ) : (
+            <Maximize className="w-4 h-4" />
+          )}
+        </button>
+
+        {/* Divider */}
+        <div className="w-px h-5 bg-white/15 mx-1" />
+
+        {/* Search */}
+        <button
+          type="button"
+          onClick={() => setSearchOpen((o) => !o)}
+          className={`w-10 h-10 inline-flex items-center justify-center hover:bg-white/10 rounded-full transition active:scale-90 ${searchOpen ? 'bg-white/20' : ''}`}
+          title="Rechercher dans le PDF (Ctrl+F)"
+          aria-label="Rechercher"
+        >
+          <Search className="w-4 h-4" />
+        </button>
+        {/* Copy */}
+        <button
+          type="button"
+          onClick={handleCopy}
+          className="w-10 h-10 inline-flex items-center justify-center hover:bg-white/10 rounded-full transition active:scale-90 relative"
+          title="Copier la sélection"
+          aria-label="Copier"
+        >
+          {copySuccess ? (
+            <Check className="w-4 h-4 text-emerald-400" />
+          ) : (
+            <Copy className="w-4 h-4" />
+          )}
+        </button>
+        {/* Fullscreen */}
+        <button
+          type="button"
+          onClick={toggleFullscreen}
+          className="w-10 h-10 inline-flex items-center justify-center hover:bg-white/10 rounded-full transition active:scale-90"
+          title="Plein écran (F)"
+          aria-label="Plein écran"
+        >
+          {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+        </button>
+        {/* Download */}
+        {onDownload && (
+          <button
+            type="button"
+            onClick={onDownload}
+            className="w-10 h-10 inline-flex items-center justify-center hover:bg-white/10 rounded-full transition active:scale-90"
+            title="Télécharger"
+            aria-label="Télécharger"
+          >
+            <Download className="w-4 h-4" />
+          </button>
+        )}
       </div>
 
-      {/* Search bar */}
+      {/* === FLOATING TOP-CENTER SEARCH BAR (overlay, glass) === */}
       {searchOpen && (
-        <div className="bg-slate-800 text-white px-3 py-2 flex items-center gap-2 border-t border-slate-700">
+        <div className="pdf-viewer-search absolute top-3 left-1/2 -translate-x-1/2 z-40 bg-slate-900/95 backdrop-blur-md text-white rounded-full pl-3 pr-2 py-1.5 shadow-2xl flex items-center gap-2 ring-1 ring-white/10 min-w-[280px] max-w-[90vw]">
           <Search className="w-4 h-4 text-slate-400 flex-shrink-0" />
           <input
             type="search"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Rechercher dans cette page..."
-            className="flex-1 bg-transparent outline-none text-sm placeholder-slate-400"
+            className="flex-1 bg-transparent outline-none text-sm placeholder-slate-400 min-w-0"
+            autoFocus
           />
           {searchQuery && (
-            <span className="text-xs text-slate-400 font-mono">
+            <span className="text-xs text-slate-400 font-mono whitespace-nowrap">
               {searchResults.count > 0 ? `${searchResults.count} résultat(s)` : 'Aucun'}
             </span>
           )}
@@ -596,10 +620,10 @@ export default function PDFViewer({
               setSearchOpen(false);
               setSearchQuery('');
             }}
-            className="p-1 hover:bg-white/10 rounded transition"
+            className="w-7 h-7 inline-flex items-center justify-center hover:bg-white/10 rounded-full transition"
             aria-label="Fermer la recherche"
           >
-            <X className="w-4 h-4" />
+            <X className="w-3.5 h-3.5" />
           </button>
         </div>
       )}
@@ -622,9 +646,11 @@ export default function PDFViewer({
         // - Mobile: 70vh + 500px min (so it's tall but not overwhelming)
         // - Desktop: 95vh + 800px min (taller, more room for the page)
         // - Fullscreen: 100vh
+        // paddingBottom reserves space for the floating bottom toolbar (64px + 16px gap = 80px)
         style={{
           height: isFullscreen ? '100vh' : '95vh',
           minHeight: '800px',
+          paddingBottom: isFullscreen ? 0 : 80,
         }}
         // Mobile-friendly touch + swipe handlers (see useEffect below for the gesture)
         onTouchStart={(e) => {
@@ -748,26 +774,7 @@ export default function PDFViewer({
         )}
       </div>
 
-      {/* Status bar */}
-      {numPages && !error && (
-        <div className="bg-slate-50 border-t border-slate-200 px-3 py-1.5 flex items-center justify-center gap-3 text-xs text-slate-500">
-          <span>
-            📄 {numPages} page{numPages > 1 ? 's' : ''}
-          </span>
-          <span className="text-slate-300">|</span>
-          <span>
-            Page {pageNumber} sur {numPages}
-          </span>
-          <span className="text-slate-300">|</span>
-          <span className="font-mono">
-            {fitMode === 'manual'
-              ? `${Math.round(scale * 100)}%`
-              : `Auto (${fitMode === 'width' ? 'largeur' : 'page'})`}
-          </span>
-          <span className="text-slate-300">|</span>
-          <span className="hidden sm:inline">⌨️ ← → / +/- / 0 = auto / F = plein écran</span>
-        </div>
-      )}
+      {/* Bottom status bar removed — replaced by floating top-right status pill above */}
     </div>
   );
 }
