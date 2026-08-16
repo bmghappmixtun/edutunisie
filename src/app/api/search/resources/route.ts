@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { unstable_cache as nextCache } from 'next/cache';
 import { prisma } from '@/lib/prisma';
+
+// PERF 2026-08-16: Cache facets/options (static per resource state, 5 min TTL).
+// These don't depend on the search query — they're the same for every user
+// until a new resource is published.
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -201,7 +206,9 @@ export async function GET(req: NextRequest) {
     ]);
   }
 
-  // Get filter options (counts) + lookup names
+  // Get filter options (counts) + lookup names — CACHED for 5 min
+  // These are the same for every user until a new resource is published.
+  // Previously fired 8 Prisma queries per search request; now 0.
   const [
     subjectCounts,
     classCounts,
@@ -211,105 +218,130 @@ export async function GET(req: NextRequest) {
     allSubjects,
     allClasses,
     allTeachers,
-  ] = await Promise.all([
-    prisma.resource.groupBy({
-      by: ['subjectId'],
-      where: { status: 'PUBLISHED' },
-      _count: { _all: true },
-    }),
-    prisma.resource.groupBy({
-      by: ['classId'],
-      where: { status: 'PUBLISHED', classId: { not: null } },
-      _count: { _all: true },
-    }),
-    prisma.resource.groupBy({
-      by: ['type'],
-      where: { status: 'PUBLISHED' },
-      _count: { _all: true },
-    }),
-    prisma.resource.groupBy({
-      by: ['year'],
-      where: { status: 'PUBLISHED', year: { not: null } },
-      _count: { _all: true },
-      orderBy: { year: 'desc' },
-    }),
-    prisma.resource.groupBy({
-      by: ['teacherId'],
-      where: { status: 'PUBLISHED' },
-      _count: { _all: true },
-      take: 20,
-      orderBy: { _count: { teacherId: 'desc' } },
-    }),
-    prisma.subject.findMany({
-      orderBy: { order: 'asc' },
-      select: { id: true, nameFr: true, icon: true },
-    }),
-    prisma.class.findMany({ orderBy: { order: 'asc' }, select: { id: true, nameFr: true } }),
-    prisma.user.findMany({
-      where: { role: 'TEACHER', status: 'ACTIVE' },
-      select: { id: true, firstName: true, lastName: true },
-      take: 30,
-    }),
-  ]);
+  ] = await getCachedFacets();
 
-  return NextResponse.json({
-    query: q,
-    page,
-    limit,
-    total,
-    totalPages: Math.ceil(total / limit),
-    sort,
-    filters: { subjectId, classId, teacherId, sectionId, type, year, fromDate, toDate },
-    results: results.map((r) => ({
-      id: r.id,
-      slug: r.slug,
-      title: r.title,
-      description: r.description,
-      type: r.type,
-      year: r.year,
-      trimester: r.trimester,
-      pageCount: r.pageCount,
-      fileSize: r.fileSize,
-      viewsCount: r.viewsCount,
-      downloadsCount: r.downloadsCount,
-      averageRating: r.averageRating || 0,
-      publishedAt: r.publishedAt,
-      // Homework & school metadata (NEW)
-      homeworkSubtype: r.homeworkSubtype,
-      homeworkNumber: r.homeworkNumber,
-      schoolType: r.schoolType,
-      product: r.product,
-      hasCorrection: r.hasCorrection,
-      correctionSummary: r.correctionSummary,
-      subject: r.subject,
-      class: r.class,
-      section: r.section,
-      teacher: r.teacher,
-      rank: r.rank,
-    })),
-    facets: {
-      subjects: subjectCounts.map((s) => ({ id: s.subjectId, count: s._count._all })),
-      classes: classCounts.map((c) => ({ id: c.classId, count: c._count._all })),
-      types: typeCounts.map((t) => ({ value: t.type, count: t._count._all })),
-      years: yearCounts.map((y) => ({ value: y.year, count: y._count._all })),
-      teachers: teacherCounts.map((t) => ({ id: t.teacherId, count: t._count._all })),
+  return NextResponse.json(
+    {
+      query: q,
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+      sort,
+      filters: { subjectId, classId, teacherId, sectionId, type, year, fromDate, toDate },
+      results: results.map((r) => ({
+        id: r.id,
+        slug: r.slug,
+        title: r.title,
+        description: r.description,
+        type: r.type,
+        year: r.year,
+        trimester: r.trimester,
+        pageCount: r.pageCount,
+        fileSize: r.fileSize,
+        viewsCount: r.viewsCount,
+        downloadsCount: r.downloadsCount,
+        averageRating: r.averageRating || 0,
+        publishedAt: r.publishedAt,
+        // Homework & school metadata (NEW)
+        homeworkSubtype: r.homeworkSubtype,
+        homeworkNumber: r.homeworkNumber,
+        schoolType: r.schoolType,
+        product: r.product,
+        hasCorrection: r.hasCorrection,
+        correctionSummary: r.correctionSummary,
+        subject: r.subject,
+        class: r.class,
+        section: r.section,
+        teacher: r.teacher,
+        rank: r.rank,
+      })),
+      facets: {
+        subjects: subjectCounts.map((s) => ({ id: s.subjectId, count: s._count._all })),
+        classes: classCounts.map((c) => ({ id: c.classId, count: c._count._all })),
+        types: typeCounts.map((t) => ({ value: t.type, count: t._count._all })),
+        years: yearCounts.map((y) => ({ value: y.year, count: y._count._all })),
+        teachers: teacherCounts.map((t) => ({ id: t.teacherId, count: t._count._all })),
+      },
+      options: {
+        subjects: allSubjects.filter((s) =>
+          subjectCounts.some((c) => c.subjectId === s.id && c._count._all > 0),
+        ),
+        classes: allClasses.filter((c) =>
+          classCounts.some((cc) => cc.classId === c.id && cc._count._all > 0),
+        ),
+        teachers: allTeachers
+          .filter((t) => teacherCounts.some((tc) => tc.teacherId === t.id && tc._count._all > 0))
+          .map((t) => ({ id: t.id, name: `${t.firstName || ''} ${t.lastName || ''}` })),
+        types: typeCounts,
+        years: yearCounts,
+      },
+      took: Date.now() - start,
     },
-    options: {
-      subjects: allSubjects.filter((s) =>
-        subjectCounts.some((c) => c.subjectId === s.id && c._count._all > 0),
-      ),
-      classes: allClasses.filter((c) =>
-        classCounts.some((cc) => cc.classId === c.id && cc._count._all > 0),
-      ),
-      teachers: allTeachers
-        .filter((t) => teacherCounts.some((tc) => tc.teacherId === t.id && tc._count._all > 0))
-        .map((t) => ({ id: t.id, name: `${t.firstName || ''} ${t.lastName || ''}` })),
-      types: typeCounts,
-      years: yearCounts,
+    {
+      headers: {
+        // Vercel CDN: identical query+filter responses served from edge for 2 min
+        'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=300',
+      },
     },
-    took: Date.now() - start,
-  });
+  );
 }
+
+// =========================================================================
+// Cached facet calculation (PERF 2026-08-16)
+// Was firing 8 Prisma queries per search request (groupBy x5 + findMany x3).
+// Now 0 — the result is cached in-memory and shared across all users until
+// invalidated by revalidateTag('resources') or revalidateTag('search-facets').
+// =========================================================================
+async function getCachedFacets() {
+  return _getCachedFacets();
+}
+const _getCachedFacets = nextCache(
+  async () => {
+    return Promise.all([
+      prisma.resource.groupBy({
+        by: ['subjectId'],
+        where: { status: 'PUBLISHED' },
+        _count: { _all: true },
+      }),
+      prisma.resource.groupBy({
+        by: ['classId'],
+        where: { status: 'PUBLISHED', classId: { not: null } },
+        _count: { _all: true },
+      }),
+      prisma.resource.groupBy({
+        by: ['type'],
+        where: { status: 'PUBLISHED' },
+        _count: { _all: true },
+      }),
+      prisma.resource.groupBy({
+        by: ['year'],
+        where: { status: 'PUBLISHED', year: { not: null } },
+        _count: { _all: true },
+        orderBy: { year: 'desc' },
+      }),
+      prisma.resource.groupBy({
+        by: ['teacherId'],
+        where: { status: 'PUBLISHED' },
+        _count: { _all: true },
+        take: 20,
+        orderBy: { _count: { teacherId: 'desc' } },
+      }),
+      prisma.subject.findMany({
+        orderBy: { order: 'asc' },
+        select: { id: true, nameFr: true, icon: true },
+      }),
+      prisma.class.findMany({ orderBy: { order: 'asc' }, select: { id: true, nameFr: true } }),
+      prisma.user.findMany({
+        where: { role: 'TEACHER', status: 'ACTIVE' },
+        select: { id: true, firstName: true, lastName: true },
+        take: 30,
+      }),
+    ]);
+  },
+  ['search-facets-v1'],
+  { revalidate: 300, tags: ['search-facets', 'resources', 'subjects', 'classes', 'teachers'] },
+);
 
 // cache bust 1783013641
 
