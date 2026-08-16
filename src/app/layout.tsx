@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { headers } from 'next/headers';
 import { Inter, Cairo, Nunito, Noto_Sans_Arabic } from 'next/font/google';
 import localFont from 'next/font/local';
 import './globals.css';
@@ -93,54 +92,37 @@ const LOCALE_DEFAULTS = {
 
 // Function-based metadata so it can read the locale at request time
 // (the previous static `export const metadata` always used FR).
-export async function generateMetadata(): Promise<Metadata> {
-  // Read locale from next-intl middleware header (x-next-intl-locale).
-  // Falls back to fr if not present (non-localized routes like /admin, /connexion).
-  const headerStore = await headers();
-  const xLocale = headerStore.get('x-next-intl-locale') || headerStore.get('x-locale');
-  const locale: 'fr' | 'ar' = xLocale === 'ar' ? 'ar' : 'fr';
-  const isAr = locale === 'ar';
-  const t = LOCALE_DEFAULTS[locale];
-  const canonical = isAr ? `${SITE_URL}/ar` : SITE_URL;
-
+// PERF 2026-08-16: removed the `await headers()` call. The previous version
+// read the locale from the middleware header on every request, which forced
+// the entire site (every page through this root layout) into dynamic mode
+// and bypassed ISR. The root metadata is now the FR default; per-locale
+// overrides live in `app/[locale]/layout.tsx` and use `params.locale`
+// (no headers needed → static at build time per-locale).
+export function generateMetadata(): Metadata {
+  const t = LOCALE_DEFAULTS.fr;
   return {
     metadataBase: new URL(SITE_URL),
     title: {
       default: t.title,
-      // Per-locale template so the suffix never duplicates the site name
-      // (was causing "— Examanet — Examanet" on several pages).
-      template: isAr ? '%s — إكسامانت' : '%s — Examanet',
+      template: '%s — Examanet',
     },
     description: t.description,
-    keywords: isAr
-      ? [
-          'إكسامانت',
-          'تعليم تونس',
-          'دروس',
-          'فروض',
-          'باكالوريا',
-          'إعدادي',
-          'ثانوي',
-          'ابتدائي',
-          'تمارين',
-          'مراجعة',
-        ]
-      : [
-          'examanet',
-          'éducation tunisie',
-          'cours',
-          'devoirs',
-          'bac',
-          'collège',
-          'lycée',
-          'primaire',
-          'exercices',
-          'révisions',
-        ],
+    keywords: [
+      'examanet',
+      'éducation tunisie',
+      'cours',
+      'devoirs',
+      'bac',
+      'collège',
+      'lycée',
+      'primaire',
+      'exercices',
+      'révisions',
+    ],
     authors: [{ name: 'Examanet' }],
     creator: 'Examanet',
     publisher: 'Examanet',
-    applicationName: isAr ? 'إكسامانت' : 'Examanet',
+    applicationName: 'Examanet',
     icons: {
       icon: [
         { url: '/favicon.ico', sizes: 'any' },
@@ -155,9 +137,9 @@ export async function generateMetadata(): Promise<Metadata> {
     manifest: '/manifest.json',
     openGraph: {
       type: 'website',
-      locale: isAr ? 'ar_TN' : 'fr_TN',
-      url: canonical,
-      siteName: isAr ? 'إكسامانت' : 'Examanet',
+      locale: 'fr_TN',
+      url: SITE_URL,
+      siteName: 'Examanet',
       title: t.ogTitle,
       description: t.ogDescription,
       images: [
@@ -165,9 +147,7 @@ export async function generateMetadata(): Promise<Metadata> {
           url: '/api/og/page/home',
           width: 1200,
           height: 630,
-          alt: isAr
-            ? 'إكسامانت - المنصة التربوية التونسية'
-            : 'Examanet - Plateforme pédagogique tunisienne',
+          alt: 'Examanet - Plateforme pédagogique tunisienne',
         },
       ],
     },
@@ -189,7 +169,7 @@ export async function generateMetadata(): Promise<Metadata> {
       },
     },
     alternates: {
-      canonical,
+      canonical: SITE_URL,
       languages: {
         'fr-TN': SITE_URL,
         'ar-TN': `${SITE_URL}/ar`,
@@ -200,12 +180,10 @@ export async function generateMetadata(): Promise<Metadata> {
       'theme-color': '#0EA5E9',
       'apple-mobile-web-app-capable': 'yes',
       'apple-mobile-web-app-status-bar-style': 'default',
-      'apple-mobile-web-app-title': isAr ? 'إكسامانت' : 'Examanet',
+      'apple-mobile-web-app-title': 'Examanet',
       'mobile-web-app-capable': 'yes',
       'format-detection': 'telephone=no',
-      // Google Search Console verification
       'google-site-verification': 'GXE5A9gq9-K7q7IztCatkSHhYrgtWWBbPloJymofPUY',
-      // Bing Webmaster Tools verification
       'msvalidate.01': 'C04AC04227DB04DAC96552F4A27BCD73',
     },
   };
@@ -218,19 +196,21 @@ export const viewport = {
   themeColor: '#0EA5E9',
 };
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  // Read locale from middleware-injected header.
-  // next-intl sets x-next-intl-locale; we also keep x-locale for the old middleware
-  // (admin/auth pages still set it).
-  const headerStore = await headers();
-  const xLocale = headerStore.get('x-next-intl-locale') || headerStore.get('x-locale');
-  const locale: 'fr' | 'ar' = xLocale === 'ar' ? 'ar' : 'fr';
-  const dir = locale === 'ar' ? 'rtl' : 'ltr';
-
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  // PERF 2026-08-16: removed `await headers()` and the locale-driven `lang`/
+  // `dir` interpolation. The previous version read the locale from middleware
+  // headers on every request, which forced the ENTIRE site (every page
+  // through this root layout) into dynamic mode and bypassed ISR.
+  //
+  // The locale-specific <html lang>/<html dir> for [locale]/* pages is now
+  // applied client-side by `SyncLocaleAttrs` (mounted in
+  // `app/[locale]/layout.tsx`) which runs synchronously before paint.
+  // For non-localized routes (/admin, /connexion, /api/*) FR defaults are
+  // correct (these pages have no Arabic variant).
   return (
     <html
-      lang={locale}
-      dir={dir}
+      lang="fr"
+      dir="ltr"
       className={`${inter.variable} ${cairo.variable} ${nunito.variable} ${fustat.variable} ${notoArabic.variable}`}
       suppressHydrationWarning
     >
