@@ -27,8 +27,12 @@ function createPrismaClient() {
   // - Neon pooler uses PgBouncer in transaction mode
   // - We set ?pgbouncer=true to tell Prisma to use transaction mode
   //   (disables prepared statements, uses simple query protocol)
-  // - connection_limit=2 per Lambda (Vercel creates new Lambda per request
-  //   in serverless, so each Lambda gets at most 2 connections)
+  // - connection_limit=5 per Lambda (Vercel can spawn multiple concurrent
+  //   instances; 5 covers ~5 in-flight queries per Lambda).
+  //   Bumped from 2 → 5 on 2026-08-16 to fix "Timed out fetching a new
+  //   connection" errors that were doubling function invocations via retries
+  //   and inflating the Observability Events line item ($31.01 on the
+  //   Aug-2026 Vercel bill).
   // - pool_timeout=20s: wait longer for a connection before failing
   if (process.env.DATABASE_URL) {
     const url = new URL(process.env.DATABASE_URL);
@@ -36,7 +40,7 @@ function createPrismaClient() {
       url.searchParams.set('pgbouncer', 'true');
     }
     if (!url.searchParams.has('connection_limit')) {
-      url.searchParams.set('connection_limit', '2');
+      url.searchParams.set('connection_limit', '5');
     }
     if (!url.searchParams.has('pool_timeout')) {
       url.searchParams.set('pool_timeout', '20');
