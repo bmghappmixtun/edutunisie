@@ -15,6 +15,7 @@ import ResourceInfoPanel from '@/components/resources/ResourceInfoPanel';
 import AiDescription from '@/components/resources/AiDescription';
 import AiContentSection from '@/components/resources/AiContentSection';
 import AiExerciseOverview from '@/components/resources/AiExerciseOverview';
+import ResourceScribdHeader from '@/components/resources/ResourceScribdHeader';
 import { getPaletteForSubject } from '@/lib/ai-palettes';
 // NOTE: getPaletteForSubject is kept for future use but currently no consumer
 // in this file (the "Sujets abordés" section was removed 2026-08-02 since
@@ -372,6 +373,68 @@ export default async function ResourcePage({
               </>
             )}
           </nav>
+
+          {/* ============================================================
+              SCRIBD-STYLE HEADER (NEW 2026-08-16)
+              Renders above the existing 2-col grid. Gives the resource page
+              the modern look from fr.scribd.com — big title, stats line,
+              expandable description, action buttons grid, AI badge, etc.
+             ============================================================ */}
+          <ResourceScribdHeader
+            title={(() => {
+              const { fr } = splitArabicSubject(resource.title);
+              return fr;
+            })()}
+            titleAr={(() => {
+              const { ar } = splitArabicSubject(resource.title);
+              return ar || null;
+            })()}
+            description={resource.description}
+            pageCount={resource.pageCount ?? null}
+            fileSize={resource.fileSize ? humanFileSize(resource.fileSize) : null}
+            viewsCount={resource.viewsCount}
+            downloadUrl={`/api/resources/${resource.id}/download`}
+            teacherName={
+              resource.teacher
+                ? `${resource.teacher.firstName || ''} ${resource.teacher.lastName || ''}`.trim() || null
+                : null
+            }
+            teacherProfileUrl={
+              resource.teacher
+                ? `/professeurs/${resource.teacher.numericId}/${resource.teacher.slug}`
+                : null
+            }
+            isFavorited={false}
+            onFavorite={async () => {
+              try {
+                const res = await fetch(`/api/favorites/${resource.id}`, { method: 'POST' });
+                if (res.status === 401) {
+                  toast.error('Connectez-vous pour ajouter aux favoris');
+                  return;
+                }
+                toast.success('Ajouté aux favoris');
+              } catch {
+                toast.error('Erreur réseau');
+              }
+            }}
+            onShare={() => {
+              if (typeof navigator !== 'undefined' && navigator.share) {
+                navigator.share({
+                  title: resource.title,
+                  url: window.location.href,
+                }).catch(() => {});
+              } else if (typeof navigator !== 'undefined' && navigator.clipboard) {
+                navigator.clipboard.writeText(window.location.href);
+                toast.success('Lien copié !');
+              }
+            }}
+            onPrint={() => {
+              if (typeof window !== 'undefined') window.print();
+            }}
+            onReport={() => {
+              toast('Pour signaler un problème, contactez-nous via la page Contact.');
+            }}
+          />
 
           <div className="grid lg:grid-cols-[1fr_360px] gap-6">
             {/* MAIN */}
