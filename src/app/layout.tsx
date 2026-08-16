@@ -221,8 +221,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
         {/* Bing Webmaster Tools verification meta tag (HTML tag verification) */}
         <meta name="msvalidate.01" content="C04AC04227DB04DAC96552F4A27BCD73" />
-        {/* OpenGraph locale: dynamic based on x-locale header (set by middleware for /ar/*) */}
-        <meta property="og:locale" content={locale === 'ar' ? 'ar_TN' : 'fr_TN'} />
+        {/* OpenGraph locale: hardcoded FR (locale override happens in [locale]/layout for /ar) */}
+        <meta property="og:locale" content="fr_TN" />
         {/* Twitter locale for AR */}
         <meta name="twitter:card" content="summary_large_image" />
         {/* Hreflang: FR is canonical, AR is at /ar/* prefix, x-default points to FR. */}
