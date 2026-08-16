@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { headers } from 'next/headers';
 import dynamic from 'next/dynamic';
 import { unstable_cache as nextCache } from 'next/cache';
 
@@ -63,52 +62,18 @@ const getCachedHomeData = nextCache(
   { revalidate: REVALIDATE_S, tags: ['home', 'resources', 'subjects'] },
 );
 
-// Page-level generateMetadata so /ar (rewritten to /) can serve Arabic metadata.
-// The root layout's locale defaults stay for children, but this overrides the
-// title/description/canonical when the request comes in via the /ar rewrite.
-export async function generateMetadata(): Promise<Metadata> {
-  const isAr: boolean = await (async () => {
-    try {
-      const h = await headers();
-      return (
-        h.get('x-locale') === 'ar' ||
-        (h.get('x-pathname') || '').startsWith('/ar') ||
-        (h.get('cookie') || '').includes('locale=ar')
-      );
-    } catch {
-      return false;
-    }
-  })();
-  if (!isAr) {
-    return {
-      title: 'Examanet — Cours, devoirs, exercices et corrigés gratuits en Tunisie',
-      description:
-        'Plateforme pédagogique tunisienne #1 : cours, devoirs, exercices, sujets de bac et corrigés pour le Primaire, Collège et Lycée. 100% gratuit.',
-      alternates: { canonical: '/' },
-    };
-  }
-  return {
-    title: 'إكسامانت — دروس، فروض، تمارين وإصلاحات مجانية في تونس',
-    description:
-      'المنصة التربوية التونسية #1: دروس، فروض، تمارين، مواضيع باكالوريا وإصلاحات للابتدائي، الإعدادي والثانوي. 100% مجاني.',
-    alternates: { canonical: '/ar' },
-    openGraph: {
-      title: 'إكسامانت — المنصة التربوية التونسية #1',
-      description: 'دروس، فروض، سلاسل، ملخصات، مواضيع باك وإصلاحات — مجانية 100%.',
-      url: '/ar',
-      type: 'website',
-      locale: 'ar_TN',
-      images: [
-        {
-          url: '/api/og/page/home',
-          width: 1200,
-          height: 630,
-          alt: 'إكسامانت - المنصة التربوية التونسية',
-        },
-      ],
-    },
-  };
-}
+
+// PERF 2026-08-16: Static metadata. The previous version called `headers()`
+// to detect the AR locale, which forced the page into dynamic mode and
+// bypassed the ISR cache. The [locale] layout (parent) already handles
+// per-locale metadata, so this page uses a generic static fallback.
+export const metadata: Metadata = {
+  title: 'Examanet — Cours, devoirs, exercices et corrigés gratuits en Tunisie',
+  description:
+    'Plateforme pédagogique tunisienne #1 : cours, devoirs, exercices, sujets de bac et corrigés pour le Primaire, Collège et Lycée. 100% gratuit.',
+  alternates: { canonical: '/' },
+};
+
 
 export const revalidate = 300; // 5 min cache
 
