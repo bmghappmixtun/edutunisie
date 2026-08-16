@@ -3,6 +3,7 @@ import { useState, useCallback, useEffect, useRef, Component, ReactNode } from '
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import {
   ZoomIn,
   ZoomOut,
@@ -23,7 +24,10 @@ import {
   Check,
   Rows3,
   Square,
+  PanelLeft,
+  PanelLeftClose,
 } from 'lucide-react';
+import PDFSidebar from './PDFSidebar';
 
 // ============================================================================
 // PDF.js Worker setup
@@ -146,6 +150,23 @@ export default function PDFViewer({
   const [pageNaturalSize, setPageNaturalSize] = useState<{ width: number; height: number } | null>(
     null,
   );
+  // Sidebar (thumbnails + outline) — desktop only, hidden < 1024px
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(true);
+  // pdfjs document reference (for the sidebar — needs getOutline/getPage for thumbs)
+  const pdfDocRef = useRef<any>(null);
+
+  // ==========================================================================
+  // TanStack Virtual — only render visible pages in continuous mode
+  // (massive perf win on 30+ page PDFs; without this, every page in the
+  // document is mounted in the React tree, even if it's off-screen)
+  // ==========================================================================
+  const virtualizer = useVirtualizer({
+    count: numPages || 0,
+    getScrollElement: () => scrollRef.current,
+    estimateSize: () => 1100, // A4 portrait at 800px wide ≈ 1100px tall
+    overscan: 3, // render 3 pages above/below viewport for smooth scroll
+    enabled: viewMode === 'continuous',
+  });
 
   // Layer enablement — auto-disabled on error
   const [textLayerEnabled, setTextLayerEnabled] = useState(true);
@@ -170,6 +191,9 @@ export default function PDFViewer({
   // Touch state for swipe detection (next/previous page on horizontal swipe)
   const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
   const touchEndRef = useRef<{ x: number; y: number; time: number } | null>(null);
+  // Pinch-to-zoom state (2-finger gesture on mobile)
+  const pinchStartDistRef = useRef<number | null>(null);
+  const pinchStartScaleRef = useRef<number | null>(null);
   // Scroll spy refs (continuous mode)
   const isScrollSpyUpdate = useRef(false);
   const pageRefsMap = useRef<Map<number, HTMLDivElement | null>>(new Map());
@@ -412,8 +436,9 @@ export default function PDFViewer({
     setPageNumber((p) => Math.min(numPages || 1, p + 1));
   }, [numPages]);
 
-  const onLoadSuccess = useCallback(({ numPages: n }: { numPages: number }) => {
-    setNumPages(n);
+  const onLoadSuccess = useCallback((pdf: any) => {
+    pdfDocRef.current = pdf;
+    setNumPages(pdf.numPages);
     setLoading(false);
     setError(null);
     setWorkerReady(true);
@@ -493,8 +518,32 @@ export default function PDFViewer({
     <div
       className={`pdf-viewer-shell relative bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm ${className}`}
     >
+      {/* === SIDEBAR (desktop only) === */}
+      {sidebarOpen && !isFullscreen && (
+        <div className="hidden lg:block">
+          <PDFSidebar
+            pdf={pdfDocRef.current}
+            currentPage={pageNumber}
+            onJump={(p) => {
+              if (viewMode === 'continuous' && scrollRef.current) {
+                const card = pageRefsMap.current.get(p);
+                if (card) {
+                  scrollRef.current.scrollTo({ top: card.offsetTop - 16, behavior: 'smooth' });
+                }
+              } else {
+                setPageNumber(p);
+              }
+            }}
+            onClose={() => setSidebarOpen(false)}
+            maxRenderedThumbs={150}
+          />
+        </div>
+      )}
+
       {/* === FLOATING BOTTOM TOOLBAR (glass, Scribd-style) === */}
-      <div className="pdf-viewer-floater absolute bottom-4 left-1/2 -translate-x-1/2 z-40 bg-slate-900/95 backdrop-blur-md text-white rounded-full px-1.5 py-1.5 shadow-2xl flex items-center gap-0.5 ring-1 ring-white/10">
+      <div
+        className={`pdf-viewer-floater absolute bottom-4 left-1/2 -translate-x-1/2 z-40 bg-slate-900/95 backdrop-blur-md text-white rounded-full px-1.5 py-1.5 shadow-2xl flex items-center gap-0.5 ring-1 ring-white/10 ${sidebarOpen && !isFullscreen ? 'lg:ml-30' : ''}`}
+      >
         {/* Page navigation */}
         <button
           type="button"
@@ -601,6 +650,16 @@ export default function PDFViewer({
           ) : (
             <Rows3 className="w-4 h-4" />
           )}
+        </button>
+        {/* Sidebar toggle (desktop only — hidden < 1024px via CSS) */}
+        <button
+          type="button"
+          onClick={() => setSidebarOpen((o) => !o)}
+          className="w-10 h-10 hidden lg:inline-flex items-center justify-center hover:bg-white/10 rounded-full transition active:scale-90"
+          title={sidebarOpen ? 'Masquer la barre latérale' : 'Afficher la barre latérale'}
+          aria-label="Barre latérale"
+        >
+          {sidebarOpen ? <PanelLeftClose className="w-4 h-4" /> : <PanelLeft className="w-4 h-4" />}
         </button>
 
         {/* Divider */}
@@ -709,18 +768,49 @@ export default function PDFViewer({
           minHeight: '800px',
           paddingBottom: isFullscreen ? 0 : 80,
         }}
-        // Mobile-friendly touch + swipe handlers (see useEffect below for the gesture)
+        // Mobile-friendly touch + swipe + PINCH handlers.
+        //  - 1 finger: swipe (existing)
+        //  - 2 fingers: pinch-to-zoom (NEW 2026-08-16)
         onTouchStart={(e) => {
+          if (e.touches.length === 2) {
+            // Pinch start: record the initial distance between the two fingers
+            const dx = e.touches[0].clientX - e.touches[1].clientX;
+            const dy = e.touches[0].clientY - e.touches[1].clientY;
+            pinchStartDistRef.current = Math.hypot(dx, dy);
+            pinchStartScaleRef.current = scale;
+            // Cancel any pending swipe
+            touchStartRef.current = null;
+            return;
+          }
           const t = e.touches[0];
           touchStartRef.current = { x: t.clientX, y: t.clientY, time: Date.now() };
           touchEndRef.current = null;
         }}
         onTouchMove={(e) => {
+          // PINCH: two fingers → adjust scale
+          if (e.touches.length === 2 && pinchStartDistRef.current && pinchStartScaleRef.current) {
+            const dx = e.touches[0].clientX - e.touches[1].clientX;
+            const dy = e.touches[0].clientY - e.touches[1].clientY;
+            const dist = Math.hypot(dx, dy);
+            const ratio = dist / pinchStartDistRef.current;
+            const newScale = pinchStartScaleRef.current * ratio;
+            setFitMode('manual');
+            setScale(
+              Math.max(MIN_SCALE, Math.min(MAX_SCALE, +(newScale * 100).toFixed(0) / 100)),
+            );
+            return;
+          }
           if (!touchStartRef.current) return;
           const t = e.touches[0];
           touchEndRef.current = { x: t.clientX, y: t.clientY, time: Date.now() };
         }}
         onTouchEnd={() => {
+          // Reset pinch state when fingers lift
+          if (pinchStartDistRef.current) {
+            pinchStartDistRef.current = null;
+            pinchStartScaleRef.current = null;
+            return;
+          }
           if (!touchStartRef.current || !touchEndRef.current || !numPages) {
             touchStartRef.current = null;
             return;
@@ -808,41 +898,68 @@ export default function PDFViewer({
                 externalLinkTarget="_blank"
               >
                 {viewMode === 'continuous' && numPages ? (
-                  // CONTINUOUS MODE: render all pages stacked, scroll spy tracks current
-                  Array.from({ length: numPages }, (_, i) => i + 1).map((p) => (
-                    <div
-                      key={p}
-                      ref={(el) => { pageRefsMap.current.set(p, el); }}
-                      data-page={p}
-                      className="w-full flex justify-center"
-                    >
-                      <PageLayerBoundary onLayerError={onTextLayerError} label="text">
-                        <PageLayerBoundary onLayerError={onAnnotationLayerError} label="annotation">
-                          <Page
-                            pageNumber={p}
-                            scale={scale}
-                            renderTextLayer={textLayerEnabled}
-                            renderAnnotationLayer={annotationLayerEnabled}
-                            onLoadSuccess={onPageLoadSuccess}
-                            loading={
-                              <div className="flex items-center justify-center min-h-[500px] bg-white shadow-2xl rounded">
-                                <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
-                              </div>
-                            }
-                            error={
-                              <div className="flex items-center justify-center min-h-[500px] bg-white shadow-2xl rounded p-8">
-                                <div className="text-center">
-                                  <AlertCircle className="w-10 h-10 mx-auto mb-2 text-red-500" />
-                                  <p className="text-sm text-slate-600">Erreur de rendu de la page {p}</p>
-                                </div>
-                              </div>
-                            }
-                            className="bg-white shadow-2xl"
-                          />
-                        </PageLayerBoundary>
-                      </PageLayerBoundary>
-                    </div>
-                  ))
+                  // CONTINUOUS MODE with TanStack Virtual — only render visible
+                  // pages + overscan. Each virtual row is a single Page; the
+                  // pageRefsMap is populated as the virtualizer mounts them
+                  // (used by the scroll spy and the sidebar jump).
+                  <div
+                    style={{
+                      height: virtualizer.getTotalSize(),
+                      position: 'relative',
+                      width: '100%',
+                    }}
+                  >
+                    {virtualizer.getVirtualItems().map((virtualRow) => {
+                      const p = virtualRow.index + 1;
+                      return (
+                        <div
+                          key={virtualRow.key}
+                          ref={(el) => {
+                            pageRefsMap.current.set(p, el);
+                          }}
+                          data-page={p}
+                          style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            transform: `translateY(${virtualRow.start}px)`,
+                          }}
+                        >
+                          <PageLayerBoundary onLayerError={onTextLayerError} label="text">
+                            <PageLayerBoundary
+                              onLayerError={onAnnotationLayerError}
+                              label="annotation"
+                            >
+                              <Page
+                                pageNumber={p}
+                                scale={scale}
+                                renderTextLayer={textLayerEnabled}
+                                renderAnnotationLayer={annotationLayerEnabled}
+                                onLoadSuccess={onPageLoadSuccess}
+                                loading={
+                                  <div className="flex items-center justify-center min-h-[500px] bg-white shadow-2xl rounded">
+                                    <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
+                                  </div>
+                                }
+                                error={
+                                  <div className="flex items-center justify-center min-h-[500px] bg-white shadow-2xl rounded p-8">
+                                    <div className="text-center">
+                                      <AlertCircle className="w-10 h-10 mx-auto mb-2 text-red-500" />
+                                      <p className="text-sm text-slate-600">
+                                        Erreur de rendu de la page {p}
+                                      </p>
+                                    </div>
+                                  </div>
+                                }
+                                className="bg-white shadow-2xl"
+                              />
+                            </PageLayerBoundary>
+                          </PageLayerBoundary>
+                        </div>
+                      );
+                    })}
+                  </div>
                 ) : (
                   // SINGLE MODE: render only the current page
                   <PageLayerBoundary onLayerError={onTextLayerError} label="text">
