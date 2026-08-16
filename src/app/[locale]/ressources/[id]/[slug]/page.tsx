@@ -17,6 +17,7 @@ import AiContentSection from '@/components/resources/AiContentSection';
 import AiExerciseOverview from '@/components/resources/AiExerciseOverview';
 import ResourceScribdHeader from '@/components/resources/ResourceScribdHeader';
 import { getPaletteForSubject } from '@/lib/ai-palettes';
+import toast from 'react-hot-toast';
 // NOTE: getPaletteForSubject is kept for future use but currently no consumer
 // in this file (the "Sujets abordés" section was removed 2026-08-02 since
 // "Sujet général" replaced it).
