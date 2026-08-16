@@ -151,7 +151,7 @@ export default function PDFViewer({
     null,
   );
   // Sidebar (thumbnails + outline) — desktop only, hidden < 1024px
-  const [sidebarOpen, setSidebarOpen] = useState<boolean>(true);
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(false); // hidden by default (2026-08-16)
   // pdfjs document reference (for the sidebar — needs getOutline/getPage for thumbs)
   const pdfDocRef = useRef<any>(null);
 
@@ -162,7 +162,13 @@ export default function PDFViewer({
   // ==========================================================================
   const virtualizer = useVirtualizer({
     count: numPages || 0,
-    getScrollElement: () => scrollRef.current,
+    // 2026-08-16: use containerRef (the actual scrolling element with
+    // overflow-auto) instead of scrollRef. The inner scrollRef div does
+    // NOT scroll itself — the parent containerRef does. Using scrollRef
+    // meant the virtualizer never detected scrolls, never mounted the
+    // right pages, and the scroll spy never fired. Same root cause as
+    // the broken prev/next arrows in continuous mode.
+    getScrollElement: () => containerRef.current,
     estimateSize: () => 1100, // A4 portrait at 800px wide ≈ 1100px tall
     overscan: 3, // render 3 pages above/below viewport for smooth scroll
     enabled: viewMode === 'continuous',
@@ -187,6 +193,11 @@ export default function PDFViewer({
 
   // Refs
   const containerRef = useRef<HTMLDivElement>(null);
+  // Shell ref — used for fullscreen so the floating bottom toolbar
+  // stays available when the viewer is in fullscreen mode. Previously
+  // we fullscreened the inner PDF container only, which left the
+  // toolbar behind in the normal layout (2026-08-16).
+  const shellRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   // Touch state for swipe detection (next/previous page on horizontal swipe)
   const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
@@ -203,20 +214,28 @@ export default function PDFViewer({
   // ==========================================================================
   useEffect(() => {
     if (viewMode !== 'continuous') return;
-    const el = scrollRef.current;
+    // 2026-08-16: listen on containerRef (the actual scrolling element)
+    // not scrollRef. scrollRef is a child div that does NOT scroll —
+    // the parent containerRef with overflow-auto is what scrolls.
+    const el = containerRef.current;
     if (!el || !numPages) return;
     let timer: ReturnType<typeof setTimeout> | null = null;
     const onScroll = () => {
       if (isScrollSpyUpdate.current) return;
       if (timer) clearTimeout(timer);
       timer = setTimeout(() => {
-        const center = el.scrollTop + el.clientHeight / 2;
+        // Use getBoundingClientRect for accurate viewport-relative
+        // positions. The viewport center is the center of containerRef
+        // in the viewport. Each card's center is its own rect's center.
+        const elRect = el.getBoundingClientRect();
+        const viewportCenter = elRect.top + el.clientHeight / 2;
         let closest = 1, minDist = Infinity;
         for (let i = 1; i <= numPages; i++) {
           const card = pageRefsMap.current.get(i);
           if (!card) continue;
-          const mid = card.offsetTop + card.offsetHeight / 2;
-          const dist = Math.abs(center - mid);
+          const cardRect = card.getBoundingClientRect();
+          const cardCenter = cardRect.top + cardRect.height / 2;
+          const dist = Math.abs(viewportCenter - cardCenter);
           if (dist < minDist) { minDist = dist; closest = i; }
         }
         if (closest !== pageNumber) {
@@ -401,7 +420,7 @@ export default function PDFViewer({
   const toggleFullscreen = useCallback(async () => {
     try {
       if (!document.fullscreenElement) {
-        await containerRef.current?.requestFullscreen?.();
+        await shellRef.current?.requestFullscreen?.();
       } else {
         await document.exitFullscreen();
       }
@@ -495,7 +514,9 @@ export default function PDFViewer({
     setNumPages(null);
     setPageNumber(1);
     // Reset scroll position to top on URL change
-    if (scrollRef.current) scrollRef.current.scrollTop = 0;
+    // 2026-08-16: scroll the actual scrolling element (containerRef),
+    // not scrollRef (which doesn't scroll itself).
+    if (containerRef.current) containerRef.current.scrollTop = 0;
   }, [url]);
 
   // Scroll to the manually-set page (jump via input, prev/next, keyboard)
@@ -505,9 +526,14 @@ export default function PDFViewer({
     if (viewMode !== 'continuous' || !numPages) return;
     if (isScrollSpyUpdate.current) return;
     const card = pageRefsMap.current.get(pageNumber);
-    const scrollEl = scrollRef.current;
+    // 2026-08-16: scroll the actual scrolling element (containerRef),
+    // not scrollRef. Also add 16px offset to account for scrollRef's
+    // p-4 padding-top (the virtualizer container starts 16px below
+    // containerRef's content top).
+    const scrollEl = containerRef.current;
     if (card && scrollEl) {
-      scrollEl.scrollTo({ top: card.offsetTop - 16, behavior: 'smooth' });
+      const start = (card as any).__virtualStart ?? 0;
+      scrollEl.scrollTo({ top: start + 16 - 16, behavior: 'smooth' });
     }
   }, [pageNumber, viewMode, numPages]);
 
@@ -516,7 +542,12 @@ export default function PDFViewer({
   // ==========================================================================
   return (
     <div
-      className={`pdf-viewer-shell relative bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm ${className}`}
+      ref={shellRef}
+      className={`pdf-viewer-shell relative bg-white overflow-hidden ${className} ${
+        isFullscreen
+          ? 'rounded-none border-0 shadow-none'
+          : 'rounded-2xl border border-slate-200 shadow-sm'
+      }`}
     >
       {/* === SIDEBAR (desktop only) === */}
       {sidebarOpen && !isFullscreen && (
@@ -525,10 +556,13 @@ export default function PDFViewer({
             pdf={pdfDocRef.current}
             currentPage={pageNumber}
             onJump={(p) => {
-              if (viewMode === 'continuous' && scrollRef.current) {
+              // 2026-08-16: scroll containerRef (the actual scrolling
+              // element), not scrollRef.
+              if (viewMode === 'continuous' && containerRef.current) {
                 const card = pageRefsMap.current.get(p);
                 if (card) {
-                  scrollRef.current.scrollTo({ top: card.offsetTop - 16, behavior: 'smooth' });
+                  const start = (card as any).__virtualStart ?? 0;
+                  containerRef.current.scrollTo({ top: start + 16 - 16, behavior: 'smooth' });
                 }
               } else {
                 setPageNumber(p);
@@ -766,7 +800,11 @@ export default function PDFViewer({
         style={{
           height: isFullscreen ? '100vh' : '95vh',
           minHeight: '800px',
-          paddingBottom: isFullscreen ? 0 : 80,
+          // 2026-08-16: keep the 80px padding in fullscreen too — the floating
+          // toolbar is now part of the fullscreen (we fullscreen the shell
+          // instead of just the container), so we still need to reserve
+          // space at the bottom so the last page doesn't hide under it.
+          paddingBottom: 80,
         }}
         // Mobile-friendly touch + swipe + PINCH handlers.
         //  - 1 finger: swipe (existing)
@@ -916,8 +954,15 @@ export default function PDFViewer({
                           key={virtualRow.key}
                           ref={(el) => {
                             pageRefsMap.current.set(p, el);
+                            // 2026-08-16: store the virtual start on the element
+                            // so the scroll spy can use it. offsetTop is 0 for
+                            // absolute children (the offsetParent is the
+                            // relative virtualizer container), so we need
+                            // the actual virtual row position.
+                            if (el) (el as any).__virtualStart = virtualRow.start;
                           }}
                           data-page={p}
+                          className="flex justify-center"
                           style={{
                             position: 'absolute',
                             top: 0,
