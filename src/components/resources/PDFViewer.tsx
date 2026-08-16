@@ -21,6 +21,8 @@ import {
   X,
   Copy,
   Check,
+  Rows3,
+  Square,
 } from 'lucide-react';
 
 // ============================================================================
@@ -42,6 +44,7 @@ const MAX_SCALE = 4;
 const SCALE_STEP = 0.25;
 
 type FitMode = 'width' | 'height' | 'page' | 'manual';
+type ViewMode = 'single' | 'continuous';
 
 // ============================================================================
 // Error boundary for individual page layers
@@ -133,6 +136,8 @@ export default function PDFViewer({
   // The container is now tall enough (95vh + 800px min) to fit most pages
   // entirely in height too — so the user sees the full first page without scrolling.
   const [fitMode, setFitMode] = useState<FitMode>('width');
+  // View mode: 'single' = 1 page at a time (prev/next), 'continuous' = scroll all pages
+  const [viewMode, setViewMode] = useState<ViewMode>('continuous');
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -165,6 +170,45 @@ export default function PDFViewer({
   // Touch state for swipe detection (next/previous page on horizontal swipe)
   const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
   const touchEndRef = useRef<{ x: number; y: number; time: number } | null>(null);
+  // Scroll spy refs (continuous mode)
+  const isScrollSpyUpdate = useRef(false);
+  const pageRefsMap = useRef<Map<number, HTMLDivElement | null>>(new Map());
+
+  // ==========================================================================
+  // Scroll spy — track current page in continuous mode
+  // ==========================================================================
+  useEffect(() => {
+    if (viewMode !== 'continuous') return;
+    const el = scrollRef.current;
+    if (!el || !numPages) return;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const onScroll = () => {
+      if (isScrollSpyUpdate.current) return;
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        const center = el.scrollTop + el.clientHeight / 2;
+        let closest = 1, minDist = Infinity;
+        for (let i = 1; i <= numPages; i++) {
+          const card = pageRefsMap.current.get(i);
+          if (!card) continue;
+          const mid = card.offsetTop + card.offsetHeight / 2;
+          const dist = Math.abs(center - mid);
+          if (dist < minDist) { minDist = dist; closest = i; }
+        }
+        if (closest !== pageNumber) {
+          isScrollSpyUpdate.current = true;
+          setPageNumber(closest);
+          // Reset flag after a tick (avoid re-trigger from page change)
+          requestAnimationFrame(() => { isScrollSpyUpdate.current = false; });
+        }
+      }, 80);
+    };
+    el.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      el.removeEventListener('scroll', onScroll);
+      if (timer) clearTimeout(timer);
+    };
+  }, [viewMode, numPages, pageNumber]);
 
   // ==========================================================================
   // Document options — self-hosted assets, no unpkg dependency
@@ -425,7 +469,22 @@ export default function PDFViewer({
     setLoading(true);
     setNumPages(null);
     setPageNumber(1);
+    // Reset scroll position to top on URL change
+    if (scrollRef.current) scrollRef.current.scrollTop = 0;
   }, [url]);
+
+  // Scroll to the manually-set page (jump via input, prev/next, keyboard)
+  // Only active in continuous mode. We use a ref flag to prevent the scroll
+  // spy from immediately overriding the page back to the previous value.
+  useEffect(() => {
+    if (viewMode !== 'continuous' || !numPages) return;
+    if (isScrollSpyUpdate.current) return;
+    const card = pageRefsMap.current.get(pageNumber);
+    const scrollEl = scrollRef.current;
+    if (card && scrollEl) {
+      scrollEl.scrollTo({ top: card.offsetTop - 16, behavior: 'smooth' });
+    }
+  }, [pageNumber, viewMode, numPages]);
 
   // ==========================================================================
   // Render
@@ -434,23 +493,6 @@ export default function PDFViewer({
     <div
       className={`pdf-viewer-shell relative bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm ${className}`}
     >
-      {/* === FLOATING TOP-RIGHT STATUS PILL (replaces the bottom status bar) === */}
-      {numPages && !error && !searchOpen && (
-        <div className="pdf-viewer-status-pill absolute top-3 right-3 z-30 inline-flex items-center gap-1.5 bg-slate-900/90 backdrop-blur-md text-white text-[11px] font-semibold px-3 py-1.5 rounded-full shadow-lg border border-white/10 font-mono tabular-nums pointer-events-none">
-          <span>📄 {numPages}</span>
-          <span className="text-slate-400">·</span>
-          <span>
-            {pageNumber}/{numPages}
-          </span>
-          <span className="text-slate-400">·</span>
-          <span>
-            {fitMode === 'manual'
-              ? `${Math.round(scale * 100)}%`
-              : `Auto`}
-          </span>
-        </div>
-      )}
-
       {/* === FLOATING BOTTOM TOOLBAR (glass, Scribd-style) === */}
       <div className="pdf-viewer-floater absolute bottom-4 left-1/2 -translate-x-1/2 z-40 bg-slate-900/95 backdrop-blur-md text-white rounded-full px-1.5 py-1.5 shadow-2xl flex items-center gap-0.5 ring-1 ring-white/10">
         {/* Page navigation */}
@@ -544,6 +586,20 @@ export default function PDFViewer({
             <Minimize className="w-4 h-4" />
           ) : (
             <Maximize className="w-4 h-4" />
+          )}
+        </button>
+        {/* View mode toggle: single page vs continuous scroll */}
+        <button
+          type="button"
+          onClick={() => setViewMode((m) => (m === 'single' ? 'continuous' : 'single'))}
+          className={`w-10 h-10 inline-flex items-center justify-center hover:bg-white/10 rounded-full transition active:scale-90 ${viewMode === 'continuous' ? 'bg-white/20' : ''}`}
+          title={viewMode === 'continuous' ? 'Mode page par page' : 'Mode scroll continu'}
+          aria-label="Changer le mode d'affichage"
+        >
+          {viewMode === 'continuous' ? (
+            <Square className="w-4 h-4" />
+          ) : (
+            <Rows3 className="w-4 h-4" />
           )}
         </button>
 
@@ -709,7 +765,14 @@ export default function PDFViewer({
             </div>
           </div>
         ) : (
-          <div ref={scrollRef} className="flex justify-center items-start min-h-full p-4">
+          <div
+            ref={scrollRef}
+            className={
+              viewMode === 'continuous'
+                ? 'flex flex-col items-center gap-4 min-h-full p-4'
+                : 'flex justify-center items-start min-h-full p-4'
+            }
+          >
             <DocumentErrorBoundary onError={setError}>
               <Document
                 file={url}
@@ -744,31 +807,70 @@ export default function PDFViewer({
                 }
                 externalLinkTarget="_blank"
               >
-                <PageLayerBoundary onLayerError={onTextLayerError} label="text">
-                  <PageLayerBoundary onLayerError={onAnnotationLayerError} label="annotation">
-                    <Page
-                      pageNumber={pageNumber}
-                      scale={scale}
-                      renderTextLayer={textLayerEnabled}
-                      renderAnnotationLayer={annotationLayerEnabled}
-                      onLoadSuccess={onPageLoadSuccess}
-                      loading={
-                        <div className="flex items-center justify-center min-h-[500px] bg-white shadow-2xl rounded">
-                          <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
-                        </div>
-                      }
-                      error={
-                        <div className="flex items-center justify-center min-h-[500px] bg-white shadow-2xl rounded p-8">
-                          <div className="text-center">
-                            <AlertCircle className="w-10 h-10 mx-auto mb-2 text-red-500" />
-                            <p className="text-sm text-slate-600">Erreur de rendu de la page</p>
+                {viewMode === 'continuous' && numPages ? (
+                  // CONTINUOUS MODE: render all pages stacked, scroll spy tracks current
+                  Array.from({ length: numPages }, (_, i) => i + 1).map((p) => (
+                    <div
+                      key={p}
+                      ref={(el) => { pageRefsMap.current.set(p, el); }}
+                      data-page={p}
+                      className="w-full flex justify-center"
+                    >
+                      <PageLayerBoundary onLayerError={onTextLayerError} label="text">
+                        <PageLayerBoundary onLayerError={onAnnotationLayerError} label="annotation">
+                          <Page
+                            pageNumber={p}
+                            scale={scale}
+                            renderTextLayer={textLayerEnabled}
+                            renderAnnotationLayer={annotationLayerEnabled}
+                            onLoadSuccess={onPageLoadSuccess}
+                            loading={
+                              <div className="flex items-center justify-center min-h-[500px] bg-white shadow-2xl rounded">
+                                <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
+                              </div>
+                            }
+                            error={
+                              <div className="flex items-center justify-center min-h-[500px] bg-white shadow-2xl rounded p-8">
+                                <div className="text-center">
+                                  <AlertCircle className="w-10 h-10 mx-auto mb-2 text-red-500" />
+                                  <p className="text-sm text-slate-600">Erreur de rendu de la page {p}</p>
+                                </div>
+                              </div>
+                            }
+                            className="bg-white shadow-2xl"
+                          />
+                        </PageLayerBoundary>
+                      </PageLayerBoundary>
+                    </div>
+                  ))
+                ) : (
+                  // SINGLE MODE: render only the current page
+                  <PageLayerBoundary onLayerError={onTextLayerError} label="text">
+                    <PageLayerBoundary onLayerError={onAnnotationLayerError} label="annotation">
+                      <Page
+                        pageNumber={pageNumber}
+                        scale={scale}
+                        renderTextLayer={textLayerEnabled}
+                        renderAnnotationLayer={annotationLayerEnabled}
+                        onLoadSuccess={onPageLoadSuccess}
+                        loading={
+                          <div className="flex items-center justify-center min-h-[500px] bg-white shadow-2xl rounded">
+                            <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
                           </div>
-                        </div>
-                      }
-                      className="bg-white shadow-2xl"
-                    />
+                        }
+                        error={
+                          <div className="flex items-center justify-center min-h-[500px] bg-white shadow-2xl rounded p-8">
+                            <div className="text-center">
+                              <AlertCircle className="w-10 h-10 mx-auto mb-2 text-red-500" />
+                              <p className="text-sm text-slate-600">Erreur de rendu de la page</p>
+                            </div>
+                          </div>
+                        }
+                        className="bg-white shadow-2xl"
+                      />
+                    </PageLayerBoundary>
                   </PageLayerBoundary>
-                </PageLayerBoundary>
+                )}
               </Document>
             </DocumentErrorBoundary>
           </div>
