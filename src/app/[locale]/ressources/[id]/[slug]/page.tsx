@@ -17,7 +17,6 @@ import AiContentSection from '@/components/resources/AiContentSection';
 import AiExerciseOverview from '@/components/resources/AiExerciseOverview';
 import ResourceScribdHeader from '@/components/resources/ResourceScribdHeader';
 import { getPaletteForSubject } from '@/lib/ai-palettes';
-import toast from 'react-hot-toast';
 // NOTE: getPaletteForSubject is kept for future use but currently no consumer
 // in this file (the "Sujets abordés" section was removed 2026-08-02 since
 // "Sujet général" replaced it).
@@ -382,6 +381,7 @@ export default async function ResourcePage({
               expandable description, action buttons grid, AI badge, etc.
              ============================================================ */}
           <ResourceScribdHeader
+            resourceId={resource.id}
             title={(() => {
               const { fr } = splitArabicSubject(resource.title);
               return fr;
@@ -405,36 +405,7 @@ export default async function ResourcePage({
                 ? `/professeurs/${resource.teacher.numericId}/${resource.teacher.slug}`
                 : null
             }
-            isFavorited={false}
-            onFavorite={async () => {
-              try {
-                const res = await fetch(`/api/favorites/${resource.id}`, { method: 'POST' });
-                if (res.status === 401) {
-                  toast.error('Connectez-vous pour ajouter aux favoris');
-                  return;
-                }
-                toast.success('Ajouté aux favoris');
-              } catch {
-                toast.error('Erreur réseau');
-              }
-            }}
-            onShare={() => {
-              if (typeof navigator !== 'undefined' && navigator.share) {
-                navigator.share({
-                  title: resource.title,
-                  url: window.location.href,
-                }).catch(() => {});
-              } else if (typeof navigator !== 'undefined' && navigator.clipboard) {
-                navigator.clipboard.writeText(window.location.href);
-                toast.success('Lien copié !');
-              }
-            }}
-            onPrint={() => {
-              if (typeof window !== 'undefined') window.print();
-            }}
-            onReport={() => {
-              toast('Pour signaler un problème, contactez-nous via la page Contact.');
-            }}
+            initialIsFavorited={false}
           />
 
           <div className="grid lg:grid-cols-[1fr_360px] gap-6">

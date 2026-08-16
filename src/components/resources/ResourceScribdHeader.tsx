@@ -2,19 +2,22 @@
 /**
  * ResourceScribdHeader — Scribd-style header above the resource page.
  *
- * Renders:
- *   - Big title (h1)
- *   - Stats line: zoom level, views, page count
- *   - Description with "Description complète" expand/collapse
- *   - "Transféré par" attribution
- *   - Action buttons grid (Scribd-style icon+label)
+ * Self-contained client component. Renders:
+ *   - Big title (h1) + optional AR title
  *   - AI-improved title/description badge
+ *   - Stats line: views + page count + file size
+ *   - Description with "Description complète" expand/collapse
+ *   - "Transféré par [teacher]" attribution
+ *   - Action buttons grid: Télécharger, Enregistrer, Partager, Imprimer, Intégrer
+ *   - Secondary actions: Ask AI, Signaler
+ *   - Thumbs up/down feedback for AI improvement
  *
- * This is meant to be rendered ABOVE the existing 2-col grid that contains
- * the PDF viewer. It brings the look closer to Scribd's resource page
- * (fr.scribd.com/document/...) without forcing a full layout rewrite.
+ * All event handlers are defined inside this component (NOT props) because
+ * Next.js App Router does NOT allow Server Components to pass functions
+ * down to Client Components. Instead, we receive `resourceId` and do the
+ * API calls locally.
  *
- * On desktop: full-width header. On mobile: same content, just stacked.
+ * Props are all serializable (strings, numbers, booleans, nullable fields).
  */
 
 import { useState, type ReactNode } from 'react';
@@ -36,28 +39,24 @@ import {
 import { formatNumber } from '@/lib/utils';
 
 export interface ResourceScribdHeaderProps {
+  resourceId: string;
   title: string;
   titleAr?: string | null;
   description?: string | null;
   pageCount?: number | null;
   fileSize?: string | null;
   viewsCount: number;
-  downloadUrl?: string;
+  downloadUrl: string;
   teacherName?: string | null;
   teacherProfileUrl?: string | null;
-  isFavorited?: boolean;
-  onFavorite?: () => void;
-  onShare?: () => void;
-  onPrint?: () => void;
-  onAskAI?: () => void;
-  onReport?: () => void;
-  // AI improvement badge (Scribd shows "Titre et description améliorés par l'IA")
+  initialIsFavorited?: boolean;
   aiImproved?: boolean;
 }
 
 const TRUNCATE_AT = 220;
 
 export default function ResourceScribdHeader({
+  resourceId,
   title,
   titleAr,
   description,
@@ -67,28 +66,122 @@ export default function ResourceScribdHeader({
   downloadUrl,
   teacherName,
   teacherProfileUrl,
-  isFavorited = false,
-  onFavorite,
-  onShare,
-  onPrint,
-  onAskAI,
-  onReport,
+  initialIsFavorited = false,
   aiImproved = true,
 }: ResourceScribdHeaderProps) {
   const [expanded, setExpanded] = useState(false);
   const [feedback, setFeedback] = useState<'up' | 'down' | null>(null);
+  const [isFavorited, setIsFavorited] = useState(initialIsFavorited);
+  const [busy, setBusy] = useState<'fav' | null>(null);
 
   const hasLongDescription = (description?.length ?? 0) > TRUNCATE_AT;
   const visibleDescription = hasLongDescription && !expanded
     ? description!.slice(0, TRUNCATE_AT).trimEnd() + '…'
     : description;
 
-  const download = () => {
-    if (!downloadUrl) return;
+  // ---- Handlers (all internal, no event-handler props) ----
+
+  const handleDownload = () => {
+    if (typeof window === 'undefined' || !downloadUrl) return;
     const a = document.createElement('a');
     a.href = downloadUrl;
     a.download = `${title}.pdf`;
     a.click();
+  };
+
+  const handleFavorite = async () => {
+    if (busy === 'fav') return;
+    setBusy('fav');
+    try {
+      const res = await fetch(`/api/favorites/${resourceId}`, { method: 'POST' });
+      if (res.status === 401) {
+        // Soft fail — user not logged in. Don't crash, just reflect the current state.
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('examanet:toast', {
+            detail: { type: 'error', message: 'Connectez-vous pour ajouter aux favoris' }
+          }));
+        }
+        return;
+      }
+      if (res.ok) {
+        setIsFavorited((f) => !f);
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('examanet:toast', {
+            detail: { type: 'success', message: 'Ajouté aux favoris' }
+          }));
+        }
+      }
+    } catch {
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('examanet:toast', {
+          detail: { type: 'error', message: 'Erreur réseau' }
+        }));
+      }
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const handleShare = async () => {
+    if (typeof window === 'undefined') return;
+    const url = window.location.href;
+    const nav = navigator as any;
+    if (nav.share) {
+      try {
+        await nav.share({ title, url });
+        return;
+      } catch {
+        // user cancelled or share failed — fall through to clipboard
+      }
+    }
+    if (navigator.clipboard) {
+      try {
+        await navigator.clipboard.writeText(url);
+        window.dispatchEvent(new CustomEvent('examanet:toast', {
+          detail: { type: 'success', message: 'Lien copié !' }
+        }));
+        return;
+      } catch {
+        // ignore
+      }
+    }
+    // Last-resort: open a prompt with the URL
+    window.prompt('Copiez ce lien :', url);
+  };
+
+  const handlePrint = () => {
+    if (typeof window === 'undefined') return;
+    window.print();
+  };
+
+  const handleEmbed = async () => {
+    if (typeof window === 'undefined') return;
+    const origin = window.location.origin;
+    const embed = `<iframe src="${origin}${downloadUrl}" width="100%" height="600" frameborder="0"></iframe>`;
+    if (navigator.clipboard) {
+      try {
+        await navigator.clipboard.writeText(embed);
+        window.dispatchEvent(new CustomEvent('examanet:toast', {
+          detail: { type: 'success', message: 'Code d\'intégration copié !' }
+        }));
+      } catch {
+        window.prompt('Copiez ce code d\'intégration :', embed);
+      }
+    } else {
+      window.prompt('Copiez ce code d\'intégration :', embed);
+    }
+  };
+
+  const handleAskAI = () => {
+    if (typeof window === 'undefined') return;
+    window.dispatchEvent(new CustomEvent('examanet:ask-ai', { detail: { resourceId } }));
+  };
+
+  const handleReport = () => {
+    if (typeof window === 'undefined') return;
+    window.dispatchEvent(new CustomEvent('examanet:toast', {
+      detail: { type: 'info', message: 'Pour signaler un problème, contactez-nous via la page Contact.' }
+    }));
   };
 
   return (
@@ -180,48 +273,43 @@ export default function ResourceScribdHeader({
           <ActionButton
             icon={<Download className="w-5 h-5" />}
             label="Télécharger"
-            onClick={download}
+            onClick={handleDownload}
             primary
           />
           <ActionButton
             icon={<Bookmark className={`w-5 h-5 ${isFavorited ? 'fill-current' : ''}`} />}
             label="Enregistrer"
-            onClick={onFavorite}
+            onClick={handleFavorite}
             active={isFavorited}
+            disabled={busy === 'fav'}
           />
           <ActionButton
             icon={<Share2 className="w-5 h-5" />}
             label="Partager"
-            onClick={onShare}
+            onClick={handleShare}
           />
           <ActionButton
             icon={<Printer className="w-5 h-5" />}
             label="Imprimer"
-            onClick={onPrint}
+            onClick={handlePrint}
           />
           <ActionButton
             icon={<Code2 className="w-5 h-5" />}
             label="Intégrer"
-            onClick={() => {
-              if (typeof window !== 'undefined' && downloadUrl) {
-                navigator.clipboard?.writeText(
-                  `<iframe src="${window.location.origin}${downloadUrl}" width="100%" height="600"></iframe>`,
-                );
-              }
-            }}
+            onClick={handleEmbed}
           />
         </div>
 
         {/* Secondary actions */}
         <div className="flex items-center gap-2 flex-wrap">
           <button
-            onClick={onAskAI}
+            onClick={handleAskAI}
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-violet-700 bg-violet-50 hover:bg-violet-100 border border-violet-200 px-3 py-1.5 rounded-full transition"
           >
             <Sparkles className="w-3.5 h-3.5" /> Ask AI
           </button>
           <button
-            onClick={onReport}
+            onClick={handleReport}
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-800 bg-slate-50 hover:bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-full transition"
           >
             <Flag className="w-3.5 h-3.5" /> Signaler
@@ -264,23 +352,26 @@ function ActionButton({
   onClick,
   primary,
   active,
+  disabled,
 }: {
   icon: ReactNode;
   label: string;
   onClick?: () => void;
   primary?: boolean;
   active?: boolean;
+  disabled?: boolean;
 }) {
   return (
     <button
       onClick={onClick}
+      disabled={disabled}
       className={`flex flex-col items-center justify-center gap-1 px-2 py-3 rounded-xl border transition text-center ${
         primary
-          ? 'bg-emerald-600 hover:bg-emerald-700 border-emerald-600 text-white shadow-sm'
+          ? 'bg-emerald-600 hover:bg-emerald-700 border-emerald-600 text-white shadow-sm disabled:opacity-60'
           : active
             ? 'bg-primary-50 border-primary-200 text-primary-700'
             : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-700'
-      }`}
+      } disabled:cursor-not-allowed`}
     >
       <div className={primary ? 'text-white' : ''}>{icon}</div>
       <span className="text-[11px] font-semibold leading-tight">{label}</span>
