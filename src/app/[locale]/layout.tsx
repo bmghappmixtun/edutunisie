@@ -4,9 +4,24 @@ import { getMessages, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { hasLocale } from 'next-intl';
+import { unstable_cache as nextCache } from 'next/cache';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import SyncLocaleAttrs from '@/components/i18n/SyncLocaleAttrs';
+
+// PERF 2026-08-16: cache getMessages() per locale. Without this, every page
+// in [locale]/ triggers a new messages fetch → dynamic rendering → bypasses
+// the Vercel CDN cache (cache-control: private, no-cache, no-store).
+// With the cache, getMessages is static per locale and the layout can be
+// pre-rendered, enabling ISR for every page under [locale]/.
+const getCachedMessages = nextCache(
+  async (locale: string) => {
+    const result = await getMessages();
+    return result as any;
+  },
+  ['i18n-messages-v1'],
+  { revalidate: 3600, tags: ['i18n'] },
+);
 
 type Props = {
   children: React.ReactNode;
@@ -38,7 +53,7 @@ export default async function LocaleLayout({ children, params }: Props) {
   }
 
   setRequestLocale(locale);
-  const messages = await getMessages();
+  const messages = await getCachedMessages(locale);
 
   // 2026-08-15 nightly fix (ERR-K2N98N/SMRMP8/F6RCN5/2PR9XS/7FH8HK/6KDXHZ/
   //   YGXCC9/DXD4MM/RGHJEC — 78 hydration errors / 7 days):

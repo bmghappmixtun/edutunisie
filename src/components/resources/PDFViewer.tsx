@@ -21,6 +21,8 @@ import {
   X,
   Copy,
   Check,
+  Rows3,
+  Square,
 } from 'lucide-react';
 
 // ============================================================================
@@ -42,6 +44,7 @@ const MAX_SCALE = 4;
 const SCALE_STEP = 0.25;
 
 type FitMode = 'width' | 'height' | 'page' | 'manual';
+type ViewMode = 'single' | 'continuous';
 
 // ============================================================================
 // Error boundary for individual page layers
@@ -133,6 +136,8 @@ export default function PDFViewer({
   // The container is now tall enough (95vh + 800px min) to fit most pages
   // entirely in height too — so the user sees the full first page without scrolling.
   const [fitMode, setFitMode] = useState<FitMode>('width');
+  // View mode: 'single' = 1 page at a time (prev/next), 'continuous' = scroll all pages
+  const [viewMode, setViewMode] = useState<ViewMode>('continuous');
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -165,6 +170,45 @@ export default function PDFViewer({
   // Touch state for swipe detection (next/previous page on horizontal swipe)
   const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
   const touchEndRef = useRef<{ x: number; y: number; time: number } | null>(null);
+  // Scroll spy refs (continuous mode)
+  const isScrollSpyUpdate = useRef(false);
+  const pageRefsMap = useRef<Map<number, HTMLDivElement | null>>(new Map());
+
+  // ==========================================================================
+  // Scroll spy — track current page in continuous mode
+  // ==========================================================================
+  useEffect(() => {
+    if (viewMode !== 'continuous') return;
+    const el = scrollRef.current;
+    if (!el || !numPages) return;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const onScroll = () => {
+      if (isScrollSpyUpdate.current) return;
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        const center = el.scrollTop + el.clientHeight / 2;
+        let closest = 1, minDist = Infinity;
+        for (let i = 1; i <= numPages; i++) {
+          const card = pageRefsMap.current.get(i);
+          if (!card) continue;
+          const mid = card.offsetTop + card.offsetHeight / 2;
+          const dist = Math.abs(center - mid);
+          if (dist < minDist) { minDist = dist; closest = i; }
+        }
+        if (closest !== pageNumber) {
+          isScrollSpyUpdate.current = true;
+          setPageNumber(closest);
+          // Reset flag after a tick (avoid re-trigger from page change)
+          requestAnimationFrame(() => { isScrollSpyUpdate.current = false; });
+        }
+      }, 80);
+    };
+    el.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      el.removeEventListener('scroll', onScroll);
+      if (timer) clearTimeout(timer);
+    };
+  }, [viewMode, numPages, pageNumber]);
 
   // ==========================================================================
   // Document options — self-hosted assets, no unpkg dependency
@@ -425,168 +469,205 @@ export default function PDFViewer({
     setLoading(true);
     setNumPages(null);
     setPageNumber(1);
+    // Reset scroll position to top on URL change
+    if (scrollRef.current) scrollRef.current.scrollTop = 0;
   }, [url]);
+
+  // Scroll to the manually-set page (jump via input, prev/next, keyboard)
+  // Only active in continuous mode. We use a ref flag to prevent the scroll
+  // spy from immediately overriding the page back to the previous value.
+  useEffect(() => {
+    if (viewMode !== 'continuous' || !numPages) return;
+    if (isScrollSpyUpdate.current) return;
+    const card = pageRefsMap.current.get(pageNumber);
+    const scrollEl = scrollRef.current;
+    if (card && scrollEl) {
+      scrollEl.scrollTo({ top: card.offsetTop - 16, behavior: 'smooth' });
+    }
+  }, [pageNumber, viewMode, numPages]);
 
   // ==========================================================================
   // Render
   // ==========================================================================
   return (
     <div
-      className={`bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm ${className}`}
+      className={`pdf-viewer-shell relative bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm ${className}`}
     >
-      {/* Toolbar */}
-      <div className="pdf-viewer-toolbar bg-slate-900 text-white px-2 sm:px-3 py-2 flex items-center justify-between gap-1 sm:gap-2 flex-wrap">
+      {/* === FLOATING BOTTOM TOOLBAR (glass, Scribd-style) === */}
+      <div className="pdf-viewer-floater absolute bottom-4 left-1/2 -translate-x-1/2 z-40 bg-slate-900/95 backdrop-blur-md text-white rounded-full px-1.5 py-1.5 shadow-2xl flex items-center gap-0.5 ring-1 ring-white/10">
         {/* Page navigation */}
-        <div className="flex items-center gap-1">
-          <button
-            type="button"
-            onClick={prevPage}
-            disabled={!numPages || pageNumber <= 1}
-            className="p-2 hover:bg-white/10 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition"
-            title="Page précédente (←)"
-            aria-label="Page précédente"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-          <div className="px-2 py-1 text-xs font-mono min-w-[70px] text-center">
-            {numPages ? (
-              <>
-                <input
-                  type="number"
-                  min={1}
-                  max={numPages}
-                  value={pageNumber}
-                  onChange={(e) => {
-                    const p = parseInt(e.target.value);
-                    if (p >= 1 && p <= numPages) setPageNumber(p);
-                  }}
-                  className="w-10 bg-transparent text-center text-white border-b border-white/30 focus:border-white outline-none"
-                  aria-label="Numéro de page"
-                />
-                <span className="text-slate-400"> / {numPages}</span>
-              </>
-            ) : (
-              <span className="text-slate-400">… / …</span>
-            )}
-          </div>
-          <button
-            type="button"
-            onClick={nextPage}
-            disabled={!numPages || pageNumber >= numPages}
-            className="p-2 hover:bg-white/10 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition"
-            title="Page suivante (→)"
-            aria-label="Page suivante"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-
-        {/* Zoom controls */}
-        <div className="flex items-center gap-1">
-          <button
-            type="button"
-            onClick={zoomOut}
-            disabled={scale <= MIN_SCALE}
-            className="p-2 hover:bg-white/10 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition"
-            title="Zoom arrière (-)"
-            aria-label="Zoom arrière"
-          >
-            <ZoomOut className="w-4 h-4" />
-          </button>
-          <button
-            type="button"
-            onClick={fitToWidth}
-            className={`px-2 py-1 hover:bg-white/10 rounded-lg text-xs font-mono min-w-[55px] transition ${fitMode === 'width' ? 'bg-white/20' : ''}`}
-            title="Ajuster à la largeur (0)"
-            aria-label="Ajuster à la largeur"
-          >
-            {fitMode === 'manual' ? `${Math.round(scale * 100)}%` : '⤢ Auto'}
-          </button>
-          <button
-            type="button"
-            onClick={zoomIn}
-            disabled={scale >= MAX_SCALE}
-            className="p-2 hover:bg-white/10 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition"
-            title="Zoom avant (+)"
-            aria-label="Zoom avant"
-          >
-            <ZoomIn className="w-4 h-4" />
-          </button>
-          <button
-            type="button"
-            onClick={fitToPage}
-            className={`p-2 hover:bg-white/10 rounded-lg transition ${fitMode === 'page' ? 'bg-white/20' : ''}`}
-            title="Ajuster à la page"
-            aria-label="Ajuster à la page"
-          >
-            {fitMode === 'page' ? (
-              <Minimize className="w-4 h-4" />
-            ) : (
-              <Maximize className="w-4 h-4" />
-            )}
-          </button>
-        </div>
-
-        {/* Right-side actions */}
-        <div className="flex items-center gap-1">
-          <button
-            type="button"
-            onClick={() => setSearchOpen((o) => !o)}
-            className={`p-2 hover:bg-white/10 rounded-lg transition ${searchOpen ? 'bg-white/20' : ''}`}
-            title="Rechercher dans le PDF (Ctrl+F)"
-            aria-label="Rechercher"
-          >
-            <Search className="w-4 h-4" />
-          </button>
-          <button
-            type="button"
-            onClick={handleCopy}
-            className="p-2 hover:bg-white/10 rounded-lg transition relative"
-            title="Copier la sélection"
-            aria-label="Copier"
-          >
-            {copySuccess ? (
-              <Check className="w-4 h-4 text-emerald-400" />
-            ) : (
-              <Copy className="w-4 h-4" />
-            )}
-          </button>
-          <button
-            type="button"
-            onClick={toggleFullscreen}
-            className="p-2 hover:bg-white/10 rounded-lg transition"
-            title="Plein écran (F)"
-            aria-label="Plein écran"
-          >
-            {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
-          </button>
-          {onDownload && (
-            <button
-              type="button"
-              onClick={onDownload}
-              className="p-2 hover:bg-white/10 rounded-lg transition"
-              title="Télécharger"
-              aria-label="Télécharger"
-            >
-              <Download className="w-4 h-4" />
-            </button>
+        <button
+          type="button"
+          onClick={prevPage}
+          disabled={!numPages || pageNumber <= 1}
+          className="w-10 h-10 inline-flex items-center justify-center hover:bg-white/10 rounded-full disabled:opacity-30 disabled:cursor-not-allowed transition active:scale-90"
+          title="Page précédente (←)"
+          aria-label="Page précédente"
+        >
+          <ChevronLeft className="w-4 h-4" />
+        </button>
+        <div className="px-2.5 h-10 text-sm font-bold font-mono tabular-nums min-w-[92px] flex items-center justify-center gap-0.5 whitespace-nowrap">
+          {numPages ? (
+            <>
+              <input
+                type="number"
+                min={1}
+                max={numPages}
+                value={pageNumber}
+                onChange={(e) => {
+                  const p = parseInt(e.target.value);
+                  if (p >= 1 && p <= numPages) setPageNumber(p);
+                }}
+                className="w-8 bg-transparent text-center text-white rounded outline-none focus:bg-white/10 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none px-0 py-0 m-0 text-sm font-bold"
+                aria-label="Numéro de page"
+              />
+              <span className="text-slate-500">/</span>
+              <span className="text-slate-400">{numPages}</span>
+            </>
+          ) : (
+            <span className="text-slate-400">…</span>
           )}
         </div>
+        <button
+          type="button"
+          onClick={nextPage}
+          disabled={!numPages || pageNumber >= numPages}
+          className="w-10 h-10 inline-flex items-center justify-center hover:bg-white/10 rounded-full disabled:opacity-30 disabled:cursor-not-allowed transition active:scale-90"
+          title="Page suivante (→)"
+          aria-label="Page suivante"
+        >
+          <ChevronRight className="w-4 h-4" />
+        </button>
+
+        {/* Divider */}
+        <div className="w-px h-5 bg-white/15 mx-1" />
+
+        {/* Zoom out */}
+        <button
+          type="button"
+          onClick={zoomOut}
+          disabled={scale <= MIN_SCALE}
+          className="w-10 h-10 inline-flex items-center justify-center hover:bg-white/10 rounded-full disabled:opacity-30 disabled:cursor-not-allowed transition active:scale-90"
+          title="Zoom arrière (-)"
+          aria-label="Zoom arrière"
+        >
+          <ZoomOut className="w-4 h-4" />
+        </button>
+        {/* Zoom level / fit-to-width toggle */}
+        <button
+          type="button"
+          onClick={fitToWidth}
+          className={`px-2 h-10 inline-flex items-center justify-center hover:bg-white/10 rounded-full text-xs font-mono min-w-[60px] transition active:scale-90 ${fitMode === 'width' ? 'bg-white/20' : ''}`}
+          title="Ajuster à la largeur (0)"
+          aria-label="Ajuster à la largeur"
+        >
+          {fitMode === 'manual' ? `${Math.round(scale * 100)}%` : '⤢ Auto'}
+        </button>
+        {/* Zoom in */}
+        <button
+          type="button"
+          onClick={zoomIn}
+          disabled={scale >= MAX_SCALE}
+          className="w-10 h-10 inline-flex items-center justify-center hover:bg-white/10 rounded-full disabled:opacity-30 disabled:cursor-not-allowed transition active:scale-90"
+          title="Zoom avant (+)"
+          aria-label="Zoom avant"
+        >
+          <ZoomIn className="w-4 h-4" />
+        </button>
+        {/* Fit to page */}
+        <button
+          type="button"
+          onClick={fitToPage}
+          className={`w-10 h-10 inline-flex items-center justify-center hover:bg-white/10 rounded-full transition active:scale-90 ${fitMode === 'page' ? 'bg-white/20' : ''}`}
+          title="Ajuster à la page"
+          aria-label="Ajuster à la page"
+        >
+          {fitMode === 'page' ? (
+            <Minimize className="w-4 h-4" />
+          ) : (
+            <Maximize className="w-4 h-4" />
+          )}
+        </button>
+        {/* View mode toggle: single page vs continuous scroll */}
+        <button
+          type="button"
+          onClick={() => setViewMode((m) => (m === 'single' ? 'continuous' : 'single'))}
+          className={`w-10 h-10 inline-flex items-center justify-center hover:bg-white/10 rounded-full transition active:scale-90 ${viewMode === 'continuous' ? 'bg-white/20' : ''}`}
+          title={viewMode === 'continuous' ? 'Mode page par page' : 'Mode scroll continu'}
+          aria-label="Changer le mode d'affichage"
+        >
+          {viewMode === 'continuous' ? (
+            <Square className="w-4 h-4" />
+          ) : (
+            <Rows3 className="w-4 h-4" />
+          )}
+        </button>
+
+        {/* Divider */}
+        <div className="w-px h-5 bg-white/15 mx-1" />
+
+        {/* Search */}
+        <button
+          type="button"
+          onClick={() => setSearchOpen((o) => !o)}
+          className={`w-10 h-10 inline-flex items-center justify-center hover:bg-white/10 rounded-full transition active:scale-90 ${searchOpen ? 'bg-white/20' : ''}`}
+          title="Rechercher dans le PDF (Ctrl+F)"
+          aria-label="Rechercher"
+        >
+          <Search className="w-4 h-4" />
+        </button>
+        {/* Copy */}
+        <button
+          type="button"
+          onClick={handleCopy}
+          className="w-10 h-10 inline-flex items-center justify-center hover:bg-white/10 rounded-full transition active:scale-90 relative"
+          title="Copier la sélection"
+          aria-label="Copier"
+        >
+          {copySuccess ? (
+            <Check className="w-4 h-4 text-emerald-400" />
+          ) : (
+            <Copy className="w-4 h-4" />
+          )}
+        </button>
+        {/* Fullscreen */}
+        <button
+          type="button"
+          onClick={toggleFullscreen}
+          className="w-10 h-10 inline-flex items-center justify-center hover:bg-white/10 rounded-full transition active:scale-90"
+          title="Plein écran (F)"
+          aria-label="Plein écran"
+        >
+          {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+        </button>
+        {/* Download */}
+        {onDownload && (
+          <button
+            type="button"
+            onClick={onDownload}
+            className="w-10 h-10 inline-flex items-center justify-center hover:bg-white/10 rounded-full transition active:scale-90"
+            title="Télécharger"
+            aria-label="Télécharger"
+          >
+            <Download className="w-4 h-4" />
+          </button>
+        )}
       </div>
 
-      {/* Search bar */}
+      {/* === FLOATING TOP-CENTER SEARCH BAR (overlay, glass) === */}
       {searchOpen && (
-        <div className="bg-slate-800 text-white px-3 py-2 flex items-center gap-2 border-t border-slate-700">
+        <div className="pdf-viewer-search absolute top-3 left-1/2 -translate-x-1/2 z-40 bg-slate-900/95 backdrop-blur-md text-white rounded-full pl-3 pr-2 py-1.5 shadow-2xl flex items-center gap-2 ring-1 ring-white/10 min-w-[280px] max-w-[90vw]">
           <Search className="w-4 h-4 text-slate-400 flex-shrink-0" />
           <input
             type="search"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Rechercher dans cette page..."
-            className="flex-1 bg-transparent outline-none text-sm placeholder-slate-400"
+            className="flex-1 bg-transparent outline-none text-sm placeholder-slate-400 min-w-0"
+            autoFocus
           />
           {searchQuery && (
-            <span className="text-xs text-slate-400 font-mono">
+            <span className="text-xs text-slate-400 font-mono whitespace-nowrap">
               {searchResults.count > 0 ? `${searchResults.count} résultat(s)` : 'Aucun'}
             </span>
           )}
@@ -596,10 +677,10 @@ export default function PDFViewer({
               setSearchOpen(false);
               setSearchQuery('');
             }}
-            className="p-1 hover:bg-white/10 rounded transition"
+            className="w-7 h-7 inline-flex items-center justify-center hover:bg-white/10 rounded-full transition"
             aria-label="Fermer la recherche"
           >
-            <X className="w-4 h-4" />
+            <X className="w-3.5 h-3.5" />
           </button>
         </div>
       )}
@@ -622,9 +703,11 @@ export default function PDFViewer({
         // - Mobile: 70vh + 500px min (so it's tall but not overwhelming)
         // - Desktop: 95vh + 800px min (taller, more room for the page)
         // - Fullscreen: 100vh
+        // paddingBottom reserves space for the floating bottom toolbar (64px + 16px gap = 80px)
         style={{
           height: isFullscreen ? '100vh' : '95vh',
           minHeight: '800px',
+          paddingBottom: isFullscreen ? 0 : 80,
         }}
         // Mobile-friendly touch + swipe handlers (see useEffect below for the gesture)
         onTouchStart={(e) => {
@@ -682,7 +765,14 @@ export default function PDFViewer({
             </div>
           </div>
         ) : (
-          <div ref={scrollRef} className="flex justify-center items-start min-h-full p-4">
+          <div
+            ref={scrollRef}
+            className={
+              viewMode === 'continuous'
+                ? 'flex flex-col items-center gap-4 min-h-full p-4'
+                : 'flex justify-center items-start min-h-full p-4'
+            }
+          >
             <DocumentErrorBoundary onError={setError}>
               <Document
                 file={url}
@@ -717,57 +807,77 @@ export default function PDFViewer({
                 }
                 externalLinkTarget="_blank"
               >
-                <PageLayerBoundary onLayerError={onTextLayerError} label="text">
-                  <PageLayerBoundary onLayerError={onAnnotationLayerError} label="annotation">
-                    <Page
-                      pageNumber={pageNumber}
-                      scale={scale}
-                      renderTextLayer={textLayerEnabled}
-                      renderAnnotationLayer={annotationLayerEnabled}
-                      onLoadSuccess={onPageLoadSuccess}
-                      loading={
-                        <div className="flex items-center justify-center min-h-[500px] bg-white shadow-2xl rounded">
-                          <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
-                        </div>
-                      }
-                      error={
-                        <div className="flex items-center justify-center min-h-[500px] bg-white shadow-2xl rounded p-8">
-                          <div className="text-center">
-                            <AlertCircle className="w-10 h-10 mx-auto mb-2 text-red-500" />
-                            <p className="text-sm text-slate-600">Erreur de rendu de la page</p>
+                {viewMode === 'continuous' && numPages ? (
+                  // CONTINUOUS MODE: render all pages stacked, scroll spy tracks current
+                  Array.from({ length: numPages }, (_, i) => i + 1).map((p) => (
+                    <div
+                      key={p}
+                      ref={(el) => { pageRefsMap.current.set(p, el); }}
+                      data-page={p}
+                      className="w-full flex justify-center"
+                    >
+                      <PageLayerBoundary onLayerError={onTextLayerError} label="text">
+                        <PageLayerBoundary onLayerError={onAnnotationLayerError} label="annotation">
+                          <Page
+                            pageNumber={p}
+                            scale={scale}
+                            renderTextLayer={textLayerEnabled}
+                            renderAnnotationLayer={annotationLayerEnabled}
+                            onLoadSuccess={onPageLoadSuccess}
+                            loading={
+                              <div className="flex items-center justify-center min-h-[500px] bg-white shadow-2xl rounded">
+                                <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
+                              </div>
+                            }
+                            error={
+                              <div className="flex items-center justify-center min-h-[500px] bg-white shadow-2xl rounded p-8">
+                                <div className="text-center">
+                                  <AlertCircle className="w-10 h-10 mx-auto mb-2 text-red-500" />
+                                  <p className="text-sm text-slate-600">Erreur de rendu de la page {p}</p>
+                                </div>
+                              </div>
+                            }
+                            className="bg-white shadow-2xl"
+                          />
+                        </PageLayerBoundary>
+                      </PageLayerBoundary>
+                    </div>
+                  ))
+                ) : (
+                  // SINGLE MODE: render only the current page
+                  <PageLayerBoundary onLayerError={onTextLayerError} label="text">
+                    <PageLayerBoundary onLayerError={onAnnotationLayerError} label="annotation">
+                      <Page
+                        pageNumber={pageNumber}
+                        scale={scale}
+                        renderTextLayer={textLayerEnabled}
+                        renderAnnotationLayer={annotationLayerEnabled}
+                        onLoadSuccess={onPageLoadSuccess}
+                        loading={
+                          <div className="flex items-center justify-center min-h-[500px] bg-white shadow-2xl rounded">
+                            <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
                           </div>
-                        </div>
-                      }
-                      className="bg-white shadow-2xl"
-                    />
+                        }
+                        error={
+                          <div className="flex items-center justify-center min-h-[500px] bg-white shadow-2xl rounded p-8">
+                            <div className="text-center">
+                              <AlertCircle className="w-10 h-10 mx-auto mb-2 text-red-500" />
+                              <p className="text-sm text-slate-600">Erreur de rendu de la page</p>
+                            </div>
+                          </div>
+                        }
+                        className="bg-white shadow-2xl"
+                      />
+                    </PageLayerBoundary>
                   </PageLayerBoundary>
-                </PageLayerBoundary>
+                )}
               </Document>
             </DocumentErrorBoundary>
           </div>
         )}
       </div>
 
-      {/* Status bar */}
-      {numPages && !error && (
-        <div className="bg-slate-50 border-t border-slate-200 px-3 py-1.5 flex items-center justify-center gap-3 text-xs text-slate-500">
-          <span>
-            📄 {numPages} page{numPages > 1 ? 's' : ''}
-          </span>
-          <span className="text-slate-300">|</span>
-          <span>
-            Page {pageNumber} sur {numPages}
-          </span>
-          <span className="text-slate-300">|</span>
-          <span className="font-mono">
-            {fitMode === 'manual'
-              ? `${Math.round(scale * 100)}%`
-              : `Auto (${fitMode === 'width' ? 'largeur' : 'page'})`}
-          </span>
-          <span className="text-slate-300">|</span>
-          <span className="hidden sm:inline">⌨️ ← → / +/- / 0 = auto / F = plein écran</span>
-        </div>
-      )}
+      {/* Bottom status bar removed — replaced by floating top-right status pill above */}
     </div>
   );
 }
