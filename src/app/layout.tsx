@@ -8,7 +8,6 @@ import ServiceWorkerRegister from '@/components/pwa/ServiceWorkerRegister';
 import ErrorHandlerInit from '@/components/errors/ErrorHandlerInit';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
 import { organizationSchema } from '@/lib/structured-data';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
@@ -240,7 +239,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
       </head>
       <body className="font-sans">
-        <NextIntlClientProvider locale={locale} messages={await getMessages()}>
+        {/* PERF 2026-08-16: removed `messages={await getMessages()}`. The
+            root layout now provides the NextIntlClientProvider with just
+            the default FR locale — no async call needed. Localized pages
+            under [locale]/ are wrapped in their own NextIntlClientProvider
+            (in app/[locale]/layout.tsx) with the proper per-locale messages,
+            which overrides this one. Non-localized pages (/admin,
+            /connexion, /api/*) get the default FR messages statically. */}
+        <NextIntlClientProvider locale="fr">
         <NuqsAdapter>
           {children}
         </NuqsAdapter>
