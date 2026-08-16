@@ -841,20 +841,14 @@ export default async function ResourcePage({
                 )}
               </div>
 
-              {/* Aperçu PDF — hidden for archived resources (non-owners) */}
+              {/* Aperçu PDF — hidden for archived resources (non-owners).
+                  2026-08-16: removed the "Aperçu du document" header and
+                  "Ouvrir en plein écran →" link above the viewer to save
+                  vertical space. The fullscreen button is still available
+                  in the floating toolbar (bottom-center glass pill), and
+                  the viewer itself is self-explanatory. */}
               {canViewBody && (
               <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden mb-4">
-                <div className="px-6 lg:px-8 py-4 border-b border-slate-100 flex items-center justify-between">
-                  <h2 className="font-bold text-lg flex items-center gap-2">
-                    <FileText className="w-5 h-5 text-primary-600" /> Aperçu du document
-                  </h2>
-                  <Link
-                    href={`/ressources/${resource.numericId}/${resource.slug}/viewer`}
-                    className="text-sm text-primary-600 font-semibold hover:underline"
-                  >
-                    Ouvrir en plein écran →
-                  </Link>
-                </div>
                 <div className="p-0">
                   <LazyPDFViewer
                     url={`/api/resources/${resource.id}/download`}
