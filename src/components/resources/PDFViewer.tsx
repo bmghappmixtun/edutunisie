@@ -151,7 +151,7 @@ export default function PDFViewer({
     null,
   );
   // Sidebar (thumbnails + outline) — desktop only, hidden < 1024px
-  const [sidebarOpen, setSidebarOpen] = useState<boolean>(true);
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(false); // hidden by default (2026-08-16)
   // pdfjs document reference (for the sidebar — needs getOutline/getPage for thumbs)
   const pdfDocRef = useRef<any>(null);
 
@@ -187,6 +187,11 @@ export default function PDFViewer({
 
   // Refs
   const containerRef = useRef<HTMLDivElement>(null);
+  // Shell ref — used for fullscreen so the floating bottom toolbar
+  // stays available when the viewer is in fullscreen mode. Previously
+  // we fullscreened the inner PDF container only, which left the
+  // toolbar behind in the normal layout (2026-08-16).
+  const shellRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   // Touch state for swipe detection (next/previous page on horizontal swipe)
   const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
@@ -401,7 +406,7 @@ export default function PDFViewer({
   const toggleFullscreen = useCallback(async () => {
     try {
       if (!document.fullscreenElement) {
-        await containerRef.current?.requestFullscreen?.();
+        await shellRef.current?.requestFullscreen?.();
       } else {
         await document.exitFullscreen();
       }
@@ -516,7 +521,12 @@ export default function PDFViewer({
   // ==========================================================================
   return (
     <div
-      className={`pdf-viewer-shell relative bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm ${className}`}
+      ref={shellRef}
+      className={`pdf-viewer-shell relative bg-white overflow-hidden ${className} ${
+        isFullscreen
+          ? 'rounded-none border-0 shadow-none'
+          : 'rounded-2xl border border-slate-200 shadow-sm'
+      }`}
     >
       {/* === SIDEBAR (desktop only) === */}
       {sidebarOpen && !isFullscreen && (
@@ -766,7 +776,11 @@ export default function PDFViewer({
         style={{
           height: isFullscreen ? '100vh' : '95vh',
           minHeight: '800px',
-          paddingBottom: isFullscreen ? 0 : 80,
+          // 2026-08-16: keep the 80px padding in fullscreen too — the floating
+          // toolbar is now part of the fullscreen (we fullscreen the shell
+          // instead of just the container), so we still need to reserve
+          // space at the bottom so the last page doesn't hide under it.
+          paddingBottom: 80,
         }}
         // Mobile-friendly touch + swipe + PINCH handlers.
         //  - 1 finger: swipe (existing)
