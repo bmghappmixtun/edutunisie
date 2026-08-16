@@ -464,7 +464,7 @@ export default function PDFViewer({
         >
           <ChevronLeft className="w-4 h-4" />
         </button>
-        <div className="px-3 text-sm font-bold font-mono tabular-nums min-w-[72px] text-center">
+        <div className="px-2.5 h-10 text-sm font-bold font-mono tabular-nums min-w-[92px] flex items-center justify-center gap-0.5 whitespace-nowrap">
           {numPages ? (
             <>
               <input
@@ -476,13 +476,14 @@ export default function PDFViewer({
                   const p = parseInt(e.target.value);
                   if (p >= 1 && p <= numPages) setPageNumber(p);
                 }}
-                className="w-10 bg-transparent text-center text-white border-b border-white/30 focus:border-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                className="w-8 bg-transparent text-center text-white rounded outline-none focus:bg-white/10 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none px-0 py-0 m-0 text-sm font-bold"
                 aria-label="Numéro de page"
               />
-              <span className="text-slate-400"> / {numPages}</span>
+              <span className="text-slate-500">/</span>
+              <span className="text-slate-400">{numPages}</span>
             </>
           ) : (
-            <span className="text-slate-400">… / …</span>
+            <span className="text-slate-400">…</span>
           )}
         </div>
         <button
