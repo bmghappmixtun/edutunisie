@@ -162,7 +162,13 @@ export default function PDFViewer({
   // ==========================================================================
   const virtualizer = useVirtualizer({
     count: numPages || 0,
-    getScrollElement: () => scrollRef.current,
+    // 2026-08-16: use containerRef (the actual scrolling element with
+    // overflow-auto) instead of scrollRef. The inner scrollRef div does
+    // NOT scroll itself — the parent containerRef does. Using scrollRef
+    // meant the virtualizer never detected scrolls, never mounted the
+    // right pages, and the scroll spy never fired. Same root cause as
+    // the broken prev/next arrows in continuous mode.
+    getScrollElement: () => containerRef.current,
     estimateSize: () => 1100, // A4 portrait at 800px wide ≈ 1100px tall
     overscan: 3, // render 3 pages above/below viewport for smooth scroll
     enabled: viewMode === 'continuous',
@@ -208,27 +214,28 @@ export default function PDFViewer({
   // ==========================================================================
   useEffect(() => {
     if (viewMode !== 'continuous') return;
-    const el = scrollRef.current;
+    // 2026-08-16: listen on containerRef (the actual scrolling element)
+    // not scrollRef. scrollRef is a child div that does NOT scroll —
+    // the parent containerRef with overflow-auto is what scrolls.
+    const el = containerRef.current;
     if (!el || !numPages) return;
     let timer: ReturnType<typeof setTimeout> | null = null;
     const onScroll = () => {
       if (isScrollSpyUpdate.current) return;
       if (timer) clearTimeout(timer);
       timer = setTimeout(() => {
-        const center = el.scrollTop + el.clientHeight / 2;
+        // Use getBoundingClientRect for accurate viewport-relative
+        // positions. The viewport center is the center of containerRef
+        // in the viewport. Each card's center is its own rect's center.
+        const elRect = el.getBoundingClientRect();
+        const viewportCenter = elRect.top + el.clientHeight / 2;
         let closest = 1, minDist = Infinity;
         for (let i = 1; i <= numPages; i++) {
           const card = pageRefsMap.current.get(i);
           if (!card) continue;
-          // 2026-08-16: use __virtualStart (the virtualizer's reported
-          // position) instead of offsetTop. The wrapper is position:
-          // absolute with top: 0, so offsetTop is always 0 relative to
-          // the virtualizer's offsetParent — useless for tracking which
-          // page is centered. __virtualStart is set in the ref callback
-          // and is the actual Y position of the page in scroll coords.
-          const start = (card as any).__virtualStart ?? 0;
-          const mid = start + card.offsetHeight / 2;
-          const dist = Math.abs(center - mid);
+          const cardRect = card.getBoundingClientRect();
+          const cardCenter = cardRect.top + cardRect.height / 2;
+          const dist = Math.abs(viewportCenter - cardCenter);
           if (dist < minDist) { minDist = dist; closest = i; }
         }
         if (closest !== pageNumber) {
@@ -507,7 +514,9 @@ export default function PDFViewer({
     setNumPages(null);
     setPageNumber(1);
     // Reset scroll position to top on URL change
-    if (scrollRef.current) scrollRef.current.scrollTop = 0;
+    // 2026-08-16: scroll the actual scrolling element (containerRef),
+    // not scrollRef (which doesn't scroll itself).
+    if (containerRef.current) containerRef.current.scrollTop = 0;
   }, [url]);
 
   // Scroll to the manually-set page (jump via input, prev/next, keyboard)
@@ -517,12 +526,14 @@ export default function PDFViewer({
     if (viewMode !== 'continuous' || !numPages) return;
     if (isScrollSpyUpdate.current) return;
     const card = pageRefsMap.current.get(pageNumber);
-    const scrollEl = scrollRef.current;
+    // 2026-08-16: scroll the actual scrolling element (containerRef),
+    // not scrollRef. Also add 16px offset to account for scrollRef's
+    // p-4 padding-top (the virtualizer container starts 16px below
+    // containerRef's content top).
+    const scrollEl = containerRef.current;
     if (card && scrollEl) {
-      // 2026-08-16: use __virtualStart instead of offsetTop (same reason
-      // as the scroll spy fix above).
       const start = (card as any).__virtualStart ?? 0;
-      scrollEl.scrollTo({ top: start - 16, behavior: 'smooth' });
+      scrollEl.scrollTo({ top: start + 16 - 16, behavior: 'smooth' });
     }
   }, [pageNumber, viewMode, numPages]);
 
@@ -545,13 +556,13 @@ export default function PDFViewer({
             pdf={pdfDocRef.current}
             currentPage={pageNumber}
             onJump={(p) => {
-              if (viewMode === 'continuous' && scrollRef.current) {
+              // 2026-08-16: scroll containerRef (the actual scrolling
+              // element), not scrollRef.
+              if (viewMode === 'continuous' && containerRef.current) {
                 const card = pageRefsMap.current.get(p);
                 if (card) {
-                  // 2026-08-16: use __virtualStart instead of offsetTop
-                  // (absolute children always have offsetTop=0).
                   const start = (card as any).__virtualStart ?? 0;
-                  scrollRef.current.scrollTo({ top: start - 16, behavior: 'smooth' });
+                  containerRef.current.scrollTo({ top: start + 16 - 16, behavior: 'smooth' });
                 }
               } else {
                 setPageNumber(p);
