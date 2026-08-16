@@ -220,7 +220,14 @@ export default function PDFViewer({
         for (let i = 1; i <= numPages; i++) {
           const card = pageRefsMap.current.get(i);
           if (!card) continue;
-          const mid = card.offsetTop + card.offsetHeight / 2;
+          // 2026-08-16: use __virtualStart (the virtualizer's reported
+          // position) instead of offsetTop. The wrapper is position:
+          // absolute with top: 0, so offsetTop is always 0 relative to
+          // the virtualizer's offsetParent — useless for tracking which
+          // page is centered. __virtualStart is set in the ref callback
+          // and is the actual Y position of the page in scroll coords.
+          const start = (card as any).__virtualStart ?? 0;
+          const mid = start + card.offsetHeight / 2;
           const dist = Math.abs(center - mid);
           if (dist < minDist) { minDist = dist; closest = i; }
         }
@@ -512,7 +519,10 @@ export default function PDFViewer({
     const card = pageRefsMap.current.get(pageNumber);
     const scrollEl = scrollRef.current;
     if (card && scrollEl) {
-      scrollEl.scrollTo({ top: card.offsetTop - 16, behavior: 'smooth' });
+      // 2026-08-16: use __virtualStart instead of offsetTop (same reason
+      // as the scroll spy fix above).
+      const start = (card as any).__virtualStart ?? 0;
+      scrollEl.scrollTo({ top: start - 16, behavior: 'smooth' });
     }
   }, [pageNumber, viewMode, numPages]);
 
@@ -538,7 +548,10 @@ export default function PDFViewer({
               if (viewMode === 'continuous' && scrollRef.current) {
                 const card = pageRefsMap.current.get(p);
                 if (card) {
-                  scrollRef.current.scrollTo({ top: card.offsetTop - 16, behavior: 'smooth' });
+                  // 2026-08-16: use __virtualStart instead of offsetTop
+                  // (absolute children always have offsetTop=0).
+                  const start = (card as any).__virtualStart ?? 0;
+                  scrollRef.current.scrollTo({ top: start - 16, behavior: 'smooth' });
                 }
               } else {
                 setPageNumber(p);
@@ -930,8 +943,15 @@ export default function PDFViewer({
                           key={virtualRow.key}
                           ref={(el) => {
                             pageRefsMap.current.set(p, el);
+                            // 2026-08-16: store the virtual start on the element
+                            // so the scroll spy can use it. offsetTop is 0 for
+                            // absolute children (the offsetParent is the
+                            // relative virtualizer container), so we need
+                            // the actual virtual row position.
+                            if (el) (el as any).__virtualStart = virtualRow.start;
                           }}
                           data-page={p}
+                          className="flex justify-center"
                           style={{
                             position: 'absolute',
                             top: 0,
