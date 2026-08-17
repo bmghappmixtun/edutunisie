@@ -408,6 +408,23 @@ export default async function ResourcePage({
                 ? `/professeurs/${resource.teacher.numericId}/${resource.teacher.slug}`
                 : null
             }
+            aiInsights={(() => {
+              const meta = resource.metadata as any;
+              const insights = (meta?.exerciseInsights as string[] | undefined)?.length
+                ? (meta.exerciseInsights as string[])
+                : (meta?.keyInsights as string[] | undefined);
+              return insights && insights.length > 0 ? insights : null;
+            })()}
+            aiKeyPoints={resource.metadata?.keyPoints || null}
+            aiShortKeyPoints={(resource.metadata as any)?.shortKeyPoints || null}
+            isArDoc={(() => {
+              const isPilotePhysiqueCollege =
+                resource.schoolType === 'PILOTE' &&
+                resource.subject?.slug === 'physique' &&
+                resource.class &&
+                ['7eme', '8eme', '9eme'].includes(resource.class.slug);
+              return resource.language === 'ar' && !isPilotePhysiqueCollege;
+            })()}
           />
 
           <div className="grid grid-cols-1 gap-6">
@@ -526,50 +543,10 @@ export default async function ResourcePage({
                   return null;
                 })()}
 
-                {/* AI Exercise Overview — Per user rule (2026-08-10):
-                    Display the AI-extracted exercise summaries from ResourceMetadata.exerciseInsights
-                    (new field, 2026-08-12) OR fallback to keyInsights (legacy physique pipeline).
-                    Two display modes:
-                    - EXERCISE/DEVOIR: "Exercice N (Type): summary" → badge + summary
-                    - COURSE: "Titre: summary" → title + summary, numbered list
-                    Hidden for SUMMARY/OTHER types. */}
-                {(() => {
-                  const meta = resource.metadata as any;
-                  // Prefer the new exerciseInsights field; fallback to legacy keyInsights
-                  const insights = (meta?.exerciseInsights as string[] | undefined)?.length
-                    ? (meta.exerciseInsights as string[])
-                    : (meta?.keyInsights as string[] | undefined);
-                  if (!insights || insights.length === 0) return null;
-
-                  // For Technologie: extract meta (system name, specialty, dossier)
-                  // and pass to the component to display at the top of the card.
-                  // For COURS: prefer DB courseSubject (pre-extracted), fall back to title regex,
-                  // then generalSubject.
-                  const isTechnologie = resource.subject?.slug === 'technologie';
-                  const isCourse = resource.type === 'COURSE';
-                  const techMeta = isTechnologie
-                    ? getTechMeta(
-                        resource.title,
-                        (resource as any).content?.fullText || null,
-                        meta?.systemName || null,
-                        {
-                          isCourse,
-                          // For COURS: prefer the pre-extracted courseSubject from DB
-                          courseSubject: isCourse ? (meta as any)?.courseSubject || null : null,
-                          generalSubject: (meta as any)?.generalSubject || null,
-                        }
-                      )
-                    : null;
-
-                  return (
-                    <AiExerciseOverview
-                      keyInsights={insights}
-                      subjectSlug={resource.subject?.slug}
-                      resourceType={resource.type as 'COURSE' | 'EXERCISE' | 'DEVOIR' | 'SUMMARY' | 'OTHER'}
-                      meta={techMeta}
-                    />
-                  );
-                })()}
+                {/* 2026-08-17: AI exercise overview + key points are now
+                    rendered INSIDE the ScribdHeader as collapsible accordions
+                    (Option A from the user proposal). The data is prepared
+                    here and passed via props. Old separate cards removed. */}
 
                 {/* AI key points — Per user rule (2026-07-30):
                     - Title: "النقاط الرئيسية" (AR) or "Points clés" (FR)
@@ -583,11 +560,7 @@ export default async function ResourcePage({
                       in alternation, max 10 bubbles total. Short KP = lighter shade
                       but SAME font size/padding as long KP (2026-08-10 update). */}
                 {(() => {
-                  // Per user rule (2026-08-09): Points clés card MIXES long KP (full
-                  // sentences) + short KP (2-3 word concepts) in alternation.
-                  // Short KP are now real concepts (not just tags) so they make
-                  // sense alongside long KP. Max 10 bubbles total. Short = lighter
-                  // shade + smaller font to visually distinguish from long KP.
+                  // Points clés data — prepared here, rendered in ScribdHeader.
                   const longKps = resource.metadata?.keyPoints || [];
                   const shortKps = (resource.metadata as any)?.shortKeyPoints || [];
                   if (longKps.length === 0 && shortKps.length === 0) return null;
@@ -598,64 +571,14 @@ export default async function ResourcePage({
                     if (i < shortKps.length) merged.push({ text: shortKps[i], isShort: true });
                     if (i < longKps.length && merged.length < 10) merged.push({ text: longKps[i], isShort: false });
                   }
-                  // Per user rule (2026-08-02): align RIGHT for AR docs, LEFT for FR docs.
                   const isPilotePhysiqueCollege =
                     resource.schoolType === 'PILOTE' &&
                     resource.subject?.slug === 'physique' &&
                     resource.class &&
                     ['7eme', '8eme', '9eme'].includes(resource.class.slug);
                   const isArDoc = resource.language === 'ar' && !isPilotePhysiqueCollege;
-                  const titleAlignRight = isArDoc;
                   const keyPointsTitle = isArDoc ? 'النقاط الرئيسية' : 'Points clés';
-                  // Long KP: full color. Short KP: lighter shade. Both same size (2026-08-10).
-                  const longPalette = [
-                    'bg-rose-100 text-rose-800 border-rose-300',
-                    'bg-fuchsia-100 text-fuchsia-800 border-fuchsia-300',
-                    'bg-teal-100 text-teal-800 border-teal-300',
-                    'bg-amber-100 text-amber-800 border-amber-300',
-                    'bg-violet-100 text-violet-800 border-violet-300',
-                  ];
-                  const shortPalette = [
-                    'bg-rose-50 text-rose-700 border-rose-200',
-                    'bg-fuchsia-50 text-fuchsia-700 border-fuchsia-200',
-                    'bg-teal-50 text-teal-700 border-teal-200',
-                    'bg-amber-50 text-amber-700 border-amber-200',
-                    'bg-violet-50 text-violet-700 border-violet-200',
-                  ];
-                  return (
-                  <AiContentSection
-                    title={keyPointsTitle}
-                    icon={<Target className="w-4 h-4" />}
-                    variant="default"
-                    subjectSlug={resource.subject?.slug}
-                    defaultOpen={false}
-                    alignRight={titleAlignRight}
-                  >
-                    <div className={`flex flex-wrap gap-2 ${isArDoc ? 'justify-end' : 'justify-start'}`}>
-                      {merged.map((kp, i) => {
-                        const kpAr = isArabic(kp.text);
-                        const palette = kp.isShort ? shortPalette : longPalette;
-                        const colorClass = palette[i % palette.length];
-                        const searchQuery = encodeURIComponent(kp.text);
-                        const searchHref = `/recherche?q=${searchQuery}`;
-                        // Per user rule (2026-08-10): SAME font and size for short + long KP.
-                        // Visual distinction is only via the lighter/darker color palette.
-                        const sizeClass = 'text-sm px-3 py-1.5';
-                        return (
-                        <Link
-                          key={`${kp.isShort ? 's' : 'l'}-${i}`}
-                          href={searchHref}
-                          dir={kpAr ? 'rtl' : 'ltr'}
-                          lang={kpAr ? 'ar' : 'fr'}
-                          className={`inline-block rounded-full font-semibold border font-arabic-title ${kpAr ? 'text-right' : 'text-left'} ${sizeClass} ${colorClass} hover:brightness-110 hover:shadow-sm hover:scale-[1.03] transition-all cursor-pointer`}
-                        >
-                          {kp.text}
-                        </Link>
-                        );
-                      })}
-                    </div>
-                  </AiContentSection>
-                  );
+                  return null; // 2026-08-17: rendered in ScribdHeader now
                 })()}
 
                 {/* Tags chips were moved to the sidebar (ResourceInfoPanel,
