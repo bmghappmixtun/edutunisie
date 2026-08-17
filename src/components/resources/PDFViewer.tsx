@@ -897,8 +897,8 @@ export default function PDFViewer({
             ref={scrollRef}
             className={
               viewMode === 'continuous'
-                ? 'flex flex-col items-center gap-4 min-h-full p-4'
-                : 'flex justify-center items-start min-h-full p-4'
+                ? 'flex flex-col items-center gap-4 min-h-full p-4 overflow-x-hidden'
+                : 'flex justify-center items-center min-h-full p-4 overflow-x-hidden'
             }
           >
             <DocumentErrorBoundary onError={setError}>
