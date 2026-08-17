@@ -249,7 +249,9 @@ export default async function ResourcePage({
       slug: true,
       title: true,
       viewsCount: true,
+      downloadsCount: true,
       avgRating: true,
+      commentsCount: true,
       subject: { select: { nameFr: true, color: true } },
       class: { select: { nameFr: true, slug: true } },
       teacher: {
@@ -394,6 +396,9 @@ export default async function ResourcePage({
             pageCount={resource.pageCount ?? null}
             fileSize={resource.fileSize ? humanFileSize(resource.fileSize) : null}
             viewsCount={resource.viewsCount}
+            downloadsCount={resource.downloadsCount}
+            avgRating={resource.avgRating}
+            commentsCount={resource.commentsCount}
             downloadUrl={`/api/resources/${resource.id}/download`}
             teacherName={
               resource.teacher
@@ -469,139 +474,11 @@ export default async function ResourcePage({
               )}
 
               <div className="bg-white rounded-2xl border border-slate-100 p-6 lg:p-8 mb-4">
-                <div className="flex flex-wrap items-center gap-2 mb-4">
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-bold ${RESOURCE_TYPE_LABELS[resource.type]?.color}`}
-                  >
-                    {RESOURCE_TYPE_LABELS[resource.type]?.fr}
-                  </span>
-                  {/* Homework subtype badge (only when DEVOIR) */}
-                  {resource.type === 'DEVOIR' &&
-                    resource.homeworkSubtype &&
-                    HOMEWORK_SUBTYPE_LABELS[resource.homeworkSubtype] && (
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-bold ${HOMEWORK_SUBTYPE_LABELS[resource.homeworkSubtype].color}`}
-                      >
-                        {HOMEWORK_SUBTYPE_LABELS[resource.homeworkSubtype].fr}
-                        {resource.homeworkNumber ? ` N°${resource.homeworkNumber}` : ''}
-                      </span>
-                    )}
-                  {resource.class && (
-                    <span className="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-bold">
-                      {resource.class.nameFr}
-                    </span>
-                  )}
-                  {resource.section && (
-                    <span className="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-bold">
-                      {resource.section.nameFr}
-                    </span>
-                  )}
-                  <span
-                    className="px-3 py-1 text-white rounded-full text-xs font-bold"
-                    style={{ background: resource.subject.color || '#0EA5E9' }}
-                  >
-                    {resource.subject.nameFr}
-                  </span>
-                  {/* Pilote badge — only shown if PILOTE (never PUBLIC) */}
-                  {resource.schoolType === 'PILOTE' && (
-                    <span className="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-xs font-bold inline-flex items-center gap-1">
-                      <GraduationCap className="w-3 h-3" />
-                      Lycée/Collège Pilote
-                    </span>
-                  )}
-                  {/* School name badge — shown when extracted from PDF header */}
-                  {resource.schoolName && (
-                    <span
-                      className="px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-xs font-medium inline-flex items-center gap-1"
-                      dir="rtl"
-                    >
-                      <Building2 className="w-3 h-3" />
-                      {resource.schoolName}
-                    </span>
-                  )}
-                </div>
-
-                {(() => {
-                  const { fr, ar } = splitArabicSubject(resource.title);
-                  const gs = (resource.metadata?.generalSubject || '').trim();
-                  // Per user rule (2026-08-13): the green cadre shows the
-                  // AI-extracted system name with the French label "Système
-                  // technique", centered. Replaces the Arabic "اسم المنتج".
-                  const sys = (resource.metadata?.systemName || '').trim();
-                  return (
-                    <>
-                      <h1
-                        className={`text-2xl lg:text-3xl font-extrabold text-slate-900 ${ar ? 'mb-1' : 'mb-3'} leading-tight ${isArabic(fr) ? 'text-right' : 'text-left'}`}
-                        dir={isArabic(fr) ? 'rtl' : 'ltr'}
-                        lang={isArabic(fr) ? 'ar' : 'fr'}
-                      >
-                        {fr}
-                      </h1>
-                      {ar && (
-                        <div
-                          className="text-lg lg:text-xl font-semibold text-slate-600 mb-3 leading-snug text-right font-arabic-title"
-                          dir="rtl"
-                          lang="ar"
-                        >
-                          {ar}
-                        </div>
-                      )}
-                      {/* Green cadre: shows the AI-extracted system name with
-                          the French label "Système technique", centered.
-                          Falls back to general subject display for backward
-                          compatibility (e.g. when systemName is not yet
-                          populated). */}
-                      {sys ? (
-                        <div className="mb-4 flex justify-center">
-                          <span className="inline-block px-4 py-2 rounded-lg border-2 border-emerald-400 bg-emerald-50 text-sm font-semibold text-emerald-900 text-center">
-                            <span className="text-emerald-700">Système technique : </span>
-                            <span className="font-bold">{sys}</span>
-                          </span>
-                        </div>
-                      ) : gs ? (
-                        <h2
-                          dir="auto"
-                          lang={isArabic(gs) ? 'ar' : 'fr'}
-                          className={`text-sm lg:text-base font-semibold text-slate-500 ${ar ? 'mb-3' : 'mb-2'} tracking-wide ${isArabic(gs) ? 'text-right font-arabic-title' : 'text-left'}`}
-                        >
-                          {isArabic(gs) ? 'الموضوع العام: ' : 'Sujet : '}
-                          <span className="text-slate-700">{gs}</span>
-                        </h2>
-                      ) : null}
-                    </>
-                  );
-                })()}
-                {resource.description && !resource.aiSummary?.summary && (
-                  <AiContentSection
-                    title={resource.language === 'ar' ? 'ملخص ذكي' : 'Résumé intelligent'}
-                    icon={<Sparkles className="w-4 h-4" />}
-                    subjectSlug={resource.subject?.slug}
-                    defaultOpen={false}
-                    className="mb-4"
-                  >
-                    <AiDescription
-                      hideTitle={true}
-                      text={resource.description}
-                      source={resource.descriptionSource}
-                      language={resource.language}
-                      headerData={resource.headerData as any}
-                      classNameFr={resource.class?.nameFr}
-                      classNameAr={resource.class?.nameAr}
-                      generalSubject={resource.metadata?.generalSubject}
-                      schoolType={resource.schoolType}
-                      hideFields={
-                        resource.class?.level?.slug === 'lycee'
-                          ? ['Sujet général', 'Enseignant', 'Classe']
-                          : null
-                      }
-                    />
-                  </AiContentSection>
-                )}
-
-                {/* Dossier technique card REMOVED per user rule (2026-08-13):
-                    Deleted for ALL files (not just Technologie). The info
-                    was redundant with the meta chips inside the
-                    "Aperçu des exercices" card. */}
+                {/* 2026-08-17: removed the duplicate badges + h1 + sujet + résumé
+                    intelligent block. The ScribdHeader above already shows the
+                    title, description, and teacher. The AI-generated summary
+                    below (with "Aperçu des exercices" and "Points clés" cards)
+                    is kept. */}
 
                                 {/* AI-generated summary — render via AiDescription for the structured grid card.
                     The general subject (الموضوع العام) is integrated inside the card
@@ -830,37 +707,8 @@ export default async function ResourcePage({
                     </div>
                   )}
 
-                {/* Stats row */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 py-4 border-y border-slate-100">
-                  <div className="text-center">
-                    <div className="flex items-center justify-center gap-1 text-slate-500 text-xs mb-1">
-                      <Eye className="w-3.5 h-3.5" /> Vues
-                    </div>
-                    <div className="font-extrabold text-lg">
-                      {formatNumber(resource.viewsCount)}
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="flex items-center justify-center gap-1 text-slate-500 text-xs mb-1">
-                      <Download className="w-3.5 h-3.5" /> Téléchargements
-                    </div>
-                    <div className="font-extrabold text-lg">
-                      {formatNumber(resource.downloadsCount)}
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="flex items-center justify-center gap-1 text-slate-500 text-xs mb-1">
-                      <Star className="w-3.5 h-3.5" /> Note
-                    </div>
-                    <div className="font-extrabold text-lg">{resource.avgRating.toFixed(1)}/5</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="flex items-center justify-center gap-1 text-slate-500 text-xs mb-1">
-                      <MessageCircle className="w-3.5 h-3.5" /> Commentaires
-                    </div>
-                    <div className="font-extrabold text-lg">{resource.commentsCount}</div>
-                  </div>
-                </div>
+                {/* 2026-08-17: removed the stats row (Vues, Téléchargements, Note,
+                    Commentaires) — moved to the ScribdHeader above. */}
 
                 {canViewBody && (
                 <ResourceActions

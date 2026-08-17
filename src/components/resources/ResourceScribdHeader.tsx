@@ -23,13 +23,15 @@
 import { useState, type ReactNode } from 'react';
 import {
   Sparkles,
-  Flag,
   ThumbsUp,
   ThumbsDown,
   ChevronDown,
   ChevronUp,
   Eye,
   FileText,
+  Download,
+  Star,
+  MessageCircle,
 } from 'lucide-react';
 import { formatNumber } from '@/lib/utils';
 
@@ -41,6 +43,9 @@ export interface ResourceScribdHeaderProps {
   pageCount?: number | null;
   fileSize?: string | null;
   viewsCount: number;
+  downloadsCount: number;
+  avgRating: number;
+  commentsCount: number;
   downloadUrl: string;
   teacherName?: string | null;
   teacherProfileUrl?: string | null;
@@ -57,6 +62,9 @@ export default function ResourceScribdHeader({
   pageCount,
   fileSize,
   viewsCount,
+  downloadsCount,
+  avgRating,
+  commentsCount,
   downloadUrl,
   teacherName,
   teacherProfileUrl,
@@ -71,18 +79,6 @@ export default function ResourceScribdHeader({
     : description;
 
   // ---- Handlers (all internal, no event-handler props) ----
-
-  const handleAskAI = () => {
-    if (typeof window === 'undefined') return;
-    window.dispatchEvent(new CustomEvent('examanet:ask-ai', { detail: { resourceId } }));
-  };
-
-  const handleReport = () => {
-    if (typeof window === 'undefined') return;
-    window.dispatchEvent(new CustomEvent('examanet:toast', {
-      detail: { type: 'info', message: 'Pour signaler un problème, contactez-nous via la page Contact.' }
-    }));
-  };
 
   return (
     <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden mb-4">
@@ -100,6 +96,32 @@ export default function ResourceScribdHeader({
               <Sparkles className="w-3 h-3" /> IA
             </span>
           )}
+
+          {/* Feedback thumbs for AI improvement (Scribd has this too) */}
+          {aiImproved && (
+            <div className="flex items-center gap-0.5 flex-shrink-0 mt-1">
+              <button
+                onClick={() => setFeedback('up')}
+                className={`p-1 rounded transition ${
+                  feedback === 'up' ? 'bg-emerald-100 text-emerald-700' : 'text-slate-400 hover:text-slate-600'
+                }`}
+                title="Améliorations utiles"
+                aria-label="Feedback positif"
+              >
+                <ThumbsUp className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={() => setFeedback('down')}
+                className={`p-1 rounded transition ${
+                  feedback === 'down' ? 'bg-rose-100 text-rose-700' : 'text-slate-400 hover:text-slate-600'
+                }`}
+                title="Améliorations non utiles"
+                aria-label="Feedback négatif"
+              >
+                <ThumbsDown className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )}
         </div>
 
         {titleAr && (
@@ -112,10 +134,24 @@ export default function ResourceScribdHeader({
           </div>
         )}
 
-        {/* Stats line — Scribd style */}
+        {/* Stats line — Scribd style. 2026-08-17: expanded to include
+            downloads count, rating, and comments count. Previously these
+            lived in a separate stats row below the page title. */}
         <div className="flex items-center gap-3 text-xs text-slate-500 mb-3 flex-wrap">
           <span className="inline-flex items-center gap-1">
             <Eye className="w-3.5 h-3.5" /> {formatNumber(viewsCount)} vues
+          </span>
+          <span className="text-slate-300">•</span>
+          <span className="inline-flex items-center gap-1">
+            <Download className="w-3.5 h-3.5" /> {formatNumber(downloadsCount)} téléchargements
+          </span>
+          <span className="text-slate-300">•</span>
+          <span className="inline-flex items-center gap-1">
+            <Star className="w-3.5 h-3.5" /> {avgRating.toFixed(1)}/5
+          </span>
+          <span className="text-slate-300">•</span>
+          <span className="inline-flex items-center gap-1">
+            <MessageCircle className="w-3.5 h-3.5" /> {commentsCount} commentaires
           </span>
           {pageCount ? (
             <>
@@ -168,53 +204,12 @@ export default function ResourceScribdHeader({
           </div>
         )}
 
-        {/* Secondary actions only — primary actions (download, save, share, print, embed)
-            were removed 2026-08-17 per user feedback. The page already has
-            its own ResourceActions component below the title, so duplicating
-            them here was redundant. */}
-        <div className="flex items-center gap-2 flex-wrap">
-          <button
-            onClick={handleAskAI}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-violet-700 bg-violet-50 hover:bg-violet-100 border border-violet-200 px-3 py-1.5 rounded-full transition"
-          >
-            <Sparkles className="w-3.5 h-3.5" /> Ask AI
-          </button>
-          <button
-            onClick={handleReport}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-800 bg-slate-50 hover:bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-full transition"
-          >
-            <Flag className="w-3.5 h-3.5" /> Signaler
-          </button>
-
-          {/* Feedback thumbs for AI improvement (Scribd has this too) */}
-          {aiImproved && (
-            <div className="ml-auto flex items-center gap-1">
-              <button
-                onClick={() => setFeedback('up')}
-                className={`p-1.5 rounded transition ${
-                  feedback === 'up' ? 'bg-emerald-100 text-emerald-700' : 'text-slate-400 hover:text-slate-600'
-                }`}
-                title="Améliorations utiles"
-                aria-label="Feedback positif"
-              >
-                <ThumbsUp className="w-3.5 h-3.5" />
-              </button>
-              <button
-                onClick={() => setFeedback('down')}
-                className={`p-1.5 rounded transition ${
-                  feedback === 'down' ? 'bg-rose-100 text-rose-700' : 'text-slate-400 hover:text-slate-600'
-                }`}
-                title="Améliorations non utiles"
-                aria-label="Feedback négatif"
-              >
-                <ThumbsDown className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          )}
-        </div>
+        {/* Feedback thumbs for AI improvement — moved to the right side
+            of the title row above (see line ~100). 2026-08-17: removed
+            Ask AI + Signaler buttons per user feedback. */}
       </div>
     </div>
   );
 }
 
-
+/* build-trigger: 2026-08-17 cache-bust */
