@@ -36,22 +36,6 @@ export interface ResourceScribdHeaderProps {
 
 const TRUNCATE_AT = 220;
 
-const KP_PALETTE_SHORT = [
-  'bg-rose-50 text-rose-700 border-rose-200',
-  'bg-fuchsia-50 text-fuchsia-700 border-fuchsia-200',
-  'bg-teal-50 text-teal-700 border-teal-200',
-  'bg-amber-50 text-amber-700 border-amber-200',
-  'bg-violet-50 text-violet-700 border-violet-200',
-];
-
-const KP_PALETTE_LONG = [
-  'bg-rose-100 text-rose-800 border-rose-300',
-  'bg-fuchsia-100 text-fuchsia-800 border-fuchsia-300',
-  'bg-teal-100 text-teal-800 border-teal-300',
-  'bg-amber-100 text-amber-800 border-amber-300',
-  'bg-violet-100 text-violet-800 border-violet-300',
-];
-
 export default function ResourceScribdHeader({
   resourceId,
   title,
@@ -206,20 +190,18 @@ export default function ResourceScribdHeader({
                   <span>{isArDoc ? 'النقاط الرئيسية' : 'Points clés'}</span>
                   <ChevronDown className="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform ml-auto" />
                 </summary>
+                {/* 2026-08-17: KP bubbles use a neutral style (no per-bubble
+                    color). Just text + border, same look for all bubbles. */}
                 <div className={`pl-6 py-2 flex flex-wrap gap-2 ${isArDoc ? 'justify-end' : 'justify-start'}`}>
-                  {mergedKP.map((kp, i) => {
-                    const palette = kp.isShort ? KP_PALETTE_SHORT : KP_PALETTE_LONG;
-                    const colorClass = palette[i % palette.length];
-                    return (
-                      <span
-                        key={i}
-                        dir={isArDoc ? 'rtl' : 'ltr'}
-                        className={`px-3 py-1 ${colorClass} border rounded-full text-xs font-semibold ${isArDoc ? 'text-right' : 'text-left'}`}
-                      >
-                        {kp.text}
-                      </span>
-                    );
-                  })}
+                  {mergedKP.map((kp, i) => (
+                    <span
+                      key={i}
+                      dir={isArDoc ? 'rtl' : 'ltr'}
+                      className={`px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded-full text-xs font-semibold hover:bg-slate-50 ${isArDoc ? 'text-right' : 'text-left'}`}
+                    >
+                      {kp.text}
+                    </span>
+                  ))}
                 </div>
               </details>
             )}
