@@ -22,9 +22,6 @@
 
 import { useState, type ReactNode } from 'react';
 import {
-  Sparkles,
-  ThumbsUp,
-  ThumbsDown,
   ChevronDown,
   ChevronUp,
   Eye,
@@ -89,7 +86,8 @@ export default function ResourceScribdHeader({
   isArDoc = false,
 }: ResourceScribdHeaderProps) {
   const [expanded, setExpanded] = useState(false);
-  const [feedback, setFeedback] = useState<'up' | 'down' | null>(null);
+  // 2026-08-17: feedback state removed (thumbs deleted)
+
 
   const hasLongDescription = (description?.length ?? 0) > TRUNCATE_AT;
   const visibleDescription = hasLongDescription && !expanded
@@ -106,40 +104,9 @@ export default function ResourceScribdHeader({
           <h1 className="flex-1 text-xl lg:text-2xl font-extrabold text-slate-900 leading-tight">
             {title}
           </h1>
-          {aiImproved && (
-            <span
-              className="inline-flex items-center gap-1 text-[10px] font-semibold text-violet-700 bg-violet-50 border border-violet-200 px-1.5 py-0.5 rounded-full flex-shrink-0 mt-1"
-              title="Titre et description améliorés par l'IA"
-            >
-              <Sparkles className="w-3 h-3" /> IA
-            </span>
-          )}
-
-          {/* Feedback thumbs for AI improvement (Scribd has this too) */}
-          {aiImproved && (
-            <div className="flex items-center gap-0.5 flex-shrink-0 mt-1">
-              <button
-                onClick={() => setFeedback('up')}
-                className={`p-1 rounded transition ${
-                  feedback === 'up' ? 'bg-emerald-100 text-emerald-700' : 'text-slate-400 hover:text-slate-600'
-                }`}
-                title="Améliorations utiles"
-                aria-label="Feedback positif"
-              >
-                <ThumbsUp className="w-3.5 h-3.5" />
-              </button>
-              <button
-                onClick={() => setFeedback('down')}
-                className={`p-1 rounded transition ${
-                  feedback === 'down' ? 'bg-rose-100 text-rose-700' : 'text-slate-400 hover:text-slate-600'
-                }`}
-                title="Améliorations non utiles"
-                aria-label="Feedback négatif"
-              >
-                <ThumbsDown className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          )}
+          {/* 2026-08-17: removed the IA badge and the feedback thumbs
+              (Scribd has these too but the user found them cluttering
+              the title row). */}
         </div>
 
         {titleAr && (
@@ -205,9 +172,9 @@ export default function ResourceScribdHeader({
           </div>
         ) : null}
 
-        {/* Transféré par attribution */}
+        {/* Transféré par attribution — right-aligned per user request 2026-08-17 */}
         {teacherName && (
-          <div className="text-xs text-slate-500 mb-3">
+          <div className="text-xs text-slate-500 mb-3 text-right">
             Transféré par{' '}
             {teacherProfileUrl ? (
               <a
@@ -231,13 +198,15 @@ export default function ResourceScribdHeader({
             the title. Collapsed by default to save vertical space.
             Both sections are optional — only render if data is provided. */}
         {(aiInsights?.length || aiKeyPoints?.length || aiShortKeyPoints?.length) ? (
-          <div className="border-t border-slate-100 pt-3 mt-3 space-y-2">
+          {/* 2026-08-17: removed the border-t and the mt-3/pt-3 to
+              tighten the gap between Transféré par and the AI sections. */}
+          <div className="pt-2 space-y-2">
             {aiInsights && aiInsights.length > 0 && (
               <details className="group">
                 <summary className="flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-primary-600 cursor-pointer list-none py-1.5">
                   <ListChecks className="w-4 h-4 text-primary-500" />
                   <span>{isArDoc ? 'نظرة عامة على التمارين' : 'Aperçu des exercices'}</span>
-                  <span className="text-[10px] font-bold bg-violet-100 text-violet-700 px-1.5 py-0.5 rounded-full">IA</span>
+                  <!-- IA badge removed 2026-08-17 -->
                   <span className="text-xs text-slate-400 ml-auto font-normal">
                     {aiInsights.length} {aiInsights.length > 1 ? 'items' : 'item'}
                   </span>
@@ -269,7 +238,7 @@ export default function ResourceScribdHeader({
                   <summary className="flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-primary-600 cursor-pointer list-none py-1.5">
                     <Target className="w-4 h-4 text-primary-500" />
                     <span>{isArDoc ? 'النقاط الرئيسية' : 'Points clés'}</span>
-                    <span className="text-[10px] font-bold bg-violet-100 text-violet-700 px-1.5 py-0.5 rounded-full">IA</span>
+                    <!-- IA badge removed 2026-08-17 -->
                     <span className="text-xs text-slate-400 ml-auto font-normal">
                       {merged.length} {merged.length > 1 ? 'notions' : 'notion'}
                     </span>
