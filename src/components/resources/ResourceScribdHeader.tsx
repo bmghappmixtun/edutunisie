@@ -271,5 +271,3 @@ export default function ResourceScribdHeader({
     </div>
   );
 }
-
-/* build-trigger: 2026-08-17 cache-bust */
