@@ -9,19 +9,19 @@ export default function Loading() {
   return (
     <div className="min-h-screen flex flex-col">
       {/* JSON-LD placeholders matching the 2 scripts in the page (course + breadcrumb).
-          The page renders them as the FIRST children of the wrapper, so the loading
-          must too — placing them inside <main> (the previous version) produced a
-          structural mismatch when the Suspense fallback was replaced by the streamed
-          content, triggering React #418/#422 hydration errors. */}
+          The page renders them as the FIRST children of the wrapper, so the
+          loading must also place them there. The previous version put them
+          inside the main element which caused a structural mismatch when the
+          Suspense fallback was replaced by the streamed content, triggering
+          React 418/422 hydration errors. */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: '{}' }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: '{}' }} />
 
       <main className="flex-1 pt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          {/* Breadcrumb nav skeleton — MUST be a <nav> with 7 children of
-              <a>/<svg> to match the page's <Link> + <ChevronRight /> structure.
-              For a PUBLISHED resource with subject + class, the page renders
-              exactly 7 children: 4 <Link> + 3 <ChevronRight />. */}
+          {/* Breadcrumb nav skeleton - MUST be a nav with 7 children
+              (4 Link + 3 ChevronRight icons) to match the page structure
+              for a PUBLISHED resource with subject + class. */}
           <nav
             aria-label="Fil d'Ariane"
             className="flex items-center gap-1 text-xs text-slate-500 mb-4 flex-wrap"
