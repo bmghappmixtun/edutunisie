@@ -206,7 +206,7 @@ export default function ResourceScribdHeader({
                 <summary className="flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-primary-600 cursor-pointer list-none py-1.5">
                   <ListChecks className="w-4 h-4 text-primary-500" />
                   <span>{isArDoc ? 'نظرة عامة على التمارين' : 'Aperçu des exercices'}</span>
-                  <!-- IA badge removed 2026-08-17 -->
+                  {/* IA badge removed 2026-08-17 */}
                   <span className="text-xs text-slate-400 ml-auto font-normal">
                     {aiInsights.length} {aiInsights.length > 1 ? 'items' : 'item'}
                   </span>
@@ -238,7 +238,7 @@ export default function ResourceScribdHeader({
                   <summary className="flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-primary-600 cursor-pointer list-none py-1.5">
                     <Target className="w-4 h-4 text-primary-500" />
                     <span>{isArDoc ? 'النقاط الرئيسية' : 'Points clés'}</span>
-                    <!-- IA badge removed 2026-08-17 -->
+                    {/* IA badge removed 2026-08-17 */}
                     <span className="text-xs text-slate-400 ml-auto font-normal">
                       {merged.length} {merged.length > 1 ? 'notions' : 'notion'}
                     </span>
