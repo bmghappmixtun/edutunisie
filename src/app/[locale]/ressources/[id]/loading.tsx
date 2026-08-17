@@ -3,23 +3,22 @@ import { Loader2, Eye, Download, Star, MessageCircle, FileText, ChevronRight } f
 /**
  * Per-route loading state for /ressources/[id]/[slug]
  *
- * Shows a skeleton with the Examanet loading icon while the page's
+ * Shows a skeleton with the Examanet loading icon while the page
  * async data (prisma query, auth, ratings) is being fetched.
  *
- * MUST mirror the page's outer element types/structure to avoid
- * React #418/#422/#419 hydration mismatches.
+ * MUST mirror the page outer element types/structure to avoid
+ * React 418/422/419 hydration mismatches.
  *
  * 2026-08-17 update: page layout was refactored to:
- *   - ResourceScribdHeader (replaces duplicate title card with badges + h1)
+ *   - ResourceScribdHeader (replaces duplicate title card)
  *   - PDF viewer
  *   - ResourceInfoPanel (moved from right sidebar, full-width)
  *   - RatingSection
  *   - CommentsSection
  *   - Similar resources
- * The right sidebar (teacher + info panel) was removed entirely. So
- * the loading skeleton is now single-column with the new component
- * order. We still keep a hidden placeholder for the sidebar to keep
- * the grid hydration-safe.
+ *
+ * The right sidebar was removed entirely. The loading skeleton is
+ * now single-column with the new component order.
  */
 export default function Loading() {
   return (
