@@ -405,11 +405,13 @@ export default async function ResourcePage({
                 ? `/professeurs/${resource.teacher.numericId}/${resource.teacher.slug}`
                 : null
             }
-            initialIsFavorited={false}
           />
 
-          <div className="grid lg:grid-cols-[1fr_360px] gap-6">
-            {/* MAIN */}
+          <div className="grid grid-cols-1 gap-6">
+            {/* MAIN — single column. Sidebar (teacher + info panel) was
+                removed 2026-08-17 to give the PDF viewer more width.
+                The teacher is now in the ScribdHeader ('Transféré par')
+                and the info panel is below the PDF viewer. */}
             <div>
               {/* ARCHIVED banner — shown to non-owners when the resource is no longer public */}
               {isArchived && (
@@ -895,6 +897,13 @@ export default async function ResourcePage({
               </div>
               )}
 
+              {/* Info Panel — moved from the right sidebar 2026-08-17.
+                  Shown below the PDF viewer so the PDF gets full width. */}
+              <ResourceInfoPanel
+                resource={resource}
+                hideClasse={resource.class?.level?.slug === 'lycee'}
+              />
+
               {/* Notation — hidden for archived resources (non-owners) */}
               {canViewBody && (
               <RatingSection
@@ -958,59 +967,10 @@ export default async function ResourcePage({
               )}
             </div>
 
-            {/* SIDEBAR */}
-            <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto">
-              {/* Prof */}
-              {resource.teacher && (
-                <div className="card p-5">
-                  <h3 className="font-bold text-sm mb-3 text-slate-500 uppercase">Enseignant</h3>
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 text-white font-bold text-lg flex items-center justify-center">
-                      {resource.teacher.firstName?.[0]}
-                      {resource.teacher.lastName?.[0]}
-                    </div>
-                    <div>
-                      <div className="font-bold">
-                        {resource.teacher.firstName} {resource.teacher.lastName}
-                      </div>
-                      {(resource.teacher.firstNameAr || resource.teacher.lastNameAr) && (
-                        <div className="text-sm text-slate-600" dir="rtl" lang="ar">
-                          {resource.teacher.firstNameAr} {resource.teacher.lastNameAr}
-                        </div>
-                      )}
-                      {(resource.teacher.schoolName || resource.teacher.schoolNameAr) && (
-                        <div className="text-xs text-slate-500 mt-1">
-                          {resource.teacher.schoolName}
-                          {resource.teacher.schoolNameAr && (
-                            <span className="block text-slate-400" dir="rtl" lang="ar">
-                              {resource.teacher.schoolNameAr}
-                            </span>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  {resource.teacher.bio && (
-                    <p className="text-sm text-slate-600 line-clamp-3">{resource.teacher.bio}</p>
-                  )}
-                  <Link
-                    href={`/professeurs/${resource.teacher.numericId}/${resource.teacher.slug}`}
-                    className="text-sm text-primary-600 font-semibold hover:underline mt-2 inline-block"
-                  >
-                    Voir le profil →
-                  </Link>
-                </div>
-              )}
-
-              {/* COMPLETE Info Panel — for lycée files we hide the "Classe" row
-                  because the AI summary card already shows it AND the title
-                  format encodes it ("... - 1AS (year)"). Other info (Type,
-                  Matière, Section, Trimestre, Année, Langue) stays. */}
-              <ResourceInfoPanel
-                resource={resource}
-                hideClasse={resource.class?.level?.slug === 'lycee'}
-              />
-            </aside>
+            {/* ResourceInfoPanel — moved here from the right sidebar
+                2026-08-17. The teacher card was removed (it's in the
+                ScribdHeader "Transféré par" attribution). Hide the "Classe"
+                row for lycée files (already in the title format). */}
           </div>
         </div>
       </main>
