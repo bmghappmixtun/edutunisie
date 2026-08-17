@@ -169,7 +169,12 @@ export default function PDFViewer({
     // right pages, and the scroll spy never fired. Same root cause as
     // the broken prev/next arrows in continuous mode.
     getScrollElement: () => containerRef.current,
-    estimateSize: () => 1100, // A4 portrait at 800px wide ≈ 1100px tall
+    // 2026-08-17: dynamic estimate based on the current container width.
+    // A4 portrait ratio is ~1.414 (height/width). On mobile, the
+    // container is narrow so pages are shorter; on desktop wider.
+    // Using a fixed 1100px caused huge empty gaps between pages on
+    // mobile (user feedback 2026-08-17).
+    estimateSize: () => Math.max(200, containerWidth * 1.414 + 32),
     overscan: 3, // render 3 pages above/below viewport for smooth scroll
     enabled: viewMode === 'continuous',
   });
@@ -474,10 +479,14 @@ export default function PDFViewer({
     try {
       const viewport = page.getViewport({ scale: 1 });
       setPageNaturalSize({ width: viewport.width, height: viewport.height });
+      // 2026-08-17: tell the virtualizer to remeasure the page so the
+      // total size matches the actual rendered height (not the estimate).
+      // Without this, there are large empty gaps between pages on mobile.
+      virtualizer.measure();
     } catch (e) {
       console.warn('[PDF] Could not capture page size:', e);
     }
-  }, []);
+  }, [virtualizer]);
 
   const handleCopy = useCallback(async () => {
     const selection = window.getSelection();
@@ -897,8 +906,8 @@ export default function PDFViewer({
             ref={scrollRef}
             className={
               viewMode === 'continuous'
-                ? 'flex flex-col items-center gap-4 min-h-full p-4'
-                : 'flex justify-center items-start min-h-full p-4'
+                ? 'flex flex-col items-center py-4 overflow-x-hidden'
+                : 'flex justify-center items-center p-4 overflow-x-hidden'
             }
           >
             <DocumentErrorBoundary onError={setError}>
