@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Propositions d'intégration des cards AI</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family: ui-sans-serif, system-ui, sans-serif; }
+  details summary { cursor: pointer; list-style: none; }
+  details summary::-webkit-details-marker { display: none; }
+  details[open] .chevron { transform: rotate(180deg); }
+  .chevron { transition: transform 0.2s; }
+</style>
+</head>
+<body class="bg-slate-50 p-6 max-w-4xl mx-auto space-y-8">
+
+<h1 class="text-3xl font-extrabold mb-2">3 propositions d'intégration</h1>
+<p class="text-slate-600 mb-6">Fusion des cards "Aperçu des exercices" + "Points clés" avec le header Scribd.</p>
+
+<!-- ============================================ -->
+<!-- OPTION A: Sections collapsibles inline       -->
+<!-- ============================================ -->
+<section>
+  <h2 class="text-xl font-bold mb-2">Option A — Sections collapsibles dans le header Scribd ⭐ recommandé</h2>
+  <p class="text-sm text-slate-600 mb-3">Une seule card contient TOUT : titre + 3 sections repliables. Le plus compact quand tout est fermé. Une card = un bloc visuel, navigation évidente.</p>
+  
+  <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+    <div class="p-5 lg:p-6">
+      <!-- Title + AI badge -->
+      <div class="flex items-start gap-2 mb-3">
+        <h1 class="flex-1 text-xl font-extrabold text-slate-900 leading-tight">
+          Devoir de Contrôle N°2 - Mathématiques - 4AS Section Sciences Expérimentales
+        </h1>
+        <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-violet-700 bg-violet-50 border border-violet-200 px-1.5 py-0.5 rounded-full flex-shrink-0 mt-1">✨ IA</span>
+      </div>
+
+      <!-- Stats -->
+      <div class="flex items-center gap-3 text-xs text-slate-500 mb-3 flex-wrap">
+        <span>👁 79 vues</span><span class="text-slate-300">•</span>
+        <span>⬇ 7 téléchargements</span><span class="text-slate-300">•</span>
+        <span>⭐ 0.0/5</span><span class="text-slate-300">•</span>
+        <span>💬 0 commentaires</span><span class="text-slate-300">•</span>
+        <span>📄 2 pages</span><span class="text-slate-300">•</span>
+        <span>85 KB</span>
+      </div>
+
+      <!-- Description -->
+      <p class="text-sm text-slate-700 leading-relaxed mb-3">
+        Ce document éducatif est un devoir de contrôle destiné aux élèves de la classe 4SC1, élaboré par le professeur Rachid Talbi. Il se compose de plusieurs exercices axés sur des concepts mathématiques avancés…
+      </p>
+
+      <!-- Transféré par -->
+      <div class="text-xs text-slate-500 mb-4">Transféré par <a class="font-semibold text-primary-600 hover:underline">Talbi Rachid</a></div>
+
+      <!-- AI sections, collapsed by default, all in the same card -->
+      <div class="border-t border-slate-100 pt-3 space-y-2">
+        <details class="group">
+          <summary class="flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-primary-600 py-2">
+            <span class="text-primary-500">📋</span>
+            Aperçu des exercices
+            <span class="text-[10px] font-bold bg-violet-100 text-violet-700 px-1.5 py-0.5 rounded-full">IA</span>
+            <span class="text-xs text-slate-400 ml-auto">2 exercices</span>
+            <svg class="chevron w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </summary>
+          <div class="pl-6 py-2 text-sm text-slate-600 space-y-2">
+            <div><strong>Exercice 1 (QCM):</strong> 5 questions à choix multiples sur les suites numériques.</div>
+            <div><strong>Exercice 2 (Analyse):</strong> Étude d'une fonction logarithme avec calcul de limites.</div>
+          </div>
+        </details>
+
+        <details class="group">
+          <summary class="flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-primary-600 py-2">
+            <span class="text-primary-500">🎯</span>
+            Points clés
+            <span class="text-[10px] font-bold bg-violet-100 text-violet-700 px-1.5 py-0.5 rounded-full">IA</span>
+            <span class="text-xs text-slate-400 ml-auto">5 notions</span>
+            <svg class="chevron w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </summary>
+          <div class="pl-6 py-2 flex flex-wrap gap-2">
+            <span class="px-3 py-1 bg-rose-50 text-rose-700 border border-rose-200 rounded-full text-xs font-semibold">Suites numériques</span>
+            <span class="px-3 py-1 bg-orange-50 text-orange-700 border border-orange-200 rounded-full text-xs font-semibold">Convergence</span>
+            <span class="px-3 py-1 bg-amber-50 text-amber-700 border border-amber-200 rounded-full text-xs font-semibold">Limites</span>
+            <span class="px-3 py-1 bg-yellow-50 text-yellow-700 border border-yellow-200 rounded-full text-xs font-semibold">Logarithme</span>
+            <span class="px-3 py-1 bg-lime-50 text-lime-700 border border-lime-200 rounded-full text-xs font-semibold">Dérivées</span>
+          </div>
+        </details>
+      </div>
+    </div>
+  </div>
+
+  <p class="text-xs text-slate-500 mt-2">↑ Tout est dans UNE card. Les 2 sections AI sont fermées par défaut → très compact. L'utilisateur expand ce qui l'intéresse.</p>
+</section>
+
+<!-- ============================================ -->
+<!-- OPTION B: Tabs navigation                    -->
+<!-- ============================================ -->
+<section>
+  <h2 class="text-xl font-bold mb-2">Option B — Tabs horizontales</h2>
+  <p class="text-sm text-slate-600 mb-3">Une card avec un système d'onglets. Une seule section visible à la fois. Très compact mais cache de l'info.</p>
+  
+  <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+    <div class="p-5 lg:p-6">
+      <h1 class="text-xl font-extrabold text-slate-900 mb-2">Devoir de Contrôle N°2 - Mathématiques - 4AS</h1>
+      <div class="text-xs text-slate-500 mb-4">Transféré par Talbi Rachid • 79 vues • 7 téléchargements</div>
+      
+      <div class="border-b border-slate-200 mb-3 flex gap-1">
+        <button class="px-4 py-2 text-sm font-semibold text-primary-600 border-b-2 border-primary-600">📋 Aperçu</button>
+        <button class="px-4 py-2 text-sm font-semibold text-slate-500 hover:text-slate-700">🎯 Points clés</button>
+        <button class="px-4 py-2 text-sm font-semibold text-slate-500 hover:text-slate-700">📝 Description</button>
+      </div>
+      
+      <div class="text-sm text-slate-700 space-y-2">
+        <div><strong>Exercice 1 (QCM):</strong> 5 questions à choix multiples sur les suites numériques.</div>
+        <div><strong>Exercice 2 (Analyse):</strong> Étude d'une fonction logarithme avec calcul de limites.</div>
+      </div>
+    </div>
+  </div>
+
+  <p class="text-xs text-slate-500 mt-2">↑ Compact mais cache de l'info. L'utilisateur doit cliquer pour voir les autres sections.</p>
+</section>
+
+<!-- ============================================ -->
+<!-- OPTION C: 2 columns side by side             -->
+<!-- ============================================ -->
+<section>
+  <h2 class="text-xl font-bold mb-2">Option C — 2 colonnes côte à côte</h2>
+  <p class="text-sm text-slate-600 mb-3">Une card, deux colonnes visibles en permanence. Plus large mais plus court verticalement.</p>
+  
+  <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+    <div class="p-5 lg:p-6">
+      <h1 class="text-xl font-extrabold text-slate-900 mb-2">Devoir de Contrôle N°2 - Mathématiques - 4AS</h1>
+      <div class="grid grid-cols-2 gap-4 mt-4">
+        <div class="border-r border-slate-200 pr-4">
+          <div class="flex items-center gap-2 mb-2 text-sm font-semibold text-slate-700">
+            <span class="text-primary-500">📋</span> Aperçu des exercices
+            <span class="text-[10px] font-bold bg-violet-100 text-violet-700 px-1.5 py-0.5 rounded-full">IA</span>
+          </div>
+          <div class="text-xs text-slate-600 space-y-2">
+            <div><strong>Ex 1:</strong> QCM sur les suites.</div>
+            <div><strong>Ex 2:</strong> Étude logarithme.</div>
+          </div>
+        </div>
+        <div>
+          <div class="flex items-center gap-2 mb-2 text-sm font-semibold text-slate-700">
+            <span class="text-primary-500">🎯</span> Points clés
+            <span class="text-[10px] font-bold bg-violet-100 text-violet-700 px-1.5 py-0.5 rounded-full">IA</span>
+          </div>
+          <div class="flex flex-wrap gap-1">
+            <span class="px-2 py-0.5 bg-rose-50 text-rose-700 border border-rose-200 rounded-full text-[10px] font-semibold">Suites</span>
+            <span class="px-2 py-0.5 bg-orange-50 text-orange-700 border border-orange-200 rounded-full text-[10px] font-semibold">Limites</span>
+            <span class="px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-full text-[10px] font-semibold">Logarithme</span>
+            <span class="px-2 py-0.5 bg-yellow-50 text-yellow-700 border border-yellow-200 rounded-full text-[10px] font-semibold">Dérivées</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="text-xs text-slate-500 mt-2">↑ Plus court verticalement mais nécessite plus de largeur. Sur mobile ça repasse en stack.</p>
+</section>
+
+<div class="bg-emerald-50 border-2 border-emerald-300 rounded-xl p-5 mt-8">
+  <h3 class="font-bold text-emerald-900 mb-2">⭐ Ma recommandation : Option A</h3>
+  <ul class="text-sm text-emerald-800 space-y-1">
+    <li>✓ <strong>Une seule card</strong> — un seul bloc visuel pour toute la méta-info du document</li>
+    <li>✓ Sections <strong>fermées par défaut</strong> — économise ~150px de hauteur</li>
+    <li>✓ L'utilisateur <strong>expand à la demande</strong> — il contrôle ce qu'il voit</li>
+    <li>✓ <strong>Hiérarchie claire</strong> : titre → description → détails AI (optionnels)</li>
+    <li>✓ <strong>Mobile-friendly</strong> — les détails s'ouvrent en dessous, pas de scroll horizontal</li>
+    <li>✓ Conserve les <strong>animations et compteurs</strong> (2 exercices, 5 notions)</li>
+  </ul>
+</div>
+
+</body>
+</html>
