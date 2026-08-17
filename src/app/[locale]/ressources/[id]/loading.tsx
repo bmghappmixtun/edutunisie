@@ -128,12 +128,15 @@ export default function Loading() {
                 </div>
               </div>
 
-              {/* PDF viewer card (matches page.tsx bg-white rounded-2xl) */}
+              {/* PDF viewer card (matches page.tsx bg-white rounded-2xl).
+                  2026-08-17 fix (nightly ERR-P3YJBK + ERR-5J325H): removed the
+                  orphaned "Aperçu du document" header skeleton. The header
+                  itself was removed from page.tsx in commit a34acc4 (PDF viewer
+                  cleanup) but the loading skeleton still rendered the title +
+                  link placeholders. The resulting child-count mismatch inside
+                  the PDF viewer card (skeleton=2, page=1) triggered React #419
+                  hydration errors on every PUBLISHED resource page. */}
               <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden mb-4">
-                <div className="px-6 lg:px-8 py-4 border-b border-slate-100 flex items-center justify-between">
-                  <div className="h-6 w-40 bg-slate-200 rounded animate-pulse" />
-                  <div className="h-4 w-32 bg-slate-100 rounded animate-pulse" />
-                </div>
                 <div className="p-0">
                   <div className="card p-4 h-[600px] flex items-center justify-center bg-slate-50">
                     <div className="text-center text-slate-400">
