@@ -20,7 +20,7 @@
  * Props are all serializable (strings, numbers, booleans, nullable fields).
  */
 
-import { useState, useMemo, type ReactNode } from 'react';
+import { useState, useMemo } from 'react';
 import {
   ChevronDown,
   ChevronUp,
@@ -271,3 +271,4 @@ export default function ResourceScribdHeader({
     </div>
   );
 }
+
