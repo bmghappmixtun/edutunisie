@@ -12,7 +12,6 @@ import LazyPDFViewer from '@/components/resources/LazyPDFViewer';
 import RatingSection from '@/components/resources/RatingSection';
 import CommentsSection from '@/components/resources/CommentsSection';
 import ResourceInfoPanel from '@/components/resources/ResourceInfoPanel';
-import AiDescription from '@/components/resources/AiDescription';
 import AiContentSection from '@/components/resources/AiContentSection';
 import AiExerciseOverview from '@/components/resources/AiExerciseOverview';
 import ResourceScribdHeader from '@/components/resources/ResourceScribdHeader';
@@ -43,7 +42,6 @@ import {
   Wrench,
   Building2,
   Target,
-  Sparkles,
 } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -480,9 +478,7 @@ export default async function ResourcePage({
                     below (with "Aperçu des exercices" and "Points clés" cards)
                     is kept. */}
 
-                                {/* AI-generated summary — render via AiDescription for the structured grid card.
-                    The general subject (الموضوع العام) is integrated inside the card
-                    as a labeled field with a Tag icon. */}
+                                {/* 2026-08-17: "Résumé intelligent" card removed. */}
                 {resource.aiSummary?.summary && (() => {
                   const summary = resource.aiSummary.summary;
                   const summaryOriginal = (resource.aiSummary as any)?.summaryOriginal || null;
@@ -521,39 +517,13 @@ export default async function ResourcePage({
                     }
                     return null;
                   })();
-                  return (
-                    <AiContentSection
-                      title={resource.language === 'ar' ? 'ملخص ذكي' : 'Résumé intelligent'}
-                      icon={<Sparkles className="w-4 h-4" />}
-                      subjectSlug={resource.subject?.slug}
-                      defaultOpen={false}
-                      className="mb-4"
-                    >
-                      <AiDescription
-                      hideTitle={true}
-                        text={summary}
-                        secondaryText={summaryOriginal}
-                        source={resource.aiSummary.modelUsed || 'gpt-4o-mini-batch-v1'}
-                        language={resource.language}
-                        headerData={resource.headerData as any}
-                        classNameFr={resource.class?.nameFr}
-                        classNameAr={resource.class?.nameAr}
-                        generalSubject={resource.metadata?.generalSubject}
-                        subjectSlug={resource.subject?.slug}
-                        systemName={resource.metadata?.systemName}
-                        subjectLabelOverride={resource.subject?.slug === 'technologie' ? 'التربية التكنولوجية' : null}
-                        isCollege={isCollege}
-                        dbSchoolNameFr={resource.schoolName}
-                        dbSchoolNameAr={null}
-                        dbTeacherNameFr={teacherFr}
-                        dbTeacherNameAr={teacherAr}
-                        aiSchoolName={resource.metadata?.schoolName ?? null}
-                        aiProfNames={resource.metadata?.profNames ?? null}
-                        schoolType={resource.schoolType}
-                        hideFields={hideFields}
-                      />
-                    </AiContentSection>
-                  );
+                  // 2026-08-17: removed the "Résumé intelligent" AiContentSection.
+                  // The description is already shown in the ScribdHeader above
+                  // (expandable "Description complète" toggle). Rendering the AI
+                  // summary again here was redundant. Kept: Aperçu des exercices
+                  // and Points clés (those have unique AI content not in the
+                  // header).
+                  return null;
                 })()}
 
                 {/* AI Exercise Overview — Per user rule (2026-08-10):
@@ -710,20 +680,6 @@ export default async function ResourcePage({
                 {/* 2026-08-17: removed the stats row (Vues, Téléchargements, Note,
                     Commentaires) — moved to the ScribdHeader above. */}
 
-                {canViewBody && (
-                <ResourceActions
-                  resourceId={resource.id}
-                  numericId={resource.numericId}
-                  slug={resource.slug}
-                  title={resource.title}
-                  fileUrl={`/api/resources/${resource.id}/download`}
-                  originalFileKey={resource.originalFileKey}
-                  originalFileName={resource.originalFileName}
-                  originalFormat={resource.originalFormat}
-                  isTeacher={userSession?.role === 'TEACHER' || userSession?.role === 'ADMIN'}
-                  isOwner={userSession?.id === resource.teacherId}
-                />
-                )}
               </div>
 
               {/* Aperçu PDF — hidden for archived resources (non-owners).
@@ -743,6 +699,26 @@ export default async function ResourcePage({
                   />
                 </div>
               </div>
+              )}
+
+              {/* Action buttons (ResourceActions) — moved here 2026-08-17
+                  from its old position (above the PDF viewer, in the title
+                  card). User wanted the action button grid (Télécharger,
+                  Lire en ligne, Imprimer, Favoris, Partager, Signaler) to
+                  be right under the PDF viewer for quick access. */}
+              {canViewBody && (
+                <ResourceActions
+                  resourceId={resource.id}
+                  numericId={resource.numericId}
+                  slug={resource.slug}
+                  title={resource.title}
+                  fileUrl={`/api/resources/${resource.id}/download`}
+                  originalFileKey={resource.originalFileKey}
+                  originalFileName={resource.originalFileName}
+                  originalFormat={resource.originalFormat}
+                  isTeacher={userSession?.role === 'TEACHER' || userSession?.role === 'ADMIN'}
+                  isOwner={userSession?.id === resource.teacherId}
+                />
               )}
 
               {/* Info Panel — moved from the right sidebar 2026-08-17.

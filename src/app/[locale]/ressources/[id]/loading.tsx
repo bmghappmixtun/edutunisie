@@ -79,10 +79,12 @@ export default function Loading() {
           {/* MAIN COLUMN — now single-column since the sidebar was removed */}
           <div className="grid grid-cols-1 gap-6">
             <div>
-              {/* AI card 1: Résumé intelligent (when description exists but no aiSummary) */}
-              <div className="hidden" aria-hidden="true" />
-              {/* AI card 2: AI-generated summary (when aiSummary.summary exists).
-                  Mirrors page.tsx — see the structure there. */}
+              {/* AI-generated summary skeleton (when aiSummary.summary exists).
+                  2026-08-17: removed the "Résumé intelligent" card from page.tsx
+                  (was redundant with the ScribdHeader description). The hidden
+                  placeholder that was here was also removed to keep the child
+                  count in sync. */}
+              <div className="bg-white rounded-2xl border border-slate-100 p-6 lg:p-8 mb-4">
               <div className="bg-white rounded-2xl border border-slate-100 p-6 lg:p-8 mb-4">
                 <div className="h-5 w-32 bg-slate-200 rounded mb-4 animate-pulse" />
                 <div className="space-y-3">
@@ -101,6 +103,17 @@ export default function Loading() {
                       <p className="text-sm">Chargement de l'aperçu PDF…</p>
                     </div>
                   </div>
+                </div>
+              </div>
+
+              {/* Action buttons skeleton (ResourceActions — moved here 2026-08-17
+                  from above the PDF viewer to right under it). 6 buttons in
+                  a 3-column grid. */}
+              <div className="bg-white rounded-2xl border border-slate-100 p-6 mb-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {[1, 2, 3, 4, 5, 6].map((i) => (
+                    <div key={i} className="h-10 bg-slate-200 rounded-lg animate-pulse" />
+                  ))}
                 </div>
               </div>
 
