@@ -65,7 +65,6 @@ export interface ResourceScribdHeaderProps {
   aiShortKeyPoints?: string[] | null;
   isArDoc?: boolean;
 }
-}
 
 const TRUNCATE_AT = 220;
 
