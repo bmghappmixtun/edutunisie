@@ -189,10 +189,7 @@ export default function ResourceScribdHeader({
                 <summary className="flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-primary-600 cursor-pointer list-none py-1.5">
                   <ListChecks className="w-4 h-4 text-primary-500" />
                   <span>{isArDoc ? 'نظرة عامة على التمارين' : 'Aperçu des exercices'}</span>
-                  <span className="text-xs text-slate-400 ml-auto font-normal">
-                    {aiInsights!.length} {aiInsights!.length > 1 ? 'items' : 'item'}
-                  </span>
-                  <ChevronDown className="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform" />
+                  <ChevronDown className="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform ml-auto" />
                 </summary>
                 <div className={`pl-6 py-2 text-sm text-slate-600 space-y-2 ${isArDoc ? 'text-right' : ''}`}>
                   {aiInsights!.map((item, i) => (
@@ -207,10 +204,7 @@ export default function ResourceScribdHeader({
                 <summary className="flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-primary-600 cursor-pointer list-none py-1.5">
                   <Target className="w-4 h-4 text-primary-500" />
                   <span>{isArDoc ? 'النقاط الرئيسية' : 'Points clés'}</span>
-                  <span className="text-xs text-slate-400 ml-auto font-normal">
-                    {mergedKP.length} {mergedKP.length > 1 ? 'notions' : 'notion'}
-                  </span>
-                  <ChevronDown className="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform" />
+                  <ChevronDown className="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform ml-auto" />
                 </summary>
                 <div className={`pl-6 py-2 flex flex-wrap gap-2 ${isArDoc ? 'justify-end' : 'justify-start'}`}>
                   {mergedKP.map((kp, i) => {
