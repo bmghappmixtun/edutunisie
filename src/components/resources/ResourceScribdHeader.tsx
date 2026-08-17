@@ -20,7 +20,7 @@
  * Props are all serializable (strings, numbers, booleans, nullable fields).
  */
 
-import { useState, type ReactNode } from 'react';
+import { useState, useMemo, type ReactNode } from 'react';
 import {
   ChevronDown,
   ChevronUp,
@@ -93,6 +93,19 @@ export default function ResourceScribdHeader({
   const visibleDescription = hasLongDescription && !expanded
     ? description!.slice(0, TRUNCATE_AT).trimEnd() + '…'
     : description;
+
+  // Merge short + long key points (alternate, max 10)
+  const mergedKP = useMemo(() => {
+    const longKps = aiKeyPoints || [];
+    const shortKps = aiShortKeyPoints || [];
+    const merged: { text: string; isShort: boolean }[] = [];
+    const maxLen = Math.max(longKps.length, shortKps.length);
+    for (let i = 0; i < maxLen && merged.length < 10; i++) {
+      if (i < shortKps.length) merged.push({ text: shortKps[i], isShort: true });
+      if (i < longKps.length && merged.length < 10) merged.push({ text: longKps[i], isShort: false });
+    }
+    return merged;
+  }, [aiKeyPoints, aiShortKeyPoints]);
 
   // ---- Handlers (all internal, no event-handler props) ----
 
@@ -222,49 +235,36 @@ export default function ResourceScribdHeader({
               </details>
             )}
 
-            {(aiKeyPoints?.length || aiShortKeyPoints?.length) ? (() => {
-              // Alternate short and long KP, capped at 10 total
-              const longKps = aiKeyPoints || [];
-              const shortKps = aiShortKeyPoints || [];
-              const merged: { text: string; isShort: boolean }[] = [];
-              const maxLen = Math.max(longKps.length, shortKps.length);
-              for (let i = 0; i < maxLen && merged.length < 10; i++) {
-                if (i < shortKps.length) merged.push({ text: shortKps[i], isShort: true });
-                if (i < longKps.length && merged.length < 10) merged.push({ text: longKps[i], isShort: false });
-              }
-              if (merged.length === 0) return null;
-              return (
-                <details className="group">
-                  <summary className="flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-primary-600 cursor-pointer list-none py-1.5">
-                    <Target className="w-4 h-4 text-primary-500" />
-                    <span>{isArDoc ? 'النقاط الرئيسية' : 'Points clés'}</span>
-                    {/* IA badge removed 2026-08-17 */}
-                    <span className="text-xs text-slate-400 ml-auto font-normal">
-                      {merged.length} {merged.length > 1 ? 'notions' : 'notion'}
-                    </span>
-                    <ChevronDown className="chevron w-4 h-4 text-slate-400" />
-                  </summary>
-                  <div className={`pl-6 py-2 flex flex-wrap gap-2 ${isArDoc ? 'justify-end' : 'justify-start'}`}>
-                    {merged.map((kp, i) => {
-                      const palette = kp.isShort
-                        ? ['bg-rose-50 text-rose-700 border-rose-200', 'bg-fuchsia-50 text-fuchsia-700 border-fuchsia-200', 'bg-teal-50 text-teal-700 border-teal-200', 'bg-amber-50 text-amber-700 border-amber-200', 'bg-violet-50 text-violet-700 border-violet-200']
-                        : ['bg-rose-100 text-rose-800 border-rose-300', 'bg-fuchsia-100 text-fuchsia-800 border-fuchsia-300', 'bg-teal-100 text-teal-800 border-teal-300', 'bg-amber-100 text-amber-800 border-amber-300', 'bg-violet-100 text-violet-800 border-violet-300'];
-                      const colorClass = palette[i % palette.length];
-                      const isAr = isArDoc;
-                      return (
-                        <span
-                          key={i}
-                          dir={isAr ? 'rtl' : 'ltr'}
-                          className={`px-3 py-1 ${colorClass} border rounded-full text-xs font-semibold ${isAr ? 'text-right' : 'text-left'}`}
-                        >
-                          {kp.text}
-                        </span>
-                      );
-                    })}
-                  </div>
-                </details>
-              );
-            })() : null}
+            {mergedKP.length > 0 && (
+              <details className="group">
+                <summary className="flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-primary-600 cursor-pointer list-none py-1.5">
+                  <Target className="w-4 h-4 text-primary-500" />
+                  <span>{isArDoc ? 'النقاط الرئيسية' : 'Points clés'}</span>
+                  {/* IA badge removed 2026-08-17 */}
+                  <span className="text-xs text-slate-400 ml-auto font-normal">
+                    {mergedKP.length} {mergedKP.length > 1 ? 'notions' : 'notion'}
+                  </span>
+                  <ChevronDown className="chevron w-4 h-4 text-slate-400" />
+                </summary>
+                <div className={`pl-6 py-2 flex flex-wrap gap-2 ${isArDoc ? 'justify-end' : 'justify-start'}`}>
+                  {mergedKP.map((kp, i) => {
+                    const palette = kp.isShort
+                      ? ['bg-rose-50 text-rose-700 border-rose-200', 'bg-fuchsia-50 text-fuchsia-700 border-fuchsia-200', 'bg-teal-50 text-teal-700 border-teal-200', 'bg-amber-50 text-amber-700 border-amber-200', 'bg-violet-50 text-violet-700 border-violet-200']
+                      : ['bg-rose-100 text-rose-800 border-rose-300', 'bg-fuchsia-100 text-fuchsia-800 border-fuchsia-300', 'bg-teal-100 text-teal-800 border-teal-300', 'bg-amber-100 text-amber-800 border-amber-300', 'bg-violet-100 text-violet-800 border-violet-300'];
+                    const colorClass = palette[i % palette.length];
+                    return (
+                      <span
+                        key={i}
+                        dir={isArDoc ? 'rtl' : 'ltr'}
+                        className={`px-3 py-1 ${colorClass} border rounded-full text-xs font-semibold ${isArDoc ? 'text-right' : 'text-left'}`}
+                      >
+                        {kp.text}
+                      </span>
+                    );
+                  })}
+                </div>
+              </details>
+            )}
           </div>
         ) : null}
       </div>
