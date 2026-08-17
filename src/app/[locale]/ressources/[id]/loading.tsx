@@ -1,25 +1,10 @@
 import { Loader2, Eye, Download, Star, MessageCircle, FileText, ChevronRight } from 'lucide-react';
 
-/**
- * Per-route loading state for /ressources/[id]/[slug]
- *
- * Shows a skeleton with the Examanet loading icon while the page
- * async data (prisma query, auth, ratings) is being fetched.
- *
- * MUST mirror the page outer element types/structure to avoid
- * React 418/422/419 hydration mismatches.
- *
- * 2026-08-17 update: page layout was refactored to:
- *   - ResourceScribdHeader (replaces duplicate title card)
- *   - PDF viewer
- *   - ResourceInfoPanel (moved from right sidebar, full-width)
- *   - RatingSection
- *   - CommentsSection
- *   - Similar resources
- *
- * The right sidebar was removed entirely. The loading skeleton is
- * now single-column with the new component order.
- */
+// Per-route loading state for /ressources/[id]/[slug]
+// Shows a skeleton while the page async data is being fetched.
+// MUST mirror the page outer element types/structure to avoid
+// React 418/422/419 hydration mismatches.
+// 2026-08-17: page layout refactored — sidebar removed, single column.
 export default function Loading() {
   return (
     <div className="min-h-screen flex flex-col">
