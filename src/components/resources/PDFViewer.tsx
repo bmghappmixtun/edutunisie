@@ -375,6 +375,21 @@ export default function PDFViewer({
         case 'F':
           if (!e.ctrlKey && !e.metaKey) toggleFullscreen();
           break;
+        case 's':
+        case 'S':
+          // 2026-08-17: Niveau 1.4 — keyboard shortcut to toggle sidebar
+          if (!e.ctrlKey && !e.metaKey) setSidebarOpen((o) => !o);
+          break;
+        case 'Escape':
+          // 2026-08-17: Niveau 1.4 — close sidebar first, then exit fullscreen
+          if (sidebarOpen) {
+            setSidebarOpen(false);
+            e.preventDefault();
+          } else if (isFullscreen) {
+            document.exitFullscreen().catch(() => {});
+            e.preventDefault();
+          }
+          break;
       }
     };
     window.addEventListener('keydown', handler);

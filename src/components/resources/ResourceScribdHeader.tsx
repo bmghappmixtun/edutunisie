@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import {
   ChevronDown,
   ChevronUp,
@@ -11,6 +11,7 @@ import {
   MessageCircle,
   ListChecks,
   Target,
+  Clock,
 } from 'lucide-react';
 import { formatNumber } from '@/lib/utils';
 
@@ -56,6 +57,33 @@ export default function ResourceScribdHeader({
   isArDoc = false,
 }: ResourceScribdHeaderProps) {
   const [expanded, setExpanded] = useState(false);
+  // 2026-08-17 (Niveau 1.2): auto-collapse AI accordions when the user
+  // scrolls into the PDF viewer. They stay closed until the user clicks
+  // them again. Tracked via a sentinel element placed just above the
+  // PDF viewer.
+  const [aiOpen, setAiOpen] = useState(false);
+  const detailsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const sentinel = document.getElementById('pdf-viewer-sentinel');
+    if (!sentinel) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // When sentinel is out of view (user scrolled past it), close accordions
+        if (!entry.isIntersecting) setAiOpen(false);
+      },
+      { threshold: 0, rootMargin: '-100px 0px 0px 0px' }
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, []);
+
+  // 2026-08-17 (Niveau 1.3): reading time estimate. ~1.5 minutes per page
+  // for academic content, rounded up to the nearest minute.
+  const readingTimeMin = useMemo(() => {
+    if (!pageCount) return null;
+    return Math.max(1, Math.ceil(pageCount * 1.5));
+  }, [pageCount]);
 
   const hasLongDescription = (description?.length ?? 0) > TRUNCATE_AT;
   const visibleDescription = hasLongDescription && !expanded
@@ -122,6 +150,14 @@ export default function ResourceScribdHeader({
               </span>
             </>
           ) : null}
+          {readingTimeMin ? (
+            <>
+              <span className="text-slate-300">•</span>
+              <span className="inline-flex items-center gap-1">
+                <Clock className="w-3.5 h-3.5" /> ≈ {readingTimeMin} min de lecture
+              </span>
+            </>
+          ) : null}
           {fileSize ? (
             <>
               <span className="text-slate-300">•</span>
@@ -167,9 +203,13 @@ export default function ResourceScribdHeader({
 
         {/* AI sections as collapsible accordions */}
         {hasAnyAI && (
-          <div className="pt-2 space-y-2">
+          <div ref={detailsRef} className="pt-2 space-y-2">
             {hasInsights && (
-              <details className="group">
+              <details
+                className="group"
+                open={aiOpen}
+                onToggle={(e) => setAiOpen((e.target as HTMLDetailsElement).open)}
+              >
                 <summary className="flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-primary-600 cursor-pointer list-none py-1.5">
                   <ListChecks className="w-4 h-4 text-primary-500" />
                   <span>{isArDoc ? 'نظرة عامة على التمارين' : 'Aperçu des exercices'}</span>
@@ -184,7 +224,11 @@ export default function ResourceScribdHeader({
             )}
 
             {hasKeyPoints && (
-              <details className="group">
+              <details
+                className="group"
+                open={aiOpen}
+                onToggle={(e) => setAiOpen((e.target as HTMLDetailsElement).open)}
+              >
                 <summary className="flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-primary-600 cursor-pointer list-none py-1.5">
                   <Target className="w-4 h-4 text-primary-500" />
                   <span>{isArDoc ? 'النقاط الرئيسية' : 'Points clés'}</span>

@@ -15,6 +15,7 @@ import ResourceInfoPanel from '@/components/resources/ResourceInfoPanel';
 import AiContentSection from '@/components/resources/AiContentSection';
 import AiExerciseOverview from '@/components/resources/AiExerciseOverview';
 import ResourceScribdHeader from '@/components/resources/ResourceScribdHeader';
+import ResourceStickyBar from '@/components/resources/ResourceStickyBar';
 import { getPaletteForSubject } from '@/lib/ai-palettes';
 // NOTE: getPaletteForSubject is kept for future use but currently no consumer
 // in this file (the "Sujets abordés" section was removed 2026-08-02 since
@@ -375,6 +376,22 @@ export default async function ResourcePage({
           </nav>
 
           {/* ============================================================
+              STICKY TITLE BAR (Niveau 1.1, 2026-08-17)
+              Appears at the top of the viewport when the user scrolls
+              past the main ResourceScribdHeader. The sticky bar watches
+              a sentinel placed just below the main header — when the
+              sentinel scrolls out of view, the bar slides in.
+             ============================================================ */}
+          <ResourceStickyBar
+            title={(() => {
+              const { fr } = splitArabicSubject(resource.title);
+              return fr;
+            })()}
+            pageCount={resource.pageCount ?? null}
+          />
+          <div id="sticky-bar-sentinel" aria-hidden="true" />
+
+          {/* ============================================================
               SCRIBD-STYLE HEADER (NEW 2026-08-16)
               Renders above the existing 2-col grid. Gives the resource page
               the modern look from fr.scribd.com — big title, stats line,
@@ -613,6 +630,10 @@ export default async function ResourcePage({
                   the viewer itself is self-explanatory. */}
               {canViewBody && (
               <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden mb-4">
+                {/* Sentinel for AI accordion auto-collapse. The ScribdHeader
+                    watches this element via IntersectionObserver — when it
+                    scrolls out of view, the AI accordions close. */}
+                <div id="pdf-viewer-sentinel" aria-hidden="true" />
                 <div className="p-0">
                   <LazyPDFViewer
                     url={`/api/resources/${resource.id}/download`}
