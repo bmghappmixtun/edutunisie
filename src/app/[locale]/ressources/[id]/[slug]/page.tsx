@@ -389,10 +389,6 @@ export default async function ResourcePage({
             })()}
             pageCount={resource.pageCount ?? null}
           />
-          {/* Sentinel for sticky bar. Has a real height so the
-              IntersectionObserver / scroll listener can track it
-              reliably across all browsers. */}
-          <div id="sticky-bar-sentinel" aria-hidden="true" style={{ height: 1 }} />
 
           {/* ============================================================
               SCRIBD-STYLE HEADER (NEW 2026-08-16)
@@ -446,6 +442,12 @@ export default async function ResourcePage({
               return resource.language === 'ar' && !isPilotePhysiqueCollege;
             })()}
           />
+
+          {/* Sentinel for sticky bar. Placed AFTER the ResourceScribdHeader
+              so the sticky bar only shows once the user has scrolled past
+              the résumé card (user feedback 2026-08-18). Has a real height
+              so the scroll listener can track it reliably. */}
+          <div id="sticky-bar-sentinel" aria-hidden="true" style={{ height: 1 }} />
 
           <div className="grid grid-cols-1 gap-6">
             {/* MAIN — single column. Sidebar (teacher + info panel) was
