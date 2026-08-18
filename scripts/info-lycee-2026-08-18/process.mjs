@@ -294,12 +294,9 @@ async function main() {
           resourceUpdate.teacherNameAr = profStr;
         }
       }
-      if (ai.duration && r.duration !== ai.duration) {
-        resourceUpdate.duration = ai.duration;
-      }
+      // Note: duration, extractedAt are on ResourceMetadata, not Resource
       // Always update headerData with full AI result
       resourceUpdate.headerData = ai;
-      resourceUpdate.extractedAt = new Date();
 
       // 3. Reclassify subject (if needed)
       if (ai.subject) {
