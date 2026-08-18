@@ -46,18 +46,25 @@ export default function Loading() {
             </div>
           </div>
 
-          {/* MAIN COLUMN */}
+          {/* MAIN COLUMN
+              2026-08-18 fix (nightly ERR-BRSXYQ + ERR-JEA95Y): the page tree
+              has 7 direct children of the inner <div> for a typical PUBLISHED
+              resource (empty card + PDF viewer + ResourceActions + ResourceInfoPanel
+              + RatingSection + CommentsSection + Similar). The loading skeleton
+              was only rendering 4 children, which caused a React #418/#419
+              hydration mismatch (child count differs from the page's tree).
+              Added the 3 missing skeleton placeholders (ResourceActions,
+              CommentsSection, Similar) and reduced the AI summary skeleton to
+              an empty card so its internal child count (0) matches the page's
+              empty card (which contains 0 or 1 Product block for tech college
+              only). The PDF viewer, ResourceInfoPanel, and Rating skeletons
+              already matched the page. */}
           <div className="grid grid-cols-1 gap-6">
             <div>
-              {/* AI summary skeleton */}
-              <div className="bg-white rounded-2xl border border-slate-100 p-6 lg:p-8 mb-4">
-                <div className="h-5 w-32 bg-slate-200 rounded mb-4 animate-pulse" />
-                <div className="space-y-3">
-                  <div className="h-3 w-full bg-slate-100 rounded animate-pulse" />
-                  <div className="h-3 w-4/5 bg-slate-100 rounded animate-pulse" />
-                  <div className="h-3 w-3/4 bg-slate-100 rounded animate-pulse" />
-                </div>
-              </div>
+              {/* Empty card — matches page.tsx empty card which has 0 children
+                  for typical resources. The Product block (tech college only)
+                  is hidden during loading. */}
+              <div className="bg-white rounded-2xl border border-slate-100 p-6 lg:p-8 mb-4"></div>
 
               {/* PDF viewer card (matches page.tsx bg-white rounded-2xl).
                   2026-08-17 fix (nightly ERR-P3YJBK + ERR-5J325H): removed the
@@ -75,6 +82,22 @@ export default function Loading() {
                       <p className="text-sm">Chargement de l'aperçu PDF…</p>
                     </div>
                   </div>
+                </div>
+              </div>
+
+              {/* ResourceActions skeleton — added 2026-08-18 to match the page's
+                  always-rendered <ResourceActions> wrapper (mt-4 div). 6 button
+                  placeholders for Télécharger / Lire en ligne / Imprimer /
+                  Favoris / Partager / Signaler. */}
+              <div className="mt-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {[1, 2, 3, 4, 5, 6].map((i) => (
+                    <div
+                      key={i}
+                      className="h-9 bg-slate-100 rounded-lg animate-pulse"
+                      aria-hidden="true"
+                    />
+                  ))}
                 </div>
               </div>
 
@@ -112,6 +135,37 @@ export default function Loading() {
                       </div>
                     ))}
                   </div>
+                </div>
+              </div>
+
+              {/* CommentsSection skeleton — added 2026-08-18 to match the page's
+                  CommentsSection wrapper (bg-white rounded-2xl p-6 lg:p-8 mb-4).
+                  Single textarea placeholder + submit button. */}
+              <div className="bg-white rounded-2xl border border-slate-100 p-6 lg:p-8 mb-4">
+                <div className="h-5 w-32 bg-slate-200 rounded mb-4 animate-pulse" />
+                <div className="h-20 w-full bg-slate-100 rounded-lg animate-pulse mb-3" />
+                <div className="h-9 w-32 bg-slate-200 rounded-lg animate-pulse" />
+              </div>
+
+              {/* Similar resources skeleton — added 2026-08-18 to match the
+                  page's Similaires wrapper (mt-6 div with 2x2 grid of cards).
+                  4 card placeholders. */}
+              <div className="mt-6">
+                <div className="h-6 w-48 bg-slate-200 rounded mb-4 animate-pulse" />
+                <div className="grid sm:grid-cols-2 gap-4">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div
+                      key={i}
+                      className="card p-4 flex gap-3"
+                      aria-hidden="true"
+                    >
+                      <div className="w-16 h-20 bg-slate-100 rounded animate-pulse flex-shrink-0" />
+                      <div className="flex-1 min-w-0 space-y-2">
+                        <div className="h-3 w-full bg-slate-100 rounded animate-pulse" />
+                        <div className="h-3 w-3/4 bg-slate-100 rounded animate-pulse" />
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
