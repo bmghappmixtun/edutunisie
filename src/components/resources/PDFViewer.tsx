@@ -147,6 +147,15 @@ export default function PDFViewer({
   const [loading, setLoading] = useState(true);
   const [containerWidth, setContainerWidth] = useState<number>(800);
   const [containerHeight, setContainerHeight] = useState<number>(600);
+  // 2026-08-18 — PDF loading UX (Niveau 4 polish):
+  // - loadProgress: 0-1, reported by react-pdf Document onProgress
+  // - readingProgress: 0-1, scroll position vs scrollable height
+  // - renderingPages: Set of page numbers currently being rendered
+  // - isSlowConnection: true if the initial load takes > 8s
+  const [loadProgress, setLoadProgress] = useState<number>(0);
+  const [readingProgress, setReadingProgress] = useState<number>(0);
+  const [renderingPages, setRenderingPages] = useState<Set<number>>(new Set());
+  const [isSlowConnection, setIsSlowConnection] = useState(false);
   const [pageNaturalSize, setPageNaturalSize] = useState<{ width: number; height: number } | null>(
     null,
   );
@@ -169,7 +178,12 @@ export default function PDFViewer({
     // right pages, and the scroll spy never fired. Same root cause as
     // the broken prev/next arrows in continuous mode.
     getScrollElement: () => containerRef.current,
-    estimateSize: () => 1100, // A4 portrait at 800px wide ≈ 1100px tall
+    // 2026-08-17: dynamic estimate based on the current container width.
+    // A4 portrait ratio is ~1.414 (height/width). On mobile, the
+    // container is narrow so pages are shorter; on desktop wider.
+    // Using a fixed 1100px caused huge empty gaps between pages on
+    // mobile (user feedback 2026-08-17).
+    estimateSize: () => Math.max(200, containerWidth * 1.414 + 32),
     overscan: 3, // render 3 pages above/below viewport for smooth scroll
     enabled: viewMode === 'continuous',
   });
@@ -210,6 +224,17 @@ export default function PDFViewer({
   const pageRefsMap = useRef<Map<number, HTMLDivElement | null>>(new Map());
 
   // ==========================================================================
+  // 2026-08-18 — Slow connection detection (Niveau 4 polish).
+  // If the document takes more than 8s to load, show a "slow
+  // connection" warning. The timer is reset on each retry.
+  // ==========================================================================
+  useEffect(() => {
+    if (!loading) return;
+    const timer = setTimeout(() => setIsSlowConnection(true), 8000);
+    return () => clearTimeout(timer);
+  }, [loading]);
+
+  // ==========================================================================
   // Scroll spy — track current page in continuous mode
   // ==========================================================================
   useEffect(() => {
@@ -224,6 +249,13 @@ export default function PDFViewer({
       if (isScrollSpyUpdate.current) return;
       if (timer) clearTimeout(timer);
       timer = setTimeout(() => {
+        // 2026-08-18: also update the reading progress bar
+        // (scroll position / scrollable height, 0-1)
+        const scrollable = el.scrollHeight - el.clientHeight;
+        if (scrollable > 0) {
+          const progress = Math.min(1, Math.max(0, el.scrollTop / scrollable));
+          setReadingProgress(progress);
+        }
         // Use getBoundingClientRect for accurate viewport-relative
         // positions. The viewport center is the center of containerRef
         // in the viewport. Each card's center is its own rect's center.
@@ -370,6 +402,21 @@ export default function PDFViewer({
         case 'F':
           if (!e.ctrlKey && !e.metaKey) toggleFullscreen();
           break;
+        case 's':
+        case 'S':
+          // 2026-08-17: Niveau 1.4 — keyboard shortcut to toggle sidebar
+          if (!e.ctrlKey && !e.metaKey) setSidebarOpen((o) => !o);
+          break;
+        case 'Escape':
+          // 2026-08-17: Niveau 1.4 — close sidebar first, then exit fullscreen
+          if (sidebarOpen) {
+            setSidebarOpen(false);
+            e.preventDefault();
+          } else if (isFullscreen) {
+            document.exitFullscreen().catch(() => {});
+            e.preventDefault();
+          }
+          break;
       }
     };
     window.addEventListener('keydown', handler);
@@ -461,6 +508,8 @@ export default function PDFViewer({
     setLoading(false);
     setError(null);
     setWorkerReady(true);
+    setLoadProgress(1);
+    setIsSlowConnection(false);
   }, []);
 
   const onLoadError = useCallback((err: Error) => {
@@ -470,14 +519,59 @@ export default function PDFViewer({
     setWorkerReady(false);
   }, []);
 
+  // 2026-08-18: react-pdf Document onLoadProgress callback
+  // (loaded bytes / total bytes, 0-1). Note: this only fires when
+  // the PDF is being downloaded over the network. If the file is
+  // already in the browser cache, the load is instant and the
+  // callback never fires — loadProgress stays at 0 until onLoadSuccess.
+  // The UI handles this by showing a generic "Chargement…" label
+  // when progress is still 0 after a brief moment.
+  const onLoadProgress = useCallback(({ loaded, total }: { loaded: number; total: number }) => {
+    if (total > 0) {
+      setLoadProgress(Math.min(1, loaded / total));
+    }
+  }, []);
+
   const onPageLoadSuccess = useCallback((page: any) => {
     try {
       const viewport = page.getViewport({ scale: 1 });
       setPageNaturalSize({ width: viewport.width, height: viewport.height });
+      // 2026-08-17: tell the virtualizer to remeasure the page so the
+      // total size matches the actual rendered height (not the estimate).
+      // Without this, there are large empty gaps between pages on mobile.
+      virtualizer.measure();
+      // 2026-08-18: mark this page as no longer rendering
+      setRenderingPages((prev) => {
+        if (!prev.has(page.pageNumber)) return prev;
+        const next = new Set(prev);
+        next.delete(page.pageNumber);
+        return next;
+      });
     } catch (e) {
       console.warn('[PDF] Could not capture page size:', e);
     }
+  }, [virtualizer]);
+
+  // 2026-08-18: track pages that start rendering (so the "Rendu page X/N"
+  // indicator knows what's pending). Called before the page actually renders.
+  const onPageRenderStart = useCallback((pageNum: number) => {
+    setRenderingPages((prev) => {
+      if (prev.has(pageNum)) return prev;
+      const next = new Set(prev);
+      next.add(pageNum);
+      return next;
+    });
   }, []);
+
+  // 2026-08-18: when pageNumber changes (user nav or scroll spy),
+  // mark the new page as rendering. The Page component will then
+  // remove it from the set once it finishes rendering.
+  useEffect(() => {
+    if (pageNumber && numPages) {
+      onPageRenderStart(pageNumber);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pageNumber, numPages]);
 
   const handleCopy = useCallback(async () => {
     const selection = window.getSelection();
@@ -549,6 +643,31 @@ export default function PDFViewer({
           : 'rounded-2xl border border-slate-200 shadow-sm'
       }`}
     >
+      {/* === READING PROGRESS BAR (Niveau 4, 2026-08-18) === */}
+      {/* Thin gradient bar at the very top of the viewer. Shows scroll
+          progress through the document. Click anywhere on it to jump. */}
+      <div
+        className="absolute top-0 left-0 right-0 h-1 bg-slate-100 z-30 cursor-pointer"
+        onClick={(e) => {
+          // 2026-08-18: click on the progress bar to jump to that
+          // position in the document
+          if (!containerRef.current) return;
+          const rect = e.currentTarget.getBoundingClientRect();
+          const ratio = (e.clientX - rect.left) / rect.width;
+          const target = ratio * (containerRef.current.scrollHeight - containerRef.current.clientHeight);
+          containerRef.current.scrollTo({ top: target, behavior: 'smooth' });
+        }}
+        role="progressbar"
+        aria-valuenow={Math.round(readingProgress * 100)}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label="Progression de lecture"
+      >
+        <div
+          className="h-full bg-gradient-to-r from-primary-500 via-fuchsia-500 to-amber-500 transition-[width] duration-100"
+          style={{ width: `${Math.round(readingProgress * 100)}%` }}
+        />
+      </div>
       {/* === SIDEBAR (desktop only) === */}
       {sidebarOpen && !isFullscreen && (
         <div className="hidden lg:block">
@@ -592,6 +711,11 @@ export default function PDFViewer({
         <div className="px-2.5 h-10 text-sm font-bold font-mono tabular-nums min-w-[92px] flex items-center justify-center gap-0.5 whitespace-nowrap">
           {numPages ? (
             <>
+              {/* 2026-08-18: page loader indicator — shows a small spinner
+                  when the current page is still being rendered */}
+              {renderingPages.has(pageNumber) && (
+                <Loader2 className="w-3 h-3 text-primary-300 animate-spin mr-1" />
+              )}
               <input
                 type="number"
                 min={1}
@@ -897,8 +1021,8 @@ export default function PDFViewer({
             ref={scrollRef}
             className={
               viewMode === 'continuous'
-                ? 'flex flex-col items-center gap-4 min-h-full p-4'
-                : 'flex justify-center items-start min-h-full p-4'
+                ? 'flex flex-col items-center py-4 overflow-x-hidden'
+                : 'flex justify-center items-center p-4 overflow-x-hidden'
             }
           >
             <DocumentErrorBoundary onError={setError}>
@@ -906,11 +1030,35 @@ export default function PDFViewer({
                 file={url}
                 onLoadSuccess={onLoadSuccess}
                 onLoadError={onLoadError}
+                onLoadProgress={onLoadProgress}
                 options={documentOptions}
                 loading={
                   <div className="flex items-center justify-center min-h-[500px]">
-                    <div className="text-center">
-                      <Loader2 className="w-10 h-10 mx-auto mb-2 text-primary-500 animate-spin" />
+                    <div className="text-center max-w-xs">
+                      {/* 2026-08-18: skeleton page placeholder with shimmer
+                          (Niveau 4 polish). Gray rectangle with animated
+                          gradient to indicate loading state. Uses the
+                          .animate-shimmer class from globals.css. */}
+                      <div className="relative w-48 h-64 mx-auto mb-4 bg-slate-200 rounded-lg overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/60 to-transparent animate-shimmer" />
+                      </div>
+                      <Loader2 className="w-6 h-6 mx-auto mb-2 text-primary-500 animate-spin" />
+                      {/* 2026-08-18: show "Téléchargement X%" only when
+                          progress is actually > 0. If it's 0, the PDF
+                          is either in browser cache (loadProgress never
+                          fires) or the download is too fast to see.
+                          In that case, just show a generic "Chargement…"
+                          label. */}
+                      <p className="text-sm font-semibold text-slate-700">
+                        {loadProgress > 0
+                          ? `Téléchargement ${Math.round(loadProgress * 100)}%`
+                          : 'Chargement du PDF…'}
+                      </p>
+                      {isSlowConnection && (
+                        <p className="text-xs text-amber-600 mt-1">
+                          Connexion lente, ça peut prendre plus de temps…
+                        </p>
+                      )}
                       <p className="text-sm text-slate-500">Chargement du PDF…</p>
                     </div>
                   </div>
@@ -1032,6 +1180,43 @@ export default function PDFViewer({
                       />
                     </PageLayerBoundary>
                   </PageLayerBoundary>
+                )}
+                {/* 2026-08-18: PRELOAD ADJACENT PAGES (Niveau 4 polish).
+                    In single mode, render pages N-1 and N+1 in a hidden
+                    offscreen div. react-pdf caches the rendered pages,
+                    so navigating to them later is instant. The pages
+                    are visually hidden (positioned off-screen) and have
+                    aria-hidden to keep them out of the accessibility tree. */}
+                {viewMode === 'single' && numPages && numPages > 1 && (
+                  <div
+                    aria-hidden="true"
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: '-99999px',
+                      width: containerWidth,
+                      pointerEvents: 'none',
+                    }}
+                  >
+                    {pageNumber > 1 && (
+                      <Page
+                        pageNumber={pageNumber - 1}
+                        width={containerWidth}
+                        renderTextLayer={false}
+                        renderAnnotationLayer={false}
+                        loading={<div className="min-h-[500px]" />}
+                      />
+                    )}
+                    {pageNumber < numPages && (
+                      <Page
+                        pageNumber={pageNumber + 1}
+                        width={containerWidth}
+                        renderTextLayer={false}
+                        renderAnnotationLayer={false}
+                        loading={<div className="min-h-[500px]" />}
+                      />
+                    )}
+                  </div>
                 )}
               </Document>
             </DocumentErrorBoundary>

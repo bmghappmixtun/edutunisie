@@ -12,9 +12,9 @@ import LazyPDFViewer from '@/components/resources/LazyPDFViewer';
 import RatingSection from '@/components/resources/RatingSection';
 import CommentsSection from '@/components/resources/CommentsSection';
 import ResourceInfoPanel from '@/components/resources/ResourceInfoPanel';
-import AiDescription from '@/components/resources/AiDescription';
 import AiContentSection from '@/components/resources/AiContentSection';
 import AiExerciseOverview from '@/components/resources/AiExerciseOverview';
+import ResourceScribdHeader from '@/components/resources/ResourceScribdHeader';
 import { getPaletteForSubject } from '@/lib/ai-palettes';
 // NOTE: getPaletteForSubject is kept for future use but currently no consumer
 // in this file (the "Sujets abordés" section was removed 2026-08-02 since
@@ -42,7 +42,6 @@ import {
   Wrench,
   Building2,
   Target,
-  Sparkles,
 } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -248,7 +247,9 @@ export default async function ResourcePage({
       slug: true,
       title: true,
       viewsCount: true,
+      downloadsCount: true,
       avgRating: true,
+      commentsCount: true,
       subject: { select: { nameFr: true, color: true } },
       class: { select: { nameFr: true, slug: true } },
       teacher: {
@@ -373,8 +374,64 @@ export default async function ResourcePage({
             )}
           </nav>
 
-          <div className="grid lg:grid-cols-[1fr_360px] gap-6">
-            {/* MAIN */}
+          {/* ============================================================
+              SCRIBD-STYLE HEADER (NEW 2026-08-16)
+              Renders above the existing 2-col grid. Gives the resource page
+              the modern look from fr.scribd.com — big title, stats line,
+              expandable description, action buttons grid, AI badge, etc.
+             ============================================================ */}
+          <ResourceScribdHeader
+            resourceId={resource.id}
+            title={(() => {
+              const { fr } = splitArabicSubject(resource.title);
+              return fr;
+            })()}
+            titleAr={(() => {
+              const { ar } = splitArabicSubject(resource.title);
+              return ar || null;
+            })()}
+            description={resource.description}
+            pageCount={resource.pageCount ?? null}
+            fileSize={resource.fileSize ? humanFileSize(resource.fileSize) : null}
+            viewsCount={resource.viewsCount}
+            downloadsCount={resource.downloadsCount}
+            avgRating={resource.avgRating}
+            commentsCount={resource.commentsCount}
+            downloadUrl={`/api/resources/${resource.id}/download`}
+            teacherName={
+              resource.teacher
+                ? `${resource.teacher.firstName || ''} ${resource.teacher.lastName || ''}`.trim() || null
+                : null
+            }
+            teacherProfileUrl={
+              resource.teacher
+                ? `/professeurs/${resource.teacher.numericId}/${resource.teacher.slug}`
+                : null
+            }
+            aiInsights={(() => {
+              const meta = resource.metadata as any;
+              const insights = (meta?.exerciseInsights as string[] | undefined)?.length
+                ? (meta.exerciseInsights as string[])
+                : (meta?.keyInsights as string[] | undefined);
+              return insights && insights.length > 0 ? insights : null;
+            })()}
+            aiKeyPoints={resource.metadata?.keyPoints || null}
+            aiShortKeyPoints={(resource.metadata as any)?.shortKeyPoints || null}
+            isArDoc={(() => {
+              const isPilotePhysiqueCollege =
+                resource.schoolType === 'PILOTE' &&
+                resource.subject?.slug === 'physique' &&
+                resource.class &&
+                ['7eme', '8eme', '9eme'].includes(resource.class.slug);
+              return resource.language === 'ar' && !isPilotePhysiqueCollege;
+            })()}
+          />
+
+          <div className="grid grid-cols-1 gap-6">
+            {/* MAIN — single column. Sidebar (teacher + info panel) was
+                removed 2026-08-17 to give the PDF viewer more width.
+                The teacher is now in the ScribdHeader ('Transféré par')
+                and the info panel is below the PDF viewer. */}
             <div>
               {/* ARCHIVED banner — shown to non-owners when the resource is no longer public */}
               {isArchived && (
@@ -432,143 +489,13 @@ export default async function ResourcePage({
               )}
 
               <div className="bg-white rounded-2xl border border-slate-100 p-6 lg:p-8 mb-4">
-                <div className="flex flex-wrap items-center gap-2 mb-4">
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-bold ${RESOURCE_TYPE_LABELS[resource.type]?.color}`}
-                  >
-                    {RESOURCE_TYPE_LABELS[resource.type]?.fr}
-                  </span>
-                  {/* Homework subtype badge (only when DEVOIR) */}
-                  {resource.type === 'DEVOIR' &&
-                    resource.homeworkSubtype &&
-                    HOMEWORK_SUBTYPE_LABELS[resource.homeworkSubtype] && (
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-bold ${HOMEWORK_SUBTYPE_LABELS[resource.homeworkSubtype].color}`}
-                      >
-                        {HOMEWORK_SUBTYPE_LABELS[resource.homeworkSubtype].fr}
-                        {resource.homeworkNumber ? ` N°${resource.homeworkNumber}` : ''}
-                      </span>
-                    )}
-                  {resource.class && (
-                    <span className="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-bold">
-                      {resource.class.nameFr}
-                    </span>
-                  )}
-                  {resource.section && (
-                    <span className="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-bold">
-                      {resource.section.nameFr}
-                    </span>
-                  )}
-                  <span
-                    className="px-3 py-1 text-white rounded-full text-xs font-bold"
-                    style={{ background: resource.subject.color || '#0EA5E9' }}
-                  >
-                    {resource.subject.nameFr}
-                  </span>
-                  {/* Pilote badge — only shown if PILOTE (never PUBLIC) */}
-                  {resource.schoolType === 'PILOTE' && (
-                    <span className="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-xs font-bold inline-flex items-center gap-1">
-                      <GraduationCap className="w-3 h-3" />
-                      Lycée/Collège Pilote
-                    </span>
-                  )}
-                  {/* School name badge — shown when extracted from PDF header */}
-                  {resource.schoolName && (
-                    <span
-                      className="px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-xs font-medium inline-flex items-center gap-1"
-                      dir="rtl"
-                    >
-                      <Building2 className="w-3 h-3" />
-                      {resource.schoolName}
-                    </span>
-                  )}
-                </div>
+                {/* 2026-08-17: removed the duplicate badges + h1 + sujet + résumé
+                    intelligent block. The ScribdHeader above already shows the
+                    title, description, and teacher. The AI-generated summary
+                    below (with "Aperçu des exercices" and "Points clés" cards)
+                    is kept. */}
 
-                {(() => {
-                  const { fr, ar } = splitArabicSubject(resource.title);
-                  const gs = (resource.metadata?.generalSubject || '').trim();
-                  // Per user rule (2026-08-13): the green cadre shows the
-                  // AI-extracted system name with the French label "Système
-                  // technique", centered. Replaces the Arabic "اسم المنتج".
-                  const sys = (resource.metadata?.systemName || '').trim();
-                  return (
-                    <>
-                      <h1
-                        className={`text-2xl lg:text-3xl font-extrabold text-slate-900 ${ar ? 'mb-1' : 'mb-3'} leading-tight ${isArabic(fr) ? 'text-right' : 'text-left'}`}
-                        dir={isArabic(fr) ? 'rtl' : 'ltr'}
-                        lang={isArabic(fr) ? 'ar' : 'fr'}
-                      >
-                        {fr}
-                      </h1>
-                      {ar && (
-                        <div
-                          className="text-lg lg:text-xl font-semibold text-slate-600 mb-3 leading-snug text-right font-arabic-title"
-                          dir="rtl"
-                          lang="ar"
-                        >
-                          {ar}
-                        </div>
-                      )}
-                      {/* Green cadre: shows the AI-extracted system name with
-                          the French label "Système technique", centered.
-                          Falls back to general subject display for backward
-                          compatibility (e.g. when systemName is not yet
-                          populated). */}
-                      {sys ? (
-                        <div className="mb-4 flex justify-center">
-                          <span className="inline-block px-4 py-2 rounded-lg border-2 border-emerald-400 bg-emerald-50 text-sm font-semibold text-emerald-900 text-center">
-                            <span className="text-emerald-700">Système technique : </span>
-                            <span className="font-bold">{sys}</span>
-                          </span>
-                        </div>
-                      ) : gs ? (
-                        <h2
-                          dir="auto"
-                          lang={isArabic(gs) ? 'ar' : 'fr'}
-                          className={`text-sm lg:text-base font-semibold text-slate-500 ${ar ? 'mb-3' : 'mb-2'} tracking-wide ${isArabic(gs) ? 'text-right font-arabic-title' : 'text-left'}`}
-                        >
-                          {isArabic(gs) ? 'الموضوع العام: ' : 'Sujet : '}
-                          <span className="text-slate-700">{gs}</span>
-                        </h2>
-                      ) : null}
-                    </>
-                  );
-                })()}
-                {resource.description && !resource.aiSummary?.summary && (
-                  <AiContentSection
-                    title={resource.language === 'ar' ? 'ملخص ذكي' : 'Résumé intelligent'}
-                    icon={<Sparkles className="w-4 h-4" />}
-                    subjectSlug={resource.subject?.slug}
-                    defaultOpen={false}
-                    className="mb-4"
-                  >
-                    <AiDescription
-                      hideTitle={true}
-                      text={resource.description}
-                      source={resource.descriptionSource}
-                      language={resource.language}
-                      headerData={resource.headerData as any}
-                      classNameFr={resource.class?.nameFr}
-                      classNameAr={resource.class?.nameAr}
-                      generalSubject={resource.metadata?.generalSubject}
-                      schoolType={resource.schoolType}
-                      hideFields={
-                        resource.class?.level?.slug === 'lycee'
-                          ? ['Sujet général', 'Enseignant', 'Classe']
-                          : null
-                      }
-                    />
-                  </AiContentSection>
-                )}
-
-                {/* Dossier technique card REMOVED per user rule (2026-08-13):
-                    Deleted for ALL files (not just Technologie). The info
-                    was redundant with the meta chips inside the
-                    "Aperçu des exercices" card. */}
-
-                                {/* AI-generated summary — render via AiDescription for the structured grid card.
-                    The general subject (الموضوع العام) is integrated inside the card
-                    as a labeled field with a Tag icon. */}
+                                {/* 2026-08-17: "Résumé intelligent" card removed. */}
                 {resource.aiSummary?.summary && (() => {
                   const summary = resource.aiSummary.summary;
                   const summaryOriginal = (resource.aiSummary as any)?.summaryOriginal || null;
@@ -607,85 +534,19 @@ export default async function ResourcePage({
                     }
                     return null;
                   })();
-                  return (
-                    <AiContentSection
-                      title={resource.language === 'ar' ? 'ملخص ذكي' : 'Résumé intelligent'}
-                      icon={<Sparkles className="w-4 h-4" />}
-                      subjectSlug={resource.subject?.slug}
-                      defaultOpen={false}
-                      className="mb-4"
-                    >
-                      <AiDescription
-                      hideTitle={true}
-                        text={summary}
-                        secondaryText={summaryOriginal}
-                        source={resource.aiSummary.modelUsed || 'gpt-4o-mini-batch-v1'}
-                        language={resource.language}
-                        headerData={resource.headerData as any}
-                        classNameFr={resource.class?.nameFr}
-                        classNameAr={resource.class?.nameAr}
-                        generalSubject={resource.metadata?.generalSubject}
-                        subjectSlug={resource.subject?.slug}
-                        systemName={resource.metadata?.systemName}
-                        subjectLabelOverride={resource.subject?.slug === 'technologie' ? 'التربية التكنولوجية' : null}
-                        isCollege={isCollege}
-                        dbSchoolNameFr={resource.schoolName}
-                        dbSchoolNameAr={null}
-                        dbTeacherNameFr={teacherFr}
-                        dbTeacherNameAr={teacherAr}
-                        aiSchoolName={resource.metadata?.schoolName ?? null}
-                        aiProfNames={resource.metadata?.profNames ?? null}
-                        schoolType={resource.schoolType}
-                        hideFields={hideFields}
-                      />
-                    </AiContentSection>
-                  );
+                  // 2026-08-17: removed the "Résumé intelligent" AiContentSection.
+                  // The description is already shown in the ScribdHeader above
+                  // (expandable "Description complète" toggle). Rendering the AI
+                  // summary again here was redundant. Kept: Aperçu des exercices
+                  // and Points clés (those have unique AI content not in the
+                  // header).
+                  return null;
                 })()}
 
-                {/* AI Exercise Overview — Per user rule (2026-08-10):
-                    Display the AI-extracted exercise summaries from ResourceMetadata.exerciseInsights
-                    (new field, 2026-08-12) OR fallback to keyInsights (legacy physique pipeline).
-                    Two display modes:
-                    - EXERCISE/DEVOIR: "Exercice N (Type): summary" → badge + summary
-                    - COURSE: "Titre: summary" → title + summary, numbered list
-                    Hidden for SUMMARY/OTHER types. */}
-                {(() => {
-                  const meta = resource.metadata as any;
-                  // Prefer the new exerciseInsights field; fallback to legacy keyInsights
-                  const insights = (meta?.exerciseInsights as string[] | undefined)?.length
-                    ? (meta.exerciseInsights as string[])
-                    : (meta?.keyInsights as string[] | undefined);
-                  if (!insights || insights.length === 0) return null;
-
-                  // For Technologie: extract meta (system name, specialty, dossier)
-                  // and pass to the component to display at the top of the card.
-                  // For COURS: prefer DB courseSubject (pre-extracted), fall back to title regex,
-                  // then generalSubject.
-                  const isTechnologie = resource.subject?.slug === 'technologie';
-                  const isCourse = resource.type === 'COURSE';
-                  const techMeta = isTechnologie
-                    ? getTechMeta(
-                        resource.title,
-                        (resource as any).content?.fullText || null,
-                        meta?.systemName || null,
-                        {
-                          isCourse,
-                          // For COURS: prefer the pre-extracted courseSubject from DB
-                          courseSubject: isCourse ? (meta as any)?.courseSubject || null : null,
-                          generalSubject: (meta as any)?.generalSubject || null,
-                        }
-                      )
-                    : null;
-
-                  return (
-                    <AiExerciseOverview
-                      keyInsights={insights}
-                      subjectSlug={resource.subject?.slug}
-                      resourceType={resource.type as 'COURSE' | 'EXERCISE' | 'DEVOIR' | 'SUMMARY' | 'OTHER'}
-                      meta={techMeta}
-                    />
-                  );
-                })()}
+                {/* 2026-08-17: AI exercise overview + key points are now
+                    rendered INSIDE the ScribdHeader as collapsible accordions
+                    (Option A from the user proposal). The data is prepared
+                    here and passed via props. Old separate cards removed. */}
 
                 {/* AI key points — Per user rule (2026-07-30):
                     - Title: "النقاط الرئيسية" (AR) or "Points clés" (FR)
@@ -699,11 +560,7 @@ export default async function ResourcePage({
                       in alternation, max 10 bubbles total. Short KP = lighter shade
                       but SAME font size/padding as long KP (2026-08-10 update). */}
                 {(() => {
-                  // Per user rule (2026-08-09): Points clés card MIXES long KP (full
-                  // sentences) + short KP (2-3 word concepts) in alternation.
-                  // Short KP are now real concepts (not just tags) so they make
-                  // sense alongside long KP. Max 10 bubbles total. Short = lighter
-                  // shade + smaller font to visually distinguish from long KP.
+                  // Points clés data — prepared here, rendered in ScribdHeader.
                   const longKps = resource.metadata?.keyPoints || [];
                   const shortKps = (resource.metadata as any)?.shortKeyPoints || [];
                   if (longKps.length === 0 && shortKps.length === 0) return null;
@@ -714,64 +571,14 @@ export default async function ResourcePage({
                     if (i < shortKps.length) merged.push({ text: shortKps[i], isShort: true });
                     if (i < longKps.length && merged.length < 10) merged.push({ text: longKps[i], isShort: false });
                   }
-                  // Per user rule (2026-08-02): align RIGHT for AR docs, LEFT for FR docs.
                   const isPilotePhysiqueCollege =
                     resource.schoolType === 'PILOTE' &&
                     resource.subject?.slug === 'physique' &&
                     resource.class &&
                     ['7eme', '8eme', '9eme'].includes(resource.class.slug);
                   const isArDoc = resource.language === 'ar' && !isPilotePhysiqueCollege;
-                  const titleAlignRight = isArDoc;
                   const keyPointsTitle = isArDoc ? 'النقاط الرئيسية' : 'Points clés';
-                  // Long KP: full color. Short KP: lighter shade. Both same size (2026-08-10).
-                  const longPalette = [
-                    'bg-rose-100 text-rose-800 border-rose-300',
-                    'bg-fuchsia-100 text-fuchsia-800 border-fuchsia-300',
-                    'bg-teal-100 text-teal-800 border-teal-300',
-                    'bg-amber-100 text-amber-800 border-amber-300',
-                    'bg-violet-100 text-violet-800 border-violet-300',
-                  ];
-                  const shortPalette = [
-                    'bg-rose-50 text-rose-700 border-rose-200',
-                    'bg-fuchsia-50 text-fuchsia-700 border-fuchsia-200',
-                    'bg-teal-50 text-teal-700 border-teal-200',
-                    'bg-amber-50 text-amber-700 border-amber-200',
-                    'bg-violet-50 text-violet-700 border-violet-200',
-                  ];
-                  return (
-                  <AiContentSection
-                    title={keyPointsTitle}
-                    icon={<Target className="w-4 h-4" />}
-                    variant="default"
-                    subjectSlug={resource.subject?.slug}
-                    defaultOpen={false}
-                    alignRight={titleAlignRight}
-                  >
-                    <div className={`flex flex-wrap gap-2 ${isArDoc ? 'justify-end' : 'justify-start'}`}>
-                      {merged.map((kp, i) => {
-                        const kpAr = isArabic(kp.text);
-                        const palette = kp.isShort ? shortPalette : longPalette;
-                        const colorClass = palette[i % palette.length];
-                        const searchQuery = encodeURIComponent(kp.text);
-                        const searchHref = `/recherche?q=${searchQuery}`;
-                        // Per user rule (2026-08-10): SAME font and size for short + long KP.
-                        // Visual distinction is only via the lighter/darker color palette.
-                        const sizeClass = 'text-sm px-3 py-1.5';
-                        return (
-                        <Link
-                          key={`${kp.isShort ? 's' : 'l'}-${i}`}
-                          href={searchHref}
-                          dir={kpAr ? 'rtl' : 'ltr'}
-                          lang={kpAr ? 'ar' : 'fr'}
-                          className={`inline-block rounded-full font-semibold border font-arabic-title ${kpAr ? 'text-right' : 'text-left'} ${sizeClass} ${colorClass} hover:brightness-110 hover:shadow-sm hover:scale-[1.03] transition-all cursor-pointer`}
-                        >
-                          {kp.text}
-                        </Link>
-                        );
-                      })}
-                    </div>
-                  </AiContentSection>
-                  );
+                  return null; // 2026-08-17: rendered in ScribdHeader now
                 })()}
 
                 {/* Tags chips were moved to the sidebar (ResourceInfoPanel,
@@ -793,52 +600,9 @@ export default async function ResourcePage({
                     </div>
                   )}
 
-                {/* Stats row */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 py-4 border-y border-slate-100">
-                  <div className="text-center">
-                    <div className="flex items-center justify-center gap-1 text-slate-500 text-xs mb-1">
-                      <Eye className="w-3.5 h-3.5" /> Vues
-                    </div>
-                    <div className="font-extrabold text-lg">
-                      {formatNumber(resource.viewsCount)}
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="flex items-center justify-center gap-1 text-slate-500 text-xs mb-1">
-                      <Download className="w-3.5 h-3.5" /> Téléchargements
-                    </div>
-                    <div className="font-extrabold text-lg">
-                      {formatNumber(resource.downloadsCount)}
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="flex items-center justify-center gap-1 text-slate-500 text-xs mb-1">
-                      <Star className="w-3.5 h-3.5" /> Note
-                    </div>
-                    <div className="font-extrabold text-lg">{resource.avgRating.toFixed(1)}/5</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="flex items-center justify-center gap-1 text-slate-500 text-xs mb-1">
-                      <MessageCircle className="w-3.5 h-3.5" /> Commentaires
-                    </div>
-                    <div className="font-extrabold text-lg">{resource.commentsCount}</div>
-                  </div>
-                </div>
+                {/* 2026-08-17: removed the stats row (Vues, Téléchargements, Note,
+                    Commentaires) — moved to the ScribdHeader above. */}
 
-                {canViewBody && (
-                <ResourceActions
-                  resourceId={resource.id}
-                  numericId={resource.numericId}
-                  slug={resource.slug}
-                  title={resource.title}
-                  fileUrl={`/api/resources/${resource.id}/download`}
-                  originalFileKey={resource.originalFileKey}
-                  originalFileName={resource.originalFileName}
-                  originalFormat={resource.originalFormat}
-                  isTeacher={userSession?.role === 'TEACHER' || userSession?.role === 'ADMIN'}
-                  isOwner={userSession?.id === resource.teacherId}
-                />
-                )}
               </div>
 
               {/* Aperçu PDF — hidden for archived resources (non-owners).
@@ -859,6 +623,33 @@ export default async function ResourcePage({
                 </div>
               </div>
               )}
+
+              {/* Action buttons (ResourceActions) — moved here 2026-08-17
+                  from its old position (above the PDF viewer, in the title
+                  card). User wanted the action button grid (Télécharger,
+                  Lire en ligne, Imprimer, Favoris, Partager, Signaler) to
+                  be right under the PDF viewer for quick access. */}
+              {canViewBody && (
+                <ResourceActions
+                  resourceId={resource.id}
+                  numericId={resource.numericId}
+                  slug={resource.slug}
+                  title={resource.title}
+                  fileUrl={`/api/resources/${resource.id}/download`}
+                  originalFileKey={resource.originalFileKey}
+                  originalFileName={resource.originalFileName}
+                  originalFormat={resource.originalFormat}
+                  isTeacher={userSession?.role === 'TEACHER' || userSession?.role === 'ADMIN'}
+                  isOwner={userSession?.id === resource.teacherId}
+                />
+              )}
+
+              {/* Info Panel — moved from the right sidebar 2026-08-17.
+                  Shown below the PDF viewer so the PDF gets full width. */}
+              <ResourceInfoPanel
+                resource={resource}
+                hideClasse={resource.class?.level?.slug === 'lycee'}
+              />
 
               {/* Notation — hidden for archived resources (non-owners) */}
               {canViewBody && (
@@ -923,59 +714,10 @@ export default async function ResourcePage({
               )}
             </div>
 
-            {/* SIDEBAR */}
-            <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto">
-              {/* Prof */}
-              {resource.teacher && (
-                <div className="card p-5">
-                  <h3 className="font-bold text-sm mb-3 text-slate-500 uppercase">Enseignant</h3>
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 text-white font-bold text-lg flex items-center justify-center">
-                      {resource.teacher.firstName?.[0]}
-                      {resource.teacher.lastName?.[0]}
-                    </div>
-                    <div>
-                      <div className="font-bold">
-                        {resource.teacher.firstName} {resource.teacher.lastName}
-                      </div>
-                      {(resource.teacher.firstNameAr || resource.teacher.lastNameAr) && (
-                        <div className="text-sm text-slate-600" dir="rtl" lang="ar">
-                          {resource.teacher.firstNameAr} {resource.teacher.lastNameAr}
-                        </div>
-                      )}
-                      {(resource.teacher.schoolName || resource.teacher.schoolNameAr) && (
-                        <div className="text-xs text-slate-500 mt-1">
-                          {resource.teacher.schoolName}
-                          {resource.teacher.schoolNameAr && (
-                            <span className="block text-slate-400" dir="rtl" lang="ar">
-                              {resource.teacher.schoolNameAr}
-                            </span>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  {resource.teacher.bio && (
-                    <p className="text-sm text-slate-600 line-clamp-3">{resource.teacher.bio}</p>
-                  )}
-                  <Link
-                    href={`/professeurs/${resource.teacher.numericId}/${resource.teacher.slug}`}
-                    className="text-sm text-primary-600 font-semibold hover:underline mt-2 inline-block"
-                  >
-                    Voir le profil →
-                  </Link>
-                </div>
-              )}
-
-              {/* COMPLETE Info Panel — for lycée files we hide the "Classe" row
-                  because the AI summary card already shows it AND the title
-                  format encodes it ("... - 1AS (year)"). Other info (Type,
-                  Matière, Section, Trimestre, Année, Langue) stays. */}
-              <ResourceInfoPanel
-                resource={resource}
-                hideClasse={resource.class?.level?.slug === 'lycee'}
-              />
-            </aside>
+            {/* ResourceInfoPanel — moved here from the right sidebar
+                2026-08-17. The teacher card was removed (it's in the
+                ScribdHeader "Transféré par" attribution). Hide the "Classe"
+                row for lycée files (already in the title format). */}
           </div>
         </div>
       </main>
