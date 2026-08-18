@@ -67,15 +67,30 @@ export default function ResourceScribdHeader({
   useEffect(() => {
     const sentinel = document.getElementById('pdf-viewer-sentinel');
     if (!sentinel) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        // When sentinel is out of view (user scrolled past it), close accordions
-        if (!entry.isIntersecting) setAiOpen(false);
-      },
-      { threshold: 0, rootMargin: '-100px 0px 0px 0px' }
-    );
-    observer.observe(sentinel);
-    return () => observer.disconnect();
+    // 2026-08-18 fix: 0-height sentinel was unreliable for
+    // IntersectionObserver. Use scroll-based detection instead:
+    // when the PDF viewer top crosses the bottom of the header,
+    // close the AI accordions.
+    let lastClosed = false;
+    const check = () => {
+      const rect = sentinel.getBoundingClientRect();
+      // Close when sentinel has scrolled above the sticky bar (top: 64px)
+      // and the PDF is now occupying the viewport
+      const shouldClose = rect.top < 64;
+      if (shouldClose && !lastClosed) {
+        lastClosed = true;
+        setAiOpen(false);
+      } else if (!shouldClose) {
+        lastClosed = false;
+      }
+    };
+    check();
+    window.addEventListener('scroll', check, { passive: true });
+    window.addEventListener('resize', check);
+    return () => {
+      window.removeEventListener('scroll', check);
+      window.removeEventListener('resize', check);
+    };
   }, []);
 
   // 2026-08-17 (Niveau 1.3): reading time estimate. ~1.5 minutes per page

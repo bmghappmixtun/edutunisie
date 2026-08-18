@@ -389,7 +389,10 @@ export default async function ResourcePage({
             })()}
             pageCount={resource.pageCount ?? null}
           />
-          <div id="sticky-bar-sentinel" aria-hidden="true" />
+          {/* Sentinel for sticky bar. Has a real height so the
+              IntersectionObserver / scroll listener can track it
+              reliably across all browsers. */}
+          <div id="sticky-bar-sentinel" aria-hidden="true" style={{ height: 1 }} />
 
           {/* ============================================================
               SCRIBD-STYLE HEADER (NEW 2026-08-16)
@@ -631,9 +634,10 @@ export default async function ResourcePage({
               {canViewBody && (
               <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden mb-4">
                 {/* Sentinel for AI accordion auto-collapse. The ScribdHeader
-                    watches this element via IntersectionObserver — when it
-                    scrolls out of view, the AI accordions close. */}
-                <div id="pdf-viewer-sentinel" aria-hidden="true" />
+                    watches this element — when it scrolls above the sticky
+                    bar position, the AI accordions close. Has a real height
+                    for reliable tracking across all browsers. */}
+                <div id="pdf-viewer-sentinel" aria-hidden="true" style={{ height: 1 }} />
                 <div className="p-0">
                   <LazyPDFViewer
                     url={`/api/resources/${resource.id}/download`}

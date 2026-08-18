@@ -23,21 +23,38 @@ export default function ResourceStickyBar({ title, pageCount }: ResourceStickyBa
   useEffect(() => {
     const sentinel = document.getElementById('sticky-bar-sentinel');
     if (!sentinel) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        // When sentinel is out of view, show the sticky bar
-        setVisible(!entry.isIntersecting);
-      },
-      { threshold: 0, rootMargin: '0px 0px 0px 0px' }
-    );
-    observer.observe(sentinel);
-    return () => observer.disconnect();
+    // 2026-08-18 fix: a 0-height sentinel doesn't reliably trigger
+    // IntersectionObserver (especially in some browsers). Also use
+    // scroll listener as a fallback for robustness.
+    let lastVisible = false;
+    const check = () => {
+      const rect = sentinel.getBoundingClientRect();
+      // Sentinel is "out of view" when its top is above the header
+      // (we use 64px to account for the fixed site header).
+      const outOfView = rect.top < 64;
+      if (outOfView !== lastVisible) {
+        lastVisible = outOfView;
+        setVisible(outOfView);
+      }
+    };
+    check();
+    window.addEventListener('scroll', check, { passive: true });
+    window.addEventListener('resize', check);
+    return () => {
+      window.removeEventListener('scroll', check);
+      window.removeEventListener('resize', check);
+    };
   }, []);
 
   return (
     <div
       aria-hidden={!visible}
-      className={`fixed top-0 left-0 right-0 z-30 transition-transform duration-200 ease-out ${
+      // 2026-08-18 fix: site Header is fixed at top-0 with z-50, h-16
+      // (64px) on mobile and h-16 on desktop. The sticky bar must sit
+      // BELOW the header so it doesn't get hidden behind it. Use top-16
+      // (64px) to match. z-[60] keeps it above all other content but
+      // below modal dialogs.
+      className={`fixed top-16 left-0 right-0 z-[60] transition-transform duration-200 ease-out ${
         visible ? 'translate-y-0' : '-translate-y-full'
       }`}
     >
