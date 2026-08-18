@@ -426,8 +426,29 @@ export default function AiDescription({
         existingLabels.add(lbl);
       }
     };
-    tryAdd('\u0627\u0644\u0645\u062f\u0631\u0633\u0629', '\u00c9tablissement', h.school, Building2);
+    // 2026-08-18 (User feedback): hide the AI-extracted PDF header attributes
+    // (Année scolaire, Matière, Type, Établissement) from the AI summary card.
+    // Per user rule: "on supprime de la card resumé ia les attributs ia
+    // (année, matiere, type , etablissement, etc.. on laisse ça juste dans la db)".
+    // These attributes remain in the DB (Resource + ResourceMetadata) for
+    // SEO, search filtering, and the title format — they're just not shown
+    // in the visible "Résumé intelligent" card anymore.
+    //
+    // The teacher (Enseignant) is still useful info so we keep it.
     tryAdd('\u0627\u0644\u0623\u0633\u062a\u0627\u0630', 'Enseignant', h.teacher, User);
+    // ANNÉE SCOLAIRE — REMOVED (kept in DB only)
+    // tryAdd(
+    //   '\u0627\u0644\u0633\u0646\u0629 \u0627\u0644\u062f\u0631\u0627\u0633\u064a\u0629',
+    //   'Ann\u00e9e scolaire',
+    //   h.year,
+    //   CalendarDays,
+    // );
+    // MATIÈRE — REMOVED (kept in DB only)
+    // tryAdd('\u0627\u0644\u0645\u0627\u062f\u0629', 'Mati\u00e8re', h.subject, BookOpen);
+    // TYPE — REMOVED (kept in DB only)
+    // tryAdd('\u0627\u0644\u0646\u0648\u0639', 'Type', h.type, FileText);
+    // ÉTABLISSEMENT — REMOVED (kept in DB only)
+    // tryAdd('\u0627\u0644\u0645\u062f\u0631\u0633\u0629', '\u00c9tablissement', h.school, Building2);
     // Override 'المستوى'/'Niveau' with the authoritative cycle from headerData
     // (AI description sometimes uses the class name as level, but they are different).
     // SKIP for college: cycle is always "Enseignement de base" → no informative value.
@@ -438,17 +459,6 @@ export default function AiDescription({
         isRtl ? h.cycleAr || h.cycle : h.cycle,
         GraduationCap,
       );
-    }
-    tryAdd(
-      '\u0627\u0644\u0633\u0646\u0629 \u0627\u0644\u062f\u0631\u0627\u0633\u064a\u0629',
-      'Ann\u00e9e scolaire',
-      h.year,
-      CalendarDays,
-    );
-    tryAdd('\u0627\u0644\u0645\u0627\u062f\u0629', 'Mati\u00e8re', h.subject, BookOpen);
-    // SKIP for college: the type is already shown in the page header (Devoir/Exercice/Cours).
-    if (!isCollege) {
-      tryAdd('\u0627\u0644\u0646\u0648\u0639', 'Type', h.type, FileText);
     }
   }
 
@@ -514,31 +524,15 @@ export default function AiDescription({
     if (aifr) return aifr;
     return null;
   };
-  // Build school value
-  const schoolDisplayed =
-    parsedFields.find((f) => f.label === schoolLabel)?.value ??
-    headerFields.find((f) => f.label === schoolLabel)?.value ??
-    (headerData?.school ?? null);
-  const schoolValue = pickPreferringAr(
-    schoolDisplayed,
-    dbSchoolNameAr,
-    dbSchoolNameFr,
-    aiSchoolName,
-    headerData?.school ?? null,
-  );
-  if (schoolValue) {
-    const idx = parsedFields.findIndex((f) => f.label === schoolLabel);
-    if (idx >= 0) {
-      parsedFields[idx] = { ...parsedFields[idx], value: schoolValue };
-    } else {
-      const hfIdx = headerFields.findIndex((f) => f.label === schoolLabel);
-      if (hfIdx >= 0) {
-        headerFields[hfIdx] = { ...headerFields[hfIdx], value: schoolValue };
-      } else {
-        headerFields.push({ Icon: Building2, label: schoolLabel, value: schoolValue });
-      }
-    }
-  }
+  // Build school value — 2026-08-18: hide school from the card per user
+  // feedback (kept in DB only). All school-related code is now no-op.
+  // The unused variables (schoolLabel, schoolDisplayed, pickPreferringAr)
+  // are kept as no-ops to avoid touching more of the parser logic.
+  void schoolLabel;
+  void dbSchoolNameAr;
+  void dbSchoolNameFr;
+  void aiSchoolName;
+  void pickPreferringAr;
   // Build teacher value — Per user rule (2026-08-03):
   //   If the file is in AR → display the AR prof name (if not null)
   //   If the file is in FR → display the FR prof name (if not null)
