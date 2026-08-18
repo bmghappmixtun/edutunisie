@@ -245,19 +245,22 @@ export default function ResourceScribdHeader({
                 <summary className="flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-primary-600 cursor-pointer list-none py-1.5">
                   <ListChecks className="w-4 h-4 text-primary-500" />
                   <span>{isArDoc ? 'نظرة عامة على التمارين' : 'Aperçu des exercices'}</span>
-                  {/* 2026-08-18: show "{N} exercices {matière}" chip. Format
-                      per user rule: count of insights + real subject name
-                      (not the parsed "Autre" fallback). */}
-                  {aiInsights && aiInsights.length > 0 && (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-semibold rounded-full bg-slate-100 text-slate-700 border border-slate-200">
-                      <BookOpen className="w-3 h-3" />
-                      {aiInsights.length} exercice{aiInsights.length > 1 ? 's' : ''}
-                      {subjectName ? ` ${subjectName}` : ''}
-                    </span>
-                  )}
                   <ChevronDown className="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform ml-auto" />
                 </summary>
                 <div className={`pl-6 py-2 text-sm text-slate-600 space-y-2 ${isArDoc ? 'text-right' : ''}`}>
+                  {/* 2026-08-18: "{N} exercices {matière}" chip INSIDE the
+                      accordion body, above the list of exercises. Format
+                      per user rule: count of insights + real subject name
+                      (not the parsed "Autre" fallback). */}
+                  {aiInsights && aiInsights.length > 0 && (
+                    <div className="mb-2">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-full bg-primary-50 text-primary-700 border border-primary-200">
+                        <BookOpen className="w-3 h-3" />
+                        {aiInsights.length} exercice{aiInsights.length > 1 ? 's' : ''}
+                        {subjectName ? ` ${subjectName}` : ''}
+                      </span>
+                    </div>
+                  )}
                   {aiInsights!.map((item, i) => (
                     <div key={i} className="leading-relaxed">{item}</div>
                   ))}
