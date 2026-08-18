@@ -9,57 +9,42 @@ export interface ResourceStickyBarProps {
 }
 
 /**
- * Sticky bar that appears at the top of the viewport when the user scrolls
- * past the main ResourceScribdHeader. Shows a compact title + page count
- * + a back-to-top button.
+ * Sticky bar that appears at the top of the viewport when the user has
+ * scrolled past the site header. Shows a compact title + page count +
+ * a back-to-top button.
  *
- * Trigger logic (user feedback 2026-08-18, v4 — final):
- * The bar must be hidden whenever the user is in the "header zone" of
- * the page — that is, anywhere the Examanet site header is the focal
- * element. This is simpler and more reliable than tracking the résumé
- * card's bounding rect, and matches the user's mental model: "the
- * sticky bar should never compete with the site header for attention."
+ * Trigger logic (user feedback 2026-08-18, v5 — ultra simple):
+ * The bar shows only when window.scrollY > HEADER_HEIGHT + 50.
+ * That's it. No bounding rect checks, no card position tracking —
+ * those introduced edge cases on initial render (user kept seeing
+ * the bar at the top of the page even with scrollY = 0).
  *
- * Two conditions must BOTH be true to show the bar:
- *  1. window.scrollY > headerHeight + 50 (the user has scrolled past
- *     the site header by at least 50px — a clear visual buffer).
- *  2. The résumé card (#resource-scribd-header) is fully out of view
- *     (rect.bottom <= 0). This ensures the bar doesn't appear while
- *     the user is still reading the résumé.
+ * Mental model: "the sticky bar should never appear in the same
+ * vertical zone as the site header". The site header sits at the
+ * top of the page. Once the user has scrolled past it (with a 50px
+ * buffer), the sticky bar can take its place.
  *
  * Position: dynamic, derived from the actual site header height at
- * runtime. We query the <header> element and use its height as the
- * sticky bar's top offset. This handles future header height changes
- * without code changes.
+ * runtime (queries the <header> element on mount + on resize).
  */
+const SHOW_THRESHOLD_PX = 50; // buffer below the header
+
 export default function ResourceStickyBar({ title, pageCount }: ResourceStickyBarProps) {
   const [visible, setVisible] = useState(false);
   const [topOffset, setTopOffset] = useState(62);
 
   useEffect(() => {
-    const target = document.getElementById('resource-scribd-header');
     const siteHeader = document.querySelector('header');
-    if (!target) return;
+    if (!siteHeader) return;
 
     let lastVisible = false;
     const check = () => {
-      const headerH = siteHeader
-        ? siteHeader.getBoundingClientRect().height
-        : window.matchMedia('(min-width: 1024px)').matches
-          ? 73
-          : 62;
+      // Dynamic top: read the actual site header height.
+      const headerH = siteHeader.getBoundingClientRect().height;
       setTopOffset(headerH);
 
-      const cardRect = target.getBoundingClientRect();
-      // 2026-08-18 v4: primary condition is scrollY. The user wants
-      // the bar hidden whenever the site header is in the focal area.
-      // Once the user has scrolled past the header (scrollY > headerH),
-      // the secondary check is whether the résumé card is still
-      // visible — if it is, we still wait until the user has scrolled
-      // past it.
-      const pastHeader = window.scrollY > headerH + 50;
-      const cardOutOfView = cardRect.bottom <= headerH;
-      const shouldShow = pastHeader && cardOutOfView;
+      // Show only when scrolled past the header + buffer.
+      const shouldShow = window.scrollY > headerH + SHOW_THRESHOLD_PX;
       if (shouldShow !== lastVisible) {
         lastVisible = shouldShow;
         setVisible(shouldShow);
