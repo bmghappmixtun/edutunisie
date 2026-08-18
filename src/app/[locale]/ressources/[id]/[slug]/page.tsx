@@ -417,6 +417,20 @@ export default async function ResourcePage({
             })()}
             aiKeyPoints={resource.metadata?.keyPoints || null}
             aiShortKeyPoints={(resource.metadata as any)?.shortKeyPoints || null}
+            subjectName={(() => {
+              // 2026-08-18: pass the subject name (lowercase, e.g. "base de
+              // données", "algorithmique et programmation") to the
+              // ResourceScribdHeader so the exercise insights accordion can
+              // show "{N} exercices {matière}" instead of "{N} exercices
+              // autre".
+              const s = resource.subject as any;
+              if (!s) return null;
+              // Prefer the display name from the DB; fall back to slug.
+              const name = s.nameFr || s.slug || null;
+              if (!name) return null;
+              return String(name).toLowerCase();
+            })()}
+            subjectSlug={resource.subject?.slug || null}
             isArDoc={(() => {
               const isPilotePhysiqueCollege =
                 resource.schoolType === 'PILOTE' &&
