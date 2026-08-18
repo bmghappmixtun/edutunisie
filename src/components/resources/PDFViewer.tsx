@@ -519,8 +519,13 @@ export default function PDFViewer({
     setWorkerReady(false);
   }, []);
 
-  // 2026-08-18: react-pdf Document onProgress callback
-  // (loaded bytes / total bytes, 0-1).
+  // 2026-08-18: react-pdf Document onLoadProgress callback
+  // (loaded bytes / total bytes, 0-1). Note: this only fires when
+  // the PDF is being downloaded over the network. If the file is
+  // already in the browser cache, the load is instant and the
+  // callback never fires — loadProgress stays at 0 until onLoadSuccess.
+  // The UI handles this by showing a generic "Chargement…" label
+  // when progress is still 0 after a brief moment.
   const onLoadProgress = useCallback(({ loaded, total }: { loaded: number; total: number }) => {
     if (total > 0) {
       setLoadProgress(Math.min(1, loaded / total));
@@ -1038,8 +1043,16 @@ export default function PDFViewer({
                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/60 to-transparent animate-shimmer" />
                       </div>
                       <Loader2 className="w-6 h-6 mx-auto mb-2 text-primary-500 animate-spin" />
+                      {/* 2026-08-18: show "Téléchargement X%" only when
+                          progress is actually > 0. If it's 0, the PDF
+                          is either in browser cache (loadProgress never
+                          fires) or the download is too fast to see.
+                          In that case, just show a generic "Chargement…"
+                          label. */}
                       <p className="text-sm font-semibold text-slate-700">
-                        Téléchargement {Math.round(loadProgress * 100)}%
+                        {loadProgress > 0
+                          ? `Téléchargement ${Math.round(loadProgress * 100)}%`
+                          : 'Chargement du PDF…'}
                       </p>
                       {isSlowConnection && (
                         <p className="text-xs text-amber-600 mt-1">
