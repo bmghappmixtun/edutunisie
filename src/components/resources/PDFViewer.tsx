@@ -1025,7 +1025,7 @@ export default function PDFViewer({
                 file={url}
                 onLoadSuccess={onLoadSuccess}
                 onLoadError={onLoadError}
-                onProgress={onLoadProgress}
+                onLoadProgress={onLoadProgress}
                 options={documentOptions}
                 loading={
                   <div className="flex items-center justify-center min-h-[500px]">
