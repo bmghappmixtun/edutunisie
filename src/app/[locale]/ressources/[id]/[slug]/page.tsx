@@ -15,7 +15,6 @@ import ResourceInfoPanel from '@/components/resources/ResourceInfoPanel';
 import AiContentSection from '@/components/resources/AiContentSection';
 import AiExerciseOverview from '@/components/resources/AiExerciseOverview';
 import ResourceScribdHeader from '@/components/resources/ResourceScribdHeader';
-import ResourceStickyBar from '@/components/resources/ResourceStickyBar';
 import { getPaletteForSubject } from '@/lib/ai-palettes';
 // NOTE: getPaletteForSubject is kept for future use but currently no consumer
 // in this file (the "Sujets abordés" section was removed 2026-08-02 since
@@ -374,21 +373,6 @@ export default async function ResourcePage({
               </>
             )}
           </nav>
-
-          {/* ============================================================
-              STICKY TITLE BAR (Niveau 1.1, 2026-08-17)
-              Appears at the top of the viewport when the user scrolls
-              past the main ResourceScribdHeader. The sticky bar watches
-              a sentinel placed just below the main header — when the
-              sentinel scrolls out of view, the bar slides in.
-             ============================================================ */}
-          <ResourceStickyBar
-            title={(() => {
-              const { fr } = splitArabicSubject(resource.title);
-              return fr;
-            })()}
-            pageCount={resource.pageCount ?? null}
-          />
 
           {/* ============================================================
               SCRIBD-STYLE HEADER (NEW 2026-08-16)
