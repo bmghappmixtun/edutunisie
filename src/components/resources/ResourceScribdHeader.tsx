@@ -65,18 +65,22 @@ export default function ResourceScribdHeader({
   const detailsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const sentinel = document.getElementById('pdf-viewer-sentinel');
-    if (!sentinel) return;
-    // 2026-08-18 fix: 0-height sentinel was unreliable for
-    // IntersectionObserver. Use scroll-based detection instead:
-    // when the PDF viewer top crosses the bottom of the header,
-    // close the AI accordions.
+    // 2026-08-18 fix (v2): watch the bottom of the résumé card itself
+    // (this component's root) instead of an external sentinel. The
+    // accordions close as soon as the user starts scrolling into the
+    // PDF — i.e. when the card is no longer the focal point. This is
+    // more reliable than a sentinel (which can be misplaced) and more
+    // intuitive (the AI sections close when you stop reading them).
+    const root = detailsRef.current?.parentElement;
+    if (!root) return;
     let lastClosed = false;
     const check = () => {
-      const rect = sentinel.getBoundingClientRect();
-      // Close when sentinel has scrolled above the sticky bar (top: 64px)
-      // and the PDF is now occupying the viewport
-      const shouldClose = rect.top < 64;
+      const rect = root.getBoundingClientRect();
+      // Close when the bottom of the card has scrolled above the header
+      // (62px mobile, 73px desktop). At that point the user is
+      // looking at the PDF, not the résumé.
+      const headerH = window.matchMedia('(min-width: 1024px)').matches ? 73 : 62;
+      const shouldClose = rect.bottom < headerH + 50;
       if (shouldClose && !lastClosed) {
         lastClosed = true;
         setAiOpen(false);
@@ -123,7 +127,10 @@ export default function ResourceScribdHeader({
   const hasAnyAI = hasInsights || hasKeyPoints;
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden mb-4">
+    <div
+      id="resource-scribd-header"
+      className="bg-white rounded-2xl border border-slate-200 overflow-hidden mb-4"
+    >
       <div className="p-5 lg:p-6">
         {/* Title */}
         <h1 className="text-xl lg:text-2xl font-extrabold text-slate-900 leading-tight mb-3">

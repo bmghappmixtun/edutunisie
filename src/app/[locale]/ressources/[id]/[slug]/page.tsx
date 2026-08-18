@@ -443,12 +443,6 @@ export default async function ResourcePage({
             })()}
           />
 
-          {/* Sentinel for sticky bar. Placed AFTER the ResourceScribdHeader
-              so the sticky bar only shows once the user has scrolled past
-              the résumé card (user feedback 2026-08-18). Has a real height
-              so the scroll listener can track it reliably. */}
-          <div id="sticky-bar-sentinel" aria-hidden="true" style={{ height: 1 }} />
-
           <div className="grid grid-cols-1 gap-6">
             {/* MAIN — single column. Sidebar (teacher + info panel) was
                 removed 2026-08-17 to give the PDF viewer more width.
@@ -635,11 +629,6 @@ export default async function ResourcePage({
                   the viewer itself is self-explanatory. */}
               {canViewBody && (
               <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden mb-4">
-                {/* Sentinel for AI accordion auto-collapse. The ScribdHeader
-                    watches this element — when it scrolls above the sticky
-                    bar position, the AI accordions close. Has a real height
-                    for reliable tracking across all browsers. */}
-                <div id="pdf-viewer-sentinel" aria-hidden="true" style={{ height: 1 }} />
                 <div className="p-0">
                   <LazyPDFViewer
                     url={`/api/resources/${resource.id}/download`}

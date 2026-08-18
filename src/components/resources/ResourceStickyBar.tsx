@@ -13,28 +13,40 @@ export interface ResourceStickyBarProps {
  * past the main ResourceScribdHeader. Shows a compact title + page count
  * + a back-to-top button.
  *
- * Implementation: an IntersectionObserver watches a sentinel placed just
- * above the sticky bar (e.g. just below the main header). When the sentinel
- * scrolls out of view, the sticky bar slides in.
+ * Trigger logic (user feedback 2026-08-18): the bar must be HIDDEN while
+ * the ResourceScribdHeader is even partially visible. It only appears
+ * once the bottom of the résumé card has scrolled above the fixed site
+ * header. We watch the ScribdHeader element directly (not a sentinel
+ * placed after it) so the threshold is the actual bottom edge of the
+ * card, not a magic 64px number.
+ *
+ * Position: `top-[62px] lg:top-[73px]` to match the site header heights
+ * (h-[62px] lg:h-[73px] in src/components/layout/Header.tsx). The
+ * earlier `top-16` (64px) overlapped the 73px desktop header and hid
+ * the bottom of the Examanet logo.
  */
 export default function ResourceStickyBar({ title, pageCount }: ResourceStickyBarProps) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const sentinel = document.getElementById('sticky-bar-sentinel');
-    if (!sentinel) return;
-    // 2026-08-18 fix: a 0-height sentinel doesn't reliably trigger
-    // IntersectionObserver (especially in some browsers). Also use
-    // scroll listener as a fallback for robustness.
+    const target = document.getElementById('resource-scribd-header');
+    if (!target) return;
+
+    // The site header is 62px on mobile, 73px on lg+. Match it so the
+    // sticky bar sits flush below the header.
+    const getHeaderHeight = () =>
+      window.matchMedia('(min-width: 1024px)').matches ? 73 : 62;
+
     let lastVisible = false;
     const check = () => {
-      const rect = sentinel.getBoundingClientRect();
-      // Sentinel is "out of view" when its top is above the header
-      // (we use 64px to account for the fixed site header).
-      const outOfView = rect.top < 64;
-      if (outOfView !== lastVisible) {
-        lastVisible = outOfView;
-        setVisible(outOfView);
+      const rect = target.getBoundingClientRect();
+      // Show the sticky bar only when the ENTIRE résumé card has
+      // scrolled above the site header. rect.bottom <= headerHeight
+      // means the card's bottom edge is at or above the header.
+      const shouldShow = rect.bottom <= getHeaderHeight();
+      if (shouldShow !== lastVisible) {
+        lastVisible = shouldShow;
+        setVisible(shouldShow);
       }
     };
     check();
@@ -49,12 +61,7 @@ export default function ResourceStickyBar({ title, pageCount }: ResourceStickyBa
   return (
     <div
       aria-hidden={!visible}
-      // 2026-08-18 fix: site Header is fixed at top-0 with z-50, h-16
-      // (64px) on mobile and h-16 on desktop. The sticky bar must sit
-      // BELOW the header so it doesn't get hidden behind it. Use top-16
-      // (64px) to match. z-[60] keeps it above all other content but
-      // below modal dialogs.
-      className={`fixed top-16 left-0 right-0 z-[60] transition-transform duration-200 ease-out ${
+      className={`fixed top-[62px] lg:top-[73px] left-0 right-0 z-[60] transition-transform duration-200 ease-out ${
         visible ? 'translate-y-0' : '-translate-y-full'
       }`}
     >
