@@ -108,7 +108,7 @@ export async function POST(req: NextRequest) {
       }
 
       const userMessage = `Titre: "${r.title}"
-Classe: ${r.class.nameFr}
+Classe: ${r.class?.nameFr || 'inconnue'}
 Matière: ${r.subject.nameFr}`;
 
       try {
