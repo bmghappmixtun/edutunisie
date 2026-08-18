@@ -558,6 +558,16 @@ export default function PDFViewer({
     });
   }, []);
 
+  // 2026-08-18: when pageNumber changes (user nav or scroll spy),
+  // mark the new page as rendering. The Page component will then
+  // remove it from the set once it finishes rendering.
+  useEffect(() => {
+    if (pageNumber && numPages) {
+      onPageRenderStart(pageNumber);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pageNumber, numPages]);
+
   const handleCopy = useCallback(async () => {
     const selection = window.getSelection();
     if (selection && selection.toString()) {
@@ -696,6 +706,11 @@ export default function PDFViewer({
         <div className="px-2.5 h-10 text-sm font-bold font-mono tabular-nums min-w-[92px] flex items-center justify-center gap-0.5 whitespace-nowrap">
           {numPages ? (
             <>
+              {/* 2026-08-18: page loader indicator — shows a small spinner
+                  when the current page is still being rendered */}
+              {renderingPages.has(pageNumber) && (
+                <Loader2 className="w-3 h-3 text-primary-300 animate-spin mr-1" />
+              )}
               <input
                 type="number"
                 min={1}
@@ -1017,15 +1032,10 @@ export default function PDFViewer({
                     <div className="text-center max-w-xs">
                       {/* 2026-08-18: skeleton page placeholder with shimmer
                           (Niveau 4 polish). Gray rectangle with animated
-                          gradient to indicate loading state. */}
+                          gradient to indicate loading state. Uses the
+                          .animate-shimmer class from globals.css. */}
                       <div className="relative w-48 h-64 mx-auto mb-4 bg-slate-200 rounded-lg overflow-hidden">
-                        <div
-                          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/60 to-transparent"
-                          style={{
-                            animation: 'shimmer 1.5s infinite',
-                            backgroundSize: '200% 100%',
-                          }}
-                        />
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/60 to-transparent animate-shimmer" />
                       </div>
                       <Loader2 className="w-6 h-6 mx-auto mb-2 text-primary-500 animate-spin" />
                       <p className="text-sm font-semibold text-slate-700">
@@ -1157,6 +1167,43 @@ export default function PDFViewer({
                       />
                     </PageLayerBoundary>
                   </PageLayerBoundary>
+                )}
+                {/* 2026-08-18: PRELOAD ADJACENT PAGES (Niveau 4 polish).
+                    In single mode, render pages N-1 and N+1 in a hidden
+                    offscreen div. react-pdf caches the rendered pages,
+                    so navigating to them later is instant. The pages
+                    are visually hidden (positioned off-screen) and have
+                    aria-hidden to keep them out of the accessibility tree. */}
+                {viewMode === 'single' && numPages && numPages > 1 && (
+                  <div
+                    aria-hidden="true"
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: '-99999px',
+                      width: containerWidth,
+                      pointerEvents: 'none',
+                    }}
+                  >
+                    {pageNumber > 1 && (
+                      <Page
+                        pageNumber={pageNumber - 1}
+                        width={containerWidth}
+                        renderTextLayer={false}
+                        renderAnnotationLayer={false}
+                        loading={<div className="min-h-[500px]" />}
+                      />
+                    )}
+                    {pageNumber < numPages && (
+                      <Page
+                        pageNumber={pageNumber + 1}
+                        width={containerWidth}
+                        renderTextLayer={false}
+                        renderAnnotationLayer={false}
+                        loading={<div className="min-h-[500px]" />}
+                      />
+                    )}
+                  </div>
                 )}
               </Document>
             </DocumentErrorBoundary>
