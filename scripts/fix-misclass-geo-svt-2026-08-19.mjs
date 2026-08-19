@@ -114,3 +114,8 @@ main()
 
 // 2026-08-19 update: #7815 reclassified class + type
 // Was 1AS, DEVOIR_CONTROLE; user says 3AS, DEVOIR_SYNTHESE
+
+// 2026-08-19 update: #13424 reclassified class + type
+// Was 1AS, DEVOIR_CONTROLE; user says 2AS eco-services, DEVOIR_SYNTHESE
+// NOTE: This file has the same title as #5009 (1AS). Might be a duplicate —
+// user can decide if both should remain (same teacher, different class).
