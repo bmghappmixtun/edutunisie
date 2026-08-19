@@ -148,3 +148,10 @@ main()
 
 // 2026-08-19 update: #15368 class 1AS → 2AS, type → DS n°1,
 // subject name in title/slug updated to 'التفكير الإسلامي'
+
+// 2026-08-19 PI bulk audit: 3 fixes
+// #15367 + #8053: 1AS had section 'sciences' — cleared (1AS = Tronc commun)
+// #15369: title was 'فرض مراقبة' (DC) but metadata.subtype=SYNTHESE
+//         changed to DS (per user pattern, headerData updated too)
+// #15370: 3AS + maths section — unusual but left as-is (PI is
+//         taught in all sections, not just lettres in Tunisia)
