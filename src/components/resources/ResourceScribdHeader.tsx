@@ -175,7 +175,7 @@ export default function ResourceScribdHeader({
         {/* Stats line */}
         <div
           dir={isAr ? 'rtl' : 'ltr'}
-          className={`flex items-center gap-3 text-xs text-slate-500 mb-3 flex-wrap ${isAr ? 'justify-end' : ''}`}
+          className={`flex items-center gap-3 text-xs text-slate-500 mb-3 flex-wrap ${isAr ? 'justify-start text-right' : ''}`}
         >
           <span className="inline-flex items-center gap-1">
             <Eye className="w-3.5 h-3.5" /> {formatNumber(viewsCount)} vues
