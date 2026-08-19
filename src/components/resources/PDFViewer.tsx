@@ -156,6 +156,41 @@ export default function PDFViewer({
   const [readingProgress, setReadingProgress] = useState<number>(0);
   const [renderingPages, setRenderingPages] = useState<Set<number>>(new Set());
   const [isSlowConnection, setIsSlowConnection] = useState(false);
+  // 2026-08-19: Fake progress so the user always sees a percentage turning,
+  // even when react-pdf's onLoadProgress doesn't fire (cached PDFs, fast
+  // CDN, small files). Without this, the UI shows 0% the whole time which
+  // feels broken. We increment from 0 → 90% in 8s with an ease curve,
+  // then snap to 100% when the real loadProgress reaches 1.
+  const [fakeProgress, setFakeProgress] = useState<number>(0);
+  const fakeProgressStartedAt = useRef<number | null>(null);
+  const fakeProgressTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    if (fakeProgressTimer.current) {
+      clearInterval(fakeProgressTimer.current);
+      fakeProgressTimer.current = null;
+    }
+    if (loading) {
+      fakeProgressStartedAt.current = Date.now();
+      setFakeProgress(0);
+      // Tick every 80ms. Target 90% in 8s = ~0.9% per tick.
+      fakeProgressTimer.current = setInterval(() => {
+        const start = fakeProgressStartedAt.current || Date.now();
+        const elapsed = (Date.now() - start) / 1000; // seconds
+        // Ease-out curve: 0% at 0s, ~70% at 4s, ~90% at 8s
+        const pct = Math.min(0.9, 0.9 * (1 - Math.exp(-elapsed / 3)));
+        setFakeProgress(pct);
+      }, 80);
+    } else {
+      setFakeProgress(1);
+    }
+    return () => {
+      if (fakeProgressTimer.current) {
+        clearInterval(fakeProgressTimer.current);
+        fakeProgressTimer.current = null;
+      }
+    };
+  }, [loading]);
   const [pageNaturalSize, setPageNaturalSize] = useState<{ width: number; height: number } | null>(
     null,
   );
@@ -1050,16 +1085,13 @@ export default function PDFViewer({
                           In that case, just show a generic "Chargement…"
                           label. */}
                       <p className="text-sm font-semibold text-slate-700">
-                        {loadProgress > 0
-                          ? `Téléchargement ${Math.round(loadProgress * 100)}%`
-                          : 'Chargement du PDF…'}
+                        {`Téléchargement ${Math.round(Math.max(loadProgress, fakeProgress) * 100)}%`}
                       </p>
                       {isSlowConnection && (
                         <p className="text-xs text-amber-600 mt-1">
                           Connexion lente, ça peut prendre plus de temps…
                         </p>
                       )}
-                      <p className="text-sm text-slate-500">Chargement du PDF…</p>
                     </div>
                   </div>
                 }
