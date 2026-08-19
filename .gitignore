@@ -143,3 +143,5 @@ url-render.png
 
 # Runtime / ephemeral files
 --psm.txt
+scripts/sample-titles.mjs
+scripts/check-*.mjs

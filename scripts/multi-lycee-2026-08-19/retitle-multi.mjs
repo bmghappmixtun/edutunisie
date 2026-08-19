@@ -13,7 +13,7 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient({
   datasources: {
-    db: { url: process.env.DATABASE_URL || 'postgresql://neondb_owner:npg_HBF0Tw4UIvWi@ep-round-art-asyh88wq-pooler.c-4.eu-central-1.aws.neon.tech/neondb?sslmode=require' }
+    db: { url: process.env.DATABASE_URL }
   }
 });
 
