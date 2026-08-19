@@ -125,3 +125,6 @@ main()
 // #13904: subject géo → SVT, section → sciences-experimentales
 
 // 2026-08-19 update: #13914 reclassified géo → SVT (2AS sciences-exp)
+
+// 2026-08-19 update: #14031 reclassified géo → SVT (2AS sciences-exp)
+// Topic 'الجيولوجيا والتضاريس' (geology and topography) is SVT not geography
