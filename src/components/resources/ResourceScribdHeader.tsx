@@ -259,7 +259,7 @@ export default function ResourceScribdHeader({
 
         {/* AI sections as collapsible accordions */}
         {hasAnyAI && (
-          <div ref={detailsRef} dir={isAr ? 'rtl' : 'ltr'} className="pt-2 space-y-2">
+          <div ref={detailsRef} className="pt-2 space-y-2">
             {hasInsights && (
               <details
                 className="group"
@@ -268,11 +268,20 @@ export default function ResourceScribdHeader({
               >
                 <summary
                   dir={isAr ? 'rtl' : 'ltr'}
-                  className={`flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-primary-600 cursor-pointer list-none py-1.5 ${isAr ? 'flex-row-reverse font-arabic-title' : ''}`}
+                  className={`flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-primary-600 cursor-pointer list-none py-1.5 ${isAr ? 'font-arabic-title' : ''}`}
                 >
-                  <ChevronDown className={`w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform ${isAr ? 'ml-0' : 'ml-auto'}`} />
-                  <span>{isAr ? 'نظرة عامة على التمارين' : 'Aperçu des exercices'}</span>
-                  <ListChecks className="w-4 h-4 text-primary-500" />
+                  {/* Source order: [icon, text, chevron].
+                      In LTR, chevron has ml-auto so it pushes to the right
+                      edge (icon left, text middle, chevron right).
+                      In RTL (direction: rtl), the visual order auto-
+                      reverses to [chevron (left), text (middle),
+                      icon (right)], all clustered on main-start (the
+                      RIGHT) — no ml-auto needed.
+                      2026-08-19: previous code used `flex-row-reverse`
+                      which canceled with inherited direction: rtl. */}
+                  <ListChecks className="w-4 h-4 text-primary-500 shrink-0" />
+                  <span className="flex-1">{isAr ? 'نظرة عامة على التمارين' : 'Aperçu des exercices'}</span>
+                  <ChevronDown className={`w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform shrink-0 ${isAr ? '' : 'ml-auto'}`} />
                 </summary>
                 <div
                   dir={isAr ? 'rtl' : 'ltr'}
@@ -306,11 +315,11 @@ export default function ResourceScribdHeader({
               >
                 <summary
                   dir={isAr ? 'rtl' : 'ltr'}
-                  className={`flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-primary-600 cursor-pointer list-none py-1.5 ${isAr ? 'flex-row-reverse font-arabic-title' : ''}`}
+                  className={`flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-primary-600 cursor-pointer list-none py-1.5 ${isAr ? 'font-arabic-title' : ''}`}
                 >
-                  <ChevronDown className={`w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform ${isAr ? 'ml-0' : 'ml-auto'}`} />
-                  <span>{isAr ? 'النقاط الرئيسية' : 'Points clés'}</span>
-                  <Target className="w-4 h-4 text-primary-500" />
+                  <Target className="w-4 h-4 text-primary-500 shrink-0" />
+                  <span className="flex-1">{isAr ? 'النقاط الرئيسية' : 'Points clés'}</span>
+                  <ChevronDown className={`w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform shrink-0 ${isAr ? '' : 'ml-auto'}`} />
                 </summary>
                 {/* 2026-08-19: KP bubbles are now CLICKABLE — each one
                     links to the search page filtered by that topic. This
