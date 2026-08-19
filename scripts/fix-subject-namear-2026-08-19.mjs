@@ -24,3 +24,7 @@ const p = new PrismaClient({
   }
   await p.$disconnect();
 })();
+
+// 2026-08-19: Also updated titles of 2 recently-reclassified français
+// files (#7915 + #3988) — replaced 'الفرنسية' with 'دراسة النص' in
+// the title to match the new subject name.
