@@ -119,3 +119,7 @@ main()
 // Was 1AS, DEVOIR_CONTROLE; user says 2AS eco-services, DEVOIR_SYNTHESE
 // NOTE: This file has the same title as #5009 (1AS). Might be a duplicate —
 // user can decide if both should remain (same teacher, different class).
+
+// 2026-08-19 update: #13437 + #13904
+// #13437: class 1AS → 4AS lettres (was wrongly 1AS)
+// #13904: subject géo → SVT, section → sciences-experimentales
