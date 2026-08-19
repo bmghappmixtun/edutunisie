@@ -128,3 +128,5 @@ main()
 
 // 2026-08-19 update: #14031 reclassified géo → SVT (2AS sciences-exp)
 // Topic 'الجيولوجيا والتضاريس' (geology and topography) is SVT not geography
+
+// 2026-08-19 update: #15349 section eco-services → lettres (2AS)
