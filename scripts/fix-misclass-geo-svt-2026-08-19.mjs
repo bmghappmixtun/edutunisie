@@ -132,3 +132,6 @@ main()
 // 2026-08-19 update: #15349 section eco-services → lettres (2AS)
 
 // 2026-08-19 update: #15348 class 1AS → 2AS (eco-services kept)
+
+// 2026-08-19 update: #15344 type HOMEWORK/DEVOIR_CONTROLE → EXAM (اختبار كتابي)
+// User: "اختبار كتابي عدد 2" — written test n°2
