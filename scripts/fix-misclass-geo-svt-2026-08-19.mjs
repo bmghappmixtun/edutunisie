@@ -169,3 +169,6 @@ main()
 // #9418: 3AS no section → lettres (3AS philo default section)
 // #9629: 3AS eco-services (2AS section) → lettres
 // #8047: 3AS sciences-informatique (4AS section) → lettres
+
+// 2026-08-19 update: #8869 education-civique → anglais (user:
+// "anglais pas education civique"). 2AS eco-services kept.
