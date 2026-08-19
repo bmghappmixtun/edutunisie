@@ -135,3 +135,9 @@ main()
 
 // 2026-08-19 update: #15344 type HOMEWORK/DEVOIR_CONTROLE → EXAM (اختبار كتابي)
 // User: "اختبار كتابي عدد 2" — written test n°2
+
+// 2026-08-19 update: #8054 class 1AS → 2AS (sciences)
+// Note: the title had already been updated to 'التفكير الإسلامي' (new
+// subject name) by the retitle-multi.mjs script that I re-ran earlier
+// (after fixing SUBJECTS_AR['pensee-islamique'] from 'الفكر الإسلامي'
+// to 'التفكير الإسلامي').

@@ -31,7 +31,7 @@ const SUBJECTS = {
 const SUBJECTS_AR = {
   arabe: 'العربية',
   philosophie: 'الفلسفة',
-  'pensee-islamique': 'الفكر الإسلامي',
+  'pensee-islamique': 'التفكير الإسلامي',
   histoire: 'التاريخ',
   geographie: 'الجغرافيا',
   'histoire-geographie': 'التاريخ والجغرافيا',
