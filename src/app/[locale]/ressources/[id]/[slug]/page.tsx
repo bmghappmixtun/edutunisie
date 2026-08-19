@@ -336,7 +336,13 @@ export default async function ResourcePage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-      <main className="flex-1 pt-20">
+      {/* 2026-08-19 nightly fix (ERR-FGCMHE 1× React #419 on /ar/ressources/3740/...):
+          use a <div> instead of <main> because the [locale]/layout.tsx already
+          wraps children in <main className="min-h-screen"> — nested <main>
+          is an HTML5 accessibility violation and a known hydration-error
+          trigger. The loading.tsx skeleton mirrors this change so the
+          Suspense fallback and the streamed page have identical structure. */}
+      <div className="flex-1 pt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           {/* Visual breadcrumb (matches BreadcrumbList JSON-LD) */}
           <nav
@@ -638,7 +644,7 @@ export default async function ResourcePage({
                 row for lycée files (already in the title format). */}
           </div>
         </div>
-      </main>
+      </div>
       </div>
   );
 }

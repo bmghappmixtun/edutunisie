@@ -9,7 +9,12 @@ export default function Loading() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: '{}' }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: '{}' }} />
 
-      <main className="flex-1 pt-20">
+      {/* 2026-08-19 nightly fix (ERR-FGCMHE): mirror page.tsx's <div> change.
+          The page used to have a nested <main> here (also wrapped in the
+          layout's <main>), so the loading skeleton had to match. After the
+          fix the page uses <div className="flex-1 pt-20"> so this skeleton
+          matches it byte-for-byte. */}
+      <div className="flex-1 pt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           {/* Breadcrumb */}
           <nav
@@ -171,7 +176,7 @@ export default function Loading() {
             </div>
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 }

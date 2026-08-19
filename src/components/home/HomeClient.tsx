@@ -54,8 +54,22 @@ export default function HomeClient({
 
   const popularTags = ['Maths', 'Physique', 'SVT', 'Français', 'Arabe', 'Anglais'];
 
+  // 2026-08-19 nightly fix (ERR-LKRCDG 3× + ERR-FGCMHE 1× React #419 on /fr):
+  //
+  // PREVIOUSLY this wrapper was <main>. The [locale]/layout.tsx ALSO wraps
+  // children in <main className="min-h-screen">, so the rendered DOM had
+  // TWO nested <main> elements (a real HTML5 accessibility violation —
+  // only one visible <main> is allowed per document). The hydration walker
+  // saw the nested <main> structure on both server and client and recovered
+  // with React #419 ("There was an error while hydrating but React was
+  // able to recover by instead client rendering the entire root") on rare
+  // navigations from the not-found boundary to /fr.
+  //
+  // FIX: use a <div> here. The layout already provides the semantic
+  // <main>, and the pt-16 lg:pt-20 classes (offset for the fixed Header)
+  // stay on this wrapper so the visual layout is unchanged.
   return (
-    <main className="flex-1 pt-16 lg:pt-20">
+    <div className="flex-1 pt-16 lg:pt-20">
       {/* HERO */}
       <section className="relative bg-gradient-to-br from-primary-50 via-white to-sky-50 overflow-hidden">
         <div className="absolute top-20 -start-20 w-48 h-48 sm:w-72 sm:h-72 lg:w-96 lg:h-96 bg-primary-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float" />
@@ -582,6 +596,6 @@ export default function HomeClient({
           </p>
         </div>
       </section>
-    </main>
+    </div>
   );
 }
