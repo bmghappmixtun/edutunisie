@@ -145,3 +145,6 @@ main()
 // 2026-08-19 update: #14567 type DEVOIR_CONTROLE → DEVOIR_SYNTHESE n°1
 // (slug had old subject name 'alfkr-alislamy' from before the retitle
 // SUBJECTS_AR fix; now regenerated to new transliteration)
+
+// 2026-08-19 update: #15368 class 1AS → 2AS, type → DS n°1,
+// subject name in title/slug updated to 'التفكير الإسلامي'
