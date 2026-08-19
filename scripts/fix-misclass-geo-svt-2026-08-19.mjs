@@ -172,3 +172,6 @@ main()
 
 // 2026-08-19 update: #8869 education-civique → anglais (user:
 // "anglais pas education civique"). 2AS eco-services kept.
+
+// 2026-08-19 update: #8853 education-civique → anglais (same year/teacher
+// pattern as #8869 — likely a series of English DC files misclassified)
