@@ -77,7 +77,7 @@ const TYPE_PREFIXES_AR = {
   COURS: 'درس',
   RESUME: 'ملخص',
   FICHE: 'بطاقة',
-  EXAMEN: 'امتحان',
+  EXAMEN: 'اختبار كتابي',
   AUTRE: 'وثيقة',
 };
 
