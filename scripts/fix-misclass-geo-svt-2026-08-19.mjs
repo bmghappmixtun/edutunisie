@@ -164,3 +164,8 @@ main()
 // 3AS sciences-experimentales, type DEVOIR_SYNTHESE n°1 kept
 
 // 2026-08-19 update: #3988 philo → français, n° 1 → 2
+
+// 2026-08-19 philo audit: 3 fixes
+// #9418: 3AS no section → lettres (3AS philo default section)
+// #9629: 3AS eco-services (2AS section) → lettres
+// #8047: 3AS sciences-informatique (4AS section) → lettres
