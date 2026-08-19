@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect, useRef } from 'react';
+import { Link } from '@/i18n/navigation';
 import {
   ChevronDown,
   ChevronUp,
@@ -69,9 +70,11 @@ export default function ResourceScribdHeader({
   const [expanded, setExpanded] = useState(false);
   // 2026-08-17 (Niveau 1.2): auto-collapse AI accordions when the user
   // scrolls into the PDF viewer. They stay closed until the user clicks
-  // them again. Tracked via a sentinel element placed just above the
-  // PDF viewer.
-  const [aiOpen, setAiOpen] = useState(false);
+  // them again.
+  // 2026-08-19 fix: each accordion now has its own state so clicking
+  // one doesn't toggle the other. (Previous bug: both shared `aiOpen`.)
+  const [aiInsightsOpen, setAiInsightsOpen] = useState(false);
+  const [aiKeyPointsOpen, setAiKeyPointsOpen] = useState(false);
   const detailsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -93,7 +96,8 @@ export default function ResourceScribdHeader({
       const shouldClose = rect.bottom < headerH + 50;
       if (shouldClose && !lastClosed) {
         lastClosed = true;
-        setAiOpen(false);
+        setAiInsightsOpen(false);
+        setAiKeyPointsOpen(false);
       } else if (!shouldClose) {
         lastClosed = false;
       }
@@ -239,8 +243,8 @@ export default function ResourceScribdHeader({
             {hasInsights && (
               <details
                 className="group"
-                open={aiOpen}
-                onToggle={(e) => setAiOpen((e.target as HTMLDetailsElement).open)}
+                open={aiInsightsOpen}
+                onToggle={(e) => setAiInsightsOpen((e.target as HTMLDetailsElement).open)}
               >
                 <summary className="flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-primary-600 cursor-pointer list-none py-1.5">
                   <ListChecks className="w-4 h-4 text-primary-500" />
@@ -271,25 +275,29 @@ export default function ResourceScribdHeader({
             {hasKeyPoints && (
               <details
                 className="group"
-                open={aiOpen}
-                onToggle={(e) => setAiOpen((e.target as HTMLDetailsElement).open)}
+                open={aiKeyPointsOpen}
+                onToggle={(e) => setAiKeyPointsOpen((e.target as HTMLDetailsElement).open)}
               >
                 <summary className="flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-primary-600 cursor-pointer list-none py-1.5">
                   <Target className="w-4 h-4 text-primary-500" />
                   <span>{isArDoc ? 'النقاط الرئيسية' : 'Points clés'}</span>
                   <ChevronDown className="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform ml-auto" />
                 </summary>
-                {/* 2026-08-17: KP bubbles use a neutral style (no per-bubble
-                    color). Just text + border, same look for all bubbles. */}
+                {/* 2026-08-19: KP bubbles are now CLICKABLE — each one
+                    links to the search page filtered by that topic. This
+                    lets users discover related resources with the same
+                    key point. Per user request. */}
                 <div className={`pl-6 py-2 flex flex-wrap gap-2 ${isArDoc ? 'justify-end' : 'justify-start'}`}>
                   {mergedKP.map((kp, i) => (
-                    <span
+                    <Link
                       key={i}
+                      href={`/recherche?q=${encodeURIComponent(kp.text)}`}
                       dir={isArDoc ? 'rtl' : 'ltr'}
-                      className={`px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded-full text-xs font-semibold hover:bg-slate-50 ${isArDoc ? 'text-right' : 'text-left'}`}
+                      title={`Rechercher des ressources contenant « ${kp.text} »`}
+                      className={`px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded-full text-xs font-semibold hover:bg-primary-50 hover:text-primary-700 hover:border-primary-200 transition-colors cursor-pointer ${isArDoc ? 'text-right' : 'text-left'}`}
                     >
                       {kp.text}
-                    </span>
+                    </Link>
                   ))}
                 </div>
               </details>
