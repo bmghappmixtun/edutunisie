@@ -208,13 +208,20 @@ function buildNewTitle(r, subject, isAr) {
   }
 
   // Build title
-  let parts = [typeWithNum, subjectLabel];
+  // 2026-08-19: format = "{Type} - {Sujet} - {Classe} - [شعبة | Section]
+  //   {Section} ({Year}) : {Topic}". Per user rule: 'on doit mettre des
+  //   tirets "-" entre type et matière et classe et section' and
+  //   'on doit mettre le mot section en arabe "شعبة" avant la section'.
+  let parts = [typeWithNum];
+  parts.push(subjectLabel);
   if (classLabel) parts.push(classLabel);
-  if (sectionLabel) parts.push(sectionLabel);
-  const base = parts.join(' - ');
-  if (year) parts.push(year);
-  if (topic) parts.push(`: ${topic}`);
-  return parts.join(' ');
+  if (sectionLabel) {
+    parts.push(isAr ? `شعبة ${sectionLabel}` : `Section ${sectionLabel}`);
+  }
+  let title = parts.join(' - ');
+  if (year) title += ` ${year}`;
+  if (topic) title += ` : ${topic}`;
+  return title;
 }
 
 async function main() {
