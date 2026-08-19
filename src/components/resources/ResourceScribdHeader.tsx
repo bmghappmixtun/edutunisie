@@ -324,7 +324,6 @@ export default function ResourceScribdHeader({
                       dir={isAr ? 'rtl' : 'ltr'}
                       title={`Rechercher des ressources contenant « ${kp.text} »`}
                       className={`px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded-full text-xs font-semibold hover:bg-primary-50 hover:text-primary-700 hover:border-primary-200 transition-colors cursor-pointer ${isAr ? 'text-right' : 'text-left'}`}
->>>>>>> feature/scribd-with-pdf-fix
                     >
                       {kp.text}
                     </Link>
