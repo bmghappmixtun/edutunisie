@@ -140,14 +140,25 @@ export default function ResourceScribdHeader({
   const hasKeyPoints = mergedKP.length > 0;
   const hasAnyAI = hasInsights || hasKeyPoints;
 
+  // 2026-08-19: detect AR content from the title if isArDoc isn't explicit.
+  // The page already passes isArDoc based on resource.language, but we
+  // also auto-detect from the title in case language is wrong/missing.
+  const titleIsAr = /[\u0600-\u06FF]/.test(title);
+  const isAr = isArDoc || titleIsAr;
+
   return (
     <div
       id="resource-scribd-header"
-      className="bg-white rounded-2xl border border-slate-200 overflow-hidden mb-4"
+      dir={isAr ? 'rtl' : 'ltr'}
+      lang={isAr ? 'ar' : 'fr'}
+      className={`bg-white rounded-2xl border border-slate-200 overflow-hidden mb-4 ${isAr ? 'font-arabic-title text-right' : ''}`}
     >
       <div className="p-5 lg:p-6">
         {/* Title */}
-        <h1 className="text-xl lg:text-2xl font-extrabold text-slate-900 leading-tight mb-3">
+        <h1
+          dir={isAr ? 'rtl' : 'ltr'}
+          className={`text-xl lg:text-2xl font-extrabold text-slate-900 leading-tight mb-3 ${isAr ? 'font-arabic-title' : ''}`}
+        >
           {title}
         </h1>
 
@@ -162,7 +173,10 @@ export default function ResourceScribdHeader({
         )}
 
         {/* Stats line */}
-        <div className="flex items-center gap-3 text-xs text-slate-500 mb-3 flex-wrap">
+        <div
+          dir={isAr ? 'rtl' : 'ltr'}
+          className={`flex items-center gap-3 text-xs text-slate-500 mb-3 flex-wrap ${isAr ? 'justify-end' : ''}`}
+        >
           <span className="inline-flex items-center gap-1">
             <Eye className="w-3.5 h-3.5" /> {formatNumber(viewsCount)} vues
           </span>
@@ -205,13 +219,16 @@ export default function ResourceScribdHeader({
         {/* Description with expand */}
         {description ? (
           <div className="mb-4">
-            <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line">
+            <p
+              dir={isAr ? 'rtl' : 'ltr'}
+              className={`text-sm text-slate-700 leading-relaxed whitespace-pre-line ${isAr ? 'font-arabic-title' : ''}`}
+            >
               {visibleDescription}
             </p>
             {hasLongDescription && (
               <button
                 onClick={() => setExpanded((e) => !e)}
-                className="text-sm text-primary-600 font-semibold hover:underline mt-1 inline-flex items-center gap-1"
+                className={`text-sm text-primary-600 font-semibold hover:underline mt-1 inline-flex items-center gap-1 ${isAr ? 'flex-row-reverse' : ''}`}
               >
                 {expanded ? 'Réduire' : 'Description complète'}
                 {expanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
@@ -222,36 +239,42 @@ export default function ResourceScribdHeader({
 
         {/* Transféré par — right-aligned per user request 2026-08-17 */}
         {teacherName && (
-          <div className="text-xs text-slate-500 mb-3 text-right">
+          <div dir={isAr ? 'rtl' : 'ltr'} className="text-xs text-slate-500 mb-3 text-right">
             Transféré par{' '}
             {teacherProfileUrl ? (
               <a
                 href={teacherProfileUrl}
-                className="font-semibold text-primary-600 hover:underline"
+                className={`font-semibold text-primary-600 hover:underline ${isAr ? 'font-arabic-title' : ''}`}
               >
                 {teacherName}
               </a>
             ) : (
-              <span className="font-semibold text-slate-700">{teacherName}</span>
+              <span className={`font-semibold text-slate-700 ${isAr ? 'font-arabic-title' : ''}`}>{teacherName}</span>
             )}
           </div>
         )}
 
         {/* AI sections as collapsible accordions */}
         {hasAnyAI && (
-          <div ref={detailsRef} className="pt-2 space-y-2">
+          <div ref={detailsRef} dir={isAr ? 'rtl' : 'ltr'} className="pt-2 space-y-2">
             {hasInsights && (
               <details
                 className="group"
                 open={aiInsightsOpen}
                 onToggle={(e) => setAiInsightsOpen((e.target as HTMLDetailsElement).open)}
               >
-                <summary className="flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-primary-600 cursor-pointer list-none py-1.5">
+                <summary
+                  dir={isAr ? 'rtl' : 'ltr'}
+                  className={`flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-primary-600 cursor-pointer list-none py-1.5 ${isAr ? 'flex-row-reverse font-arabic-title' : ''}`}
+                >
                   <ListChecks className="w-4 h-4 text-primary-500" />
-                  <span>{isArDoc ? 'نظرة عامة على التمارين' : 'Aperçu des exercices'}</span>
+                  <span>{isAr ? 'نظرة عامة على التمارين' : 'Aperçu des exercices'}</span>
                   <ChevronDown className="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform ml-auto" />
                 </summary>
-                <div className={`pl-6 py-2 text-sm text-slate-600 space-y-2 ${isArDoc ? 'text-right' : ''}`}>
+                <div
+                  dir={isAr ? 'rtl' : 'ltr'}
+                  className={`pl-6 py-2 text-sm text-slate-600 space-y-2 ${isAr ? 'text-right font-arabic-title' : ''}`}
+                >
                   {/* 2026-08-18: "{N} exercices {matière}" chip INSIDE the
                       accordion body, above the list of exercises. Format
                       per user rule: count of insights + real subject name
@@ -278,23 +301,30 @@ export default function ResourceScribdHeader({
                 open={aiKeyPointsOpen}
                 onToggle={(e) => setAiKeyPointsOpen((e.target as HTMLDetailsElement).open)}
               >
-                <summary className="flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-primary-600 cursor-pointer list-none py-1.5">
+                <summary
+                  dir={isAr ? 'rtl' : 'ltr'}
+                  className={`flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-primary-600 cursor-pointer list-none py-1.5 ${isAr ? 'flex-row-reverse font-arabic-title' : ''}`}
+                >
                   <Target className="w-4 h-4 text-primary-500" />
-                  <span>{isArDoc ? 'النقاط الرئيسية' : 'Points clés'}</span>
+                  <span>{isAr ? 'النقاط الرئيسية' : 'Points clés'}</span>
                   <ChevronDown className="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform ml-auto" />
                 </summary>
                 {/* 2026-08-19: KP bubbles are now CLICKABLE — each one
                     links to the search page filtered by that topic. This
                     lets users discover related resources with the same
                     key point. Per user request. */}
-                <div className={`pl-6 py-2 flex flex-wrap gap-2 ${isArDoc ? 'justify-end' : 'justify-start'}`}>
+                <div
+                  dir={isAr ? 'rtl' : 'ltr'}
+                  className={`pl-6 py-2 flex flex-wrap gap-2 ${isAr ? 'justify-end font-arabic-title' : 'justify-start'}`}
+                >
                   {mergedKP.map((kp, i) => (
                     <Link
                       key={i}
                       href={`/recherche?q=${encodeURIComponent(kp.text)}`}
-                      dir={isArDoc ? 'rtl' : 'ltr'}
+                      dir={isAr ? 'rtl' : 'ltr'}
                       title={`Rechercher des ressources contenant « ${kp.text} »`}
-                      className={`px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded-full text-xs font-semibold hover:bg-primary-50 hover:text-primary-700 hover:border-primary-200 transition-colors cursor-pointer ${isArDoc ? 'text-right' : 'text-left'}`}
+                      className={`px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded-full text-xs font-semibold hover:bg-primary-50 hover:text-primary-700 hover:border-primary-200 transition-colors cursor-pointer ${isAr ? 'text-right' : 'text-left'}`}
+>>>>>>> feature/scribd-with-pdf-fix
                     >
                       {kp.text}
                     </Link>
