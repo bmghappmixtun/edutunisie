@@ -123,3 +123,5 @@ main()
 // 2026-08-19 update: #13437 + #13904
 // #13437: class 1AS → 4AS lettres (was wrongly 1AS)
 // #13904: subject géo → SVT, section → sciences-experimentales
+
+// 2026-08-19 update: #13914 reclassified géo → SVT (2AS sciences-exp)
