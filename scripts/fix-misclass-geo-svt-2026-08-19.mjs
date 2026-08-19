@@ -130,3 +130,5 @@ main()
 // Topic 'الجيولوجيا والتضاريس' (geology and topography) is SVT not geography
 
 // 2026-08-19 update: #15349 section eco-services → lettres (2AS)
+
+// 2026-08-19 update: #15348 class 1AS → 2AS (eco-services kept)
