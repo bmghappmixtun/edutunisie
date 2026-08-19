@@ -231,16 +231,19 @@ export default function ResourceScribdHeader({
                 className={`text-sm text-primary-600 font-semibold hover:underline mt-1 inline-flex items-center gap-1 ${isAr ? 'flex-row-reverse font-arabic-title' : ''}`}
               >
                 {expanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-                {expanded ? 'Réduire' : 'Description complète'}
+                {expanded
+                  ? (isAr ? 'طي' : 'Réduire')
+                  : (isAr ? 'الوصف الكامل' : 'Description complète')}
               </button>
             )}
           </div>
         ) : null}
 
-        {/* Transféré par — right-aligned per user request 2026-08-17 */}
+        {/* Transféré par — right-aligned per user request 2026-08-17.
+            2026-08-19: AR translation 'نقل بواسطة' when the doc is AR. */}
         {teacherName && (
-          <div dir={isAr ? 'rtl' : 'ltr'} className="text-xs text-slate-500 mb-3 text-right">
-            Transféré par{' '}
+          <div dir={isAr ? 'rtl' : 'ltr'} className={`text-xs text-slate-500 mb-3 text-right ${isAr ? 'font-arabic-title' : ''}`}>
+            {isAr ? 'نقل بواسطة' : 'Transféré par'}{' '}
             {teacherProfileUrl ? (
               <a
                 href={teacherProfileUrl}

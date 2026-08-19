@@ -11,7 +11,11 @@
 
 import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  datasources: {
+    db: { url: process.env.DATABASE_URL || 'postgresql://neondb_owner:npg_HBF0Tw4UIvWi@ep-round-art-asyh88wq-pooler.c-4.eu-central-1.aws.neon.tech/neondb?sslmode=require' }
+  }
+});
 
 const ARABIC_SUBJECTS = new Set(['arabe', 'philosophie', 'pensee-islamique', 'histoire', 'geographie', 'histoire-geographie']);
 
@@ -104,10 +108,13 @@ const SECTION_LABELS_FR = {
 
 const SECTION_LABELS_AR = {
   'sciences-informatique': 'علوم الإعلامية',
+  'technologies-informatique': 'علوم الإعلامية',
   maths: 'الرياضيات',
   lettres: 'الآداب',
   'eco-gestion': 'الاقتصاد والتصرف',
+  'eco-services': 'الاقتصاد والخدمات',
   technique: 'التقنية',
+  sciences: 'العلوم',
   'sciences-experimentales': 'العلوم التجريبية',
   'sciences-techniques': 'العلوم التقنية',
   sport: 'الرياضة',
@@ -174,10 +181,14 @@ function buildNewTitle(r, subject, isAr) {
   }
 
   // Homework number
+  // 2026-08-19: 'N°' in Latin was leaking into 100% AR titles.
+  // Use 'عدد' (adad = number) in AR titles per user rule 'tous les titres
+  // en arabe lycée doivent etre 100% arabe'.
   const hwNum = r.homeworkNumber;
   let typeWithNum = typeStr;
   if (hwNum && r.type === 'HOMEWORK') {
-    typeWithNum = `${typeStr} N°${hwNum}`;
+    const numSep = isAr ? ' عدد ' : ' N°';
+    typeWithNum = `${typeStr}${numSep}${hwNum}`;
   }
 
   // Class
