@@ -34,7 +34,7 @@
     "@statsig/js-client": "^3.33.4",
     "@statsig/session-replay": "^3.33.4",
     "@statsig/web-analytics": "^3.33.4",
-    "@tanstack/react-virtual": "^3.14.9",
+    "@tanstack/react-virtual": "^3.14.10",
     "@types/pg": "^8.20.0",
     "@vercel/analytics": "^2.0.1",
     "@vercel/blob": "^2.4.0",
