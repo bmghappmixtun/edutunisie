@@ -159,3 +159,6 @@ main()
 // 2026-08-19: Deleted #9630 (Philosophie 3AS lettres, "المرأة والحرية -
 // سيمون دي بوفوار", 2024-2025). User said "supprimer". Orphan PDF
 // remains in Vercel Blob (no BLOB_READ_WRITE_TOKEN to clean).
+
+// 2026-08-19 update: #7915 subject philo → français (étude de texte)
+// 3AS sciences-experimentales, type DEVOIR_SYNTHESE n°1 kept
