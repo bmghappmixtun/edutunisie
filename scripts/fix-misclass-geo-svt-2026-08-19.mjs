@@ -111,3 +111,6 @@ async function main() {
 main()
   .then(() => p.$disconnect())
   .catch(e => { console.error('💥', e); p.$disconnect(); process.exit(1); });
+
+// 2026-08-19 update: #7815 reclassified class + type
+// Was 1AS, DEVOIR_CONTROLE; user says 3AS, DEVOIR_SYNTHESE
