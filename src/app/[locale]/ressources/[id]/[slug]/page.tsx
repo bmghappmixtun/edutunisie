@@ -502,109 +502,17 @@ export default async function ResourcePage({
                 </div>
               )}
 
-              <div className="bg-white rounded-2xl border border-slate-100 p-6 lg:p-8 mb-4">
-                {/* 2026-08-17: removed the duplicate badges + h1 + sujet + résumé
-                    intelligent block. The ScribdHeader above already shows the
-                    title, description, and teacher. The AI-generated summary
-                    below (with "Aperçu des exercices" and "Points clés" cards)
-                    is kept. */}
+              {/* 2026-08-19: removed the empty wrapper div that was rendering
+                  as a white rectangle on every page with no AI data. The
+                  original block contained 3 IIFEs that all returned null.
+                  The product chip (technologie+college) is preserved below. */}
 
-                                {/* 2026-08-17: "Résumé intelligent" card removed. */}
-                {resource.aiSummary?.summary && (() => {
-                  const summary = resource.aiSummary.summary;
-                  const summaryOriginal = (resource.aiSummary as any)?.summaryOriginal || null;
-                  // Per user rule (2026-07-30): for college, hide Type (النوع) and
-                  // Niveau (المستوى) from the AI card — they're always the same.
-                  const isCollege = resource.class?.level?.slug === 'college';
-                  // Per user rule (2026-08-06): for all lycée files (any subject),
-                  // hide Sujet général / Enseignant / Classe — these are already
-                  // shown in the page header (h1), the right sidebar (Enseignant +
-                  // Classe) and the title format "BASE (year) : GeneralSubject",
-                  // so the AI card would just be redundant.
-                  const isLycee = resource.class?.level?.slug === 'lycee';
-                  const hideFields = isLycee
-                    ? ['Sujet général', 'Enseignant', 'Classe']
-                    : null;
-                  // Teacher full name (FR + AR) — prefer the resource.teacherNameAr
-                  // (text field, no relation) for AR. Fall back to the User record.
-                  // Per user rule: "teacherNameAr est juste une info pour l'utilisateur
-                  // du site et les moteurs de recherche" — display/SEO only.
-                  const teacherFr = resource.teacher
-                    ? `${resource.teacher.firstName || ''} ${resource.teacher.lastName || ''}`
-                        .replace(/\s+/g, ' ')
-                        .trim() || null
-                    : null;
-                  const teacherAr = (() => {
-                    // 1. Prefer the resource-level teacherNameAr (text, no FK)
-                    if (resource.teacherNameAr && resource.teacherNameAr.trim()) {
-                      return resource.teacherNameAr.trim();
-                    }
-                    // 2. Fall back to the User record's firstNameAr + lastNameAr
-                    if (resource.teacher) {
-                      const v = `${resource.teacher.firstNameAr || ''} ${resource.teacher.lastNameAr || ''}`
-                        .replace(/\s+/g, ' ')
-                        .trim();
-                      return v || null;
-                    }
-                    return null;
-                  })();
-                  // 2026-08-17: removed the "Résumé intelligent" AiContentSection.
-                  // The description is already shown in the ScribdHeader above
-                  // (expandable "Description complète" toggle). Rendering the AI
-                  // summary again here was redundant. Kept: Aperçu des exercices
-                  // and Points clés (those have unique AI content not in the
-                  // header).
-                  return null;
-                })()}
-
-                {/* 2026-08-17: AI exercise overview + key points are now
-                    rendered INSIDE the ScribdHeader as collapsible accordions
-                    (Option A from the user proposal). The data is prepared
-                    here and passed via props. Old separate cards removed. */}
-
-                {/* AI key points — Per user rule (2026-07-30):
-                    - Title: "النقاط الرئيسية" (AR) or "Points clés" (FR)
-                    - Display: multi-color rounded bubbles instead of a bullet list
-                    - Per-subject palette: rose/fuchsia/teal/amber/violet
-                    - Per user rule (2026-08-02): align bubbles RIGHT for AR docs,
-                      LEFT for FR docs — based on document language, not keyPoint lang
-                    - Per user rule (2026-08-03): PILOTE collège Physique is FR (JORT 2019-063),
-                      so its card title stays in French ("Points clés") even if resource.lang === 'ar'
-                    - Per user rule (2026-08-06): merge long (keyPoints) + short (shortKeyPoints) KP
-                      in alternation, max 10 bubbles total. Short KP = lighter shade
-                      but SAME font size/padding as long KP (2026-08-10 update). */}
-                {(() => {
-                  // Points clés data — prepared here, rendered in ScribdHeader.
-                  const longKps = resource.metadata?.keyPoints || [];
-                  const shortKps = (resource.metadata as any)?.shortKeyPoints || [];
-                  if (longKps.length === 0 && shortKps.length === 0) return null;
-                  // Alternate: short, long, short, long, ... capped at 10 total
-                  const merged: { text: string; isShort: boolean }[] = [];
-                  const maxLen = Math.max(longKps.length, shortKps.length);
-                  for (let i = 0; i < maxLen && merged.length < 10; i++) {
-                    if (i < shortKps.length) merged.push({ text: shortKps[i], isShort: true });
-                    if (i < longKps.length && merged.length < 10) merged.push({ text: longKps[i], isShort: false });
-                  }
-                  const isPilotePhysiqueCollege =
-                    resource.schoolType === 'PILOTE' &&
-                    resource.subject?.slug === 'physique' &&
-                    resource.class &&
-                    ['7eme', '8eme', '9eme'].includes(resource.class.slug);
-                  const isArDoc = resource.language === 'ar' && !isPilotePhysiqueCollege;
-                  const keyPointsTitle = isArDoc ? 'النقاط الرئيسية' : 'Points clés';
-                  return null; // 2026-08-17: rendered in ScribdHeader now
-                })()}
-
-                {/* Tags chips were moved to the sidebar (ResourceInfoPanel,
-                    under "Langue") per user rule (2026-08-13). The AI-extracted
-                    `metadata.topics` now render as chips in the right sidebar
-                    of the "Informations" card, not at the bottom of the KP. */}
-
-                {/* Product (المنتج) — only for technologie + college */}
-                {resource.product &&
-                  resource.subject?.slug === 'technologie' &&
-                  resource.class &&
-                  ['7eme', '8eme', '9eme'].includes(resource.class.slug) && (
+              {/* Product (المنتج) — only for technologie + college */}
+              {resource.product &&
+                resource.subject?.slug === 'technologie' &&
+                resource.class &&
+                ['7eme', '8eme', '9eme'].includes(resource.class.slug) && (
+                  <div className="bg-white rounded-2xl border border-slate-100 p-6 lg:p-8 mb-4">
                     <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg inline-flex items-center gap-2 text-sm">
                       <Wrench className="w-4 h-4 text-amber-700" />
                       <span className="font-bold text-amber-900">المنتج / Produit :</span>
@@ -612,12 +520,8 @@ export default async function ResourcePage({
                         {resource.product}
                       </span>
                     </div>
-                  )}
-
-                {/* 2026-08-17: removed the stats row (Vues, Téléchargements, Note,
-                    Commentaires) — moved to the ScribdHeader above. */}
-
-              </div>
+                  </div>
+                )}
 
               {/* Aperçu PDF — hidden for archived resources (non-owners).
                   2026-08-16: removed the "Aperçu du document" header and
