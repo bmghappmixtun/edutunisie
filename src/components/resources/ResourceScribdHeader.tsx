@@ -228,10 +228,10 @@ export default function ResourceScribdHeader({
             {hasLongDescription && (
               <button
                 onClick={() => setExpanded((e) => !e)}
-                className={`text-sm text-primary-600 font-semibold hover:underline mt-1 inline-flex items-center gap-1 ${isAr ? 'flex-row-reverse' : ''}`}
+                className={`text-sm text-primary-600 font-semibold hover:underline mt-1 inline-flex items-center gap-1 ${isAr ? 'flex-row-reverse font-arabic-title' : ''}`}
               >
-                {expanded ? 'Réduire' : 'Description complète'}
                 {expanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                {expanded ? 'Réduire' : 'Description complète'}
               </button>
             )}
           </div>
