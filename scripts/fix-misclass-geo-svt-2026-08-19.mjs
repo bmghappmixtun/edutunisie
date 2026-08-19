@@ -162,3 +162,5 @@ main()
 
 // 2026-08-19 update: #7915 subject philo → français (étude de texte)
 // 3AS sciences-experimentales, type DEVOIR_SYNTHESE n°1 kept
+
+// 2026-08-19 update: #3988 philo → français, n° 1 → 2
