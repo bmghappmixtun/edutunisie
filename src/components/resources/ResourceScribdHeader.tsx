@@ -267,9 +267,9 @@ export default function ResourceScribdHeader({
                   dir={isAr ? 'rtl' : 'ltr'}
                   className={`flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-primary-600 cursor-pointer list-none py-1.5 ${isAr ? 'flex-row-reverse font-arabic-title' : ''}`}
                 >
-                  <ListChecks className="w-4 h-4 text-primary-500" />
+                  <ChevronDown className={`w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform ${isAr ? 'ml-0' : 'ml-auto'}`} />
                   <span>{isAr ? 'نظرة عامة على التمارين' : 'Aperçu des exercices'}</span>
-                  <ChevronDown className="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform ml-auto" />
+                  <ListChecks className="w-4 h-4 text-primary-500" />
                 </summary>
                 <div
                   dir={isAr ? 'rtl' : 'ltr'}
@@ -305,9 +305,9 @@ export default function ResourceScribdHeader({
                   dir={isAr ? 'rtl' : 'ltr'}
                   className={`flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-primary-600 cursor-pointer list-none py-1.5 ${isAr ? 'flex-row-reverse font-arabic-title' : ''}`}
                 >
-                  <Target className="w-4 h-4 text-primary-500" />
+                  <ChevronDown className={`w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform ${isAr ? 'ml-0' : 'ml-auto'}`} />
                   <span>{isAr ? 'النقاط الرئيسية' : 'Points clés'}</span>
-                  <ChevronDown className="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform ml-auto" />
+                  <Target className="w-4 h-4 text-primary-500" />
                 </summary>
                 {/* 2026-08-19: KP bubbles are now CLICKABLE — each one
                     links to the search page filtered by that topic. This
