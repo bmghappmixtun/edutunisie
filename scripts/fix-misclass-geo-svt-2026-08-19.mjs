@@ -141,3 +141,7 @@ main()
 // subject name) by the retitle-multi.mjs script that I re-ran earlier
 // (after fixing SUBJECTS_AR['pensee-islamique'] from 'الفكر الإسلامي'
 // to 'التفكير الإسلامي').
+
+// 2026-08-19 update: #14567 type DEVOIR_CONTROLE → DEVOIR_SYNTHESE n°1
+// (slug had old subject name 'alfkr-alislamy' from before the retitle
+// SUBJECTS_AR fix; now regenerated to new transliteration)
