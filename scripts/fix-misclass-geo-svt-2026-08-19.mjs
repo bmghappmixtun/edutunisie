@@ -155,3 +155,7 @@ main()
 //         changed to DS (per user pattern, headerData updated too)
 // #15370: 3AS + maths section — unusual but left as-is (PI is
 //         taught in all sections, not just lettres in Tunisia)
+
+// 2026-08-19: Deleted #9630 (Philosophie 3AS lettres, "المرأة والحرية -
+// سيمون دي بوفوار", 2024-2025). User said "supprimer". Orphan PDF
+// remains in Vercel Blob (no BLOB_READ_WRITE_TOKEN to clean).
