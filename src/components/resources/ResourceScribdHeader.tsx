@@ -30,6 +30,8 @@ export interface ResourceScribdHeaderProps {
   commentsCount: number;
   downloadUrl: string;
   teacherName?: string | null;
+  /** 2026-08-20: prof name in AR, used when isArDoc=true and AR version exists */
+  teacherNameAr?: string | null;
   teacherProfileUrl?: string | null;
   aiInsights?: string[] | null;
   aiKeyPoints?: string[] | null;
@@ -59,6 +61,7 @@ export default function ResourceScribdHeader({
   commentsCount,
   downloadUrl,
   teacherName,
+  teacherNameAr,
   teacherProfileUrl,
   aiInsights = null,
   aiKeyPoints = null,
@@ -152,6 +155,11 @@ export default function ResourceScribdHeader({
   // also auto-detect from the title in case language is wrong/missing.
   const titleIsAr = /[\u0600-\u06FF]/.test(title);
   const isAr = isArDoc || titleIsAr;
+
+  // 2026-08-20: when AR, prefer the AR prof name (if available), else fall back to FR
+  const displayTeacherName = isAr
+    ? (teacherNameAr && teacherNameAr.trim() ? teacherNameAr : teacherName)
+    : teacherName;
 
   return (
     <div
@@ -247,8 +255,10 @@ export default function ResourceScribdHeader({
         ) : null}
 
         {/* Transféré par — right-aligned per user request 2026-08-17.
-            2026-08-19: AR translation 'نقل بواسطة' when the doc is AR. */}
-        {teacherName && (
+            2026-08-19: AR translation 'نقل بواسطة' when the doc is AR.
+            2026-08-20: when AR, use the prof's AR name (teacherNameAr) if available,
+            else fall back to the FR name. */}
+        {displayTeacherName && (
           <div dir={isAr ? 'rtl' : 'ltr'} className={`text-xs text-slate-500 mb-3 text-right ${isAr ? 'font-arabic-title' : ''}`}>
             {isAr ? 'نقل بواسطة' : 'Transféré par'}{' '}
             {teacherProfileUrl ? (
@@ -256,10 +266,10 @@ export default function ResourceScribdHeader({
                 href={teacherProfileUrl}
                 className={`font-semibold text-primary-600 hover:underline ${isAr ? 'font-arabic-title' : ''}`}
               >
-                {teacherName}
+                {displayTeacherName}
               </a>
             ) : (
-              <span className={`font-semibold text-slate-700 ${isAr ? 'font-arabic-title' : ''}`}>{teacherName}</span>
+              <span className={`font-semibold text-slate-700 ${isAr ? 'font-arabic-title' : ''}`}>{displayTeacherName}</span>
             )}
           </div>
         )}
