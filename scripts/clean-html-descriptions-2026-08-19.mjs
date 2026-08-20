@@ -55,3 +55,7 @@ async function main() {
   console.log(`Scanned: ${total} | Updated: ${updated}`);
 }
 main().then(() => p.$disconnect()).catch(e => { console.error('💥', e); p.$disconnect(); process.exit(1); });
+
+// 2026-08-19 update: ran in batches, cleaned 3758 → 1 (remaining 1
+// is #7442 with a math expression '2<n≤50' — not real HTML, kept
+// as-is to avoid breaking math content).
