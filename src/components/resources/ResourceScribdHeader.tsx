@@ -302,8 +302,12 @@ export default function ResourceScribdHeader({
                     <div className="mb-2">
                       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-full bg-primary-50 text-primary-700 border border-primary-200">
                         <BookOpen className="w-3 h-3" />
-                        {aiInsights.length} exercice{aiInsights.length > 1 ? 's' : ''}
-                        {subjectName ? ` ${subjectName}` : ''}
+                        {/* 2026-08-19: AR translation — use 'تمارين' for
+                            'exercices' when the doc is in AR, so the chip
+                            is 100% in the same language as the file. */}
+                        {isAr
+                          ? `${aiInsights.length} تمارين${subjectName ? ' ' + (subjectName || 'العربية') : ''}`
+                          : `${aiInsights.length} exercice${aiInsights.length > 1 ? 's' : ''}${subjectName ? ' ' + subjectName : ''}`}
                       </span>
                     </div>
                   )}
@@ -334,7 +338,11 @@ export default function ResourceScribdHeader({
                     key point. Per user request. */}
                 <div
                   dir={isAr ? 'rtl' : 'ltr'}
-                  className={`pl-6 py-2 flex flex-wrap gap-2 ${isAr ? 'justify-end font-arabic-title' : 'justify-start'}`}
+                  // 2026-08-19 fix: in RTL, 'justify-end' aligns to
+                  // main-end (LEFT). Use 'justify-start' (which in
+                  // RTL is the RIGHT/main-start) so KP bubbles are
+                  // right-aligned for AR files.
+                  className={`pl-6 py-2 flex flex-wrap gap-2 ${isAr ? 'justify-start font-arabic-title' : 'justify-start'}`}
                 >
                   {mergedKP.map((kp, i) => (
                     <Link
