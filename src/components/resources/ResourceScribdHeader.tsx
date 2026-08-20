@@ -119,9 +119,16 @@ export default function ResourceScribdHeader({
   }, [pageCount]);
 
   const hasLongDescription = (description?.length ?? 0) > TRUNCATE_AT;
+  // 2026-08-19 fix: strip HTML tags from description (AI summaries for
+  // collège files contain <strong>/<br>/<em> tags that shouldn't be
+  // rendered as raw text). We strip them BEFORE truncation so the
+  // character count is consistent.
+  const stripHtml = (s: string) =>
+    s.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  const cleanDescription = description ? stripHtml(description) : description;
   const visibleDescription = hasLongDescription && !expanded
-    ? description!.slice(0, TRUNCATE_AT).trimEnd() + '…'
-    : description;
+    ? cleanDescription!.slice(0, TRUNCATE_AT).trimEnd() + '…'
+    : cleanDescription;
 
   // Merge short + long key points (alternate, max 10)
   const mergedKP = useMemo(() => {
