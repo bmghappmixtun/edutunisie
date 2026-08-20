@@ -70,3 +70,7 @@ async function main() {
   }
 }
 main().then(() => p.$disconnect()).catch(e => { console.error(e); p.$disconnect(); process.exit(1); });
+
+// 2026-08-19 update: #14023 philo → français (étude de texte)
+// Content is in French (Laurent Chaloupe, robots, libre arbitre)
+// 4AS lettres, DC n°3, kept all other fields
