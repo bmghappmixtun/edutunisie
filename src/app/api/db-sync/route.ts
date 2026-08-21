@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { Client } from 'pg';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -6,15 +7,15 @@ export const runtime = 'nodejs';
 /**
  * DB Sync endpoint — Vercel Cron auto-heal for Neon password.
  *
- * Optimized 2026-08-21: skip Vercel env update when password unchanged
- * and removed the deploy hook (was costing $67/mo in unnecessary rebuilds).
+ * Optimized 2026-08-21 v2: use DB connection test instead of comparing
+ * Vercel env (which is cached at lambda boot). This is a true no-op when
+ * the existing password works.
  *
  * Flow:
- * 1. Read current Vercel env DATABASE_URL
- * 2. Reset Neon password (only way to get current value via API)
- * 3. If new password == current Vercel password, skip update
- * 4. Otherwise update Vercel env (prod + preview) — NO redeploy
- * 5. Next cold start picks up new env var automatically
+ * 1. Try to connect to DB with current process.env.DATABASE_URL
+ * 2. If connection succeeds, NO-OP (most common case, 99% of calls)
+ * 3. If connection fails, reset Neon password + update Vercel env (prod + preview)
+ * 4. NO redeploy — env vars are picked up on next cold start
  *
  * Schedule (vercel.json): 0 8,20 * * * — twice daily at 8am and 8pm UTC
  *
@@ -35,6 +36,30 @@ export async function GET(req: Request) {
     duration: 0,
   };
 
+  // Step 1: Test current DB connection (cheap, ~50ms)
+  const currentDbUrl = process.env.DATABASE_URL;
+  if (!currentDbUrl) {
+    return NextResponse.json({ ok: false, error: 'DATABASE_URL not set' }, { status: 500 });
+  }
+
+  const client = new Client({ connectionString: currentDbUrl, ssl: { rejectUnauthorized: false } });
+  try {
+    await client.connect();
+    await client.query('SELECT 1');
+    await client.end();
+
+    // Connection works — no-op
+    results.steps.push({ step: 'db_connection', ok: true, message: 'DB connection succeeded, no rotation needed' });
+    results.changed = false;
+    results.duration = Date.now() - start;
+    return NextResponse.json({ ok: true, ...results });
+  } catch (err: any) {
+    results.steps.push({ step: 'db_connection', ok: false, error: err?.message?.slice(0, 200) });
+    try { await client.end(); } catch {}
+    // Connection failed — fall through to reset
+  }
+
+  // Step 2: Reset Neon password and update Vercel env
   try {
     const neonKey = process.env.NEON_API_KEY!;
     const vercelToken = process.env.VERCEL_TOKEN!;
@@ -48,23 +73,7 @@ export async function GET(req: Request) {
     const HOST = 'ep-round-art-asyh88wq-pooler.c-4.eu-central-1.aws.neon.tech';
     const DB = 'neondb';
 
-    // Step 1: Read current Vercel env DATABASE_URL
-    const envRes = await fetch(
-      `https://api.vercel.com/v9/projects/${vercelProjectId}/env/${envProd}`,
-      { headers: { Authorization: `Bearer ${vercelToken}` } }
-    );
-    const envData = await envRes.json();
-    const currentUrl: string = envData?.value || '';
-    const passMatch = currentUrl.match(/:[^:@]+@/);
-    const currentPass = passMatch ? passMatch[0].slice(1, -1) : '';
-    results.steps.push({ step: 'read_vercel_env', ok: !!currentPass, passPrefix: currentPass.slice(0, 8) });
-
-    if (!currentPass) {
-      results.error = 'Could not read current Vercel DATABASE_URL';
-      return NextResponse.json({ ...results, ok: false }, { status: 500 });
-    }
-
-    // Step 2: Reset Neon password (only way to get current value via API)
+    // Reset Neon password
     const resetRes = await fetch(
       `https://console.neon.tech/api/v2/projects/${PROJECT_ID}/branches/${BRANCH_ID}/roles/${ROLE}/reset_password`,
       { method: 'POST', headers: { Authorization: `Bearer ${neonKey}` } }
@@ -79,16 +88,7 @@ export async function GET(req: Request) {
     results.steps.push({ step: 'reset_password', ok: true });
     results.newPasswordPrefix = newPass.slice(0, 8);
 
-    // Step 3: If password unchanged, skip everything (no-op, no Vercel updates)
-    if (newPass === currentPass) {
-      results.steps.push({ step: 'no_change', ok: true, message: 'password unchanged, skipping Vercel update' });
-      results.changed = false;
-      results.duration = Date.now() - start;
-      return NextResponse.json({ ok: true, ...results });
-    }
-
-    // Step 4: Build new DATABASE_URL and update Vercel env (prod + preview)
-    // NO redeploy — env vars are picked up on next cold start
+    // Build new DATABASE_URL and update Vercel env
     const newUrl = `postgresql://${ROLE}:${newPass}@${HOST}/${DB}?sslmode=require`;
 
     for (const [envId, target] of [[envProd, 'production'], [envPreview, 'preview']]) {
