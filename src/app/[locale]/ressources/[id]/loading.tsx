@@ -1,4 +1,4 @@
-import { Loader2, Eye, Download, Star, MessageCircle, FileText, ChevronRight } from 'lucide-react';
+import { Loader2, Eye, Download, Star, MessageCircle, FileText, ChevronRight, Wrench } from 'lucide-react';
 
 // Per-route loading state for /ressources/[id]/[slug]
 
@@ -16,7 +16,23 @@ export default function Loading() {
           matches it byte-for-byte. */}
       <div className="flex-1 pt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          {/* Breadcrumb */}
+          {/* Breadcrumb — 2026-08-21 nightly fix (ERR-LHP3SU React #419):
+              The previous skeleton had 7 children (4 anchors + 3 chevrons) but
+              the page used React.Fragment for the conditional subject/class
+              items, making the page's nav have only 5 React children. The
+              child-count mismatch triggered hydration #418/#419 on every
+              resource page (6 events captured, but the actual exposure was
+              every /ressources/{id} view). The page now uses the "always
+              render, hide via CSS" pattern: the nav has exactly 5 React
+              children (Link + ChevronRight + Link + subject-span + class-span).
+              The subject/class spans wrap a ChevronRight + Link pair and are
+              hidden when the resource has no subject/class. The skeleton
+              mirrors this exact structure — the spans are always hidden
+              during loading (the resource data isn't available yet) and
+              contain the same internal structure (ChevronRight + Link) as
+              the page. React tree: 5 children in both. DOM: 7 children in
+              the page (when subject+class exist) or 3-7 in the loading
+              (3 visible + 4 inside 2 hidden spans). */}
           <nav
             aria-label="Fil d'Ariane"
             className="flex items-center gap-1 text-xs text-slate-500 mb-4 flex-wrap"
@@ -24,10 +40,14 @@ export default function Loading() {
             <a className="h-3 w-12 bg-slate-200 rounded animate-pulse" aria-hidden="true" />
             <ChevronRight className="w-3 h-3 text-slate-300" aria-hidden="true" />
             <a className="h-3 w-16 bg-slate-200 rounded animate-pulse" aria-hidden="true" />
-            <ChevronRight className="w-3 h-3 text-slate-300" aria-hidden="true" />
-            <a className="h-3 w-20 bg-slate-200 rounded animate-pulse" aria-hidden="true" />
-            <ChevronRight className="w-3 h-3 text-slate-300" aria-hidden="true" />
-            <a className="h-3 w-16 bg-slate-200 rounded animate-pulse" aria-hidden="true" />
+            <span className="inline-flex items-center gap-1 hidden" aria-hidden="true">
+              <ChevronRight className="w-3 h-3 text-slate-300" aria-hidden="true" />
+              <a className="h-3 w-20 bg-slate-200 rounded animate-pulse" aria-hidden="true" />
+            </span>
+            <span className="inline-flex items-center gap-1 hidden" aria-hidden="true">
+              <ChevronRight className="w-3 h-3 text-slate-300" aria-hidden="true" />
+              <a className="h-3 w-16 bg-slate-200 rounded animate-pulse" aria-hidden="true" />
+            </span>
           </nav>
 
           {/* SCRIBD HEADER SKELETON */}
@@ -66,10 +86,27 @@ export default function Loading() {
               already matched the page. */}
           <div className="grid grid-cols-1 gap-6">
             <div>
-              {/* Empty card — matches page.tsx empty card which has 0 children
-                  for typical resources. The Product block (tech college only)
-                  is hidden during loading. */}
-              <div className="bg-white rounded-2xl border border-slate-100 p-6 lg:p-8 mb-4"></div>
+              {/* Product wrapper (المنتج / Produit) — 2026-08-21 nightly fix
+                  (ERR-LHP3SU React #419): the page now uses the "always render,
+                  hide via CSS" pattern for the product block (technologie +
+                  college only). The wrapper + inner content are always
+                  rendered, hidden via `hidden` class + `aria-hidden` when the
+                  conditions aren't met. The skeleton mirrors this exact
+                  structure — both wrapper and inner div are hidden during
+                  loading (the resource data isn't available yet), but the
+                  internal children (Wrench svg + 2 spans) match the page's
+                  structure so React's hydration check passes. The first span
+                  has the same text in both ("المنتج / Produit :"), and the
+                  product-name span uses `suppressHydrationWarning` on the
+                  page side because the loading skeleton can't know the
+                  product name during the Suspense fallback. */}
+              <div className="bg-white rounded-2xl border border-slate-100 p-6 lg:p-8 mb-4 hidden" aria-hidden="true">
+                <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg inline-flex items-center gap-2 text-sm hidden" aria-hidden="true">
+                  <Wrench className="w-4 h-4 text-amber-700" aria-hidden="true" />
+                  <span className="font-bold text-amber-900">المنتج / Produit :</span>
+                  <span className="text-amber-800" dir="rtl" suppressHydrationWarning></span>
+                </div>
+              </div>
 
               {/* PDF viewer card (matches page.tsx bg-white rounded-2xl).
                   2026-08-17 fix (nightly ERR-P3YJBK + ERR-5J325H): removed the

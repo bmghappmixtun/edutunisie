@@ -344,7 +344,30 @@ export default async function ResourcePage({
           Suspense fallback and the streamed page have identical structure. */}
       <div className="flex-1 pt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          {/* Visual breadcrumb (matches BreadcrumbList JSON-LD) */}
+          {/* Visual breadcrumb (matches BreadcrumbList JSON-LD)
+              2026-08-21 nightly fix (ERR-LHP3SU React #419 hydration on
+              /fr/ressources/14703/... — 6 events captured, but the same
+              child-count mismatch existed on every resource page):
+              The previous code used React.Fragment for the conditional
+              subject and class items, which made the nav have 5 React
+              children (Link, svg, Link, Fragment, Fragment) while the
+              loading.tsx skeleton had 7 (4 anchors + 3 chevrons). React's
+              hydration check is child-count-strict, so this triggered
+              React #418/#419 on every resource page. The visible error
+              count was 6 because most users were sent to the canonical
+              slug before hydration; the bug only surfaced when the slug
+              redirected (i.e. the loading skeleton was hydrated against
+              the page's RSC payload that included the breadcrumb).
+              Fix: apply the "always render, hide via CSS" pattern. The
+              nav now has exactly 5 React children in both the page and
+              the loading skeleton: Link + ChevronRight + Link + subject-
+              span + class-span. Each span wraps a ChevronRight + Link
+              pair and is hidden via `hidden` class + `aria-hidden` when
+              the condition is false. For resources without subject/class
+              (rare but possible — schema allows classId: null), the
+              spans are display:none and the inner Link hrefs/text are
+              empty. The loading skeleton mirrors this exact structure
+              with the spans always hidden. */}
           <nav
             aria-label="Fil d'Ariane"
             className="flex items-center gap-1 text-xs text-slate-500 mb-4 flex-wrap"
@@ -356,28 +379,32 @@ export default async function ResourcePage({
             <Link href="/ressources" className="hover:text-primary-600 transition">
               Ressources
             </Link>
-            {resource.subject && (
-              <>
-                <ChevronRight className="w-3 h-3 text-slate-300" />
-                <Link
-                  href={`/matieres/${resource.subject.slug}`}
-                  className="hover:text-primary-600 transition"
-                >
-                  {resource.subject.nameFr}
-                </Link>
-              </>
-            )}
-            {resource.class && (
-              <>
-                <ChevronRight className="w-3 h-3 text-slate-300" />
-                <Link
-                  href={`/niveaux/${resource.class.level?.slug}`}
-                  className="hover:text-primary-600 transition"
-                >
-                  {resource.class.nameFr}
-                </Link>
-              </>
-            )}
+            <span
+              className={`inline-flex items-center gap-1 ${resource.subject ? '' : 'hidden'}`}
+              aria-hidden={!resource.subject}
+            >
+              <ChevronRight className="w-3 h-3 text-slate-300" />
+              <Link
+                href={resource.subject ? `/matieres/${resource.subject.slug}` : '/matieres'}
+                className="hover:text-primary-600 transition"
+                tabIndex={resource.subject ? undefined : -1}
+              >
+                {resource.subject?.nameFr || ''}
+              </Link>
+            </span>
+            <span
+              className={`inline-flex items-center gap-1 ${resource.class ? '' : 'hidden'}`}
+              aria-hidden={!resource.class}
+            >
+              <ChevronRight className="w-3 h-3 text-slate-300" />
+              <Link
+                href={resource.class ? `/niveaux/${resource.class.level?.slug}` : '/niveaux'}
+                className="hover:text-primary-600 transition"
+                tabIndex={resource.class ? undefined : -1}
+              >
+                {resource.class?.nameFr || ''}
+              </Link>
+            </span>
           </nav>
 
           {/* ============================================================
@@ -518,21 +545,43 @@ export default async function ResourcePage({
                   original block contained 3 IIFEs that all returned null.
                   The product chip (technologie+college) is preserved below. */}
 
-              {/* Product (المنتج) — only for technologie + college */}
-              {resource.product &&
-                resource.subject?.slug === 'technologie' &&
-                resource.class &&
-                ['7eme', '8eme', '9eme'].includes(resource.class.slug) && (
-                  <div className="bg-white rounded-2xl border border-slate-100 p-6 lg:p-8 mb-4">
-                    <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg inline-flex items-center gap-2 text-sm">
+              {/* Product (المنتج) — only for technologie + college.
+                  2026-08-21 nightly fix (ERR-LHP3SU React #419): apply the
+                  "always render, hide via CSS" pattern. The previous code
+                  used a conditional render — the wrapper existed only for
+                  technologie+college resources, while loading.tsx always
+                  rendered an empty placeholder. This caused a child-count
+                  mismatch (page=0, loading=1) on every typical resource
+                  page. The wrapper is now always rendered and hidden via
+                  `hidden` class + `aria-hidden` when the conditions aren't
+                  met. The inner content (Wrench + 2 spans) is also always
+                  rendered, hidden when the wrapper is hidden. The loading
+                  skeleton mirrors this exact structure. `suppressHydrationWarning`
+                  on the product-name span prevents React #419 because the
+                  loading skeleton can't know the product name during the
+                  Suspense fallback. */}
+              {(() => {
+                const showProduct = !!(
+                  resource.product &&
+                  resource.subject?.slug === 'technologie' &&
+                  resource.class &&
+                  ['7eme', '8eme', '9eme'].includes(resource.class.slug)
+                );
+                return (
+                  <div
+                    className={`bg-white rounded-2xl border border-slate-100 p-6 lg:p-8 mb-4 ${showProduct ? '' : 'hidden'}`}
+                    aria-hidden={!showProduct}
+                  >
+                    <div className={`mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg inline-flex items-center gap-2 text-sm ${showProduct ? '' : 'hidden'}`}>
                       <Wrench className="w-4 h-4 text-amber-700" />
                       <span className="font-bold text-amber-900">المنتج / Produit :</span>
-                      <span className="text-amber-800" dir="rtl">
-                        {resource.product}
+                      <span className="text-amber-800" dir="rtl" suppressHydrationWarning>
+                        {resource.product || ''}
                       </span>
                     </div>
                   </div>
-                )}
+                );
+              })()}
 
               {/* Aperçu PDF — hidden for archived resources (non-owners).
                   2026-08-16: removed the "Aperçu du document" header and
