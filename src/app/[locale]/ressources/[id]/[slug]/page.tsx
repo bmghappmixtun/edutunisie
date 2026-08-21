@@ -409,6 +409,11 @@ export default async function ResourcePage({
                 ? `${resource.teacher.firstName || ''} ${resource.teacher.lastName || ''}`.trim() || null
                 : null
             }
+            teacherNameAr={
+              resource.teacher
+                ? `${resource.teacher.firstNameAr || ''} ${resource.teacher.lastNameAr || ''}`.trim() || null
+                : null
+            }
             teacherProfileUrl={
               resource.teacher
                 ? `/professeurs/${resource.teacher.numericId}/${resource.teacher.slug}`
