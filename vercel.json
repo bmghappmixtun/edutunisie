@@ -19,7 +19,7 @@
     },
     {
       "path": "/api/db-sync",
-      "schedule": "0 */3 * * *"
+      "schedule": "0 8,20 * * *"
     },
     {
       "path": "/api/cron/agent-poll",
