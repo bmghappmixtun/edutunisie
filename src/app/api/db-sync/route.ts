@@ -4,14 +4,19 @@ export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 /**
- * DB Sync endpoint — called by Vercel Cron to auto-heal
- * if the Neon password was rotated by another agent/project.
+ * DB Sync endpoint — Vercel Cron auto-heal for Neon password.
+ *
+ * Optimized 2026-08-21: skip Vercel env update when password unchanged
+ * and removed the deploy hook (was costing $67/mo in unnecessary rebuilds).
  *
  * Flow:
- * 1. Get current password from Neon (by resetting the role)
- * 2. Update Vercel env with the new DATABASE_URL
- * 3. Trigger a redeploy via Vercel deploy hook
- * 4. Return 200 with status
+ * 1. Read current Vercel env DATABASE_URL
+ * 2. Reset Neon password (only way to get current value via API)
+ * 3. If new password == current Vercel password, skip update
+ * 4. Otherwise update Vercel env (prod + preview) — NO redeploy
+ * 5. Next cold start picks up new env var automatically
+ *
+ * Schedule (vercel.json): 0 8,20 * * * — twice daily at 8am and 8pm UTC
  *
  * Protected by CRON_SECRET (Vercel Cron sends Authorization: Bearer ${CRON_SECRET})
  */
@@ -33,7 +38,6 @@ export async function GET(req: Request) {
   try {
     const neonKey = process.env.NEON_API_KEY!;
     const vercelToken = process.env.VERCEL_TOKEN!;
-    const deployHook = process.env.VERCEL_DEPLOY_HOOK!;
     const vercelProjectId = process.env.VERCEL_PROJECT_ID!;
     const envProd = process.env.VERCEL_ENV_PROD!;
     const envPreview = process.env.VERCEL_ENV_PREVIEW!;
@@ -44,7 +48,23 @@ export async function GET(req: Request) {
     const HOST = 'ep-round-art-asyh88wq-pooler.c-4.eu-central-1.aws.neon.tech';
     const DB = 'neondb';
 
-    // Step 1: Reset password to get the current one
+    // Step 1: Read current Vercel env DATABASE_URL
+    const envRes = await fetch(
+      `https://api.vercel.com/v9/projects/${vercelProjectId}/env/${envProd}`,
+      { headers: { Authorization: `Bearer ${vercelToken}` } }
+    );
+    const envData = await envRes.json();
+    const currentUrl: string = envData?.value || '';
+    const passMatch = currentUrl.match(/:[^:@]+@/);
+    const currentPass = passMatch ? passMatch[0].slice(1, -1) : '';
+    results.steps.push({ step: 'read_vercel_env', ok: !!currentPass, passPrefix: currentPass.slice(0, 8) });
+
+    if (!currentPass) {
+      results.error = 'Could not read current Vercel DATABASE_URL';
+      return NextResponse.json({ ...results, ok: false }, { status: 500 });
+    }
+
+    // Step 2: Reset Neon password (only way to get current value via API)
     const resetRes = await fetch(
       `https://console.neon.tech/api/v2/projects/${PROJECT_ID}/branches/${BRANCH_ID}/roles/${ROLE}/reset_password`,
       { method: 'POST', headers: { Authorization: `Bearer ${neonKey}` } }
@@ -59,10 +79,18 @@ export async function GET(req: Request) {
     results.steps.push({ step: 'reset_password', ok: true });
     results.newPasswordPrefix = newPass.slice(0, 8);
 
-    // Step 2: Build new DATABASE_URL
-    const newUrl = `postgresql://neondb_owner:${newPass}@${HOST}/${DB}?sslmode=require`;
+    // Step 3: If password unchanged, skip everything (no-op, no Vercel updates)
+    if (newPass === currentPass) {
+      results.steps.push({ step: 'no_change', ok: true, message: 'password unchanged, skipping Vercel update' });
+      results.changed = false;
+      results.duration = Date.now() - start;
+      return NextResponse.json({ ok: true, ...results });
+    }
 
-    // Step 3: Update Vercel env (prod + preview)
+    // Step 4: Build new DATABASE_URL and update Vercel env (prod + preview)
+    // NO redeploy — env vars are picked up on next cold start
+    const newUrl = `postgresql://${ROLE}:${newPass}@${HOST}/${DB}?sslmode=require`;
+
     for (const [envId, target] of [[envProd, 'production'], [envPreview, 'preview']]) {
       const patchRes = await fetch(
         `https://api.vercel.com/v9/projects/${vercelProjectId}/env/${envId}`,
@@ -78,13 +106,8 @@ export async function GET(req: Request) {
       results.steps.push({ step: `update_vercel_${target}`, ok: patchRes.ok });
     }
 
-    // Step 4: Trigger redeploy
-    const deployRes = await fetch(
-      `https://api.vercel.com/v1/integrations/deploy/${vercelProjectId}/${deployHook}`,
-      { method: 'POST', headers: { Authorization: `Bearer ${vercelToken}` } }
-    );
-    results.steps.push({ step: 'redeploy', ok: deployRes.ok, status: deployRes.status });
-
+    results.changed = true;
+    results.message = 'Password rotated and Vercel env updated. Next cold start will use new password.';
     results.duration = Date.now() - start;
     return NextResponse.json({ ok: true, ...results });
   } catch (err: any) {
