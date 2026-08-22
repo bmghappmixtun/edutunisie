@@ -97,7 +97,8 @@ export async function generateMetadata(): Promise<Metadata> {
     : 'Bac Tunisie 2025 — Sujets, Corrigés et Révision complète';
   const description = isAr
     ? '🎓 كل ما تحتاجه للنجاح في الباكالوريا التونسية 2025: مواضيع الدورة الرئيسية والمراقبة منذ 2010، إصلاحات رسمية، منهجية مراجعة + 7 شعب (رياضيات، علوم تجريبية، تقنية، إعلامية، اقتصاد وتصرف، آداب، رياضة). 100٪ مجاني.'
-    : '🎓 Tout pour réussir le Baccalauréat tunisien 2025 : sujets des sessions principale et de contrôle depuis 2010, corrigés officiels, méthodologie de révision + 7 sections (Math, Sciences Exp, Technique, Informatique, Éco-Gestion, Lettres, Sport). 100% gratuit.';
+    // SEO 2026-08-22: trimmed from 246 to ~158 chars (Google SERP limit).
+    : '🎓 Bac Tunisie 2025 : sujets et corrigés depuis 2010, méthodologie de révision + 7 sections (Math, Sc.Exp, Technique, Info, Éco, Lettres, Sport). Gratuit.';
 
   return {
     title,

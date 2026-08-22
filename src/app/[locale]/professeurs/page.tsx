@@ -43,7 +43,7 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
     title: isAr ? `المعلمون — ${total} معلم معتمد` : `Professeurs — ${total} enseignants certifiés`,
     description: isAr
       ? `اكتشف ${total} معلماً معتمداً ومواردهم التعليمية المجانية: دروس، فروض، تمارين لجميع المستويات في تونس.`
-      : `Découvrez nos ${total} professeurs certifiés et leurs ressources pédagogiques gratuites : cours, devoirs, exercices pour tous les niveaux en Tunisie.`,
+      : `Découvrez ${total} professeurs certifiés et leurs ressources gratuites en Tunisie : cours, devoirs, exercices.`,
     alternates: { canonical: 'https://examanet.com/professeurs' },
     openGraph: {
       title: isAr ? 'المعلمون التونسيون على إكسامانت' : 'Professeurs tunisiens sur Examanet',

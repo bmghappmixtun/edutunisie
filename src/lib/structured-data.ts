@@ -318,3 +318,59 @@ export function faqSchema(faqs: Array<{ question: string; answer: string }>) {
 }
 
 export { SITE_URL, SITE_NAME, SITE_DESCRIPTION };
+
+/**
+ * Quiz schema — for EXAM and DEVOIR resources.
+ * Helps Google understand test/exam content and surface it in educational SERPs.
+ * Extends Course with the educational assessment type.
+ */
+export function quizSchema(opts: {
+  slug: string;
+  title: string;
+  description: string;
+  language: string;
+  level: string;
+  subject: string;
+  type: string;
+  url: string;
+  datePublished: string;
+  dateModified: string;
+  teacher?: string | null;
+  teacherAr?: string | null;
+  /** Total number of questions in the quiz/exam. */
+  numberOfQuestions?: number;
+  /** Time expected to complete, e.g. "PT2H" (2 hours). */
+  timeRequired?: string;
+  /** For exams: typical exam duration */
+  estimatedDuration?: string;
+}) {
+  const data: Record<string, unknown> = {
+    '@context': 'https://schema.org',
+    '@type': 'Quiz',
+    name: opts.title,
+    description: opts.description,
+    url: opts.url,
+    inLanguage: opts.language,
+    educationalLevel: opts.level,
+    about: opts.subject,
+    provider: { '@id': `${SITE_URL}#organization` },
+    isAccessibleForFree: true,
+    hasPart: {
+      '@type': 'Assessment',
+      name: opts.title,
+      ...(opts.numberOfQuestions ? { numberOfQuestions: opts.numberOfQuestions } : {}),
+      ...(opts.timeRequired ? { timeRequired: opts.timeRequired } : {}),
+    },
+    datePublished: opts.datePublished,
+    dateModified: opts.dateModified,
+    isPartOf: { '@id': `${SITE_URL}#website` },
+  };
+  if (opts.teacher) {
+    data.author = {
+      '@type': 'Person',
+      name: opts.teacher,
+      ...(opts.teacherAr ? { alternateName: opts.teacherAr } : {}),
+    };
+  }
+  return data;
+}

@@ -23,7 +23,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: isAr
       ? 'جميع المستويات الدراسية — الابتدائي، الإعدادي، الثانوي في تونس'
-      : 'Tous les niveaux scolaires — Primaire, Collège, Lycée en Tunisie',
+      : 'Niveaux scolaires Tunisie — Primaire, Collège, Lycée',
     description: isAr
       ? 'موارد مجانية حسب المستوى الدراسي التونسي: من السنة السابعة إلى التاسعة أساسي (الإعدادي)، ومن الأولى إلى الرابعة ثانوي (الباك). دروس، تمارين وإصلاحات لكل قسم.'
       : 'Ressources gratuites par niveau scolaire tunisien : 7ème à 9ème année (Collège), 1ère à 4ème année (Lycée/Bac). Cours, exercices et corrigés pour chaque classe.',

@@ -68,9 +68,12 @@ const getCachedHomeData = nextCache(
 // per-locale metadata (og:locale, hreflang, etc.), so this page only needs
 // to set the title/description which is the same for both locales.
 export const metadata: Metadata = {
-  title: 'Examanet — Cours, devoirs, exercices et corrigés gratuits en Tunisie',
+  // SEO 2026-08-22: trimmed from 71 to 60 chars (Google displays ~60 chars
+  // before truncating). Removed "gratuits" (already in description) and
+  // "en Tunisie" (the brand + description already imply Tunisia).
+  title: 'Examanet — Cours, devoirs et exercices en Tunisie',
   description:
-    'Plateforme pédagogique tunisienne #1 : cours, devoirs, exercices, sujets de bac et corrigés pour le Primaire, Collège et Lycée. 100% gratuit.',
+    'Plateforme pédagogique #1 pour les élèves tunisiens : cours, devoirs, exercices, sujets de bac et corrigés pour le Primaire, Collège et Lycée. Gratuit.',
   // SEO 2026-08-22: don't override canonical here — the [locale] layout's
   // generateMetadata sets the locale-prefixed canonical (and hreflang
   // alternates) for both /fr and /ar.
