@@ -68,10 +68,15 @@ const getCachedHomeData = nextCache(
 // per-locale metadata (og:locale, hreflang, etc.), so this page only needs
 // to set the title/description which is the same for both locales.
 export const metadata: Metadata = {
-  // SEO 2026-08-22: trimmed from 71 to 60 chars (Google displays ~60 chars
+  // SEO 2026-08-22: trimmed from 71 to 50 chars (Google displays ~60 chars
   // before truncating). Removed "gratuits" (already in description) and
   // "en Tunisie" (the brand + description already imply Tunisia).
-  title: 'Examanet — Cours, devoirs et exercices en Tunisie',
+  // Using `absolute: true` to opt out of the parent layout's title template
+  // (otherwise the rendered title would be "... | Examanet" — the brand
+  // appears twice on the homepage).
+  title: {
+    absolute: 'Examanet — Cours, devoirs et exercices en Tunisie',
+  },
   description:
     'Plateforme pédagogique #1 pour les élèves tunisiens : cours, devoirs, exercices, sujets de bac et corrigés pour le Primaire, Collège et Lycée. Gratuit.',
   // SEO 2026-08-22: don't override canonical here — the [locale] layout's
