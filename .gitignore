@@ -145,3 +145,6 @@ url-render.png
 --psm.txt
 scripts/sample-titles.mjs
 scripts/check-*.mjs
+
+# POC artifacts
+docs/architecture-*.png
