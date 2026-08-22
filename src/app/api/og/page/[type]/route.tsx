@@ -1,6 +1,6 @@
 import { ImageResponse } from 'next/og';
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const PAGE_CONFIG: Record<

@@ -1,0 +1,37 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "main": ".open-next/worker.js",
+  "name": "examanet-poc",
+  "compatibility_date": "2024-12-30",
+  "compatibility_flags": [
+    "nodejs_compat",
+    "global_fetch_strictly_public"
+  ],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "services": [
+    {
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "examanet-poc"
+    }
+  ],
+  "observability": {
+    "enabled": true
+  },
+  // R2 binding for ISR cache + future PDF storage
+  "r2_buckets": [
+    {
+      "binding": "NEXT_INC_CACHE_R2_BUCKET",
+      "bucket_name": "examanet-poc-cache"
+    }
+  ],
+  // KV for edge config (sessions, etc.)
+  "kv_namespaces": [
+    {
+      "binding": "NEXT_INC_CACHE_KV",
+      "id": "poc-cache-kv-id"
+    }
+  ]
+}

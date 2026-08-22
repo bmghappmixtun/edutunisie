@@ -145,3 +145,10 @@ url-render.png
 --psm.txt
 scripts/sample-titles.mjs
 scripts/check-*.mjs
+
+# OpenNext Cloudflare build output
+.open-next/
+cloudflare-env.d.ts
+
+# Cloudflare Workers local state (wrangler dev)
+.wrangler/
