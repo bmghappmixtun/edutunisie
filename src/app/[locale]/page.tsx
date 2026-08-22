@@ -74,9 +74,7 @@ export const metadata: Metadata = {
   // Using `absolute: true` to opt out of the parent layout's title template
   // (otherwise the rendered title would be "... | Examanet" — the brand
   // appears twice on the homepage).
-  title: {
-    absolute: 'Examanet — Cours, devoirs et exercices en Tunisie',
-  },
+  // Title is inherited from [locale] layout (per-locale, no template applied via absolute)
   description:
     'Plateforme pédagogique #1 pour les élèves tunisiens : cours, devoirs, exercices, sujets de bac et corrigés pour le Primaire, Collège et Lycée. Gratuit.',
   // SEO 2026-08-22: don't override canonical here — the [locale] layout's
