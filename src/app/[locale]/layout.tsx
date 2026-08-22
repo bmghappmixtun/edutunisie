@@ -9,6 +9,30 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import SyncLocaleAttrs from '@/components/i18n/SyncLocaleAttrs';
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
+
+// SEO 2026-08-22: per-locale default metadata. This is the FALLBACK for any
+// page under [locale]/ that doesn't define its own generateMetadata — it
+// ensures every page gets:
+// - Locale-prefixed canonical (so /fr/ressources ≠ /ar/ressources ≠ /)
+// - Locale-correct og:locale (fr_TN vs ar_TN)
+// - Hreflang alternates pointing to both FR and AR versions
+// - A descriptive title and description in the right language
+const LOCALE_META = {
+  fr: {
+    title: 'Examanet — La plateforme pédagogique #1 en Tunisie',
+    description:
+      'Plateforme pédagogique tunisienne #1 : cours, devoirs, exercices, sujets de bac et corrigés pour le Primaire, Collège et Lycée. 100% gratuit.',
+    ogLocale: 'fr_TN' as const,
+  },
+  ar: {
+    title: 'إكسامانت — المنصة التربوية #1 في تونس',
+    description:
+      'المنصة التربوية التونسية #1: دروس، فروض، تمارين، سلاسل، ملخصات، مواضيع باكالوريا وإصلاحات للابتدائي، الإعدادي والثانوي. مجانية 100%.',
+    ogLocale: 'ar_TN' as const,
+  },
+} as const;
+
 // PERF 2026-08-16: cache getMessages() per locale. Without this, every page
 // in [locale]/ triggers a new messages fetch → dynamic rendering → bypasses
 // the Vercel CDN cache (cache-control: private, no-cache, no-store).
@@ -30,6 +54,48 @@ type Props = {
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
+}
+
+/**
+ * Per-locale metadata fallback.
+ *
+ * SEO 2026-08-22: This fixes the audit findings that every [locale] page was
+ * inheriting the root layout's FR metadata (canonical: SITE_URL, og:locale: fr_TN,
+ * no hreflang). With this in place:
+ * - The /ar home page now has og:locale=ar_TN, AR description, and hreflang
+ *   alternates pointing to /fr and /ar variants
+ * - Child page-level generateMetadata() can STILL override canonical/og:url
+ *   for their own URL — this only sets the per-locale defaults
+ *
+ * The root layout's `template: '%s — Examanet'` is overridden here so each
+ * locale gets a properly-translated brand suffix (no more "Examanet" hard-coded).
+ */
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+  if (!hasLocale(routing.locales, locale)) {
+    return {};
+  }
+
+  const t = LOCALE_META[locale as keyof typeof LOCALE_META];
+
+  return {
+    title: {
+      default: t.title,
+      template: locale === 'ar' ? '%s | إكسامانت' : '%s | Examanet',
+    },
+    description: t.description,
+    alternates: {
+      languages: {
+        'fr-TN': `${SITE_URL}/fr`,
+        'ar-TN': `${SITE_URL}/ar`,
+        'x-default': `${SITE_URL}/fr`,
+      },
+    },
+    openGraph: {
+      locale: t.ogLocale,
+      siteName: locale === 'ar' ? 'إكسامانت' : 'Examanet',
+    },
+  };
 }
 
 /**

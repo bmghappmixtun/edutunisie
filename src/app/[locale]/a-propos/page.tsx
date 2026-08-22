@@ -27,7 +27,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: isAr
       ? 'اكتشف إكسامانت، المنصة التربوية #1 في تونس. مهمتنا: جعل التعليم مجانياً ومتاحاً لجميع التلاميذ التونسيين.'
       : "Découvrez Examanet, la plateforme pédagogique #1 en Tunisie. Notre mission : rendre l'éducation gratuite et accessible à tous les élèves tunisiens.",
-    alternates: isAr ? { canonical: '/a-propos' } : { canonical: '/a-propos' },
+    alternates: isAr ? { canonical: '/ar/a-propos' } : { canonical: '/fr/a-propos' },
     openGraph: {
       title: isAr ? 'حول إكسامانت' : "À propos d'Examanet",
       description: isAr

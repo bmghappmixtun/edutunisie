@@ -15,10 +15,12 @@ export async function generateMetadata(): Promise<Metadata> {
     title: isAr
       ? 'جميع المواد — دروس، تمارين وإصلاحات'
       : 'Toutes les matières — Cours, exercices et corrigés',
+    // SEO 2026-08-22: trimmed descriptions to ~155 chars (Google displays ~160).
+    // Was 190 chars (too long, Google would truncate mid-sentence).
     description: isAr
-      ? 'اكتشف جميع مواد البرنامج المدرسي التونسي: الرياضيات، الفيزياء، علوم الحياة والأرض، الفرنسية، العربية، التاريخ، الفلسفة والمزيد. موارد مجانية لكل مادة.'
-      : 'Découvrez toutes les matières du programme scolaire tunisien : Mathématiques, Physique, SVT, Français, Arabe, Histoire, Philosophie et plus. Ressources gratuites par matière.',
-    alternates: isAr ? { canonical: '/matieres' } : { canonical: '/matieres' },
+      ? 'جميع مواد البرنامج التونسي: الرياضيات، الفيزياء، علوم الحياة والأرض، الفرنسية، العربية، التاريخ، الفلسفة. دروس، تمارين وإصلاحات لكل مادة.'
+      : 'Toutes les matières du programme tunisien : Maths, Physique, SVT, Français, Arabe, Histoire, Philosophie. Cours, exercices et corrigés par matière.',
+    alternates: isAr ? { canonical: '/ar/matieres' } : { canonical: '/fr/matieres' },
     openGraph: {
       title: isAr ? 'جميع مواد البرنامج التونسي' : 'Toutes les matières du programme tunisien',
       description: isAr

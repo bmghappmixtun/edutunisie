@@ -8,7 +8,9 @@ import { BacArchivesClient } from './client';
 
 export const revalidate = 3600;
 
-const PAGE_URL = `${SITE_URL}/bac/archives`;
+const PAGE_PATH = '/bac/archives';
+const PAGE_URL_FR = `${SITE_URL}/fr${PAGE_PATH}`;
+const PAGE_URL_AR = `${SITE_URL}/ar${PAGE_PATH}`;
 const PARENT_URL = `${SITE_URL}/bac`;
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -91,13 +93,17 @@ export async function generateMetadata(): Promise<Metadata> {
           'examanet bac',
         ],
     alternates: {
-      canonical: PAGE_URL,
-      languages: { fr: PAGE_URL, ar: PAGE_URL, 'x-default': PAGE_URL },
+      canonical: isAr ? PAGE_URL_AR : PAGE_URL_FR,
+      languages: {
+        'fr-TN': PAGE_URL_FR,
+        'ar-TN': PAGE_URL_AR,
+        'x-default': PAGE_URL_FR,
+      },
     },
     openGraph: {
       title,
       description: desc,
-      url: PAGE_URL,
+      url: isAr ? PAGE_URL_AR : PAGE_URL_FR,
       siteName: 'Examanet',
       locale: isAr ? 'ar_TN' : 'fr_TN',
       type: 'website',
@@ -188,18 +194,21 @@ export default async function BacArchivesPage({ searchParams }: PageProps) {
   const itemListJsonLd = itemListSchema({
     name: t('bac.archives.title') || 'Archives Bac Tunisie',
     description: `${stats.totalFiles} fichiers de sujets et corrigés du Bac tunisien de 2010 à 2025`,
-    url: PAGE_URL,
+    url: isAr ? PAGE_URL_AR : PAGE_URL_FR,
     items: allFiles.map((f: any) => ({
       name: `${f.subject} ${f.year} ${f.session === 'principale' ? (isAr ? 'د.ر' : 'P') : isAr ? 'د.م' : 'C'} ${f.type === 'sujets' ? (isAr ? 'موضوع' : 'Sujet') : isAr ? 'إصلاح' : 'Corrigé'}`,
       url: f.url,
     })),
   });
 
-  const breadcrumbJsonLd = breadcrumbSchema([
-    { name: t('common.home') || 'Accueil', url: SITE_URL },
-    { name: t('levels.bac') || 'Bac', url: PARENT_URL },
-    { name: t('bac.archives.title') || 'Archives', url: PAGE_URL },
-  ]);
+  const breadcrumbJsonLd = breadcrumbSchema(
+    [
+      { name: t('common.home') || 'Accueil', url: SITE_URL },
+      { name: t('levels.bac') || 'Bac', url: PARENT_URL },
+      { name: t('bac.archives.title') || 'Archives', url: isAr ? PAGE_URL_AR : PAGE_URL_FR },
+    ],
+    (await getLocale()) as 'fr' | 'ar'
+  );
 
   return (
     <div className="min-h-screen flex flex-col">

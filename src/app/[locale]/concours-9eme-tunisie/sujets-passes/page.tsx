@@ -8,13 +8,16 @@ import { ConcoursSujetsClient } from './client';
 
 export const revalidate = 3600; // ISR: refresh every hour
 
-const PAGE_URL = `${SITE_URL}/concours-9eme-tunisie/sujets-passes`;
+const PAGE_PATH = '/concours-9eme-tunisie/sujets-passes';
+const PAGE_URL_FR = `${SITE_URL}/fr${PAGE_PATH}`;
+const PAGE_URL_AR = `${SITE_URL}/ar${PAGE_PATH}`;
 const PARENT_URL = `${SITE_URL}/concours-9eme-tunisie`;
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations();
   const stats = getConcoursStats();
   const locale = await getLocale();
+  const isAr = locale === 'ar';
   const title = t('concours.passes.title')
     .replace('{highlight}', '')
     .replace('{total}', String(stats.totalFiles));
@@ -47,13 +50,17 @@ export async function generateMetadata(): Promise<Metadata> {
             'مناظرة التاسعة أساسي',
           ],
     alternates: {
-      canonical: PAGE_URL,
-      languages: { fr: PAGE_URL, ar: PAGE_URL, 'x-default': PAGE_URL },
+      canonical: isAr ? PAGE_URL_AR : PAGE_URL_FR,
+      languages: {
+        'fr-TN': PAGE_URL_FR,
+        'ar-TN': PAGE_URL_AR,
+        'x-default': PAGE_URL_FR,
+      },
     },
     openGraph: {
       title,
       description: desc,
-      url: PAGE_URL,
+      url: isAr ? PAGE_URL_AR : PAGE_URL_FR,
       siteName: 'Examanet',
       locale: locale === 'ar' ? 'ar_TN' : 'fr_TN',
       type: 'website',
@@ -67,6 +74,8 @@ interface PageProps {
 
 export default async function ConcoursSujetsPassesPage({ searchParams }: PageProps) {
   const t = await getTranslations();
+  const locale = await getLocale();
+  const isAr = locale === 'ar';
   const stats = getConcoursStats();
   const yearGroups = groupByYear();
 
@@ -134,7 +143,7 @@ export default async function ConcoursSujetsPassesPage({ searchParams }: PagePro
       .replace('{highlight}', '')
       .replace('{total}', String(stats.totalFiles)),
     description: `Liste complète des ${stats.totalFiles} sujets et corrigés du concours 9ème depuis 2001`,
-    url: PAGE_URL,
+    url: isAr ? PAGE_URL_AR : PAGE_URL_FR,
     items: allFiles.map((f: any) => ({
       name: f.key.split('/').slice(2).join('/'),
       url: f.url,
@@ -145,7 +154,7 @@ export default async function ConcoursSujetsPassesPage({ searchParams }: PagePro
     { name: 'Accueil', url: SITE_URL },
     { name: 'Collège', url: `${SITE_URL}/college` },
     { name: 'Concours 9ème', url: PARENT_URL },
-    { name: t('concours.breadcrumb.sujetsPasses'), url: PAGE_URL },
+    { name: t('concours.breadcrumb.sujetsPasses'), url: isAr ? PAGE_URL_AR : PAGE_URL_FR },
   ]);
 
   return (

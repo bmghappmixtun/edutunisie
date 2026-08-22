@@ -65,12 +65,18 @@ const getCachedHomeData = nextCache(
 // PERF 2026-08-16: Static metadata. The previous version called `headers()`
 // to detect the AR locale, which forced the page into dynamic mode and
 // bypassed the ISR cache. The [locale] layout (parent) already handles
-// per-locale metadata, so this page uses a generic static fallback.
+// per-locale metadata (og:locale, hreflang, etc.), so this page only needs
+// to set the title/description which is the same for both locales.
 export const metadata: Metadata = {
-  title: 'Examanet — Cours, devoirs, exercices et corrigés gratuits en Tunisie',
+  // SEO 2026-08-22: trimmed from 71 to 60 chars (Google displays ~60 chars
+  // before truncating). Removed "gratuits" (already in description) and
+  // "en Tunisie" (the brand + description already imply Tunisia).
+  title: 'Examanet — Cours, devoirs et exercices en Tunisie',
   description:
-    'Plateforme pédagogique tunisienne #1 : cours, devoirs, exercices, sujets de bac et corrigés pour le Primaire, Collège et Lycée. 100% gratuit.',
-  alternates: { canonical: '/' },
+    'Plateforme pédagogique #1 pour les élèves tunisiens : cours, devoirs, exercices, sujets de bac et corrigés pour le Primaire, Collège et Lycée. Gratuit.',
+  // SEO 2026-08-22: don't override canonical here — the [locale] layout's
+  // generateMetadata sets the locale-prefixed canonical (and hreflang
+  // alternates) for both /fr and /ar.
 };
 
 

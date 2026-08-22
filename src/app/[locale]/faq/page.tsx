@@ -13,7 +13,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: isAr
       ? 'جميع الإجابات على أسئلتك حول إكسامانت: دروس مجانية، مستويات، مواد، معلمون، تحميل.'
       : 'Toutes les réponses à vos questions sur Examanet : cours gratuits, niveaux, matières, enseignants, téléchargement.',
-    alternates: isAr ? { canonical: '/faq' } : { canonical: '/faq' },
+    alternates: isAr ? { canonical: '/ar/faq' } : { canonical: '/fr/faq' },
     openGraph: {
       title: isAr ? 'الأسئلة الشائعة إكسامانت' : 'FAQ Examanet',
       description: isAr

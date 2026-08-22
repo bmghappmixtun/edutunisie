@@ -8,76 +8,71 @@ export const revalidate = 3600; // Refresh every hour
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
 
-  // Static pages
-  // Helper: add AR alternates to sitemap entries
-  const arAlternates = (url: string) => ({
-    url,
-    alternates: {
-      languages: {
-        'fr-TN': url,
-        'ar-TN': url.replace(baseUrl, baseUrl + '/ar'),
-        'x-default': url,
+  // SEO 2026-08-22: EVERY URL in the sitemap now gets hreflang alternates
+  // pointing to both the FR and AR version of the same page. This is the
+  // #1 issue from the SEO audit — previously only the 14 static pages
+  // had hreflang, the 15,659 dynamic URLs had none, so Google couldn't
+  // discover the AR version of resource/subject/teacher pages.
+  //
+  // The helper takes a URL (with or without /fr or /ar prefix) and emits
+  // a Next.js sitemap entry with the proper alternates. URLs without a
+  // locale prefix are treated as the canonical FR version.
+  const withAlternates = (path: string, priority?: number, cf?: 'daily' | 'weekly' | 'monthly' | 'yearly') => {
+    // Normalize: strip leading /fr/ or /ar/ to get the canonical path
+    const canonicalPath = path
+      .replace(/^https?:\/\/[^/]+/, '') // strip origin
+      .replace(/^\/(fr|ar)(\/|$)/, '/') // strip locale prefix
+      .replace(/\/$/, '') || '/';
+    const frUrl = `${baseUrl}/fr${canonicalPath === '/' ? '' : canonicalPath}`;
+    const arUrl = `${baseUrl}/ar${canonicalPath === '/' ? '' : canonicalPath}`;
+    return {
+      url: frUrl, // canonical = FR (default locale)
+      alternates: {
+        languages: {
+          'fr-TN': frUrl,
+          'ar-TN': arUrl,
+          'x-default': frUrl,
+        },
       },
-    },
-  });
+      ...(priority !== undefined ? { priority } : {}),
+      ...(cf ? { changeFrequency: cf } : {}),
+    };
+  };
 
+  // Static pages — hand-curated
   const staticPages: MetadataRoute.Sitemap = [
-    arAlternates(baseUrl),
-    arAlternates(`${baseUrl}/a-propos`),
-    arAlternates(`${baseUrl}/contact`),
-    arAlternates(`${baseUrl}/cgu`),
-    arAlternates(`${baseUrl}/matieres`),
-    arAlternates(`${baseUrl}/niveaux`),
-    arAlternates(`${baseUrl}/college`),
-    arAlternates(`${baseUrl}/concours-9eme-tunisie`),
-    arAlternates(`${baseUrl}/concours-9eme-tunisie/sujets-passes`),
-    arAlternates(`${baseUrl}/bac`),
-    arAlternates(`${baseUrl}/bac/archives`),
-    arAlternates(`${baseUrl}/professeurs`),
-    arAlternates(`${baseUrl}/faq`),
-    arAlternates(`${baseUrl}/recherche`),
-    arAlternates(`${baseUrl}/referentiel-national`),
-  ].map((entry, i) => ({
-    ...entry,
-    lastModified: i === 0 ? new Date() : undefined,
-    changeFrequency: [
-      'daily',
-      'monthly',
-      'monthly',
-      'yearly',
-      'weekly',
-      'weekly',
-      'daily',
-      'daily',
-      'daily',
-      'weekly',
-      'monthly',
-      'monthly',
-      'monthly',
-      'daily',
-    ][i] as any,
-    priority: [1.0, 0.5, 0.5, 0.3, 0.8, 0.8, 0.9, 0.9, 0.8, 0.7, 0.6, 0.5, 0.5][i],
-  }));
+    { ...withAlternates('/', 1.0, 'daily'), lastModified: new Date() },
+    withAlternates('/a-propos', 0.5, 'monthly'),
+    withAlternates('/contact', 0.5, 'monthly'),
+    withAlternates('/cgu', 0.3, 'monthly'),
+    withAlternates('/matieres', 0.8, 'weekly'),
+    withAlternates('/niveaux', 0.8, 'weekly'),
+    withAlternates('/college', 0.9, 'daily'),
+    withAlternates('/concours-9eme-tunisie', 0.9, 'daily'),
+    withAlternates('/concours-9eme-tunisie/sujets-passes', 0.8, 'daily'),
+    withAlternates('/bac', 0.7, 'weekly'),
+    withAlternates('/bac/archives', 0.6, 'monthly'),
+    withAlternates('/professeurs', 0.5, 'monthly'),
+    withAlternates('/faq', 0.5, 'monthly'),
+    withAlternates('/recherche', 0.5, 'monthly'),
+    withAlternates('/referentiel-national', 0.5, 'monthly'),
+  ];
 
   // Subjects (matieres)
   const subjects = await prisma.subject.findMany({
     select: { slug: true },
   });
-  const subjectPages: MetadataRoute.Sitemap = subjects.map((s) => ({
-    url: `${baseUrl}/matieres/${s.slug}`,
-    changeFrequency: 'weekly' as const,
-    priority: 0.7,
-  }));
+  const subjectPages: MetadataRoute.Sitemap = subjects.map((s) =>
+    withAlternates(`/matieres/${s.slug}`, 0.7, 'weekly')
+  );
 
   // Classes (niveaux)
   const classes = await prisma.class.findMany({
     select: { slug: true },
   });
-  const classPages: MetadataRoute.Sitemap = classes.map((c) => ({
-    url: `${baseUrl}/niveaux/${c.slug}`,
-    changeFrequency: 'weekly' as const,
-    priority: 0.7,
-  }));
+  const classPages: MetadataRoute.Sitemap = classes.map((c) =>
+    withAlternates(`/niveaux/${c.slug}`, 0.7, 'weekly')
+  );
 
   // Teachers (top 200 by resource count)
   const teachers = await prisma.user.findMany({
@@ -85,11 +80,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     select: { id: true, numericId: true, slug: true },
     take: 200,
   });
-  const teacherPages: MetadataRoute.Sitemap = teachers.map((t) => ({
-    url: `${baseUrl}/professeurs/${t.numericId}/${t.slug}`,
-    changeFrequency: 'monthly' as const,
-    priority: 0.5,
-  }));
+  const teacherPages: MetadataRoute.Sitemap = teachers.map((t) =>
+    withAlternates(`/professeurs/${t.numericId}/${t.slug}`, 0.5, 'monthly')
+  );
 
   // Resources - ALL published (Google accepts up to 50k per file)
   // We currently have ~15k so 1 file is enough
@@ -112,10 +105,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const changeFrequency: 'daily' | 'weekly' | 'monthly' =
       popularity > 500 ? 'daily' : popularity > 50 ? 'weekly' : 'monthly';
     return {
-      url: `${baseUrl}/ressources/${r.numericId}/${r.slug}`,
+      ...withAlternates(`/ressources/${r.numericId}/${r.slug}`, priority, changeFrequency),
       lastModified: r.updatedAt,
-      changeFrequency,
-      priority,
     };
   });
 

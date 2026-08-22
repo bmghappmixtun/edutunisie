@@ -16,10 +16,12 @@ export async function generateMetadata({ searchParams }: { searchParams: any }):
   const hasQuery = !!(searchParams?.q || searchParams?.subject || searchParams?.class);
   return {
     title: isAr ? 'بحث' : 'Recherche',
+    // SEO 2026-08-22: trimmed from 178 to ~150 chars.
     description: isAr
-      ? 'ابحث في آلاف الموارد التربوية المجانية: دروس، فروض، تمارين، مواضيع باك وإصلاحات. بحث متسامح مع الأخطاء، مرادفات فرنسية/عربية مشمولة.'
-      : 'Recherchez parmi des milliers de ressources pédagogiques gratuites : cours, devoirs, exercices, sujets de bac et corrigés. Recherche tolérante aux fautes, synonymes FR/AR inclus.',
-    alternates: { canonical: '/recherche' },
+      ? 'ابحث في آلاف الموارد التربوية المجانية: دروس، فروض، تمارين، مواضيع باك وإصلاحات. بحث متسامح مع مرادفات.'
+      : 'Recherchez parmi des milliers de ressources : cours, devoirs, exercices, sujets de bac et corrigés. Recherche tolérante aux fautes avec synonymes FR/AR.',
+    // SEO 2026-08-22: locale-prefixed canonical. Was bare '/recherche' before.
+    alternates: { canonical: isAr ? '/ar/recherche' : '/fr/recherche' },
     robots: hasQuery ? { index: false, follow: true } : { index: true, follow: true },
     openGraph: {
       title: isAr ? 'بحث في إكسامانت' : 'Recherche Examanet',

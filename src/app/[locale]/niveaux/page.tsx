@@ -23,17 +23,19 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: isAr
       ? 'جميع المستويات الدراسية — الابتدائي، الإعدادي، الثانوي في تونس'
-      : 'Tous les niveaux scolaires — Primaire, Collège, Lycée en Tunisie',
+      : 'Niveaux scolaires Tunisie — Primaire, Collège, Lycée',
     description: isAr
       ? 'موارد مجانية حسب المستوى الدراسي التونسي: من السنة السابعة إلى التاسعة أساسي (الإعدادي)، ومن الأولى إلى الرابعة ثانوي (الباك). دروس، تمارين وإصلاحات لكل قسم.'
       : 'Ressources gratuites par niveau scolaire tunisien : 7ème à 9ème année (Collège), 1ère à 4ème année (Lycée/Bac). Cours, exercices et corrigés pour chaque classe.',
-    alternates: { canonical: '/niveaux' },
+    // SEO 2026-08-22: locale-prefixed canonical. Was bare '/niveaux' before
+    // (same canonical on /fr/niveaux and /ar/niveaux = duplicate content).
+    alternates: { canonical: isAr ? '/ar/niveaux' : '/fr/niveaux' },
     openGraph: {
       title: isAr ? 'جميع المستويات الدراسية في تونس' : 'Tous les niveaux scolaires en Tunisie',
       description: isAr
         ? 'من الابتدائي إلى الباك: دروس، تمارين وإصلاحات حسب القسم والشعبة.'
         : 'Du Primaire au Bac : cours, exercices et corrigés par classe et section.',
-      url: '/niveaux',
+      url: isAr ? '/ar/niveaux' : '/fr/niveaux',
       type: 'website',
       locale: isAr ? 'ar_TN' : 'fr_TN',
       images: [

@@ -68,15 +68,18 @@ const fustat = localFont({
 // children pages never need to worry about i18n.
 const LOCALE_DEFAULTS = {
   fr: {
-    title: 'Examanet — La plateforme pédagogique #1 en Tunisie',
+    // SEO 2026-08-22: trimmed root title to 47 chars (was 53) so child
+    // page titles like "Bac Tunisie 2025 | Examanet" (56 chars) fit in
+    // Google's 60-char SERP limit.
+    title: 'Examanet — Plateforme pédagogique tunisienne',
     description:
-      'Cours, devoirs, séries, révisions, sujets bac et corrigés — 100% gratuits pour les élèves du Primaire, Collège et Lycée en Tunisie.',
-    ogTitle: 'Examanet — La plateforme pédagogique #1 en Tunisie',
+      'Cours, devoirs, exercices, sujets de bac et corrigés pour le Primaire, Collège et Lycée en Tunisie. Gratuit.',
+    ogTitle: 'Examanet — Plateforme pédagogique tunisienne',
     ogDescription:
-      'Cours, devoirs, séries, révisions, sujets bac et corrigés — 100% gratuits pour les élèves tunisiens.',
-    twitterTitle: 'Examanet — La plateforme pédagogique #1 en Tunisie',
+      'Cours, devoirs, exercices, sujets de bac et corrigés pour le Primaire, Collège et Lycée en Tunisie. Gratuit.',
+    twitterTitle: 'Examanet — Plateforme pédagogique tunisienne',
     twitterDescription:
-      'Cours, devoirs, séries, révisions, sujets bac et corrigés — 100% gratuits.',
+      'Cours, devoirs, exercices, sujets de bac et corrigés pour le Primaire, Collège et Lycée en Tunisie. Gratuit.',
   },
   ar: {
     title: 'إكسامانت — المنصة التربوية #1 في تونس',
@@ -103,7 +106,10 @@ export function generateMetadata(): Metadata {
     metadataBase: new URL(SITE_URL),
     title: {
       default: t.title,
-      template: '%s — Examanet',
+      // SEO 2026-08-22: changed " — Examanet" → " | Examanet" so the title
+      // reads "X | Examanet" instead of "Examanet — X — Examanet" (the brand
+      // was appearing twice when page titles started with "Examanet — X").
+      template: '%s | Examanet',
     },
     description: t.description,
     keywords: [
@@ -167,6 +173,11 @@ export function generateMetadata(): Metadata {
         'max-snippet': -1,
       },
     },
+    // SEO 2026-08-22: the canonical on the ROOT layout is the bare site URL
+    // (this is the homepage canonical). For [locale]/* pages, the locale
+    // layout's generateMetadata() OVERRIDES this with a locale-prefixed
+    // canonical + proper hreflang alternates. This is correct Next.js
+    // behavior — child metadata wins.
     alternates: {
       canonical: SITE_URL,
       languages: {

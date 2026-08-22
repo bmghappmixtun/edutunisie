@@ -7,6 +7,7 @@ import {
   itemListSchema,
   SITE_URL,
 } from '@/lib/structured-data';
+import { localeUrl } from '@/lib/seo-urls';
 import { getTranslations, getLocale, getMessages } from 'next-intl/server';
 import { getBacFiles, getSectionMeta, getSubjectMeta } from '@/lib/bac-data';
 import {
@@ -75,7 +76,11 @@ const SUBJECT_ICONS: Record<string, any> = {
 
 export const revalidate = 3600; // ISR: refresh hourly
 
-const PAGE_URL = `${SITE_URL}/bac`;
+// SEO 2026-08-22: locale-aware PAGE_PATH. The previous `const PAGE_URL = ...`
+// was a single global pointing to https://examanet.com/bac — but the page
+// renders under both /fr/bac and /ar/bac, so the canonical was wrong on
+// both. Now we use the helper to compute per-locale URLs.
+const PAGE_PATH = '/bac';
 
 // ============================================================================
 // METADATA — full SEO optimized
@@ -83,13 +88,17 @@ const PAGE_URL = `${SITE_URL}/bac`;
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
   const isAr = locale === 'ar';
+  const PAGE_URL = localeUrl(PAGE_PATH, locale as 'fr' | 'ar');
+  const PAGE_URL_FR = localeUrl(PAGE_PATH, 'fr');
+  const PAGE_URL_AR = localeUrl(PAGE_PATH, 'ar');
 
   const title = isAr
     ? 'باكالوريا تونس 2025 — مواضيع، إصلاحات ومراجعة كاملة'
     : 'Bac Tunisie 2025 — Sujets, Corrigés et Révision complète';
   const description = isAr
     ? '🎓 كل ما تحتاجه للنجاح في الباكالوريا التونسية 2025: مواضيع الدورة الرئيسية والمراقبة منذ 2010، إصلاحات رسمية، منهجية مراجعة + 7 شعب (رياضيات، علوم تجريبية، تقنية، إعلامية، اقتصاد وتصرف، آداب، رياضة). 100٪ مجاني.'
-    : '🎓 Tout pour réussir le Baccalauréat tunisien 2025 : sujets des sessions principale et de contrôle depuis 2010, corrigés officiels, méthodologie de révision + 7 sections (Math, Sciences Exp, Technique, Informatique, Éco-Gestion, Lettres, Sport). 100% gratuit.';
+    // SEO 2026-08-22: trimmed from 246 to ~158 chars (Google SERP limit).
+    : '🎓 Bac Tunisie 2025 : sujets et corrigés depuis 2010, méthodologie de révision + 7 sections (Math, Sc.Exp, Technique, Info, Éco, Lettres, Sport). Gratuit.';
 
   return {
     title,
@@ -204,9 +213,9 @@ export async function generateMetadata(): Promise<Metadata> {
     alternates: {
       canonical: PAGE_URL,
       languages: {
-        fr: PAGE_URL,
-        ar: `${SITE_URL}/ar/bac`,
-        'x-default': PAGE_URL,
+        'fr-TN': PAGE_URL_FR,
+        'ar-TN': PAGE_URL_AR,
+        'x-default': PAGE_URL_FR,
       },
     },
     openGraph: {
@@ -246,14 +255,21 @@ export default async function BacPillar() {
   const t = await getTranslations();
   const locale = await getLocale();
   const isAr = locale === 'ar';
+  // SEO 2026-08-22: locale-aware URL — used in structured data and OG tags.
+  const PAGE_URL = localeUrl(PAGE_PATH, locale as 'fr' | 'ar');
 
   // ==========================================================================
   // STRUCTURED DATA — 4 schemas for SEO dominance
   // ==========================================================================
-  const breadcrumbJsonLd = breadcrumbSchema([
-    { name: 'Accueil', url: SITE_URL },
-    { name: 'Bac', url: PAGE_URL },
-  ]);
+  // SEO 2026-08-22: pass `locale` so the breadcrumb URLs are localized
+  // (e.g. /fr/bac instead of bare /bac).
+  const breadcrumbJsonLd = breadcrumbSchema(
+    [
+      { name: 'Accueil', url: SITE_URL },
+      { name: 'Bac', url: PAGE_URL },
+    ],
+    locale as 'fr' | 'ar'
+  );
 
   // 7 sections as an ItemList
   const sectionKeys = ['math', 'scExp', 'scTech', 'scInfo', 'eco', 'lettres', 'sport'];
