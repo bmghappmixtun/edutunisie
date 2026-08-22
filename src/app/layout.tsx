@@ -103,7 +103,10 @@ export function generateMetadata(): Metadata {
     metadataBase: new URL(SITE_URL),
     title: {
       default: t.title,
-      template: '%s — Examanet',
+      // SEO 2026-08-22: changed " — Examanet" → " | Examanet" so the title
+      // reads "X | Examanet" instead of "Examanet — X — Examanet" (the brand
+      // was appearing twice when page titles started with "Examanet — X").
+      template: '%s | Examanet',
     },
     description: t.description,
     keywords: [
@@ -167,6 +170,11 @@ export function generateMetadata(): Metadata {
         'max-snippet': -1,
       },
     },
+    // SEO 2026-08-22: the canonical on the ROOT layout is the bare site URL
+    // (this is the homepage canonical). For [locale]/* pages, the locale
+    // layout's generateMetadata() OVERRIDES this with a locale-prefixed
+    // canonical + proper hreflang alternates. This is correct Next.js
+    // behavior — child metadata wins.
     alternates: {
       canonical: SITE_URL,
       languages: {

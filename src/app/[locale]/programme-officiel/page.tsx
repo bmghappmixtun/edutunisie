@@ -14,7 +14,9 @@ import ProgrammeOfficielClient from '@/components/programme-officiel/ProgrammeOf
 
 export const revalidate = 3600; // ISR: refresh hourly
 
-const PAGE_URL = `${SITE_URL}/programme-officiel`;
+const PAGE_PATH = '/programme-officiel';
+const PAGE_URL_FR = `${SITE_URL}/fr${PAGE_PATH}`;
+const PAGE_URL_AR = `${SITE_URL}/ar${PAGE_PATH}`;
 
 // ============================================================================
 // METADATA — Full SEO optimized
@@ -146,17 +148,17 @@ export async function generateMetadata(): Promise<Metadata> {
     publisher: 'Examanet',
     category: isAr ? 'تعليم' : 'Éducation',
     alternates: {
-      canonical: PAGE_URL,
+      canonical: isAr ? PAGE_URL_AR : PAGE_URL_FR,
       languages: {
-        fr: PAGE_URL,
-        ar: `${SITE_URL}/ar/programme-officiel`,
-        'x-default': PAGE_URL,
+        'fr-TN': PAGE_URL_FR,
+        'ar-TN': PAGE_URL_AR,
+        'x-default': PAGE_URL_FR,
       },
     },
     openGraph: {
       title,
       description,
-      url: PAGE_URL,
+      url: isAr ? PAGE_URL_AR : PAGE_URL_FR,
       siteName: 'Examanet',
       locale: isAr ? 'ar_TN' : 'fr_TN',
       alternateLocale: isAr ? ['fr_TN'] : ['ar_TN'],
@@ -220,7 +222,7 @@ export default async function ProgrammeOfficielPage() {
   // 1. Breadcrumb
   const breadcrumbJsonLd = breadcrumbSchema([
     { name: 'Accueil', url: SITE_URL },
-    { name: 'Programme Officiel', url: PAGE_URL },
+    { name: 'Programme Officiel', url: isAr ? PAGE_URL_AR : PAGE_URL_FR },
   ]);
 
   // 2. Organization (Examanet)
@@ -238,7 +240,7 @@ export default async function ProgrammeOfficielPage() {
     cycle: isAr ? 'التعليم الأساسي والثانوي' : 'Enseignement de base et secondaire',
     subject: isAr ? 'جميع المواد' : 'Toutes les matières',
     type: 'Curriculum',
-    url: PAGE_URL,
+    url: isAr ? PAGE_URL_AR : PAGE_URL_FR,
     datePublished: '2024-09-01',
     dateModified: new Date().toISOString(),
   });
@@ -258,10 +260,10 @@ export default async function ProgrammeOfficielPage() {
     description: isAr
       ? 'قائمة كاملة بشعب الباكالوريا التونسية السبع الرسمية'
       : 'Liste complète des 7 sections officielles du Baccalauréat tunisien',
-    url: PAGE_URL,
+    url: isAr ? PAGE_URL_AR : PAGE_URL_FR,
     items: bacSections.map((s) => ({
       name: isAr ? s.ar : s.fr,
-      url: `${PAGE_URL}#section-${s.key}`,
+      url: `${isAr ? PAGE_URL_AR : PAGE_URL_FR}#section-${s.key}`,
       description: isAr ? s.descAr : s.desc,
     })),
   });

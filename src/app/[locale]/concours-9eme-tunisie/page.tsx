@@ -35,7 +35,9 @@ import {
 
 export const revalidate = 3600; // ISR: refresh every hour
 
-const PAGE_URL = `${SITE_URL}/concours-9eme-tunisie`;
+const PAGE_PATH = '/concours-9eme-tunisie';
+const PAGE_URL_FR = `${SITE_URL}/fr${PAGE_PATH}`;
+const PAGE_URL_AR = `${SITE_URL}/ar${PAGE_PATH}`;
 
 // ============================================================================
 // METADATA — generated dynamically based on locale
@@ -43,6 +45,7 @@ const PAGE_URL = `${SITE_URL}/concours-9eme-tunisie`;
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations();
   const locale = await getLocale();
+  const isAr = locale === 'ar';
   const stats = getConcoursStats();
   const title = t('concours.meta.title').replace('{total}', String(stats.totalFiles));
   const desc = t('concours.meta.description').replace('{total}', String(stats.totalFiles));
@@ -79,17 +82,17 @@ export async function generateMetadata(): Promise<Metadata> {
             'examanet concours',
           ],
     alternates: {
-      canonical: PAGE_URL,
+      canonical: isAr ? PAGE_URL_AR : PAGE_URL_FR,
       languages: {
-        fr: PAGE_URL,
-        ar: PAGE_URL,
-        'x-default': PAGE_URL,
+        'fr-TN': PAGE_URL_FR,
+        'ar-TN': PAGE_URL_AR,
+        'x-default': PAGE_URL_FR,
       },
     },
     openGraph: {
       title,
       description: desc,
-      url: PAGE_URL,
+      url: isAr ? PAGE_URL_AR : PAGE_URL_FR,
       siteName: 'Examanet',
       locale: locale === 'ar' ? 'ar_TN' : 'fr_TN',
       type: 'website',
@@ -118,6 +121,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Concours9emePillar() {
   const t = await getTranslations();
   const locale = await getLocale();
+  const isAr = locale === 'ar';
   const stats = getConcoursStats();
   const corriges2020Plus = getCorriges2020Plus();
   const upcoming = getUpcomingCorriges();
@@ -402,7 +406,7 @@ export default async function Concours9emePillar() {
     subject: 'Multidisciplinaire',
     type: 'COURSE',
     year: '2027',
-    url: PAGE_URL,
+    url: isAr ? PAGE_URL_AR : PAGE_URL_FR,
     datePublished: '2026-07-01',
     dateModified: new Date().toISOString().split('T')[0],
     aggregateRating: { ratingCount: 1250, ratingValue: 4.7 },
@@ -413,13 +417,13 @@ export default async function Concours9emePillar() {
     { name: 'Accueil', url: SITE_URL },
     { name: 'Collège', url: `${SITE_URL}/college` },
     { name: '9ème année', url: `${SITE_URL}/ressources?class=9eme` },
-    { name: t('concours.breadcrumb.concours9eme'), url: PAGE_URL },
+    { name: t('concours.breadcrumb.concours9eme'), url: isAr ? PAGE_URL_AR : PAGE_URL_FR },
   ]);
 
   const itemListJsonLd = itemListSchema({
     name: t('concours.meta.title').replace('{total}', String(stats.totalFiles)),
     description: `Liste des sujets et corrigés du concours 9ème année en Tunisie depuis 2001`,
-    url: PAGE_URL,
+    url: isAr ? PAGE_URL_AR : PAGE_URL_FR,
     items: stats.gold2020Corrige
       ? [
           {
@@ -430,12 +434,12 @@ export default async function Concours9emePillar() {
           },
           ...yearGroups.slice(0, 49).map((yg) => ({
             name: `Sujets du concours 9ème ${yg.year}`,
-            url: `${PAGE_URL}/sujets-passes?year=${yg.year}`,
+            url: `${isAr ? PAGE_URL_AR : PAGE_URL_FR}/sujets-passes?year=${yg.year}`,
           })),
         ]
       : yearGroups.slice(0, 50).map((yg) => ({
           name: `Sujets du concours 9ème ${yg.year}`,
-          url: `${PAGE_URL}/sujets-passes?year=${yg.year}`,
+          url: `${isAr ? PAGE_URL_AR : PAGE_URL_FR}/sujets-passes?year=${yg.year}`,
         })),
   });
 

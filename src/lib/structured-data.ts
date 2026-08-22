@@ -74,7 +74,19 @@ export function organizationSchema() {
  * Defensive: ensures `name` is always present (required by Google).
  * Falls back to URL slug if name is missing/empty.
  */
-export function breadcrumbSchema(items: BreadcrumbItem[]) {
+/**
+ * BreadcrumbList — for the visual breadcrumb in SERPs.
+ * Pass items in order from root to current page.
+ *
+ * Defensive: ensures `name` is always present (required by Google).
+ * Falls back to URL slug if name is missing/empty.
+ *
+ * SEO 2026-08-22: if `locale` is passed, prepends the locale segment to
+ * each item URL so the breadcrumb points to the actual page the user is
+ * on, not the locale-agnostic root path. This fixes the audit finding
+ * "BreadcrumbList schema uses root URLs instead of locale-aware URLs".
+ */
+export function breadcrumbSchema(items: BreadcrumbItem[], locale?: 'fr' | 'ar') {
   return {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -93,11 +105,21 @@ export function breadcrumbSchema(items: BreadcrumbItem[]) {
           name = `Page ${index + 1}`;
         }
       }
+      // Localize URL: prepend /fr or /ar to the path so the breadcrumb
+      // points to the locale-specific page. Skip if the URL already has
+      // a locale prefix (or if it's the site root with no path).
+      let localizedUrl = item.url;
+      if (locale && item.url.startsWith(SITE_URL)) {
+        const path = item.url.slice(SITE_URL.length);
+        if (path && !/^\/(fr|ar)(\/|$)/.test(path)) {
+          localizedUrl = `${SITE_URL}/${locale}${path === '/' ? '' : path}`;
+        }
+      }
       return {
         '@type': 'ListItem',
         position: index + 1,
         name,
-        item: item.url,
+        item: localizedUrl,
       };
     }),
   };

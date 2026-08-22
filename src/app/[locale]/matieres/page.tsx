@@ -18,7 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: isAr
       ? 'اكتشف جميع مواد البرنامج المدرسي التونسي: الرياضيات، الفيزياء، علوم الحياة والأرض، الفرنسية، العربية، التاريخ، الفلسفة والمزيد. موارد مجانية لكل مادة.'
       : 'Découvrez toutes les matières du programme scolaire tunisien : Mathématiques, Physique, SVT, Français, Arabe, Histoire, Philosophie et plus. Ressources gratuites par matière.',
-    alternates: isAr ? { canonical: '/matieres' } : { canonical: '/matieres' },
+    alternates: isAr ? { canonical: '/ar/matieres' } : { canonical: '/fr/matieres' },
     openGraph: {
       title: isAr ? 'جميع مواد البرنامج التونسي' : 'Toutes les matières du programme tunisien',
       description: isAr

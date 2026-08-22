@@ -43,7 +43,9 @@ export async function generateMetadata(): Promise<Metadata> {
           'baccalauréat tunisien',
           'réforme éducative Tunisie',
         ],
-    alternates: { canonical: `${SITE_URL}/referentiel-national` },
+    // SEO 2026-08-22: locale-prefixed canonical. Was `${SITE_URL}/referentiel-national`
+    // (same canonical for /fr and /ar pages).
+    alternates: { canonical: `${SITE_URL}${isAr ? '/ar' : '/fr'}/referentiel-national` },
     openGraph: {
       title: isAr
         ? 'المرجع الوطني للمنظومة التربوية التونسية'

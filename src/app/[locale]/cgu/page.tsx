@@ -13,7 +13,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: isAr
       ? 'شروط استخدام منصة إكسامانت. الحقوق والالتزامات والمسؤوليات.'
       : "Conditions générales d'utilisation de la plateforme Examanet. Droits, obligations et responsabilités des utilisateurs.",
-    alternates: isAr ? { canonical: '/cgu' } : { canonical: '/cgu' },
+    alternates: isAr ? { canonical: '/ar/cgu' } : { canonical: '/fr/cgu' },
   };
 }
 

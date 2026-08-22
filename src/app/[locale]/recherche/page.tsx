@@ -19,7 +19,8 @@ export async function generateMetadata({ searchParams }: { searchParams: any }):
     description: isAr
       ? 'ابحث في آلاف الموارد التربوية المجانية: دروس، فروض، تمارين، مواضيع باك وإصلاحات. بحث متسامح مع الأخطاء، مرادفات فرنسية/عربية مشمولة.'
       : 'Recherchez parmi des milliers de ressources pédagogiques gratuites : cours, devoirs, exercices, sujets de bac et corrigés. Recherche tolérante aux fautes, synonymes FR/AR inclus.',
-    alternates: { canonical: '/recherche' },
+    // SEO 2026-08-22: locale-prefixed canonical. Was bare '/recherche' before.
+    alternates: { canonical: isAr ? '/ar/recherche' : '/fr/recherche' },
     robots: hasQuery ? { index: false, follow: true } : { index: true, follow: true },
     openGraph: {
       title: isAr ? 'بحث في إكسامانت' : 'Recherche Examanet',

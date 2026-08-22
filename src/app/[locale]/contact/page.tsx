@@ -14,7 +14,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: isAr
       ? 'تواصل مع فريق إكسامانت. سؤال، خطأ، اقتراح؟ سنرد عليك خلال 24-48 ساعة.'
       : "Contactez l'équipe Examanet. Une question, un bug, une suggestion ? Nous vous répondons sous 24-48h.",
-    alternates: isAr ? { canonical: '/contact' } : { canonical: '/contact' },
+    alternates: isAr ? { canonical: '/ar/contact' } : { canonical: '/fr/contact' },
     openGraph: {
       title: isAr ? 'اتصل بإكسامانت' : 'Contact Examanet',
       description: isAr

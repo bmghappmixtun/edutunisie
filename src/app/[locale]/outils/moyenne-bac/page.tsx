@@ -6,7 +6,9 @@ import { SITE_URL } from '@/lib/structured-data';
 
 export const revalidate = 3600;
 
-const PAGE_URL = `${SITE_URL}/outils/moyenne-bac`;
+const PAGE_PATH = '/outils/moyenne-bac';
+const PAGE_URL_FR = `${SITE_URL}/fr${PAGE_PATH}`;
+const PAGE_URL_AR = `${SITE_URL}/ar${PAGE_PATH}`;
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
@@ -18,13 +20,13 @@ export async function generateMetadata(): Promise<Metadata> {
     description: isAr
       ? 'احسب معدلك في الباكالوريا التونسية حسب شعبتك مع المعاملات الرسمية لوزارة التربية (الدورة الرئيسية والمراقبة).'
       : "Calculez votre moyenne du Bac tunisien selon votre section, avec les coefficients officiels du Ministère de l'Éducation (sessions principale et de contrôle).",
-    alternates: { canonical: PAGE_URL },
+    alternates: { canonical: isAr ? PAGE_URL_AR : PAGE_URL_FR },
     openGraph: {
       title: isAr ? 'حساب معدل الباكالوريا' : 'Calcul Moyenne Bac',
       description: isAr
         ? 'احسب معدلك في الباكالوريا التونسية'
         : 'Calculez votre moyenne du Bac tunisien',
-      url: PAGE_URL,
+      url: isAr ? PAGE_URL_AR : PAGE_URL_FR,
       locale: isAr ? 'ar_TN' : 'fr_TN',
       type: 'website',
     },

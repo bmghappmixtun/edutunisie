@@ -32,7 +32,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: isAr
       ? '📚 +3700 مورد مجاني للإعدادي في تونس: دروس، فروض، سلاسل، تمارين وإصلاحات للسنة السابعة والثامنة والتاسعة أساسي.'
       : '📚 +3 700 ressources gratuites pour le collège en Tunisie : cours, devoirs, séries, exercices et corrigés pour la 7ème, 8ème et 9ème année de base. Mathématiques, Physique, SVT, Français, Arabe, Anglais et plus.',
-    alternates: isAr ? { canonical: '/college' } : { canonical: '/college' },
+    alternates: isAr ? { canonical: '/ar/college' } : { canonical: '/fr/college' },
     openGraph: {
       title: isAr
         ? 'دروس الإعدادي تونس — السنة 7، 8، 9'
