@@ -6,17 +6,20 @@
 # for Vercel compatibility.
 #
 # Usage:
-#   ./scripts/deploy-cf.sh deploy
-#   ./scripts/deploy-cf.sh build
-#   ./scripts/deploy-cf.sh revert
+#   ./scripts/deploy-cf.sh build    # Apply CF config + build OpenNext bundle
+#   ./scripts/deploy-cf.sh deploy   # build + deploy to CF
+#   ./scripts/deploy-cf.sh revert   # Restore main next.config.js
 
 set -e
 
 ACTION="${1:-build}"
 
+# Ensure bun is in PATH
+export PATH="/usr/local/bin:$PATH"
+
 if [ "$ACTION" = "revert" ]; then
   echo "→ Reverting CF-specific next.config.js changes"
-  git checkout main -- next.config.js
+  git checkout main -- next.config.js 2>/dev/null || git checkout HEAD -- next.config.js
   exit 0
 fi
 
@@ -24,7 +27,7 @@ if [ "$ACTION" = "build" ] || [ "$ACTION" = "deploy" ]; then
   echo "→ Applying CF-specific next.config.js changes"
   
   # Backup original
-  cp next.config.js next.config.js.original
+  cp next.config.js next.config.js.original 2>/dev/null || true
   
   # Add output: standalone and unoptimized via node
   node -e "
@@ -51,9 +54,22 @@ if [ "$ACTION" = "build" ] || [ "$ACTION" = "deploy" ]; then
   console.log('CF-specific next.config.js applied');
   "
   
+  # Apply surgery (stub sharp, stub next/og, delete WASM)
+  if [ -f "scripts/surgery-cf.sh" ]; then
+    ./scripts/surgery-cf.sh
+  fi
+  
+  # Build with skipNextBuild (we run npx next build separately to avoid ensure-search.sh issues)
+  echo "→ Running npx next build"
+  rm -rf .next .open-next
+  DATABASE_URL="${DATABASE_URL:-postgresql://stub:stub@localhost:5432/stub}" npx next build 2>&1 | tail -5
+  
+  echo "→ Running opennextjs-cloudflare build"
+  DATABASE_URL="${DATABASE_URL:-postgresql://stub:stub@localhost:5432/stub}" npx opennextjs-cloudflare build --skipNextBuild 2>&1 | tail -10
+  
   if [ "$ACTION" = "deploy" ]; then
-    echo "→ Building and deploying to Cloudflare"
-    # ... add wrangler deploy here
-    echo "Build and deploy completed"
+    echo "→ Deploying to Cloudflare"
+    CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE="postgresql://stub:stub@localhost:5432/stub" \
+      npx wrangler deploy 2>&1 | tail -10
   fi
 fi
