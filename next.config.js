@@ -3,9 +3,16 @@ const createNextIntlPlugin = require('next-intl/plugin');
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 /** @type {import('next').NextConfig} */
+// Cloudflare Workers isolated branch (feature/cf-isolated)
+// This config is BAKED for CF — no more modifications needed at deploy time.
+// To deploy: just run `./scripts/deploy-cf.sh` (or `npx wrangler deploy`).
 const nextConfig = {
+  // CF Workers requires standalone output for OpenNext
+  output: "standalone",
   reactStrictMode: true,
   images: {
+    // CF Workers doesn't support image optimization at runtime
+    unoptimized: true,
     // SECURITY: restrict remotePatterns to trusted image hosts only
     // Was: { protocol: 'https', hostname: '**' } (allowed ANY HTTPS host = SSRF risk)
     remotePatterns: [
