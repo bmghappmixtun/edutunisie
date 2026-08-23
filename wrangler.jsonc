@@ -31,5 +31,11 @@
       "binding": "NEXT_INC_CACHE_KV",
       "id": "5e995bd9ed034fb4bdd507c8754b5844"
     }
+  ],
+  "hyperdrive": [
+    {
+      "binding": "HYPERDRIVE",
+      "id": "f229c4a38255449198890e4259aef52e"
+    }
   ]
 }
