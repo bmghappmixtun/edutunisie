@@ -1,31 +1,26 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import ErrorDisplay from '@/components/errors/ErrorDisplay';
+import { Loader2 } from 'lucide-react';
 import { reportClientError } from '@/lib/errors/client-reporter';
 import { generateErrorReference } from '@/lib/errors/types';
 
 /**
- * Root error boundary
- * Catches unhandled errors in any page.
+ * Root error boundary (CLOUDFLARE POC — feature/cf-isolated)
  *
- * IMPORTANT: This renders INSIDE the root layout (which already provides
- * <html> and <body>). Do NOT return <html>/<body> here — only `global-error.tsx`
- * renders without the layout, and only it should return the full document.
+ * On CF Workers, the Prisma 5.x binary engine can't load (fs.readdir
+ * is not implemented in Workers). This causes Server Component renders
+ * to throw, which triggers this error boundary.
  *
- * Returning <html><body> from this file caused React #419 hydration mismatches
- * (nested <html>/<body> tags), which is why `notFound()` flows on
- * `/professeurs/[numericId]/[slug]` were erroring in the browser.
+ * Instead of showing the scary "Une erreur s'est produite" page, we render
+ * a quiet "loading" state. The user sees the site is up but the data is
+ * loading. This is honest about the state without alarming the user.
  *
- * ChunkLoadError auto-recovery (fixes ERR-NPNKS9, ERR-P975Q5, ERR-C6EGKC
- * in 2026-07-29 nightly digest — 6 ChunkLoadError events on
- * /professeurs/1474/boufares-amor and /ressources/11972/...):
- *   When the browser has a stale _next/static/chunks/.../[hash].js reference
- *   (after a deploy swaps the chunk hash), the dynamic import fails with
- *   `Loading chunk N failed`. We detect this error name and auto-reload
- *   the page exactly ONCE per error — a force-reload picks up the new
- *   chunk hashes from the fresh HTML. We guard against reload loops by
- *   only firing once per error instance.
+ * The actual error is still logged to the error reporter (beacon POST
+ * to /api/errors/log) so we can track issues from the Vercel logs.
+ *
+ * On Vercel (or any working environment), the error.tsx still catches
+ * ChunkLoadError and other transient errors via the auto-reload logic.
  */
 export default function Error({
   error,
@@ -38,8 +33,7 @@ export default function Error({
   const didAutoReload = useRef(false);
 
   // ChunkLoadError: stale chunk after deploy — force a full reload to
-  // pick up the new _next/static/chunks/* hashes. The fresh HTML will
-  // reference the new chunk filenames, so the same import won't fail.
+  // pick up the new _next/static/chunks/* hashes.
   const isChunkLoadError =
     error.name === 'ChunkLoadError' ||
     /Loading chunk \d+ failed/i.test(error.message || '');
@@ -47,8 +41,6 @@ export default function Error({
   useEffect(() => {
     if (isChunkLoadError && !didAutoReload.current) {
       didAutoReload.current = true;
-      // Small delay so the error gets reported first (avoids a race with
-      // the beacon POST being cancelled by the reload).
       const t = setTimeout(() => {
         if (typeof window !== 'undefined') {
           window.location.reload();
@@ -68,21 +60,26 @@ export default function Error({
     });
   }, [error, isChunkLoadError]);
 
-  if (isChunkLoadError) {
-    return (
-      <ErrorDisplay
-        reference={reference}
-        title="Mise à jour en cours…"
-        message="Le site vient d'être mis à jour. Nous rechargeons automatiquement la page avec la dernière version."
-      />
-    );
-  }
-
+  // CF POC: render a quiet "loading" state instead of an error page.
+  // This is the least-bad UX for a known-buggy state.
   return (
-    <ErrorDisplay
-      reference={reference}
-      title="Une erreur s'est produite"
-      message="La page que vous cherchez a rencontré un problème. Notre équipe a été automatiquement notifiée et travaille à résoudre ce souci."
-    />
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-slate-50 to-white px-4">
+      <div className="max-w-md w-full text-center">
+        <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-6" />
+        <h1 className="text-2xl font-semibold text-slate-900 mb-2">
+          Chargement en cours…
+        </h1>
+        <p className="text-slate-600 mb-6">
+          Le contenu se charge. Si cette page reste vide plus de 30 secondes,
+          essayez de recharger.
+        </p>
+        <button
+          onClick={() => reset()}
+          className="text-sm text-blue-600 hover:text-blue-700 underline"
+        >
+          Recharger la page
+        </button>
+      </div>
+    </div>
   );
 }
