@@ -34,13 +34,15 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    "src/types/**/*.d.ts"
   ],
   "exclude": [
     "node_modules",
     "scripts",
     "main",
     ".next",
-    "out"
+    "out",
+    "open-next.config.ts"
   ]
 }

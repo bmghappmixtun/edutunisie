@@ -1,8 +1,9 @@
+// Cloudflare Workers config for examanet-poc
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "main": ".open-next/worker.js",
   "name": "examanet-poc",
-  "compatibility_date": "2024-12-30",
+  "compatibility_date": "2025-09-01",
   "compatibility_flags": [
     "nodejs_compat",
     "global_fetch_strictly_public"
@@ -30,6 +31,10 @@
     {
       "binding": "NEXT_INC_CACHE_KV",
       "id": "5e995bd9ed034fb4bdd507c8754b5844"
+    },
+    {
+      "binding": "NEXT_TAG_CACHE_KV",
+      "id": "f867cda55be745238e021349f594654d"
     }
   ],
   "hyperdrive": [

@@ -152,3 +152,8 @@ cloudflare-env.d.ts
 
 # Cloudflare Workers local state (wrangler dev)
 .wrangler/
+
+# CF-specific build artifacts
+src/lib/prisma.ts.vercel.bak
+src/lib/prisma.proxy.ts.bak
+next.config.js.original

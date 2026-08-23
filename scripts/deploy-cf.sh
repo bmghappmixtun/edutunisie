@@ -58,15 +58,31 @@ if [ "$ACTION" = "build" ] || [ "$ACTION" = "deploy" ]; then
   if [ -f "scripts/surgery-cf.sh" ]; then
     ./scripts/surgery-cf.sh
   fi
-  
+
+  # Swap prisma.ts with prisma.cf.ts (PrismaPg + Hyperdrive for Workers)
+  if [ -f "scripts/swap-prisma-cf.sh" ]; then
+    ./scripts/swap-prisma-cf.sh
+  fi
+
   # Build with skipNextBuild (we run npx next build separately to avoid ensure-search.sh issues)
   echo "→ Running npx next build"
   rm -rf .next .open-next
   DATABASE_URL="${DATABASE_URL:-postgresql://stub:stub@localhost:5432/stub}" npx next build 2>&1 | tail -5
-  
+
   echo "→ Running opennextjs-cloudflare build"
   DATABASE_URL="${DATABASE_URL:-postgresql://stub:stub@localhost:5432/stub}" npx opennextjs-cloudflare build --skipNextBuild 2>&1 | tail -10
-  
+
+  # Restore prisma.ts to Vercel version (so subsequent Vercel deploys work)
+  if [ -f "scripts/swap-prisma-cf.sh" ]; then
+    ./scripts/swap-prisma-cf.sh restore
+  fi
+
+  # Stub the Prisma native binary to reduce bundle size
+  # The binary can't be loaded on Workers anyway, so we replace it with empty file
+  if [ -f "scripts/stub-prisma-binary.sh" ]; then
+    ./scripts/stub-prisma-binary.sh
+  fi
+
   if [ "$ACTION" = "deploy" ]; then
     echo "→ Deploying to Cloudflare"
     CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE="postgresql://stub:stub@localhost:5432/stub" \
