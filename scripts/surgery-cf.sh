@@ -50,9 +50,16 @@ rm -f node_modules/next/dist/server/lib/squoosh/resize/squoosh_resize_bg.wasm
 # Stub the avif/png encoders to noop (to prevent runtime errors)
 rm -rf node_modules/next/dist/server/lib/squoosh 2>/dev/null
 mkdir -p node_modules/next/dist/server/lib/squoosh
+cat > node_modules/next/dist/server/lib/squoosh/main.js <<'STUB'
+// Stub for squoosh/main - image optimization disabled for CF POC
+module.exports = {
+  processBuffer: async () => {
+    throw new Error('Image optimization disabled in CF Workers');
+  }
+};
+STUB
 cat > node_modules/next/dist/server/lib/squoosh/index.js <<'STUB'
-// Stub for squoosh - image optimization disabled for CF POC
-module.exports = {};
+module.exports = require('./main');
 STUB
 
 # 4. Move dev assets out of public/
@@ -66,6 +73,15 @@ if [ -d "public" ] && [ ! -d "public-dev-assets-backup" ]; then
     fi
   done
 fi
+
+# 5. Create stub WASM files (wrangler-module-collector needs them to exist)
+# handler.mjs references yoga.wasm and resvg.wasm even after we delete them
+# Creating empty stubs is enough for the build to succeed
+echo "  - Creating stub WASM files"
+mkdir -p node_modules/next/dist/compiled/@vercel/og
+# Minimal valid WASM header (8 bytes): magic + version
+printf '\x00\x61\x73\x6d\x01\x00\x00\x00' > node_modules/next/dist/compiled/@vercel/og/yoga.wasm
+printf '\x00\x61\x73\x6d\x01\x00\x00\x00' > node_modules/next/dist/compiled/@vercel/og/resvg.wasm
 
 echo "✅ CF bundle surgery applied"
 echo "Run: ./scripts/deploy-cf.sh revert to restore before Vercel deploys"
