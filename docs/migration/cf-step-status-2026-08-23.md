@@ -7,18 +7,18 @@
 - Step 3: Hyperdrive `examanet-neon` → unpooled Neon endpoint
 
 ## ⏳ In Progress
-- **Step 4 (Blob backup)**: Full backup to R2 in background (4800/30108 = 16%, ETA ~13 min)
-- ~625 orphaned DB refs to deleted Vercel Blob files (skipped)
+- **Step 4 (Blob backup)**: Full backup to R2 (~12.6 GB total, ~5.5 GB done, 44% complete)
+  - 30,108 files from Vercel Blob
+  - 625 errors (orphaned DB refs to deleted Vercel Blob files)
+  - Speed: 44 files/sec, ETA ~7 min
 
 ## ❌ Not Possible
 - **Sippy** (incremental migration) — Vercel Blob is NOT S3-compatible.
   Sippy only supports AWS S3 and Google Cloud Storage.
   Vercel uses custom storage with a CDN URL but no public S3 endpoint.
 
-## 📋 Next Steps
-- **Step 4 (alternative)**: Use R2 bucket with custom domain as the new
-  primary blob storage. Upload to R2 instead of Vercel Blob.
-  Gradual rollout via database tracking.
+## 📋 Next Steps (after backup completes)
+- **Step 4b (Verify backup)**: Run R2 inventory, compare to DB count
 - **Step 5 (CF Images)**: Configure `next.config.js` to use custom loader
   for CF Images (replaces `next/image`).
 - **Step 6 (CF Secrets)**: Run `scripts/setup-cf-secrets.sh` after
@@ -28,8 +28,8 @@
   traffic split (Vercel 90% / CF 10%).
 
 ## ⚠️ Decisions Needed
-- **Backup strategy** after full backup:
-  - Use R2 as primary (write new uploads to R2)
+- **Backup strategy after full backup**:
+  - Use R2 as primary for new uploads (write to R2 instead of Vercel Blob)
   - OR keep Vercel Blob as primary (read-through to R2 fallback)
 - **When to cutover**: Q1 2027 (per migration plan)
 - **next-auth vs better-auth**: Keep next-auth (user decision 2026-08-23)
@@ -42,4 +42,11 @@
 ## 💰 Cost Projection
 - Vercel: $22-32/mo
 - Cloudflare (post-migration): $5-7/mo (75% cheaper, 100% on egress)
-- R2: ~$0.015/GB/mo + free egress
+- R2 storage: 12.6 GB × $0.015/GB = $0.19/mo
+- R2 egress: $0 (free)
+
+## 📁 Files Created Today
+- `scripts/deploy-cf.sh` — applies CF-specific next.config.js changes
+- `scripts/setup-cf-secrets.sh` — pushes 16 secrets to a target worker
+- `scripts/setup-cf-secrets-poc.sh` — pushes 7 essential secrets to POC
+- `docs/migration/cf-step-status-2026-08-23.md` — this doc
