@@ -8,8 +8,11 @@ const nextConfig = {
 
   reactStrictMode: true,
   images: {
+    // CLOUDFLARE POC: disable image optimization to reduce bundle size
+    // (sharp/libvips native lib = 18MB raw, removes ~1MB compressed)
+    // We accept unoptimized images for the POC only
+    unoptimized: true,
     // SECURITY: restrict remotePatterns to trusted image hosts only
-    // Was: { protocol: 'https', hostname: '**' } (allowed ANY HTTPS host = SSRF risk)
     remotePatterns: [
       { protocol: 'https', hostname: 'examanet.com' },
       { protocol: 'https', hostname: '*.examanet.com' },
@@ -22,10 +25,9 @@ const nextConfig = {
       { protocol: 'https', hostname: 'lh3.googleusercontent.com' }, // Google avatars
       { protocol: 'https', hostname: 'platform-lookaside.fbsbx.com' }, // Facebook avatars
     ],
-    formats: ['image/webp'],
-    deviceSizes: [640, 750, 828, 1080, 1200],
   },
   experimental: {
+    serverComponentsExternalPackages: ["sharp", "@img/sharp-libvips-linux-x64", "@vercel/og"],
     serverActions: { bodySizeLimit: '50mb' },
     // 2026-07-30: Expanded for build perf (Vercel build time optimization).
     // Each entry enables tree-shaking so only used icons/parts ship.
@@ -161,6 +163,14 @@ const nextConfig = {
   // The new ESLint config catches hundreds of pre-existing issues that
   // would block deploys. Incremental fix in progress.
   eslint: { ignoreDuringBuilds: true },
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      "next/og": require.resolve("./node_modules/next/og-stub/index.js"),
+      "@vercel/og": require.resolve("./node_modules/next/og-stub/index.js"),
+    };
+    return config;
+  },
 };
 
 module.exports = withNextIntl(nextConfig);

@@ -20,18 +20,16 @@
   "observability": {
     "enabled": true
   },
-  // R2 binding for ISR cache + future PDF storage
   "r2_buckets": [
     {
       "binding": "NEXT_INC_CACHE_R2_BUCKET",
       "bucket_name": "examanet-poc-cache"
     }
   ],
-  // KV for edge config (sessions, etc.)
   "kv_namespaces": [
     {
       "binding": "NEXT_INC_CACHE_KV",
-      "id": "poc-cache-kv-id"
+      "id": "5e995bd9ed034fb4bdd507c8754b5844"
     }
   ]
 }
