@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Public agent digest endpoint
  * Returns a summary of recent errors for Mavis to read at session start

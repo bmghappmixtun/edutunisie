@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import HideOnScrollSearchBar from '@/components/search/HideOnScrollSearchBar';

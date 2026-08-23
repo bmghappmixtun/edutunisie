@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { getLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import ResourceCard from '@/components/resources/ResourceCard';

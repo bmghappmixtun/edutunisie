@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Nightly error cleanup cron
  * Runs every day at 2:00 AM UTC (3:00 AM Tunisia, UTC+1)

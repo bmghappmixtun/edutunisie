@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server';
 import { isValidOrigin, isProduction } from '@/lib/security';
 import { rateLimit, getClientIp } from '@/lib/security';

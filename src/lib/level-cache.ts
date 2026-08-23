@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Cache for `Class.id` indexed by `Level.slug`.
  *

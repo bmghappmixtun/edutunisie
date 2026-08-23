@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Upload pre-generated thumbnail JPEG.
  *

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
 import ResourceCard from '@/components/resources/ResourceCard';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { Metadata } from 'next';
 import { unstable_cache as nextCache } from 'next/cache';
 

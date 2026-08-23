@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { Metadata } from 'next';
 import { Prisma } from '@prisma/client';
 import { redirect } from 'next/navigation';

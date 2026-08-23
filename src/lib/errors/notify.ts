@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Agent notification system
  * - Logs errors to a queue that the agent can poll

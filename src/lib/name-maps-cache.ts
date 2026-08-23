@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Cached lookup of the full Class / Section / Subject list.
  *

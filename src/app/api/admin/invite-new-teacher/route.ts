@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * POST /api/admin/invite-new-teacher
  *

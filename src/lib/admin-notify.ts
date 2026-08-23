@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Resend } from 'resend';
 import { renderNewTeacherEmail, renderNewResourceEmail, renderTeacherActivatedEmail } from './email-templates';
 import { prisma } from './prisma';

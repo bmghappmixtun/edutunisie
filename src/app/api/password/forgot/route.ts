@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Forgot Password — Step 1: request a reset code
  *

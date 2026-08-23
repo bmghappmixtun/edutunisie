@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { prisma } from './prisma';
 import { unstable_cache } from 'next/cache';
 

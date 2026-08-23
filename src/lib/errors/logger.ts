@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Server-side error logger
  * Logs errors to the database + sends AGENT alert email

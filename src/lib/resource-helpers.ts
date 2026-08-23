@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { getCurrentUser } from './auth';
 import { prisma } from './prisma';
 

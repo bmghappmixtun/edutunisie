@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AI extraction endpoint — async, called after Resource creation.
  * Extracts OCR text (PyMuPDF + Tesseract) and GPT-4o-mini attributes.

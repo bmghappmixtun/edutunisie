@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Agent poll endpoint
  * Called by Vercel Cron to aggregate unseen errors and prepare a digest

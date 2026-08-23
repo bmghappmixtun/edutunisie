@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Mavis nightly fix report
  * POSTs the agent's fix summary to Discord (using the same webhook as

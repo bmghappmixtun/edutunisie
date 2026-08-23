@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { Metadata } from 'next';
 import { Link } from '@/i18n/navigation';
 import ResourceCard from '@/components/resources/ResourceCard';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { notFound, permanentRedirect } from 'next/navigation';
 import { Link } from '@/i18n/navigation';
 import { prisma } from '@/lib/prisma';

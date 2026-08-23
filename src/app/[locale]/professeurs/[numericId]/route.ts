@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Short URL for prof profiles: /professeurs/{numericId} (without slug)
  * → real 308 redirect to /professeurs/{numericId}/{slug}

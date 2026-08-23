@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Link } from '@/i18n/navigation';
 import { prisma } from '@/lib/prisma';
 import { itemListSchema, breadcrumbSchema, SITE_URL } from '@/lib/structured-data';

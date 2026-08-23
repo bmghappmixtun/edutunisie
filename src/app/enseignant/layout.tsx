@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { redirect } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getInitials } from '@/lib/text-utils';

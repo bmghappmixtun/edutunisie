@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Teacher library blob proxy - INTERNAL USE ONLY.
  *

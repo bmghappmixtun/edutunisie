@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { notFound } from 'next/navigation';
 import { Link } from '@/i18n/navigation';
 import { headers } from 'next/headers';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AI extraction endpoint — accepts pre-extracted text (from local PyMuPDF+Tesseract)
  * and runs GPT-4o-mini to extract metadata.

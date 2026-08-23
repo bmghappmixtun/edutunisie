@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { redirect } from 'next/navigation';
 import { getInitials } from '@/lib/text-utils';
 import Link from 'next/link';

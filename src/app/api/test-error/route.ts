@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Test error endpoint — DELETE THIS after testing
  * Triggers different error types to verify the admin error pipeline

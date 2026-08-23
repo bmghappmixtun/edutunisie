@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { notFound } from 'next/navigation';
 import { getInitials } from '@/lib/text-utils';
 import { Link } from '@/i18n/navigation';

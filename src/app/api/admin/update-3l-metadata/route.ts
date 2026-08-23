@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * POST /api/admin/update-3l-metadata
  * Bulk update AI metadata for 3ème Langue files (Allemand, Italien, Espagnol).

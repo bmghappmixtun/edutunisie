@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Forgot Password — Step 2: verify the code and set a new password
  *

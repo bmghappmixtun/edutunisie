@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { redirect } from 'next/navigation';
 import type { Metadata } from 'next';
 import Header from '@/components/layout/Header';

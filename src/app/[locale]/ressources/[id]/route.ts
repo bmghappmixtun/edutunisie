@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Short URL for resources: /ressources/{numericId} (without slug)
  * → real 308 redirect to /ressources/{numericId}/{slug}

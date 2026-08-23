@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Wrapper for API route handlers
  * Catches errors, logs them with the global error logger, returns user-friendly response

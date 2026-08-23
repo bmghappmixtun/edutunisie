@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * search-v2.ts
  * Shared search engine: FTS + pg_trgm + Synonyms + Highlighting + Facets

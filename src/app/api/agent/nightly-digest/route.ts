@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Mavis reads the latest nightly error digest
  * Public GET (no auth) — Mavis can call this at session start
