@@ -148,3 +148,7 @@ scripts/check-*.mjs
 
 # POC artifacts
 docs/architecture-*.png
+
+# Worktrees (dev only)
+.worktrees/
+run/
