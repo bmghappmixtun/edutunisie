@@ -480,8 +480,10 @@ function makeModelProxy(modelName: 'resource' | 'user' | 'subject' | 'class' | '
       const orderBy = buildOrderBy(table, args?.orderBy);
       let q: any = db.select().from(table).where(conditions);
       if (orderBy && orderBy.length) q = q.orderBy(...orderBy);
+      // Safety cap to prevent runaway queries on Workers
+      const MAX_ROWS = 500;
+      if (typeof args?.take === 'number') q = q.limit(Math.min(args.take, MAX_ROWS));
       if (typeof args?.skip === 'number') q = q.offset(args.skip);
-      if (typeof args?.take === 'number') q = q.limit(args.take);
       const rows = await q;
       // Return type cast: we declare `any` so downstream reduce callbacks work
       // @ts-ignore - suppress array return type to allow implicit any in reduce callbacks
@@ -510,10 +512,105 @@ function makeModelProxy(modelName: 'resource' | 'user' | 'subject' | 'class' | '
     updateMany: async () => { throw new Error(`Drizzle proxy: updateMany on ${modelName} not supported yet`); },
     createMany: async () => { throw new Error(`Drizzle proxy: createMany on ${modelName} not supported yet`); },
 
-    groupBy: async () => {
-      // For /fr/ressources filters — return empty array
-      // The page will show "all types" if no groupBy
-      return [];
+    groupBy: async (args?: { by?: string[]; where?: WhereInput; _count?: any; _avg?: any; _sum?: any; _min?: any; _max?: any; orderBy?: any; take?: number; skip?: number }): Promise<any[]> => {
+      if (!isSupported || !args?.by?.length) return [];
+      try {
+        const db = await getDb();
+        const conditions = buildConditions(table, args?.where);
+        // Build select object
+        const selectObj: Record<string, any> = {};
+        const aliasMap: Record<string, string> = {};  // alias -> real column name
+        for (const col of args.by) {
+          if ((table as any)[col]) {
+            selectObj[col] = (table as any)[col];
+          }
+        }
+        // Aggregations
+        const aggs: Record<string, string> = {};
+        if (args._count) {
+          if (args._count._all) {
+            selectObj['_count_all'] = sql<number>`count(*)::int`;
+            aggs['_count_all'] = '_count';
+          }
+          for (const [k, v] of Object.entries(args._count)) {
+            if (k === '_all') continue;
+            if (v && (table as any)[k]) {
+              selectObj[`_count_${k}`] = sql<number>`count(${(table as any)[k]})::int`;
+              aggs[`_count_${k}`] = '_count';
+            }
+          }
+        }
+        if (args._avg) {
+          for (const [k, v] of Object.entries(args._avg)) {
+            if (v && (table as any)[k]) {
+              selectObj[`_avg_${k}`] = sql<string>`avg(${(table as any)[k]})::float`;
+              aggs[`_avg_${k}`] = '_avg';
+            }
+          }
+        }
+        if (args._sum) {
+          for (const [k, v] of Object.entries(args._sum)) {
+            if (v && (table as any)[k]) {
+              selectObj[`_sum_${k}`] = sql<number>`sum(${(table as any)[k]})::int`;
+              aggs[`_sum_${k}`] = '_sum';
+            }
+          }
+        }
+        if (args._min) {
+          for (const [k, v] of Object.entries(args._min)) {
+            if (v && (table as any)[k]) {
+              selectObj[`_min_${k}`] = sql<any>`min(${(table as any)[k]})`;
+              aggs[`_min_${k}`] = '_min';
+            }
+          }
+        }
+        if (args._max) {
+          for (const [k, v] of Object.entries(args._max)) {
+            if (v && (table as any)[k]) {
+              selectObj[`_max_${k}`] = sql<any>`max(${(table as any)[k]})`;
+              aggs[`_max_${k}`] = '_max';
+            }
+          }
+        }
+        // Build query
+        let q: any = db.select(selectObj).from(table).where(conditions);
+        // Group by
+        const groupCols = args.by.filter(c => (table as any)[c]).map(c => (table as any)[c]);
+        if (groupCols.length) q = q.groupBy(...groupCols);
+        // Order by
+        const orderBy = buildOrderBy(table, args?.orderBy);
+        if (orderBy && orderBy.length) q = q.orderBy(...orderBy);
+        // Skip/Take (with safety cap to prevent runaway queries)
+        // Always apply a max limit even if no take specified
+        const maxRows = 500;
+        const take = typeof args?.take === 'number' ? Math.min(args.take, maxRows) : maxRows;
+        q = q.limit(take);
+        if (typeof args?.skip === 'number') q = q.offset(args.skip);
+        const rows = await q;
+        // Transform: { col1, _count_all: N } => { col1, _count: { _all: N } }
+        return rows.map((row: any) => {
+          const result: any = {};
+          // Copy group by columns
+          for (const col of args.by!) {
+            if (col in row) result[col] = row[col];
+          }
+          // Re-nest aggregations
+          for (const [alias, type] of Object.entries(aggs)) {
+            const realCol = alias.replace(new RegExp(`^${type}_`), '');
+            if (!result[type]) result[type] = {};
+            if (realCol === 'all' && type === '_count') {
+              result[type]._all = Number(row[alias] || 0);
+            } else {
+              const v = row[alias];
+              result[type][realCol] = type === '_avg' ? (v === null ? null : Number(v)) : (type === '_count' || type === '_sum' ? Number(v || 0) : v);
+            }
+          }
+          return result;
+        });
+      } catch (e) {
+        console.error('[groupBy]', modelName, e?.message || String(e));
+        return [];
+      }
     },
 
     aggregate: async () => {

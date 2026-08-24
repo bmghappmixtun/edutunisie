@@ -26,13 +26,14 @@ async function createDrizzleClient() {
     throw new Error('HYPERDRIVE binding missing on Cloudflare Worker');
   }
 
-  // postgres.js with Hyperdrive: max=1 connection, idle_timeout disabled
-  // for Workers (which can freeze the isolate)
+  // postgres.js with Hyperdrive: max=1 connection for sequential queries
+  // Workers can freeze any time, so idle_timeout=0
+  // max=1 because Hyperdrive handles pooling; multiple workers=bad
   const client = postgres(connectionString, {
     max: 1,
-    idle_timeout: 0,    // Workers can freeze any time
+    idle_timeout: 0,
     connect_timeout: 10,
-    prepare: false,      // Workers don't support named prepared statements
+    prepare: false,
   });
 
   return drizzle(client, { schema });
