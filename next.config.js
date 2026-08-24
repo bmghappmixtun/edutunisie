@@ -118,6 +118,13 @@ const nextConfig = {
       {
         source: '/:path*',
         headers: [
+          // 2026-08-24: noindex/nofollow for the CF POC/prod site (examanet-prod.examanet-poc.workers.dev).
+          // The CF worker is a POC/dev environment, NOT production. We must prevent search engines
+          // from indexing it (Google could start crawling as soon as the worker is deployed and could
+          // outrank the real examanet.com with duplicate content).
+          // X-Robots-Tag is the canonical way to do this; respected by Google, Bing, etc.
+          // robots.txt is set separately in public/robots.txt to disallow well-behaved crawlers.
+          { key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive, nosnippet' },
           // Prevent MIME type sniffing
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           // Prevent clickjacking

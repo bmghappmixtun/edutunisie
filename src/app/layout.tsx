@@ -163,14 +163,19 @@ export function generateMetadata(): Metadata {
       images: ['/api/og/page/home'],
       creator: '@examanet',
     },
+    // 2026-08-24: noindex for the CF POC site. See next.config.js for the matching
+    // X-Robots-Tag header. Combined, these prevent Google from indexing the POC.
+    // The real production is examanet.com (Vercel) — that site uses its own metadata.
     robots: {
-      index: true,
-      follow: true,
+      index: false,
+      follow: false,
+      nocache: true,
       googleBot: {
-        index: true,
-        follow: true,
-        'max-image-preview': 'large',
-        'max-snippet': -1,
+        index: false,
+        follow: false,
+        noimageindex: true,
+        'max-image-preview': 'none',
+        'max-snippet': 0,
       },
     },
     // SEO 2026-08-22: the canonical on the ROOT layout is the bare site URL
