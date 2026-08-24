@@ -249,6 +249,23 @@ async function applyInclude(
   if (!include || !Array.isArray(rows) || rows.length === 0) return rows;
   if (typeof include === 'object' && Object.keys(include).length === 0) return rows;
 
+  try {
+    return await _applyIncludeImpl(rows, include, parentModel);
+  } catch (e: any) {
+    // Never let include errors break the page — log and return rows as-is
+    console.error('[applyInclude]', parentModel, e?.message || String(e));
+    return rows;
+  }
+}
+
+async function _applyIncludeImpl(
+  rows: any[],
+  include: any | undefined,
+  parentModel: string
+): Promise<any[]> {
+  if (!include || !Array.isArray(rows) || rows.length === 0) return rows;
+  if (typeof include === 'object' && Object.keys(include).length === 0) return rows;
+
   const out: any[] = [];
   for (const row of rows) {
     const enriched: any = { ...row };
@@ -338,6 +355,21 @@ async function applyCount(
   if (typeof countArg !== 'object') return rows;
   const selectMap = countArg.select || (countArg === true ? null : countArg);
   if (!selectMap || typeof selectMap !== 'object') return rows;
+
+  try {
+    return await _applyCountImpl(rows, selectMap, parentModel);
+  } catch (e: any) {
+    // Never let count errors break the page — log and return rows as-is
+    console.error('[applyCount]', parentModel, e?.message || String(e));
+    return rows;
+  }
+}
+
+async function _applyCountImpl(
+  rows: any[],
+  selectMap: any,
+  parentModel: string
+): Promise<any[]> {
 
   for (const row of rows) {
     row._count = row._count || {};
