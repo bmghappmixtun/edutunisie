@@ -38,9 +38,21 @@ const LOCALE_META = {
 // the Vercel CDN cache (cache-control: private, no-cache, no-store).
 // With the cache, getMessages is static per locale and the layout can be
 // pre-rendered, enabling ISR for every page under [locale]/.
+//
+// 2026-08-24 EMERGENCY FIX (user reported "homepage ne marche tjrs pas",
+// 35% timeouts on /fr due to dynamic rendering):
+// PREVIOUSLY this called `getMessages()` with NO argument, which made
+// next-intl fall back to `getRequestLocale()` → `headers()` → cookies →
+// DYNAMIC_SERVER_USAGE → page forced into dynamic mode → x-vercel-cache: MISS
+// on every request. Under traffic, 35% of homepage requests were timing out
+// at 8s, which the user perceived as "la page ne marche pas".
+// FIX: pass the locale explicitly to getMessages({ locale }) so the
+// request-locale fallback is skipped. The locale is already validated by
+// setRequestLocale() above, so we know it's correct. This makes the layout
+// static-renderable, enabling ISR + Vercel edge cache.
 const getCachedMessages = nextCache(
   async (locale: string) => {
-    const result = await getMessages();
+    const result = await getMessages({ locale });
     return result as any;
   },
   ['i18n-messages-v1'],
