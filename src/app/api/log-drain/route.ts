@@ -94,11 +94,27 @@ export async function POST(req: NextRequest) {
       skipped: logs.length - rows.length,
     });
   } catch (e) {
-    console.error('[api/log-drain] Error processing log drain:', e);
+    // 2026-08-24 INCIDENT MITIGATION:
+    // On 2026-08-24 at 11:55 UTC, Vercel started sending 93.7k+ log drain
+    // requests / 5 min that ALL failed with "Can't reach database server".
+    // Each failure created a new log event, which Vercel retried, creating
+    // a positive feedback loop. The site itself was working but the noise
+    // masked the real issue + cost $$$.
+    //
+    // We now fail-soft: on any error (DB down, Prisma timeout, network), we
+    // return 200 OK so Vercel stops retrying. We log the error to console
+    // for debugging, but never expose it to Vercel.
+    //
+    // This is a TEMPORARY mitigation until we either:
+    // 1. Switch from Vercel → CF Workers (in progress, see feature/cf-isolated)
+    // 2. Move logs to a separate Vercel-native store (Log Drains → Datadog/etc)
+    console.error('[api/log-drain] Fail-soft: returning 200 to break feedback loop. Error:', e);
     return NextResponse.json({ 
-      error: 'Processing failed',
-      detail: (e as Error).message,
-    }, { status: 500 });
+      ok: true, 
+      degraded: true,
+      received: 0,
+      stored: 0,
+    }, { status: 200 });
   }
 }
 
