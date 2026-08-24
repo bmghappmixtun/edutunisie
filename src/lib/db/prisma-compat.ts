@@ -281,8 +281,15 @@ async function _applyIncludeImpl(
       if (!relatedTable) continue;
 
       // For 1-1 relations (where fk === 'id'), the FK is row.id
-      // For 1-many relations, the FK is on the related table
-      const fkValue = rel.fk === 'id' ? row.id : row[rel.fk];
+      // For 1-many relations:
+      //   - BACKWARD (FK on related, e.g. user.uploadedFiles -> resource.teacherId):
+      //     use row.id (parent's PK)
+      //   - FORWARD (FK on parent, e.g. resource.subject -> subject.id):
+      //     use row[rel.fk] (parent's FK column)
+      //   Detect direction by checking if FK column exists on related table.
+      const _rt = MODEL_TO_TABLE[rel.relatedModel];
+      const _fkOnRelated = _rt ? (_rt as any)[rel.fk] : null;
+      const fkValue = rel.fk === 'id' ? row.id : (_fkOnRelated ? row.id : row[rel.fk]);
 
       if (!fkValue) {
         enriched[relationName] = null;
@@ -315,11 +322,26 @@ async function _applyIncludeImpl(
         const rs = await query;
         enriched[relationName] = rs[0] || null;
       } else {
-        // 1-many
-        const fkCol = (relatedTable as any)[rel.fk];
-        if (!fkCol) {
-          enriched[relationName] = null;
-          continue;
+        // 1-many relation. The relation can be:
+        //   FORWARD: parent's FK points to child (e.g. resource.subjectId -> subject.id)
+        //            query: WHERE related.id = parent.fk
+        //   BACKWARD: child's FK points to parent (e.g. resource.teacherId -> user.id)
+        //            query: WHERE related.fk = parent.id
+        //
+        // Detect direction by checking if the FK column exists on the related table.
+        // If yes: BACKWARD. If no: FORWARD (FK must be on the parent).
+        const fkOnRelated = (relatedTable as any)[rel.fk];
+        let whereClause: SQL;
+        if (fkOnRelated) {
+          // BACKWARD: child has FK pointing to parent
+          whereClause = eq(fkOnRelated, fkValue);
+        } else {
+          // FORWARD: parent has FK pointing to child (use child's PK)
+          if (!(relatedTable as any).id) {
+            enriched[relationName] = null;
+            continue;
+          }
+          whereClause = eq(relatedTable.id, fkValue);
         }
         if (selectOpt) {
           const cols: any = {};
@@ -328,9 +350,9 @@ async function _applyIncludeImpl(
               cols[f] = (relatedTable as any)[f];
             }
           }
-          query = db.select(cols).from(relatedTable).where(eq(fkCol, fkValue)).limit(takeOpt);
+          query = db.select(cols).from(relatedTable).where(whereClause).limit(takeOpt);
         } else {
-          query = db.select().from(relatedTable).where(eq(fkCol, fkValue)).limit(takeOpt);
+          query = db.select().from(relatedTable).where(whereClause).limit(takeOpt);
         }
         const rs = await query;
         // Prisma convention: 1-1 returns object, 1-many returns array
@@ -388,17 +410,26 @@ async function _applyCountImpl(
         continue;
       }
 
+      // Detect direction:
+      //   - BACKWARD (FK on related, e.g. user.uploadedFiles): child has FK to parent
+      //     fkCol = relatedTable.fk, WHERE fkCol = row.id
+      //   - FORWARD (FK on parent, e.g. resource.subjects): parent has FK to child
+      //     For counting parents, we'd group by parent.fk and count
+      //     But this is rare - usually applyCount is used for 1-many backward relations
+      //     For now, if FK is on parent, just return 0 (parent either has 0 or 1 child of this type)
       const fkCol = (relatedTable as any)[rel.fk];
       if (!fkCol) {
-        row._count[relationName] = 0;
+        // FORWARD direction: parent has FK to child. Count of children is 0 or 1.
+        // Skip for now — applyInclude handles the actual data.
+        row._count[relationName] = row[rel.fk] ? 1 : 0;
         continue;
       }
       const whereOpt = relationValue && typeof relationValue === 'object' ? relationValue.where : undefined;
-      const conditions = buildConditions(relatedTable, whereOpt ? { [rel.fk]: row[rel.fk === 'id' ? 'id' : 'id'], ...whereOpt } : whereOpt);
+      const conditions = buildConditions(relatedTable, whereOpt ? { [rel.fk]: row.id, ...whereOpt } : whereOpt);
 
-      // Simplified: WHERE fkCol = row[rel.fk] (and merge with whereOpt)
+      // BACKWARD: WHERE relatedTable.fk = row.id (parent's PK)
       const db = await getDb();
-      const conds: SQL<unknown>[] = [eq(fkCol, row[rel.fk === 'id' ? 'id' : rel.fk.replace('Id', 'Id')])];
+      const conds: SQL<unknown>[] = [eq(fkCol, row.id)];
       // row's FK for this relation is row.<relationName + "Id"> or row.<parentField>
       // Simpler: use the explicit FK column from the relation
       // rel.fk is the FK column on the related table, e.g. 'teacherId' on resource
