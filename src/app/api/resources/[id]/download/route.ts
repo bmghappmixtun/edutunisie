@@ -35,22 +35,19 @@ function sanitizeFilename(name: string): string {
  * - On Vercel (`*.examanet.com`): always use the existing Vercel Blob URL.
  *   The Vercel DB row's `r2Key` is NULL because we never ran the populate
  *   script on the main DB, so this is a no-op for Vercel.
- * - On CF (`*.workers.dev`): use the R2 public URL if `r2Key` is set,
- *   otherwise fall back to the Vercel Blob URL (covers the 1,338 dead links
- *   + the 2 transient errors from the original sync).
- *
- * Public R2 base URL: r2.dev is the public R2 hosting domain (free egress).
- * The bucket `examanet-pdf-prod` is public-read for these files.
+ * - On CF (`*.workers.dev`): return a special marker so streamFileToClient
+ *   knows to use the R2 binding directly (more efficient than fetching
+ *   a public URL, and works without enabling r2.dev on the bucket).
  */
-function pickStorageUrl(
+function pickStorageSource(
   host: string | null,
   primary: { fileUrl: string; r2Key?: string | null },
-): string {
+): { type: 'url'; url: string } | { type: 'r2'; key: string } {
   const isCF = host?.endsWith('.workers.dev') ?? false;
   if (isCF && primary.r2Key) {
-    return `https://pub-${process.env.R2_ACCOUNT_ID || '59cffdeaadf3809cc3d2039c43f836e0'}.r2.dev/examanet-pdf-prod/${primary.r2Key}`;
+    return { type: 'r2', key: primary.r2Key };
   }
-  return primary.fileUrl;
+  return { type: 'url', url: primary.fileUrl };
 }
 
 function buildFilename(
@@ -71,16 +68,53 @@ function buildFilename(
 }
 
 /**
- * Stream a file from a URL (Vercel Blob) to the client.
+ * Stream a file to the client.
+ * - source = { type: 'url', url }: fetch from URL (Vercel Blob or R2 public)
+ * - source = { type: 'r2', key }: stream from CF R2 binding (no public URL needed)
  * Sets Content-Disposition so the browser downloads with the right filename.
  */
 async function streamFileToClient(
-  blobUrl: string,
+  source: { type: 'url'; url: string } | { type: 'r2'; key: string },
   filename: string,
   contentType?: string,
 ): Promise<NextResponse> {
-  // Fetch the file from blob storage (server-side, so URL is hidden)
-  const upstream = await fetch(blobUrl, {
+  const safeName = sanitizeFilename(filename);
+  const finalContentType = contentType || 'application/pdf';
+
+  // CF R2 binding path (no public URL needed, faster than HTTP fetch)
+  if (source.type === 'r2') {
+    try {
+      // getCloudflareContext is provided by @opennextjs/cloudflare
+      // (only available on CF Workers, throws on Vercel — but we only get
+      // here on CF because pickStorageSource only returns 'r2' on CF)
+      const { getCloudflareContext } = await import('@opennextjs/cloudflare');
+      const { env } = await getCloudflareContext({ async: true });
+      // Use the dedicated PDFS_BUCKET binding (same bucket as the ISR cache,
+      // but logically separate for clarity)
+      const bucket = env.PDFS_BUCKET || env.NEXT_INC_CACHE_R2_BUCKET;
+      if (!bucket) throw new Error('R2 binding not available on this worker');
+      const object = await bucket.get(source.key);
+      if (!object) {
+        return new NextResponse(`File not found in R2: ${source.key}`, { status: 404 });
+      }
+      return new NextResponse(object.body, {
+        status: 200,
+        headers: {
+          'Content-Type': object.httpMetadata?.contentType || finalContentType,
+          'Content-Disposition': `attachment; filename="${safeName}"; filename*=UTF-8''${encodeURIComponent(safeName)}`,
+          'Cache-Control': 'public, max-age=3600, must-revalidate',
+          'X-Content-Type-Options': 'nosniff',
+          'X-Storage-Backend': 'cloudflare-r2',
+        },
+      });
+    } catch (e: any) {
+      // Fall through to error — R2 binding not available
+      return new NextResponse(`R2 error: ${e.message || 'unknown'}`, { status: 502 });
+    }
+  }
+
+  // URL path (Vercel Blob, or R2 public URL on CF if r2Key was missing)
+  const upstream = await fetch(source.url, {
     headers: { 'User-Agent': 'Examanet-Proxy/1.0' },
   });
 
@@ -88,14 +122,7 @@ async function streamFileToClient(
     return new NextResponse(`Upstream fetch failed: ${upstream.status}`, { status: 502 });
   }
 
-  // Get content type from upstream or default to PDF
-  const upstreamType = upstream.headers.get('content-type') || contentType || 'application/pdf';
-
-  // Sanitize filename for Content-Disposition
-  const safeName = sanitizeFilename(filename);
-
-  // Stream the response
-  // Note: Next.js can stream via ReadableStream
+  const upstreamType = upstream.headers.get('content-type') || finalContentType;
   const stream = upstream.body;
   if (!stream) {
     return new NextResponse('No body', { status: 502 });
@@ -108,6 +135,7 @@ async function streamFileToClient(
       'Content-Disposition': `attachment; filename="${safeName}"; filename*=UTF-8''${encodeURIComponent(safeName)}`,
       'Cache-Control': 'public, max-age=3600, must-revalidate',
       'X-Content-Type-Options': 'nosniff',
+      'X-Storage-Backend': 'vercel-blob',
     },
   });
 }
@@ -196,12 +224,12 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
         : libFile.fileName?.endsWith('.odt')
           ? 'application/vnd.oasis.opendocument.text'
           : 'application/octet-stream';
-      // CF site: prefer R2 for the original file too (via r2PdfKey fallback to r2Key)
-      const libUrl = pickStorageUrl(req.headers.get('host'), {
+      // 2026-08-24: CF uses R2 binding (r2Key); Vercel uses Vercel Blob (fileUrl)
+      const libSource = pickStorageSource(req.headers.get('host'), {
         fileUrl: libFile.fileUrl,
         r2Key: libFile.r2Key,
       });
-      return streamFileToClient(libUrl, libFile.fileName || 'document', contentType);
+      return streamFileToClient(libSource, libFile.fileName || 'document', contentType);
     }
     return NextResponse.json({ error: 'Fichier original introuvable' }, { status: 404 });
   }
@@ -213,7 +241,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   }
 
   return streamFileToClient(
-    pickStorageUrl(req.headers.get('host'), { fileUrl: resource.fileUrl, r2Key: resource.r2Key }),
+    pickStorageSource(req.headers.get('host'), { fileUrl: resource.fileUrl, r2Key: resource.r2Key }),
     buildFilename(resource, false),
     'application/pdf'
   );

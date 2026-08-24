@@ -26,6 +26,10 @@
     {
       "binding": "NEXT_INC_CACHE_R2_BUCKET",
       "bucket_name": "examanet-pdf-prod"
+    },
+    {
+      "binding": "PDFS_BUCKET",
+      "bucket_name": "examanet-pdf-prod"
     }
   ],
   "kv_namespaces": [
