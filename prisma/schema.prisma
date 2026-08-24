@@ -959,3 +959,14 @@ model VercelLog {
   @@index([reviewed, timestamp])
   @@index([timestamp])
 }
+
+// ============ CREDENTIALS (for agent coordination) ============
+// Used by /api/cron/rotate-password to store the latest DB password
+// so Mavis can sync .env.local on next session.
+model Credential {
+  key         String   @id
+  value       String   @db.Text
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
