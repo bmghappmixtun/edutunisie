@@ -28,6 +28,14 @@
     {
       "path": "/api/cron/nightly-cleanup",
       "schedule": "0 2 * * *"
+    },
+    {
+      "path": "/api/cron/db-monitor",
+      "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/cron/rotate-password",
+      "schedule": "0 2 1 */3 *"
     }
   ],
   "headers": [
