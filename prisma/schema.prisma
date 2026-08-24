@@ -225,6 +225,10 @@ model Resource {
   pageCount       Int?
   thumbnailKey    String?
   thumbnailUrl    String?
+  /// 2026-08-24: R2 object key for this file (same as fileKey/pathname). NULL until
+  /// the r2Key migration runs on the CF POC database (see scripts/_one-off/populate-r2key.mjs).
+  /// The Vercel site continues to use fileUrl (Vercel Blob); the CF POC uses r2Key when set.
+  r2Key           String?
 
   classId         String?
   class           Class?         @relation(fields: [classId], references: [id])
@@ -461,6 +465,10 @@ model TeacherFile {
   pdfUrl            String?
   pdfSize           Int?
   conversionStatus  String?  // PENDING, SUCCESS, FAILED
+  /// 2026-08-24: R2 object keys (NULL until populated by the migration script on the CF POC DB).
+  /// CF proxy route uses these when set; Vercel site keeps using fileUrl/pdfUrl.
+  r2Key             String?  // R2 key for the original file (same as fileKey)
+  r2PdfKey          String?  // R2 key for the generated PDF (same as pdfKey)
 
   // Categorization (matches Resource so teacher can re-publish later)
   type              String?  // COURSE, HOMEWORK, EXERCISE, etc.

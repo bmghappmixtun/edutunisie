@@ -30,6 +30,29 @@ function sanitizeFilename(name: string): string {
     .substring(0, 200);
 }
 
+/**
+ * 2026-08-24: Pick the right storage URL based on the request host.
+ * - On Vercel (`*.examanet.com`): always use the existing Vercel Blob URL.
+ *   The Vercel DB row's `r2Key` is NULL because we never ran the populate
+ *   script on the main DB, so this is a no-op for Vercel.
+ * - On CF (`*.workers.dev`): use the R2 public URL if `r2Key` is set,
+ *   otherwise fall back to the Vercel Blob URL (covers the 1,338 dead links
+ *   + the 2 transient errors from the original sync).
+ *
+ * Public R2 base URL: r2.dev is the public R2 hosting domain (free egress).
+ * The bucket `examanet-pdf-prod` is public-read for these files.
+ */
+function pickStorageUrl(
+  host: string | null,
+  primary: { fileUrl: string; r2Key?: string | null },
+): string {
+  const isCF = host?.endsWith('.workers.dev') ?? false;
+  if (isCF && primary.r2Key) {
+    return `https://pub-${process.env.R2_ACCOUNT_ID || '59cffdeaadf3809cc3d2039c43f836e0'}.r2.dev/examanet-pdf-prod/${primary.r2Key}`;
+  }
+  return primary.fileUrl;
+}
+
 function buildFilename(
   resource: { title: string; originalFileName?: string | null },
   original: boolean,
@@ -96,7 +119,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const ua = req.headers.get('user-agent');
   const skipTracking = isBotOrPlaceholder(ip, ua);
 
-  const resource = await prisma.resource.findUnique({ where: { id } });
+  const resource = await prisma.resource.findUnique({ where: { id }, select: { id: true, title: true, fileUrl: true, r2Key: true, originalFileKey: true, originalFileName: true, downloadsCount: true } });
   if (!resource) return NextResponse.json({ error: 'Non trouvé' }, { status: 404 });
 
   const wantsOriginal = req.nextUrl.searchParams.get('original') === '1';
@@ -148,7 +171,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   const ua = req.headers.get('user-agent');
   const skipTracking = isBotOrPlaceholder(ip, ua);
 
-  const resource = await prisma.resource.findUnique({ where: { id } });
+  const resource = await prisma.resource.findUnique({ where: { id }, select: { id: true, title: true, fileUrl: true, r2Key: true, originalFileKey: true, originalFileName: true, downloadsCount: true } });
   if (!resource) return NextResponse.json({ error: 'Non trouvé' }, { status: 404 });
 
   if (wantsOriginal) {
@@ -165,7 +188,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     // Get the original file from teacher library
     const libFile = await prisma.teacherFile.findFirst({
       where: { resourceId: id },
-      select: { fileUrl: true, fileName: true },
+      select: { fileUrl: true, fileName: true, r2Key: true, r2PdfKey: true },
     });
     if (libFile) {
       const contentType = libFile.fileName?.endsWith('.docx')
@@ -173,7 +196,12 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
         : libFile.fileName?.endsWith('.odt')
           ? 'application/vnd.oasis.opendocument.text'
           : 'application/octet-stream';
-      return streamFileToClient(libFile.fileUrl, libFile.fileName || 'document', contentType);
+      // CF site: prefer R2 for the original file too (via r2PdfKey fallback to r2Key)
+      const libUrl = pickStorageUrl(req.headers.get('host'), {
+        fileUrl: libFile.fileUrl,
+        r2Key: libFile.r2Key,
+      });
+      return streamFileToClient(libUrl, libFile.fileName || 'document', contentType);
     }
     return NextResponse.json({ error: 'Fichier original introuvable' }, { status: 404 });
   }
@@ -184,5 +212,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     await prisma.resource.update({ where: { id }, data: { downloadsCount: { increment: 1 } } });
   }
 
-  return streamFileToClient(resource.fileUrl, buildFilename(resource, false), 'application/pdf');
+  return streamFileToClient(
+    pickStorageUrl(req.headers.get('host'), { fileUrl: resource.fileUrl, r2Key: resource.r2Key }),
+    buildFilename(resource, false),
+    'application/pdf'
+  );
 }
