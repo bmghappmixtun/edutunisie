@@ -26,10 +26,18 @@ type WhereInput = Record<string, any>;
 function buildConditions(table: any, where: WhereInput | undefined): SQL | undefined {
   if (!where) return undefined;
 
+  // Check for no-match marker (set by preprocessWhereForRelations when a
+  // nested relation filter resolved to zero matches)
+  if (where.__no_match__) {
+    // Return a condition that matches nothing: 1=0
+    return sql<unknown>`1 = 0`;
+  }
+
   const conditions: SQL<unknown>[] = [];
 
   for (const [key, value] of Object.entries(where)) {
     if (value === undefined) continue;
+    if (key === '__no_match__') continue;
 
     // Handle Prisma operators
     if (key === 'AND' || key === 'OR' || key === 'NOT') {
@@ -237,6 +245,155 @@ const MODEL_TO_TABLE: Record<string, any> = {
 
 function getRelatedModel(parent: string, relationName: string): { relatedModel: string; fk: string } | null {
   return RELATION_MAP[parent]?.[relationName] || null;
+}
+
+// Phase 3 (2026-08-24): nested relation filter support
+// Pre-process the where clause to resolve nested relation filters like
+//   { class: { slug: { in: ['xxx'] } } }
+// into FK-based IN filters:
+//   { classId: { in: ['id1', 'id2', ...] } }
+//
+// This unblocks pages that use nested relations in WHERE:
+//   - /fr/professeurs: filters teachers by subjects/classes they teach
+//   - /fr/ressources: facetBase uses class/section/subject slug filters
+//   - Many other pages with `where: { x: { y: { ... } } }` patterns
+//
+// The function:
+//   1. Walks the where clause looking for relation keys (top-level keys
+//      that are NOT simple column names AND NOT Prisma operators)
+//   2. For each relation, runs a subquery on the related table to get
+//      the matching IDs
+//   3. Replaces the relation with `{ fkColumn: { in: [ids] } }`
+//   4. If the subquery returns 0 rows, sets __no_match__ marker so
+//      buildConditions returns "1 = 0" (impossible)
+async function preprocessWhereForRelations(
+  where: WhereInput | undefined,
+  parentModel: string
+): Promise<WhereInput | undefined> {
+  if (!where || typeof where !== 'object') return where;
+
+  const out: WhereInput = {};
+
+  for (const [key, value] of Object.entries(where)) {
+    if (value === undefined) continue;
+    if (key === '__no_match__') continue;
+
+    // Pass through AND/OR/NOT (recursive)
+    if (key === 'AND') {
+      if (Array.isArray(value)) {
+        out[key] = await Promise.all(
+          (value as WhereInput[]).map((sub) => preprocessWhereForRelations(sub, parentModel))
+        );
+      } else {
+        out[key] = value;
+      }
+      continue;
+    }
+    if (key === 'OR') {
+      if (Array.isArray(value)) {
+        out[key] = await Promise.all(
+          (value as WhereInput[]).map((sub) => preprocessWhereForRelations(sub, parentModel))
+        );
+      } else {
+        out[key] = value;
+      }
+      continue;
+    }
+    if (key === 'NOT') {
+      out[key] = await preprocessWhereForRelations(value as WhereInput, parentModel);
+      continue;
+    }
+
+    // Check if value is an object (could be operator or relation filter)
+    if (
+      typeof value === 'object' &&
+      value !== null &&
+      !Array.isArray(value) &&
+      !(value instanceof Date)
+    ) {
+      // Is it an operator? (contains, gt, etc. — no nested keys)
+      const isOperator = Object.keys(value).every((k) =>
+        [
+          'contains',
+          'startsWith',
+          'endsWith',
+          'gt',
+          'gte',
+          'lt',
+          'lte',
+          'in',
+          'notIn',
+          'not',
+          'equals',
+          'mode',
+          'has',
+          'some',
+          'every',
+          'none',
+        ].includes(k)
+      );
+
+      if (isOperator) {
+        out[key] = value; // Pass through to existing buildConditions
+        continue;
+      }
+
+      // It looks like a nested relation filter: { class: { slug: { in: [...] } } }
+      const rel = getRelatedModel(parentModel, key);
+      if (!rel) {
+        out[key] = value; // Unknown relation, pass through
+        continue;
+      }
+
+      const relatedTable = MODEL_TO_TABLE[rel.relatedModel];
+      if (!relatedTable) {
+        out[key] = value; // Unknown table, pass through
+        continue;
+      }
+
+      try {
+        // Build subquery: SELECT id FROM relatedTable WHERE <inner filter>
+        const subConditions = buildConditions(relatedTable, value);
+        const db = await getDb();
+        const idCol = (relatedTable as any).id;
+        if (!idCol) {
+          out[key] = value;
+          continue;
+        }
+        const subResult = await db
+          .select({ id: idCol })
+          .from(relatedTable)
+          .where(subConditions)
+          .limit(500);
+
+        const ids = subResult.map((r: any) => r.id).filter(Boolean);
+
+        if (ids.length === 0) {
+          // No matches — impossible condition
+          out.__no_match__ = true;
+          return out; // Short-circuit
+        }
+
+        // Replace with FK-based IN filter
+        out[rel.fk] = { in: ids };
+      } catch (e: any) {
+        // On error, fall back to skipping (preserves old behavior)
+        console.warn(
+          '[preprocessWhereForRelations]',
+          parentModel,
+          key,
+          e?.message || String(e)
+        );
+        // Don't add anything — let the rest of the query proceed
+      }
+      continue;
+    }
+
+    // Simple value
+    out[key] = value;
+  }
+
+  return out;
 }
 
 // Apply include relations to a list of rows.
@@ -479,7 +636,7 @@ function makeModelProxy(modelName: 'resource' | 'user' | 'subject' | 'class' | '
     findUnique: async (args?: { where?: WhereInput; select?: any; include?: any }): Promise<any> => {
       if (!isSupported) return null;
       const db = await getDb();
-      const where = args?.where;
+      const where = await preprocessWhereForRelations(args?.where, modelName);
       // Prisma uses { where: { id: 'xxx' } } or { where: { numericId: 1 } }
       const conditions = buildConditions(table, where);
       const rows = await db.select().from(table).where(conditions).limit(1);
@@ -490,7 +647,8 @@ function makeModelProxy(modelName: 'resource' | 'user' | 'subject' | 'class' | '
     findFirst: async (args?: { where?: WhereInput; orderBy?: any; select?: any; include?: any; skip?: number; take?: number }): Promise<any> => {
       if (!isSupported) return null;
       const db = await getDb();
-      const conditions = buildConditions(table, args?.where);
+      const where = await preprocessWhereForRelations(args?.where, modelName);
+      const conditions = buildConditions(table, where);
       const orderBy = buildOrderBy(table, args?.orderBy) || [desc((table as any).id)];
       const rows = await db.select().from(table)
         .where(conditions)
@@ -507,7 +665,8 @@ function makeModelProxy(modelName: 'resource' | 'user' | 'subject' | 'class' | '
       // untyped accumulator (this would happen if we typed it as `any[]`).
       if (!isSupported) return [];
       const db = await getDb();
-      const conditions = buildConditions(table, args?.where);
+      const where = await preprocessWhereForRelations(args?.where, modelName);
+      const conditions = buildConditions(table, where);
       const orderBy = buildOrderBy(table, args?.orderBy);
       let q: any = db.select().from(table).where(conditions);
       if (orderBy && orderBy.length) q = q.orderBy(...orderBy);
@@ -529,7 +688,8 @@ function makeModelProxy(modelName: 'resource' | 'user' | 'subject' | 'class' | '
     count: async (args?: { where?: WhereInput }) => {
       if (!isSupported) return 0;
       const db = await getDb();
-      const conditions = buildConditions(table, args?.where);
+      const where = await preprocessWhereForRelations(args?.where, modelName);
+      const conditions = buildConditions(table, where);
       const rows = await db.select({ count: sql<number>`count(*)::int` }).from(table).where(conditions);
       return Number(rows[0]?.count || 0);
     },
@@ -547,7 +707,8 @@ function makeModelProxy(modelName: 'resource' | 'user' | 'subject' | 'class' | '
       if (!isSupported || !args?.by?.length) return [];
       try {
         const db = await getDb();
-        const conditions = buildConditions(table, args?.where);
+        const where = await preprocessWhereForRelations(args?.where, modelName);
+        const conditions = buildConditions(table, where);
         // Build select object
         const selectObj: Record<string, any> = {};
         const aliasMap: Record<string, string> = {};  // alias -> real column name
