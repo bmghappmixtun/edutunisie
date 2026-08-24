@@ -470,6 +470,7 @@ function makeModelProxy(modelName: 'resource' | 'user' | 'subject' | 'class' | '
     },
 
     findMany: async (args?: any): Promise<any> => {
+      console.log('[findMany]', modelName, 'include=', Object.keys(args?.include || {}), 'hasWhere=', !!args?.where);
       // Returns `any` (not `any[]`) so downstream code can call methods
       // like `.reduce((s, c) => ...)` without TypeScript complaining about
       // untyped accumulator (this would happen if we typed it as `any[]`).
@@ -484,7 +485,12 @@ function makeModelProxy(modelName: 'resource' | 'user' | 'subject' | 'class' | '
       const rows = await q;
       // Return type cast: we declare `any` so downstream reduce callbacks work
       // @ts-ignore - suppress array return type to allow implicit any in reduce callbacks
-      return await applyCount(await applyInclude(applySelect(rows, args?.select), args?.include, modelName), args?._count, modelName) as any;
+      const result = await applyCount(await applyInclude(applySelect(rows, args?.select), args?.include, modelName), args?._count, modelName) as any;
+      try {
+        const allKeys = Array.isArray(result) && result[0] ? Object.keys(result[0]) : [];
+        console.log('[findMany end]', modelName, 'len=', Array.isArray(result) ? result.length : 0, 'allKeys=', JSON.stringify(allKeys), 'sample=', Array.isArray(result) && result[0] ? JSON.stringify(result[0]).slice(0, 500) : 'none');
+      } catch (e) {}
+      return result as any;
     },
 
     count: async (args?: { where?: WhereInput }) => {
