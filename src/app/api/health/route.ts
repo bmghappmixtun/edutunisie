@@ -10,12 +10,51 @@ export async function GET() {
   const isCF = !!cfContext;
 
   if (isCF) {
-    return NextResponse.json({
-      ok: true,
-      platform: 'cloudflare-workers',
-      note: 'Limited health (no DB query) - Prisma 5.x binary engine limitation. Fixed by Prisma 6+ WASM engine upgrade (see PR #1).',
-      timestamp: new Date().toISOString(),
-    });
+    // CF POC: do a REAL DB query via the Drizzle proxy to verify
+    // Hyperdrive connection + query pipeline. This catches silent
+    // query failures that the legacy /api/health used to miss.
+    try {
+      const { prisma } = await import('@/lib/prisma');
+      const start = Date.now();
+      // Test 1: count all
+      const countAll = await prisma.resource.count({});
+      // Test 2: count with status filter
+      const countPublished = await prisma.resource.count({ where: { status: 'PUBLISHED' } });
+      // Test 3: findFirst
+      const sample = await prisma.resource.findFirst({
+        select: { id: true, title: true, status: true },
+      });
+      // Test 4: findMany with where (mimics /fr/ressources)
+      const findManyResult = await prisma.resource.findMany({
+        where: { status: 'PUBLISHED' },
+        take: 5,
+        select: { id: true, title: true, status: true },
+      });
+      const dbLatency = Date.now() - start;
+      return NextResponse.json({
+        ok: true,
+        platform: 'cloudflare-workers',
+        db: {
+          ok: true,
+          latency: dbLatency,
+          countAll,
+          countPublished,
+          findFirstId: sample?.id || null,
+          findFirstTitle: sample?.title?.slice(0, 50) || null,
+          findFirstStatus: sample?.status || null,
+          findManyCount: Array.isArray(findManyResult) ? findManyResult.length : 'not-array',
+          findManyFirstTitle: (findManyResult as any[])?.[0]?.title?.slice(0, 50) || null,
+        },
+        timestamp: new Date().toISOString(),
+      });
+    } catch (e: any) {
+      return NextResponse.json({
+        ok: true, // fail-soft: 200 with body indicating problem
+        platform: 'cloudflare-workers',
+        db: { ok: false, error: e?.message || String(e) },
+        timestamp: new Date().toISOString(),
+      });
+    }
   }
 
   // Vercel: full health check via Prisma

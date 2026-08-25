@@ -709,7 +709,13 @@ function makeModelProxy(modelName: 'resource' | 'user' | 'subject' | 'class' | '
         const MAX_ROWS = 500;
         if (typeof args?.take === 'number') q = q.limit(Math.min(args.take, MAX_ROWS));
         if (typeof args?.skip === 'number') q = q.offset(args.skip);
+        // DEBUG (2026-08-25): log the actual SQL being generated
+        try {
+          const sqlStr = q.toSQL ? q.toSQL() : 'no-toSQL';
+          console.log('[findMany SQL]', modelName, JSON.stringify(sqlStr).slice(0, 500));
+        } catch (e) {}
         const rows = await q;
+        console.log('[findMany RAW]', modelName, 'returned', rows.length, 'rows, first=', rows[0] ? JSON.stringify(rows[0]).slice(0, 300) : 'null');
         // Return type cast: we declare `any` so downstream reduce callbacks work
         // @ts-ignore - suppress array return type to allow implicit any in reduce callbacks
         const result = await applyCount(await applyInclude(applySelect(rows, args?.select), args?.include, modelName), args?._count, modelName) as any;
@@ -732,7 +738,14 @@ function makeModelProxy(modelName: 'resource' | 'user' | 'subject' | 'class' | '
         const db = await getDb();
         const where = await preprocessWhereForRelations(args?.where, modelName);
         const conditions = buildConditions(table, where);
+        // DEBUG (2026-08-25): log the count SQL
+        try {
+          const q = db.select({ count: sql<number>`count(*)::int` }).from(table).where(conditions);
+          const sqlStr = q.toSQL ? q.toSQL() : 'no-toSQL';
+          console.log('[count SQL]', modelName, JSON.stringify(sqlStr).slice(0, 500));
+        } catch (e) {}
         const rows = await db.select({ count: sql<number>`count(*)::int` }).from(table).where(conditions);
+        console.log('[count RAW]', modelName, 'returned', rows.length, 'rows, count=', rows[0]?.count);
         return Number(rows[0]?.count || 0);
       } catch (e: any) {
         // RESILIENCE (2026-08-25): never let a single count failure
