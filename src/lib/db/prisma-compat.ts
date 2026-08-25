@@ -756,13 +756,40 @@ function makeModelProxy(modelName: 'resource' | 'user' | 'subject' | 'class' | '
     },
 
     // Operations that we don't support yet — return sensible defaults
-    create: async () => { throw new Error(`Drizzle proxy: create on ${modelName} not supported yet`); },
-    update: async () => { throw new Error(`Drizzle proxy: update on ${modelName} not supported yet`); },
-    upsert: async () => { throw new Error(`Drizzle proxy: upsert on ${modelName} not supported yet`); },
-    delete: async () => { throw new Error(`Drizzle proxy: delete on ${modelName} not supported yet`); },
-    deleteMany: async () => { throw new Error(`Drizzle proxy: deleteMany on ${modelName} not supported yet`); },
-    updateMany: async () => { throw new Error(`Drizzle proxy: updateMany on ${modelName} not supported yet`); },
-    createMany: async () => { throw new Error(`Drizzle proxy: createMany on ${modelName} not supported yet`); },
+    // RESILIENCE (2026-08-25): don't THROW, return null and log.
+    // Reason: pages like /fr/ressources/[id]/[slug] call prisma.view.create()
+    // and prisma.resource.update() for view-tracking. Throwing these crashes
+    // the entire page (Error 1101). Returning null lets the page render
+    // normally; view-tracking is skipped silently on CF (acceptable — analytics
+    // are a Vercel concern, not a CF POC one).
+    create: async (args?: any) => {
+      console.warn('[create] not supported in CF proxy, skipping', modelName, 'data=', JSON.stringify(args?.data || {}).slice(0, 100));
+      return null;
+    },
+    update: async (args?: any) => {
+      console.warn('[update] not supported in CF proxy, skipping', modelName, 'where=', JSON.stringify(args?.where || {}).slice(0, 100));
+      return null;
+    },
+    upsert: async (args?: any) => {
+      console.warn('[upsert] not supported in CF proxy, skipping', modelName);
+      return null;
+    },
+    delete: async (args?: any) => {
+      console.warn('[delete] not supported in CF proxy, skipping', modelName);
+      return null;
+    },
+    deleteMany: async (args?: any) => {
+      console.warn('[deleteMany] not supported in CF proxy, skipping', modelName);
+      return { count: 0 };
+    },
+    updateMany: async (args?: any) => {
+      console.warn('[updateMany] not supported in CF proxy, skipping', modelName);
+      return { count: 0 };
+    },
+    createMany: async (args?: any) => {
+      console.warn('[createMany] not supported in CF proxy, skipping', modelName);
+      return { count: 0 };
+    },
 
     groupBy: async (args?: { by?: string[]; where?: WhereInput; _count?: any; _avg?: any; _sum?: any; _min?: any; _max?: any; orderBy?: any; take?: number; skip?: number }): Promise<any[]> => {
       if (!isSupported || !args?.by?.length) return [];
