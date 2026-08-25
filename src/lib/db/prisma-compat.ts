@@ -15,7 +15,7 @@
 
 import { getDb } from './index';
 import * as s from './schema';
-import { eq, and, or, desc, asc, sql, SQL } from 'drizzle-orm';
+import { eq, and, or, desc, asc, sql, inArray, SQL } from 'drizzle-orm';
 
 // ============================================================
 // SQL translation helpers
@@ -549,68 +549,92 @@ async function _applyCountImpl(
   selectMap: any,
   parentModel: string
 ): Promise<any[]> {
+  // ============================================================
+  // BATCH OPTIMIZATION (2026-08-25 fix for /fr/ressources loading bug):
+  // Previously this function ran ONE count query PER ROW PER RELATION.
+  // For a list of 24 resources × 3 _count relations (comments, ratings,
+  // favorites) that's 72 round trips — exceeds the postgres.js max:3
+  // connection pool and causes queryWithCache timeouts.
+  //
+  // NEW STRATEGY: Group counts by relation, run ONE batched query per
+  // relation using WHERE fk IN (rowIds) GROUP BY fk. Total queries: N
+  // relations instead of N rows × N relations. ~24x speedup for typical
+  // resource list.
+  // ============================================================
+  const db = await getDb();
 
-  for (const row of rows) {
-    row._count = row._count || {};
-    for (const [relationName, relationValue] of Object.entries(selectMap)) {
-      if (relationValue === false) continue;
+  // Classify each relation and prep plan
+  const plan: Array<{
+    relationName: string;
+    rel: any;
+    relatedTable: any;
+    fkCol: any;
+    whereOpt: any;
+  }> = [];
 
-      const rel = getRelatedModel(parentModel, relationName);
-      if (!rel) continue;
-      const relatedTable = MODEL_TO_TABLE[rel.relatedModel];
-      if (!relatedTable) continue;
+  for (const [relationName, relationValue] of Object.entries(selectMap)) {
+    if (relationValue === false) continue;
+    const rel = getRelatedModel(parentModel, relationName);
+    if (!rel) continue;
+    const relatedTable = MODEL_TO_TABLE[rel.relatedModel];
+    if (!relatedTable) continue;
 
-      // For 1-1, count is always 1 or 0
-      // For 1-many, do a count query
-      if (rel.fk === 'id') {
+    // 1-1 relation: count is always 0 or 1, no query needed
+    if (rel.fk === 'id') {
+      for (const row of rows) {
+        row._count = row._count || {};
         row._count[relationName] = row.id && (relatedTable as any).id ? 1 : 0;
-        continue;
       }
-
-      // Detect direction:
-      //   - BACKWARD (FK on related, e.g. user.uploadedFiles): child has FK to parent
-      //     fkCol = relatedTable.fk, WHERE fkCol = row.id
-      //   - FORWARD (FK on parent, e.g. resource.subjects): parent has FK to child
-      //     For counting parents, we'd group by parent.fk and count
-      //     But this is rare - usually applyCount is used for 1-many backward relations
-      //     For now, if FK is on parent, just return 0 (parent either has 0 or 1 child of this type)
-      const fkCol = (relatedTable as any)[rel.fk];
-      if (!fkCol) {
-        // FORWARD direction: parent has FK to child. Count of children is 0 or 1.
-        // Skip for now — applyInclude handles the actual data.
-        row._count[relationName] = row[rel.fk] ? 1 : 0;
-        continue;
-      }
-      const whereOpt = relationValue && typeof relationValue === 'object' ? relationValue.where : undefined;
-      const conditions = buildConditions(relatedTable, whereOpt ? { [rel.fk]: row.id, ...whereOpt } : whereOpt);
-
-      // BACKWARD: WHERE relatedTable.fk = row.id (parent's PK)
-      const db = await getDb();
-      const conds: SQL<unknown>[] = [eq(fkCol, row.id)];
-      // row's FK for this relation is row.<relationName + "Id"> or row.<parentField>
-      // Simpler: use the explicit FK column from the relation
-      // rel.fk is the FK column on the related table, e.g. 'teacherId' on resource
-      // The value is row.<parent's column>, e.g. row.id (when parent is the user)
-      // We need to find the parent's column that points to the related
-      // For "user" with "uploadedFiles" relation (resource.teacherId = user.id), the value is row.id
-      // For "class" with "resources" relation (resource.classId = class.id), the value is row.id
-      // So generally: the value is the parent's primary key (row.id), and the relation uses a FK on the related side
-
-      // Rebuild query properly
-      const finalConds: SQL<unknown>[] = [eq(fkCol, row.id)];
-      if (whereOpt) {
-        const sub = buildConditions(relatedTable, whereOpt);
-        if (sub) finalConds.push(sub);
-      }
-      const where = finalConds.length > 1 ? and(...finalConds) : finalConds[0];
-
-      const result = await db
-        .select({ count: sql<number>`count(*)::int` })
-        .from(relatedTable)
-        .where(where);
-      row._count[relationName] = Number(result[0]?.count || 0);
+      continue;
     }
+
+    const fkCol = (relatedTable as any)[rel.fk];
+    if (!fkCol) {
+      // FORWARD: parent has FK to child. Count is 0 or 1.
+      for (const row of rows) {
+        row._count = row._count || {};
+        row._count[relationName] = row[rel.fk] ? 1 : 0;
+      }
+      continue;
+    }
+
+    const whereOpt = relationValue && typeof relationValue === 'object' ? relationValue.where : undefined;
+    plan.push({ relationName, rel, relatedTable, fkCol, whereOpt });
   }
+
+  // Run ONE batched query per relation: WHERE fk IN (rowIds) GROUP BY fk
+  // Parallel for speed — fits Hyperdrive's pool nicely (3 queries max at once)
+  await Promise.all(plan.map(async (p) => {
+    const rowIds = rows.map((r: any) => r.id).filter(Boolean);
+    if (rowIds.length === 0) return;
+
+    const conds: SQL<unknown>[] = [inArray(p.fkCol, rowIds)];
+    if (p.whereOpt) {
+      const sub = buildConditions(p.relatedTable, p.whereOpt);
+      if (sub) conds.push(sub);
+    }
+    const where = conds.length > 1 ? and(...conds) : conds[0];
+
+    const results = await db
+      .select({
+        fk: p.fkCol,
+        count: sql<number>`count(*)::int`,
+      })
+      .from(p.relatedTable)
+      .where(where)
+      .groupBy(p.fkCol);
+
+    const countByRowId = new Map<string, number>();
+    for (const r of results) {
+      countByRowId.set(String((r as any).fk), Number((r as any).count || 0));
+    }
+
+    for (const row of rows) {
+      row._count = row._count || {};
+      row._count[p.relationName] = countByRowId.get(String(row.id)) || 0;
+    }
+  }));
+
   return rows;
 }
 
@@ -635,27 +659,37 @@ function makeModelProxy(modelName: 'resource' | 'user' | 'subject' | 'class' | '
   return {
     findUnique: async (args?: { where?: WhereInput; select?: any; include?: any }): Promise<any> => {
       if (!isSupported) return null;
-      const db = await getDb();
-      const where = await preprocessWhereForRelations(args?.where, modelName);
-      // Prisma uses { where: { id: 'xxx' } } or { where: { numericId: 1 } }
-      const conditions = buildConditions(table, where);
-      const rows = await db.select().from(table).where(conditions).limit(1);
-      const result = await applyCount(await applyInclude(applySelect(rows, args?.select), args?.include, modelName), args?._count, modelName);
-      return result[0] || null;
+      try {
+        const db = await getDb();
+        const where = await preprocessWhereForRelations(args?.where, modelName);
+        // Prisma uses { where: { id: 'xxx' } } or { where: { numericId: 1 } }
+        const conditions = buildConditions(table, where);
+        const rows = await db.select().from(table).where(conditions).limit(1);
+        const result = await applyCount(await applyInclude(applySelect(rows, args?.select), args?.include, modelName), args?._count, modelName);
+        return result[0] || null;
+      } catch (e: any) {
+        console.error('[findUnique FAILED]', modelName, 'where=', JSON.stringify(args?.where || {}).slice(0, 200), 'err=', e?.message || String(e));
+        return null;
+      }
     },
 
     findFirst: async (args?: { where?: WhereInput; orderBy?: any; select?: any; include?: any; skip?: number; take?: number }): Promise<any> => {
       if (!isSupported) return null;
-      const db = await getDb();
-      const where = await preprocessWhereForRelations(args?.where, modelName);
-      const conditions = buildConditions(table, where);
-      const orderBy = buildOrderBy(table, args?.orderBy) || [desc((table as any).id)];
-      const rows = await db.select().from(table)
-        .where(conditions)
-        .orderBy(...orderBy)
-        .limit(1);
-      const result = await applyCount(await applyInclude(applySelect(rows, args?.select), args?.include, modelName), args?._count, modelName);
-      return result[0] || null;
+      try {
+        const db = await getDb();
+        const where = await preprocessWhereForRelations(args?.where, modelName);
+        const conditions = buildConditions(table, where);
+        const orderBy = buildOrderBy(table, args?.orderBy) || [desc((table as any).id)];
+        const rows = await db.select().from(table)
+          .where(conditions)
+          .orderBy(...orderBy)
+          .limit(1);
+        const result = await applyCount(await applyInclude(applySelect(rows, args?.select), args?.include, modelName), args?._count, modelName);
+        return result[0] || null;
+      } catch (e: any) {
+        console.error('[findFirst FAILED]', modelName, 'where=', JSON.stringify(args?.where || {}).slice(0, 200), 'err=', e?.message || String(e));
+        return null;
+      }
     },
 
     findMany: async (args?: any): Promise<any> => {
@@ -664,34 +698,48 @@ function makeModelProxy(modelName: 'resource' | 'user' | 'subject' | 'class' | '
       // like `.reduce((s, c) => ...)` without TypeScript complaining about
       // untyped accumulator (this would happen if we typed it as `any[]`).
       if (!isSupported) return [];
-      const db = await getDb();
-      const where = await preprocessWhereForRelations(args?.where, modelName);
-      const conditions = buildConditions(table, where);
-      const orderBy = buildOrderBy(table, args?.orderBy);
-      let q: any = db.select().from(table).where(conditions);
-      if (orderBy && orderBy.length) q = q.orderBy(...orderBy);
-      // Safety cap to prevent runaway queries on Workers
-      const MAX_ROWS = 500;
-      if (typeof args?.take === 'number') q = q.limit(Math.min(args.take, MAX_ROWS));
-      if (typeof args?.skip === 'number') q = q.offset(args.skip);
-      const rows = await q;
-      // Return type cast: we declare `any` so downstream reduce callbacks work
-      // @ts-ignore - suppress array return type to allow implicit any in reduce callbacks
-      const result = await applyCount(await applyInclude(applySelect(rows, args?.select), args?.include, modelName), args?._count, modelName) as any;
       try {
-        const allKeys = Array.isArray(result) && result[0] ? Object.keys(result[0]) : [];
-        console.log('[findMany end]', modelName, 'len=', Array.isArray(result) ? result.length : 0, 'allKeys=', JSON.stringify(allKeys), 'sample=', Array.isArray(result) && result[0] ? JSON.stringify(result[0]).slice(0, 500) : 'none');
-      } catch (e) {}
-      return result as any;
+        const db = await getDb();
+        const where = await preprocessWhereForRelations(args?.where, modelName);
+        const conditions = buildConditions(table, where);
+        const orderBy = buildOrderBy(table, args?.orderBy);
+        let q: any = db.select().from(table).where(conditions);
+        if (orderBy && orderBy.length) q = q.orderBy(...orderBy);
+        // Safety cap to prevent runaway queries on Workers
+        const MAX_ROWS = 500;
+        if (typeof args?.take === 'number') q = q.limit(Math.min(args.take, MAX_ROWS));
+        if (typeof args?.skip === 'number') q = q.offset(args.skip);
+        const rows = await q;
+        // Return type cast: we declare `any` so downstream reduce callbacks work
+        // @ts-ignore - suppress array return type to allow implicit any in reduce callbacks
+        const result = await applyCount(await applyInclude(applySelect(rows, args?.select), args?.include, modelName), args?._count, modelName) as any;
+        try {
+          const allKeys = Array.isArray(result) && result[0] ? Object.keys(result[0]) : [];
+          console.log('[findMany end]', modelName, 'len=', Array.isArray(result) ? result.length : 0, 'allKeys=', JSON.stringify(allKeys), 'sample=', Array.isArray(result) && result[0] ? JSON.stringify(result[0]).slice(0, 500) : 'none');
+        } catch (e) {}
+        return result as any;
+      } catch (e: any) {
+        // RESILIENCE (2026-08-25): never let a single findMany failure
+        // take down the whole page. Log with full context and return [].
+        console.error('[findMany FAILED]', modelName, 'where=', JSON.stringify(args?.where || {}).slice(0, 300), 'err=', e?.message || String(e), 'stack=', e?.stack?.split('\n').slice(0, 3).join(' | '));
+        return [];
+      }
     },
 
     count: async (args?: { where?: WhereInput }) => {
       if (!isSupported) return 0;
-      const db = await getDb();
-      const where = await preprocessWhereForRelations(args?.where, modelName);
-      const conditions = buildConditions(table, where);
-      const rows = await db.select({ count: sql<number>`count(*)::int` }).from(table).where(conditions);
-      return Number(rows[0]?.count || 0);
+      try {
+        const db = await getDb();
+        const where = await preprocessWhereForRelations(args?.where, modelName);
+        const conditions = buildConditions(table, where);
+        const rows = await db.select({ count: sql<number>`count(*)::int` }).from(table).where(conditions);
+        return Number(rows[0]?.count || 0);
+      } catch (e: any) {
+        // RESILIENCE (2026-08-25): never let a single count failure
+        // take down the whole page. Log with full context and return 0.
+        console.error('[count FAILED]', modelName, 'where=', JSON.stringify(args?.where || {}).slice(0, 300), 'err=', e?.message || String(e), 'stack=', e?.stack?.split('\n').slice(0, 3).join(' | '));
+        return 0;
+      }
     },
 
     // Operations that we don't support yet — return sensible defaults
