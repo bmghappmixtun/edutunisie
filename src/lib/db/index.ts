@@ -26,14 +26,20 @@ async function createDrizzleClient() {
     throw new Error('HYPERDRIVE binding missing on Cloudflare Worker');
   }
 
-  // postgres.js with Hyperdrive: max=3 connections (sweet spot for Workers)
-  // Workers can freeze any time, so idle_timeout=0
-  // max=3 because Hyperdrive handles external pooling
+  // postgres.js with Hyperdrive: max=5 connections (was 3).
+  // 2026-08-25: bumped from 3 to 5 to reduce Error 1101 "Worker threw
+  // exception" on /fr/ressources, which fires 20+ parallel queries.
+  // With max=3, queries queue up and some hit the 30s Workers CPU
+  // limit, killing the request. Hyperdrive handles external pooling,
+  // so raising max on the inner driver is safe.
+  // Also added statement_timeout=15s to prevent any single query from
+  // hanging indefinitely and pinning a connection.
   const client = postgres(connectionString, {
-    max: 3,
+    max: 5,
     idle_timeout: 0,
     connect_timeout: 10,
     prepare: false,
+    statement_timeout: 15_000,
   });
 
   return drizzle(client, { schema });
