@@ -39,7 +39,6 @@ async function createDrizzleClient() {
     idle_timeout: 0,
     connect_timeout: 10,
     prepare: false,
-    statement_timeout: 15_000,
   });
 
   return drizzle(client, { schema });
