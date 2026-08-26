@@ -24,7 +24,7 @@ export default async function ResourceViewerPage({
   } catch {
     slug = rawSlug;
   }
-  const resource = await prisma.resource.findUnique({ where: { numericId } });
+  const resource = await prisma.resource.findUnique({ where: { numericId }, select: { id: true, numericId: true, title: true, fileUrl: true, r2Key: true, status: true } });
   if (!resource || resource.status !== 'PUBLISHED') notFound();
 
   // Increment view (use real IP, skip bots)
@@ -66,7 +66,7 @@ export default async function ResourceViewerPage({
               <p className="text-xs text-slate-500">Mode lecture</p>
             </div>
           </div>
-          <a href={`/api/resources/${resource.id}/download`} className="btn-primary text-sm">
+          <a href={`/api/resources/${resource.numericId}/download`} className="btn-primary text-sm">
             <Download className="w-4 h-4" /> Télécharger
           </a>
         </div>
@@ -74,7 +74,7 @@ export default async function ResourceViewerPage({
       <div className="flex-1 p-4">
         <div className="max-w-7xl mx-auto">
           <PDFViewer
-            url={`/api/resources/${resource.id}/download`}
+            url={`/api/resources/${resource.numericId}/download`}
             fileName={`${resource.title}.pdf`}
           />
           <div className="mt-3 text-center text-xs text-slate-500">

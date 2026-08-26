@@ -69,7 +69,7 @@ export default function ResourceActions({
 
   async function handleDownload() {
     try {
-      const res = await fetch(`/api/resources/${resourceId}/download`, { method: 'POST' });
+      const res = await fetch(`/api/resources/${numericId || resourceId}/download`, { method: 'POST' });
       const data = await res.json();
       if (data.url) {
         window.open(data.url, '_blank');

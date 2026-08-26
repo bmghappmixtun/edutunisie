@@ -227,7 +227,7 @@ export default async function ResourcePage({
   // (the user never sees the Vercel Blob URL). Skipped for archived resources
   // because we don't want bots/casual visitors tracking views on dead links.
   if (canViewBody) {
-    resource.fileUrl = `/api/resources/${resource.id}/download`;
+    resource.fileUrl = `/api/resources/${resource.numericId}/download`;
 
     // Track view
     await prisma.view.create({ data: { resourceId: resource.id, ipAddress: 'visitor' } });
@@ -414,8 +414,8 @@ export default async function ResourcePage({
               the modern look from fr.scribd.com — big title, stats line,
               expandable description, action buttons grid, AI badge, etc.
              ============================================================ */}
-          <ResourceScribdHeader
-            resourceId={resource.id}
+          
+<ResourceScribdHeader            resourceId={resource.id}
             title={(() => {
               const { fr } = splitArabicSubject(resource.title);
               return fr;
@@ -431,7 +431,7 @@ export default async function ResourcePage({
             downloadsCount={resource.downloadsCount}
             avgRating={resource.avgRating}
             commentsCount={resource.commentsCount}
-            downloadUrl={`/api/resources/${resource.id}/download`}
+            downloadUrl={`/api/resources/${resource.numericId}/download`}
             teacherName={
               resource.teacher
                 ? `${resource.teacher.firstName || ''} ${resource.teacher.lastName || ''}`.trim() || null
@@ -594,7 +594,7 @@ export default async function ResourcePage({
               <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden mb-4">
                 <div className="p-0">
                   <LazyPDFViewer
-                    url={`/api/resources/${resource.id}/download`}
+                    url={`/api/resources/${resource.numericId}/download`}
                     fileName={`${resource.title}.pdf`}
                     pageCount={resource.pageCount ?? null}
                     fileSize={resource.fileSize ? humanFileSize(resource.fileSize) : null}
@@ -610,11 +610,10 @@ export default async function ResourcePage({
                   be right under the PDF viewer for quick access. */}
               {canViewBody && (
                 <ResourceActions
-                  resourceId={resource.id}
-                  numericId={resource.numericId}
+                  resourceId={resource.id} numericId={resource.numericId}
                   slug={resource.slug}
                   title={resource.title}
-                  fileUrl={`/api/resources/${resource.id}/download`}
+                  fileUrl={`/api/resources/${resource.numericId}/download`}
                   originalFileKey={resource.originalFileKey}
                   originalFileName={resource.originalFileName}
                   originalFormat={resource.originalFormat}
@@ -632,8 +631,8 @@ export default async function ResourcePage({
 
               {/* Notation — hidden for archived resources (non-owners) */}
               {canViewBody && (
-              <RatingSection
-                resourceId={resource.id}
+              
+<RatingSection                resourceId={resource.id}
                 avgRating={resource.avgRating}
                 ratingCount={resource.ratingCount}
                 distribution={dist}
@@ -643,8 +642,8 @@ export default async function ResourcePage({
 
               {/* Commentaires — hidden for archived resources (non-owners) */}
               {canViewBody && (
-              <CommentsSection
-                resourceId={resource.id}
+              
+<CommentsSection                resourceId={resource.id}
                 initialComments={resource.comments.map((c) => ({
                   id: c.id,
                   content: c.content,

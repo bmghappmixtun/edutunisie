@@ -22,6 +22,29 @@ import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { getVisitorIpFromRequest, isBotOrPlaceholder } from '@/lib/visitor';
 
+/**
+ * 2026-08-26: Accept both numericId (new format) and CUID (legacy) for backward compat.
+ * The user-facing page uses numericId (e.g. 12168) but the API was originally written
+ * for the internal CUID. This helper resolves either to the resource's id.
+ */
+async function resolveResourceId(rawId: string) {
+  const numericId = parseInt(rawId, 10);
+  if (!isNaN(numericId) && numericId > 0 && String(numericId) === rawId) {
+    // Numeric path: look up by numericId
+    const r = await prisma.resource.findUnique({
+      where: { numericId },
+      select: { id: true },
+    });
+    return r?.id || null;
+  }
+  // CUID path: look up directly by id
+  const r = await prisma.resource.findUnique({
+    where: { id: rawId },
+    select: { id: true },
+  });
+  return r?.id || null;
+}
+
 function sanitizeFilename(name: string): string {
   // Strip control characters and limit length
   return name
@@ -142,7 +165,9 @@ async function streamFileToClient(
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const user = await getCurrentUser();
-  const { id } = await params;
+  const { id: rawId } = await params;
+  const id = await resolveResourceId(rawId);
+  if (!id) return NextResponse.json({ error: 'Non trouvé' }, { status: 404 });
   const ip = getVisitorIpFromRequest(req);
   const ua = req.headers.get('user-agent');
   const skipTracking = isBotOrPlaceholder(ip, ua);
@@ -196,7 +221,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   try {
 
   const user = await getCurrentUser();
-  const { id } = await params;
+  const { id: rawId } = await params;
+  const id = await resolveResourceId(rawId);
+  if (!id) return NextResponse.json({ error: 'Non trouvé' }, { status: 404 });
   const wantsOriginal = req.nextUrl.searchParams.get('original') === '1';
   const ip = getVisitorIpFromRequest(req);
   const ua = req.headers.get('user-agent');
