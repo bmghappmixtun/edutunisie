@@ -35,7 +35,7 @@ async function createDrizzleClient() {
   // Also added statement_timeout=15s to prevent any single query from
   // hanging indefinitely and pinning a connection.
   const client = postgres(connectionString, {
-    max: 5,
+    max: 10,
     idle_timeout: 0,
     connect_timeout: 10,
     prepare: false,
