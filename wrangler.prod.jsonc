@@ -52,7 +52,7 @@
     {
       "binding": "DB",
       "database_name": "examanet-db",
-      "database_id": "REPLACE_WITH_D1_ID_AFTER_PHASE_0",
+      "database_id": "22ad2e7f-1692-486e-9131-d6c4062012e1",
       "migrations_dir": "drizzle-migrations"
     }
   ]
