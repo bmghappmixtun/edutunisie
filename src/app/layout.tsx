@@ -1,9 +1,7 @@
 import type { Metadata } from 'next';
-import { Inter, Cairo, Nunito, Noto_Sans_Arabic } from 'next/font/google';
 import localFont from 'next/font/local';
 import './globals.css';
 import { Toaster } from 'react-hot-toast';
-import AnalyticsWithOptOut from '@/components/analytics/AnalyticsWithOptOut';
 import ServiceWorkerRegister from '@/components/pwa/ServiceWorkerRegister';
 import ErrorHandlerInit from '@/components/errors/ErrorHandlerInit';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
@@ -16,39 +14,6 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
 // external CSS request to fonts.googleapis.com (was ~150ms TTFB on cold visits,
 // especially on 3G networks in Tunisia). Also: subset to latin + latin-ext
 // + arabic to avoid downloading unused glyphs (~30% smaller).
-const inter = Inter({
-  subsets: ['latin', 'latin-ext'],
-  display: 'swap',
-  variable: '--font-inter',
-  weight: ['400', '500', '600', '700', '800'],
-  preload: true,
-});
-const cairo = Cairo({
-  subsets: ['arabic', 'latin-ext'],
-  display: 'swap',
-  variable: '--font-cairo',
-  weight: ['400', '600', '700', '800'],
-  preload: true,
-});
-const nunito = Nunito({
-  subsets: ['latin', 'latin-ext'],
-  display: 'swap',
-  variable: '--font-nunito',
-  weight: ['600', '700', '800', '900'],
-  preload: false,
-});
-// 2026-08-15: Moved Noto_Sans_Arabic from [locale]/layout.tsx to the root
-// layout (next/font/google can only be loaded in a layout, and the
-// root layout is the only one that renders <html> after the nested-html
-// hydration fix). tailwind's `font-arabic` resolves to
-// `var(--font-noto-arabic)` first, with --font-cairo as fallback.
-const notoArabic = Noto_Sans_Arabic({
-  subsets: ['arabic'],
-  weight: ['400', '500', '600', '700', '800'],
-  variable: '--font-noto-arabic',
-  display: 'swap',
-  preload: true,
-});
 
 // Fustat: used for ARABIC TITLES and AI SUMMARIES (selected 2026-07-28 after
 // /font-test comparison). Self-hosted from Google Fonts (not in next/font/google).
@@ -226,7 +191,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="fr"
       dir="ltr"
-      className={`${inter.variable} ${cairo.variable} ${nunito.variable} ${fustat.variable} ${notoArabic.variable}`}
+      className={fustat.variable}
       suppressHydrationWarning
     >
       <head>
@@ -281,8 +246,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
           />
         ))}
-        <AnalyticsWithOptOut />
-        <ServiceWorkerRegister />
+                <ServiceWorkerRegister />
         <ErrorHandlerInit />
       </body>
     </html>

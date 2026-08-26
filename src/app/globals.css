@@ -346,7 +346,7 @@
 /* Arabic font applied to any RTL content */
 [dir="rtl"],
 [dir="rtl"] * {
-  font-family: var(--font-noto-arabic), 'Noto Sans Arabic', 'Noto Sans', 'Segoe UI Arabic', 'Tahoma', sans-serif !important;
+  font-family: var(--font-fustat), 'Noto Sans Arabic', 'Noto Sans', 'Segoe UI Arabic', 'Tahoma', sans-serif !important;
 }
 
 /* Force alignment of Arabic text to the right */
@@ -398,5 +398,5 @@
 [dir="rtl"] li,
 [dir="rtl"] ul,
 [dir="rtl"] a {
-  font-family: var(--font-noto-arabic), 'Noto Sans Arabic', 'Segoe UI Arabic', 'Tahoma', sans-serif !important;
+  font-family: var(--font-fustat), 'Noto Sans Arabic', 'Segoe UI Arabic', 'Tahoma', sans-serif !important;
 }

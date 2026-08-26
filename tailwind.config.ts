@@ -27,9 +27,9 @@ const config: Config = {
         }
       },
       fontFamily: {
-        sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
-        arabic: ['var(--font-noto-arabic)', 'var(--font-cairo)', 'system-ui', 'sans-serif'],
-        display: ['var(--font-nunito)', 'var(--font-inter)', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-fustat)', 'system-ui', 'sans-serif'],
+        arabic: ['var(--font-fustat)', 'system-ui', 'sans-serif'],
+        display: ['var(--font-fustat)', 'system-ui', 'sans-serif'],
       },
       animation: {
         'float': 'float 6s ease-in-out infinite',
