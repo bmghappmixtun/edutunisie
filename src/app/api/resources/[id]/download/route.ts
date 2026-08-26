@@ -192,6 +192,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
  * The blob.vercel-storage.com URL is never exposed to the user.
  */
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const reqStart = Date.now();
+  try {
+
   const user = await getCurrentUser();
   const { id } = await params;
   const wantsOriginal = req.nextUrl.searchParams.get('original') === '1';
@@ -245,4 +248,23 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     buildFilename(resource, false),
     'application/pdf'
   );
+
+  } catch (e: any) {
+    // 2026-08-26: catch-all to surface real error instead of "error code: 1101"
+    const elapsed = Date.now() - reqStart;
+    console.error('[download FAILED]', {
+      elapsed,
+      error: e?.message || String(e),
+      stack: e?.stack?.split('\n').slice(0, 3).join(' | '),
+      name: e?.name,
+    });
+    return new NextResponse(
+      JSON.stringify({
+        error: 'Download failed',
+        message: e?.message || String(e),
+        elapsed,
+      }),
+      { status: 500, headers: { 'content-type': 'application/json' } }
+    );
+  }
 }
