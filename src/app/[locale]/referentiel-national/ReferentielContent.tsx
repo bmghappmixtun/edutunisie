@@ -27,7 +27,15 @@ export default function ReferentielContent({
   }, [html]);
 
   return (
-    <div id="referentiel-body" dangerouslySetInnerHTML={{ __html: html }}>
+    <>
+      {/* Body HTML. Inline scripts are NOT children of this div — putting them
+          here alongside `dangerouslySetInnerHTML` triggers React error #60
+          ("Can only set one of `children` or `props.dangerouslySetInnerHTML`")
+          on the production minified client, captured as ERR-SX7MS6 (2x on
+          /fr/referentiel-national, 2026-08-26 nightly digest). The scripts
+          are rendered as siblings below so they execute once during hydration
+          and don't get re-injected into the innerHTML. */}
+      <div id="referentiel-body" dangerouslySetInnerHTML={{ __html: html }} />
       {scripts.map((code, idx) => (
         // eslint-disable-next-line react/no-danger
         <script
@@ -35,6 +43,6 @@ export default function ReferentielContent({
           dangerouslySetInnerHTML={{ __html: code }}
         />
       ))}
-    </div>
+    </>
   );
 }
