@@ -24,7 +24,11 @@
     "build:cf": "prisma generate && next build",
     "preview:cf": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "deploy:cf": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
-    "cf:typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
+    "cf:typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
+    "db:d1:generate": "drizzle-kit generate",
+    "db:d1:push:local": "wrangler d1 migrations apply examanet-db --local",
+    "db:d1:push:remote": "wrangler d1 migrations apply examanet-db --remote",
+    "db:d1:studio:local": "wrangler d1 execute examanet-db --local --command=\"SELECT 1\""
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.7.2",

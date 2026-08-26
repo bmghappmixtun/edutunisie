@@ -47,5 +47,13 @@
       "binding": "HYPERDRIVE",
       "id": "f229c4a38255449198890e4259aef52e"
     }
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "examanet-db",
+      "database_id": "REPLACE_WITH_D1_ID_AFTER_PHASE_0",
+      "migrations_dir": "drizzle-migrations"
+    }
   ]
 }
