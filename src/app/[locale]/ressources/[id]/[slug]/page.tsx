@@ -372,12 +372,45 @@ export default async function ResourcePage({
             aria-label="Fil d'Ariane"
             className="flex items-center gap-1 text-xs text-slate-500 mb-4 flex-wrap"
           >
+            {/* 2026-08-27 nightly fix (ERR-6ZE9PE React #419 on
+                /fr/ressources/15365 — 5 events captured across 7 days):
+                The previous breadcrumb had text content that differed
+                between the loading skeleton (empty <a> placeholders) and
+                the page (e.g. "Accueil", "Français", "1ère année
+                secondaire"). React's hydration check is text-strict: a
+                structural match (5 children of <nav>) is not enough when
+                the child elements have different text content. The
+                child-count fix from c2255df2 (5 children in both states)
+                was necessary but not sufficient — text content still
+                mismatched and React #419 was thrown.
+
+                Fix: wrap each Link's text in a <span
+                suppressHydrationWarning>...</span>. The DOM structure
+                becomes `<a><span>text</span></a>` in the page and
+                `<a><span></span></a>` in the loading skeleton. React's
+                hydration check:
+                  1. <a> matches <a> ✓
+                  2. <a> has 1 child in both states ✓
+                  3. <span> matches <span> ✓
+                  4. <span> text differs ("" vs "Accueil") — but the
+                     `suppressHydrationWarning` flag on the <span>
+                     silences this specific check, identical to the
+                     pattern already used for the product wrapper and
+                     the timeAgo div in CommentsSection.
+
+                The `tabIndex` prop and `aria-hidden` on the parent
+                <span> are preserved unchanged. The wrapping <span> is
+                `inline` by default so it does not affect the flex
+                layout. The outer <span> for subject/class keeps its
+                `hidden` toggle so the breadcrumb still has 5 children
+                in both states (the 2 conditional <span>s are always
+                rendered, just hidden when no subject/class). */}
             <Link href="/" className="hover:text-primary-600 transition">
-              Accueil
+              <span suppressHydrationWarning>Accueil</span>
             </Link>
             <ChevronRight className="w-3 h-3 text-slate-300" />
             <Link href="/ressources" className="hover:text-primary-600 transition">
-              Ressources
+              <span suppressHydrationWarning>Ressources</span>
             </Link>
             <span
               className={`inline-flex items-center gap-1 ${resource.subject ? '' : 'hidden'}`}
@@ -389,7 +422,7 @@ export default async function ResourcePage({
                 className="hover:text-primary-600 transition"
                 tabIndex={resource.subject ? undefined : -1}
               >
-                {resource.subject?.nameFr || ''}
+                <span suppressHydrationWarning>{resource.subject?.nameFr || ''}</span>
               </Link>
             </span>
             <span
@@ -402,7 +435,7 @@ export default async function ResourcePage({
                 className="hover:text-primary-600 transition"
                 tabIndex={resource.class ? undefined : -1}
               >
-                {resource.class?.nameFr || ''}
+                <span suppressHydrationWarning>{resource.class?.nameFr || ''}</span>
               </Link>
             </span>
           </nav>

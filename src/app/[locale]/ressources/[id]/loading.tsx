@@ -32,21 +32,48 @@ export default function Loading() {
               contain the same internal structure (ChevronRight + Link) as
               the page. React tree: 5 children in both. DOM: 7 children in
               the page (when subject+class exist) or 3-7 in the loading
-              (3 visible + 4 inside 2 hidden spans). */}
+              (3 visible + 4 inside 2 hidden spans).
+
+              2026-08-27 nightly fix (ERR-6ZE9PE React #419 on
+              /fr/ressources/15365 — 5 events captured across 7 days):
+              The c2255df2 child-count fix was necessary but not
+              sufficient — React's hydration check is also text-strict.
+              The page's Links had text content ("Accueil", "Ressources",
+              subject name, class name) while the loading skeleton's
+              placeholder <a> tags were empty (`<a></a>`). This made
+              the page DOM `<a>Accueil</a>` vs the loading DOM
+              `<a></a>` — a React #419 text-content mismatch.
+
+              Fix (mirrors the page): each placeholder <a> now contains
+              an inner <span suppressHydrationWarning></span>. The DOM
+              becomes `<a><span></span></a>` in the loading and
+              `<a><span>Accueil</span></a>` in the page. The text inside
+              the <span> can differ (loading is empty, page has the real
+              text) without triggering a hydration error because the
+              <span> has `suppressHydrationWarning`. The child-count
+              match (1 child per <a>) is preserved in both states. */}
           <nav
             aria-label="Fil d'Ariane"
             className="flex items-center gap-1 text-xs text-slate-500 mb-4 flex-wrap"
           >
-            <a className="h-3 w-12 bg-slate-200 rounded animate-pulse" aria-hidden="true" />
+            <a className="h-3 w-12 bg-slate-200 rounded animate-pulse" aria-hidden="true">
+              <span suppressHydrationWarning></span>
+            </a>
             <ChevronRight className="w-3 h-3 text-slate-300" aria-hidden="true" />
-            <a className="h-3 w-16 bg-slate-200 rounded animate-pulse" aria-hidden="true" />
+            <a className="h-3 w-16 bg-slate-200 rounded animate-pulse" aria-hidden="true">
+              <span suppressHydrationWarning></span>
+            </a>
             <span className="inline-flex items-center gap-1 hidden" aria-hidden="true">
               <ChevronRight className="w-3 h-3 text-slate-300" aria-hidden="true" />
-              <a className="h-3 w-20 bg-slate-200 rounded animate-pulse" aria-hidden="true" />
+              <a className="h-3 w-20 bg-slate-200 rounded animate-pulse" aria-hidden="true">
+                <span suppressHydrationWarning></span>
+              </a>
             </span>
             <span className="inline-flex items-center gap-1 hidden" aria-hidden="true">
               <ChevronRight className="w-3 h-3 text-slate-300" aria-hidden="true" />
-              <a className="h-3 w-16 bg-slate-200 rounded animate-pulse" aria-hidden="true" />
+              <a className="h-3 w-16 bg-slate-200 rounded animate-pulse" aria-hidden="true">
+                <span suppressHydrationWarning></span>
+              </a>
             </span>
           </nav>
 
