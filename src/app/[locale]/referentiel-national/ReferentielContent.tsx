@@ -27,7 +27,8 @@ export default function ReferentielContent({
   }, [html]);
 
   return (
-    <div id="referentiel-body" dangerouslySetInnerHTML={{ __html: html }}>
+    <>
+      <div id="referentiel-body" dangerouslySetInnerHTML={{ __html: html }} />
       {scripts.map((code, idx) => (
         // eslint-disable-next-line react/no-danger
         <script
@@ -35,6 +36,6 @@ export default function ReferentielContent({
           dangerouslySetInnerHTML={{ __html: code }}
         />
       ))}
-    </div>
+    </>
   );
 }
