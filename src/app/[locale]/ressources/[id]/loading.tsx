@@ -110,9 +110,45 @@ export default function Loading() {
               an empty card so its internal child count (0) matches the page's
               empty card (which contains 0 or 1 Product block for tech college
               only). The PDF viewer, ResourceInfoPanel, and Rating skeletons
-              already matched the page. */}
+              already matched the page.
+
+              2026-08-31 fix (ERR-AH9FU2 React #419 on
+              /fr/ressources/10717/devoir-de-controle-n-1-math-bac-informatique-2017-2018-2
+              — 4 events captured in 24h, but the same mismatch existed on
+              every resource page with hasCorrection=true or isArchived=true):
+              The page tree has UP TO 9 direct children of the inner <div>
+              (ARCHIVED banner + correction banner + product wrapper + PDF
+              viewer + ResourceActions + ResourceInfoPanel + RatingSection +
+              CommentsSection + Similar). For a typical PUBLISHED resource
+              with hasCorrection and similar resources, the page has 8
+              children. The loading skeleton was only rendering 7 children,
+              which caused a React #422 (child count mismatch) that cascaded
+              into a React #419 (text content mismatch) during hydration.
+              Fix: add 2 hidden placeholder divs to the loading skeleton (one
+              for the ARCHIVED banner, one for the correction banner) so the
+              skeleton always renders 9 children, matching the page's maximum
+              structure. The placeholders are always hidden during loading
+              (the resource data isn't available yet) and have the same
+              wrapper className as the page's banners so React's hydration
+              check passes. The correction banner has suppressHydrationWarning
+              on its text content because the loading skeleton can't know the
+              correction summary during the Suspense fallback. */}
           <div className="grid grid-cols-1 gap-6">
             <div>
+              {/* ARCHIVED banner placeholder — 2026-08-31 nightly fix
+                  (ERR-AH9FU2): mirrors the page's ARCHIVED banner
+                  (bg-amber-50 border-2 border-amber-200 rounded-2xl p-5 mb-4)
+                  which is conditionally rendered for archived resources.
+                  Always hidden during loading. */}
+              <div className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-5 mb-4 hidden" aria-hidden="true"></div>
+
+              {/* Correction banner placeholder — 2026-08-31 nightly fix
+                  (ERR-AH9FU2): mirrors the page's correction banner
+                  (bg-gradient-to-r from-emerald-500 ... rounded-2xl p-5 mb-4
+                  shadow-lg) which is conditionally rendered when
+                  resource.hasCorrection is true. Always hidden during loading. */}
+              <div className="bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 rounded-2xl p-5 mb-4 hidden" aria-hidden="true"></div>
+
               {/* Product wrapper (المنتج / Produit) — 2026-08-21 nightly fix
                   (ERR-LHP3SU React #419): the page now uses the "always render,
                   hide via CSS" pattern for the product block (technologie +
