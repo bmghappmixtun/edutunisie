@@ -518,60 +518,84 @@ export default async function ResourcePage({
                 The teacher is now in the ScribdHeader ('Transféré par')
                 and the info panel is below the PDF viewer. */}
             <div>
-              {/* ARCHIVED banner — shown to non-owners when the resource is no longer public */}
-              {isArchived && (
-                <div className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-5 mb-4">
-                  <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-amber-200 flex items-center justify-center text-amber-700 font-bold text-lg">
-                      !
-                    </div>
-                    <div className="flex-1">
-                      <h2 className="font-bold text-amber-900 mb-1">
-                        Cette ressource n'est plus disponible
-                      </h2>
-                      <p className="text-sm text-amber-800">
-                        Ce document a été archivé et n'est plus accessible au public.
-                        {resource.subject && resource.class && (
-                          <>
-                            {' '}Vous pouvez explorer d'autres ressources de{' '}
-                            <Link
-                              href={`/matieres/${resource.subject.slug}/${resource.class.slug}`}
-                              className="font-semibold underline hover:text-amber-900"
-                            >
-                              {resource.subject.nameFr} — {resource.class.nameFr}
-                            </Link>
-                            .
-                          </>
-                        )}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
+              {/* ARCHIVED banner — shown to non-owners when the resource is no longer public.
+                  2026-09-01 nightly fix (ERR-HBRKND React #419 on
+                  /fr/ressources/14018 — 4 events captured, but the same mismatch
+                  existed on every /fr/ressources/{id} view with PUBLISHED +
+                  hasCorrection): the page tree has UP TO 9 direct children of
+                  this inner <div>. The 2026-08-31 fix (ERR-AH9FU2) added 2
+                  hidden placeholder divs to loading.tsx (ARCHIVED + correction
+                  banners) so the skeleton now has 9 children. But the page
+                  still conditionally rendered the banners via `{cond && (...)}`,
+                  so for a typical PUBLISHED resource the page had 8 children
+                  (ARCHIVED skipped, correction rendered) while loading had 9
+                  (ARCHIVED placeholder present at position 0). React threw #422
+                  (child count mismatch) → cascaded into #419 (text content
+                  mismatch) during hydration.
 
-              {/* PROMINENT correction banner — students search corrected homeworks */}
-              {resource.hasCorrection && (
-                <div className="bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 text-white rounded-2xl p-5 mb-4 shadow-lg border-2 border-emerald-400/50">
-                  <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                      <CheckCircle2 className="w-6 h-6" />
-                    </div>
-                    <div className="flex-1">
-                      <h2 className="font-extrabold text-lg mb-1">
-                        ✅ Ce document contient un corrigé
-                      </h2>
-                      {resource.correctionSummary ? (
-                        <p className="text-sm text-emerald-50">{resource.correctionSummary}</p>
-                      ) : (
-                        <p className="text-sm text-emerald-50">
-                          Le corrigé détaillé est intégré à la fin du document. Faites défiler pour
-                          le consulter.
-                        </p>
-                      )}
-                    </div>
+                  Fix: apply the "always render, hide via CSS" pattern. The
+                  wrapper is now always rendered with the same className as the
+                  loading skeleton's placeholder, hidden via `hidden` class +
+                  `aria-hidden` when the condition is false. The internal
+                  structure (icon, h2, p) is also always rendered. Static text
+                  (banner headings) is identical between page and loading. The
+                  dynamic text (subject/class names in the ARCHIVED Link, the
+                  correctionSummary paragraph) is wrapped in
+                  `<span suppressHydrationWarning>` so the difference in content
+                  between the loading placeholder (empty) and the streamed page
+                  (real data) doesn't trigger #419. The page now has 9
+                  children at fixed positions matching the loading.tsx skeleton's
+                  9 children. */}
+              <div
+                className={`bg-amber-50 border-2 border-amber-200 rounded-2xl p-5 mb-4 ${isArchived ? '' : 'hidden'}`}
+                aria-hidden={!isArchived}
+              >
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-amber-200 flex items-center justify-center text-amber-700 font-bold text-lg">
+                    !
+                  </div>
+                  <div className="flex-1">
+                    <h2 className="font-bold text-amber-900 mb-1">
+                      Cette ressource n'est plus disponible
+                    </h2>
+                    <p className="text-sm text-amber-800">
+                      Ce document a été archivé et n'est plus accessible au public.
+                      <span suppressHydrationWarning>
+                        {resource.subject && resource.class
+                          ? ` Vous pouvez explorer d'autres ressources de ${resource.subject.nameFr} — ${resource.class.nameFr}.`
+                          : ''}
+                      </span>
+                    </p>
                   </div>
                 </div>
-              )}
+              </div>
+
+              {/* PROMINENT correction banner — students search corrected homeworks.
+                  Same "always render, hide via CSS" pattern as the ARCHIVED banner
+                  above (see ERR-HBRKND fix comment). The correction summary text
+                  is wrapped in `<span suppressHydrationWarning>` because the
+                  loading skeleton can't know the summary during the Suspense
+                  fallback. The static heading text ("Ce document contient un
+                  corrigé") is identical between page and loading. */}
+              <div
+                className={`bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 text-white rounded-2xl p-5 mb-4 shadow-lg border-2 border-emerald-400/50 ${resource.hasCorrection ? '' : 'hidden'}`}
+                aria-hidden={!resource.hasCorrection}
+              >
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                    <CheckCircle2 className="w-6 h-6" />
+                  </div>
+                  <div className="flex-1">
+                    <h2 className="font-extrabold text-lg mb-1">
+                      ✅ Ce document contient un corrigé
+                    </h2>
+                    <p className="text-sm text-emerald-50" suppressHydrationWarning>
+                      {resource.correctionSummary ||
+                        'Le corrigé détaillé est intégré à la fin du document. Faites défiler pour le consulter.'}
+                    </p>
+                  </div>
+                </div>
+              </div>
 
               {/* 2026-08-19: removed the empty wrapper div that was rendering
                   as a white rectangle on every page with no AI data. The
