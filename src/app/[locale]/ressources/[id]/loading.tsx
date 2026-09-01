@@ -1,4 +1,4 @@
-import { Loader2, Eye, Download, Star, MessageCircle, FileText, ChevronRight, Wrench } from 'lucide-react';
+import { Loader2, Eye, Download, Star, MessageCircle, FileText, ChevronRight, Wrench, CheckCircle2 } from 'lucide-react';
 
 // Per-route loading state for /ressources/[id]/[slug]
 
@@ -139,15 +139,67 @@ export default function Loading() {
                   (ERR-AH9FU2): mirrors the page's ARCHIVED banner
                   (bg-amber-50 border-2 border-amber-200 rounded-2xl p-5 mb-4)
                   which is conditionally rendered for archived resources.
-                  Always hidden during loading. */}
-              <div className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-5 mb-4 hidden" aria-hidden="true"></div>
+
+                  2026-09-01 update (ERR-HBRKND): the page now uses the
+                  "always render, hide via CSS" pattern (matching the loading
+                  skeleton's child count of 9). The placeholder now mirrors
+                  the full internal structure of the page's ARCHIVED banner
+                  (icon div, h2 heading, p with optional Link) so the React
+                  tree has the same element types and child count at every
+                  position. The dynamic text (subject.nameFr — class.nameFr
+                  inside the Link) is wrapped in
+                  `<span suppressHydrationWarning></span>` because the loading
+                  skeleton can't know the resource's subject/class during the
+                  Suspense fallback. The static heading text and the "!"
+                  character are identical to the page's content. The
+                  placeholder's wrapper is always hidden during loading. */}
+              <div className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-5 mb-4 hidden" aria-hidden="true">
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-amber-200 flex items-center justify-center text-amber-700 font-bold text-lg" aria-hidden="true">
+                    !
+                  </div>
+                  <div className="flex-1">
+                    <h2 className="font-bold text-amber-900 mb-1">
+                      Cette ressource n'est plus disponible
+                    </h2>
+                    <p className="text-sm text-amber-800">
+                      Ce document a été archivé et n'est plus accessible au public.
+                      <span suppressHydrationWarning>{''}</span>
+                    </p>
+                  </div>
+                </div>
+              </div>
 
               {/* Correction banner placeholder — 2026-08-31 nightly fix
                   (ERR-AH9FU2): mirrors the page's correction banner
                   (bg-gradient-to-r from-emerald-500 ... rounded-2xl p-5 mb-4
-                  shadow-lg) which is conditionally rendered when
-                  resource.hasCorrection is true. Always hidden during loading. */}
-              <div className="bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 rounded-2xl p-5 mb-4 hidden" aria-hidden="true"></div>
+                  shadow-lg border-2 border-emerald-400/50) which is
+                  conditionally rendered when resource.hasCorrection is true.
+
+                  2026-09-01 update (ERR-HBRKND): same "always render, hide
+                  via CSS" pattern as the ARCHIVED banner above. The
+                  placeholder now mirrors the page's full internal structure
+                  (CheckCircle2 svg, h2 heading, p with correctionSummary).
+                  The dynamic correction summary text is wrapped in
+                  `<p suppressHydrationWarning></p>` because the loading
+                  skeleton can't know the summary during the Suspense
+                  fallback. The static heading text is identical. The
+                  placeholder's wrapper is always hidden during loading. */}
+              <div className="bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 text-white rounded-2xl p-5 mb-4 shadow-lg border-2 border-emerald-400/50 hidden" aria-hidden="true">
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-white/20 flex items-center justify-center" aria-hidden="true">
+                    <CheckCircle2 className="w-6 h-6" aria-hidden="true" />
+                  </div>
+                  <div className="flex-1">
+                    <h2 className="font-extrabold text-lg mb-1">
+                      ✅ Ce document contient un corrigé
+                    </h2>
+                    <p className="text-sm text-emerald-50" suppressHydrationWarning>
+                      Le corrigé détaillé est intégré à la fin du document. Faites défiler pour le consulter.
+                    </p>
+                  </div>
+                </div>
+              </div>
 
               {/* Product wrapper (المنتج / Produit) — 2026-08-21 nightly fix
                   (ERR-LHP3SU React #419): the page now uses the "always render,
