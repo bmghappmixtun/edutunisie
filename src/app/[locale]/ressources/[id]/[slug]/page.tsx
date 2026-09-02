@@ -716,12 +716,52 @@ export default async function ResourcePage({
               />
               )}
 
-              {/* Similaires */}
-              {similar.length > 0 && (
-                <div className="mt-6">
-                  <h2 className="font-bold text-xl mb-4">📚 Ressources similaires</h2>
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    {similar.map((s) => (
+              {/* Similaires
+                  2026-09-02 nightly fix (ERR-5ZDSNC React #419 on
+                  /fr/ressources/1090/devoir-de-controle-n-1-math-8eme-2018-2019
+                  — 8 events captured in 7 days, but the same mismatch
+                  existed on every /fr/ressources/{id} view where
+                  similar.length === 0):
+
+                  The previous code used `{similar.length > 0 && (...)}` for
+                  this section, but loading.tsx always renders the
+                  <div className="mt-6"> wrapper. For resources with no
+                  similar (e.g. subjects with only 1 PUBLISHED resource,
+                  or the current resource being the only one for that
+                  subject), the page had 8 children of the inner <div>
+                  while the loading skeleton had 9. React threw #422
+                  (child count mismatch) → cascaded into #419 (text
+                  content mismatch) during hydration.
+
+                  This bug only manifests when:
+                    1. The resource is PUBLISHED (canViewBody=true, so
+                       PDF viewer + ResourceActions + Rating + Comments
+                       all render)
+                    2. similar.length === 0 (no other PUBLISHED
+                       resources with the same subjectId)
+
+                  The 2026-09-01 fix (ERR-HBRKND) addressed the same
+                  problem for the ARCHIVED and correction banners by
+                  applying the "always render, hide via CSS" pattern.
+                  This fix applies the same pattern to the Similar
+                  section. The wrapper is now always rendered (hidden
+                  when similar.length === 0), matching the loading
+                  skeleton's 9-children structure exactly. The dynamic
+                  h2 text and per-card content are wrapped in
+                  `<span suppressHydrationWarning>` so the difference
+                  in content between the loading placeholder (skeleton
+                  cards with static placeholder text) and the streamed
+                  page (real resource titles) doesn't trigger #419. */}
+              <div
+                className={`mt-6 ${similar.length > 0 ? '' : 'hidden'}`}
+                aria-hidden={similar.length === 0}
+              >
+                <h2 className="font-bold text-xl mb-4">
+                  <span suppressHydrationWarning>📚 Ressources similaires</span>
+                </h2>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  {similar.length > 0 &&
+                    similar.map((s) => (
                       <Link
                         key={s.id}
                         href={`/ressources/${s.numericId}/${s.slug}`}
@@ -731,12 +771,14 @@ export default async function ResourcePage({
                           <FileText className="w-8 h-8 text-slate-300" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-bold text-sm line-clamp-2 mb-1">{s.title}</h3>
+                          <h3 className="font-bold text-sm line-clamp-2 mb-1" suppressHydrationWarning>
+                            {s.title}
+                          </h3>
                           <div className="flex items-center gap-2 text-xs text-slate-500">
-                            <span className="flex items-center gap-1">
+                            <span className="flex items-center gap-1" suppressHydrationWarning>
                               <Eye className="w-3 h-3" /> {formatNumber(s.viewsCount)}
                             </span>
-                            <span className="flex items-center gap-1">
+                            <span className="flex items-center gap-1" suppressHydrationWarning>
                               <Star className="w-3 h-3 fill-amber-400 text-amber-400" />{' '}
                               {s.avgRating.toFixed(1)}
                             </span>
@@ -744,9 +786,8 @@ export default async function ResourcePage({
                         </div>
                       </Link>
                     ))}
-                  </div>
                 </div>
-              )}
+              </div>
             </div>
 
             {/* ResourceInfoPanel — moved here from the right sidebar
