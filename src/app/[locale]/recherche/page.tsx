@@ -142,7 +142,35 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
     <div className="min-h-screen flex flex-col bg-slate-50">
       <div className="h-20" />
       <HideOnScrollSearchBar initialQuery={currentQ} />
-      <main className="flex-1 mt-6">
+      {/*
+        2026-09-02 nightly fix (ERR-9PR3CS "Server Components render" error on
+        /fr/recherche?q=Cas+possibles — 156 events captured in 7 days, all
+        from the same IP 157.48.255.80 with the same query):
+
+        PREVIOUSLY this page wrapped its content in a <main> element while
+        the [locale]/layout.tsx already renders a <main> for every page.
+        Nested <main> elements are an HTML5 accessibility violation, and
+        the browser's HTML parser silently closes the outer <main> when it
+        encounters the inner one. This created a real DOM with a closed
+        outer <main> + an inner <main> that the React hydration walker
+        would then try to hydrate against the React tree (which still has
+        both <main>s nested), causing a hydration mismatch. On Next.js
+        production builds, this surfaces as "An error occurred in the
+        Server Components render" with the actual mismatch hidden behind
+        the generic message.
+
+        The error was captured 156 times for the same URL because a bot
+        (likely Googlebot — IP 157.48.255.80 is in the Googlebot range)
+        was repeatedly hitting the search page and reporting the
+        hydration error. The error count was amplified because the
+        user-agent's headless browser kept re-trying the page.
+
+        FIX: change <main> to <div>. The [locale]/layout.tsx already
+        provides the <main> wrapper, so removing the inner one makes
+        the page valid HTML and prevents the hydration mismatch.
+        Same fix pattern as ERR-FGCMHE (resource page, 2026-08-19).
+      */}
+      <div className="flex-1 mt-6">
         <Suspense
           fallback={
             <div className="flex items-center justify-center py-20">
@@ -153,7 +181,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
           {/* Async server component — Next.js 14 streaming pattern */}
           <SearchResultsAsync params={params} />
         </Suspense>
-      </main>
       </div>
+    </div>
   );
 }
