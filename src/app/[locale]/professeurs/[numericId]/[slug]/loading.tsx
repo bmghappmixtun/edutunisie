@@ -51,7 +51,16 @@ export default function Loading() {
         dangerouslySetInnerHTML={{ __html: '{}' }}
       />
 
-      <main className="flex-1 pt-20">
+      {/* 2026-09-03 nightly fix (ERR-E5UG3K 49× React #419/#422 on
+          /fr/professeurs/2015/hakim-aloui, 2026-09-02 nightly digest): mirror
+          the page.tsx change — use <div> instead of <main> because the
+          [locale]/layout.tsx already wraps children in <main className="min-h-screen">.
+          Nested <main> causes the browser's HTML parser to silently close the
+          outer one when it encounters the inner, breaking React's hydration
+          check (see page.tsx for full rationale). Mirrors the same
+          2026-08-19 fix (ERR-FGCMHE) applied to the ressources detail page
+          + its loading.tsx. */}
+      <div className="flex-1 pt-20">
         {/* Breadcrumb skeleton — <nav> (NOT <div>) to match the page's actual
             element type. The page renders <nav aria-label="Fil d'Ariane">,
             so the loading must too.
@@ -259,7 +268,7 @@ export default function Loading() {
             </aside>
           </div>
         </div>
-      </main>
+      </div>
 
       </div>
   );

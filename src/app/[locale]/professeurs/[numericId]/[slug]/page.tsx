@@ -418,7 +418,18 @@ export default async function TeacherProfilePage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-      <main className="flex-1 pt-20">
+      {/* 2026-09-03 nightly fix (ERR-E5UG3K 49× React #419/#422 on
+          /fr/professeurs/2015/hakim-aloui, 2026-09-02 nightly digest):
+          use a <div> instead of <main> because the [locale]/layout.tsx already
+          wraps children in <main className="min-h-screen"> — nested <main> is
+          an HTML5 accessibility violation AND a known hydration-error trigger
+          (browser's HTML parser silently closes the OUTER <main> when it
+          encounters the inner one, so the actual DOM has fewer <main> elements
+          than the React tree thinks it rendered → React #418/#422 → #419).
+          The loading.tsx skeleton mirrors this change so the Suspense fallback
+          and the streamed page have identical structure. Mirrors the same
+          2026-08-19 fix (ERR-FGCMHE) applied to the ressources detail page. */}
+      <div className="flex-1 pt-20">
         {/* Visual breadcrumb (matches BreadcrumbList JSON-LD) */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
           <nav
@@ -999,7 +1010,7 @@ export default async function TeacherProfilePage({
             </aside>
           </div>
         </div>
-      </main>
+      </div>
 
       </div>
   );

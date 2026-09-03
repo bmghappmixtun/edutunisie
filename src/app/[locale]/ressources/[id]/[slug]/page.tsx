@@ -70,6 +70,29 @@ export async function generateMetadata({
   });
   if (!resource) return { title: 'Ressource non trouvée' };
 
+  // 2026-09-03 nightly fix (ERR-6XJL8R 3× React #419 on
+  // /fr/ressources/6873/devoir-de-synthese-n-2-sciences-physiques-...
+  // — 3 events captured in the 7-day window): redirect to the canonical
+  // slug from generateMetadata, NOT from the page function below.
+  //
+  // Why: when the redirect happens in the page function (after the heavy
+  // data fetch), Next.js has ALREADY started streaming the response with
+  // the root loading.tsx as the Suspense fallback. The redirect is then
+  // sent as an RSC payload (NEXT_REDIRECT) inside a 200 response. The
+  // client receives the body + the redirect instruction, tries to hydrate
+  // the spinner HTML, then navigates. On some paths (notably when Vercel
+  // has cached a stale loading.tsx or when the user has the old HTML in
+  // a back-forward cache), this hydration step throws React #419.
+  //
+  // By moving the redirect into generateMetadata, it throws NEXT_REDIRECT
+  // BEFORE the page function runs. Next.js then returns a true HTTP 308
+  // with NO body (the streaming never starts), and the browser does a
+  // single clean navigation to the canonical URL. No spinner, no
+  // hydration, no error.
+  if (slug !== resource.slug) {
+    permanentRedirect(`/ressources/${resource.numericId}/${resource.slug}`);
+  }
+
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://examanet.com';
   // Strip HTML tags from description (AI summaries may contain <strong>/<ul>)
   const stripHtml = (s: string) => s.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
@@ -204,8 +227,13 @@ export default async function ResourcePage({
         }
       : null;
   if (!resource) notFound();
-  // 301 redirect to canonical slug when the requested slug is outdated
-  // (titles get rebuilt periodically; this preserves SEO equity from old links).
+  // Canonical-slug redirect — primary check now lives in generateMetadata
+  // (see ERR-6XJL8R fix comment above) so the redirect happens before any
+  // body is streamed. This is a defense-in-depth check in case the page is
+  // ever rendered through a path that doesn't go through generateMetadata
+  // (e.g. static build, route handler tests, future RSC payload injection).
+  // In the normal SSR flow, this branch is unreachable because
+  // generateMetadata already threw NEXT_REDIRECT.
   if (slug !== resource.slug) {
     permanentRedirect(`/ressources/${resource.numericId}/${resource.slug}`);
   }
