@@ -673,39 +673,93 @@ export default async function ResourcePage({
                   "Ouvrir en plein écran →" link above the viewer to save
                   vertical space. The fullscreen button is still available
                   in the floating toolbar (bottom-center glass pill), and
-                  the viewer itself is self-explanatory. */}
-              {canViewBody && (
-              <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden mb-4">
+                  the viewer itself is self-explanatory.
+
+                  2026-09-04 nightly fix (ERR-M7CJ89 React #419 on
+                  /fr/ressources/13363/cours-analyse-fonctionnelle-dun-systeme-technique-2as-sciences
+                  — 2 events captured in 7 days, but the same mismatch
+                  exists on EVERY /fr/ressources/{id} view where the
+                  resource is ARCHIVED and the viewer is not the owner/admin):
+
+                  The page tree has UP TO 9 direct children of the inner
+                  <div>. The loading skeleton (loading.tsx) ALWAYS renders
+                  9 children, including the PDF viewer wrapper at position
+                  4. The page previously used `{canViewBody && (<X/>)}` so
+                  for archived resources viewed by non-owners, this slot
+                  was empty (page had 5 children, loading had 9) → React
+                  #422 (child count mismatch) → #419 (text content
+                  mismatch) during hydration.
+
+                  Same fix pattern as ERR-HBRKND (ARCHIVED/correction
+                  banners, 2026-09-01), ERR-5ZDSNC (Similaires,
+                  2026-09-02), and ERR-LHP3SU (Product, 2026-08-21):
+                  always render the wrapper, hide it via `hidden` class +
+                  `aria-hidden` when the condition is false. The
+                  expensive `LazyPDFViewer` (a 'use client' dynamic-import
+                  component) is still gated by `canViewBody` so it never
+                  mounts for archived resources, but the wrapper div is
+                  always present in the DOM, keeping the child count
+                  identical to the loading skeleton (9 children in both
+                  states). The inner `<div className="p-0">` is also
+                  always rendered so the React tree shape matches
+                  loading.tsx byte-for-byte. */}
+              <div
+                className={`bg-white rounded-2xl border border-slate-100 overflow-hidden mb-4 ${canViewBody ? '' : 'hidden'}`}
+                aria-hidden={!canViewBody}
+              >
                 <div className="p-0">
-                  <LazyPDFViewer
-                    url={`/api/resources/${resource.id}/download`}
-                    fileName={`${resource.title}.pdf`}
-                    pageCount={resource.pageCount ?? null}
-                    fileSize={resource.fileSize ? humanFileSize(resource.fileSize) : null}
-                  />
+                  {canViewBody ? (
+                    <LazyPDFViewer
+                      url={`/api/resources/${resource.id}/download`}
+                      fileName={`${resource.title}.pdf`}
+                      pageCount={resource.pageCount ?? null}
+                      fileSize={resource.fileSize ? humanFileSize(resource.fileSize) : null}
+                    />
+                  ) : null}
                 </div>
               </div>
-              )}
 
               {/* Action buttons (ResourceActions) — moved here 2026-08-17
                   from its old position (above the PDF viewer, in the title
                   card). User wanted the action button grid (Télécharger,
                   Lire en ligne, Imprimer, Favoris, Partager, Signaler) to
-                  be right under the PDF viewer for quick access. */}
-              {canViewBody && (
-                <ResourceActions
-                  resourceId={resource.id}
-                  numericId={resource.numericId}
-                  slug={resource.slug}
-                  title={resource.title}
-                  fileUrl={`/api/resources/${resource.id}/download`}
-                  originalFileKey={resource.originalFileKey}
-                  originalFileName={resource.originalFileName}
-                  originalFormat={resource.originalFormat}
-                  isTeacher={userSession?.role === 'TEACHER' || userSession?.role === 'ADMIN'}
-                  isOwner={userSession?.id === resource.teacherId}
-                />
-              )}
+                  be right under the PDF viewer for quick access.
+
+                  2026-09-04 nightly fix (ERR-M7CJ89 — same fix as the
+                  PDF viewer above): apply the "always render, hide via
+                  CSS" pattern. The `ResourceActions` component itself
+                  has its own root `<div className="mt-4">` so the page's
+                  previous conditional render put that div at position 5
+                  of the inner <div>. For archived resources (canViewBody
+                  false), position 5 was empty, breaking the child-count
+                  match with loading.tsx (9 children). Fix: always render
+                  the wrapper div (same className as the skeleton and as
+                  ResourceActions' own root), hide via `hidden` +
+                  `aria-hidden` when !canViewBody, and only mount the
+                  actual `ResourceActions` (a 'use client' component) when
+                  the viewer is allowed. The 6-button grid (Télécharger
+                  / Lire en ligne / Imprimer / Favoris / Partager /
+                  Signaler) is therefore never reachable for archived
+                  resources, matching the original behavior. */}
+              <div
+                className={`mt-4 ${canViewBody ? '' : 'hidden'}`}
+                aria-hidden={!canViewBody}
+              >
+                {canViewBody ? (
+                  <ResourceActions
+                    resourceId={resource.id}
+                    numericId={resource.numericId}
+                    slug={resource.slug}
+                    title={resource.title}
+                    fileUrl={`/api/resources/${resource.id}/download`}
+                    originalFileKey={resource.originalFileKey}
+                    originalFileName={resource.originalFileName}
+                    originalFormat={resource.originalFormat}
+                    isTeacher={userSession?.role === 'TEACHER' || userSession?.role === 'ADMIN'}
+                    isOwner={userSession?.id === resource.teacherId}
+                  />
+                ) : null}
+              </div>
 
               {/* Info Panel — moved from the right sidebar 2026-08-17.
                   Shown below the PDF viewer so the PDF gets full width. */}
@@ -714,35 +768,68 @@ export default async function ResourcePage({
                 hideClasse={resource.class?.level?.slug === 'lycee'}
               />
 
-              {/* Notation — hidden for archived resources (non-owners) */}
-              {canViewBody && (
-              <RatingSection
-                resourceId={resource.id}
-                avgRating={resource.avgRating}
-                ratingCount={resource.ratingCount}
-                distribution={dist}
-                maxCount={maxCount}
-              />
-              )}
+              {/* Notation — hidden for archived resources (non-owners)
+                  2026-09-04 nightly fix (ERR-M7CJ89 — same fix as the
+                  PDF viewer / ResourceActions above): wrap the
+                  `RatingSection` in an always-rendered div with the same
+                  className as the loading skeleton's rating placeholder
+                  AND as `RatingSection`'s own root
+                  (`bg-white rounded-2xl border border-slate-100 p-6 lg:p-8 mb-4`).
+                  Hide via `hidden` + `aria-hidden` when !canViewBody. The
+                  `RatingSection` is a 'use client' component that fetches
+                  the user's existing rating on mount; we keep the
+                  canViewBody gate so non-owners never trigger that fetch.
+                  The page now has 9 children at fixed positions matching
+                  loading.tsx. */}
+              <div
+                className={`bg-white rounded-2xl border border-slate-100 p-6 lg:p-8 mb-4 ${canViewBody ? '' : 'hidden'}`}
+                aria-hidden={!canViewBody}
+              >
+                {canViewBody ? (
+                  <RatingSection
+                    resourceId={resource.id}
+                    avgRating={resource.avgRating}
+                    ratingCount={resource.ratingCount}
+                    distribution={dist}
+                    maxCount={maxCount}
+                  />
+                ) : null}
+              </div>
 
-              {/* Commentaires — hidden for archived resources (non-owners) */}
-              {canViewBody && (
-              <CommentsSection
-                resourceId={resource.id}
-                initialComments={resource.comments.map((c) => ({
-                  id: c.id,
-                  content: c.content,
-                  createdAt: c.createdAt.toISOString(),
-                  // Pre-compute the relative-time label on the server so the
-                  // client component can render byte-for-byte identical HTML
-                  // (timeAgo uses Date.now() — non-deterministic across
-                  // SSR/hydration). CommentsSection re-runs timeAgo in
-                  // useEffect after mount to tick the label forward.
-                  createdAtLabel: timeAgo(c.createdAt),
-                  user: c.user,
-                }))}
-              />
-              )}
+              {/* Commentaires — hidden for archived resources (non-owners)
+                  2026-09-04 nightly fix (ERR-M7CJ89 — same fix pattern):
+                  always render the wrapper, hide via CSS when
+                  !canViewBody. The inner `CommentsSection` is a
+                  'use client' component that creates a new comment on
+                  form submit; gating the component itself with
+                  canViewBody ensures the textarea never mounts for
+                  non-owners viewing archived resources. The static
+                  `timeAgo(c.createdAt)` for each comment is
+                  pre-computed on the server so the initial HTML
+                  matches the loading skeleton's structure (and avoids
+                  a Date.now() non-determinism hydration error). */}
+              <div
+                className={`bg-white rounded-2xl border border-slate-100 p-6 lg:p-8 mb-4 ${canViewBody ? '' : 'hidden'}`}
+                aria-hidden={!canViewBody}
+              >
+                {canViewBody ? (
+                  <CommentsSection
+                    resourceId={resource.id}
+                    initialComments={resource.comments.map((c) => ({
+                      id: c.id,
+                      content: c.content,
+                      createdAt: c.createdAt.toISOString(),
+                      // Pre-compute the relative-time label on the server so the
+                      // client component can render byte-for-byte identical HTML
+                      // (timeAgo uses Date.now() — non-deterministic across
+                      // SSR/hydration). CommentsSection re-runs timeAgo in
+                      // useEffect after mount to tick the label forward.
+                      createdAtLabel: timeAgo(c.createdAt),
+                      user: c.user,
+                    }))}
+                  />
+                ) : null}
+              </div>
 
               {/* Similaires
                   2026-09-02 nightly fix (ERR-5ZDSNC React #419 on
