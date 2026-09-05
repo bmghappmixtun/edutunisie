@@ -725,41 +725,52 @@ export default async function ResourcePage({
                   Lire en ligne, Imprimer, Favoris, Partager, Signaler) to
                   be right under the PDF viewer for quick access.
 
-                  2026-09-04 nightly fix (ERR-M7CJ89 — same fix as the
-                  PDF viewer above): apply the "always render, hide via
-                  CSS" pattern. The `ResourceActions` component itself
-                  has its own root `<div className="mt-4">` so the page's
-                  previous conditional render put that div at position 5
-                  of the inner <div>. For archived resources (canViewBody
-                  false), position 5 was empty, breaking the child-count
-                  match with loading.tsx (9 children). Fix: always render
-                  the wrapper div (same className as the skeleton and as
-                  ResourceActions' own root), hide via `hidden` +
-                  `aria-hidden` when !canViewBody, and only mount the
-                  actual `ResourceActions` (a 'use client' component) when
-                  the viewer is allowed. The 6-button grid (Télécharger
-                  / Lire en ligne / Imprimer / Favoris / Partager /
-                  Signaler) is therefore never reachable for archived
-                  resources, matching the original behavior. */}
-              <div
-                className={`mt-4 ${canViewBody ? '' : 'hidden'}`}
-                aria-hidden={!canViewBody}
-              >
-                {canViewBody ? (
-                  <ResourceActions
-                    resourceId={resource.id}
-                    numericId={resource.numericId}
-                    slug={resource.slug}
-                    title={resource.title}
-                    fileUrl={`/api/resources/${resource.id}/download`}
-                    originalFileKey={resource.originalFileKey}
-                    originalFileName={resource.originalFileName}
-                    originalFormat={resource.originalFormat}
-                    isTeacher={userSession?.role === 'TEACHER' || userSession?.role === 'ADMIN'}
-                    isOwner={userSession?.id === resource.teacherId}
-                  />
-                ) : null}
-              </div>
+                  2026-09-05 nightly fix (ERR-APKKJS — 108 events on
+                  /fr/ressources/13296/, also ERR-PH3RMF on 7296 and
+                  ERR-47N8JH on 11390, all 3 /fr/ressources/{id} URLs):
+
+                  The 2026-09-04 fix (ERR-M7CJ89) wrapped this slot in a
+                  `<div className="mt-4">` to "always render, hide via CSS"
+                  and keep the parent-level child count at 9 for ARCHIVED
+                  non-owners. But `ResourceActions` already renders its own
+                  root `<div className="mt-4">`, so the page DOM was
+                  `<div class="mt-4 "><div class="mt-4">buttons</div></div>`
+                  (DOUBLE wrapper, depth 0=1, depth 1=1, depth 2=6).
+                  The loading skeleton's slot 5 was a SINGLE wrapper
+                  `<div class="mt-4"><div class="grid">placeholders</div></div>`
+                  (depth 0=1, depth 1=1, depth 2=6 — the SAME shape!).
+
+                  So actually the structures DID match depth-for-depth at
+                  position 5: page=outer>inner(RA root)>buttons(6),
+                  loading=outer>inner(placeholders)>placeholders(6). The
+                  reported "Server Components render" error was therefore
+                  NOT caused by slot 5.
+
+                  The 2026-09-04 wrapper IS reverted here as a precaution
+                  because it provides no value (the parent-level count fix
+                  it claimed to add was illusory — for canViewBody=true the
+                  page already had 9 children without it, and for
+                  canViewBody=false the depth-1 child count is still 0 vs
+                  loading's 1, which is the SAME hydration error type that
+                  motivated ERR-M7CJ89 in the first place). The simple
+                  conditional render is byte-for-byte identical to the
+                  pre-2026-09-04 code, and matches the loading skeleton's
+                  slot 5 wrapper-for-wrapper when canViewBody=true (the
+                  99% case for PUBLISHED resources). */}
+              {canViewBody && (
+                <ResourceActions
+                  resourceId={resource.id}
+                  numericId={resource.numericId}
+                  slug={resource.slug}
+                  title={resource.title}
+                  fileUrl={`/api/resources/${resource.id}/download`}
+                  originalFileKey={resource.originalFileKey}
+                  originalFileName={resource.originalFileName}
+                  originalFormat={resource.originalFormat}
+                  isTeacher={userSession?.role === 'TEACHER' || userSession?.role === 'ADMIN'}
+                  isOwner={userSession?.id === resource.teacherId}
+                />
+              )}
 
               {/* Info Panel — moved from the right sidebar 2026-08-17.
                   Shown below the PDF viewer so the PDF gets full width. */}
@@ -769,67 +780,81 @@ export default async function ResourcePage({
               />
 
               {/* Notation — hidden for archived resources (non-owners)
-                  2026-09-04 nightly fix (ERR-M7CJ89 — same fix as the
-                  PDF viewer / ResourceActions above): wrap the
-                  `RatingSection` in an always-rendered div with the same
-                  className as the loading skeleton's rating placeholder
-                  AND as `RatingSection`'s own root
-                  (`bg-white rounded-2xl border border-slate-100 p-6 lg:p-8 mb-4`).
-                  Hide via `hidden` + `aria-hidden` when !canViewBody. The
-                  `RatingSection` is a 'use client' component that fetches
-                  the user's existing rating on mount; we keep the
-                  canViewBody gate so non-owners never trigger that fetch.
-                  The page now has 9 children at fixed positions matching
-                  loading.tsx. */}
-              <div
-                className={`bg-white rounded-2xl border border-slate-100 p-6 lg:p-8 mb-4 ${canViewBody ? '' : 'hidden'}`}
-                aria-hidden={!canViewBody}
-              >
-                {canViewBody ? (
-                  <RatingSection
-                    resourceId={resource.id}
-                    avgRating={resource.avgRating}
-                    ratingCount={resource.ratingCount}
-                    distribution={dist}
-                    maxCount={maxCount}
-                  />
-                ) : null}
-              </div>
+                  2026-09-05 nightly fix (ERR-APKKJS — 108 events on
+                  /fr/ressources/13296/): REVERT the 2026-09-04 wrapper
+                  added by ERR-M7CJ89.
+
+                  Why: `RatingSection` (a 'use client' component) renders
+                  its OWN root `<div className="bg-white rounded-2xl border
+                  border-slate-100 p-6 lg:p-8 mb-4">` — identical to the
+                  page's wrapper. So the 2026-09-04 "always render, hide
+                  via CSS" wrapper created a DOUBLE wrapper:
+                    page canViewBody=true:  <div class="X "> <div class="X">h2+grid</div> </div>
+                                                  (depth 0=1, depth 1=1, depth 2=2)
+                    loading skeleton:        <div class="X">   <h-5/><grid/></div>
+                                                  (depth 0=1, depth 1=2)
+                  Mismatch at depth 1 (page=1, loading=2) → React #422
+                  (child count) → #419 (text content) during hydration.
+                  This is the same family of mismatch that ERR-M7CJ89
+                  tried to fix, but the fix INTRODUCED a new mismatch
+                  because the page's outer wrapper "absorbed" the slot
+                  that should have been the client component's own root.
+
+                  The pre-2026-09-04 simple conditional render is correct:
+                    page canViewBody=true:  <div class="X">h2+grid</div>     (the RatingSection's own root)
+                    loading skeleton:       <div class="X">h-5+grid</div>   (placeholder with same depth)
+                  Depth 0=1, depth 1=2 in both → MATCH ✓
+                  The `RatingSection` is still gated by canViewBody so the
+                  'use client' component (which fetches the user's
+                  existing rating on mount) never mounts for ARCHIVED
+                  non-owners — the original security/UX requirement
+                  from ERR-M7CJ89 is preserved. */}
+              {canViewBody && (
+                <RatingSection
+                  resourceId={resource.id}
+                  avgRating={resource.avgRating}
+                  ratingCount={resource.ratingCount}
+                  distribution={dist}
+                  maxCount={maxCount}
+                />
+              )}
 
               {/* Commentaires — hidden for archived resources (non-owners)
-                  2026-09-04 nightly fix (ERR-M7CJ89 — same fix pattern):
-                  always render the wrapper, hide via CSS when
-                  !canViewBody. The inner `CommentsSection` is a
-                  'use client' component that creates a new comment on
-                  form submit; gating the component itself with
-                  canViewBody ensures the textarea never mounts for
-                  non-owners viewing archived resources. The static
-                  `timeAgo(c.createdAt)` for each comment is
-                  pre-computed on the server so the initial HTML
-                  matches the loading skeleton's structure (and avoids
-                  a Date.now() non-determinism hydration error). */}
-              <div
-                className={`bg-white rounded-2xl border border-slate-100 p-6 lg:p-8 mb-4 ${canViewBody ? '' : 'hidden'}`}
-                aria-hidden={!canViewBody}
-              >
-                {canViewBody ? (
-                  <CommentsSection
-                    resourceId={resource.id}
-                    initialComments={resource.comments.map((c) => ({
-                      id: c.id,
-                      content: c.content,
-                      createdAt: c.createdAt.toISOString(),
-                      // Pre-compute the relative-time label on the server so the
-                      // client component can render byte-for-byte identical HTML
-                      // (timeAgo uses Date.now() — non-deterministic across
-                      // SSR/hydration). CommentsSection re-runs timeAgo in
-                      // useEffect after mount to tick the label forward.
-                      createdAtLabel: timeAgo(c.createdAt),
-                      user: c.user,
-                    }))}
-                  />
-                ) : null}
-              </div>
+                  2026-09-05 nightly fix (ERR-APKKJS — same root cause
+                  and fix as RatingSection above). CommentsSection also
+                  renders its own root with the same className as the
+                  loading skeleton's comments placeholder, so wrapping
+                  it in another div with the same class created a
+                  double-wrapper hydration mismatch (page depth 1=1,
+                  loading depth 1=2). The simple conditional render
+                  matches the loading skeleton's structure byte-for-byte
+                  when canViewBody=true. For canViewBody=false the slot
+                  is empty (page has 8 children of the inner <div>
+                  instead of 9) — this is the same pre-2026-09-04
+                  edge case that ERR-M7CJ89 was trying (and failing) to
+                  fix; a proper fix requires rendering matching
+                  placeholders for hidden content, deferred to a future
+                  nightly. The `CommentsSection` is still gated by
+                  canViewBody so its `'use client'` form (with the
+                  textarea + submit button) never mounts for ARCHIVED
+                  non-owners. */}
+              {canViewBody && (
+                <CommentsSection
+                  resourceId={resource.id}
+                  initialComments={resource.comments.map((c) => ({
+                    id: c.id,
+                    content: c.content,
+                    createdAt: c.createdAt.toISOString(),
+                    // Pre-compute the relative-time label on the server so the
+                    // client component can render byte-for-byte identical HTML
+                    // (timeAgo uses Date.now() — non-deterministic across
+                    // SSR/hydration). CommentsSection re-runs timeAgo in
+                    // useEffect after mount to tick the label forward.
+                    createdAtLabel: timeAgo(c.createdAt),
+                    user: c.user,
+                  }))}
+                />
+              )}
 
               {/* Similaires
                   2026-09-02 nightly fix (ERR-5ZDSNC React #419 on
